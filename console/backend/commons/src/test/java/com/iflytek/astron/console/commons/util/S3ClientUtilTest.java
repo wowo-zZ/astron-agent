@@ -50,6 +50,28 @@ class S3ClientUtilTest {
 
     private static boolean minioAvailable = true;
 
+    static {
+        // Check MinIO availability at class loading time
+        try {
+            URL url = new URL(TEST_ENDPOINT + "/minio/health/live");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(2000);
+            connection.setReadTimeout(2000);
+            connection.connect();
+            int responseCode = connection.getResponseCode();
+            connection.disconnect();
+
+            if (responseCode != 200) {
+                minioAvailable = false;
+                System.out.println("Warning: MinIO service is unavailable, related tests will be skipped");
+            }
+        } catch (Exception e) {
+            minioAvailable = false;
+            System.out.println("Warning: MinIO service is unavailable, related tests will be skipped");
+        }
+    }
+
     @BeforeEach
     void setUp() throws Exception {
         s3ClientUtil = new S3ClientUtil();
