@@ -2,6 +2,8 @@
 
 <div align="center">
 
+![Logo](docs/logo.svg)
+
 **An enterprise-ready AI agent development platform combining intelligent RPA, enabling agents to not only think but also act—automating workflows across digital and desktop environments.**
 
 [![License](https://img.shields.io/badge/license-apache2.0-blue.svg)](LICENSE)

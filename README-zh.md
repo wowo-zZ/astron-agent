@@ -2,6 +2,8 @@
 
 <div align="center">
 
+![Logo](docs/logo.svg)
+
 **企业级 AI 智能代理开发平台，结合智能 RPA，让代理不仅能思考，更能行动——跨数字和桌面环境自动化工作流程。**
 
 [![License](https://img.shields.io/badge/license-apache2.0-blue.svg)](LICENSE)
