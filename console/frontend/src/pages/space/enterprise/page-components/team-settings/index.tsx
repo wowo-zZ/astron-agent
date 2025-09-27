@@ -1,13 +1,13 @@
-import React, { useState, useCallback } from "react";
-import InfoHeader from "./components/info-header";
-import TeamInfo from "./components/team-info";
-import LeaveTeamModal from "./components/leave-team-modal";
-import SpaceButton from "@/components/button-group/space-button";
-import type { ButtonConfig } from "@/components/button-group/types";
-import { PermissionFailureBehavior } from "@/components/button-group";
-import { ModuleType, OperationType } from "@/permissions/permission-type";
-import useEnterpriseStore from "@/store/enterprise-store";
-import styles from "./index.module.scss";
+import React, { useState, useCallback } from 'react';
+import InfoHeader from './components/info-header';
+import TeamInfo from './components/team-info';
+import LeaveTeamModal from './components/leave-team-modal';
+import SpaceButton from '@/components/button-group/space-button';
+import type { ButtonConfig } from '@/components/button-group/types';
+import { PermissionFailureBehavior } from '@/components/button-group';
+import { ModuleType, OperationType } from '@/permissions/permission-type';
+import useEnterpriseStore from '@/store/enterprise-store';
+import styles from './index.module.scss';
 
 const TeamSettings: React.FC = () => {
   const {
@@ -27,9 +27,9 @@ const TeamSettings: React.FC = () => {
 
   // 离开团队/企业按钮配置
   const leaveTeamButtonConfig: ButtonConfig = {
-    key: "leave-team",
-    text: "离开团队/企业",
-    type: "primary",
+    key: 'leave-team',
+    text: '离开团队/企业',
+    type: 'primary',
     danger: true,
     permission: {
       module: ModuleType.SPACE,

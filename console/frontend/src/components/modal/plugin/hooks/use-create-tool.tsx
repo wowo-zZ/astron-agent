@@ -1,21 +1,21 @@
-import { AvatarType, RecurseData, ToolItem } from "@/types/resource";
-import { useImperativeHandle, useRef } from "react";
-import { Form, FormInstance, message } from "antd";
-import React, { useState } from "react";
-import { InputParamsData } from "@/types/resource";
-import { useMemoizedFn } from "ahooks";
-import { v4 as uuid } from "uuid";
-import { useEffect } from "react";
-import { useCallback } from "react";
-import globalStore from "@/store/global-store";
-import { cloneDeep } from "lodash";
-import { useTranslation } from "react-i18next";
+import { AvatarType, RecurseData, ToolItem } from '@/types/resource';
+import { useImperativeHandle, useRef } from 'react';
+import { Form, FormInstance, message } from 'antd';
+import React, { useState } from 'react';
+import { InputParamsData } from '@/types/resource';
+import { useMemoizedFn } from 'ahooks';
+import { v4 as uuid } from 'uuid';
+import { useEffect } from 'react';
+import { useCallback } from 'react';
+import globalStore from '@/store/global-store';
+import { cloneDeep } from 'lodash';
+import { useTranslation } from 'react-i18next';
 import {
   createTool,
   debugTool,
   temporaryTool,
   updateTool,
-} from "@/services/plugin";
+} from '@/services/plugin';
 export interface BaseFormData {
   name?: string;
   description?: string;
@@ -48,7 +48,7 @@ const useFormManagement = (): {
     baseForm.setFieldsValue({
       authType: 1,
       visibility: 0,
-      location: "header",
+      location: 'header',
     });
     paramsForm.setFieldsValue({
       creationMethod: 1,
@@ -99,16 +99,16 @@ const useToolStates = (): {
   resetStates: () => void;
 } => {
   const [authType, setAuthType] = useState(1);
-  const [name, setName] = useState("");
-  const [desc, setDesc] = useState("");
+  const [name, setName] = useState('');
+  const [desc, setDesc] = useState('');
   const [inputParamsData, setInputParamsData] = useState<InputParamsData[]>([]);
   const [outputParamsData, setOutputParamsData] = useState<InputParamsData[]>(
-    [],
+    []
   );
   const [debuggerParamsData, setDebuggerParamsData] = useState<
     InputParamsData[]
   >([]);
-  const [debuggerJsonData, setDebuggerJsonData] = useState("");
+  const [debuggerJsonData, setDebuggerJsonData] = useState('');
   const [canPublish, setCanPublish] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [debugLoading, setDebugLoading] = useState(false);
@@ -119,13 +119,13 @@ const useToolStates = (): {
   >(null);
 
   const resetStates = useCallback(() => {
-    setName("");
-    setDesc("");
+    setName('');
+    setDesc('');
     setInputParamsData([]);
     setOutputParamsData([]);
     setDebuggerParamsData([]);
     setAuthType(1);
-    setDebuggerJsonData("");
+    setDebuggerJsonData('');
   }, []);
 
   return {
@@ -163,7 +163,7 @@ const useToolStates = (): {
 const useDataTransform = (): {
   addTestProperty: (obj: InputParamsData) => void;
   transformInputDataToDefaultParamsData: (
-    node: InputParamsData,
+    node: InputParamsData
   ) => InputParamsData;
   parmasTableSetDefault: (data: InputParamsData[]) => InputParamsData[];
 } => {
@@ -172,7 +172,7 @@ const useDataTransform = (): {
     obj.id = uuid();
 
     if (obj.children && Array.isArray(obj.children)) {
-      obj.children.forEach((child) => addTestProperty(child));
+      obj.children.forEach(child => addTestProperty(child));
     }
   }, []);
 
@@ -181,18 +181,18 @@ const useDataTransform = (): {
       function recurse(
         node: InputParamsData,
         defaultVal: RecurseData | undefined,
-        parentId: string,
+        parentId: string
       ): void {
         node.id = parentId ? `${parentId}-${uuid()}` : uuid();
-        if (node.type === "object") {
-          (node.children || []).forEach((child) => {
+        if (node.type === 'object') {
+          (node.children || []).forEach(child => {
             recurse(
               child,
               defaultVal ? defaultVal[child.name] : undefined,
-              node.id,
+              node.id
             );
           });
-        } else if (node.type === "array") {
+        } else if (node.type === 'array') {
           const arrayDefault = (
             Array.isArray(defaultVal) ? defaultVal : []
           ) as InputParamsData[];
@@ -207,7 +207,7 @@ const useDataTransform = (): {
             recurse(
               newChild as InputParamsData,
               defaultItem as RecurseData,
-              newChild.id,
+              newChild.id
             );
 
             return newChild;
@@ -220,17 +220,17 @@ const useDataTransform = (): {
       recurse(node as InputParamsData, node.default as RecurseData, node.id);
       return node;
     },
-    [],
+    []
   );
 
   const parmasTableSetDefault = useCallback(
     (data: InputParamsData[]) => {
       function transformData(node: InputParamsData): InputParamsData {
         if (node?.children && node?.children?.length > 0) {
-          node.children = node?.children?.map((node) => transformData(node));
+          node.children = node?.children?.map(node => transformData(node));
         }
         if (
-          node?.type === "array" &&
+          node?.type === 'array' &&
           Array.isArray(node?.default) &&
           node?.default?.length > 0
         ) {
@@ -242,9 +242,9 @@ const useDataTransform = (): {
         }
       }
 
-      return data?.map((node) => transformData(node));
+      return data?.map(node => transformData(node));
     },
-    [addTestProperty, transformInputDataToDefaultParamsData],
+    [addTestProperty, transformInputDataToDefaultParamsData]
   );
 
   return {
@@ -290,36 +290,36 @@ const useParamsValidation = (): {
       }
       return null;
     },
-    [],
+    []
   );
 
   const checkParmas = useCallback(
     (params: InputParamsData[], id: string, key: string) => {
       let passFlag = true;
       const errEsg =
-        key === "name"
-          ? t("plugin.pleaseEnterParameterName")
-          : t("plugin.pleaseEnterParameterDescription");
+        key === 'name'
+          ? t('plugin.pleaseEnterParameterName')
+          : t('plugin.pleaseEnterParameterDescription');
       const currentNode = findNodeById(params, id) || ({} as InputParamsData);
       if (!currentNode[key]) {
         currentNode[`${key}ErrMsg`] = errEsg;
         passFlag = false;
       } else if (
-        key === "name" &&
-        currentNode.fatherType !== "array" &&
+        key === 'name' &&
+        currentNode.fatherType !== 'array' &&
         !checkNameConventions(currentNode[key])
       ) {
-        currentNode.nameErrMsg = t("common.onlyLettersNumbersDashUnderscore");
+        currentNode.nameErrMsg = t('common.onlyLettersNumbersDashUnderscore');
       } else {
-        currentNode[`${key}ErrMsg`] = "";
+        currentNode[`${key}ErrMsg`] = '';
       }
       return passFlag;
     },
-    [t],
+    [t]
   );
 
   const validateTransformedData = (
-    data: InputParamsData[],
+    data: InputParamsData[]
   ): { validatedData: InputParamsData[]; flag: boolean } => {
     let flag = true;
 
@@ -327,35 +327,35 @@ const useParamsValidation = (): {
       const nameCount: Record<string, number> = {};
       const newItems = items.map((item, index) => {
         if (!item?.name?.trim()) {
-          item.nameErrMsg = t("common.valueCannotBeEmpty");
+          item.nameErrMsg = t('common.valueCannotBeEmpty');
           flag = false;
         } else if (
-          item.fatherType !== "array" &&
+          item.fatherType !== 'array' &&
           !checkNameConventions(item?.name)
         ) {
-          item.nameErrMsg = t("common.onlyLettersNumbersDashUnderscore");
+          item.nameErrMsg = t('common.onlyLettersNumbersDashUnderscore');
           flag = false;
         } else {
-          item.nameErrMsg = "";
+          item.nameErrMsg = '';
         }
         if (!item?.description?.trim()) {
-          item.descriptionErrMsg = t("common.valueCannotBeEmpty");
+          item.descriptionErrMsg = t('common.valueCannotBeEmpty');
           flag = false;
         } else {
-          item.descriptionErrMsg = "";
+          item.descriptionErrMsg = '';
         }
         nameCount[item.name] = (nameCount[item.name] || 0) + 1;
         return item;
       });
 
-      newItems.forEach((item) => {
+      newItems.forEach(item => {
         if ((nameCount[item.name] || 0) > 1) {
           flag = false;
-          item.nameErrMsg = t("common.valueCannotBeRepeated");
+          item.nameErrMsg = t('common.valueCannotBeRepeated');
         }
       });
 
-      return newItems?.map((item) => {
+      return newItems?.map(item => {
         if (Array.isArray(item.children)) {
           item.children = validate(item.children);
         }
@@ -368,28 +368,28 @@ const useParamsValidation = (): {
   };
 
   const validateDebuggerTransformedData = (
-    data: InputParamsData[],
+    data: InputParamsData[]
   ): { validatedData: InputParamsData[]; flag: boolean } => {
     let flag = true;
 
     const validate = (items: InputParamsData[]): InputParamsData[] => {
       const newItems = items.map((item, index) => {
-        if (item?.type !== "object" && item?.type !== "array") {
+        if (item?.type !== 'object' && item?.type !== 'array') {
           if (
             item?.required &&
-            item?.type === "string" &&
+            item?.type === 'string' &&
             !(item?.default as string)?.trim()
           ) {
-            item.defaultErrMsg = t("common.valueCannotBeEmpty");
+            item.defaultErrMsg = t('common.valueCannotBeEmpty');
             flag = false;
           } else {
-            item.defaultErrMsg = "";
+            item.defaultErrMsg = '';
           }
         }
         return item;
       });
 
-      return newItems?.map((item) => {
+      return newItems?.map(item => {
         if (Array.isArray(item.children)) {
           item.children = validate(item.children);
         }
@@ -444,15 +444,15 @@ const useToolOperations = ({
       // This would need to be adapted to use the form validation properly
       let params = {} as ToolItem;
       params = {
-        name: baseFormData?.name || "",
-        description: baseFormData?.description || "",
-        endPoint: baseFormData?.endPoint || "",
+        name: baseFormData?.name || '',
+        description: baseFormData?.description || '',
+        endPoint: baseFormData?.endPoint || '',
         authType: baseFormData?.authType || 0,
-        method: baseFormData?.method || "",
+        method: baseFormData?.method || '',
         // visibility: baseFormData?.visibility || 0,
         creationMethod: 1,
         avatarColor: botColor,
-        avatarIcon: botIcon.value || "",
+        avatarIcon: botIcon.value || '',
         webSchema: JSON.stringify({
           toolRequestInput: inputParamsData,
           toolRequestOutput: outputParamsData,
@@ -469,8 +469,8 @@ const useToolOperations = ({
       if (temporaryStorageToolId) {
         params.id = temporaryStorageToolId;
       }
-      temporaryTool(params).then((res) =>
-        setTemporaryStorageToolId(res?.id || ""),
+      temporaryTool(params).then(res =>
+        setTemporaryStorageToolId(res?.id || '')
       );
     } catch (error) {
       console.log(error);
@@ -480,15 +480,15 @@ const useToolOperations = ({
   const handlePublishTool = useCallback(() => {
     setPublishLoading(true);
     const params = {
-      name: baseFormData?.name || "",
-      description: baseFormData?.description || "",
-      endPoint: baseFormData?.endPoint || "",
+      name: baseFormData?.name || '',
+      description: baseFormData?.description || '',
+      endPoint: baseFormData?.endPoint || '',
       authType: baseFormData?.authType || 0,
-      method: baseFormData?.method || "",
+      method: baseFormData?.method || '',
       // visibility: baseFormData?.visibility || 0,
       creationMethod: 1,
       avatarColor: botColor,
-      avatarIcon: botIcon.value || "",
+      avatarIcon: botIcon.value || '',
       webSchema: JSON.stringify({
         toolRequestInput: inputParamsData,
         toolRequestOutput: outputParamsData,
@@ -571,8 +571,8 @@ const useStepManagement = ({
 
   const handlePreStep = useCallback(() => {
     if (step === 2) {
-      setName(baseFormData?.name || "");
-      setDesc(baseFormData?.description || "");
+      setName(baseFormData?.name || '');
+      setDesc(baseFormData?.description || '');
     } else if (step === 3) {
       setCanPublish(false);
     }
@@ -583,17 +583,17 @@ const useStepManagement = ({
     if (step === 1) {
       baseForm.validateFields().then((values: BaseFormData) => {
         setBaseFormData(values);
-        setStep((step) => step + 1);
+        setStep(step => step + 1);
       });
     }
     if (step === 2) {
       const flag = checkParmasTable();
       if (!flag) {
-        message.warning(t("plugin.parameterValidationFailed"));
+        message.warning(t('plugin.parameterValidationFailed'));
         return;
       }
       setDebuggerParamsData(parmasTableSetDefault(cloneDeep(inputParamsData)));
-      setStep((step) => step + 1);
+      setStep(step => step + 1);
     }
   }, [
     step,
@@ -657,7 +657,7 @@ const useToolDebugger = ({
   const handleDebuggerTool = useCallback(() => {
     const flag = checkDebuggerParmasTable();
     if (!flag) {
-      message.warning(t("plugin.requiredParameterNotFilled"));
+      message.warning(t('plugin.requiredParameterNotFilled'));
       return;
     }
     setDebugLoading(true);
@@ -683,12 +683,12 @@ const useToolDebugger = ({
       });
     }
     debugTool(params)
-      .then((result) => {
+      .then(result => {
         setCanPublish(true);
         setDebuggerJsonData(JSON.stringify(result, null, 2));
-        message.success(result?.message || t("operationSuccessful"));
+        message.success(result?.message || t('operationSuccessful'));
       })
-      .catch((error) => {
+      .catch(error => {
         setCanPublish(false);
         setDebuggerJsonData(
           JSON.stringify(
@@ -697,8 +697,8 @@ const useToolDebugger = ({
               message: error?.message,
             },
             null,
-            2,
-          ),
+            2
+          )
         );
         message.error(error?.message);
       })
@@ -723,7 +723,7 @@ const useToolDebugger = ({
 
 // 工具初始化相关 Hook
 const useToolInitialization = (
-  currentToolId: number | string | undefined,
+  currentToolId: number | string | undefined
 ): {
   currentDebuggerToolInfo: React.MutableRefObject<ToolItem>;
   avatarIcon: AvatarType[];
@@ -731,9 +731,9 @@ const useToolInitialization = (
   getAvatarConfig: () => void;
 } => {
   const currentDebuggerToolInfo = useRef<ToolItem>({} as ToolItem);
-  const avatarIcon = globalStore((state) => state.avatarIcon);
-  const avatarColor = globalStore((state) => state.avatarColor);
-  const getAvatarConfig = globalStore((state) => state.getAvatarConfig);
+  const avatarIcon = globalStore(state => state.avatarIcon);
+  const avatarColor = globalStore(state => state.avatarColor);
+  const getAvatarConfig = globalStore(state => state.getAvatarConfig);
 
   return {
     currentDebuggerToolInfo,
@@ -748,7 +748,7 @@ const useFormDataHandler = (
   toolStates: ReturnType<typeof useToolStates>,
   formManagement: ReturnType<typeof useFormManagement>,
   setBotIcon: (botIcon: AvatarType) => void,
-  setBotColor: (botColor: string) => void,
+  setBotColor: (botColor: string) => void
 ): {
   handleSetFormData: (data: ToolItem) => void;
 } => {
@@ -764,7 +764,7 @@ const useFormDataHandler = (
       creationMethod: data?.creationMethod,
     });
     if (data?.authType === 2) {
-      const authInfo = JSON.parse(data?.authInfo || "{}");
+      const authInfo = JSON.parse(data?.authInfo || '{}');
       formManagement.baseForm.setFieldsValue({
         location: authInfo?.location,
         parameterName: authInfo?.parameterName,
@@ -779,7 +779,7 @@ const useFormDataHandler = (
     toolStates.setDebuggerParamsData(data?.toolRequestInput || []);
     setBotIcon({
       name: data?.address,
-      value: data?.icon || "",
+      value: data?.icon || '',
     });
     setBotColor(data?.avatarColor);
   });
@@ -841,7 +841,7 @@ const useToolEffects = ({
       formManagement.resetBaseForms();
       toolStates.resetStates();
     }
-    toolStates.setDebuggerJsonData("");
+    toolStates.setDebuggerJsonData('');
   }, [currentToolInfo?.id, currentToolInfo?.webSchema, currentToolId]);
 };
 
@@ -863,7 +863,7 @@ const useToolInfoUpdater = ({
 }): {
   updateToolInfo: (
     selectedCard: ToolItem,
-    shouldUpdateToolInfo: boolean,
+    shouldUpdateToolInfo: boolean
   ) => void;
 } => {
   const updateToolInfo = useCallback(
@@ -886,8 +886,8 @@ const useToolInfoUpdater = ({
           }),
           toolRequestInput: toolStates.inputParamsData,
           toolRequestOutput: toolStates.outputParamsData,
-          address: botIcon?.name || "",
-          icon: botIcon.value || "",
+          address: botIcon?.name || '',
+          icon: botIcon.value || '',
           avatarColor: botColor,
         } as ToolItem;
       }
@@ -899,20 +899,13 @@ const useToolInfoUpdater = ({
           toolRequestOutput: paramsData?.toolRequestOutput,
         });
       }
-      if (selectedCard?.id === "") {
+      if (selectedCard?.id === '') {
         formHandler.handleSetFormData(
-          initialization.currentDebuggerToolInfo?.current as ToolItem,
+          initialization.currentDebuggerToolInfo?.current as ToolItem
         );
       }
     },
-    [
-      toolStates,
-      formManagement,
-      initialization,
-      formHandler,
-      botIcon,
-      botColor,
-    ],
+    [toolStates, formManagement, initialization, formHandler, botIcon, botColor]
   );
 
   return {
@@ -948,7 +941,7 @@ const useCreateToolReturn = ({
   handleNextStep: () => void;
   addTestProperty: (obj: InputParamsData) => void;
   transformInputDataToDefaultParamsData: (
-    node: InputParamsData,
+    node: InputParamsData
   ) => InputParamsData;
   parmasTableSetDefault: (data: InputParamsData[]) => InputParamsData[];
   onHold: () => Promise<void>;
@@ -1074,14 +1067,14 @@ export const useCreateTool = ({
   ref: React.RefObject<{
     updateToolInfo: (
       selectedCard: ToolItem,
-      shouldUpdateToolInfo: boolean,
+      shouldUpdateToolInfo: boolean
     ) => void;
   }>;
 }): {
   handlePreStep: () => void;
   addTestProperty: (obj: InputParamsData) => void;
   transformInputDataToDefaultParamsData: (
-    node: InputParamsData,
+    node: InputParamsData
   ) => InputParamsData;
   parmasTableSetDefault: (data: InputParamsData[]) => InputParamsData[];
   handleNextStep: () => void;
@@ -1138,7 +1131,7 @@ export const useCreateTool = ({
     toolStates,
     formManagement,
     setBotIcon,
-    setBotColor,
+    setBotColor
   );
 
   const toolOperations = useToolOperations({

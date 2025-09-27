@@ -1,28 +1,28 @@
-import React, { useCallback, useMemo, useRef } from "react";
-import { message, Modal, Select } from "antd";
+import React, { useCallback, useMemo, useRef } from 'react';
+import { message, Modal, Select } from 'antd';
 import SpaceTable, {
   SpaceColumnConfig,
   ActionColumnConfig,
   QueryParams,
   QueryResult,
   SpaceTableRef,
-} from "@/components/space/space-table";
-import { ButtonConfig } from "@/components/button-group";
-import { useSpaceI18n } from "@/pages/space/hooks/use-space-i18n";
-import { ModuleType, OperationType } from "@/permissions/permission-type";
-import { usePermissions } from "@/hooks/use-permissions";
-import useUserStore from "@/store/user-store";
+} from '@/components/space/space-table';
+import { ButtonConfig } from '@/components/button-group';
+import { useSpaceI18n } from '@/pages/space/hooks/use-space-i18n';
+import { ModuleType, OperationType } from '@/permissions/permission-type';
+import { usePermissions } from '@/hooks/use-permissions';
+import useUserStore from '@/store/user-store';
 
 import {
   getEnterpriseMemberList,
   removeEnterpriseUser,
   updateEnterpriseUserRole,
-} from "@/services/enterprise";
+} from '@/services/enterprise';
 import {
   roleToRoleType,
   roleTypeToRole,
   SUPER_ADMIN_ROLE,
-} from "@/pages/space/config";
+} from '@/pages/space/config';
 
 const { Option } = Select;
 
@@ -56,7 +56,7 @@ const MemberList: React.FC<MemberListProps> = ({ searchValue, roleFilter }) => {
           role: newRole,
         });
 
-        message.success("角色更新成功");
+        message.success('角色更新成功');
         // 判断如果是操作自己，则刷新页面
         if (Number(memberId) === Number(user?.uid)) {
           window.location.reload();
@@ -67,7 +67,7 @@ const MemberList: React.FC<MemberListProps> = ({ searchValue, roleFilter }) => {
         message.error(error?.msg || error?.desc);
       }
     },
-    [],
+    []
   );
 
   // 获取角色文本
@@ -75,14 +75,14 @@ const MemberList: React.FC<MemberListProps> = ({ searchValue, roleFilter }) => {
     (role: string) => {
       return roleTextMap[roleToRoleType(Number(role), true)] || role;
     },
-    [roleTextMap],
+    [roleTextMap]
   );
 
   // 模拟查询成员数据的函数
   const queryMemberData = useCallback(
     async (params: QueryParams): Promise<QueryResult<MemberData>> => {
       // 模拟后端根据参数返回过滤后的数据
-      console.log("API 请求参数:", {
+      console.log('API 请求参数:', {
         current: params.current,
         pageSize: params.pageSize,
         searchValue: params.searchValue,
@@ -114,7 +114,7 @@ const MemberList: React.FC<MemberListProps> = ({ searchValue, roleFilter }) => {
         };
       }
     },
-    [],
+    []
   );
 
   // 处理删除操作
@@ -135,27 +135,27 @@ const MemberList: React.FC<MemberListProps> = ({ searchValue, roleFilter }) => {
   const columns: SpaceColumnConfig<MemberData>[] = useMemo(
     () => [
       {
-        title: "用户名",
-        dataIndex: "nickname",
-        key: "nickname",
+        title: '用户名',
+        dataIndex: 'nickname',
+        key: 'nickname',
         width: 200,
         render: (text: string, record: MemberData) => (
-          <div style={{ display: "flex", alignItems: "center" }}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
             <span>{text}</span>
           </div>
         ),
       },
       {
-        title: "角色",
-        dataIndex: "role",
-        key: "role",
+        title: '角色',
+        dataIndex: 'role',
+        key: 'role',
         width: 120,
         render: (role: string, record: MemberData) => {
           const showText =
             role == SUPER_ADMIN_ROLE ||
             !permissionInfo?.checks.hasModulePermission(
               ModuleType.SPACE,
-              OperationType.MODIFY_MEMBER_PERMISSIONS,
+              OperationType.MODIFY_MEMBER_PERMISSIONS
             );
           if (showText) {
             return <span>{getRoleText(role)}</span>;
@@ -164,11 +164,11 @@ const MemberList: React.FC<MemberListProps> = ({ searchValue, roleFilter }) => {
           return (
             <Select
               value={role}
-              onChange={(value) => handleRoleChange(record.uid, value)}
-              style={{ width: "100px" }}
+              onChange={value => handleRoleChange(record.uid, value)}
+              style={{ width: '100px' }}
               popupMatchSelectWidth={false}
             >
-              {memberRoleOptions.map((option) => (
+              {memberRoleOptions.map(option => (
                 <Option key={option.value} value={option.value}>
                   {option.label}
                 </Option>
@@ -178,26 +178,26 @@ const MemberList: React.FC<MemberListProps> = ({ searchValue, roleFilter }) => {
         },
       },
       {
-        title: "加入时间",
-        dataIndex: "createTime",
-        key: "createTime",
+        title: '加入时间',
+        dataIndex: 'createTime',
+        key: 'createTime',
         width: 180,
       },
     ],
-    [getRoleText, memberRoleOptions, handleRoleChange, permissionInfo],
+    [getRoleText, memberRoleOptions, handleRoleChange, permissionInfo]
   );
 
   // 操作列配置
   const actionColumn: ActionColumnConfig<MemberData> = useMemo(
     () => ({
-      title: "操作",
+      title: '操作',
       width: 100,
       getActionButtons: (record: MemberData) => {
         const buttons: ButtonConfig[] = [
           {
-            key: "delete",
-            text: "删除",
-            type: "link",
+            key: 'delete',
+            text: '删除',
+            type: 'link',
             // danger: true,
             permission: {
               customCheck: () => {
@@ -206,7 +206,7 @@ const MemberList: React.FC<MemberListProps> = ({ searchValue, roleFilter }) => {
                   permissionInfo?.checks.canRemoveMembers(ModuleType.SPACE) &&
                   !permissionInfo?.checks.canDeleteResource(
                     ModuleType.SPACE,
-                    `${record.uid}`,
+                    `${record.uid}`
                   )
                 );
               },
@@ -214,10 +214,10 @@ const MemberList: React.FC<MemberListProps> = ({ searchValue, roleFilter }) => {
             onClick: () => {
               // 使用确认弹窗
               Modal.confirm({
-                title: "确认删除",
-                content: "确定要删除这个成员吗？",
-                okText: "确认",
-                cancelText: "取消",
+                title: '确认删除',
+                content: '确定要删除这个成员吗？',
+                okText: '确认',
+                cancelText: '取消',
                 onOk: () => handleDelete(record),
               });
             },
@@ -227,7 +227,7 @@ const MemberList: React.FC<MemberListProps> = ({ searchValue, roleFilter }) => {
         return buttons;
       },
     }),
-    [handleDelete],
+    [handleDelete]
   );
 
   return (
@@ -245,7 +245,7 @@ const MemberList: React.FC<MemberListProps> = ({ searchValue, roleFilter }) => {
         pageSize: 10,
         showSizeChanger: true,
         showTotal: (total, range) => `共 ${total} 项数据`,
-        pageSizeOptions: ["10", "20", "50"],
+        pageSizeOptions: ['10', '20', '50'],
       }}
     />
   );

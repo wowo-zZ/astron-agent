@@ -1,19 +1,19 @@
-import { useMemo, useCallback, useRef } from "react";
+import { useMemo, useCallback, useRef } from 'react';
 import {
   SpaceType,
   RoleType,
   ModuleType,
   OperationType,
   RolePermissionConfig,
-} from "@/permissions/permission-type";
+} from '@/permissions/permission-type';
 import {
   getRoleConfig,
   hasModulePermission,
   getModulePermissions,
   getAccessibleModules,
   checkResourceRestrictions,
-} from "@/permissions/utils";
-import useUserStore from "@/store/user-store";
+} from '@/permissions/utils';
+import useUserStore from '@/store/user-store';
 
 // ==================== 类型定义 ====================
 
@@ -38,7 +38,7 @@ export interface PermissionChecks {
   // 自定义权限检查
   hasModulePermission: (
     module: ModuleType,
-    operation: OperationType,
+    operation: OperationType
   ) => boolean;
 
   // 资源权限检查
@@ -47,7 +47,7 @@ export interface PermissionChecks {
 
   // 批量权限检查
   checkMultiplePermissions: (
-    checks: Array<{ module: ModuleType; operation: OperationType }>,
+    checks: Array<{ module: ModuleType; operation: OperationType }>
   ) => Record<string, boolean>;
 }
 
@@ -138,7 +138,7 @@ export function usePermissions(): UserPermissionInfo | null {
           userRole,
           module,
           resourceOwnerId,
-          currentUserIdRef.current,
+          currentUserIdRef.current
         );
       },
       canDeleteResource: (module: ModuleType, resourceOwnerId?: string) => {
@@ -146,13 +146,13 @@ export function usePermissions(): UserPermissionInfo | null {
           userRole,
           module,
           resourceOwnerId,
-          currentUserIdRef.current,
+          currentUserIdRef.current
         );
       },
 
       // 批量权限检查
       checkMultiplePermissions: (
-        checks: Array<{ module: ModuleType; operation: OperationType }>,
+        checks: Array<{ module: ModuleType; operation: OperationType }>
       ) => {
         const result: Record<string, boolean> = {};
         checks.forEach(({ module, operation }) => {
@@ -177,12 +177,12 @@ export function usePermissions(): UserPermissionInfo | null {
       hasModulePermission(
         userRole,
         ModuleType.SPACE,
-        OperationType.MODIFY_MEMBER_PERMISSIONS,
+        OperationType.MODIFY_MEMBER_PERMISSIONS
       ) ||
       hasModulePermission(
         userRole,
         ModuleType.SPACE,
-        OperationType.ADD_MEMBERS,
+        OperationType.ADD_MEMBERS
       );
 
     return {
@@ -190,7 +190,7 @@ export function usePermissions(): UserPermissionInfo | null {
       isAdminLevel,
       canManageUsers,
       accessibleModules: getAccessibleModules(userRole),
-      modulePermissions: roleConfig.modulePermissions.map((mp) => ({
+      modulePermissions: roleConfig.modulePermissions.map(mp => ({
         module: mp.module,
         operations: mp.operations,
       })),

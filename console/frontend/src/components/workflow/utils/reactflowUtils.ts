@@ -1,33 +1,33 @@
-import { cloneDeep } from "lodash";
-import { v4 as uuid } from "uuid";
-import Ajv from "ajv";
-import i18next from "i18next";
-import { isJSON } from "@/utils";
+import { cloneDeep } from 'lodash';
+import { v4 as uuid } from 'uuid';
+import Ajv from 'ajv';
+import i18next from 'i18next';
+import { isJSON } from '@/utils';
 
 const errorOutputTemplate = [
   {
     id: uuid(),
-    name: "errorCode",
+    name: 'errorCode',
     schema: {
-      type: "string",
-      default: "错误码",
+      type: 'string',
+      default: '错误码',
     },
-    nameErrMsg: "",
+    nameErrMsg: '',
   },
   {
     id: uuid(),
-    name: "errorMessage",
+    name: 'errorMessage',
     schema: {
-      type: "string",
-      default: "错误信息",
+      type: 'string',
+      default: '错误信息',
     },
-    nameErrMsg: "",
+    nameErrMsg: '',
   },
 ];
 
 // ==================== 基础工具函数 ====================
 export function scapedJSONStringfy(json: object): string {
-  return customStringify(json).replace(/"/g, "œ");
+  return customStringify(json).replace(/"/g, 'œ');
 }
 
 export function scapeJSONParse(json: string): unknown {
@@ -36,11 +36,11 @@ export function scapeJSONParse(json: string): unknown {
 }
 
 export function customStringify(obj: unknown): string {
-  if (typeof obj === "undefined") {
-    return "null";
+  if (typeof obj === 'undefined') {
+    return 'null';
   }
 
-  if (obj === null || typeof obj !== "object") {
+  if (obj === null || typeof obj !== 'object') {
     if (obj instanceof Date) {
       return `"${obj.toISOString()}"`;
     }
@@ -48,22 +48,22 @@ export function customStringify(obj: unknown): string {
   }
 
   if (Array.isArray(obj)) {
-    const arrayItems = obj.map((item) => customStringify(item)).join(",");
+    const arrayItems = obj.map(item => customStringify(item)).join(',');
     return `[${arrayItems}]`;
   }
 
   const keys = Object.keys(obj).sort();
   const keyValuePairs = keys.map(
-    (key) => `"${key}":${customStringify(obj[key])}`,
+    key => `"${key}":${customStringify(obj[key])}`
   );
-  return `{${keyValuePairs.join(",")}}`;
+  return `{${keyValuePairs.join(',')}}`;
 }
 
 export function getHandleId(
   source: string,
   sourceHandle: string,
   target: string,
-  targetHandle: string,
+  targetHandle: string
 ): string {
   return `reactflow__edge-${source}${sourceHandle}-${target}${targetHandle}`;
 }
@@ -100,7 +100,7 @@ export function generateRandomPosition(viewPoint: unknown): {
 }
 
 export const capitalizeFirstLetter = (string: string): string => {
-  if (!string) return "";
+  if (!string) return '';
   return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
@@ -117,23 +117,23 @@ export function isValidURL(str: string): boolean {
 // ==================== 输入数据验证 ====================
 function validateInputName(
   data: unknown[],
-  nameCount: Record<string, number>,
+  nameCount: Record<string, number>
 ): boolean {
   let passFlag = true;
 
-  data.forEach((item) => {
+  data.forEach(item => {
     if (!item?.name?.trim()) {
       item.nameErrMsg = i18next.t(
-        "workflow.nodes.validation.valueCannotBeEmpty",
+        'workflow.nodes.validation.valueCannotBeEmpty'
       );
       passFlag = false;
     } else if (!checkNameConventions(item.name)) {
       item.nameErrMsg = i18next.t(
-        "workflow.nodes.validation.canOnlyContainLettersNumbersHyphensOrUnderscores",
+        'workflow.nodes.validation.canOnlyContainLettersNumbersHyphensOrUnderscores'
       );
       passFlag = false;
     } else {
-      item.nameErrMsg = "";
+      item.nameErrMsg = '';
     }
     nameCount[item.name] = (nameCount[item.name] || 0) + 1;
   });
@@ -143,38 +143,38 @@ function validateInputName(
 
 function validateInputContent(
   data: unknown[],
-  noNeedCheckIds: string[],
+  noNeedCheckIds: string[]
 ): boolean {
   let passFlag = true;
 
-  data.forEach((item) => {
+  data.forEach(item => {
     if (noNeedCheckIds.includes(item?.id)) {
-      item.nameErrMsg = "";
-      item.schema.value.contentErrMsg = "";
+      item.nameErrMsg = '';
+      item.schema.value.contentErrMsg = '';
       return;
     }
 
     const { type, content } = item.schema.value;
 
     if (
-      (type === "ref" && !content.name) ||
-      (type === "literal" && !content?.trim())
+      (type === 'ref' && !content.name) ||
+      (type === 'literal' && !content?.trim())
     ) {
       item.schema.value.contentErrMsg = i18next.t(
-        "workflow.nodes.validation.valueCannotBeEmpty",
+        'workflow.nodes.validation.valueCannotBeEmpty'
       );
       passFlag = false;
     } else if (
-      item.customParameterType === "image_understanding" &&
-      type === "literal" &&
+      item.customParameterType === 'image_understanding' &&
+      type === 'literal' &&
       !isValidURL(content)
     ) {
       item.schema.value.contentErrMsg = i18next.t(
-        "workflow.nodes.validation.pleaseEnterValidURL",
+        'workflow.nodes.validation.pleaseEnterValidURL'
       );
       passFlag = false;
     } else {
-      item.schema.value.contentErrMsg = "";
+      item.schema.value.contentErrMsg = '';
     }
   });
 
@@ -183,7 +183,7 @@ function validateInputContent(
 
 export const checkedNodeInputData = (
   data: unknown[],
-  currentCheckNode: unknown,
+  currentCheckNode: unknown
 ): boolean => {
   let passFlag = true;
   const nameCount: Record<string, number> = {};
@@ -192,21 +192,21 @@ export const checkedNodeInputData = (
   passFlag = validateInputName(data, nameCount);
 
   // 检查重复名称
-  data.forEach((item) => {
+  data.forEach(item => {
     if (nameCount[item.name] > 1 && !item.nameErrMsg) {
       item.nameErrMsg = i18next.t(
-        "workflow.nodes.validation.valueCannotBeRepeated",
+        'workflow.nodes.validation.valueCannotBeRepeated'
       );
       passFlag = false;
     }
 
     if (
       currentCheckNode?.data?.nodeParam?.enableChatHistoryV2?.isEnabled &&
-      item?.name === "history" &&
+      item?.name === 'history' &&
       !item.nameErrMsg
     ) {
       item.nameErrMsg = i18next.t(
-        "workflow.nodes.validation.valueCannotBeRepeated",
+        'workflow.nodes.validation.valueCannotBeRepeated'
       );
       passFlag = false;
     }
@@ -214,22 +214,22 @@ export const checkedNodeInputData = (
 
   // 获取不需要检查的输入ID
   const noNeedCheckIfElseInputs =
-    currentCheckNode?.data?.nodeParam?.cases?.flatMap((item) =>
+    currentCheckNode?.data?.nodeParam?.cases?.flatMap(item =>
       item.conditions
-        ?.filter((condition) =>
-          ["not_null", "null", "empty", "not_empty", "not null"].includes(
-            condition?.compareOperator || condition?.selectCondition,
-          ),
+        ?.filter(condition =>
+          ['not_null', 'null', 'empty', 'not_empty', 'not null'].includes(
+            condition?.compareOperator || condition?.selectCondition
+          )
         )
-        ?.map((condition) => condition?.rightVarIndex || condition?.varIndex),
+        ?.map(condition => condition?.rightVarIndex || condition?.varIndex)
     ) || [];
 
   const noNeedCheckToolInputs =
-    currentCheckNode?.nodeType === "plugin" ||
-    currentCheckNode?.nodeType === "flow"
+    currentCheckNode?.nodeType === 'plugin' ||
+    currentCheckNode?.nodeType === 'flow'
       ? currentCheckNode?.data?.inputs
-          ?.filter((input) => !input?.required || input?.disabled)
-          ?.map((input) => input?.id)
+          ?.filter(input => !input?.required || input?.disabled)
+          ?.map(input => input?.id)
       : [];
 
   const noNeedCheckIds = [...noNeedCheckIfElseInputs, ...noNeedCheckToolInputs];
@@ -242,21 +242,21 @@ export const checkedNodeInputData = (
 
 export const checkedNodeRepeatedInputData = (
   inputs: unknown[],
-  variableNodes: unknown[],
+  variableNodes: unknown[]
 ): boolean => {
   let passFlag = true;
   const variableNodesName = variableNodes
-    .flatMap((item) => item?.data?.inputs)
-    .map((item) => item.name);
+    .flatMap(item => item?.data?.inputs)
+    .map(item => item.name);
 
-  inputs.forEach((input) => {
+  inputs.forEach(input => {
     if (variableNodesName?.includes(input.name)) {
       input.schema.value.contentErrMsg = i18next.t(
-        "workflow.nodes.validation.variableMemoryNamingConflict",
+        'workflow.nodes.validation.variableMemoryNamingConflict'
       );
       passFlag = false;
     } else {
-      input.schema.value.contentErrMsg = "";
+      input.schema.value.contentErrMsg = '';
     }
   });
 
@@ -266,47 +266,47 @@ export const checkedNodeRepeatedInputData = (
 // ==================== 输出数据验证 ====================
 function validateProperties(
   items: unknown[],
-  parentPath = "",
-  parentType: string,
+  parentPath = '',
+  parentType: string
 ): { validatedItems: unknown[]; flag: boolean } {
   let flag = true;
   const nameCount: Record<string, number> = {};
 
   const newItems = items
-    .filter((item) => item.name || item?.schema?.type || item?.type)
-    .map((item) => {
+    .filter(item => item.name || item?.schema?.type || item?.type)
+    .map(item => {
       if (!item?.name?.trim()) {
         item.nameErrMsg = i18next.t(
-          "workflow.nodes.validation.valueCannotBeEmpty",
+          'workflow.nodes.validation.valueCannotBeEmpty'
         );
         flag = false;
       } else if (!checkNameConventions(item.name)) {
         item.nameErrMsg = i18next.t(
-          "workflow.nodes.validation.canOnlyContainLettersNumbersOrUnderscores",
+          'workflow.nodes.validation.canOnlyContainLettersNumbersOrUnderscores'
         );
         flag = false;
       } else {
-        item.nameErrMsg = "";
+        item.nameErrMsg = '';
       }
       nameCount[item.name] = (nameCount[item.name] || 0) + 1;
       return item;
     });
 
-  newItems.forEach((item) => {
+  newItems.forEach(item => {
     if (nameCount[item.name] > 1 && !item.nameErrMsg) {
       item.nameErrMsg = i18next.t(
-        "workflow.nodes.validation.valueCannotBeRepeated",
+        'workflow.nodes.validation.valueCannotBeRepeated'
       );
       flag = false;
     }
   });
 
-  const validatedItems = newItems.map((item) => {
+  const validatedItems = newItems.map(item => {
     if (item.schema && Array.isArray(item.schema.properties)) {
       const result = validateProperties(
         item.schema.properties,
         parentPath,
-        parentType,
+        parentType
       );
       item.schema.properties = result.validatedItems;
       flag = flag && result.flag;
@@ -316,7 +316,7 @@ function validateProperties(
       const result = validateProperties(
         item.properties,
         parentPath,
-        parentType,
+        parentType
       );
       item.properties = result.validatedItems;
       flag = flag && result.flag;
@@ -329,30 +329,30 @@ function validateProperties(
 
 export const checkedNodeOutputData = (
   data: unknown[],
-  currentCheckNode: unknown,
+  currentCheckNode: unknown
 ): boolean => {
   let passFlag = true;
 
-  if (currentCheckNode?.nodeType !== "plugin") {
+  if (currentCheckNode?.nodeType !== 'plugin') {
     const validateData = validateProperties(data);
     data = validateData.validatedItems;
     passFlag = validateData.flag;
   }
 
   if (
-    currentCheckNode?.nodeType === "extractor-parameter" ||
-    (currentCheckNode?.nodeType === "question-answer" &&
-      currentCheckNode?.data?.nodeParam?.answerType === "direct" &&
+    currentCheckNode?.nodeType === 'extractor-parameter' ||
+    (currentCheckNode?.nodeType === 'question-answer' &&
+      currentCheckNode?.data?.nodeParam?.answerType === 'direct' &&
       currentCheckNode?.data?.nodeParam?.directAnswer?.handleResponse)
   ) {
-    data.forEach((item) => {
+    data.forEach(item => {
       if (!item?.schema?.description?.trim() && !item?.schema?.default) {
         item.schema.descriptionErrMsg = i18next.t(
-          "workflow.nodes.validation.valueCannotBeEmpty",
+          'workflow.nodes.validation.valueCannotBeEmpty'
         );
         passFlag = false;
       } else {
-        item.schema.descriptionErrMsg = "";
+        item.schema.descriptionErrMsg = '';
       }
     });
   }
@@ -363,9 +363,9 @@ export const checkedNodeOutputData = (
 // ==================== 节点参数验证 ====================
 function validateTemplateParams(currentCheckNode: unknown): boolean {
   if (
-    !["spark-llm", "message"].includes(currentCheckNode?.type) &&
+    !['spark-llm', 'message'].includes(currentCheckNode?.type) &&
     !(
-      currentCheckNode?.nodeType === "node-end" &&
+      currentCheckNode?.nodeType === 'node-end' &&
       currentCheckNode?.data?.nodeParam?.outputMode === 1
     )
   ) {
@@ -374,33 +374,33 @@ function validateTemplateParams(currentCheckNode: unknown): boolean {
 
   if (!currentCheckNode?.data.nodeParam.template?.trim()) {
     currentCheckNode.data.nodeParam.templateErrMsg = i18next.t(
-      "workflow.nodes.validation.valueCannotBeEmpty",
+      'workflow.nodes.validation.valueCannotBeEmpty'
     );
     return false;
   }
 
-  currentCheckNode.data.nodeParam.templateErrMsg = "";
+  currentCheckNode.data.nodeParam.templateErrMsg = '';
   return true;
 }
 
 function validateQuestionAnswerParams(currentCheckNode: unknown): boolean {
-  if (currentCheckNode?.nodeType !== "question-answer") {
+  if (currentCheckNode?.nodeType !== 'question-answer') {
     return true;
   }
 
   if (!currentCheckNode?.data.nodeParam.question?.trim()) {
     currentCheckNode.data.nodeParam.questionErrMsg = i18next.t(
-      "workflow.nodes.validation.valueCannotBeEmpty",
+      'workflow.nodes.validation.valueCannotBeEmpty'
     );
     return false;
   }
 
-  currentCheckNode.data.nodeParam.questionErrMsg = "";
+  currentCheckNode.data.nodeParam.questionErrMsg = '';
   return true;
 }
 
 function validateDecisionMakingParams(currentCheckNode: unknown): boolean {
-  if (currentCheckNode?.nodeType !== "decision-making") {
+  if (currentCheckNode?.nodeType !== 'decision-making') {
     return true;
   }
 
@@ -409,73 +409,73 @@ function validateDecisionMakingParams(currentCheckNode: unknown): boolean {
   currentCheckNode.data.nodeParam.intentChains.forEach((chain: unknown) => {
     if (!chain?.name?.trim()) {
       chain.nameErrMsg = i18next.t(
-        "workflow.nodes.validation.valueCannotBeEmpty",
+        'workflow.nodes.validation.valueCannotBeEmpty'
       );
       passFlag = false;
     } else {
-      chain.nameErrMsg = "";
+      chain.nameErrMsg = '';
     }
 
     if (!chain?.description?.trim()) {
       chain.descriptionErrMsg = i18next.t(
-        "workflow.nodes.validation.valueCannotBeEmpty",
+        'workflow.nodes.validation.valueCannotBeEmpty'
       );
       passFlag = false;
     } else {
-      chain.descriptionErrMsg = "";
+      chain.descriptionErrMsg = '';
     }
   });
 
   return (
     passFlag &&
     currentCheckNode.data.nodeParam.intentChains.every(
-      (chain: unknown) => chain?.name?.trim() && chain?.description?.trim(),
+      (chain: unknown) => chain?.name?.trim() && chain?.description?.trim()
     )
   );
 }
 
 function validateKnowledgeBaseParams(currentCheckNode: unknown): boolean {
-  if (currentCheckNode?.nodeType === "knowledge-base") {
+  if (currentCheckNode?.nodeType === 'knowledge-base') {
     if (currentCheckNode.data.nodeParam?.repoId?.length === 0) {
       currentCheckNode.data.nodeParam.repoIdErrMsg = i18next.t(
-        "workflow.nodes.validation.knowledgeCannotBeEmpty",
+        'workflow.nodes.validation.knowledgeCannotBeEmpty'
       );
       return false;
     }
-    currentCheckNode.data.nodeParam.repoIdErrMsg = "";
+    currentCheckNode.data.nodeParam.repoIdErrMsg = '';
   }
 
-  if (currentCheckNode?.nodeType === "knowledge-pro-base") {
+  if (currentCheckNode?.nodeType === 'knowledge-pro-base') {
     if (currentCheckNode.data.nodeParam?.repoIds?.length === 0) {
       currentCheckNode.data.nodeParam.repoIdErrMsg = i18next.t(
-        "workflow.nodes.validation.knowledgeCannotBeEmpty",
+        'workflow.nodes.validation.knowledgeCannotBeEmpty'
       );
       return false;
     }
-    currentCheckNode.data.nodeParam.repoIdErrMsg = "";
+    currentCheckNode.data.nodeParam.repoIdErrMsg = '';
   }
 
   return true;
 }
 
 function validateIflyCodeParams(currentCheckNode: unknown): boolean {
-  if (currentCheckNode?.nodeType !== "ifly-code") {
+  if (currentCheckNode?.nodeType !== 'ifly-code') {
     return true;
   }
 
   if (!currentCheckNode.data.nodeParam?.code) {
     currentCheckNode.data.nodeParam.codeErrMsg = i18next.t(
-      "workflow.nodes.validation.codeCannotBeEmpty",
+      'workflow.nodes.validation.codeCannotBeEmpty'
     );
     return false;
   }
 
-  currentCheckNode.data.nodeParam.codeErrMsg = "";
+  currentCheckNode.data.nodeParam.codeErrMsg = '';
   return true;
 }
 
 function validateIfElseParams(currentCheckNode: unknown): boolean {
-  if (currentCheckNode?.nodeType !== "if-else") {
+  if (currentCheckNode?.nodeType !== 'if-else') {
     return true;
   }
 
@@ -486,10 +486,10 @@ function validateIfElseParams(currentCheckNode: unknown): boolean {
       if (!condition.compareOperator) {
         passFlag = false;
         condition.compareOperatorErrMsg = i18next.t(
-          "workflow.nodes.validation.valueCannotBeEmpty",
+          'workflow.nodes.validation.valueCannotBeEmpty'
         );
       } else {
-        condition.compareOperatorErrMsg = "";
+        condition.compareOperatorErrMsg = '';
       }
     });
   });
@@ -498,7 +498,7 @@ function validateIfElseParams(currentCheckNode: unknown): boolean {
 }
 
 function validateTextJoinerParams(currentCheckNode: unknown): boolean {
-  if (currentCheckNode?.nodeType !== "text-joiner") {
+  if (currentCheckNode?.nodeType !== 'text-joiner') {
     return true;
   }
 
@@ -507,41 +507,41 @@ function validateTextJoinerParams(currentCheckNode: unknown): boolean {
     !currentCheckNode?.data?.nodeParam?.separator
   ) {
     currentCheckNode.data.nodeParam.separatorErrMsg = i18next.t(
-      "workflow.nodes.validation.separatorCannotBeEmpty",
+      'workflow.nodes.validation.separatorCannotBeEmpty'
     );
     return false;
   }
 
-  currentCheckNode.data.nodeParam.separatorErrMsg = "";
+  currentCheckNode.data.nodeParam.separatorErrMsg = '';
   return true;
 }
 
 function validateAgentParams(currentCheckNode: unknown): boolean {
-  if (currentCheckNode?.nodeType !== "agent") {
+  if (currentCheckNode?.nodeType !== 'agent') {
     return true;
   }
 
   if (!currentCheckNode?.data.nodeParam.instruction?.query?.trim()) {
     currentCheckNode.data.nodeParam.instruction.queryErrMsg = i18next.t(
-      "workflow.nodes.validation.valueCannotBeEmpty",
+      'workflow.nodes.validation.valueCannotBeEmpty'
     );
     return false;
   }
 
-  currentCheckNode.data.nodeParam.instruction.queryErrMsg = "";
+  currentCheckNode.data.nodeParam.instruction.queryErrMsg = '';
 
   return Boolean(
     currentCheckNode?.data.nodeParam.instruction?.query?.trim() &&
       currentCheckNode?.data.nodeParam?.plugin?.mcpServerUrls?.every(
-        (item: string) => !item?.trim() || isValidURL(item),
-      ),
+        (item: string) => !item?.trim() || isValidURL(item)
+      )
   );
 }
 
 function validateQuestionAnswerOptions(currentCheckNode: unknown): boolean {
   if (
-    currentCheckNode?.nodeType !== "question-answer" ||
-    currentCheckNode.data.nodeParam?.answerType !== "option"
+    currentCheckNode?.nodeType !== 'question-answer' ||
+    currentCheckNode.data.nodeParam?.answerType !== 'option'
   ) {
     return true;
   }
@@ -554,18 +554,18 @@ function validateQuestionAnswerOptions(currentCheckNode: unknown): boolean {
       if (!item?.content) {
         passFlag = false;
         item.contentErrMsg = i18next.t(
-          "workflow.nodes.validation.valueCannotBeEmpty",
+          'workflow.nodes.validation.valueCannotBeEmpty'
         );
       } else if (
-        item?.["content_type"] === "image" &&
+        item?.['content_type'] === 'image' &&
         !isValidURL(item?.content)
       ) {
         passFlag = false;
         item.contentErrMsg = i18next.t(
-          "workflow.nodes.validation.pleaseEnterValidURL",
+          'workflow.nodes.validation.pleaseEnterValidURL'
         );
       } else {
-        item.contentErrMsg = "";
+        item.contentErrMsg = '';
       }
     });
 
@@ -575,33 +575,33 @@ function validateQuestionAnswerOptions(currentCheckNode: unknown): boolean {
 function validateDbId(nodeParam: unknown): boolean {
   if (!nodeParam?.dbId) {
     nodeParam.dbErrMsg = i18next.t(
-      "workflow.nodes.databaseNode.valueCannotBeEmpty",
+      'workflow.nodes.databaseNode.valueCannotBeEmpty'
     );
     return false;
   }
-  nodeParam.dbErrMsg = "";
+  nodeParam.dbErrMsg = '';
   return true;
 }
 
 function validateTableName(nodeParam: unknown): boolean {
   if (!nodeParam?.tableName) {
     nodeParam.tableNameErrMsg = i18next.t(
-      "workflow.nodes.databaseNode.valueCannotBeEmpty",
+      'workflow.nodes.databaseNode.valueCannotBeEmpty'
     );
     return false;
   }
-  nodeParam.tableNameErrMsg = "";
+  nodeParam.tableNameErrMsg = '';
   return true;
 }
 
 function validateAssignmentList(nodeParam: unknown): boolean {
   if (!nodeParam?.assignmentList?.length) {
     nodeParam.fieldNameErrMsg = i18next.t(
-      "workflow.nodes.databaseNode.valueCannotBeEmpty",
+      'workflow.nodes.databaseNode.valueCannotBeEmpty'
     );
     return false;
   }
-  nodeParam.fieldNameErrMsg = "";
+  nodeParam.fieldNameErrMsg = '';
   return true;
 }
 
@@ -611,20 +611,20 @@ function validateCases(nodeParam: unknown): boolean {
     item.conditions?.forEach((condition: unknown) => {
       if (!condition.selectCondition) {
         condition.compareOperatorErrMsg = i18next.t(
-          "workflow.nodes.databaseNode.valueCannotBeEmpty",
+          'workflow.nodes.databaseNode.valueCannotBeEmpty'
         );
         pass = false;
       } else {
-        condition.compareOperatorErrMsg = "";
+        condition.compareOperatorErrMsg = '';
       }
 
       if (!condition.fieldName) {
         condition.fieldErrMsg = i18next.t(
-          "workflow.nodes.databaseNode.valueCannotBeEmpty",
+          'workflow.nodes.databaseNode.valueCannotBeEmpty'
         );
         pass = false;
       } else {
-        condition.fieldErrMsg = "";
+        condition.fieldErrMsg = '';
       }
     });
   });
@@ -634,16 +634,16 @@ function validateCases(nodeParam: unknown): boolean {
 function validateSql(nodeParam: unknown): boolean {
   if (!nodeParam?.sql?.trim()) {
     nodeParam.sqlErrMsg = i18next.t(
-      "workflow.nodes.databaseNode.valueCannotBeEmpty",
+      'workflow.nodes.databaseNode.valueCannotBeEmpty'
     );
     return false;
   }
-  nodeParam.sqlErrMsg = "";
+  nodeParam.sqlErrMsg = '';
   return true;
 }
 
 export function validateDatabaseParams(currentCheckNode: unknown): boolean {
-  if (currentCheckNode?.nodeType !== "database") return true;
+  if (currentCheckNode?.nodeType !== 'database') return true;
 
   const nodeParam = currentCheckNode.data.nodeParam;
   let passFlag = true;
@@ -668,12 +668,12 @@ export function validateDatabaseParams(currentCheckNode: unknown): boolean {
 
 function validateServiceIdParams(currentCheckNode: unknown): boolean {
   const nodeTypesRequiringServiceId = [
-    "spark-llm",
-    "knowledge-pro-base",
-    "question-answer",
-    "decision-making",
-    "agent",
-    "extractor-parameter",
+    'spark-llm',
+    'knowledge-pro-base',
+    'question-answer',
+    'decision-making',
+    'agent',
+    'extractor-parameter',
   ];
 
   if (!nodeTypesRequiringServiceId.includes(currentCheckNode?.nodeType)) {
@@ -682,12 +682,12 @@ function validateServiceIdParams(currentCheckNode: unknown): boolean {
 
   if (!currentCheckNode?.data?.nodeParam?.serviceId) {
     currentCheckNode.data.nodeParam.llmIdErrMsg = i18next.t(
-      "workflow.nodes.databaseNode.modelCannotBeEmpty",
+      'workflow.nodes.databaseNode.modelCannotBeEmpty'
     );
     return false;
   }
 
-  currentCheckNode.data.nodeParam.llmIdErrMsg = "";
+  currentCheckNode.data.nodeParam.llmIdErrMsg = '';
   return true;
 }
 
@@ -697,12 +697,12 @@ function validateRetryConfig(currentCheckNode: unknown): boolean {
   }
 
   if (!currentCheckNode?.data?.retryConfig?.customOutput) {
-    currentCheckNode.data.nodeParam.setAnswerContentErrMsg = "值不能为空";
+    currentCheckNode.data.nodeParam.setAnswerContentErrMsg = '值不能为空';
     return false;
   }
 
   if (!isJSON(currentCheckNode?.data?.retryConfig?.customOutput)) {
-    currentCheckNode.data.nodeParam.setAnswerContentErrMsg = "无效的JSON格式";
+    currentCheckNode.data.nodeParam.setAnswerContentErrMsg = '无效的JSON格式';
     return false;
   }
 
@@ -725,15 +725,15 @@ export const checkedNodeParams = (currentCheckNode: unknown): boolean => {
     validateRetryConfig,
   ];
 
-  return validations.every((validation) => validation(currentCheckNode));
+  return validations.every(validation => validation(currentCheckNode));
 };
 
 // ==================== 节点操作函数 ====================
 export function getNextName(arr: unknown[], prefix: string): string {
   const regex = new RegExp(`^${prefix}_(\\d+)$`);
   const numbers = arr
-    .map((item) => item?.data?.label)
-    .map((name) => {
+    .map(item => item?.data?.label)
+    .map(name => {
       const match = name?.match(regex);
       return match ? parseInt(match[1], 10) : null;
     })
@@ -755,21 +755,21 @@ export function getNextName(arr: unknown[], prefix: string): string {
 
 export function findChildrenNodes(
   startNodeId: string,
-  edges: unknown[],
+  edges: unknown[]
 ): string[] {
   const visited = new Set<string>();
   const stack = [startNodeId];
   const result: string[] = [];
 
   while (stack.length > 0) {
-    const currentNodeId = stack.pop() || "";
+    const currentNodeId = stack.pop() || '';
     if (!visited.has(currentNodeId)) {
       visited.add(currentNodeId);
       if (currentNodeId !== startNodeId) {
         result.push(currentNodeId);
       }
 
-      edges.forEach((edge) => {
+      edges.forEach(edge => {
         if (edge.source === currentNodeId && !visited.has(edge.target)) {
           stack.push(edge.target);
         }
@@ -782,21 +782,21 @@ export function findChildrenNodes(
 
 export function findParentNodes(
   startNodeId: string,
-  edges: unknown[],
+  edges: unknown[]
 ): string[] {
   const visited = new Set<string>();
   const stack = [startNodeId];
   const result: string[] = [];
 
   while (stack.length > 0) {
-    const currentNodeId = stack.pop() || "";
+    const currentNodeId = stack.pop() || '';
     if (!visited.has(currentNodeId)) {
       visited.add(currentNodeId);
       if (currentNodeId !== startNodeId) {
         result.push(currentNodeId);
       }
 
-      edges.forEach((edge) => {
+      edges.forEach(edge => {
         if (edge.target === currentNodeId && !visited.has(edge.source)) {
           stack.push(edge.source);
         }
@@ -824,7 +824,7 @@ export const copyNodeData = (data: unknown): unknown => {
       (item: unknown) => ({
         ...item,
         id: `intent-one-of::${uuid()}`,
-      }),
+      })
     );
   }
 
@@ -833,7 +833,7 @@ export const copyNodeData = (data: unknown): unknown => {
       (item: unknown) => ({
         ...item,
         id: `option-one-of::${uuid()}`,
-      }),
+      })
     );
   }
 
@@ -871,15 +871,15 @@ export function findItemById(dataArray: unknown[], id: string): unknown | null {
 }
 
 export function renderType(params): string {
-  if (params.fileType && params?.type === "array-string") {
+  if (params.fileType && params?.type === 'array-string') {
     return `Array<${
-      (params?.fileType?.slice(0, 1).toUpperCase() || "") +
-      (params?.fileType?.slice(1) || "")
+      (params?.fileType?.slice(0, 1).toUpperCase() || '') +
+      (params?.fileType?.slice(1) || '')
     }>`;
   }
-  const type = params?.type || params?.schema?.type || "";
-  if (type?.includes("array")) {
-    const baseType = type.split("-")[1];
+  const type = params?.type || params?.schema?.type || '';
+  if (type?.includes('array')) {
+    const baseType = type.split('-')[1];
     const capitalized = baseType.charAt(0).toUpperCase() + baseType.slice(1);
     return `Array<${capitalized}>`;
   }
@@ -888,16 +888,16 @@ export function renderType(params): string {
 
 export function isBaseType(type: string): boolean {
   const baseTypes = [
-    "string",
-    "integer",
-    "boolean",
-    "number",
-    "array-string",
-    "array-integer",
-    "array-boolean",
-    "array-number",
-    "image",
-    "pdf",
+    'string',
+    'integer',
+    'boolean',
+    'number',
+    'array-string',
+    'array-integer',
+    'array-boolean',
+    'array-number',
+    'image',
+    'pdf',
   ];
   return baseTypes.includes(type);
 }
@@ -906,39 +906,39 @@ export function isBaseType(type: string): boolean {
 export function generateKnowledgeOutput(type: string): unknown[] {
   const commonResult = {
     id: uuid(),
-    name: "results",
+    name: 'results',
     schema: {
-      type: "array-object",
+      type: 'array-object',
       properties: [] as unknown[],
     },
     required: true,
-    nameErrMsg: "",
+    nameErrMsg: '',
   };
 
-  if (type === "SparkDesk-RAG") {
+  if (type === 'SparkDesk-RAG') {
     commonResult.schema.properties = [
-      createProperty("score", "number"),
-      createProperty("index", "number"),
-      createProperty("type", "string"),
-      createProperty("content", "string"),
-      createProperty("fileType", "string"),
-      createProperty("fileId", "string"),
+      createProperty('score', 'number'),
+      createProperty('index', 'number'),
+      createProperty('type', 'string'),
+      createProperty('content', 'string'),
+      createProperty('fileType', 'string'),
+      createProperty('fileId', 'string'),
     ];
-  } else if (type === "CBG-RAG") {
+  } else if (type === 'CBG-RAG') {
     commonResult.schema.properties = [
-      createProperty("score", "number"),
-      createProperty("docId", "string"),
-      createProperty("content", "string"),
-      createProperty("references", "object"),
+      createProperty('score', 'number'),
+      createProperty('docId', 'string'),
+      createProperty('content', 'string'),
+      createProperty('references', 'object'),
     ];
   } else {
     commonResult.schema.properties = [
-      createProperty("score", "number"),
-      createProperty("docId", "string"),
-      createProperty("title", "string"),
-      createProperty("content", "string"),
-      createProperty("context", "string"),
-      createProperty("references", "object"),
+      createProperty('score', 'number'),
+      createProperty('docId', 'string'),
+      createProperty('title', 'string'),
+      createProperty('content', 'string'),
+      createProperty('context', 'string'),
+      createProperty('references', 'object'),
     ];
   }
 
@@ -950,51 +950,51 @@ function createProperty(name: string, type: string): unknown {
     id: uuid(),
     name,
     type,
-    default: "",
+    default: '',
     required: true,
-    nameErrMsg: "",
+    nameErrMsg: '',
   };
 }
 
 // ==================== 版本检查函数 ====================
 export function isOldVersionFlow(inputTime: string): boolean {
-  const fixedTime = new Date("2025-03-14T06:00:00.000+00:00");
+  const fixedTime = new Date('2025-03-14T06:00:00.000+00:00');
   const inputDate = new Date(inputTime);
   return inputDate < fixedTime;
 }
 
 export function hasDecisionMakingNode(nodes: unknown[]): boolean {
   return nodes?.some(
-    (node) =>
-      node?.id?.startsWith("decision-making") &&
-      node?.data?.nodeParam?.reasonMode !== 1,
+    node =>
+      node?.id?.startsWith('decision-making') &&
+      node?.data?.nodeParam?.reasonMode !== 1
   );
 }
 
 export const handleReplaceNodeId = (
   childNodes: unknown[],
-  replacements: Record<string, string>,
+  replacements: Record<string, string>
 ): unknown[] => {
   const childNodesString = JSON.stringify(childNodes);
   return JSON.parse(
     childNodesString.replace(
-      new RegExp(Object.keys(replacements).join("|"), "g"),
-      (match) => replacements[match],
-    ),
+      new RegExp(Object.keys(replacements).join('|'), 'g'),
+      match => replacements[match]
+    )
   );
 };
 
 export const isRefKnowledgeBase = (input: unknown): boolean => {
   return (
-    input?.schema?.type !== "array-object" &&
-    input?.schema?.value?.content?.nodeId?.startsWith("knowledge-base")
+    input?.schema?.type !== 'array-object' &&
+    input?.schema?.value?.content?.nodeId?.startsWith('knowledge-base')
   );
 };
 
 // ==================== JSON 验证函数 ====================
 export const validateInputJSON = (
   newValue: string,
-  schema: unknown,
+  schema: unknown
 ): string => {
   try {
     const ajv = new Ajv();
@@ -1006,27 +1006,27 @@ export const validateInputJSON = (
       const firstError = validate?.errors?.[0];
       const path = firstError?.instancePath
         ? firstError.instancePath.slice(1)
-        : "";
-      const msg = firstError?.message ?? "";
+        : '';
+      const msg = firstError?.message ?? '';
       return `${path} ${msg}`.trim();
     }
-    return "";
+    return '';
   } catch {
-    return "Invalid JSON format";
+    return 'Invalid JSON format';
   }
 };
 
 export const generateDefaultInput = (type: string): unknown => {
   switch (type) {
-    case "boolean":
+    case 'boolean':
       return false;
-    case "number":
-    case "integer":
+    case 'number':
+    case 'integer':
       return 0;
-    case "string":
-      return "";
+    case 'string':
+      return '';
     default:
-      return "";
+      return '';
   }
 };
 
@@ -1035,10 +1035,10 @@ function generateSchemaForNode(node: unknown): unknown {
   const schema: unknown = {};
 
   switch (node.type) {
-    case "array-object":
-      schema.type = "array";
+    case 'array-object':
+      schema.type = 'array';
       schema.items = {
-        type: "object",
+        type: 'object',
         properties: {},
         required: [],
       };
@@ -1056,28 +1056,28 @@ function generateSchemaForNode(node: unknown): unknown {
       }
       break;
 
-    case "array-integer":
-      schema.type = "array";
-      schema.items = { type: "integer" };
+    case 'array-integer':
+      schema.type = 'array';
+      schema.items = { type: 'integer' };
       break;
 
-    case "array-boolean":
-      schema.type = "array";
-      schema.items = { type: "boolean" };
+    case 'array-boolean':
+      schema.type = 'array';
+      schema.items = { type: 'boolean' };
       break;
 
-    case "array-string":
-      schema.type = "array";
-      schema.items = { type: "string" };
+    case 'array-string':
+      schema.type = 'array';
+      schema.items = { type: 'string' };
       break;
 
-    case "array-number":
-      schema.type = "array";
-      schema.items = { type: "number" };
+    case 'array-number':
+      schema.type = 'array';
+      schema.items = { type: 'number' };
       break;
 
-    case "object":
-      schema.type = "object";
+    case 'object':
+      schema.type = 'object';
       schema.properties = {};
       schema.required = [];
 
@@ -1106,13 +1106,13 @@ export const generateValidationSchema = (data: unknown): unknown => {
 
 export const generateUploadType = (type: string): string[] => {
   const typeMap: Record<string, string[]> = {
-    image: ["jpg", "png", "bmp", "jpeg"],
-    pdf: ["pdf"],
-    doc: ["docx", "doc"],
-    ppt: ["ppt", "pptx"],
-    excel: ["xls", "xlsx", "csv"],
-    txt: ["txt"],
-    audio: ["wav", "mp3", "flac", "m4a", "aac", "ogg", "wma", "midi"],
+    image: ['jpg', 'png', 'bmp', 'jpeg'],
+    pdf: ['pdf'],
+    doc: ['docx', 'doc'],
+    ppt: ['ppt', 'pptx'],
+    excel: ['xls', 'xlsx', 'csv'],
+    txt: ['txt'],
+    audio: ['wav', 'mp3', 'flac', 'm4a', 'aac', 'ogg', 'wma', 'midi'],
   };
 
   return typeMap[type] || [];
@@ -1121,18 +1121,18 @@ export const generateUploadType = (type: string): string[] => {
 // ==================== 工具函数 ====================
 const handleParmasOrder = (
   source: unknown[],
-  target: Record<string, unknown>,
+  target: Record<string, unknown>
 ): Record<string, unknown> => {
   const ordered: Record<string, unknown> = {};
-  const sourceKeys = source?.map((item) => item?.name) || [];
+  const sourceKeys = source?.map(item => item?.name) || [];
 
-  Object.keys(target).forEach((key) => {
+  Object.keys(target).forEach(key => {
     if (!sourceKeys.includes(key)) {
       ordered[key] = target[key];
     }
   });
 
-  source?.forEach((item) => {
+  source?.forEach(item => {
     const key = item.name;
     if (Object.hasOwn(target, key)) {
       ordered[key] = target[key];
@@ -1145,13 +1145,13 @@ const handleParmasOrder = (
 export const generateInputsAndOutputsOrder = (
   currentNode: unknown,
   target: Record<string, unknown>,
-  key: string,
+  key: string
 ): Record<string, unknown> => {
   let source: unknown[] = [];
 
-  if (currentNode?.id?.startsWith("node-end")) {
+  if (currentNode?.id?.startsWith('node-end')) {
     source = currentNode?.data?.inputs || [];
-  } else if (currentNode?.id?.startsWith("node-start")) {
+  } else if (currentNode?.id?.startsWith('node-start')) {
     source = currentNode?.data?.outputs || [];
   } else {
     source = currentNode?.data?.[key] || [];
@@ -1167,7 +1167,7 @@ export function filterTreeNodes(nodes: unknown[]): unknown[] {
   }
 
   return nodes
-    .map((node) => {
+    .map(node => {
       if (node.open === false) {
         return null;
       }
@@ -1180,13 +1180,13 @@ export function filterTreeNodes(nodes: unknown[]): unknown[] {
 
       return newNode;
     })
-    .filter((node) => node !== null);
+    .filter(node => node !== null);
 }
 
 // ==================== 对象生成和合并函数 ====================
 export function generateOrUpdateObject(
   schemaList: unknown[],
-  oldObj: unknown = null,
+  oldObj: unknown = null
 ): unknown {
   const newObj = generateDefaultObject(schemaList);
   return oldObj ? mergeByStructure(newObj, oldObj) : newObj;
@@ -1195,10 +1195,10 @@ export function generateOrUpdateObject(
 function generateDefaultObject(schemaList: unknown[]): Record<string, unknown> {
   const defaultValues: Record<string, unknown> = {};
 
-  schemaList.forEach((item) => {
+  schemaList.forEach(item => {
     defaultValues[item.name] = getDefaultValueForType(
       item.schema?.type,
-      item.schema,
+      item.schema
     );
   });
 
@@ -1219,7 +1219,7 @@ function mergeByStructure(newObj: unknown, oldObj: unknown): unknown {
 
 function mergeObjectsByStructure(
   newObj: Record<string, unknown>,
-  oldObj: Record<string, unknown>,
+  oldObj: Record<string, unknown>
 ): Record<string, unknown> {
   const result: Record<string, unknown> = {};
   const newKeys = Object.keys(newObj);
@@ -1240,7 +1240,7 @@ function mergeObjectsByStructure(
 
 function mergeArraysByStructure(
   newObj: unknown[],
-  oldObj: unknown[],
+  oldObj: unknown[]
 ): unknown[] {
   if (Array.isArray(oldObj) && oldObj.length > 0) {
     return [mergeByStructure(newObj[0], oldObj[0])];
@@ -1250,19 +1250,19 @@ function mergeArraysByStructure(
 
 function getDefaultValueForType(type: string, schema: unknown): unknown {
   const typeHandlers: Record<string, () => unknown> = {
-    string: () => "",
+    string: () => '',
     integer: () => 0,
     boolean: () => false,
     number: () => 0,
-    "array-string": () => [],
-    "array-integer": () => [],
-    "array-boolean": () => [],
-    "array-number": () => [],
+    'array-string': () => [],
+    'array-integer': () => [],
+    'array-boolean': () => [],
+    'array-number': () => [],
     object: () => handleObjectSchema(schema),
-    "array-object": () => handleArrayObjectSchema(schema),
+    'array-object': () => handleArrayObjectSchema(schema),
   };
 
-  return typeHandlers[type]?.() || "";
+  return typeHandlers[type]?.() || '';
 }
 
 function handleObjectSchema(schema: unknown): Record<string, unknown> {
@@ -1282,14 +1282,14 @@ function handleArrayObjectSchema(schema: unknown): unknown[] {
 }
 
 function isObject(value: unknown): boolean {
-  return value && typeof value === "object" && !Array.isArray(value);
+  return value && typeof value === 'object' && !Array.isArray(value);
 }
 
 // ==================== 路径查找函数 ====================
 export function findPathById(
   schemaList: unknown[],
   targetId: string,
-  currentPath: string[] = [],
+  currentPath: string[] = []
 ): string[] | null {
   for (const item of schemaList) {
     if (item.id === targetId) {
@@ -1342,11 +1342,11 @@ export function deleteFieldByPath(obj: unknown, path: string[]): unknown {
 
 // ==================== 工具参数处理函数 ====================
 export const handleModifyToolUrlParams = (
-  toolUrlParams: unknown[],
+  toolUrlParams: unknown[]
 ): unknown[] => {
   return (toolUrlParams || [])
-    .filter((item) => item?.open !== false)
-    .map((item) => ({
+    .filter(item => item?.open !== false)
+    .map(item => ({
       id: uuid(),
       name: item.name,
       type: item.type,
@@ -1356,7 +1356,7 @@ export const handleModifyToolUrlParams = (
       schema: {
         type: item.type,
         value: {
-          type: "ref",
+          type: 'ref',
           content: {},
         },
       },
@@ -1368,7 +1368,7 @@ export const findFromTwoItems = (tree: unknown[]): string[] => {
   const result: string[] = [];
 
   function traverse(node: unknown): void {
-    if (node.from === 1 && node?.fatherType !== "array") {
+    if (node.from === 1 && node?.fatherType !== 'array') {
       result.push(node.name);
     }
 
@@ -1377,7 +1377,7 @@ export const findFromTwoItems = (tree: unknown[]): string[] => {
     }
   }
 
-  tree.forEach((node) => traverse(node));
+  tree.forEach(node => traverse(node));
   return result;
 };
 
@@ -1396,7 +1396,7 @@ function transformArrayItem(item: unknown, isFirstLevel: boolean): unknown {
     transformedItem.type = item.type;
   }
 
-  if (item.type === "array") {
+  if (item.type === 'array') {
     handleArrayTransformation(item, transformedItem, isFirstLevel);
   } else if (item.children) {
     handleObjectTransformation(item, transformedItem, isFirstLevel);
@@ -1408,11 +1408,11 @@ function transformArrayItem(item: unknown, isFirstLevel: boolean): unknown {
 function handleArrayTransformation(
   item: unknown,
   transformedItem: unknown,
-  isFirstLevel: boolean,
+  isFirstLevel: boolean
 ): void {
   const firstChildType = item?.children?.[0]?.type;
 
-  if (firstChildType !== "object") {
+  if (firstChildType !== 'object') {
     if (isFirstLevel) {
       transformedItem.schema.type = `array-${firstChildType}`;
       transformedItem.schema.properties = [];
@@ -1427,10 +1427,10 @@ function handleArrayTransformation(
       .filter(Boolean);
 
     if (isFirstLevel) {
-      transformedItem.schema.type = "array-object";
+      transformedItem.schema.type = 'array-object';
       transformedItem.schema.properties = transformedChildren;
     } else {
-      transformedItem.type = "array-object";
+      transformedItem.type = 'array-object';
       transformedItem.properties = transformedChildren;
     }
   }
@@ -1439,34 +1439,32 @@ function handleArrayTransformation(
 function handleObjectTransformation(
   item: unknown,
   transformedItem: unknown,
-  isFirstLevel: boolean,
+  isFirstLevel: boolean
 ): void {
   const transformedChildren = item.children
     .map((child: unknown) => transformArrayItem(child, false))
     .filter(Boolean);
 
   if (isFirstLevel) {
-    transformedItem.schema.type = "object";
+    transformedItem.schema.type = 'object';
     transformedItem.schema.properties = transformedChildren;
   } else {
-    transformedItem.type = "object";
+    transformedItem.type = 'object';
     transformedItem.properties = transformedChildren;
   }
 }
 
 export const transformTree = (inputArray: unknown[]): unknown[] => {
-  return inputArray
-    .map((item) => transformArrayItem(item, true))
-    .filter(Boolean);
+  return inputArray.map(item => transformArrayItem(item, true)).filter(Boolean);
 };
 
 // ==================== 项目删除函数 ====================
 function removeFromProperties(
   propertiesArray: unknown[],
-  idToRemove: string,
+  idToRemove: string
 ): unknown[] {
   return propertiesArray
-    .map((property) => {
+    .map(property => {
       if (property.properties && Array.isArray(property.properties)) {
         return {
           ...property,
@@ -1475,15 +1473,15 @@ function removeFromProperties(
       }
       return property;
     })
-    .filter((property) => property.id !== idToRemove);
+    .filter(property => property.id !== idToRemove);
 }
 
 export const removeItemById = (
   dataArray: unknown[],
-  idToRemove: string,
+  idToRemove: string
 ): unknown[] => {
   return dataArray
-    .map((item) => {
+    .map(item => {
       if (item.schema && item.schema.properties) {
         return {
           ...item,
@@ -1491,14 +1489,14 @@ export const removeItemById = (
             ...item.schema,
             properties: removeFromProperties(
               item.schema.properties,
-              idToRemove,
+              idToRemove
             ),
           },
         };
       }
       return item;
     })
-    .filter((item) => item.id !== idToRemove);
+    .filter(item => item.id !== idToRemove);
 };
 
 // ==================== ID 提取函数 ====================
@@ -1543,7 +1541,7 @@ type EdgeType = {
 
 function buildOwnReferences(
   sourceNode: NodeType,
-  targetNode: NodeType,
+  targetNode: NodeType
 ): unknown[] {
   const errorOutputs =
     [1, 2]?.includes(sourceNode?.data?.retryConfig?.errorStrategy) &&
@@ -1552,9 +1550,9 @@ function buildOwnReferences(
       : [];
 
   const outputs =
-    targetNode?.nodeType === "iteration"
+    targetNode?.nodeType === 'iteration'
       ? sourceNode?.data?.outputs?.filter((output: unknown) =>
-          output?.schema?.type?.includes("array"),
+          output?.schema?.type?.includes('array')
         )
       : [...(sourceNode?.data?.outputs || []), ...errorOutputs];
 
@@ -1563,9 +1561,9 @@ function buildOwnReferences(
       originId: sourceNode.id,
       id: output.id,
       label: output.name,
-      type: output.schema?.type || "string",
+      type: output.schema?.type || 'string',
       value: output.name,
-      fileType: output.fileType || "",
+      fileType: output.fileType || '',
     })) || []
   );
 }
@@ -1581,9 +1579,9 @@ function buildOwnReferences(
 export function generateReferences(
   nodes: NodeType[],
   edges: EdgeType[],
-  id: string,
+  id: string
 ): unknown[] {
-  const targetNode = nodes.find((n) => n.id === id);
+  const targetNode = nodes.find(n => n.id === id);
   if (!targetNode) return [];
 
   // BFS/DFS 向上（沿 incoming edges）找所有上游节点（包含间接上游）
@@ -1594,7 +1592,7 @@ export function generateReferences(
   while (queue.length > 0) {
     const current = queue.shift();
     // 找到所有指向 current 的边（incoming）
-    const incoming = edges.filter((e) => e.target === current);
+    const incoming = edges.filter(e => e.target === current);
     for (const e of incoming) {
       const src = e.source;
       if (visited.has(src)) continue;
@@ -1606,19 +1604,19 @@ export function generateReferences(
 
   // 把每个上游节点做成两层结构：顶层节点 -> children -> references（由 buildOwnReferences 产生）
   const result = Array.from(ancestorIds)
-    .map((srcId) => {
-      const srcNode = nodes.find((n) => n.id === srcId);
+    .map(srcId => {
+      const srcNode = nodes.find(n => n.id === srcId);
       if (!srcNode) return null;
       // 调用你已有的构造引用函数（传入 targetNode，以便 buildOwnReferences 能知道引用目标）
       const references = buildOwnReferences(srcNode, targetNode) || [];
       return {
-        label: srcNode.data?.label ?? "",
+        label: srcNode.data?.label ?? '',
         value: srcNode.id,
         parentNode: true,
         children: [
           {
-            label: "",
-            value: "",
+            label: '',
+            value: '',
             references,
           },
         ],
@@ -1631,13 +1629,13 @@ export function generateReferences(
     const references = buildOwnReferences(targetNode, targetNode) || [];
     return [
       {
-        label: targetNode.data?.label ?? "",
+        label: targetNode.data?.label ?? '',
         value: targetNode.id,
         parentNode: true,
         children: [
           {
-            label: "",
-            value: "",
+            label: '',
+            value: '',
             references,
           },
         ],
@@ -1650,10 +1648,10 @@ export function generateReferences(
 
 export const convertToKBMB = (bytes: number): string => {
   if (bytes >= 1024 * 1024) {
-    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   } else if (bytes >= 1024) {
-    return (bytes / 1024).toFixed(1) + "KB";
+    return (bytes / 1024).toFixed(1) + 'KB';
   } else {
-    return bytes + "B";
+    return bytes + 'B';
   }
 };

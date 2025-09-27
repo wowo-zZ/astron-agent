@@ -1,8 +1,8 @@
-import { batchImportEnterpriseUser } from "@/services/enterprise";
-import { message } from "antd";
+import { batchImportEnterpriseUser } from '@/services/enterprise';
+import { message } from 'antd';
 
 const templateUrl =
-  "https://openres.xfyun.cn/xfyundoc/2025-08-25/b3aa233a-de0c-4ef6-a178-457aa11c8ae9/1756089615004/%E5%AF%BC%E5%85%A5%E6%A8%A1%E6%9D%BF.xlsx";
+  'https://openres.xfyun.cn/xfyundoc/2025-08-25/b3aa233a-de0c-4ef6-a178-457aa11c8ae9/1756089615004/%E5%AF%BC%E5%85%A5%E6%A8%A1%E6%9D%BF.xlsx';
 
 // 批量导入成员接口类型
 export interface BatchImportParams {
@@ -19,41 +19,41 @@ export interface BatchImportResult {
 
 // 根据链接下载excel文件
 const downloadExcelByUrl = (url: string, filename?: string) => {
-  const link = document.createElement("a");
+  const link = document.createElement('a');
   link.href = url;
-  link.download = filename || "download.xlsx";
+  link.download = filename || 'download.xlsx';
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-  message.success("下载成功");
+  message.success('下载成功');
 };
 
 // 下载成员导入模板
 export function downloadMemberTemplate(): void {
-  downloadExcelByUrl(templateUrl, "成员导入模板.xlsx");
+  downloadExcelByUrl(templateUrl, '成员导入模板.xlsx');
 }
 
 // excel校验
 export const validExcel = (file: File) => {
   return (
     file.type ===
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
-    file.type === "application/vnd.ms-excel" ||
-    file.name.endsWith(".xlsx") ||
-    file.name.endsWith(".xls")
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+    file.type === 'application/vnd.ms-excel' ||
+    file.name.endsWith('.xlsx') ||
+    file.name.endsWith('.xls')
   );
 };
 
 // 批量导入成员
 export async function batchImportMembers(
   params: FormData,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ): Promise<BatchImportResult> {
   try {
     const response: any = await batchImportEnterpriseUser(params, {
       signal, // 传递 AbortSignal
     });
-    console.log(response, "======== batchImportMembers =======");
+    console.log(response, '======== batchImportMembers =======');
     const { chatUserVOS, resultUrl } = response;
     const mockResult: BatchImportResult = {
       success: true,
@@ -65,7 +65,7 @@ export async function batchImportMembers(
 
     return mockResult;
   } catch (error: any) {
-    console.error("批量导入成员失败:", error);
+    console.error('批量导入成员失败:', error);
     throw error;
   }
 }

@@ -4,15 +4,15 @@ import React, {
   useEffect,
   useRef,
   useState,
-} from "react";
-import { Row, Col, Spin, message } from "antd";
-import { useNavigate } from "react-router-dom";
-import classNames from "classnames";
-import SpaceCard from "../space-card";
-import Empty from "../empty";
-import styles from "./index.module.scss";
-import useSpaceStore from "@/store/space-store";
-import { visitSpace, joinEnterpriseSpace } from "@/services/space";
+} from 'react';
+import { Row, Col, Spin, message } from 'antd';
+import { useNavigate } from 'react-router-dom';
+import classNames from 'classnames';
+import SpaceCard from '../space-card';
+import Empty from '../empty';
+import styles from './index.module.scss';
+import useSpaceStore from '@/store/space-store';
+import { visitSpace, joinEnterpriseSpace } from '@/services/space';
 
 interface SpaceItem {
   id: string;
@@ -61,11 +61,11 @@ const SpaceList: React.FC<SpaceListProps> = ({
   const computeColSpan = useCallback(
     (width: number) => {
       const candidates = [3, 4, 6]; // 最小两列
-      const possible = candidates.filter((c) => width / c >= minCardWidth);
+      const possible = candidates.filter(c => width / c >= minCardWidth);
       const cols = possible.length > 0 ? Math.max(...possible) : 3; // 至少两列
       return 24 / cols;
     },
-    [minCardWidth],
+    [minCardWidth]
   );
 
   useEffect(() => {
@@ -92,13 +92,13 @@ const SpaceList: React.FC<SpaceListProps> = ({
     async (space: SpaceItem) => {
       try {
         await joinEnterpriseSpace({ spaceId: `${space.id}` });
-        message.success("申请成功");
+        message.success('申请成功');
         refresh?.();
       } catch (err) {
         // message.error();
       }
     },
-    [refresh],
+    [refresh]
   );
 
   // 处理按钮点击事件
@@ -109,39 +109,39 @@ const SpaceList: React.FC<SpaceListProps> = ({
           await visitSpace(space.id);
           setSpaceId(space.id);
           setSpaceName(space.name);
-          setSpaceAvatar(space.avatarUrl || "");
+          setSpaceAvatar(space.avatarUrl || '');
           navigate(`/space/space-detail/${space.id}`);
         };
 
         switch (action) {
-          case "enter":
+          case 'enter':
             enterSpace();
             break;
-          case "join":
+          case 'join':
             // 处理申请加入
-            console.log("申请加入空间:", space.id);
+            console.log('申请加入空间:', space.id);
             spaceApply(space);
             break;
-          case "pending":
+          case 'pending':
             // 处理申请中状态
-            console.log("查看申请状态:", space.id);
+            console.log('查看申请状态:', space.id);
             break;
-          case "noPermission":
+          case 'noPermission':
             // 处理无权限情况
-            console.log("无权限访问空间:", space.id);
+            console.log('无权限访问空间:', space.id);
             break;
-          case "custom":
+          case 'custom':
             // 处理自定义操作
-            console.log("自定义操作:", space.id);
+            console.log('自定义操作:', space.id);
             break;
           default:
-            console.log("未知操作:", action, space.id);
+            console.log('未知操作:', action, space.id);
         }
       } catch (error: any) {
-        message.error(error.msg || error.desc || "访问空间失败");
+        message.error(error.msg || error.desc || '访问空间失败');
       }
     },
-    [navigate, setSpaceId, setSpaceName, spaceApply],
+    [navigate, setSpaceId, setSpaceName, spaceApply]
   );
 
   const content = useMemo(() => {
@@ -153,10 +153,10 @@ const SpaceList: React.FC<SpaceListProps> = ({
               {prefix}
             </Col>
           )}
-          {dataSource.map((space) => (
+          {dataSource.map(space => (
             <Col key={space.id} span={colSpan} className={styles.spaceCol}>
               <SpaceCard
-                style={{ width: "100%" }}
+                style={{ width: '100%' }}
                 spaceType={spaceType}
                 space={space}
                 onButtonClick={handleButtonClick}
@@ -175,7 +175,7 @@ const SpaceList: React.FC<SpaceListProps> = ({
     return (
       <>
         {prefix && prefix}
-        {dataSource.map((space) => (
+        {dataSource.map(space => (
           <SpaceCard
             key={space.id}
             spaceType={spaceType}

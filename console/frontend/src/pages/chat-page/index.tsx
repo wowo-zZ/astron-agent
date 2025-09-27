@@ -1,11 +1,11 @@
-import { ReactElement, useEffect, useState } from "react";
-import { message, Spin } from "antd";
-import useBotInfoStore from "@/store/bot-info-store";
-import ChatHeader from "./components/chat-header";
-import chatBg from "@/assets/imgs/chat/chat-bg.png";
-import MessageList from "./components/message-list";
-import useChatStore from "@/store/chat-store";
-import { useParams, useSearchParams } from "react-router-dom";
+import { ReactElement, useEffect, useState } from 'react';
+import { message, Spin } from 'antd';
+import useBotInfoStore from '@/store/bot-info-store';
+import ChatHeader from './components/chat-header';
+import chatBg from '@/assets/imgs/chat/chat-bg.png';
+import MessageList from './components/message-list';
+import useChatStore from '@/store/chat-store';
+import { useParams, useSearchParams } from 'react-router-dom';
 import {
   getChatHistory,
   postCreateChat,
@@ -14,31 +14,31 @@ import {
   postChatList,
   createChatByShareKey,
   getWorkflowBotInfoApi,
-} from "@/services/chat";
-import ChatInput from "./components/chat-input";
-import ChatSide from "./components/chat-side";
-import useChat from "@/hooks/use-chat";
-import { formatHistoryToMessages } from "@/utils";
-import { useTranslation } from "react-i18next";
+} from '@/services/chat';
+import ChatInput from './components/chat-input';
+import ChatSide from './components/chat-side';
+import useChat from '@/hooks/use-chat';
+import { formatHistoryToMessages } from '@/utils';
+import { useTranslation } from 'react-i18next';
 
 const ChatPage = (): ReactElement => {
-  const botInfo = useBotInfoStore((state) => state.botInfo); //  智能体信息
-  const setBotInfo = useBotInfoStore((state) => state.setBotInfo); //  设置智能体信息
-  const messageList = useChatStore((state) => state.messageList); //  消息列表
-  const streamId = useChatStore((state) => state.streamId); //  流式id
-  const isLoading = useChatStore((state) => state.isLoading); //  加载状态
-  const setMessageList = useChatStore((state) => state.setMessageList); //  设置消息列表
-  const setCurrentChatId = useChatStore((state) => state.setCurrentChatId); //  设置当前聊天id
-  const initChatStore = useChatStore((state) => state.initChatStore); //  初始化聊天store
+  const botInfo = useBotInfoStore(state => state.botInfo); //  智能体信息
+  const setBotInfo = useBotInfoStore(state => state.setBotInfo); //  设置智能体信息
+  const messageList = useChatStore(state => state.messageList); //  消息列表
+  const streamId = useChatStore(state => state.streamId); //  流式id
+  const isLoading = useChatStore(state => state.isLoading); //  加载状态
+  const setMessageList = useChatStore(state => state.setMessageList); //  设置消息列表
+  const setCurrentChatId = useChatStore(state => state.setCurrentChatId); //  设置当前聊天id
+  const initChatStore = useChatStore(state => state.initChatStore); //  初始化聊天store
   const [isDataLoading, setIsDataLoading] = useState<boolean>(false); //  数据加载状态
   const [searchParams] = useSearchParams();
   const { botId: botIdParam, version } = useParams<{
     botId: string;
     version?: string;
   }>();
-  const sharekey = searchParams.get("sharekey") || ""; //  分享key
-  const botId = parseInt(botIdParam || "0", 10) || 0; //  智能体ID
-  const [botNameColor, setBotNameColor] = useState<string>("#000000"); //设置字体颜色
+  const sharekey = searchParams.get('sharekey') || ''; //  分享key
+  const botId = parseInt(botIdParam || '0', 10) || 0; //  智能体ID
+  const [botNameColor, setBotNameColor] = useState<string>('#000000'); //设置字体颜色
   const { onSendMsg } = useChat();
   const { t } = useTranslation();
 
@@ -53,7 +53,7 @@ const ChatPage = (): ReactElement => {
       initChatStore();
       // 1. 判断是否有对话
       const chatList = await postChatList();
-      const hasChat = chatList.find((item) => item.botId === botId);
+      const hasChat = chatList.find(item => item.botId === botId);
       let chatId = 0;
 
       // 2. 判断是否有分享key
@@ -67,7 +67,7 @@ const ChatPage = (): ReactElement => {
       // 3. 获取智能体信息
       const botInfo = await getBotInfoApi(
         botId,
-        version !== "debugger" ? version || "" : "",
+        version !== 'debugger' ? version || '' : ''
       );
 
       const workflowBotInfo = await getWorkflowBotInfoApi(botId);
@@ -82,7 +82,7 @@ const ChatPage = (): ReactElement => {
       await getChatHistoryData(chatId);
       setIsDataLoading(false);
     } catch (error) {
-      console.error("初始化聊天页面失败:", error);
+      console.error('初始化聊天页面失败:', error);
       setBotInfo({});
     } finally {
       setIsDataLoading(false);
@@ -99,7 +99,7 @@ const ChatPage = (): ReactElement => {
   //发送消息
   const handleRecomendClick = (item: string, callback?: () => void) => {
     if (streamId || isDataLoading || isLoading) {
-      message.warning(t("chatPage.chatWindow.answeringInProgress"));
+      message.warning(t('chatPage.chatWindow.answeringInProgress'));
       return;
     }
     onSendMsg({

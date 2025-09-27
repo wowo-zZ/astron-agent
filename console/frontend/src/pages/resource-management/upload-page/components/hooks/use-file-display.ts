@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
 interface UseFileDisplayProps {
   showMore: boolean;
@@ -15,9 +15,9 @@ export const useFileDisplay = (): UseFileDisplayProps & {
   };
 
   useEffect(() => {
-    document.documentElement.addEventListener("click", clickOutside);
+    document.documentElement.addEventListener('click', clickOutside);
     return (): void =>
-      document.documentElement.removeEventListener("click", clickOutside);
+      document.documentElement.removeEventListener('click', clickOutside);
   }, []);
 
   return {

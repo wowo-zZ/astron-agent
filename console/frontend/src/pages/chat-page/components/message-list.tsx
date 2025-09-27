@@ -4,22 +4,22 @@ import {
   useRef,
   MutableRefObject,
   useState,
-} from "react";
-import type { MessageListType, BotInfoType, Option } from "@/types/chat";
-import recommendIcon from "@/assets/imgs/chat/recommend.svg";
-import rightArrowIcon from "@/assets/imgs/chat/right-arrow.svg";
-import LoadingAnimate from "@/constants/lottie-react/chat-loading.json";
-import { Progress, Skeleton } from "antd";
-import useUserStore from "@/store/user-store";
-import useChatStore from "@/store/chat-store";
-import { getLanguageCode } from "@/utils/http";
-import Lottie from "lottie-react";
-import DeepThinkProgress from "./deep-think-progress";
-import MarkdownRender from "@/components/markdown-render";
-import useBindEvents from "@/hooks/search-event-bind";
-import SourceInfoBox from "./source-info-box";
-import UseToolsInfo from "./use-tools-info";
-import WorkflowNodeOptions from "./workflow-node-options";
+} from 'react';
+import type { MessageListType, BotInfoType, Option } from '@/types/chat';
+import recommendIcon from '@/assets/imgs/chat/recommend.svg';
+import rightArrowIcon from '@/assets/imgs/chat/right-arrow.svg';
+import LoadingAnimate from '@/constants/lottie-react/chat-loading.json';
+import { Progress, Skeleton } from 'antd';
+import useUserStore from '@/store/user-store';
+import useChatStore from '@/store/chat-store';
+import { getLanguageCode } from '@/utils/http';
+import Lottie from 'lottie-react';
+import DeepThinkProgress from './deep-think-progress';
+import MarkdownRender from '@/components/markdown-render';
+import useBindEvents from '@/hooks/search-event-bind';
+import SourceInfoBox from './source-info-box';
+import UseToolsInfo from './use-tools-info';
+import WorkflowNodeOptions from './workflow-node-options';
 
 //渲染全新开始
 const renderRestart = (): ReactElement => {
@@ -49,9 +49,9 @@ const MessageList = (props: {
   const languageCode = getLanguageCode();
   const scrollAnchorRef = useRef<HTMLDivElement>(null);
   const answerPercent = useChatStore((state: any) => state.answerPercent); //回答进度条
-  const isLoading = useChatStore((state) => state.isLoading); //是否正在加载
-  const streamId = useChatStore((state) => state.streamId); //流式回复id
-  const workflowOperation = useChatStore((state) => state.workflowOperation); //工作流操作
+  const isLoading = useChatStore(state => state.isLoading); //是否正在加载
+  const streamId = useChatStore(state => state.streamId); //流式回复id
+  const workflowOperation = useChatStore(state => state.workflowOperation); //工作流操作
   const { user } = useUserStore();
   const lastClickedQA: MutableRefObject<MessageListType | null> =
     useRef<MessageListType | null>(null);
@@ -180,7 +180,7 @@ const MessageList = (props: {
   //渲染回复
   const renderResp = (
     item: MessageListType,
-    messageIndex: number,
+    messageIndex: number
   ): ReactElement => {
     const showLoading = !item.sid && (isLoading || !!answerPercent);
     const workflowContent = item?.workflowEventData?.content;
@@ -204,11 +204,11 @@ const MessageList = (props: {
                   loop={true}
                   className="w-[30px] h-[30px] mr-1"
                   rendererSettings={{
-                    preserveAspectRatio: "xMidYMid slice",
+                    preserveAspectRatio: 'xMidYMid slice',
                   }}
                 />
                 <span className="text-sm text-gray-500">
-                  {languageCode === "zh" ? "正在回答中..." : "Processing..."}
+                  {languageCode === 'zh' ? '正在回答中...' : 'Processing...'}
                 </span>
                 {!!answerPercent && (
                   <Progress
@@ -261,9 +261,9 @@ const MessageList = (props: {
               const actualIndex = messageList.length - 1 - index; // 计算真实的消息索引
               return (
                 <div className="w-[inherit]" key={actualIndex}>
-                  {item?.reqId === "USER" && renderReq(item)}
-                  {item?.reqId === "BOT" && renderResp(item, actualIndex)}
-                  {item?.reqId === "START" && renderRestart()}
+                  {item?.reqId === 'USER' && renderReq(item)}
+                  {item?.reqId === 'BOT' && renderResp(item, actualIndex)}
+                  {item?.reqId === 'START' && renderRestart()}
                 </div>
               );
             })}

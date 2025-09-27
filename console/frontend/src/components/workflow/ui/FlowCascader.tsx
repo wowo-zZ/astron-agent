@@ -1,13 +1,13 @@
-import React, { useState, useCallback, memo } from "react";
-import { Cascader, Empty } from "antd";
-import { cn } from "@/utils";
-import { useTranslation } from "react-i18next";
-import FlowTree from "./FlowTree";
+import React, { useState, useCallback, memo } from 'react';
+import { Cascader, Empty } from 'antd';
+import { cn } from '@/utils';
+import { useTranslation } from 'react-i18next';
+import FlowTree from './FlowTree';
 
-import formSelect from "@/assets/imgs/main/icon_nav_dropdown.svg";
+import formSelect from '@/assets/imgs/main/icon_nav_dropdown.svg';
 
 function FlowCascader({
-  className = "",
+  className = '',
   handleTreeSelect,
   ...reset
 }): React.ReactElement {
@@ -19,10 +19,10 @@ function FlowCascader({
     setOpen(false);
   }, []);
 
-  const titleRender = useCallback((nodeData) => {
+  const titleRender = useCallback(nodeData => {
     let type = nodeData?.type;
-    if (type?.includes("array")) {
-      const arr = nodeData?.type?.split("-");
+    if (type?.includes('array')) {
+      const arr = nodeData?.type?.split('-');
       if (nodeData?.fileType) {
         type = `Array<${
           nodeData?.fileType?.slice(0, 1).toUpperCase() +
@@ -44,7 +44,7 @@ function FlowCascader({
     );
   }, []);
 
-  const optionRender = useCallback((option) => {
+  const optionRender = useCallback(option => {
     return option?.disabled ? (
       <div className="flex flex-col items-center">
         <Empty />
@@ -59,11 +59,11 @@ function FlowCascader({
         )}
       </div>
     ) : (
-      <div onClick={(e) => e.stopPropagation()}>
+      <div onClick={e => e.stopPropagation()}>
         <FlowTree
           fieldNames={{
-            key: "id",
-            title: "label",
+            key: 'id',
+            title: 'label',
           }}
           defaultExpandAll
           titleRender={titleRender}
@@ -83,8 +83,8 @@ function FlowCascader({
         optionRender={optionRender}
         allowClear={false}
         suffixIcon={<img src={formSelect} className="w-4 h-4" />}
-        placeholder={t("common.pleaseSelect")}
-        className={cn("flow-select nodrag w-full", className)}
+        placeholder={t('common.pleaseSelect')}
+        className={cn('flow-select nodrag w-full', className)}
         dropdownAlign={{ offset: [0, 0] }}
         popupClassName="custom-cascader-popup"
         {...reset}

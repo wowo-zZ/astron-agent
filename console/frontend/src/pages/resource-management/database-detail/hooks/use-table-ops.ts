@@ -1,10 +1,10 @@
-import { useCallback } from "react";
-import { message, Modal } from "antd";
-import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
-import { useDatabaseContext } from "../context/database-context";
-import { tableList, deleteTable, copyTable } from "@/services/database";
-import { DatabaseItem } from "@/types/database";
+import { useCallback } from 'react';
+import { message, Modal } from 'antd';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
+import { useDatabaseContext } from '../context/database-context';
+import { tableList, deleteTable, copyTable } from '@/services/database';
+import { DatabaseItem } from '@/types/database';
 
 /**
  * 表格操作Hook
@@ -28,7 +28,7 @@ export const useTableOps = (): {
 
       if (list?.length) {
         const activeItem = list.find(
-          (item) => item.id === state.currentSheet?.id,
+          item => item.id === state.currentSheet?.id
         );
         actions.setCurrentSheet(activeItem || list[0] || null);
       }
@@ -40,7 +40,7 @@ export const useTableOps = (): {
   const deleteTableById = useCallback(
     async (tableId: number) => {
       Modal.confirm({
-        title: t("database.confirmDeleteTable"),
+        title: t('database.confirmDeleteTable'),
         centered: true,
         onOk: async () => {
           try {
@@ -48,7 +48,7 @@ export const useTableOps = (): {
             await deleteTable({ id: tableId });
             actions.setCurrentSheet(null);
             fetchTableList();
-            message.success(t("database.deleteSuccess"));
+            message.success(t('database.deleteSuccess'));
           } catch (error) {
             actions.setTables(state.tables, false);
           }
@@ -61,7 +61,7 @@ export const useTableOps = (): {
       state.tables,
       fetchTableList,
       t,
-    ],
+    ]
   );
 
   const copyTableById = useCallback(
@@ -69,19 +69,19 @@ export const useTableOps = (): {
       try {
         await copyTable({ tbId: tableId });
         fetchTableList();
-        message.success(t("database.copySuccess"));
+        message.success(t('database.copySuccess'));
       } catch (error) {
         // 复制表格失败
       }
     },
-    [fetchTableList, t],
+    [fetchTableList, t]
   );
 
   const handleSheetSelect = useCallback(
     (sheet: DatabaseItem | null) => {
       actions.setCurrentSheet(sheet);
     },
-    [actions.setCurrentSheet],
+    [actions.setCurrentSheet]
   );
 
   return { fetchTableList, deleteTableById, copyTableById, handleSheetSelect };

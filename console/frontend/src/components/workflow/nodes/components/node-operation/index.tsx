@@ -1,33 +1,33 @@
-import React, { useState, useMemo, memo } from "react";
-import { nodeDebug } from "@/services/flow";
-import { cloneDeep } from "lodash";
-import { message, Dropdown, Space, Tooltip } from "antd";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import SingleNodeDebugging from "@/components/workflow/drawer/single-node-debugging";
-import { generateDefaultInput } from "@/components/workflow/utils/reactflowUtils";
-import { useTranslation } from "react-i18next";
-import { useMemoizedFn } from "ahooks";
-import { useNodeCommon } from "@/components/workflow/hooks/useNodeCommon";
-import { UseNodeDebuggerReturn } from "@/components/workflow/types/nodes";
-import { Icons } from "@/components/workflow/icons";
+import React, { useState, useMemo, memo } from 'react';
+import { nodeDebug } from '@/services/flow';
+import { cloneDeep } from 'lodash';
+import { message, Dropdown, Space, Tooltip } from 'antd';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import SingleNodeDebugging from '@/components/workflow/drawer/single-node-debugging';
+import { generateDefaultInput } from '@/components/workflow/utils/reactflowUtils';
+import { useTranslation } from 'react-i18next';
+import { useMemoizedFn } from 'ahooks';
+import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import { UseNodeDebuggerReturn } from '@/components/workflow/types/nodes';
+import { Icons } from '@/components/workflow/icons';
 
 const useNodeDebugger = (id, data, labelInput): UseNodeDebuggerReturn => {
   const { currentNode } = useNodeCommon({ id, data });
   const { t } = useTranslation();
-  const setShowNodeList = useFlowsManager((state) => state.setShowNodeList);
+  const setShowNodeList = useFlowsManager(state => state.setShowNodeList);
   const autoSaveCurrentFlow = useFlowsManager(
-    (state) => state.autoSaveCurrentFlow,
+    state => state.autoSaveCurrentFlow
   );
-  const currentStore = useFlowsManager((state) => state.getCurrentStore());
-  const currentFlow = useFlowsManager((state) => state.currentFlow);
-  const nodes = currentStore((state) => state.nodes);
-  const checkNode = currentStore((state) => state.checkNode);
-  const setNode = currentStore((state) => state.setNode);
+  const currentStore = useFlowsManager(state => state.getCurrentStore());
+  const currentFlow = useFlowsManager(state => state.currentFlow);
+  const nodes = currentStore(state => state.nodes);
+  const checkNode = currentStore(state => state.checkNode);
+  const setNode = currentStore(state => state.setNode);
   const [open, setOpen] = useState(false);
   const [refInputs, setRefInputs] = useState([]);
 
   const nodeDebugExect = useMemoizedFn((currentNode, debuggerNode) => {
-    currentNode.data.status = "running";
+    currentNode.data.status = 'running';
     setShowNodeList(false);
     setNode(id, cloneDeep(currentNode));
     const params = {
@@ -40,21 +40,21 @@ const useNodeDebugger = (id, data, labelInput): UseNodeDebuggerReturn => {
       },
     };
     nodeDebug(id, params)
-      .then((res) => {
+      .then(res => {
         if (res.code === 0) {
           currentNode.data.debuggerResult = {
-            timeCost: res.data["node_exec_cost"],
-            tokenCost: res?.data?.["token_cost"]?.["total_tokens"] || undefined,
+            timeCost: res.data['node_exec_cost'],
+            tokenCost: res?.data?.['token_cost']?.['total_tokens'] || undefined,
             input: res.data.input && JSON.parse(res.data.input),
-            rawOutput: res.data["raw_output"],
+            rawOutput: res.data['raw_output'],
             output: res.data.output && JSON.parse(res.data.output),
           };
-          currentNode.data.status = "success";
+          currentNode.data.status = 'success';
         } else {
           currentNode.data.debuggerResult = {
             failedReason: res.message,
           };
-          currentNode.data.status = "failed";
+          currentNode.data.status = 'failed';
         }
         setNode(id, cloneDeep(currentNode));
       })
@@ -63,13 +63,13 @@ const useNodeDebugger = (id, data, labelInput): UseNodeDebuggerReturn => {
 
   const handleNodeDebug = useMemoizedFn(() => {
     if (!checkNode(id)) {
-      message.warning(t("workflow.promptDebugger.nodeValidationWarning"));
+      message.warning(t('workflow.promptDebugger.nodeValidationWarning'));
       return;
     }
-    const currentNode = nodes.find((node) => node.id === id);
+    const currentNode = nodes.find(node => node.id === id);
     const refInputs = currentNode.data.inputs
-      .filter((input) => input.schema.value.type === "ref")
-      ?.map((input) => {
+      .filter(input => input.schema.value.type === 'ref')
+      ?.map(input => {
         return {
           id: input.id,
           name: input.name,
@@ -77,10 +77,10 @@ const useNodeDebugger = (id, data, labelInput): UseNodeDebuggerReturn => {
           type: input?.schema?.type,
           default: input?.fileType
             ? []
-            : input?.schema?.type === "object"
-              ? "{}"
-              : input?.schema?.type.includes("array")
-                ? "[]"
+            : input?.schema?.type === 'object'
+              ? '{}'
+              : input?.schema?.type.includes('array')
+                ? '[]'
                 : generateDefaultInput(input?.schema?.type),
           fileType: input.fileType,
           allowedFileType: [input?.fileType],
@@ -89,7 +89,7 @@ const useNodeDebugger = (id, data, labelInput): UseNodeDebuggerReturn => {
     if (refInputs.length === 0) {
       const debuggerNode = cloneDeep(currentNode);
       debuggerNode.data.inputs = debuggerNode.data.inputs?.filter(
-        (input) => input?.schema?.value?.content,
+        input => input?.schema?.value?.content
       );
       nodeDebugExect(currentNode, debuggerNode);
     } else {
@@ -100,8 +100,8 @@ const useNodeDebugger = (id, data, labelInput): UseNodeDebuggerReturn => {
 
   const remarkStatus = useMemo(() => {
     const data = currentNode?.data;
-    if (data && Object.hasOwn(data.nodeParam, "remark")) {
-      return data.nodeParam.remarkVisible ? "show" : "hide";
+    if (data && Object.hasOwn(data.nodeParam, 'remark')) {
+      return data.nodeParam.remarkVisible ? 'show' : 'hide';
     }
     return null;
   }, [currentNode]);
@@ -113,8 +113,8 @@ const useNodeDebugger = (id, data, labelInput): UseNodeDebuggerReturn => {
         ...currentNode.data,
         nodeParam: {
           ...currentNode.data.nodeParam,
-          remarkVisible: remarkStatus === "show" ? false : true,
-          remark: remarkStatus ? currentNode.data.nodeParam.remark : "",
+          remarkVisible: remarkStatus === 'show' ? false : true,
+          remark: remarkStatus ? currentNode.data.nodeParam.remark : '',
         },
       },
     });
@@ -140,24 +140,24 @@ const useNodeDebugger = (id, data, labelInput): UseNodeDebuggerReturn => {
 
 const NodeMenu = ({ id, remarkStatus, remarkClick }): React.ReactElement => {
   const { t } = useTranslation();
-  const currentStore = useFlowsManager((state) => state.getCurrentStore());
-  const deleteNode = currentStore((state) => state.deleteNode);
-  const copyNode = currentStore((state) => state.copyNode);
+  const currentStore = useFlowsManager(state => state.getCurrentStore());
+  const deleteNode = currentStore(state => state.deleteNode);
+  const copyNode = currentStore(state => state.copyNode);
   const setNodeInfoEditDrawerlInfo = useFlowsManager(
-    (state) => state.setNodeInfoEditDrawerlInfo,
+    state => state.setNodeInfoEditDrawerlInfo
   );
   const items = [
     {
-      key: "1",
+      key: '1',
       label: (
         <Space size={4}>
           <img width={15} src={Icons.nodeOperation.remark} alt="" />
           <span className="text-[#99A1B6]">
             {remarkStatus
-              ? remarkStatus === "show"
-                ? t("workflow.nodes.common.hideNote")
-                : t("workflow.nodes.common.showNote")
-              : t("workflow.nodes.common.addNote")}
+              ? remarkStatus === 'show'
+                ? t('workflow.nodes.common.hideNote')
+                : t('workflow.nodes.common.showNote')
+              : t('workflow.nodes.common.addNote')}
           </span>
         </Space>
       ),
@@ -167,12 +167,12 @@ const NodeMenu = ({ id, remarkStatus, remarkClick }): React.ReactElement => {
       },
     },
     {
-      key: "2",
+      key: '2',
       label: (
         <Space size={4}>
           <img width={15} src={Icons.nodeOperation.copy} alt="" />
           <span className="text-[#99A1B6]">
-            {t("workflow.nodes.common.createCopy")}
+            {t('workflow.nodes.common.createCopy')}
           </span>
         </Space>
       ),
@@ -182,22 +182,22 @@ const NodeMenu = ({ id, remarkStatus, remarkClick }): React.ReactElement => {
       },
     },
     {
-      key: "3",
+      key: '3',
       label: (
         <Space size={4}>
           <div className="w-[15px] h-[15px] flex justify-center items-center delete-icon"></div>
           <span className="delete-text">
-            {t("workflow.nodes.common.deleteNode")}
+            {t('workflow.nodes.common.deleteNode')}
           </span>
         </Space>
       ),
-      "data-type": "delete",
+      'data-type': 'delete',
       onClick: (e): void => {
         e.domEvent.stopPropagation();
         deleteNode(id);
         setNodeInfoEditDrawerlInfo({
           open: false,
-          nodeId: "",
+          nodeId: '',
         });
       },
     },
@@ -217,7 +217,7 @@ const NodeMenu = ({ id, remarkStatus, remarkClick }): React.ReactElement => {
   );
 };
 
-function index({ data, id, labelInput = "labelInput" }): React.ReactElement {
+function index({ data, id, labelInput = 'labelInput' }): React.ReactElement {
   const {
     open,
     setOpen,
@@ -230,12 +230,12 @@ function index({ data, id, labelInput = "labelInput" }): React.ReactElement {
     labelInputId,
   } = useNodeDebugger(id, data, labelInput);
   const { nodeType } = useNodeCommon({ id, data });
-  const getCurrentStore = useFlowsManager((state) => state.getCurrentStore);
+  const getCurrentStore = useFlowsManager(state => state.getCurrentStore);
   const currentStore = getCurrentStore();
   const updateNodeNameStatus = currentStore(
-    (state) => state.updateNodeNameStatus,
+    state => state.updateNodeNameStatus
   );
-  const canvasesDisabled = useFlowsManager((state) => state.canvasesDisabled);
+  const canvasesDisabled = useFlowsManager(state => state.canvasesDisabled);
 
   return (
     <>
@@ -249,8 +249,8 @@ function index({ data, id, labelInput = "labelInput" }): React.ReactElement {
             setRefInputs={setRefInputs}
             nodeDebugExect={nodeDebugExect}
           />
-          {!["if-else", "message", "iteration", "question-answer"].includes(
-            nodeType as string,
+          {!['if-else', 'message', 'iteration', 'question-answer'].includes(
+            nodeType as string
           ) && (
             <Tooltip title="测试该节点" overlayClassName="black-tooltip">
               <img
@@ -261,7 +261,7 @@ function index({ data, id, labelInput = "labelInput" }): React.ReactElement {
                   handleNodeDebug();
                 }}
                 style={{
-                  pointerEvents: "auto",
+                  pointerEvents: 'auto',
                 }}
               />
             </Tooltip>

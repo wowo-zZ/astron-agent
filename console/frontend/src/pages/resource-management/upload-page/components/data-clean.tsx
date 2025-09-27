@@ -1,35 +1,35 @@
-import React, { FC } from "react";
-import { Button, Input, InputNumber } from "antd";
-import { useTranslation } from "react-i18next";
-import Lottie from "lottie-react";
-import GlobalMarkDown from "@/components/global-markdown";
-import { typeList } from "@/constants";
-import { downloadExcel, generateType } from "@/utils/utils";
+import React, { FC } from 'react';
+import { Button, Input, InputNumber } from 'antd';
+import { useTranslation } from 'react-i18next';
+import Lottie from 'lottie-react';
+import GlobalMarkDown from '@/components/global-markdown';
+import { typeList } from '@/constants';
+import { downloadExcel, generateType } from '@/utils/utils';
 import {
   Chunk,
   FileStatusResponse,
   FlexibleType,
   RepoItem,
   UploadFile,
-} from "@/types/resource";
-import { useDataClean } from "./hooks/use-data-clean";
-import { useFileDisplay } from "./hooks/use-file-display";
-import { useKnowledgeSelect } from "./hooks/use-knowledge-select";
+} from '@/types/resource';
+import { useDataClean } from './hooks/use-data-clean';
+import { useFileDisplay } from './hooks/use-file-display';
+import { useKnowledgeSelect } from './hooks/use-knowledge-select';
 
 // Images
-import jiexiAnimation from "@/constants/lottie-react/jiexi.json";
-import setting from "@/assets/imgs/knowledge/icon_zhishi_datawashing_setting.png";
-import quote from "@/assets/imgs/knowledge/icon_zhishi_datawashing_index.png";
-import preview from "@/assets/imgs/knowledge/icon_zhishi_datawashing_preview.png";
-import check from "@/assets/imgs/knowledge/icon_dialog_check.png";
-import order from "@/assets/imgs/knowledge/icon_zhishi_order.png";
-import text from "@/assets/imgs/knowledge/icon_zhishi_text.png";
-import select from "@/assets/imgs/knowledge/icon_nav_dropdown.png";
-import restart from "@/assets/imgs/knowledge/bnt_zhishi_restart.png";
-import arrowRight from "@/assets/imgs/knowledge/icon_zhishi_datawashing_rightarow.png";
-import arrowDown from "@/assets/imgs/knowledge/icon_zhishi_datawashing_downarow.png";
-import download from "@/assets/imgs/knowledge/icon_zhishi_download.png";
-import dataCleanWait from "@/assets/imgs/knowledge/data-clean-wait.svg";
+import jiexiAnimation from '@/constants/lottie-react/jiexi.json';
+import setting from '@/assets/imgs/knowledge/icon_zhishi_datawashing_setting.png';
+import quote from '@/assets/imgs/knowledge/icon_zhishi_datawashing_index.png';
+import preview from '@/assets/imgs/knowledge/icon_zhishi_datawashing_preview.png';
+import check from '@/assets/imgs/knowledge/icon_dialog_check.png';
+import order from '@/assets/imgs/knowledge/icon_zhishi_order.png';
+import text from '@/assets/imgs/knowledge/icon_zhishi_text.png';
+import select from '@/assets/imgs/knowledge/icon_nav_dropdown.png';
+import restart from '@/assets/imgs/knowledge/bnt_zhishi_restart.png';
+import arrowRight from '@/assets/imgs/knowledge/icon_zhishi_datawashing_rightarow.png';
+import arrowDown from '@/assets/imgs/knowledge/icon_zhishi_datawashing_downarow.png';
+import download from '@/assets/imgs/knowledge/icon_zhishi_download.png';
+import dataCleanWait from '@/assets/imgs/knowledge/data-clean-wait.svg';
 
 interface DataCleanProps {
   tag: string;
@@ -69,30 +69,30 @@ const FileHeader: React.FC<{
 }> = ({ importType, uploadList, linkList, showMore, setShowMore }) => {
   const { t } = useTranslation();
 
-  if (importType === "text") {
+  if (importType === 'text') {
     return (
       <div
         className="relative ml-4 w-[400px] px-3.5 py-2.5 bg-[#EFF1F9] flex items-center"
         style={{ borderRadius: 10 }}
-        onClick={(event) => {
+        onClick={event => {
           event.stopPropagation();
           setShowMore(!showMore);
         }}
       >
         <img
-          src={typeList.get(uploadList[0]?.type || "")}
+          src={typeList.get(uploadList[0]?.type || '')}
           className="w-[22px] h-[22px] flex-shrink-0"
           alt=""
         />
         <p
           className="flex-1 ml-2 text-sm font-medium text-overflow text-second"
-          title={uploadList[0]?.name || ""}
+          title={uploadList[0]?.name || ''}
         >
-          {uploadList[0]?.name || ""}
+          {uploadList[0]?.name || ''}
         </p>
         {uploadList.length > 1 && (
           <span className="ml-2 text-desc">
-            {t("knowledge.filesCount", { count: uploadList.length })}
+            {t('knowledge.filesCount', { count: uploadList.length })}
           </span>
         )}
         {uploadList.length > 1 && (
@@ -100,13 +100,13 @@ const FileHeader: React.FC<{
         )}
         {showMore && uploadList.length > 1 && (
           <div className="absolute right-0 top-[42px] list-options py-3.5 pt-2 w-full z-10 max-h-[205px] overflow-auto">
-            {uploadList.slice(1).map((item) => (
+            {uploadList.slice(1).map(item => (
               <div
                 key={item.id}
                 className="w-full px-5 py-1.5 pr-4 text-desc font-medium hover:bg-[#F9FAFB] flex items-center"
               >
                 <img
-                  src={typeList.get(item.type || "")}
+                  src={typeList.get(item.type || '')}
                   className="flex-shrink-0 w-4 h-4"
                   alt=""
                 />
@@ -121,12 +121,12 @@ const FileHeader: React.FC<{
     );
   }
 
-  if (importType === "web") {
+  if (importType === 'web') {
     return (
       <div
         className="relative ml-4 w-[400px] px-3.5 py-2.5 bg-[#EFF1F9] flex items-center"
         style={{ borderRadius: 10 }}
-        onClick={(event) => {
+        onClick={event => {
           event.stopPropagation();
           setShowMore(!showMore);
         }}
@@ -139,7 +139,7 @@ const FileHeader: React.FC<{
         </p>
         {linkList.length > 1 && (
           <span className="ml-2 text-desc">
-            {t("knowledge.filesCount", { count: linkList.length })}
+            {t('knowledge.filesCount', { count: linkList.length })}
           </span>
         )}
         {linkList.length > 1 && (
@@ -181,16 +181,16 @@ const FailedFilesSection: React.FC<{
   return (
     <div className="mb-4">
       <div className="flex items-center">
-        <span>{t("knowledge.failedCount", { count: failedList.length })}</span>
+        <span>{t('knowledge.failedCount', { count: failedList.length })}</span>
         <div
           className="flex items-center text-[#757575] text-xs cursor-pointer"
           onClick={reTry}
         >
           <img src={restart} className="w-4 h-4" alt="" />
-          <p className="ml-1.5">{t("knowledge.retry")}</p>
+          <p className="ml-1.5">{t('knowledge.retry')}</p>
         </div>
       </div>
-      {failedList.map((u) => (
+      {failedList.map(u => (
         <div
           key={u.id}
           className="bg-[#fef6f5] rounded-xl p-2.5 flex items-center gap-2 justify-between mt-2"
@@ -198,7 +198,7 @@ const FailedFilesSection: React.FC<{
           <div className="flex items-center overflow-hidden">
             <img
               src={typeList.get(
-                generateType(u.type?.toLowerCase() || "") || "",
+                generateType(u.type?.toLowerCase() || '') || ''
               )}
               className="w-[22px] h-[22px]"
               alt=""
@@ -266,25 +266,25 @@ const SegmentationSettings: React.FC<{
           <img src={setting} className="w-5 h-5" alt="" />
         </div>
         <span className="ml-3 text-lg font-semibold text-second">
-          {t("knowledge.segmentationSettings")}
+          {t('knowledge.segmentationSettings')}
         </span>
       </div>
       <div
         className={`mt-3 border border-${
-          sliceType === "default" ? "[#009dff]" : "[#e7ecff]"
+          sliceType === 'default' ? '[#009dff]' : '[#e7ecff]'
         } rounded-lg px-6 py-4 cursor-pointer flex justify-between items-center`}
         onClick={selectDefault}
       >
         <div>
           <h2 className="text-xl font-medium text-second">
-            {t("knowledge.autoSegmentationAndCleaning")}
+            {t('knowledge.autoSegmentationAndCleaning')}
           </h2>
           <p className="mt-2 text-desc">
-            {t("knowledge.autoSegmentationAndCleaningDesc")}
+            {t('knowledge.autoSegmentationAndCleaningDesc')}
           </p>
         </div>
         <div className="w-5 h-5 bg-[#275EFF] rounded-full flex justify-center items-center">
-          {sliceType === "default" ? (
+          {sliceType === 'default' ? (
             <img src={check} className="w-4 h-4" alt="" />
           ) : (
             <span className="border border-[#d3d3d3] w-5 h-5 rounded-full bg-[#EFF1F9]"></span>
@@ -293,47 +293,47 @@ const SegmentationSettings: React.FC<{
       </div>
       <div
         className={`mt-3 border border-${
-          sliceType === "custom" ? "[#009dff]" : "[#e7ecff]"
+          sliceType === 'custom' ? '[#009dff]' : '[#e7ecff]'
         } rounded-lg px-6 py-4 cursor-pointer`}
         onClick={selectCustom}
       >
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-xl font-medium text-second">
-              {t("knowledge.custom")}
+              {t('knowledge.custom')}
             </h2>
-            <p className="mt-2 text-desc">{t("knowledge.customDesc")}</p>
+            <p className="mt-2 text-desc">{t('knowledge.customDesc')}</p>
           </div>
           <div className="w-5 h-5 bg-[#275EFF] rounded-full flex justify-center items-center">
-            {sliceType === "custom" ? (
+            {sliceType === 'custom' ? (
               <img src={check} className="w-4 h-4" alt="" />
             ) : (
               <span className="border border-[#d3d3d3] w-5 h-5 rounded-full bg-[#EFF1F9]"></span>
             )}
           </div>
         </div>
-        {sliceType === "custom" && (
+        {sliceType === 'custom' && (
           <div className="mt-5">
             <div className="text-sm font-medium text-second">
-              {t("knowledge.segmentIdentifier")}
+              {t('knowledge.segmentIdentifier')}
             </div>
             <div ref={knowledgeSelectRef} className="relative mt-1.5">
               <Input
                 value={configDetail.seperator}
-                onChange={(event) => {
+                onChange={event => {
                   const newConfig = { ...configDetail };
                   newConfig.seperator = event.target.value;
                   setConfigDetail(newConfig);
                 }}
-                placeholder={t("knowledge.pleaseEnter")}
+                placeholder={t('knowledge.pleaseEnter')}
                 className="absolute top-0 left-0 z-10 global-input"
                 onFocus={() => setOpen(true)}
               />
             </div>
             <div className="mt-6 text-sm font-medium text-second">
-              {t("knowledge.segmentLength")}{" "}
+              {t('knowledge.segmentLength')}{' '}
               <span className="text-xs text-desc">
-                {t("knowledge.supportSegmentLength", {
+                {t('knowledge.supportSegmentLength', {
                   min: lengthRange[0],
                   max: lengthRange[1],
                 })}
@@ -345,14 +345,14 @@ const SegmentationSettings: React.FC<{
                 max={lengthRange[1] || 0}
                 controls={false}
                 value={configDetail.min}
-                onChange={(value) => {
+                onChange={value => {
                   if (value) {
                     const newConfig = { ...configDetail };
                     newConfig.min = value as number;
                     setConfigDetail(newConfig);
                   }
                 }}
-                placeholder={t("knowledge.pleaseEnter")}
+                placeholder={t('knowledge.pleaseEnter')}
                 className="global-input w-[141px] py-1"
               />
               <span className="w-5 h-[1px] bg-[#d3d3d3] mx-2"></span>
@@ -360,7 +360,7 @@ const SegmentationSettings: React.FC<{
                 min={lengthRange[0] || 0}
                 max={lengthRange[1] || 0}
                 value={configDetail.max}
-                onChange={(value) => {
+                onChange={value => {
                   if (value) {
                     const newConfig = { ...configDetail };
                     newConfig.max = value;
@@ -368,7 +368,7 @@ const SegmentationSettings: React.FC<{
                   }
                 }}
                 controls={false}
-                placeholder={t("knowledge.pleaseEnter")}
+                placeholder={t('knowledge.pleaseEnter')}
                 className="global-input w-[141px] py-1"
               />
             </div>
@@ -378,14 +378,14 @@ const SegmentationSettings: React.FC<{
                 className="primary-btn w-[90px] h-10"
                 onClick={() => customSlice()}
               >
-                {t("knowledge.preview")}
+                {t('knowledge.preview')}
               </Button>
               <Button
                 type="text"
                 className="second-btn w-[90px] h-10"
                 onClick={() => initConfig()}
               >
-                {t("knowledge.reset")}
+                {t('knowledge.reset')}
               </Button>
             </div>
           </div>
@@ -406,15 +406,15 @@ const IndexingMethod: React.FC = () => {
           <img src={quote} className="w-5 h-5" alt="" />
         </div>
         <span className="ml-3 text-lg font-semibold text-second">
-          {t("knowledge.indexingMethod")}
+          {t('knowledge.indexingMethod')}
         </span>
       </div>
       <div className="mt-3 border border-[#009dff] rounded-lg px-6 py-4 flex justify-between items-center">
         <div>
           <h2 className="text-xl font-medium text-second">
-            {t("knowledge.highQuality")}
+            {t('knowledge.highQuality')}
           </h2>
-          <p className="mt-2 text-desc">{t("knowledge.highQualityDesc")}</p>
+          <p className="mt-2 text-desc">{t('knowledge.highQualityDesc')}</p>
         </div>
       </div>
     </>
@@ -446,23 +446,23 @@ const SegmentPreviewHeader: React.FC<{
           <img src={preview} className="w-5 h-5" alt="" />
         </div>
         <span className="ml-3 text-lg font-semibold text-second">
-          {t("knowledge.segmentPreview")}
+          {t('knowledge.segmentPreview')}
         </span>
         {sliceType && (
           <span className="ml-3 h-[20px] px-2 leading-[20px] text-[10px] text-[#FFFFFF] rounded-[4px] bg-[#3DC253]">
-            {sliceType === "default"
-              ? t("knowledge.automatic")
-              : t("knowledge.customized")}
+            {sliceType === 'default'
+              ? t('knowledge.automatic')
+              : t('knowledge.customized')}
           </span>
         )}
         {!slicing ? (
           <span className="text-desc text-sm mt-1.5 ml-2">
-            ({t("knowledge.violationCount", { count: violationTotal })}/
-            {t("knowledge.totalCount", { count: total })})
+            ({t('knowledge.violationCount', { count: violationTotal })}/
+            {t('knowledge.totalCount', { count: total })})
           </span>
         ) : (
           <span className="text-desc text-[12px] ml-2">
-            {t("knowledge.saveTip")}
+            {t('knowledge.saveTip')}
           </span>
         )}
       </div>
@@ -472,7 +472,7 @@ const SegmentPreviewHeader: React.FC<{
           onClick={() => downloadExcel(fileIds, 0, knowledgeDetail.name)}
         >
           <img src={download} className="w-4 h-4" alt="" />
-          <span>{t("knowledge.downloadViolationDetails")}</span>
+          <span>{t('knowledge.downloadViolationDetails')}</span>
         </div>
       )}
     </div>
@@ -491,7 +491,7 @@ const SegmentPreviewContent: React.FC<{
 
   const handleViolationToggle = (itemId: string): void => {
     if (violationIds.includes(itemId)) {
-      const newViolationIds = violationIds.filter((v) => v !== itemId);
+      const newViolationIds = violationIds.filter(v => v !== itemId);
       setViolationIds([...newViolationIds]);
     } else {
       violationIds.push(itemId);
@@ -502,7 +502,7 @@ const SegmentPreviewContent: React.FC<{
   if (slicing) {
     return (
       <div className="flex flex-col h-full gap-4 overflow-auto">
-        {[1, 2].map((index) => (
+        {[1, 2].map(index => (
           <div
             key={index}
             className="bg-[#F8FAFF] rounded-xl w-[450px] p-4 relative"
@@ -511,12 +511,12 @@ const SegmentPreviewContent: React.FC<{
               animationData={jiexiAnimation}
               loop={true}
               autoplay={true}
-              style={{ width: "100%", height: "auto" }}
+              style={{ width: '100%', height: 'auto' }}
             />
             <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[210px] h-[94px] bg-[#fff] rounded-2xl flex flex-col items-center justify-center gap-3">
               <img src={dataCleanWait} className="w-[18px] h-[18px]" alt="" />
               <p className="text-[#8FACFF] text-sm font-medium">
-                {t("knowledge.slicing")}
+                {t('knowledge.slicing')}
               </p>
             </div>
           </div>
@@ -531,7 +531,7 @@ const SegmentPreviewContent: React.FC<{
         <div key={item.id} className="rounded-xl bg-[#F6F6FD] p-4">
           <div className="flex items-center">
             <div className="flex items-center flex-1 overflow-hidden">
-              {["block", "review"].includes(item.auditSuggest || "") && (
+              {['block', 'review'].includes(item.auditSuggest || '') && (
                 <div className="rounded border border-[#FFA19B] bg-[#fff5f4] px-2 py-1 text-[#E92215] text-xs mr-2.5">
                   违规
                 </div>
@@ -540,8 +540,8 @@ const SegmentPreviewContent: React.FC<{
               <span
                 className="text-xs text-[#F6B728]"
                 style={{
-                  fontFamily: "SF Pro Text, SF Pro Text-600",
-                  fontStyle: "italic",
+                  fontFamily: 'SF Pro Text, SF Pro Text-600',
+                  fontStyle: 'italic',
                 }}
               >
                 00{index + 1}
@@ -550,7 +550,7 @@ const SegmentPreviewContent: React.FC<{
                 src={
                   item.fileInfoV2 &&
                   typeList.get(
-                    generateType(item.fileInfoV2.type?.toLowerCase()) || "",
+                    generateType(item.fileInfoV2.type?.toLowerCase()) || ''
                   )
                 }
                 className="w-4 h-4 ml-1"
@@ -566,13 +566,13 @@ const SegmentPreviewContent: React.FC<{
             </div>
           </div>
           <GlobalMarkDown content={item.markdownContent} isSending={false} />
-          {["block", "review"].includes(item.auditSuggest || "") && (
+          {['block', 'review'].includes(item.auditSuggest || '') && (
             <div className="w-full flex mt-2 border-t border-[#E2E8FF] py-2 text-[#000] text-sm font-semibold gap-1 overflow-hidden">
               <img
                 src={violationIds.includes(item.id) ? arrowDown : arrowRight}
                 className="w-4 h-4 cursor-pointer mt-0.5"
                 alt=""
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation();
                   handleViolationToggle(item.id);
                 }}
@@ -582,14 +582,14 @@ const SegmentPreviewContent: React.FC<{
                   className="max-w-[400px] text-overflow"
                   title={item.auditDetail}
                 >
-                  {t("knowledge.violationReason", {
+                  {t('knowledge.violationReason', {
                     reason: item.auditDetail,
                   })}
                 </span>
               )}
               {violationIds.includes(item.id) && (
                 <span className="max-w-[400px]">
-                  {t("knowledge.violationReason", {
+                  {t('knowledge.violationReason', {
                     reason: item.auditDetail,
                   })}
                 </span>
@@ -603,7 +603,7 @@ const SegmentPreviewContent: React.FC<{
 };
 
 // 主组件
-const DataClean: FC<DataCleanProps> = (props) => {
+const DataClean: FC<DataCleanProps> = props => {
   const {
     knowledgeDetail,
     uploadList,

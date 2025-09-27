@@ -1,6 +1,6 @@
-import { useMemo, useCallback } from "react";
-import { useModelContext } from "../context/model-context";
-import { ModelInfo, CategoryNode, ShelfStatus } from "@/types/model";
+import { useMemo, useCallback } from 'react';
+import { useModelContext } from '../context/model-context';
+import { ModelInfo, CategoryNode, ShelfStatus } from '@/types/model';
 
 /**
  * 模型筛选Hook
@@ -31,27 +31,27 @@ export const useModelFilters = (): {
       }
       // 否则递归它的孩子
       return node.children.some((child: CategoryNode) =>
-        treeContainsAnyLeaf(child, required),
+        treeContainsAnyLeaf(child, required)
       );
     },
-    [],
+    []
   );
 
   // 上下文长度筛选判断
   const treeContainsContextLengthGreaterThan = useCallback(
     (node: CategoryNode, val: number): boolean => {
       if (!node.children?.length) {
-        if (node.key !== "contextLengthTag") return false;
+        if (node.key !== 'contextLengthTag') return false;
 
         const m = String(node.name).match(/(\d+)/);
         const num = m ? Number(m[1]) : 0;
         return num <= val;
       }
       return node.children.some((child: CategoryNode) =>
-        treeContainsContextLengthGreaterThan(child, val),
+        treeContainsContextLengthGreaterThan(child, val)
       );
     },
-    [],
+    []
   );
 
   // 筛选模型
@@ -59,17 +59,17 @@ export const useModelFilters = (): {
     (
       models: ModelInfo[],
       checkedLeaves: CategoryNode[],
-      contextLength?: number,
+      contextLength?: number
     ): ModelInfo[] => {
       let ret = models;
 
       /* 1. 把"已下架""即将下架"从普通分类节点里拆出来 */
-      const offShelfNode = checkedLeaves.find((n) => n.id === -1); // "已下架"
-      const toBeOffShelfNode = checkedLeaves.find((n) => n.id === -2); // "即将下架"
+      const offShelfNode = checkedLeaves.find(n => n.id === -1); // "已下架"
+      const toBeOffShelfNode = checkedLeaves.find(n => n.id === -2); // "即将下架"
 
       /* 2. 根据 shelfStatus 过滤 */
       if (offShelfNode || toBeOffShelfNode) {
-        ret = ret.filter((m) => {
+        ret = ret.filter(m => {
           if (offShelfNode && m.shelfStatus === ShelfStatus.OFF_SHELF)
             return true; // 已下架
           if (toBeOffShelfNode && m.shelfStatus === ShelfStatus.WAIT_OFF_SHELF)
@@ -80,24 +80,24 @@ export const useModelFilters = (): {
 
       /* 3. 普通分类节点过滤（排除 -1、-2 这两个伪节点） */
       const realLeaves = checkedLeaves.filter(
-        (n) => n.id !== -1 && n.id !== -2 && n.name !== "多语言",
+        n => n.id !== -1 && n.id !== -2 && n.name !== '多语言'
       );
       if (realLeaves.length) {
-        const required = new Set(realLeaves.map((n) => n.name));
-        ret = ret.filter((model) =>
+        const required = new Set(realLeaves.map(n => n.name));
+        ret = ret.filter(model =>
           model.categoryTree?.some((tree: CategoryNode) =>
-            treeContainsAnyLeaf(tree, required),
-          ),
+            treeContainsAnyLeaf(tree, required)
+          )
         );
       }
 
       /* 4. 上下文长度过滤 */
       if (contextLength != null) {
         if (contextLength !== 0 && contextLength !== state.contextMaxLength) {
-          ret = ret.filter((model) =>
+          ret = ret.filter(model =>
             model.categoryTree?.some((tree: CategoryNode) =>
-              treeContainsContextLengthGreaterThan(tree, contextLength),
-            ),
+              treeContainsContextLengthGreaterThan(tree, contextLength)
+            )
           );
         }
       }
@@ -108,7 +108,7 @@ export const useModelFilters = (): {
       treeContainsAnyLeaf,
       treeContainsContextLengthGreaterThan,
       state.contextMaxLength,
-    ],
+    ]
   );
 
   // 过滤后的模型列表
@@ -126,7 +126,7 @@ export const useModelFilters = (): {
     // 应用搜索筛选
     if (state.searchInput.trim()) {
       const searchLower = state.searchInput.toLowerCase();
-      models = models.filter((m) => m.name.toLowerCase().includes(searchLower));
+      models = models.filter(m => m.name.toLowerCase().includes(searchLower));
     }
 
     return models;
@@ -145,7 +145,7 @@ export const useModelFilters = (): {
     (checkedLeaves: CategoryNode[]): void => {
       actions.setCheckedLeaves(checkedLeaves);
     },
-    [actions],
+    [actions]
   );
 
   // 处理上下文长度变化
@@ -153,7 +153,7 @@ export const useModelFilters = (): {
     (length?: number): void => {
       actions.setContextLength(length);
     },
-    [actions],
+    [actions]
   );
 
   // 处理搜索输入变化
@@ -161,7 +161,7 @@ export const useModelFilters = (): {
     (value: string): void => {
       actions.setSearchInput(value);
     },
-    [actions],
+    [actions]
   );
 
   // 处理筛选类型变化（个人模型）
@@ -169,7 +169,7 @@ export const useModelFilters = (): {
     (type: number): void => {
       actions.setFilterType(type);
     },
-    [actions],
+    [actions]
   );
 
   // 设置上下文最大长度
@@ -177,7 +177,7 @@ export const useModelFilters = (): {
     (length: number): void => {
       actions.setContextMaxLength(length);
     },
-    [actions],
+    [actions]
   );
 
   return {

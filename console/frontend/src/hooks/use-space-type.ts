@@ -1,4 +1,4 @@
-import useSpaceStore, { SpaceStore } from "@/store/space-store";
+import useSpaceStore, { SpaceStore } from '@/store/space-store';
 import {
   createPersonalSpace,
   updatePersonalSpace,
@@ -11,18 +11,18 @@ import {
   getLastVisitSpace,
   getJoinedCorporateList,
   visitSpace,
-} from "@/services/space";
-import { useCallback, useMemo } from "react";
+} from '@/services/space';
+import { useCallback, useMemo } from 'react';
 
 // 从spaceStore中引入类型
 type SpaceStoreState = Pick<
   SpaceStore,
-  "spaceId" | "spaceName" | "spaceType" | "enterpriseId" | "spaceAvatar"
+  'spaceId' | 'spaceName' | 'spaceType' | 'enterpriseId' | 'spaceAvatar'
 >;
 
 export const SPACE_TYPES = {
-  PERSONAL: "personal",
-  TEAM: "team",
+  PERSONAL: 'personal',
+  TEAM: 'team',
 } as const;
 
 interface DeleteSpaceParams {
@@ -44,16 +44,16 @@ export const useSpaceType = (navigate?: any) => {
   // 空间类型判断
   const isPersonalSpace = useCallback(
     () => spaceType === SPACE_TYPES.PERSONAL,
-    [spaceType],
+    [spaceType]
   );
   const isTeamSpace = useCallback(
     () => spaceType === SPACE_TYPES.TEAM,
-    [spaceType],
+    [spaceType]
   );
   // 默认的个人空间
   const isDefaultPersonalSpace = useCallback(
     () => !isTeamSpace() && !spaceId,
-    [isTeamSpace, spaceId],
+    [isTeamSpace, spaceId]
   );
 
   // 空间操作方法
@@ -64,7 +64,7 @@ export const useSpaceType = (navigate?: any) => {
       }
       return createCorporateSpace(params);
     },
-    [isPersonalSpace],
+    [isPersonalSpace]
   );
 
   const editSpace = useCallback(
@@ -78,7 +78,7 @@ export const useSpaceType = (navigate?: any) => {
       }
       return updateCorporateSpace(editParams);
     },
-    [isPersonalSpace],
+    [isPersonalSpace]
   );
 
   const sendCodeForDelete = useCallback(async () => {
@@ -94,32 +94,32 @@ export const useSpaceType = (navigate?: any) => {
       }
       return deleteCorporateSpace(params);
     },
-    [isPersonalSpace],
+    [isPersonalSpace]
   );
 
   // 切换到个人空间 配置参数 支持参数控制执行路由跳转
   const switchToPersonal = useCallback(
     (params: { isJump?: boolean; spaceId?: string } = { isJump: true }) => {
       setSpaceStore({
-        spaceType: "personal",
-        spaceId: params?.spaceId || "",
-        spaceName: "",
-        enterpriseId: "",
-        enterpriseName: "",
+        spaceType: 'personal',
+        spaceId: params?.spaceId || '',
+        spaceName: '',
+        enterpriseId: '',
+        enterpriseName: '',
       });
 
       if (params?.isJump) {
-        window.location.href = "/space/agent";
+        window.location.href = '/space/agent';
       }
     },
-    [setSpaceStore],
+    [setSpaceStore]
   );
 
   // 切换到企业团队 配置参数 支持参数控制执行路由跳转
   const handleTeamSwitch = useCallback(
     async (
       _enterpriseId?: string,
-      param: { isJump: boolean } = { isJump: true },
+      param: { isJump: boolean } = { isJump: true }
     ) => {
       if (!(_enterpriseId || enterpriseId)) {
         switchToPersonal();
@@ -128,19 +128,19 @@ export const useSpaceType = (navigate?: any) => {
       const resetTeamPath = (hasSpace: boolean) => {
         if (param?.isJump) {
           if (hasSpace) {
-            navigate?.("/space/agent");
+            navigate?.('/space/agent');
           } else {
-            navigate?.("/home");
+            navigate?.('/home');
           }
         }
       };
 
       const resetSpaceStore = () => {
         const emptyState: Partial<SpaceStoreState> = {
-          spaceId: "",
-          spaceName: "",
-          spaceAvatar: "",
-          spaceType: "team",
+          spaceId: '',
+          spaceName: '',
+          spaceAvatar: '',
+          spaceType: 'team',
         };
         setSpaceStore(emptyState);
         resetTeamPath(false);
@@ -151,7 +151,7 @@ export const useSpaceType = (navigate?: any) => {
         _enterpriseId && setEnterpriseId(_enterpriseId);
         console.log(
           _enterpriseId,
-          "-------------- _enterpriseId --------------",
+          '-------------- _enterpriseId --------------'
         );
         // 获取最近访问空间
         const spaceData: any = await getLastVisitSpace();
@@ -163,7 +163,7 @@ export const useSpaceType = (navigate?: any) => {
           const spaceState: Partial<SpaceStoreState> = {
             spaceId: spaceData.id,
             spaceName: spaceData.name,
-            spaceType: "team",
+            spaceType: 'team',
             spaceAvatar: spaceData.avatarUrl,
             enterpriseId: spaceData.enterpriseId,
           };
@@ -187,24 +187,24 @@ export const useSpaceType = (navigate?: any) => {
         const spaceState: Partial<SpaceStoreState> = {
           spaceId: defaultSpace.id,
           spaceName: defaultSpace.name,
-          spaceType: "team",
+          spaceType: 'team',
           spaceAvatar: defaultSpace.avatarUrl,
         };
         setSpaceStore(spaceState);
         visitSpace(defaultSpace.id);
         resetTeamPath(true);
       } catch (error) {
-        console.error("切换团队空间失败:", error);
+        console.error('切换团队空间失败:', error);
         resetSpaceStore();
       }
     },
-    [enterpriseId, setEnterpriseId, setSpaceStore],
+    [enterpriseId, setEnterpriseId, setSpaceStore]
   );
 
   const deleteSpaceCb = useCallback(async () => {
     if (!isTeamSpace()) {
       getLastVisitSpaceInfo();
-      navigate?.("/space/agent");
+      navigate?.('/space/agent');
       return;
     }
 
@@ -215,7 +215,7 @@ export const useSpaceType = (navigate?: any) => {
     async (params: { name: string; id?: string }) => {
       return checkSpaceName(params);
     },
-    [],
+    []
   );
 
   const goToSpaceManagement = useCallback(() => {
@@ -227,7 +227,7 @@ export const useSpaceType = (navigate?: any) => {
         navigate?.(`/enterprise/${enterpriseId}/space`);
         break;
       default:
-        console.warn("Unknown space type:", spaceType);
+        console.warn('Unknown space type:', spaceType);
         break;
     }
   }, [spaceType, navigate, enterpriseId]);
@@ -240,11 +240,11 @@ export const useSpaceType = (navigate?: any) => {
 
         if (!id) {
           if (!enterpriseId) {
-            throw new Error("最近访问空间不存在");
+            throw new Error('最近访问空间不存在');
           }
 
-          if (!window.location.pathname.includes("/home")) {
-            window.location.href = "/home";
+          if (!window.location.pathname.includes('/home')) {
+            window.location.href = '/home';
             return;
           }
 
@@ -253,21 +253,21 @@ export const useSpaceType = (navigate?: any) => {
         }
 
         setSpaceStore({
-          spaceType: enterpriseId ? "team" : "personal",
+          spaceType: enterpriseId ? 'team' : 'personal',
           spaceId: id,
           spaceName: name,
           spaceAvatar: avatarUrl,
-          enterpriseId: `${enterpriseId || ""}`,
+          enterpriseId: `${enterpriseId || ''}`,
         });
       } catch (error) {
-        console.log("getLastVisitSpaceInfo error", error);
-        setSpaceAvatar("");
+        console.log('getLastVisitSpaceInfo error', error);
+        setSpaceAvatar('');
         switchToPersonal({ isJump: false });
       } finally {
         cb?.();
       }
     },
-    [setSpaceStore],
+    [setSpaceStore]
   );
 
   const returnValues = useMemo(
@@ -276,7 +276,7 @@ export const useSpaceType = (navigate?: any) => {
       spaceType,
       spaceId,
       // 企业id
-      enterpriseId: `${enterpriseId || ""}`,
+      enterpriseId: `${enterpriseId || ''}`,
       // 类型判断
       isPersonalSpace,
       isTeamSpace,
@@ -311,7 +311,7 @@ export const useSpaceType = (navigate?: any) => {
       getLastVisitSpaceInfo,
       goToSpaceManagement,
       switchToPersonal,
-    ],
+    ]
   );
 
   return returnValues;

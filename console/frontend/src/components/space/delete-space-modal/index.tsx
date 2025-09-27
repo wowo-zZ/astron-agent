@@ -1,13 +1,13 @@
-import React from "react";
-import { Modal, message } from "antd";
-import ButtonGroup from "@/components/button-group/button-group";
-import type { ButtonConfig } from "@/components/button-group/types";
+import React from 'react';
+import { Modal, message } from 'antd';
+import ButtonGroup from '@/components/button-group/button-group';
+import type { ButtonConfig } from '@/components/button-group/types';
 
-import styles from "./index.module.scss";
+import styles from './index.module.scss';
 
-import warningImg from "@/assets/imgs/space/warning.png";
-import { useSpaceType } from "@/hooks/use-space-type";
-import { useNavigate } from "react-router-dom";
+import warningImg from '@/assets/imgs/space/warning.png';
+import { useSpaceType } from '@/hooks/use-space-type';
+import { useNavigate } from 'react-router-dom';
 interface DeleteSpaceModalProps {
   open: boolean;
   onClose: () => void;
@@ -28,10 +28,10 @@ const DeleteSpaceModal: React.FC<DeleteSpaceModalProps> = ({
       // This assumes the backend will be updated to not require these fields
       await deleteSpace({
         spaceId,
-        mobile: "",
-        verifyCode: "",
+        mobile: '',
+        verifyCode: '',
       });
-      message.success("删除空间成功");
+      message.success('删除空间成功');
       deleteSpaceCb();
       onSubmit();
     } catch (error: any) {
@@ -45,15 +45,15 @@ const DeleteSpaceModal: React.FC<DeleteSpaceModalProps> = ({
 
   const buttons: ButtonConfig[] = [
     {
-      key: "cancel",
-      text: "取消",
-      type: "default",
+      key: 'cancel',
+      text: '取消',
+      type: 'default',
       onClick: () => handleClose(),
     },
     {
-      key: "submit",
-      text: "确认",
-      type: "primary",
+      key: 'submit',
+      text: '确认',
+      type: 'primary',
       onClick: () => handleSubmit(),
       disabled: false,
     },

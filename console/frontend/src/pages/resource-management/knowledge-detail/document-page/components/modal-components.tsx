@@ -1,25 +1,25 @@
-import React, { useState, useEffect, useMemo, FC } from "react";
-import { Form, Input, Button, Tag } from "antd";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useMemo, FC } from 'react';
+import { Form, Input, Button, Tag } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import {
   createFolderAPI,
   updateFolderAPI,
   updateFileAPI,
   deleteFileAPI,
   deleteFolderAPI,
-} from "@/services/knowledge";
-import { typeList, tagTypeClass } from "@/constants";
-import { generateType } from "@/utils/utils";
-import { useTranslation } from "react-i18next";
+} from '@/services/knowledge';
+import { typeList, tagTypeClass } from '@/constants';
+import { generateType } from '@/utils/utils';
+import { useTranslation } from 'react-i18next';
 
-import dialogDel from "@/assets/imgs/main/icon_dialog_del.png";
-import folder from "@/assets/imgs/knowledge/icon_dialog_folder.png";
+import dialogDel from '@/assets/imgs/main/icon_dialog_del.png';
+import folder from '@/assets/imgs/knowledge/icon_dialog_folder.png';
 import {
   CreateFolderParams,
   FileItem,
   TagDto,
   UpdateFolderParams,
-} from "@/types/resource";
+} from '@/types/resource';
 
 const { TextArea } = Input;
 
@@ -42,7 +42,7 @@ export const AddFolder: FC<{
   const [form] = Form.useForm();
   const [folderTags, setFolderTags] = useState<string[]>([]);
   const [_, setOtherTags] = useState<TagDto[]>([]);
-  const [tagValue, setTagValue] = useState("");
+  const [tagValue, setTagValue] = useState('');
   const [disabledSave, setDisabledSave] = useState(true);
   const [loading, setLoading] = useState(false);
 
@@ -58,7 +58,7 @@ export const AddFolder: FC<{
 
     let requestAPI;
 
-    if (modalType === "edit") {
+    if (modalType === 'edit') {
       params.id = currentFile.id;
       requestAPI = updateFolderAPI;
     } else {
@@ -77,7 +77,7 @@ export const AddFolder: FC<{
 
   useEffect(() => {
     if (tagValue) {
-      const tagArr = tagValue.split(/[,，]/).filter((item) => item);
+      const tagArr = tagValue.split(/[,，]/).filter(item => item);
       setFolderTags([...tagArr]);
     } else {
       setFolderTags([]);
@@ -96,15 +96,15 @@ export const AddFolder: FC<{
   }
 
   useEffect(() => {
-    if (modalType === "edit") {
+    if (modalType === 'edit') {
       const currentTags = currentFile.tagDtoList
-        ?.filter((item) => item.type === 2)
-        .map((item) => item.tagName);
+        ?.filter(item => item.type === 2)
+        .map(item => item.tagName);
       const remainTags = currentFile.tagDtoList?.filter(
-        (item) => item.type !== 2,
+        item => item.type !== 2
       );
       setDisabledSave(false);
-      setTagValue(currentTags?.join("，") || "");
+      setTagValue(currentTags?.join('，') || '');
       setOtherTags(remainTags || []);
       form.setFieldsValue({
         name: currentFile.name,
@@ -124,21 +124,21 @@ export const AddFolder: FC<{
         <div className="flex items-center">
           <img src={folder} className="w-10 h-10" alt="" />
           <h3 className="ml-2.5 text-lg font-medium text-second">
-            {modalType === "create" ? t("common.create") : t("common.edit")}
-            {t("knowledge.folder")}
+            {modalType === 'create' ? t('common.create') : t('common.edit')}
+            {t('knowledge.folder')}
           </h3>
         </div>
         <div className="mt-7">
           <Form layout="vertical" form={form} onFieldsChange={handleFormChange}>
             <Form.Item
-              label={t("knowledge.folderName")}
+              label={t('knowledge.folderName')}
               rules={[{ required: true }]}
               name="name"
             >
               <Input
                 type="text"
                 className="global-input"
-                placeholder={t("knowledge.pleaseEnter")}
+                placeholder={t('knowledge.pleaseEnter')}
                 maxLength={20}
                 showCount
               />
@@ -208,14 +208,14 @@ export const AddFolder: FC<{
             disabled={disabledSave}
             loading={loading}
           >
-            {modalType === "edit" ? t("common.save") : t("common.add")}
+            {modalType === 'edit' ? t('common.save') : t('common.add')}
           </Button>
           <Button
             type="text"
             className="origin-btn px-[48px]"
             onClick={() => setAddFolderModal(false)}
           >
-            {t("common.cancel")}
+            {t('common.cancel')}
           </Button>
         </div>
       </div>
@@ -238,12 +238,12 @@ export const DeleteFile: FC<{
     if (currentFile.isFile) {
       deleteFileAPI(
         repoId,
-        tag !== "SparkDesk-RAG"
+        tag !== 'SparkDesk-RAG'
           ? currentFile.id
           : currentFile?.fileInfoV2?.uuid,
-        tag,
+        tag
       )
-        .then((data) => {
+        .then(data => {
           setDeleteModal(false);
           getFiles();
         })
@@ -252,7 +252,7 @@ export const DeleteFile: FC<{
         });
     } else {
       deleteFolderAPI(currentFile.id)
-        .then((data) => {
+        .then(data => {
           setDeleteModal(false);
           getFiles();
         })
@@ -263,11 +263,11 @@ export const DeleteFile: FC<{
   }
 
   const fileImg = useMemo(() => {
-    if (currentFile.type === "folder") {
+    if (currentFile.type === 'folder') {
       return typeList.get(currentFile.type);
     }
     return typeList.get(
-      generateType((currentFile.type || "")?.toLowerCase()) || "",
+      generateType((currentFile.type || '')?.toLowerCase()) || ''
     );
   }, [currentFile, typeList, generateType]);
 
@@ -279,9 +279,9 @@ export const DeleteFile: FC<{
             <img src={dialogDel} className="w-7 h-7" alt="" />
           </div>
           <p className="ml-2.5">
-            {currentFile.type === "folder"
-              ? t("knowledge.confirmDeleteFolder")
-              : t("knowledge.confirmDeleteFile")}
+            {currentFile.type === 'folder'
+              ? t('knowledge.confirmDeleteFolder')
+              : t('knowledge.confirmDeleteFile')}
             ？
           </p>
         </div>
@@ -297,9 +297,9 @@ export const DeleteFile: FC<{
           </div>
         </div>
         <p className="mt-6 text-desc max-w-[292px]">
-          {currentFile.type === "folder"
-            ? t("knowledge.folderDeleteWarning")
-            : t("knowledge.fileDeleteWarning")}
+          {currentFile.type === 'folder'
+            ? t('knowledge.folderDeleteWarning')
+            : t('knowledge.fileDeleteWarning')}
         </p>
         <div className="flex flex-row-reverse gap-3 mt-7">
           <Button
@@ -309,7 +309,7 @@ export const DeleteFile: FC<{
             className="delete-btn"
             style={{ paddingLeft: 24, paddingRight: 24 }}
           >
-            {t("common.delete")}
+            {t('common.delete')}
           </Button>
           <Button
             type="text"
@@ -317,7 +317,7 @@ export const DeleteFile: FC<{
             onClick={() => setDeleteModal(false)}
             style={{ paddingLeft: 24, paddingRight: 24 }}
           >
-            {t("common.cancel")}
+            {t('common.cancel')}
           </Button>
         </div>
       </div>
@@ -336,25 +336,23 @@ export const TagsManage: FC<{
   const navigate = useNavigate();
   const [folderTags, setFolderTags] = useState<string[]>([]);
   const [othersTag, setOtherTags] = useState<TagDto[]>([]);
-  const [tagValue, setTagValue] = useState("");
-  const [modalType] = useState("edit");
+  const [tagValue, setTagValue] = useState('');
+  const [modalType] = useState('edit');
   const [loading, setLoading] = useState(false);
   const [moreTags, setMoreTags] = useState(false);
 
   useEffect(() => {
     const currentTags = currentFile.tagDtoList
-      ?.filter((item) => item.type === 3)
-      .map((item) => item.tagName);
-    const remainTags = currentFile.tagDtoList?.filter(
-      (item) => item.type !== 3,
-    );
-    setTagValue(currentTags?.join("，") || "");
+      ?.filter(item => item.type === 3)
+      .map(item => item.tagName);
+    const remainTags = currentFile.tagDtoList?.filter(item => item.type !== 3);
+    setTagValue(currentTags?.join('，') || '');
     setOtherTags(remainTags || []);
   }, []);
 
   useEffect(() => {
     if (tagValue) {
-      const tagArr = tagValue.split(/[,，]/).filter((item) => item);
+      const tagArr = tagValue.split(/[,，]/).filter(item => item);
       setFolderTags([...tagArr]);
     } else {
       setFolderTags([]);
@@ -370,7 +368,7 @@ export const TagsManage: FC<{
       tags: folderTags,
     };
     updateFileAPI(params)
-      .then((data) => {
+      .then(data => {
         setTagsModal(false);
         getFiles();
       })
@@ -382,21 +380,21 @@ export const TagsManage: FC<{
   function deleteTag(index: number): void {
     folderTags.splice(index, 1);
     setFolderTags([...folderTags]);
-    setTagValue(folderTags.join("，"));
+    setTagValue(folderTags.join('，'));
   }
 
   return (
     <div className="mask">
       <div className="p-6 absolute bg-[#fff] rounded-2xl top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 text-second font-medium text-md w-[448px]">
-        {modalType === "edit" && (
+        {modalType === 'edit' && (
           <>
             <div className="text-lg text-second text-medium">
-              {t("knowledge.tagSettings")}
+              {t('knowledge.tagSettings')}
             </div>
             <div className="bg-[#F9FAFB] mt-6 p-3 w-full flex items-center justify-center">
               <img
                 src={typeList.get(
-                  generateType((currentFile.type || "")?.toLowerCase()) || "",
+                  generateType((currentFile.type || '')?.toLowerCase()) || ''
                 )}
                 className="w-4 h-4"
                 alt=""
@@ -406,10 +404,10 @@ export const TagsManage: FC<{
               </p>
             </div>
             <div className="text-sm font-medium text-second mt-7">
-              {t("knowledge.addTags")}
+              {t('knowledge.addTags')}
             </div>
             <div className="mt-1.5 text-desc font-medium">
-              {t("knowledge.addTagsDescription")}{" "}
+              {t('knowledge.addTagsDescription')}{' '}
               <span
                 className="text-[#275EFF] cursor-pointer"
                 onClick={() =>
@@ -420,7 +418,7 @@ export const TagsManage: FC<{
                   })
                 }
               >
-                {t("knowledge.knowledgeSettings")}
+                {t('knowledge.knowledgeSettings')}
               </span>
             </div>
             {folderTags.length || othersTag.length ? (
@@ -479,16 +477,16 @@ export const TagsManage: FC<{
             <TextArea
               placeholder="请输入"
               className="mt-2 global-textarea"
-              style={{ height: 104, resize: "none" }}
+              style={{ height: 104, resize: 'none' }}
               value={tagValue}
-              onChange={(event) => setTagValue(event.target.value)}
-              onBlur={(event) => {
-                let valueArr = event.target.value.split("，");
+              onChange={event => setTagValue(event.target.value)}
+              onBlur={event => {
+                let valueArr = event.target.value.split('，');
                 //@ts-ignore
                 valueArr = [...new Set(valueArr)];
-                const others = othersTag.map((item) => item.tagName);
-                valueArr = valueArr.filter((item) => !others.includes(item));
-                setTagValue(valueArr.join("，"));
+                const others = othersTag.map(item => item.tagName);
+                valueArr = valueArr.filter(item => !others.includes(item));
+                setTagValue(valueArr.join('，'));
               }}
             />
             <div className="flex flex-row-reverse gap-3 mt-7">
@@ -498,26 +496,26 @@ export const TagsManage: FC<{
                 loading={loading}
                 onClick={handleOk}
               >
-                {t("common.save")}
+                {t('common.save')}
               </Button>
               <Button
                 type="text"
                 className="origin-btn px-[48px]"
                 onClick={() => setTagsModal(false)}
               >
-                {t("common.cancel")}
+                {t('common.cancel')}
               </Button>
             </div>
           </>
         )}
-        {modalType === "delete" && (
+        {modalType === 'delete' && (
           <>
             <div className="flex items-center">
               <div className="bg-[#fff5f4] w-10 h-10 flex justify-center items-center rounded-lg">
                 <img src={dialogDel} className="w-7 h-7" alt="" />
               </div>
               <p className="ml-2.5">
-                {t("knowledge.confirmDeleteKnowledgeTag")}
+                {t('knowledge.confirmDeleteKnowledgeTag')}
               </p>
             </div>
           </>

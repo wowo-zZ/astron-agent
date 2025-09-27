@@ -1,13 +1,13 @@
 // Casdoor 配置与 SDK 初始化
-import Sdk from "casdoor-js-sdk";
+import Sdk from 'casdoor-js-sdk';
 
 export const casdoorSdk = new Sdk({
-  serverUrl: import.meta.env.VITE_CASDOOR_SERVER_URL || "http://localhost:3000",
-  clientId: import.meta.env.VITE_CASDOOR_CLIENT_ID || "",
-  appName: import.meta.env.VITE_CASDOOR_APP_NAME || "",
-  organizationName: import.meta.env.VITE_CASDOOR_ORG_NAME || "",
-  redirectPath: "/callback",
-  signinPath: "/api/signin",
+  serverUrl: import.meta.env.VITE_CASDOOR_SERVER_URL || 'http://localhost:3000',
+  clientId: import.meta.env.VITE_CASDOOR_CLIENT_ID || '',
+  appName: import.meta.env.VITE_CASDOOR_APP_NAME || '',
+  organizationName: import.meta.env.VITE_CASDOOR_ORG_NAME || '',
+  redirectPath: '/callback',
+  signinPath: '/api/signin',
 });
 
 export const saveTokenFromResponse = (res: unknown): void => {
@@ -16,11 +16,11 @@ export const saveTokenFromResponse = (res: unknown): void => {
     const data = (r?.data as Record<string, unknown>) || r;
     const token = (data as { accessToken?: string }).accessToken;
     if (token) {
-      localStorage.setItem("accessToken", token);
+      localStorage.setItem('accessToken', token);
     }
     const refreshToken = (data as { refreshToken?: string }).refreshToken;
     if (refreshToken) {
-      localStorage.setItem("refreshToken", refreshToken);
+      localStorage.setItem('refreshToken', refreshToken);
     }
   } catch {
     // ignore
@@ -39,26 +39,26 @@ export const isGetTokenSuccessful = (res: unknown): boolean => {
 
 // ======= PKCE/前端直连辅助方法 =======
 export const getLogoutUrl = (postLogoutRedirect?: string): string => {
-  const server = import.meta.env.VITE_CASDOOR_SERVER_URL || "";
-  const clientId = import.meta.env.VITE_CASDOOR_CLIENT_ID || "";
+  const server = import.meta.env.VITE_CASDOOR_SERVER_URL || '';
+  const clientId = import.meta.env.VITE_CASDOOR_CLIENT_ID || '';
   const redirect = postLogoutRedirect || window.location.origin;
-  const url = new URL(`${server.replace(/\/$/, "")}/logout`);
-  if (clientId) url.searchParams.set("clientId", clientId);
-  url.searchParams.set("post_logout_redirect_uri", redirect);
+  const url = new URL(`${server.replace(/\/$/, '')}/logout`);
+  if (clientId) url.searchParams.set('clientId', clientId);
+  url.searchParams.set('post_logout_redirect_uri', redirect);
   return url.toString();
 };
 
 export const performLogout = (postLogoutRedirect?: string): void => {
-  localStorage.removeItem("accessToken");
-  localStorage.removeItem("refreshToken");
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('refreshToken');
   // 可选：清理可能的临时登录状态
   try {
-    sessionStorage.removeItem("postLoginRedirect");
+    sessionStorage.removeItem('postLoginRedirect');
   } catch {
     //
   }
   // 返回首页
-  window.location.href = "/home";
+  window.location.href = '/home';
 };
 
 export interface ParsedUserInfo {
@@ -69,7 +69,7 @@ export interface ParsedUserInfo {
 }
 
 export const parseCurrentUserFromToken = (): ParsedUserInfo | undefined => {
-  const token = localStorage.getItem("accessToken");
+  const token = localStorage.getItem('accessToken');
   if (!token) return undefined;
   try {
     const result = casdoorSdk.parseAccessToken(token) as unknown as {

@@ -1,20 +1,20 @@
-import React, { useMemo, memo } from "react";
-import { useTranslation } from "react-i18next";
-import { cloneDeep } from "lodash";
-import { v4 as uuid } from "uuid";
-import Inputs from "./components/inputs";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import useFlowStore from "@/components/workflow/store/useFlowStore";
-import { FlowSelect, FLowCollapse } from "@/components/workflow/ui";
+import React, { useMemo, memo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { cloneDeep } from 'lodash';
+import { v4 as uuid } from 'uuid';
+import Inputs from './components/inputs';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowStore from '@/components/workflow/store/useFlowStore';
+import { FlowSelect, FLowCollapse } from '@/components/workflow/ui';
 import {
   isRefKnowledgeBase,
   renderType,
-} from "@/components/workflow/utils/reactflowUtils";
-import { useNodeCommon } from "@/components/workflow/hooks/useNodeCommon";
-import { useMemoizedFn } from "ahooks";
+} from '@/components/workflow/utils/reactflowUtils';
+import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import { useMemoizedFn } from 'ahooks';
 
-import inputAddIcon from "@/assets/imgs/workflow/input-add-icon.png";
-import remove from "@/assets/imgs/workflow/input-remove-icon.png";
+import inputAddIcon from '@/assets/imgs/workflow/input-add-icon.png';
+import remove from '@/assets/imgs/workflow/input-remove-icon.png';
 
 function Outputs({
   id,
@@ -23,32 +23,32 @@ function Outputs({
   handleChangeOutputParam,
   handleRemoveOutputLine,
 }): React.ReactElement {
-  const currentStore = useFlowsManager((state) => state.getCurrentStore());
-  const updateNodeRef = currentStore((state) => state.updateNodeRef);
-  const checkNode = currentStore((state) => state.checkNode);
+  const currentStore = useFlowsManager(state => state.getCurrentStore());
+  const updateNodeRef = currentStore(state => state.updateNodeRef);
+  const checkNode = currentStore(state => state.checkNode);
 
   const shouldAddParam = useMemoizedFn((input, paramsOptionsArr): boolean => {
     if (!input?.name) return false;
 
     const existSame = paramsOptionsArr?.some(
-      (option) => option?.label === input?.name,
+      option => option?.label === input?.name
     );
     if (existSame) return false;
 
     const schema = input?.schema?.value;
     if (!schema) return false;
 
-    if (schema.type === "literal" && schema.content) return true;
-    if (schema.type === "ref" && schema.content?.name) return true;
+    if (schema.type === 'literal' && schema.content) return true;
+    if (schema.type === 'ref' && schema.content?.name) return true;
 
     return false;
   });
 
   const paramsOptions = useMemo(() => {
     const variableMemoryNode = currentNodes.filter(
-      (node) =>
-        node.nodeType === "node-variable" &&
-        node.data.nodeParam.method === "set",
+      node =>
+        node.nodeType === 'node-variable' &&
+        node.data.nodeParam.method === 'set'
     );
     const paramsOptionsArr: Array<{
       id: string;
@@ -56,8 +56,8 @@ function Outputs({
       value: string;
       type: string;
     }> = [];
-    variableMemoryNode.forEach((item) => {
-      item?.data?.inputs?.forEach((input) => {
+    variableMemoryNode.forEach(item => {
+      item?.data?.inputs?.forEach(input => {
         if (shouldAddParam(input, paramsOptionsArr)) {
           paramsOptionsArr.push({
             id: input.id,
@@ -73,10 +73,10 @@ function Outputs({
     return paramsOptionsArr;
   }, [currentNodes]);
 
-  const optionRender = useMemoizedFn((nodeData) => {
+  const optionRender = useMemoizedFn(nodeData => {
     let type = nodeData?.data?.type;
-    if (type?.includes("array")) {
-      const arr = nodeData?.data?.type?.split("-");
+    if (type?.includes('array')) {
+      const arr = nodeData?.data?.type?.split('-');
       type = `Array<${arr[1]}>`;
     }
     return (
@@ -89,7 +89,7 @@ function Outputs({
 
   return (
     <>
-      {outputs?.map((output) => (
+      {outputs?.map(output => (
         <div className="px-[18px]" key={output.id}>
           <div className="flex items-center gap-3 text-desc">
             <div className="flex-1">
@@ -105,7 +105,7 @@ function Outputs({
                       data.name = value;
                       data.schema.type = currentOption?.type;
                     },
-                    value,
+                    value
                   );
                 }}
                 onBlur={() => {
@@ -134,7 +134,7 @@ function Outputs({
   );
 }
 
-export const VariableMemoryDetail = memo((props) => {
+export const VariableMemoryDetail = memo(props => {
   const { id, data } = props;
   const {
     handleChangeNodeParam,
@@ -145,22 +145,20 @@ export const VariableMemoryDetail = memo((props) => {
     outputs,
   } = useNodeCommon({ id, data });
   const { t } = useTranslation();
-  const getCurrentStore = useFlowsManager((state) => state.getCurrentStore);
+  const getCurrentStore = useFlowsManager(state => state.getCurrentStore);
   const currentStore = getCurrentStore();
-  const iteratorId = useFlowsManager((state) => state.iteratorId);
-  const showIterativeModal = useFlowsManager(
-    (state) => state.showIterativeModal,
-  );
-  const updateNodeRef = currentStore((state) => state.updateNodeRef);
-  const nodes = currentStore((state) => state.nodes);
-  const flowNodes = useFlowStore((state) => state.nodes);
-  const canvasesDisabled = useFlowsManager((state) => state.canvasesDisabled);
+  const iteratorId = useFlowsManager(state => state.iteratorId);
+  const showIterativeModal = useFlowsManager(state => state.showIterativeModal);
+  const updateNodeRef = currentStore(state => state.updateNodeRef);
+  const nodes = currentStore(state => state.nodes);
+  const flowNodes = useFlowStore(state => state.nodes);
+  const canvasesDisabled = useFlowsManager(state => state.canvasesDisabled);
 
   const currentNodes = useMemo(() => {
     if (showIterativeModal) {
-      const nodeIds = nodes?.map((node) => node?.id);
+      const nodeIds = nodes?.map(node => node?.id);
       return cloneDeep([
-        ...flowNodes.filter((node) => !nodeIds?.includes(node?.id)),
+        ...flowNodes.filter(node => !nodeIds?.includes(node?.id)),
         ...nodes,
       ]);
     } else {
@@ -180,18 +178,18 @@ export const VariableMemoryDetail = memo((props) => {
                   <div
                     className="flex-1 rounded-md  hover:bg-[#fff] text-center p-1"
                     style={{
-                      background: nodeParam?.method === "set" ? "#fff" : "",
+                      background: nodeParam?.method === 'set' ? '#fff' : '',
                     }}
                     onClick={() =>
                       handleChangeNodeParam((data, value) => {
                         data.inputs = [
                           {
                             id: uuid(),
-                            name: "input",
+                            name: 'input',
                             schema: {
-                              type: "string",
+                              type: 'string',
                               value: {
-                                type: "ref",
+                                type: 'ref',
                                 content: {},
                               },
                             },
@@ -200,15 +198,15 @@ export const VariableMemoryDetail = memo((props) => {
                         data.outputs = [];
                         data.nodeParam.method = value;
                         updateNodeRef(id);
-                      }, "set")
+                      }, 'set')
                     }
                   >
-                    {t("workflow.nodes.variableMemoryNode.setVariableValue")}
+                    {t('workflow.nodes.variableMemoryNode.setVariableValue')}
                   </div>
                   <div
                     className="flex-1 rounded-md hover:bg-[#fff] text-center p-1"
                     style={{
-                      background: nodeParam?.method === "get" ? "#fff" : "",
+                      background: nodeParam?.method === 'get' ? '#fff' : '',
                     }}
                     onClick={() =>
                       handleChangeNodeParam((data, value) => {
@@ -216,29 +214,29 @@ export const VariableMemoryDetail = memo((props) => {
                         data.outputs = [
                           {
                             id: uuid(),
-                            name: "",
+                            name: '',
                             schema: {
-                              type: "",
-                              description: "",
+                              type: '',
+                              description: '',
                             },
                             required: true,
                           },
                         ];
                         data.nodeParam.method = value;
-                      }, "get")
+                      }, 'get')
                     }
                   >
-                    {t("workflow.nodes.variableMemoryNode.getVariableValue")}
+                    {t('workflow.nodes.variableMemoryNode.getVariableValue')}
                   </div>
                 </div>
               </div>
             }
           />
-          {nodeParam?.method === "set" && (
+          {nodeParam?.method === 'set' && (
             <FLowCollapse
               label={
                 <div className="text-base font-medium">
-                  {t("workflow.nodes.variableMemoryNode.input")}
+                  {t('workflow.nodes.variableMemoryNode.input')}
                 </div>
               }
               content={
@@ -246,21 +244,21 @@ export const VariableMemoryDetail = memo((props) => {
               }
             />
           )}
-          {nodeParam?.method === "get" && (
+          {nodeParam?.method === 'get' && (
             <FLowCollapse
               label={
                 <div className="text-base font-medium">
-                  {t("workflow.nodes.variableMemoryNode.output")}
+                  {t('workflow.nodes.variableMemoryNode.output')}
                 </div>
               }
               content={
                 <div>
                   <div className="flex items-center gap-3 text-desc px-[18px]">
                     <h4 className="flex-1">
-                      {t("workflow.nodes.variableMemoryNode.parameterName")}
+                      {t('workflow.nodes.variableMemoryNode.parameterName')}
                     </h4>
                     <h4 className="w-1/3">
-                      {t("workflow.nodes.variableMemoryNode.variableType")}
+                      {t('workflow.nodes.variableMemoryNode.variableType')}
                     </h4>
                     {outputs?.length > 1 && <span className="w-5 h-5"></span>}
                   </div>
@@ -279,7 +277,7 @@ export const VariableMemoryDetail = memo((props) => {
                       onClick={() => handleAddOutputLine()}
                     >
                       <img src={inputAddIcon} className="w-3 h-3" alt="" />
-                      <span>{t("workflow.nodes.variableMemoryNode.add")}</span>
+                      <span>{t('workflow.nodes.variableMemoryNode.add')}</span>
                     </div>
                   )}
                 </div>

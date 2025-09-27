@@ -1,7 +1,7 @@
-import { message } from "antd";
-import React from "react";
-import { useTranslation } from "react-i18next";
-import { sliceFilesAPI, getStatusAPI } from "@/services/knowledge";
+import { message } from 'antd';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { sliceFilesAPI, getStatusAPI } from '@/services/knowledge';
 import {
   Chunk,
   FileStatusResponse,
@@ -9,7 +9,7 @@ import {
   KnowledgeItem,
   PageData,
   UploadFile,
-} from "@/types/resource";
+} from '@/types/resource';
 
 let timer: number;
 
@@ -47,7 +47,7 @@ interface UseSliceOperationsProps {
  * 切片操作相关的 hook
  */
 export const useSliceOperations = (
-  props: UseSliceOperationsProps,
+  props: UseSliceOperationsProps
 ): {
   selectDefault: () => void;
   selectCustom: () => void;
@@ -87,31 +87,31 @@ export const useSliceOperations = (
         tag,
         fileIds: currentFileIds,
       };
-      getStatusAPI(params).then((data) => {
+      getStatusAPI(params).then(data => {
         const doneList = data.filter(
-          (item) => item.status === 1 || item.status === 2,
+          item => item.status === 1 || item.status === 2
         );
-        const failedList = data.filter((item) => item.status === 1);
+        const failedList = data.filter(item => item.status === 1);
         if (doneList.length === currentFileIds.length) {
           setSlicing(false);
           getChunks(
-            failedList.map((item) => item.id || ""),
-            type,
+            failedList.map(item => item.id || ''),
+            type
           );
           window.clearInterval(timer);
         }
-        if (importType === "web") {
+        if (importType === 'web') {
           setUploadList(
             () =>
-              doneList.map((item) => ({
+              doneList.map(item => ({
                 ...item,
                 type: item?.type,
-                status: "done",
+                status: 'done',
                 fileId: item?.id,
-              })) as UploadFile[],
+              })) as UploadFile[]
           );
-          failedList.forEach((item) => {
-            item.type = item?.type || "html";
+          failedList.forEach(item => {
+            item.type = item?.type || 'html';
           });
         }
         setFailedList(failedList);
@@ -132,7 +132,7 @@ export const useSliceOperations = (
     };
     sliceFilesAPI(params)
       .then(() => {
-        getFileStatus("default");
+        getFileStatus('default');
         setNewSaveDisabled(false);
       })
       .catch(() => {
@@ -151,14 +151,14 @@ export const useSliceOperations = (
       tag,
       sliceConfig: {
         type: 1,
-        seperator: [configDetail.seperator.replace("\\n", "\n")],
+        seperator: [configDetail.seperator.replace('\\n', '\n')],
         lengthRange: [configDetail.min, configDetail.max],
       },
       fileIds: ids || currentFileIds,
     };
     sliceFilesAPI(sliceConfig)
       .then(() => {
-        getFileStatus("custom");
+        getFileStatus('custom');
         setNewSaveDisabled(false);
         if (chunkRef.current) {
           chunkRef.current.scrollTop = 0;
@@ -171,10 +171,10 @@ export const useSliceOperations = (
 
   const selectDefault = (): void => {
     if (slicing) {
-      message.warning(t("knowledge.slicing"));
+      message.warning(t('knowledge.slicing'));
       return;
     }
-    setSliceType("default");
+    setSliceType('default');
     window.clearInterval(timer);
     if (Object.keys(selectTypeCache.current.default).length > 0) {
       getCacheData(selectTypeCache.current.default as PageData<KnowledgeItem>);
@@ -185,10 +185,10 @@ export const useSliceOperations = (
 
   const selectCustom = (): void => {
     if (slicing) {
-      message.warning(t("knowledge.slicing"));
+      message.warning(t('knowledge.slicing'));
       return;
     }
-    setSliceType("custom");
+    setSliceType('custom');
     window.clearInterval(timer);
     if (Object.keys(selectTypeCache.current.custom).length > 0) {
       getCacheData(selectTypeCache.current.custom as PageData<KnowledgeItem>);
@@ -200,8 +200,8 @@ export const useSliceOperations = (
   };
 
   const reTry = (): void => {
-    const failedIds = failedList.map((item) => item.id || "");
-    if (sliceType === "default") {
+    const failedIds = failedList.map(item => item.id || '');
+    if (sliceType === 'default') {
       defaultSlice(failedIds);
     } else {
       customSlice(failedIds);

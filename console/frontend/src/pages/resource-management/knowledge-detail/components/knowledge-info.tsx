@@ -1,7 +1,7 @@
-import { RepoItem } from "@/types/resource";
-import { FC, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { RepoItem } from '@/types/resource';
+import { FC, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 export const KnowledgeInfo: FC<{
   knowledgeInfo: RepoItem;
@@ -16,12 +16,12 @@ export const KnowledgeInfo: FC<{
           <div className="flex items-center text-sm">
             <span>{knowledgeInfo?.bots?.length}</span>
             <span className="text-[#757575]">
-              &nbsp;{t("knowledge.relatedApplications")}
+              &nbsp;{t('knowledge.relatedApplications')}
             </span>
             <div
               className="flex p-1 rounded-xl ml-3"
               style={{
-                background: isHover ? "#8299FF" : "",
+                background: isHover ? '#8299FF' : '',
               }}
             >
               <div
@@ -39,9 +39,9 @@ export const KnowledgeInfo: FC<{
                     key={item.id as string}
                     className="flex items-center justify-center w-8 h-8 absolute transition-all"
                     style={{
-                      border: "1px solid #e2e8ff",
-                      borderRadius: "10px",
-                      boxShadow: "-2px 0px 8px 0px rgba(0,0,0,0.10)",
+                      border: '1px solid #e2e8ff',
+                      borderRadius: '10px',
+                      boxShadow: '-2px 0px 8px 0px rgba(0,0,0,0.10)',
                       background: item.color as string,
                       right: isHover
                         ? (knowledgeInfo?.bots?.length - 1 - index) * 36 + 4

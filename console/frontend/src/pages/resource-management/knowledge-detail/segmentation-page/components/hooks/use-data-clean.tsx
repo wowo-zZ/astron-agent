@@ -4,7 +4,7 @@ import {
   getStatusAPI,
   listPreviewKnowledgeByPage,
   sliceFilesAPI,
-} from "@/services/knowledge";
+} from '@/services/knowledge';
 import {
   Chunk,
   FileInfoV2,
@@ -13,20 +13,20 @@ import {
   KnowledgeItem,
   PageData,
   SliceFilesParams,
-} from "@/types/resource";
-import { modifyChunks } from "@/utils/utils";
-import { message } from "antd";
-import { cloneDeep } from "lodash";
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+} from '@/types/resource';
+import { modifyChunks } from '@/utils/utils';
+import { message } from 'antd';
+import { cloneDeep } from 'lodash';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 let loading: boolean = false;
 let timer: number;
 
 // 配置管理 Hook
 const useConfigManagement = (
-  tag: string,
+  tag: string
 ): {
   defaultConfig: Record<string, unknown>;
   configDetail: { min: number; max: number; seperator: string };
@@ -44,7 +44,7 @@ const useConfigManagement = (
   const [configDetail, setConfigDetail] = useState({
     min: 1,
     max: 256,
-    seperator: "\\n",
+    seperator: '\\n',
   });
   const [lengthRange, setLengthRange] = useState([1, 256]);
   const [seperatorsOptions, setSeperatorsOptions] = useState<
@@ -56,40 +56,40 @@ const useConfigManagement = (
   const timerRef = useRef<number>();
 
   const sliceConfig = useMemo(() => {
-    if (tag === "CBG-RAG") {
+    if (tag === 'CBG-RAG') {
       return [
-        "DEFAULT_SLICE_RULES_CBG",
-        "CUSTOM_SLICE_RULES_CBG",
-        "CUSTOM_SLICE_SEPERATORS_CBG",
+        'DEFAULT_SLICE_RULES_CBG',
+        'CUSTOM_SLICE_RULES_CBG',
+        'CUSTOM_SLICE_SEPERATORS_CBG',
       ];
-    } else if (tag === "AIUI-RAG2") {
+    } else if (tag === 'AIUI-RAG2') {
       return [
-        "DEFAULT_SLICE_RULES_AIUI",
-        "CUSTOM_SLICE_RULES_AIUI",
-        "CUSTOM_SLICE_SEPERATORS_AIUI",
+        'DEFAULT_SLICE_RULES_AIUI',
+        'CUSTOM_SLICE_RULES_AIUI',
+        'CUSTOM_SLICE_SEPERATORS_AIUI',
       ];
     } else {
       return [
-        "DEFAULT_SLICE_RULES_SPARK",
-        "CUSTOM_SLICE_RULES_SPARK",
-        "CUSTOM_SLICE_SEPERATORS_SPARK",
+        'DEFAULT_SLICE_RULES_SPARK',
+        'CUSTOM_SLICE_RULES_SPARK',
+        'CUSTOM_SLICE_SEPERATORS_SPARK',
       ];
     }
   }, [tag]);
 
   useEffect(() => {
-    getConfigs(sliceConfig[0]).then((data) => {
-      const config = JSON.parse(data[0]?.value || "{}");
+    getConfigs(sliceConfig[0]).then(data => {
+      const config = JSON.parse(data[0]?.value || '{}');
       setDefaultConfig(config);
     });
 
-    getConfigs(sliceConfig[1]).then((data) => {
-      const config = JSON.parse(data[0]?.value || "{}");
+    getConfigs(sliceConfig[1]).then(data => {
+      const config = JSON.parse(data[0]?.value || '{}');
       setLengthRange(config.lengthRange);
     });
 
-    getConfigs(sliceConfig[2]).then((data) => {
-      setSeperatorsOptions(JSON.parse(data[0]?.value || "{}"));
+    getConfigs(sliceConfig[2]).then(data => {
+      setSeperatorsOptions(JSON.parse(data[0]?.value || '{}'));
     });
   }, [sliceConfig]);
 
@@ -97,7 +97,7 @@ const useConfigManagement = (
     setConfigDetail({
       min: lengthRange[0] || 0,
       max: lengthRange[1] || 0,
-      seperator: "\\n",
+      seperator: '\\n',
     });
   };
 
@@ -134,7 +134,7 @@ const useConfigManagement = (
 // 分页和数据管理 Hook
 const usePaginationAndData = (
   tag: string,
-  fileId: string,
+  fileId: string
 ): {
   chunkRef: React.RefObject<HTMLDivElement>;
   pageNumber: number;
@@ -149,7 +149,7 @@ const usePaginationAndData = (
   setViolationTotal: React.Dispatch<React.SetStateAction<number>>;
   getChunks: (
     selectType: string,
-    failList: FileStatusResponse[],
+    failList: FileStatusResponse[]
   ) => Promise<PageData<KnowledgeItem> | null>;
   getCacheData: (cacheData: PageData<KnowledgeItem>) => void;
   resetData: () => void;
@@ -168,10 +168,10 @@ const usePaginationAndData = (
       pageNo: pageNumber,
       pageSize: 10,
     };
-    listPreviewKnowledgeByPage(params).then((data) => {
+    listPreviewKnowledgeByPage(params).then(data => {
       const newChunks = modifyChunks(data.pageData || []);
-      setChunks((prevItems) => [...prevItems, ...newChunks]);
-      setPageNumber((prevPageNumber) => prevPageNumber + 1);
+      setChunks(prevItems => [...prevItems, ...newChunks]);
+      setPageNumber(prevPageNumber => prevPageNumber + 1);
       loading = false;
       if (total > chunks.length + 10) {
         setHasMore(true);
@@ -195,7 +195,7 @@ const usePaginationAndData = (
 
   const getChunks = (
     selectType: string,
-    failList: FileStatusResponse[],
+    failList: FileStatusResponse[]
   ): Promise<PageData<KnowledgeItem> | null> => {
     const params = {
       tag,
@@ -203,7 +203,7 @@ const usePaginationAndData = (
       pageNo: 1,
       pageSize: 10,
     };
-    return listPreviewKnowledgeByPage(params).then((data) => {
+    return listPreviewKnowledgeByPage(params).then(data => {
       const chunks = modifyChunks(data.pageData || []);
       setChunks(chunks);
       setPageNumber(2);
@@ -242,12 +242,12 @@ const usePaginationAndData = (
   useEffect(() => {
     const element = chunkRef.current;
     if (element) {
-      element.addEventListener("scroll", handleScroll);
+      element.addEventListener('scroll', handleScroll);
     }
 
     return (): void => {
       if (element) {
-        element.removeEventListener("scroll", handleScroll);
+        element.removeEventListener('scroll', handleScroll);
       }
     };
   }, [pageNumber, hasMore, chunks]);
@@ -278,7 +278,7 @@ const useDataSlicing = (params: {
   configDetail: { min: number; max: number; seperator: string };
   getChunks: (
     selectType: string,
-    failList: FileStatusResponse[],
+    failList: FileStatusResponse[]
   ) => Promise<PageData<KnowledgeItem> | null>;
   getCacheData: (cacheData: PageData<KnowledgeItem>) => void;
   resetData: () => void;
@@ -305,7 +305,7 @@ const useDataSlicing = (params: {
     resetData,
   } = params;
   const { t } = useTranslation();
-  const [sliceType, setSliceType] = useState("");
+  const [sliceType, setSliceType] = useState('');
   const [slicing, setSlicing] = useState(false);
   const [saveDisable, setSaveDisable] = useState(false);
   const [failedList, setFailedList] = useState<FileStatusResponse[]>([]);
@@ -325,7 +325,7 @@ const useDataSlicing = (params: {
     };
     sliceFilesAPI(params).then(() => {
       setSaveDisable(false);
-      getFileStatus("default");
+      getFileStatus('default');
     });
   };
 
@@ -336,7 +336,7 @@ const useDataSlicing = (params: {
     const sliceConfig = {
       sliceConfig: config || {
         type: 1,
-        seperator: [configDetail.seperator.replace("\\n", "\n")],
+        seperator: [configDetail.seperator.replace('\\n', '\n')],
         lengthRange: [configDetail.min, configDetail.max],
       },
       fileIds: [fileId],
@@ -345,7 +345,7 @@ const useDataSlicing = (params: {
     sliceFilesAPI(sliceConfig)
       .then(() => {
         setSaveDisable(false);
-        getFileStatus("custom");
+        getFileStatus('custom');
       })
       .catch(() => {
         setSlicing(false);
@@ -360,14 +360,14 @@ const useDataSlicing = (params: {
         tag,
         fileIds: [fileId],
       };
-      getStatusAPI(params).then((data) => {
+      getStatusAPI(params).then(data => {
         const doneList = data.filter(
-          (item) => item.status === 1 || item.status === 2 || item.status === 5,
+          item => item.status === 1 || item.status === 2 || item.status === 5
         );
-        const failedList = data.filter((item) => item.status === 1);
+        const failedList = data.filter(item => item.status === 1);
         if (doneList.length === 1) {
           setSlicing(false);
-          getChunks(type, failedList).then((cacheData) => {
+          getChunks(type, failedList).then(cacheData => {
             if (cacheData) {
               selectTypeCache.current[
                 type as keyof typeof selectTypeCache.current
@@ -387,10 +387,10 @@ const useDataSlicing = (params: {
 
   const selectDefault = (): void => {
     if (slicing) {
-      message.warning(t("knowledge.slicing"));
+      message.warning(t('knowledge.slicing'));
       return;
     }
-    setSliceType("default");
+    setSliceType('default');
     if (Object.keys(selectTypeCache.current.default).length > 0) {
       getCacheData(selectTypeCache.current.default as PageData<KnowledgeItem>);
     } else {
@@ -400,11 +400,11 @@ const useDataSlicing = (params: {
 
   const selectCustom = (): void => {
     if (slicing) {
-      message.warning(t("knowledge.slicing"));
+      message.warning(t('knowledge.slicing'));
       return;
     }
     window.clearInterval(timer);
-    setSliceType("custom");
+    setSliceType('custom');
     if (Object.keys(selectTypeCache.current.custom).length > 0) {
       getCacheData(selectTypeCache.current.custom as PageData<KnowledgeItem>);
     } else {
@@ -432,7 +432,7 @@ const useSaveOperation = (
   repoId: string,
   tag: string,
   fileInfo: FileInfoV2,
-  pid: string,
+  pid: string
 ): {
   saveLoading: boolean;
   setSaveLoading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -459,7 +459,7 @@ const useSaveOperation = (
       configs: {},
       fileIds: [fileInfo.id],
     };
-    if (tag === "SparkDesk-RAG") {
+    if (tag === 'SparkDesk-RAG') {
       params.sparkFiles = [
         {
           fileId: fileInfo.id,
@@ -510,10 +510,10 @@ const useUIState = (): {
       }
     };
 
-    window.addEventListener("click", handleClickOutside);
+    window.addEventListener('click', handleClickOutside);
 
     return (): void => {
-      window.removeEventListener("click", handleClickOutside);
+      window.removeEventListener('click', handleClickOutside);
     };
   }, []);
 
@@ -612,17 +612,17 @@ export const useDataClean = ({
         min: sliceData.lengthRange[0] || 0,
         max: sliceData.lengthRange[1] || 0,
         seperator:
-          sliceData.seperator[0] === "\n"
-            ? "\\n"
-            : sliceData.seperator[0] || "",
+          sliceData.seperator[0] === '\n'
+            ? '\\n'
+            : sliceData.seperator[0] || '',
       };
       dataSliceManager.setSlicing(true);
       configManager.setConfigDetail({ ...configParameter });
-      dataSliceManager.setSliceType("custom");
+      dataSliceManager.setSliceType('custom');
     }
     if (sliceData.sliceType === 0) {
       dataSliceManager.setSlicing(true);
-      dataSliceManager.setSliceType("default");
+      dataSliceManager.setSliceType('default');
       configManager.initConfig();
     }
   };

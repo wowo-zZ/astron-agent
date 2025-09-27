@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
 /** 助手详细信息接口 */
 export interface BotDetailInfo {
@@ -25,13 +25,13 @@ export interface BotState {
 }
 
 // 创建Zustand store
-export const useBotStateStore = create<BotState>()((set) => ({
+export const useBotStateStore = create<BotState>()(set => ({
   // 初始化状态
   botDetailInfo: null,
   botVcn: {
-    cn: "",
-    en: "",
-    speed: "",
+    cn: '',
+    en: '',
+    speed: '',
     isDialect: false,
   },
 

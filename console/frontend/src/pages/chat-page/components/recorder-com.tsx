@@ -4,16 +4,16 @@ import {
   useImperativeHandle,
   forwardRef,
   useCallback,
-} from "react";
-import Media from "@/utils/record/record";
+} from 'react';
+import Media from '@/utils/record/record';
 
-import { getRtasrToken } from "@/services/chat";
-import { message } from "antd";
-import AudioAnimate from "./audio-animate";
-import { ReactSVG } from "react-svg";
+import { getRtasrToken } from '@/services/chat';
+import { message } from 'antd';
+import AudioAnimate from './audio-animate';
+import { ReactSVG } from 'react-svg';
 
 // 录音状态类型
-type RecorderStatus = "ready" | "start" | "end";
+type RecorderStatus = 'ready' | 'start' | 'end';
 
 // 组件Props类型
 interface RecorderProps {
@@ -29,23 +29,23 @@ export interface RecorderRef {
 let timer: NodeJS.Timeout | null = null;
 const RecorderCom = forwardRef<RecorderRef, RecorderProps>(
   ({ send, disabled = false }, ref) => {
-    const [status, setStatus] = useState<RecorderStatus>("ready");
+    const [status, setStatus] = useState<RecorderStatus>('ready');
     const record = useRef<any>(
-      new (Media as any)({ resetText: (text: any) => handleRecord(text) }),
+      new (Media as any)({ resetText: (text: any) => handleRecord(text) })
     );
     // 处理录音文本回调
     const handleRecord = useCallback(
       (text: string): void => {
-        if (text && typeof text === "string") {
+        if (text && typeof text === 'string') {
           send(text);
         }
       },
-      [send],
+      [send]
     );
 
     // 开始录音事件处理
     const handleStartRecord = useCallback(async (): Promise<void> => {
-      if (disabled || (status !== "ready" && status !== "end")) {
+      if (disabled || (status !== 'ready' && status !== 'end')) {
         return;
       }
 
@@ -53,21 +53,21 @@ const RecorderCom = forwardRef<RecorderRef, RecorderProps>(
         const tokenResponse = await getRtasrToken();
 
         if (!record.current) {
-          throw new Error("录音器未初始化");
+          throw new Error('录音器未初始化');
         }
 
         await record.current.recStart(tokenResponse);
-        setStatus("start");
+        setStatus('start');
 
         // 设置60秒超时
         timer = setTimeout(() => {
           stopAudio();
         }, 60 * 1000);
       } catch (error) {
-        console.warn("录音启动失败:", error);
+        console.warn('录音启动失败:', error);
 
         // 类型安全的错误处理
-        if (error && typeof error === "object" && "detail" in error) {
+        if (error && typeof error === 'object' && 'detail' in error) {
           const errorDetail = error.detail as { code?: number };
           if (errorDetail.code && [80000, 90000].includes(errorDetail.code)) {
             return;
@@ -75,9 +75,9 @@ const RecorderCom = forwardRef<RecorderRef, RecorderProps>(
         }
 
         const errorMsg =
-          error && typeof error === "object" && "msg" in error
+          error && typeof error === 'object' && 'msg' in error
             ? (error.msg as string)
-            : "录音启动失败";
+            : '录音启动失败';
 
         message.error(errorMsg);
         record.current?.recStop();
@@ -94,9 +94,9 @@ const RecorderCom = forwardRef<RecorderRef, RecorderProps>(
           timer = null;
         }
 
-        setStatus("end");
+        setStatus('end');
       } catch (error) {
-        console.warn("停止录音失败:", error);
+        console.warn('停止录音失败:', error);
       }
     }, []);
 
@@ -106,17 +106,17 @@ const RecorderCom = forwardRef<RecorderRef, RecorderProps>(
       () => ({
         stopAudio,
       }),
-      [stopAudio],
+      [stopAudio]
     );
 
     return (
       <div className="cursor-pointer bg-contain rounded-lg border-transparent text-xl flex justify-center items-center relative">
         {/* 录音中状态 */}
-        {status === "start" && (
+        {status === 'start' && (
           <div
             onClick={disabled ? undefined : stopAudio}
             className={`w-fit h-auto flex justify-center items-center z-10 ${
-              disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+              disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
             }`}
           >
             <AudioAnimate isPlaying={true} />
@@ -124,12 +124,12 @@ const RecorderCom = forwardRef<RecorderRef, RecorderProps>(
         )}
 
         {/* 准备/结束状态 */}
-        {(status === "ready" || status === "end") && (
+        {(status === 'ready' || status === 'end') && (
           <div
             className={`relative w-full h-full text-gray-700 z-10 flex items-center justify-center transition-colors duration-200 ${
               disabled
-                ? "cursor-not-allowed opacity-50"
-                : "cursor-pointer hover:text-blue-600"
+                ? 'cursor-not-allowed opacity-50'
+                : 'cursor-pointer hover:text-blue-600'
             }`}
             onClick={disabled ? undefined : handleStartRecord}
           >
@@ -143,9 +143,9 @@ const RecorderCom = forwardRef<RecorderRef, RecorderProps>(
         )}
       </div>
     );
-  },
+  }
 );
 
-RecorderCom.displayName = "RecorderCom";
+RecorderCom.displayName = 'RecorderCom';
 
 export default RecorderCom;

@@ -4,23 +4,23 @@ import React, {
   useCallback,
   useMemo,
   KeyboardEvent,
-} from "react";
-import { Modal, message } from "antd";
-import styles from "./index.module.scss";
-import ButtonGroup from "@/components/button-group/button-group";
-import type { ButtonConfig } from "@/components/button-group/types";
+} from 'react';
+import { Modal, message } from 'antd';
+import styles from './index.module.scss';
+import ButtonGroup from '@/components/button-group/button-group';
+import type { ButtonConfig } from '@/components/button-group/types';
 
-import SpaceSearch from "@/components/space/space-search";
-import UserItem from "./user-item";
-import SelectedUserItem from "./selected-user-item";
-import CusCheckBox from "./cus-check-box";
+import SpaceSearch from '@/components/space/space-search';
+import UserItem from './user-item';
+import SelectedUserItem from './selected-user-item';
+import CusCheckBox from './cus-check-box';
 
-import emptyImg from "@/assets/imgs/space/empty.png";
-import creatorImg from "@/assets/imgs/space/person-space-icon.svg";
+import emptyImg from '@/assets/imgs/space/empty.png';
+import creatorImg from '@/assets/imgs/space/person-space-icon.svg';
 
-import { searchInviteUsers, getUserLimit } from "./config";
-import { MEMBER_ROLE } from "@/pages/space/config";
-import { patterns } from "@/utils/pattern";
+import { searchInviteUsers, getUserLimit } from './config';
+import { MEMBER_ROLE } from '@/pages/space/config';
+import { patterns } from '@/utils/pattern';
 
 interface User {
   uid: string;
@@ -42,7 +42,7 @@ interface SelectedUser {
 
 interface AddMemberModalProps {
   title?: React.ReactNode;
-  inviteType?: "enterprise" | "space";
+  inviteType?: 'enterprise' | 'space';
   open: boolean;
   onClose: () => void;
   onSubmit: (values: SelectedUser[]) => void;
@@ -61,7 +61,7 @@ const transformUserInfo = (users: User[]): SelectedUser[] => {
     return [];
   }
 
-  return users.map((user) => {
+  return users.map(user => {
     const { uid, username, mobile, avatar, role, status } = user;
     return {
       uid,
@@ -75,9 +75,9 @@ const transformUserInfo = (users: User[]): SelectedUser[] => {
 };
 
 // 搜索用户相关逻辑的 Hook
-const useUserSearch = (inviteType: "enterprise" | "space") => {
-  const [searchValue, setSearchValue] = useState<string>("");
-  const [lastSearchedValue, setLastSearchedValue] = useState<string>("");
+const useUserSearch = (inviteType: 'enterprise' | 'space') => {
+  const [searchValue, setSearchValue] = useState<string>('');
+  const [lastSearchedValue, setLastSearchedValue] = useState<string>('');
   const [userList, setUserList] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -99,9 +99,9 @@ const useUserSearch = (inviteType: "enterprise" | "space") => {
 
         const res = await searchInviteUsers(
           { username: searchKeyword },
-          inviteType,
+          inviteType
         );
-        const users = (res || []).map((user) => ({
+        const users = (res || []).map(user => ({
           ...user,
           avatar: user.avatar || creatorImg,
         }));
@@ -113,7 +113,7 @@ const useUserSearch = (inviteType: "enterprise" | "space") => {
         setLoading(false);
       }
     },
-    [inviteType],
+    [inviteType]
   );
 
   const handleSearch = useCallback(
@@ -123,8 +123,8 @@ const useUserSearch = (inviteType: "enterprise" | "space") => {
       // const numericValue = value.replace(/\D/g, '').slice(0, 11);
       setSearchValue(numericValue);
 
-      if (numericValue === "") {
-        searchUsers("");
+      if (numericValue === '') {
+        searchUsers('');
         return;
       }
 
@@ -134,27 +134,27 @@ const useUserSearch = (inviteType: "enterprise" | "space") => {
       //   }
       // }
     },
-    [searchUsers],
+    [searchUsers]
   );
 
   const handleKeyPress = useCallback(
     (e: KeyboardEvent<HTMLInputElement>): void => {
-      if (e.key === "Enter") {
+      if (e.key === 'Enter') {
         e.preventDefault();
         const trimmedValue = searchValue.trim();
         if (!trimmedValue) {
-          message.warning("请输入手机号");
+          message.warning('请输入手机号');
           return;
         }
         searchUsers(trimmedValue);
       }
     },
-    [searchValue, searchUsers],
+    [searchValue, searchUsers]
   );
 
   const resetSearch = useCallback((): void => {
-    setSearchValue("");
-    setLastSearchedValue("");
+    setSearchValue('');
+    setLastSearchedValue('');
     setUserList([]);
   }, []);
 
@@ -175,13 +175,13 @@ const useUserSelection = (maxMembers: number, userList: User[]) => {
   const [allChecked, setAllChecked] = useState<boolean>(false);
 
   const selectedUserIds = useMemo(
-    () => new Set(selectedUsers.map((user) => user.uid)),
-    [selectedUsers],
+    () => new Set(selectedUsers.map(user => user.uid)),
+    [selectedUsers]
   );
 
   const addableUsers = useMemo(
-    () => userList.filter((user) => user.status === 0),
-    [userList],
+    () => userList.filter(user => user.status === 0),
+    [userList]
   );
 
   const handleSelectUser = useCallback(
@@ -195,13 +195,13 @@ const useUserSelection = (maxMembers: number, userList: User[]) => {
         const transformedUsers = transformUserInfo([user]);
         const newUser = transformedUsers[0];
         if (newUser) {
-          setSelectedUsers((prev) => [...prev, newUser]);
+          setSelectedUsers(prev => [...prev, newUser]);
         }
       } else {
-        setSelectedUsers((prev) => prev.filter((u) => u.uid !== user.uid));
+        setSelectedUsers(prev => prev.filter(u => u.uid !== user.uid));
       }
     },
-    [selectedUsers.length, maxMembers],
+    [selectedUsers.length, maxMembers]
   );
 
   const handleSelectAll = useCallback(
@@ -214,54 +214,54 @@ const useUserSelection = (maxMembers: number, userList: User[]) => {
       if (checked) {
         const remainingSlots = maxMembers - selectedUsers.length;
         const usersToAdd = transformUserInfo(
-          addableUsers.slice(0, remainingSlots),
+          addableUsers.slice(0, remainingSlots)
         );
 
-        setSelectedUsers((prev) => {
-          const existingIds = prev.map((u) => u.uid);
+        setSelectedUsers(prev => {
+          const existingIds = prev.map(u => u.uid);
           const newUsers = usersToAdd.filter(
-            (user) => !existingIds.includes(user.uid),
+            user => !existingIds.includes(user.uid)
           );
           return [...prev, ...newUsers];
         });
       } else {
-        const addableUserIds = addableUsers.map((user) => user.uid);
-        setSelectedUsers((prev) =>
-          prev.filter((user) => !addableUserIds.includes(user.uid)),
+        const addableUserIds = addableUsers.map(user => user.uid);
+        setSelectedUsers(prev =>
+          prev.filter(user => !addableUserIds.includes(user.uid))
         );
       }
     },
-    [addableUsers, selectedUsers.length, maxMembers],
+    [addableUsers, selectedUsers.length, maxMembers]
   );
 
   const handleRoleChange = useCallback((userId: string, role: string): void => {
-    setSelectedUsers((prev) =>
-      prev.map((user) => (user.uid === userId ? { ...user, role } : user)),
+    setSelectedUsers(prev =>
+      prev.map(user => (user.uid === userId ? { ...user, role } : user))
     );
   }, []);
 
   const handleRemoveUser = useCallback((userId: string): void => {
-    setSelectedUsers((prev) => prev.filter((user) => user.uid !== userId));
+    setSelectedUsers(prev => prev.filter(user => user.uid !== userId));
   }, []);
 
   const isUserSelected = useCallback(
     (userId: string): boolean => {
-      const user = userList.find((u) => u.uid === userId);
+      const user = userList.find(u => u.uid === userId);
       return (user && user.status === 1) || selectedUserIds.has(userId);
     },
-    [userList, selectedUserIds],
+    [userList, selectedUserIds]
   );
 
   const isCheckboxDisabled = useCallback(
     (userId: string): boolean => {
       const isSelected = isUserSelected(userId);
-      const user = userList.find((u) => u.uid === userId);
+      const user = userList.find(u => u.uid === userId);
       const isExisting = user && user.status !== 0;
       const reachedMaxMembers = selectedUsers.length >= maxMembers;
 
       return Boolean(isExisting || (!isSelected && reachedMaxMembers));
     },
-    [selectedUsers.length, maxMembers, isUserSelected, userList],
+    [selectedUsers.length, maxMembers, isUserSelected, userList]
   );
 
   const resetSelection = useCallback((): void => {
@@ -271,10 +271,10 @@ const useUserSelection = (maxMembers: number, userList: User[]) => {
 
   // 更新全选状态
   useEffect(() => {
-    const selectedIds = selectedUsers.map((user) => user.uid);
+    const selectedIds = selectedUsers.map(user => user.uid);
     const allSelected =
       addableUsers.length > 0 &&
-      addableUsers.every((user) => selectedIds.includes(user.uid));
+      addableUsers.every(user => selectedIds.includes(user.uid));
     setAllChecked(allSelected);
   }, [addableUsers, selectedUsers]);
 
@@ -294,8 +294,8 @@ const useUserSelection = (maxMembers: number, userList: User[]) => {
 
 const AddMemberModal: React.FC<AddMemberModalProps> = React.memo(
   ({
-    title = "添加新成员",
-    inviteType = "enterprise",
+    title = '添加新成员',
+    inviteType = 'enterprise',
     open,
     onClose,
     onSubmit,
@@ -323,7 +323,7 @@ const AddMemberModal: React.FC<AddMemberModalProps> = React.memo(
 
     const handleSubmit = useCallback((): void => {
       if (userSelection.selectedUsers.length === 0) {
-        message.warning("请至少选择一个用户");
+        message.warning('请至少选择一个用户');
         return;
       }
       onSubmit(userSelection.selectedUsers);
@@ -333,26 +333,26 @@ const AddMemberModal: React.FC<AddMemberModalProps> = React.memo(
       (e: any): void => {
         userSelection.handleSelectAll(e);
       },
-      [userSelection.handleSelectAll],
+      [userSelection.handleSelectAll]
     );
 
     const emptyStateText = useMemo(() => {
       return !userSearch.lastSearchedValue
-        ? "搜索手机号以添加新成员"
+        ? '搜索手机号以添加新成员'
         : `未找到"${userSearch.lastSearchedValue}"相关用户`;
     }, [userSearch.lastSearchedValue]);
 
     const buttons: ButtonConfig[] = [
       {
-        key: "cancel",
-        text: "取消",
-        type: "default",
+        key: 'cancel',
+        text: '取消',
+        type: 'default',
         onClick: () => onClose(),
       },
       {
-        key: "submit",
-        text: "确定",
-        type: "primary",
+        key: 'submit',
+        text: '确定',
+        type: 'primary',
         disabled: userSelection.selectedUsers.length === 0,
         onClick: () => handleSubmit(),
       },
@@ -403,14 +403,14 @@ const AddMemberModal: React.FC<AddMemberModalProps> = React.memo(
                     <span className={styles.emptyText}>搜索中...</span>
                   </div>
                 ) : userSearch.userList.length > 0 ? (
-                  userSearch.userList.map((user) => (
+                  userSearch.userList.map(user => (
                     <UserItem
                       key={user.uid}
                       user={user}
                       isUserSelected={userSelection.isUserSelected}
                       handleSelectUser={userSelection.handleSelectUser}
                       checkboxDisabled={userSelection.isCheckboxDisabled(
-                        user.uid,
+                        user.uid
                       )}
                     />
                   ))
@@ -432,7 +432,7 @@ const AddMemberModal: React.FC<AddMemberModalProps> = React.memo(
             </div>
 
             <div className={styles.selectedUsers}>
-              {userSelection.selectedUsers.map((user) => (
+              {userSelection.selectedUsers.map(user => (
                 <SelectedUserItem
                   key={user.uid}
                   user={user}
@@ -449,7 +449,7 @@ const AddMemberModal: React.FC<AddMemberModalProps> = React.memo(
         </div>
       </Modal>
     );
-  },
+  }
 );
 
 export default AddMemberModal;

@@ -1,12 +1,12 @@
-import { ConnectionLineComponentProps } from "reactflow";
-import React from "react";
+import { ConnectionLineComponentProps } from 'reactflow';
+import React from 'react';
 
 const ConnectionLineComponent = ({
   fromX,
   fromY,
   toX,
   toY,
-  connectionLineStyle = { strokeWidth: 2, stroke: "#275EFF" }, // provide a default value for connectionLineStyle
+  connectionLineStyle = { strokeWidth: 2, stroke: '#275EFF' }, // provide a default value for connectionLineStyle
 }: ConnectionLineComponentProps): React.ReactElement => {
   return (
     <g>

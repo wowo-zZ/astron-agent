@@ -1,25 +1,25 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
-import { Tag, message, Modal } from "antd";
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Tag, message, Modal } from 'antd';
 import SpaceTable, {
   SpaceColumnConfig,
   ActionColumnConfig,
   QueryParams,
   QueryResult,
   SpaceTableRef,
-} from "@/components/space/space-table";
-import { ButtonConfig } from "@/components/button-group";
-import { ModuleType, OperationType } from "@/permissions/permission-type";
-import SpaceTag from "@/components/space/space-tag";
+} from '@/components/space/space-table';
+import { ButtonConfig } from '@/components/button-group';
+import { ModuleType, OperationType } from '@/permissions/permission-type';
+import SpaceTag from '@/components/space/space-tag';
 
-import styles from "./index.module.scss";
+import styles from './index.module.scss';
 
 import {
   getApllyRecord,
   agreeEnterpriseSpace,
   refuseEnterpriseSpace,
-} from "@/services/space";
-import { STATUS_THEME_MAP_APPLY, PENDING_STATUS } from "@/pages/space/config";
-import { useSpaceI18n } from "@/pages/space/hooks/use-space-i18n";
+} from '@/services/space';
+import { STATUS_THEME_MAP_APPLY, PENDING_STATUS } from '@/pages/space/config';
+import { useSpaceI18n } from '@/pages/space/hooks/use-space-i18n';
 
 interface Invitation {
   id: string;
@@ -57,10 +57,10 @@ interface UseApplyTableConfigReturn {
 const useApplyData = (): UseApplyDataReturn => {
   // 查询申请数据的函数
   const queryApply = async (
-    params: QueryParams,
+    params: QueryParams
   ): Promise<QueryResult<Invitation>> => {
     // 模拟后端根据参数返回过滤后的数据
-    console.log("申请管理 API 请求参数:", {
+    console.log('申请管理 API 请求参数:', {
       current: params.current,
       pageSize: params.pageSize,
       searchValue: params.searchValue,
@@ -85,7 +85,7 @@ const useApplyData = (): UseApplyDataReturn => {
       };
     } catch (err: unknown) {
       const error = err as { msg?: string; desc?: string };
-      console.log(error, "------------- getApplyRecord ------------");
+      console.log(error, '------------- getApplyRecord ------------');
       message.error(error?.msg || error?.desc);
       return {
         data: [],
@@ -98,7 +98,7 @@ const useApplyData = (): UseApplyDataReturn => {
   // 校验id是否存在
   const checkId = (id: string): boolean => {
     if (!id) {
-      message.warning("申请id不存在");
+      message.warning('申请id不存在');
       return false;
     }
     return true;
@@ -113,14 +113,14 @@ const useApplyData = (): UseApplyDataReturn => {
 // 操作处理Hook
 const useApplyActions = (
   tableRef: React.RefObject<SpaceTableRef>,
-  checkId: (id: string) => boolean,
+  checkId: (id: string) => boolean
 ): UseApplyActionsReturn => {
   const handleReject = (invitationId: string, username: string): void => {
     Modal.confirm({
-      title: "确认拒绝",
+      title: '确认拒绝',
       content: `是否拒绝该用户？`,
-      okText: "确定",
-      cancelText: "取消",
+      okText: '确定',
+      cancelText: '取消',
       onOk: async () => {
         try {
           if (!checkId(invitationId)) {
@@ -129,10 +129,10 @@ const useApplyActions = (
 
           await refuseEnterpriseSpace({ applyId: invitationId });
 
-          message.success("拒绝成功");
+          message.success('拒绝成功');
           tableRef?.current?.reload();
         } catch (error) {
-          message.error("拒绝失败");
+          message.error('拒绝失败');
         }
       },
     });
@@ -140,10 +140,10 @@ const useApplyActions = (
 
   const handlePass = (invitationId: string, username: string): void => {
     Modal.confirm({
-      title: "确认通过",
+      title: '确认通过',
       content: `是否确认通过申请？`,
-      okText: "确定",
-      cancelText: "取消",
+      okText: '确定',
+      cancelText: '取消',
       onOk: async () => {
         if (!checkId(invitationId)) {
           return;
@@ -152,10 +152,10 @@ const useApplyActions = (
         try {
           await agreeEnterpriseSpace({ applyId: invitationId });
 
-          message.success("通过成功");
+          message.success('通过成功');
           tableRef?.current?.reload();
         } catch (error) {
-          message.error("通过失败");
+          message.error('通过失败');
         }
       },
     });
@@ -170,7 +170,7 @@ const useApplyActions = (
 // 状态标签渲染函数
 const renderStatusTag = (
   status: number,
-  applyStatusTextMap: Record<string, string>,
+  applyStatusTextMap: Record<string, string>
 ): React.JSX.Element => {
   const theme =
     STATUS_THEME_MAP_APPLY[
@@ -187,7 +187,7 @@ const renderStatusTag = (
 const generateActionButtons = (
   invitation: Invitation,
   handleReject: (invitationId: string, username: string) => void,
-  handlePass: (invitationId: string, username: string) => void,
+  handlePass: (invitationId: string, username: string) => void
 ): ButtonConfig[] => {
   if (invitation.status !== Number(PENDING_STATUS)) {
     return [];
@@ -195,10 +195,10 @@ const generateActionButtons = (
 
   return [
     {
-      key: "reject",
-      text: "拒绝",
-      type: "link",
-      size: "small",
+      key: 'reject',
+      text: '拒绝',
+      type: 'link',
+      size: 'small',
       permission: {
         module: ModuleType.SPACE,
         operation: OperationType.APPLY_MANAGE,
@@ -206,10 +206,10 @@ const generateActionButtons = (
       onClick: () => handleReject(invitation.id, invitation.applyNickname),
     },
     {
-      key: "pass",
-      text: "通过",
-      type: "link",
-      size: "small",
+      key: 'pass',
+      text: '通过',
+      type: 'link',
+      size: 'small',
       permission: {
         module: ModuleType.SPACE,
         operation: OperationType.APPLY_MANAGE,
@@ -223,25 +223,25 @@ const generateActionButtons = (
 const useApplyTableConfig = (
   applyStatusTextMap: Record<string, string>,
   handleReject: (invitationId: string, username: string) => void,
-  handlePass: (invitationId: string, username: string) => void,
+  handlePass: (invitationId: string, username: string) => void
 ): UseApplyTableConfigReturn => {
   const getStatusTag = useCallback(
     (status: number) => renderStatusTag(status, applyStatusTextMap),
-    [applyStatusTextMap],
+    [applyStatusTextMap]
   );
 
   const getActionButtons = useCallback(
     (invitation: Invitation) =>
       generateActionButtons(invitation, handleReject, handlePass),
-    [handleReject, handlePass],
+    [handleReject, handlePass]
   );
 
   // 列配置
   const columns: SpaceColumnConfig<Invitation>[] = [
     {
-      title: "用户名",
-      dataIndex: "applyNickname",
-      key: "applyNickname",
+      title: '用户名',
+      dataIndex: 'applyNickname',
+      key: 'applyNickname',
       render: (text: string, record: Invitation) => (
         <div className={styles.usernameCell}>
           <span>{text}</span>
@@ -249,22 +249,22 @@ const useApplyTableConfig = (
       ),
     },
     {
-      title: "申请时间",
-      dataIndex: "createTime",
-      key: "createTime",
+      title: '申请时间',
+      dataIndex: 'createTime',
+      key: 'createTime',
       render: (text: string) => <span className={styles.joinTime}>{text}</span>,
     },
     {
-      title: "申请状态",
-      dataIndex: "status",
-      key: "status",
+      title: '申请状态',
+      dataIndex: 'status',
+      key: 'status',
       render: (status: number) => getStatusTag(status),
     },
   ];
 
   // 操作列配置
   const actionColumn: ActionColumnConfig<Invitation> = {
-    title: "操作",
+    title: '操作',
     width: 200,
     getActionButtons: (record: Invitation) => getActionButtons(record),
   };
@@ -277,8 +277,8 @@ const useApplyTableConfig = (
 
 const ApplyManagement: React.FC<ApplyManagementProps> = ({
   spaceId,
-  searchValue: externalSearchValue = "",
-  statusFilter: externalStatusFilter = "all",
+  searchValue: externalSearchValue = '',
+  statusFilter: externalStatusFilter = 'all',
 }) => {
   const tableRef = useRef<SpaceTableRef>(null);
   const { applyStatusTextMap } = useSpaceI18n();
@@ -289,7 +289,7 @@ const ApplyManagement: React.FC<ApplyManagementProps> = ({
   const { columns, actionColumn } = useApplyTableConfig(
     applyStatusTextMap,
     handleReject,
-    handlePass,
+    handlePass
   );
 
   return (

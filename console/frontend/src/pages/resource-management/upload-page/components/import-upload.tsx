@@ -1,11 +1,11 @@
-import { UploadFile } from "@/types/resource";
-import { DraggerProps } from "antd/es/upload";
-import React, { FC } from "react";
-import { useTranslation } from "react-i18next";
-import { Input, Progress, Upload } from "antd";
-import { typeList } from "@/constants";
-import { convertToKBMB } from "../utils";
-import { UploadFileStatus } from "antd/es/upload/interface";
+import { UploadFile } from '@/types/resource';
+import { DraggerProps } from 'antd/es/upload';
+import React, { FC } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Input, Progress, Upload } from 'antd';
+import { typeList } from '@/constants';
+import { convertToKBMB } from '../utils';
+import { UploadFileStatus } from 'antd/es/upload/interface';
 const { Dragger } = Upload;
 
 export const ImportUpload: FC<{
@@ -32,18 +32,18 @@ export const ImportUpload: FC<{
   const { t } = useTranslation();
   return (
     <>
-      {importType === "text" && (
+      {importType === 'text' && (
         <>
           <div className="pt-3 mt-8 border-t border-[#E2E8FF] text-lg font-medium text-second">
-            {t("knowledge.importTextFile")}
+            {t('knowledge.importTextFile')}
           </div>
           <div className="mt-3">
             <Dragger {...fileProps} className="knowledge-upload">
               <img src={uploadAct} className="w-8 h-8" alt="" />
               <div className="mt-6 text-xl font-medium text-second">
-                {t("knowledge.dragAndDropFile")}{" "}
+                {t('knowledge.dragAndDropFile')}{' '}
                 <span className="text-[#275EFF]">
-                  {t("knowledge.selectFile")}
+                  {t('knowledge.selectFile')}
                 </span>
               </div>
               <p className="mt-4 text-desc max-w-[500px]">
@@ -52,14 +52,14 @@ export const ImportUpload: FC<{
             </Dragger>
           </div>
           <div className="flex flex-col gap-3 pb-10 mt-3">
-            {uploadList.map((u) => (
+            {uploadList.map(u => (
               <div
                 key={u.id}
                 className="bg-[#F6F6FD] rounded-xl p-2.5 flex items-center justify-between cursor-pointer group"
               >
                 <div className="flex items-center">
                   <img
-                    src={typeList.get(u.type || "")}
+                    src={typeList.get(u.type || '')}
                     className="w-[22px] h-[22px]"
                     alt=""
                   />
@@ -71,7 +71,7 @@ export const ImportUpload: FC<{
                   </div>
                 </div>
                 <div className="flex items-center">
-                  {u.status === ("loading" as UploadFileStatus) && (
+                  {u.status === ('loading' as UploadFileStatus) && (
                     <Progress
                       className="w-[60px] upload-progress"
                       percent={u.progress || 0}
@@ -89,22 +89,22 @@ export const ImportUpload: FC<{
           </div>
         </>
       )}
-      {importType === "web" && (
+      {importType === 'web' && (
         <div>
           <div className="pt-8 text-lg font-medium text-second">
-            {t("knowledge.uploadWebsiteLink")}
+            {t('knowledge.uploadWebsiteLink')}
           </div>
           <div className="mt-3 text-desc">
-            <p>{t("knowledge.websiteLinkSupport")}</p>
-            <p> {t("knowledge.useNewlineToSeparate")}</p>
+            <p>{t('knowledge.websiteLinkSupport')}</p>
+            <p> {t('knowledge.useNewlineToSeparate')}</p>
           </div>
           <div>
             <Input.TextArea
-              placeholder={t("knowledge.inputMultipleLinks")}
+              placeholder={t('knowledge.inputMultipleLinks')}
               className="mt-3 global-textarea link-textarea"
               style={{ height: 200 }}
               value={linkValue}
-              onChange={(event) => setLinkValue(event.target.value)}
+              onChange={event => setLinkValue(event.target.value)}
             />
           </div>
         </div>

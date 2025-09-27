@@ -1,18 +1,18 @@
-import React, { useEffect, memo, useState, useCallback } from "react";
-import { cn } from "@/utils";
-import { v4 as uuid } from "uuid";
-import { debounce } from "lodash";
+import React, { useEffect, memo, useState, useCallback } from 'react';
+import { cn } from '@/utils';
+import { v4 as uuid } from 'uuid';
+import { debounce } from 'lodash';
 
 function FlowNodeTextArea({
-  className = "",
-  value = "",
+  className = '',
+  value = '',
   adaptiveHeight = false,
   allowWheel = true,
   onChange,
   ...reset
 }): React.ReactElement {
-  const textareaId = "textarea" + uuid();
-  const [textareaValue, setTextareaValue] = useState("");
+  const textareaId = 'textarea' + uuid();
+  const [textareaValue, setTextareaValue] = useState('');
 
   useEffect(() => {
     setTextareaValue(value);
@@ -26,10 +26,10 @@ function FlowNodeTextArea({
         event.stopPropagation();
       };
 
-      textarea.addEventListener("keydown", handleKeyDown);
+      textarea.addEventListener('keydown', handleKeyDown);
 
       return () => {
-        textarea.removeEventListener("keydown", handleKeyDown);
+        textarea.removeEventListener('keydown', handleKeyDown);
       };
     }
   }, []);
@@ -41,10 +41,10 @@ function FlowNodeTextArea({
         e.stopPropagation();
       };
 
-      textarea.addEventListener("wheel", handleWheel);
+      textarea.addEventListener('wheel', handleWheel);
 
       return () => {
-        textarea.removeEventListener("wheel", handleWheel);
+        textarea.removeEventListener('wheel', handleWheel);
       };
     }
   }, []);
@@ -53,20 +53,20 @@ function FlowNodeTextArea({
     if (textareaValue && adaptiveHeight) {
       const textarea = document.getElementById(textareaId);
       if (textarea) {
-        textarea.style.height = "30px";
-        textarea.style.height = textarea.scrollHeight + 2 + "px";
+        textarea.style.height = '30px';
+        textarea.style.height = textarea.scrollHeight + 2 + 'px';
       }
     }
   }, [textareaValue, adaptiveHeight]);
 
   const handleChangeDebounce = useCallback(
-    debounce((value) => {
+    debounce(value => {
       onChange(value);
     }, 500),
-    [],
+    []
   );
 
-  const handleValueChange = useCallback((value) => {
+  const handleValueChange = useCallback(value => {
     setTextareaValue(value);
     handleChangeDebounce(value);
   }, []);
@@ -76,8 +76,8 @@ function FlowNodeTextArea({
       id={textareaId}
       placeholder="请输入"
       value={textareaValue}
-      className={cn("nodrag global-textarea flow-textarea", className)}
-      onChange={(e) => handleValueChange(e.target.value)}
+      className={cn('nodrag global-textarea flow-textarea', className)}
+      onChange={e => handleValueChange(e.target.value)}
       {...reset}
     />
   );

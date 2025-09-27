@@ -1,60 +1,60 @@
-import React, { FC } from "react";
-import { Table, Form, Dropdown } from "antd";
+import React, { FC } from 'react';
+import { Table, Form, Dropdown } from 'antd';
 
-import { useTranslation } from "react-i18next";
-import ArrayDefault from "@/components/modal/workflow/array-default";
+import { useTranslation } from 'react-i18next';
+import ArrayDefault from '@/components/modal/workflow/array-default';
 
-import JsonEditorModal from "@/components/modal/json-modal";
+import JsonEditorModal from '@/components/modal/json-modal';
 
-import inputAddIcon from "@/assets/imgs/workflow/input-add-icon.png";
+import inputAddIcon from '@/assets/imgs/workflow/input-add-icon.png';
 
-import { InputParamsData, ToolItem } from "@/types/resource";
-import { useToolInputParameters } from "./hooks/use-tool-input-parameters";
-import { useColumns } from "./hooks/use-columns";
+import { InputParamsData, ToolItem } from '@/types/resource';
+import { useToolInputParameters } from './hooks/use-tool-input-parameters';
+import { useColumns } from './hooks/use-columns';
 
 const typeOptions = [
   {
-    label: "String",
-    value: "string",
+    label: 'String',
+    value: 'string',
   },
   {
-    label: "Number",
-    value: "number",
+    label: 'Number',
+    value: 'number',
   },
   {
-    label: "Integer",
-    value: "integer",
+    label: 'Integer',
+    value: 'integer',
   },
   {
-    label: "Boolean",
-    value: "boolean",
+    label: 'Boolean',
+    value: 'boolean',
   },
   {
-    label: "Array",
-    value: "array",
+    label: 'Array',
+    value: 'array',
   },
   {
-    label: "Object",
-    value: "object",
+    label: 'Object',
+    value: 'object',
   },
 ];
 
 const methodsOptions = [
   {
-    label: "Body",
-    value: "body",
+    label: 'Body',
+    value: 'body',
   },
   {
-    label: "Path",
-    value: "path",
+    label: 'Path',
+    value: 'path',
   },
   {
-    label: "Query",
-    value: "query",
+    label: 'Query',
+    value: 'query',
   },
   {
-    label: "Header",
-    value: "header",
+    label: 'Header',
+    value: 'header',
   },
 ];
 
@@ -120,7 +120,7 @@ const ToolInputParameters: FC<{
         label={
           <div className="flex items-center justify-between w-full gap-1">
             <span className="text-base font-medium">
-              {t("workflow.nodes.toolNode.configureInputParameters")}
+              {t('workflow.nodes.toolNode.configureInputParameters')}
             </span>
             {/* {!selectedCard?.id && <div
               className='flex items-center gap-1.5 text-[#275eff] cursor-pointer'
@@ -138,7 +138,7 @@ const ToolInputParameters: FC<{
               >
                 <div className="flex items-center gap-1.5 text-[#275eff] cursor-pointer">
                   <img src={inputAddIcon} className="w-2.5 h-2.5" alt="" />
-                  <span>{t("workflow.nodes.common.add")}</span>
+                  <span>{t('workflow.nodes.common.add')}</span>
                 </div>
               </Dropdown>
             )}
@@ -155,12 +155,12 @@ const ToolInputParameters: FC<{
             expandIcon: customExpandIcon,
             expandedRowKeys,
           }}
-          rowKey={(record) => record?.id}
+          rowKey={record => record?.id}
           locale={{
             emptyText: (
-              <div style={{ padding: "20px" }}>
+              <div style={{ padding: '20px' }}>
                 <p className="text-[#333333]">
-                  {t("workflow.nodes.toolNode.noData")}
+                  {t('workflow.nodes.toolNode.noData')}
                 </p>
               </div>
             ),

@@ -1,10 +1,10 @@
-import { InputParamsData } from "@/types/resource";
-import { cloneDeep } from "lodash";
-import React, { useCallback, useEffect, useState } from "react";
-import { v4 as uuid } from "uuid";
-import expand from "@/assets/imgs/plugin/icon_fold.png";
-import shrink from "@/assets/imgs/plugin/icon_shrink.png";
-import { useTranslation } from "react-i18next";
+import { InputParamsData } from '@/types/resource';
+import { cloneDeep } from 'lodash';
+import React, { useCallback, useEffect, useState } from 'react';
+import { v4 as uuid } from 'uuid';
+import expand from '@/assets/imgs/plugin/icon_fold.png';
+import shrink from '@/assets/imgs/plugin/icon_shrink.png';
+import { useTranslation } from 'react-i18next';
 
 export const useDebuggerTable = ({
   debuggerParamsData,
@@ -22,7 +22,7 @@ export const useDebuggerTable = ({
   handleAddItem: (record: InputParamsData) => void;
   deleteNodeFromTree: (
     tree: InputParamsData[],
-    id: string,
+    id: string
   ) => InputParamsData[];
   customExpandIcon: (params: {
     expanded: boolean;
@@ -44,20 +44,20 @@ export const useDebuggerTable = ({
   }, []);
 
   const handleExpand = useCallback((record: InputParamsData) => {
-    setExpandedRowKeys((expandedRowKeys) => [...expandedRowKeys, record.id]);
+    setExpandedRowKeys(expandedRowKeys => [...expandedRowKeys, record.id]);
   }, []);
 
   const handleCollapse = useCallback((record: InputParamsData) => {
-    setExpandedRowKeys((expandedRowKeys) =>
-      expandedRowKeys.filter((id) => id !== record.id),
+    setExpandedRowKeys(expandedRowKeys =>
+      expandedRowKeys.filter(id => id !== record.id)
     );
   }, []);
 
   const updateIds = useCallback((obj: InputParamsData) => {
-    const newObj = { ...obj, id: uuid(), default: "" };
+    const newObj = { ...obj, id: uuid(), default: '' };
 
     if (newObj.children && Array.isArray(newObj.children)) {
-      newObj.children = newObj.children.map((child) => updateIds(child));
+      newObj.children = newObj.children.map(child => updateIds(child));
     }
 
     return newObj;
@@ -66,14 +66,14 @@ export const useDebuggerTable = ({
   const handleAddItem = useCallback(
     (record: InputParamsData) => {
       const newData = updateIds(
-        record?.children?.[0] || ({} as InputParamsData),
+        record?.children?.[0] || ({} as InputParamsData)
       );
       const currentNode =
         findNodeById(debuggerParamsData, record?.id) || ({} as InputParamsData);
       currentNode.children?.push(newData);
       setDebuggerParamsData(cloneDeep(debuggerParamsData));
     },
-    [debuggerParamsData, setDebuggerParamsData],
+    [debuggerParamsData, setDebuggerParamsData]
   );
 
   const deleteNodeFromTree = useCallback(
@@ -91,7 +91,7 @@ export const useDebuggerTable = ({
         return acc;
       }, []);
     },
-    [],
+    []
   );
 
   const customExpandIcon = useCallback(
@@ -101,7 +101,7 @@ export const useDebuggerTable = ({
           <img
             src={shrink}
             className="w-4 h-4 inline-block mb-1 mr-1"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               handleCollapse(record);
             }}
@@ -110,7 +110,7 @@ export const useDebuggerTable = ({
           <img
             src={expand}
             className="w-4 h-4 inline-block mb-1 mr-1"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               handleExpand(record);
             }}
@@ -119,12 +119,12 @@ export const useDebuggerTable = ({
       }
       return null;
     },
-    [],
+    []
   );
 
   const findNodeById = (
     tree: InputParamsData[],
-    id: string,
+    id: string
   ): InputParamsData | null => {
     for (const node of tree) {
       if (node.id === id) {
@@ -149,23 +149,23 @@ export const useDebuggerTable = ({
       currentNode.default = value;
       setDebuggerParamsData(cloneDeep(debuggerParamsData));
     },
-    [debuggerParamsData, setDebuggerParamsData, setExpandedRowKeys],
+    [debuggerParamsData, setDebuggerParamsData, setExpandedRowKeys]
   );
 
   const checkParmas = useCallback(
     (params: InputParamsData[], id: string, key: string) => {
       let passFlag = true;
-      const errEsg = t("workflow.nodes.toolNode.pleaseEnterParameterValue");
+      const errEsg = t('workflow.nodes.toolNode.pleaseEnterParameterValue');
       const currentNode = findNodeById(params, id) || ({} as InputParamsData);
       if (!currentNode[key]) {
         currentNode[`${key}ErrMsg`] = errEsg;
         passFlag = false;
       } else {
-        currentNode[`${key}ErrMsg`] = "";
+        currentNode[`${key}ErrMsg`] = '';
       }
       return passFlag;
     },
-    [],
+    []
   );
 
   const handleCheckInput = useCallback(
@@ -173,7 +173,7 @@ export const useDebuggerTable = ({
       checkParmas(debuggerParamsData, record?.id, key);
       setDebuggerParamsData(cloneDeep(debuggerParamsData));
     },
-    [debuggerParamsData, setDebuggerParamsData],
+    [debuggerParamsData, setDebuggerParamsData]
   );
   return {
     expandedRowKeys,

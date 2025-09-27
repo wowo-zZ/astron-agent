@@ -1,21 +1,21 @@
-import React, { useState, useEffect, FC } from "react";
-import { Modal, Form, Input, Button, Select } from "antd";
-import i18next from "i18next";
-import { toolFeedback, listToolSquare } from "@/services/plugin";
+import React, { useState, useEffect, FC } from 'react';
+import { Modal, Form, Input, Button, Select } from 'antd';
+import i18next from 'i18next';
+import { toolFeedback, listToolSquare } from '@/services/plugin';
 
 const { TextArea } = Input;
 
-import close from "@/assets/imgs/workflow/modal-close.png";
-import { ToolItem } from "@/types/resource";
+import close from '@/assets/imgs/workflow/modal-close.png';
+import { ToolItem } from '@/types/resource';
 
 const FeedbackDialog: FC<{
   visible: boolean;
   setVisible: (visible: boolean) => void;
-}> = (props) => {
+}> = props => {
   const { visible, setVisible } = props;
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [desc, setDesc] = useState("");
+  const [desc, setDesc] = useState('');
   const [pluginType, setPluginType] = useState(0);
   const [dataSource, setDataSource] = useState<ToolItem[]>([]);
 
@@ -31,34 +31,34 @@ const FeedbackDialog: FC<{
       pageSize: 999,
       orderFlag: 0,
     };
-    listToolSquare(params).then((data) => {
+    listToolSquare(params).then(data => {
       setDataSource(data?.pageData || []);
     });
   }, []);
 
   const handleCancel = (): void => {
     form.resetFields();
-    setDesc("");
+    setDesc('');
     setVisible(false);
     setLoading(false);
     setPluginType(0);
   };
 
   const handleOk = (): void => {
-    form.validateFields().then((values) => {
+    form.validateFields().then(values => {
       const toolName = dataSource.find(
-        (item) => item.toolId === values.toolId,
+        item => item.toolId === values.toolId
       )?.name;
       const params: { remark: string; toolId?: string; name?: string } = {
         remark: values.description,
       };
       if (values.pluginType === 1) {
         params.toolId = values?.toolId;
-        params.name = toolName || "";
+        params.name = toolName || '';
       }
       setLoading(true);
       toolFeedback(params)
-        .then((res) => {
+        .then(res => {
           handleCancel();
         })
         .finally(() => {
@@ -72,12 +72,12 @@ const FeedbackDialog: FC<{
       title={
         <div
           style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
           }}
         >
-          <span>{i18next.t("plugin.pluginFeedback")}</span>
+          <span>{i18next.t('plugin.pluginFeedback')}</span>
           <img
             src={close}
             alt=""
@@ -94,7 +94,7 @@ const FeedbackDialog: FC<{
       onCancel={handleCancel}
       footer={[
         <Button key="cancel" onClick={handleCancel}>
-          {i18next.t("workflow.promptDebugger.cancel")}
+          {i18next.t('workflow.promptDebugger.cancel')}
         </Button>,
         <Button
           key="submit"
@@ -102,7 +102,7 @@ const FeedbackDialog: FC<{
           loading={loading}
           onClick={handleOk}
         >
-          {i18next.t("common.save")}
+          {i18next.t('common.save')}
         </Button>,
       ]}
       width={640}
@@ -119,27 +119,27 @@ const FeedbackDialog: FC<{
           rules={[
             {
               required: true,
-              message: i18next.t("plugin.pleaseEnterPluginName"),
+              message: i18next.t('plugin.pleaseEnterPluginName'),
             },
           ]}
           name="pluginType"
-          label={i18next.t("plugin.feedbackType")}
+          label={i18next.t('plugin.feedbackType')}
         >
           <Select
             className="global-select"
-            placeholder={i18next.t("common.pleaseSelect")}
+            placeholder={i18next.t('common.pleaseSelect')}
             options={[
               {
-                label: i18next.t("plugin.nonexistentPlugin"),
+                label: i18next.t('plugin.nonexistentPlugin'),
                 value: 0,
               },
               {
-                label: i18next.t("plugin.existPlugin"),
+                label: i18next.t('plugin.existPlugin'),
                 value: 1,
               },
             ]}
             value={pluginType}
-            onChange={(value) => setPluginType(value)}
+            onChange={value => setPluginType(value)}
           />
         </Form.Item>
         {pluginType === 1 && (
@@ -147,17 +147,17 @@ const FeedbackDialog: FC<{
             rules={[
               {
                 required: true,
-                message: i18next.t("plugin.pleaseSelectOfficialPlugin"),
+                message: i18next.t('plugin.pleaseSelectOfficialPlugin'),
               },
             ]}
             name="toolId"
-            label={i18next.t("plugin.selectOfficialPlugin")}
+            label={i18next.t('plugin.selectOfficialPlugin')}
           >
             <Select
               className="global-select"
-              placeholder={i18next.t("common.pleaseSelect")}
+              placeholder={i18next.t('common.pleaseSelect')}
             >
-              {dataSource.map((item) => (
+              {dataSource.map(item => (
                 <Select.Option key={item.toolId} value={item.toolId}>
                   <div className="flex items-center gap-2">
                     <img
@@ -174,18 +174,18 @@ const FeedbackDialog: FC<{
         )}
         <Form.Item
           name="description"
-          label={i18next.t("workflow.promptDebugger.feedbackContent")}
+          label={i18next.t('workflow.promptDebugger.feedbackContent')}
           rules={[
             {
               required: true,
               message: i18next.t(
-                "workflow.promptDebugger.pleaseEnterFeedbackContent",
+                'workflow.promptDebugger.pleaseEnterFeedbackContent'
               ),
             },
             {
               max: 1000,
               message: i18next.t(
-                "workflow.promptDebugger.feedbackContentMaxLength",
+                'workflow.promptDebugger.feedbackContentMaxLength'
               ),
             },
           ]}
@@ -194,11 +194,11 @@ const FeedbackDialog: FC<{
           <div className="relative">
             <TextArea
               maxLength={200}
-              placeholder={i18next.t("common.inputPlaceholder")}
+              placeholder={i18next.t('common.inputPlaceholder')}
               className="global-textarea shrink-0"
               style={{ height: 120 }}
               value={desc}
-              onChange={(event) => setDesc(event.target.value)}
+              onChange={event => setDesc(event.target.value)}
             />
             <div className="absolute bottom-3 right-3 ant-input-limit ">
               {desc?.length} / 200

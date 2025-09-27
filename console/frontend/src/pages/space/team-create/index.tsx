@@ -1,16 +1,16 @@
-import React, { useState, useMemo } from "react";
-import { Button, Input, message } from "antd";
-import { useNavigate, useParams } from "react-router-dom";
-import styles from "./index.module.scss";
-import { checkEnterpriseName, createEnterprise } from "@/services/enterprise";
-import UploadAvatar from "./upload-avatar";
-import useUserStore from "@/store/user-store";
-import { useSpaceI18n } from "@/pages/space/hooks/use-space-i18n";
-import { useSpaceType } from "@/hooks/use-space-type";
-import { useEnterprise } from "@/hooks/use-enterprise";
-import { defaultEnterpriseAvatar } from "@/constants/config";
-import agentLogoText from "@/assets/imgs/sidebar/agentLogoText.svg";
-import creatorImg from "@/assets/imgs/space/creator.svg";
+import React, { useState, useMemo } from 'react';
+import { Button, Input, message } from 'antd';
+import { useNavigate, useParams } from 'react-router-dom';
+import styles from './index.module.scss';
+import { checkEnterpriseName, createEnterprise } from '@/services/enterprise';
+import UploadAvatar from './upload-avatar';
+import useUserStore from '@/store/user-store';
+import { useSpaceI18n } from '@/pages/space/hooks/use-space-i18n';
+import { useSpaceType } from '@/hooks/use-space-type';
+import { useEnterprise } from '@/hooks/use-enterprise';
+import { defaultEnterpriseAvatar } from '@/constants/config';
+import agentLogoText from '@/assets/imgs/sidebar/agentLogoText.svg';
+import creatorImg from '@/assets/imgs/space/creator.svg';
 
 const TeamCreate: React.FC = () => {
   const user = useUserStore((state: any) => state.user);
@@ -18,19 +18,19 @@ const TeamCreate: React.FC = () => {
   const navigate = useNavigate();
   const { handleTeamSwitch } = useSpaceType(navigate);
   const { getJoinedEnterpriseList } = useEnterprise();
-  const [teamName, setTeamName] = useState("");
-  const [teamDescription, setTeamDescription] = useState("");
+  const [teamName, setTeamName] = useState('');
+  const [teamDescription, setTeamDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const [logoUrl, setLogoUrl] = useState(defaultEnterpriseAvatar);
   const { type } = useParams();
 
   const roleText = useMemo(() => {
     const key = user?.roleType as keyof typeof roleTextMap | undefined;
-    return key && key in roleTextMap ? roleTextMap[key] : "-";
+    return key && key in roleTextMap ? roleTextMap[key] : '-';
   }, [user?.roleType, roleTextMap]);
 
   const enterpriseType = useMemo(() => {
-    return type === "2" ? "企业" : "团队";
+    return type === '2' ? '企业' : '团队';
   }, [type]);
 
   const textConfig = useMemo(
@@ -40,7 +40,7 @@ const TeamCreate: React.FC = () => {
       createSuccessTip: `${enterpriseType}创建成功`,
       createFailedTip: `${enterpriseType}创建失败`,
     }),
-    [enterpriseType],
+    [enterpriseType]
   );
 
   const handleCreateTeam = async () => {
@@ -58,7 +58,7 @@ const TeamCreate: React.FC = () => {
         throw new Error(textConfig.existTip);
       }
 
-      console.log("创建团队:", { name, teamDescription, logoUrl });
+      console.log('创建团队:', { name, teamDescription, logoUrl });
       const res: any = await createEnterprise({
         name,
         avatarUrl: logoUrl,
@@ -66,7 +66,7 @@ const TeamCreate: React.FC = () => {
 
       console.log(
         res,
-        "============= TeamCreate => handleCreateTeam ===========",
+        '============= TeamCreate => handleCreateTeam ==========='
       );
 
       message.success(textConfig.createSuccessTip);
@@ -126,7 +126,7 @@ const TeamCreate: React.FC = () => {
               <label className={styles.fieldLabel}>{enterpriseType}名称</label>
               <Input
                 value={teamName}
-                onChange={(e) => setTeamName(e.target.value)}
+                onChange={e => setTeamName(e.target.value)}
                 placeholder={textConfig.emptyTip}
                 variant="borderless"
                 className={styles.fieldInput}

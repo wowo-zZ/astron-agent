@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from 'react';
 
 interface UseConfigManagementProps {
   lengthRange: number[];
@@ -28,14 +28,14 @@ export const useConfigManagement = ({
   const [configDetail, setConfigDetail] = useState({
     min: 1,
     max: 256,
-    seperator: "\n",
+    seperator: '\n',
   });
 
   const initConfig = (): void => {
     setConfigDetail({
       min: lengthRange[0] || 0,
       max: lengthRange[1] || 0,
-      seperator: "\\n",
+      seperator: '\\n',
     });
   };
 

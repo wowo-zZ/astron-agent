@@ -1,15 +1,15 @@
-import React, { useState } from "react";
-import classNames from "classnames";
-import { hasModulePermission } from "@/permissions/utils";
+import React, { useState } from 'react';
+import classNames from 'classnames';
+import { hasModulePermission } from '@/permissions/utils';
 import {
   SpaceType,
   RoleType,
   ModuleType,
   OperationType,
-} from "@/permissions/permission-type";
-import styles from "./index.module.scss";
+} from '@/permissions/permission-type';
+import styles from './index.module.scss';
 
-import { useUserStoreHook } from "@/hooks/use-user-store";
+import { useUserStoreHook } from '@/hooks/use-user-store';
 
 // 用户角色接口
 interface UserRole {
@@ -71,7 +71,7 @@ const SpaceTab: React.FC<SpaceTabProps> = ({
   }
 
   const [internalActiveKey, setInternalActiveKey] = useState(
-    options[0]?.key || "",
+    options[0]?.key || ''
   );
 
   // 使用外部传入的activeKey或内部状态
@@ -94,7 +94,7 @@ const SpaceTab: React.FC<SpaceTabProps> = ({
       return hasModulePermission(
         effectiveUserRole,
         option.permission.module,
-        option.permission.operation,
+        option.permission.operation
       );
     }
 
@@ -107,11 +107,11 @@ const SpaceTab: React.FC<SpaceTabProps> = ({
       return true; // 默认可见
     }
 
-    if (typeof option.visible === "boolean") {
+    if (typeof option.visible === 'boolean') {
       return option.visible;
     }
 
-    if (typeof option.visible === "function" && effectiveUserRole) {
+    if (typeof option.visible === 'function' && effectiveUserRole) {
       return option.visible(effectiveUserRole);
     }
 
@@ -127,10 +127,10 @@ const SpaceTab: React.FC<SpaceTabProps> = ({
 
   // 过滤掉没有权限或不可见的选项
   const filteredOptions = options.filter(
-    (option) => checkTabPermission(option) && checkTabVisible(option),
+    option => checkTabPermission(option) && checkTabVisible(option)
   );
 
-  const activeTab = filteredOptions.find((option) => option.key === activeKey);
+  const activeTab = filteredOptions.find(option => option.key === activeKey);
   const activeContent = activeTab?.content;
 
   // 如果没有可显示的选项，返回null
@@ -143,12 +143,12 @@ const SpaceTab: React.FC<SpaceTabProps> = ({
       {/* 上部分：左右布局 */}
       <div className={styles.tabHeader}>
         <div className={styles.tabList}>
-          {filteredOptions.map((option) => (
+          {filteredOptions.map(option => (
             <div
               key={option.key}
               className={classNames(
                 styles.tabItem,
-                option.key === activeKey && styles.active,
+                option.key === activeKey && styles.active
               )}
               onClick={() => handleTabClick(option.key)}
             >

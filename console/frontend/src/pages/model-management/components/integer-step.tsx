@@ -1,9 +1,9 @@
-import { useState, useEffect, FC } from "react";
-import type { InputNumberProps } from "antd";
-import { Col, Row, Slider } from "antd";
+import { useState, useEffect, FC } from 'react';
+import type { InputNumberProps } from 'antd';
+import { Col, Row, Slider } from 'antd';
 
-import type { SliderSingleProps } from "antd";
-import { IntegerStepProps } from "@/types/model";
+import type { SliderSingleProps } from 'antd';
+import { IntegerStepProps } from '@/types/model';
 
 const IntegerStep: FC<IntegerStepProps> = ({
   max,
@@ -13,7 +13,7 @@ const IntegerStep: FC<IntegerStepProps> = ({
 }) => {
   // 非受控模式用内部 state；受控模式用外部 value
   const [innerVal, setInnerVal] = useState(
-    value !== undefined ? defaultValue : defaultValue,
+    value !== undefined ? defaultValue : defaultValue
   );
 
   // 同步受控值
@@ -23,18 +23,18 @@ const IntegerStep: FC<IntegerStepProps> = ({
     }
   }, [value]);
 
-  const handleChange: InputNumberProps["onChange"] = (newValue) => {
-    const v = typeof newValue === "number" ? newValue : 1;
+  const handleChange: InputNumberProps['onChange'] = newValue => {
+    const v = typeof newValue === 'number' ? newValue : 1;
     // 内部 state（非受控）
     if (value === undefined) setInnerVal(v);
     // 抛给父组件
     onChange?.(v);
   };
 
-  const marks: SliderSingleProps["marks"] = {
-    0: "0",
-    32: "32k",
-    64: "64k",
+  const marks: SliderSingleProps['marks'] = {
+    0: '0',
+    32: '32k',
+    64: '64k',
     [max]: `max`,
   };
 

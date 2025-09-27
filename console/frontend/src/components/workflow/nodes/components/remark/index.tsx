@@ -1,19 +1,19 @@
-import React, { useRef, useEffect, useState } from "react";
-import styles from "./index.module.scss";
-import { useSize } from "ahooks";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import cloneDeep from "lodash/cloneDeep";
-import { useDebounceFn } from "ahooks";
-import { useTranslation } from "react-i18next";
+import React, { useRef, useEffect, useState } from 'react';
+import styles from './index.module.scss';
+import { useSize } from 'ahooks';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import cloneDeep from 'lodash/cloneDeep';
+import { useDebounceFn } from 'ahooks';
+import { useTranslation } from 'react-i18next';
 
 const Remark = (props: unknown): React.ReactElement => {
   const { id, data } = props;
-  const getCurrentStore = useFlowsManager((state) => state.getCurrentStore);
+  const getCurrentStore = useFlowsManager(state => state.getCurrentStore);
   const currentStore = getCurrentStore();
-  const setNodes = currentStore((state) => state.setNodes);
-  const setNode = currentStore((state) => state.setNode);
+  const setNodes = currentStore(state => state.setNodes);
+  const setNode = currentStore(state => state.setNode);
   const autoSaveCurrentFlow = useFlowsManager(
-    (state) => state.autoSaveCurrentFlow,
+    state => state.autoSaveCurrentFlow
   );
   const containerRef = useRef<HTMLDivElement | null>(null);
   const contentSize = useSize(containerRef);
@@ -26,7 +26,7 @@ const Remark = (props: unknown): React.ReactElement => {
   const [width, setWidth] = useState(583);
   const handleRef = useRef<HTMLDivElement | null>(null);
   const isDraggingRef = useRef(false);
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState('');
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -51,9 +51,9 @@ const Remark = (props: unknown): React.ReactElement => {
       const handleWheel = (event: WheelEvent): void => {
         event.stopPropagation();
       };
-      textarea.addEventListener("wheel", handleWheel);
+      textarea.addEventListener('wheel', handleWheel);
       return (): void => {
-        textarea.removeEventListener("wheel", handleWheel);
+        textarea.removeEventListener('wheel', handleWheel);
       };
     }
   }, []);
@@ -64,20 +64,20 @@ const Remark = (props: unknown): React.ReactElement => {
       const handleStop = (e: MouseEvent): void => {
         e.stopPropagation();
       };
-      container.addEventListener("mousedown", handleStop);
+      container.addEventListener('mousedown', handleStop);
       return (): void => {
-        container.removeEventListener("mousedown", handleStop);
+        container.removeEventListener('mousedown', handleStop);
       };
     }
   }, []);
 
   const handleFocus = (): void => {
     setActive(true);
-    setNodes((nodes) =>
-      nodes?.map((node) => ({
+    setNodes(nodes =>
+      nodes?.map(node => ({
         ...node,
         selected: false,
-      })),
+      }))
     );
   };
   const handleBlur = (): void => {
@@ -90,7 +90,7 @@ const Remark = (props: unknown): React.ReactElement => {
 
   const { run } = useDebounceFn(
     (value): void => {
-      setNode(id, (old) => {
+      setNode(id, old => {
         old.data.nodeParam.remark = value;
         return {
           ...cloneDeep(old),
@@ -98,7 +98,7 @@ const Remark = (props: unknown): React.ReactElement => {
       });
       autoSaveCurrentFlow();
     },
-    { wait: 500 },
+    { wait: 500 }
   );
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>): void => {
@@ -123,8 +123,8 @@ const Remark = (props: unknown): React.ReactElement => {
       e.stopPropagation();
     }
     isDraggingRef.current = false;
-    document.removeEventListener("mousemove", handleDrag);
-    document.removeEventListener("mouseup", stopDrag);
+    document.removeEventListener('mousemove', handleDrag);
+    document.removeEventListener('mouseup', stopDrag);
   };
 
   const startDrag = (e: MouseEvent): void => {
@@ -133,18 +133,18 @@ const Remark = (props: unknown): React.ReactElement => {
     startYRef.current = e.clientY;
     startHeightRef.current = containerRef.current.clientHeight;
     isDraggingRef.current = true;
-    document.addEventListener("mousemove", handleDrag);
-    document.addEventListener("mouseup", stopDrag);
+    document.addEventListener('mousemove', handleDrag);
+    document.addEventListener('mouseup', stopDrag);
   };
 
   useEffect((): void | (() => void) => {
     const handleEle = handleRef.current;
     if (handleEle) {
-      handleEle.addEventListener("mousedown", startDrag);
+      handleEle.addEventListener('mousedown', startDrag);
     }
     return (): void => {
       if (handleEle) {
-        handleEle.removeEventListener("mousedown", startDrag);
+        handleEle.removeEventListener('mousedown', startDrag);
       }
     };
   }, []);
@@ -154,7 +154,7 @@ const Remark = (props: unknown): React.ReactElement => {
       className={`${styles.remark}`}
       style={{
         top: data.status ? -(top + 28) : -(top + 28),
-        visibility: top > 0 ? "visible" : "hidden",
+        visibility: top > 0 ? 'visible' : 'hidden',
       }}
       onClick={(e): void => {
         e.stopPropagation();
@@ -162,13 +162,13 @@ const Remark = (props: unknown): React.ReactElement => {
     >
       <div
         ref={containerRef}
-        className={`${styles.textContainer} ${active ? styles.active : ""}`}
+        className={`${styles.textContainer} ${active ? styles.active : ''}`}
         style={{ width: `${width}px`, height: `${height}px` }}
       >
         <textarea
           ref={textareaRef}
           className={styles.textarea}
-          placeholder={`${t("workflow.nodes.common.inputPlaceholder")}...`}
+          placeholder={`${t('workflow.nodes.common.inputPlaceholder')}...`}
           value={value}
           onFocus={handleFocus}
           onBlur={handleBlur}

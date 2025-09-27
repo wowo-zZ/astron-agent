@@ -1,8 +1,8 @@
-import React, { Suspense, memo } from "react";
-import { Spin } from "antd";
-import { Routes, Route } from "react-router-dom";
+import React, { Suspense, memo } from 'react';
+import { Spin } from 'antd';
+import { Routes, Route } from 'react-router-dom';
 
-const AgentPage = React.lazy(() => import("./agent-page"));
+const AgentPage = React.lazy(() => import('./agent-page'));
 
 function index() {
   return (

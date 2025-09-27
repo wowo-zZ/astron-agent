@@ -5,10 +5,10 @@ import {
   SetStateAction,
   RefObject,
   MutableRefObject,
-} from "react";
-import { pageList, create } from "@/services/database";
-import { DatabaseItem, CreateDbParams } from "@/types/database";
-import { useInfiniteScroll } from "./use-infinite-scroll";
+} from 'react';
+import { pageList, create } from '@/services/database';
+import { DatabaseItem, CreateDbParams } from '@/types/database';
+import { useInfiniteScroll } from './use-infinite-scroll';
 
 type createDatabaseOk = (createParams: CreateDbParams) => Promise<void>;
 
@@ -44,11 +44,11 @@ export const useDatabaseList = (): UseDatabaseListReturn => {
     pageSize: 20,
   }); // 分页信息
   const [dataSource, setDataSource] = useState<DatabaseItem[]>([]); // 数据库列表
-  const [searchValue, setSearchValue] = useState(""); // 搜索内容
+  const [searchValue, setSearchValue] = useState(''); // 搜索内容
 
   // 无限滚动回调函数
   const handleLoadMore = useCallback((): void => {
-    setPagination((pagination) => ({
+    setPagination(pagination => ({
       ...pagination,
       pageNum: pagination?.pageNum + 1,
     }));
@@ -56,7 +56,7 @@ export const useDatabaseList = (): UseDatabaseListReturn => {
 
   const { targetRef: loader, loading: loadingRef } = useInfiniteScroll(
     handleLoadMore,
-    hasMore,
+    hasMore
   );
 
   // 获取数据库列表
@@ -68,9 +68,9 @@ export const useDatabaseList = (): UseDatabaseListReturn => {
       search: searchValue,
     };
     pageList(params)
-      .then((data) => {
+      .then(data => {
         const newData = data?.records || [];
-        setDataSource((preDataSource) => {
+        setDataSource(preDataSource => {
           if (pagination?.pageNum === 1) {
             return [...newData];
           } else {
@@ -94,7 +94,7 @@ export const useDatabaseList = (): UseDatabaseListReturn => {
       await create(createParams);
       getList();
     },
-    [getList],
+    [getList]
   );
 
   return {

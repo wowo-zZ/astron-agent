@@ -2,7 +2,7 @@ import {
   ModuleType,
   OperationType,
   RoutePermissionConfig,
-} from "@/permissions/permission-type";
+} from '@/permissions/permission-type';
 
 // ==================== 路由权限映射 ===================
 
@@ -53,7 +53,7 @@ export const ROUTE_PERMISSIONS: RoutePermissionConfig[] = [
 
   // 效果测评相关路由
   {
-    path: "/management/evaluation",
+    path: '/management/evaluation',
     module: ModuleType.SPACE,
     operation: OperationType.ALL_RESOURCES_ACCESS,
   },
@@ -97,7 +97,7 @@ export const ROUTE_PERMISSIONS: RoutePermissionConfig[] = [
 
   // 智能体相关路由
   {
-    path: "/space/agent",
+    path: '/space/agent',
     module: ModuleType.SPACE,
     operation: OperationType.ALL_RESOURCES_ACCESS,
   },

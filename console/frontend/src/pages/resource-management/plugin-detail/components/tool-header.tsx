@@ -1,13 +1,13 @@
-import { FC, SetStateAction, Dispatch } from "react";
-import { Tooltip } from "antd";
-import { useNavigate } from "react-router-dom";
+import { FC, SetStateAction, Dispatch } from 'react';
+import { Tooltip } from 'antd';
+import { useNavigate } from 'react-router-dom';
 
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 
-import arrowLeft from "@/assets/imgs/knowledge/icon_zhishi_arrow-left.png";
-import formSelect from "@/assets/imgs/knowledge/icon_form_select.png";
-import { AvatarType, ToolItem } from "../../../../types/resource";
-import { useToolHeader } from "../hooks/use-tool-header";
+import arrowLeft from '@/assets/imgs/knowledge/icon_zhishi_arrow-left.png';
+import formSelect from '@/assets/imgs/knowledge/icon_form_select.png';
+import { AvatarType, ToolItem } from '../../../../types/resource';
+import { useToolHeader } from '../hooks/use-tool-header';
 
 const ToolHeader: FC<{
   toolInfo: ToolItem;
@@ -35,8 +35,8 @@ const ToolHeader: FC<{
     <div
       className="mx-auto h-[80px] bg-[#fff] border-b border-[#e2e8ff] flex justify-between px-6 py-5"
       style={{
-        borderRadius: "0px 0px 24px 24px",
-        width: "85%",
+        borderRadius: '0px 0px 24px 24px',
+        width: '85%',
         minWidth: 1000,
         maxWidth: 1425,
       }}
@@ -46,11 +46,11 @@ const ToolHeader: FC<{
           src={arrowLeft}
           className="w-7 h-7 cursor-pointer"
           alt=""
-          onClick={() => navigate("/resource/plugin")}
+          onClick={() => navigate('/resource/plugin')}
         />
         <div
           className="flex items-center gap-2"
-          onClick={(e) => {
+          onClick={e => {
             e.stopPropagation();
             filterTools.length > 0 && setShowDropList(true);
           }}
@@ -58,12 +58,12 @@ const ToolHeader: FC<{
           <div
             className="flex items-center gap-2 relative rounded-lg py-1 px-1.5"
             style={{
-              background: showDropList ? "#d5e8ff" : "",
-              cursor: filterTools.length > 0 ? "pointer" : "default",
+              background: showDropList ? '#d5e8ff' : '',
+              cursor: filterTools.length > 0 ? 'pointer' : 'default',
             }}
           >
             <img
-              src={botIcon?.name || "" + botIcon?.value || ""}
+              src={botIcon?.name || '' + botIcon?.value || ''}
               className="w-6 h-6"
               alt=""
             />
@@ -76,11 +76,11 @@ const ToolHeader: FC<{
                 className="w-full absolute  left-0 top-[38px] list-options py-3.5 pt-2 max-h-[255px] overflow-auto bg-[#fff] min-w-[150px] z-50"
                 ref={optionsRef}
               >
-                {filterTools?.map((item) => (
+                {filterTools?.map(item => (
                   <div
                     key={item.id}
                     className="w-full px-5 py-2.5 pr-4 text-desc font-medium hover:bg-[#F9FAFB] cursor-pointer flex items-center"
-                    onClick={(e) => {
+                    onClick={e => {
                       e.stopPropagation();
                       setShowDropList(false);
                       navigate(`/resource/plugin/detail/${item.id}/parameter`);
@@ -107,43 +107,43 @@ const ToolHeader: FC<{
       <div className="flex w-1/2 items-center gap-6 justify-center">
         <div
           className={`flex items-center px-5 py-2.5 rounded-xl font-medium cursor-pointer  ${
-            currentTab === "parameter"
-              ? "config-tabs-active"
-              : "config-tabs-normal"
+            currentTab === 'parameter'
+              ? 'config-tabs-active'
+              : 'config-tabs-normal'
           }`}
           onClick={() => {
-            setCurrentTab("parameter");
+            setCurrentTab('parameter');
             navigate(`/resource/plugin/detail/${toolId}/parameter`);
           }}
         >
           <span className="parameter-icon"></span>
-          <span className="ml-2">{t("plugin.toolParameters")}</span>
+          <span className="ml-2">{t('plugin.toolParameters')}</span>
         </div>
         <div
           className={`flex items-center px-5 py-2.5 rounded-xl font-medium cursor-pointer  ${
-            currentTab === "test" ? "config-tabs-active" : "config-tabs-normal"
+            currentTab === 'test' ? 'config-tabs-active' : 'config-tabs-normal'
           }`}
           onClick={() => {
-            setCurrentTab("test");
+            setCurrentTab('test');
             navigate(`/resource/plugin/detail/${toolId}/test`);
           }}
         >
           <span className="test-icon"></span>
-          <span className="ml-2">{t("plugin.toolTest")}</span>
+          <span className="ml-2">{t('plugin.toolTest')}</span>
         </div>
         <div
           className={`flex items-center px-5 py-2.5 rounded-xl font-medium cursor-pointer  ${
-            currentTab === "setting"
-              ? "config-tabs-active"
-              : "config-tabs-normal"
+            currentTab === 'setting'
+              ? 'config-tabs-active'
+              : 'config-tabs-normal'
           }`}
           onClick={() => {
-            setCurrentTab("setting");
+            setCurrentTab('setting');
             navigate(`/resource/plugin/detail/${toolId}/setting`);
           }}
         >
           <span className="base-icon"></span>
-          <span className="ml-2">{t("plugin.settings")}</span>
+          <span className="ml-2">{t('plugin.settings')}</span>
         </div>
       </div>
       <div className="w-1/4 h-10 flex items-center gap-2 justify-end flow-header-operation-container">
@@ -160,12 +160,12 @@ const ToolHeader: FC<{
             <div className="flex items-center text-sm">
               <span>{toolInfo?.bots?.length}</span>
               <span className="text-[#757575]">
-                &nbsp;{t("plugin.relatedApplications")}
+                &nbsp;{t('plugin.relatedApplications')}
               </span>
               <div
                 className="flex p-1 rounded-xl ml-3"
                 style={{
-                  background: isHover ? "#8299FF" : "",
+                  background: isHover ? '#8299FF' : '',
                 }}
               >
                 <div
@@ -183,9 +183,9 @@ const ToolHeader: FC<{
                       key={item.id as string}
                       className="flex items-center justify-center w-8 h-8 absolute transition-all"
                       style={{
-                        border: "1px solid #e2e8ff",
-                        borderRadius: "10px",
-                        boxShadow: "-2px 0px 8px 0px rgba(0,0,0,0.10)",
+                        border: '1px solid #e2e8ff',
+                        borderRadius: '10px',
+                        boxShadow: '-2px 0px 8px 0px rgba(0,0,0,0.10)',
                         background: item.color as string,
                         right: isHover
                           ? ((toolInfo?.bots?.length || 0) - 1 - index) * 36 + 4
@@ -198,7 +198,7 @@ const ToolHeader: FC<{
                     >
                       <img
                         src={
-                          (item.address || "" + item.avatarIcon || "") as string
+                          (item.address || '' + item.avatarIcon || '') as string
                         }
                         className="w-5 h-5"
                         alt=""

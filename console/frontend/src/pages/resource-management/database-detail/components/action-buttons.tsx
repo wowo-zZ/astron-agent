@@ -1,11 +1,11 @@
-import React, { memo } from "react";
-import { Button } from "antd";
-import { useTranslation } from "react-i18next";
-import importDataTable from "@/assets/imgs/database/import-data-table.svg";
-import addTableFields from "@/assets/imgs/database/add-table-fields.svg";
-import exportIcon from "@/assets/imgs/database/export.svg";
-import refreshIcon from "@/assets/imgs/database/refresh.svg";
-import deleteIcon from "@/assets/imgs/database/delete.svg";
+import React, { memo } from 'react';
+import { Button } from 'antd';
+import { useTranslation } from 'react-i18next';
+import importDataTable from '@/assets/imgs/database/import-data-table.svg';
+import addTableFields from '@/assets/imgs/database/add-table-fields.svg';
+import exportIcon from '@/assets/imgs/database/export.svg';
+import refreshIcon from '@/assets/imgs/database/refresh.svg';
+import deleteIcon from '@/assets/imgs/database/delete.svg';
 
 interface ActionButtonsProps {
   dataType: number;
@@ -38,7 +38,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         className="h-8 rounded-lg border border-blue-100 text-blue-600"
         icon={<img src={addTableFields} alt="" />}
       >
-        {t("database.addData")}
+        {t('database.addData')}
       </Button>
       <Button
         onClick={onBatchDelete}
@@ -46,7 +46,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         className="h-8 rounded-lg border border-blue-100 text-blue-600"
         icon={<img src={deleteIcon} alt="" />}
       >
-        {t("database.batchDelete")}
+        {t('database.batchDelete')}
       </Button>
       {dataType === 3 && onRefreshData && (
         <Button
@@ -55,7 +55,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
           className="h-8 rounded-lg border border-blue-100 text-blue-600"
           icon={<img src={refreshIcon} alt="" />}
         >
-          {t("database.refreshData")}
+          {t('database.refreshData')}
         </Button>
       )}
       <Button
@@ -64,7 +64,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         className="h-8 rounded-lg border border-blue-100 text-blue-600"
         icon={<img src={importDataTable} alt="" />}
       >
-        {t("database.importDataAction")}
+        {t('database.importDataAction')}
       </Button>
       <Button
         onClick={onExportData}
@@ -73,7 +73,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         className="h-8 rounded-lg border border-blue-100 text-blue-600"
         icon={<img src={exportIcon} alt="" />}
       >
-        {t("database.exportData")}
+        {t('database.exportData')}
       </Button>
     </div>
   );

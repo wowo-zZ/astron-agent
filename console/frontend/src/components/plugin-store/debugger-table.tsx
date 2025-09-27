@@ -1,16 +1,16 @@
-import React, { useCallback, useState, useEffect } from "react";
-import { Table, Tooltip, Input, Select, InputNumber } from "antd";
-import { cloneDeep } from "lodash";
-import { v4 as uuid } from "uuid";
-import { useTranslation } from "react-i18next";
-import { DebugInput, DebugInputBase } from "@/types/plugin-store";
+import React, { useCallback, useState, useEffect } from 'react';
+import { Table, Tooltip, Input, Select, InputNumber } from 'antd';
+import { cloneDeep } from 'lodash';
+import { v4 as uuid } from 'uuid';
+import { useTranslation } from 'react-i18next';
+import { DebugInput, DebugInputBase } from '@/types/plugin-store';
 
-import expand from "@/assets/imgs/tool-square/icon-fold.png";
-import shrink from "@/assets/imgs/tool-square/icon-shrink.png";
-import addItemIcon from "@/assets/imgs/workflow/add-item-icon.png";
-import remove from "@/assets/imgs/workflow/input-remove-icon.png";
-import inputErrorMsg from "@/assets/svgs/input-error-msg.svg";
-import formSelect from "@/assets/imgs/workflow/icon-form-select.png";
+import expand from '@/assets/imgs/tool-square/icon-fold.png';
+import shrink from '@/assets/imgs/tool-square/icon-shrink.png';
+import addItemIcon from '@/assets/imgs/workflow/add-item-icon.png';
+import remove from '@/assets/imgs/workflow/input-remove-icon.png';
+import inputErrorMsg from '@/assets/svgs/input-error-msg.svg';
+import formSelect from '@/assets/imgs/workflow/icon-form-select.png';
 
 function DebuggerTable({
   debuggerParamsData,
@@ -35,21 +35,21 @@ function DebuggerTable({
   }, []);
 
   const handleExpand = useCallback((record: DebugInput) => {
-    setExpandedRowKeys((expandedRowKeys) => [...expandedRowKeys, record.id]);
+    setExpandedRowKeys(expandedRowKeys => [...expandedRowKeys, record.id]);
   }, []);
 
   const handleCollapse = useCallback((record: DebugInput) => {
-    setExpandedRowKeys((expandedRowKeys) =>
-      expandedRowKeys.filter((id) => id !== record.id),
+    setExpandedRowKeys(expandedRowKeys =>
+      expandedRowKeys.filter(id => id !== record.id)
     );
   }, []);
 
   const updateIds = useCallback((obj: DebugInput) => {
-    const newObj = { ...obj, id: uuid(), default: "" };
+    const newObj = { ...obj, id: uuid(), default: '' };
 
     if (newObj.children && Array.isArray(newObj.children)) {
       newObj.children = newObj.children.map((child: DebugInput) =>
-        updateIds(child),
+        updateIds(child)
       );
     }
 
@@ -65,7 +65,7 @@ function DebuggerTable({
       }
       setDebuggerParamsData(cloneDeep(debuggerParamsData));
     },
-    [debuggerParamsData, setDebuggerParamsData],
+    [debuggerParamsData, setDebuggerParamsData]
   );
 
   const deleteNodeFromTree = useCallback((tree: DebugInput[], id: string) => {
@@ -92,7 +92,7 @@ function DebuggerTable({
       expanded: boolean;
       onExpand: (
         record: DebugInput,
-        e: React.MouseEvent<HTMLImageElement>,
+        e: React.MouseEvent<HTMLImageElement>
       ) => void;
       record: DebugInput;
     }) => {
@@ -101,7 +101,7 @@ function DebuggerTable({
           <img
             src={shrink}
             className="w-4 h-4 inline-block mb-1 mr-1"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               handleCollapse(record);
             }}
@@ -110,7 +110,7 @@ function DebuggerTable({
           <img
             src={expand}
             className="w-4 h-4 inline-block mb-1 mr-1"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               handleExpand(record);
             }}
@@ -119,7 +119,7 @@ function DebuggerTable({
       }
       return null;
     },
-    [],
+    []
   );
 
   const findNodeById = (tree: DebugInput[], id: string): DebugInput | null => {
@@ -143,32 +143,32 @@ function DebuggerTable({
     (id: string, value: string | boolean | number) => {
       const currentNode: DebugInput | null = findNodeById(
         debuggerParamsData,
-        id,
+        id
       );
       if (currentNode) {
         currentNode.default = value;
       }
       setDebuggerParamsData(cloneDeep(debuggerParamsData));
     },
-    [debuggerParamsData, setDebuggerParamsData, setExpandedRowKeys],
+    [debuggerParamsData, setDebuggerParamsData, setExpandedRowKeys]
   );
 
   const checkParmas = useCallback(
     (params: DebugInput[], id: string, key: string) => {
       let passFlag = true;
-      const errEsg = t("workflow.nodes.toolNode.pleaseEnterParameterValue");
+      const errEsg = t('workflow.nodes.toolNode.pleaseEnterParameterValue');
       const currentNode: DebugInput | null = findNodeById(params, id);
       if (currentNode && !currentNode?.[key as keyof DebugInput]) {
         currentNode[`${key as keyof DebugInputBase}ErrMsg`] = errEsg;
         passFlag = false;
       } else {
         if (currentNode) {
-          currentNode[`${key as keyof DebugInputBase}ErrMsg`] = "";
+          currentNode[`${key as keyof DebugInputBase}ErrMsg`] = '';
         }
       }
       return passFlag;
     },
-    [],
+    []
   );
 
   const handleCheckInput = useCallback(
@@ -176,89 +176,89 @@ function DebuggerTable({
       checkParmas(debuggerParamsData, record?.id, key);
       setDebuggerParamsData(cloneDeep(debuggerParamsData));
     },
-    [debuggerParamsData, setDebuggerParamsData],
+    [debuggerParamsData, setDebuggerParamsData]
   );
 
   const renderInput = (record: DebugInput): React.ReactNode => {
     const type = record?.type;
-    if (type === "string") {
+    if (type === 'string') {
       return (
         <Input
           disabled={record?.defalutDisabled || false}
-          placeholder={t("common.pleaseEnterDefaultValue")}
+          placeholder={t('common.pleaseEnterDefaultValue')}
           className="global-input params-input"
           value={record?.default as string}
-          onChange={(e) => {
+          onChange={e => {
             handleInputParamsChange(record?.id, e.target.value);
-            handleCheckInput(record, "default");
+            handleCheckInput(record, 'default');
           }}
-          onBlur={() => handleCheckInput(record, "default")}
+          onBlur={() => handleCheckInput(record, 'default')}
         />
       );
-    } else if (type === "boolean") {
+    } else if (type === 'boolean') {
       return (
         <Select
-          placeholder={t("common.pleaseSelect")}
+          placeholder={t('common.pleaseSelect')}
           suffixIcon={<img src={formSelect} className="w-4 h-4 " />}
           options={[
             {
-              label: "true",
+              label: 'true',
               value: true,
             },
             {
-              label: "false",
+              label: 'false',
               value: false,
             },
           ]}
           style={{
-            lineHeight: "40px",
-            height: "40px",
+            lineHeight: '40px',
+            height: '40px',
           }}
           value={record?.default}
-          onChange={(value) => {
+          onChange={value => {
             handleInputParamsChange(record?.id, value);
-            handleCheckInput(record, "default");
+            handleCheckInput(record, 'default');
           }}
-          onBlur={() => handleCheckInput(record, "default")}
+          onBlur={() => handleCheckInput(record, 'default')}
         />
       );
-    } else if (type === "integer") {
+    } else if (type === 'integer') {
       return (
         <InputNumber
           disabled={record?.defalutDisabled || false}
-          placeholder={t("common.pleaseEnterDefaultValue")}
+          placeholder={t('common.pleaseEnterDefaultValue')}
           step={1}
           precision={0}
           controls={false}
           style={{
-            lineHeight: "40px",
-            height: "40px",
+            lineHeight: '40px',
+            height: '40px',
           }}
           className="global-input params-input w-full"
           value={record?.default as number}
-          onChange={(value) => {
+          onChange={value => {
             handleInputParamsChange(record?.id, value as number);
-            handleCheckInput(record, "default");
+            handleCheckInput(record, 'default');
           }}
-          onBlur={() => handleCheckInput(record, "default")}
+          onBlur={() => handleCheckInput(record, 'default')}
         />
       );
-    } else if (type === "number") {
+    } else if (type === 'number') {
       return (
         <InputNumber
           disabled={record?.defalutDisabled || false}
-          placeholder={t("common.pleaseEnterDefaultValue")}
+          placeholder={t('common.pleaseEnterDefaultValue')}
           className="global-input params-input w-full"
           controls={false}
           style={{
-            lineHeight: "40px",
+            lineHeight: '40px',
           }}
           value={record?.default as number}
-          onChange={(value) => {
+          onChange={value => {
             handleInputParamsChange(record?.id, value as number);
-            handleCheckInput(record, "default");
+            handleCheckInput(record, 'default');
           }}
-          onBlur={() => handleCheckInput(record, "default")}
+          onBlur={() => handleCheckInput(record, 'default')}
         />
       );
     } else {
@@ -268,10 +268,10 @@ function DebuggerTable({
 
   const columns = [
     {
-      title: t("workflow.nodes.common.parameterName"),
-      dataIndex: "name",
-      key: "name",
-      width: "30%",
+      title: t('workflow.nodes.common.parameterName'),
+      dataIndex: 'name',
+      key: 'name',
+      width: '30%',
       render: (name: string, record: DebugInput) => (
         <Tooltip
           title={record?.description}
@@ -282,36 +282,36 @@ function DebuggerTable({
       ),
     },
     {
-      title: t("workflow.nodes.common.variableType"),
-      dataIndex: "type",
-      key: "type",
-      width: "10%",
+      title: t('workflow.nodes.common.variableType'),
+      dataIndex: 'type',
+      key: 'type',
+      width: '10%',
     },
     {
-      title: t("workflow.nodes.toolNode.isRequired"),
-      dataIndex: "required",
-      key: "required",
-      width: "10%",
+      title: t('workflow.nodes.toolNode.isRequired'),
+      dataIndex: 'required',
+      key: 'required',
+      width: '10%',
       render: (required: boolean) => (
         <div
           style={{
-            color: required ? "#275EFF" : "#F74E43",
+            color: required ? '#275EFF' : '#F74E43',
           }}
         >
           {required
-            ? t("workflow.nodes.toolNode.yes")
-            : t("workflow.nodes.toolNode.no")}
+            ? t('workflow.nodes.toolNode.yes')
+            : t('workflow.nodes.toolNode.no')}
         </div>
       ),
     },
     {
-      title: t("workflow.nodes.toolNode.parameterValue"),
-      dataIndex: "default",
-      key: "default",
-      width: "40%",
+      title: t('workflow.nodes.toolNode.parameterValue'),
+      dataIndex: 'default',
+      key: 'default',
+      width: '40%',
       render: (_: unknown, record: DebugInput) => (
         <div className="w-full flex flex-col gap-1">
-          {record?.type === "object" || record?.type === "array"
+          {record?.type === 'object' || record?.type === 'array'
             ? null
             : renderInput(record)}
           {record?.defaultErrMsg && (
@@ -324,14 +324,14 @@ function DebuggerTable({
       ),
     },
     {
-      title: t("workflow.nodes.toolNode.operation"),
-      key: "operation",
-      width: "5%",
+      title: t('workflow.nodes.toolNode.operation'),
+      key: 'operation',
+      width: '5%',
       render: (_: unknown, record: DebugInput) => (
         <div className=" flex items-center gap-2">
-          {record?.type === "array" && (
+          {record?.type === 'array' && (
             <Tooltip
-              title={t("workflow.nodes.toolNode.addSubItem")}
+              title={t('workflow.nodes.toolNode.addSubItem')}
               overlayClassName="black-tooltip config-secret"
             >
               <img
@@ -341,16 +341,14 @@ function DebuggerTable({
               />
             </Tooltip>
           )}
-          {record?.fatherType === "array" && (
+          {record?.fatherType === 'array' && (
             <Tooltip title="" overlayClassName="black-tooltip config-secret">
               <img
                 className="w-4 h-4 cursor-pointer"
                 src={remove}
                 onClick={() => {
                   setDebuggerParamsData(
-                    cloneDeep(
-                      deleteNodeFromTree(debuggerParamsData, record.id),
-                    ),
+                    cloneDeep(deleteNodeFromTree(debuggerParamsData, record.id))
                   );
                 }}
                 alt=""
@@ -367,7 +365,7 @@ function DebuggerTable({
       <div className="w-full flex items-center gap-1 justify-between">
         {showTitle && (
           <span className="text-base font-medium">
-            {t("workflow.nodes.toolNode.parameterConfiguration")}
+            {t('workflow.nodes.toolNode.parameterConfiguration')}
           </span>
         )}
       </div>
@@ -380,12 +378,12 @@ function DebuggerTable({
           expandIcon: customExpandIcon,
           expandedRowKeys,
         }}
-        rowKey={(record) => record?.id}
+        rowKey={record => record?.id}
         locale={{
           emptyText: (
-            <div style={{ padding: "20px" }}>
+            <div style={{ padding: '20px' }}>
               <p className="text-[#333333]">
-                {t("workflow.nodes.toolNode.noData")}
+                {t('workflow.nodes.toolNode.noData')}
               </p>
             </div>
           ),

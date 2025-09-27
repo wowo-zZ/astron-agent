@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
-import { Button, message } from "antd";
-import { deleteBotAPI, deleteAgent } from "@/services/agent";
-import dialogDel from "@/assets/imgs/main/icon_dialog_del.png";
-import { applyCancelUpload } from "@/services/spark-common";
-import eventBus from "@/utils/event-bus";
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Button, message } from 'antd';
+import { deleteBotAPI, deleteAgent } from '@/services/agent';
+import dialogDel from '@/assets/imgs/main/icon_dialog_del.png';
+import { applyCancelUpload } from '@/services/spark-common';
+import eventBus from '@/utils/event-bus';
 
 type BotDetail = {
   botStatus?: number;
@@ -34,15 +34,15 @@ function index({
     // 从智能体Tab传入Bot的删除 -- 调用星火方面接口
     setLoading(true);
     if (botDetail?.botStatus === 2) {
-      await applyCancelUpload({ botId: botDetail.botId, reason: "" });
+      await applyCancelUpload({ botId: botDetail.botId, reason: '' });
     }
     if (type) {
       deleteAgent({ botId: botDetail.botId })
-        .then((data) => {
+        .then(data => {
           setDeleteModal(false);
           initData();
-          eventBus.emit("chatListChange");
-          message.success(t("agentPage.deleteBot.deleteSuccess"));
+          eventBus.emit('chatListChange');
+          message.success(t('agentPage.deleteBot.deleteSuccess'));
         })
         .finally(() => {
           setLoading(false);
@@ -51,10 +51,10 @@ function index({
     }
 
     deleteBotAPI(Number(botDetail.id as number))
-      .then((data) => {
+      .then(data => {
         setDeleteModal(false);
         initData();
-        message.success(t("agentPage.deleteBot.deleteSuccess"));
+        message.success(t('agentPage.deleteBot.deleteSuccess'));
       })
       .finally(() => {
         setLoading(false);
@@ -68,17 +68,17 @@ function index({
           <div className="bg-[#fff5f4] w-10 h-10 flex justify-center items-center rounded-lg">
             <img src={dialogDel} className="w-7 h-7" alt="" />
           </div>
-          <p className="ml-2.5">{t("agentPage.deleteBot.confirmDelete")}</p>
+          <p className="ml-2.5">{t('agentPage.deleteBot.confirmDelete')}</p>
         </div>
         <div className="w-full h-10 bg-[#F9FAFB] text-center mt-7 py-2 text-ellipsis overflow-hidden whitespace-nowrap">
           {botDetail.name || botDetail.botName}
         </div>
         <p className="mt-6 text-desc">
           {botDetail?.botStatus == 2
-            ? t("agentPage.deleteBot.publishedWarning")
+            ? t('agentPage.deleteBot.publishedWarning')
             : type
-              ? t("agentPage.deleteBot.deletionNotice1")
-              : t("agentPage.deleteBot.deletionNotice2")}
+              ? t('agentPage.deleteBot.deletionNotice1')
+              : t('agentPage.deleteBot.deletionNotice2')}
         </p>
         <div className="flex flex-row-reverse gap-3 mt-7">
           <Button
@@ -86,17 +86,17 @@ function index({
             loading={loading}
             onClick={handleOk}
             className="delete-btn px-6"
-            style={{ textAlign: "center" }}
+            style={{ textAlign: 'center' }}
           >
-            {t("agentPage.deleteBot.deleteButton")}
+            {t('agentPage.deleteBot.deleteButton')}
           </Button>
           <Button
             type="text"
             className="origin-btn px-6"
             onClick={() => setDeleteModal(false)}
-            style={{ textAlign: "center" }}
+            style={{ textAlign: 'center' }}
           >
-            {t("agentPage.deleteBot.cancelButton")}
+            {t('agentPage.deleteBot.cancelButton')}
           </Button>
         </div>
       </div>

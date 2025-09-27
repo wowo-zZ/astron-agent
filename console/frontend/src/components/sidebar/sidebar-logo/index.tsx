@@ -1,9 +1,9 @@
-import { ReactElement } from "react";
-import { useNavigate } from "react-router-dom";
-import agentLog from "@/assets/imgs/sidebar/agentLog.svg";
-import agentLogoText from "@/assets/imgs/sidebar/agentLogoText.svg";
-import agentLogoTextEn from "@/assets/imgs/sidebar/agentLogoTextEn.svg";
-import textLogo from "@/assets/imgs/sidebar/logoText.png";
+import { ReactElement } from 'react';
+import { useNavigate } from 'react-router-dom';
+import agentLog from '@/assets/imgs/sidebar/agentLog.svg';
+import agentLogoText from '@/assets/imgs/sidebar/agentLogoText.svg';
+import agentLogoTextEn from '@/assets/imgs/sidebar/agentLogoTextEn.svg';
+import textLogo from '@/assets/imgs/sidebar/logoText.png';
 
 interface SidebarLogoProps {
   isCollapsed: boolean;
@@ -16,12 +16,12 @@ const SidebarLogo = ({
   isCollapsed,
   isEnterprise = false,
   enterpriseLogo,
-  languageCode = "zh",
+  languageCode = 'zh',
 }: SidebarLogoProps): ReactElement => {
   const navigate = useNavigate();
 
   const handleLogoClick = (): void => {
-    navigate("/home");
+    navigate('/home');
   };
 
   if (isEnterprise && enterpriseLogo) {
@@ -31,8 +31,8 @@ const SidebarLogo = ({
         className="rounded-[6px] cursor-pointer transition-all duration-300 ease-in-out mx-auto"
         alt=""
         style={{
-          width: "34px",
-          height: "34px",
+          width: '34px',
+          height: '34px',
           opacity: 1,
         }}
         onClick={handleLogoClick}
@@ -65,13 +65,13 @@ const SidebarLogo = ({
       src={
         isCollapsed
           ? agentLog
-          : languageCode === "zh"
+          : languageCode === 'zh'
             ? agentLogoText
             : agentLogoTextEn
       }
       className="w-[190px] cursor-pointer mx-auto"
       alt="讯飞星辰Agent"
-      style={{ height: isCollapsed ? "34px" : "auto" }}
+      style={{ height: isCollapsed ? '34px' : 'auto' }}
       onClick={handleLogoClick}
     />
   );

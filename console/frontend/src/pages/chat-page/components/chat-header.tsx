@@ -1,18 +1,18 @@
-import { ReactElement, useState } from "react";
-import { Skeleton, message } from "antd";
-import { useTranslation } from "react-i18next";
-import { BotInfoType } from "@/types/chat";
-import { collectBot, cancelFavorite } from "@/services/agent-square";
-import backIcon from "@/assets/imgs/chat/back.svg";
-import authorIcon from "@/assets/svgs/author.svg";
-import collectIcon from "@/assets/svgs/collect.svg";
-import collectHoverIcon from "@/assets/svgs/collect-hover.svg";
-import chatCollectIcon from "@/assets/svgs/collected.svg";
-import shareIcon from "@/assets/svgs/share.svg";
-import shareHoverIcon from "@/assets/svgs/hover-share.svg";
-import { useNavigate } from "react-router-dom";
-import useChatStore from "@/store/chat-store";
-import { handleShare } from "@/utils";
+import { ReactElement, useState } from 'react';
+import { Skeleton, message } from 'antd';
+import { useTranslation } from 'react-i18next';
+import { BotInfoType } from '@/types/chat';
+import { collectBot, cancelFavorite } from '@/services/agent-square';
+import backIcon from '@/assets/imgs/chat/back.svg';
+import authorIcon from '@/assets/svgs/author.svg';
+import collectIcon from '@/assets/svgs/collect.svg';
+import collectHoverIcon from '@/assets/svgs/collect-hover.svg';
+import chatCollectIcon from '@/assets/svgs/collected.svg';
+import shareIcon from '@/assets/svgs/share.svg';
+import shareHoverIcon from '@/assets/svgs/hover-share.svg';
+import { useNavigate } from 'react-router-dom';
+import useChatStore from '@/store/chat-store';
+import { handleShare } from '@/utils';
 
 const ChatHeader = (props: {
   botInfo: BotInfoType;
@@ -24,7 +24,7 @@ const ChatHeader = (props: {
   const navigate = useNavigate();
   const [collectHover, setCollectHover] = useState<boolean>(false);
   const [shareHover, setShareHover] = useState<boolean>(false);
-  const controllerRef = useChatStore((state) => state.controllerRef); //sse请求ref
+  const controllerRef = useChatStore(state => state.controllerRef); //sse请求ref
 
   // 返回首页
   const handleBack = (): void => {
@@ -32,40 +32,40 @@ const ChatHeader = (props: {
     if (window.history.length > 2) {
       navigate(-1);
     } else {
-      navigate("/home");
+      navigate('/home');
     }
   };
 
   // 收藏/取消收藏
   const handleFavoriteOperation = (): void => {
     const form = new URLSearchParams();
-    form.append("botId", botInfo.botId.toString());
+    form.append('botId', botInfo.botId.toString());
     const isCurrentlyFavorite = botInfo.isFavorite === 1;
     if (!isCurrentlyFavorite) {
       // 添加收藏
       collectBot(form)
         .then(() => {
-          message.success(t("home.collectionSuccess"));
+          message.success(t('home.collectionSuccess'));
           setBotInfo({
             ...botInfo,
             isFavorite: 1,
           });
         })
-        .catch((err) => {
-          message.error(err?.msg || "收藏失败，请稍后再试~");
+        .catch(err => {
+          message.error(err?.msg || '收藏失败，请稍后再试~');
         });
     } else {
       // 取消收藏
       cancelFavorite(form)
         .then(() => {
-          message.success(t("home.cancelCollectionSuccess"));
+          message.success(t('home.cancelCollectionSuccess'));
           setBotInfo({
             ...botInfo,
             isFavorite: 0,
           });
         })
-        .catch((err) => {
-          message.error(err?.msg || "取消收藏失败，请稍后再试~");
+        .catch(err => {
+          message.error(err?.msg || '取消收藏失败，请稍后再试~');
         });
     }
   };
@@ -91,15 +91,15 @@ const ChatHeader = (props: {
   //收藏按钮样式
   const collectButtonClass = `cursor-pointer flex items-center justify-center w-[84px] h-9 border rounded-[18px] transition-all duration-200 ${
     collectHover
-      ? "text-[#275eff] border-[#275eff]"
-      : "text-gray-600 border-[#e4eaff] hover:text-[#275eff] hover:border-[#275eff]"
+      ? 'text-[#275eff] border-[#275eff]'
+      : 'text-gray-600 border-[#e4eaff] hover:text-[#275eff] hover:border-[#275eff]'
   }`;
 
   //分享按钮样式
   const shareButtonClass = `cursor-pointer flex items-center justify-center w-[84px] h-9 border rounded-[18px] transition-all duration-200 ${
     shareHover
-      ? "text-[#275eff] border-[#275eff]"
-      : "text-gray-600 border-[#e4eaff] hover:text-[#275eff] hover:border-[#275eff]"
+      ? 'text-[#275eff] border-[#275eff]'
+      : 'text-gray-600 border-[#e4eaff] hover:text-[#275eff] hover:border-[#275eff]'
   }`;
 
   // 渲染左侧区域内容
@@ -182,7 +182,7 @@ const ChatHeader = (props: {
           onMouseLeave={() => setCollectHover(false)}
         >
           <img src={getCollectIcon()} alt="" className="w-4 h-4 mr-2" />
-          <span>{t("chatPage.chatHeader.collect")}</span>
+          <span>{t('chatPage.chatHeader.collect')}</span>
         </div>
 
         {/* 分享按钮 */}
@@ -193,7 +193,7 @@ const ChatHeader = (props: {
           onMouseLeave={() => setShareHover(false)}
         >
           <img src={getShareIcon()} alt="" className="w-4 h-4 mr-2" />
-          <span>{t("chatPage.chatHeader.share")}</span>
+          <span>{t('chatPage.chatHeader.share')}</span>
         </div>
       </>
     );

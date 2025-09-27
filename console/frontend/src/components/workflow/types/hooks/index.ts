@@ -4,8 +4,8 @@ import {
   FlowType,
   PositionType,
   NewNodeType,
-} from "../drawer/chat-debugger";
-import React from "react";
+} from '../drawer/chat-debugger';
+import React from 'react';
 
 // Hook 相关类型定义
 
@@ -68,18 +68,18 @@ export interface UseNodeFuncReturn {
   handleNodeClick: () => void;
   handleChangeNodeParam: (
     fn: (data: NodeDataType, value: unknown) => void,
-    value: unknown,
+    value: unknown
   ) => void;
   handleChangeOutputParam: (
     outputId: string,
     fn: (data: OutputItem, value: unknown) => void,
-    value: unknown,
+    value: unknown
   ) => void;
   handleIteratorEndChange: (
-    type: "add" | "remove" | "replace",
+    type: 'add' | 'remove' | 'replace',
     outputId: string,
     value?: unknown,
-    currentNode?: NodeDataType,
+    currentNode?: NodeDataType
   ) => void;
   handleAddOutputLine: () => void;
   handleRemoveOutputLine: (outputId: string) => void;
@@ -96,7 +96,7 @@ export interface UseNodeOutputRenderReturn {
       hasDescription?: boolean;
       hasRef?: boolean;
       allowRemove?: boolean;
-    },
+    }
   ) => React.ReactElement;
   outputTypeList: Array<{
     label: string;
@@ -191,17 +191,17 @@ export interface UseNodeCommonReturn {
   handleNodeClick: () => void;
   handleChangeNodeParam: (
     fn: (data: NodeDataType, value: unknown) => void,
-    value: unknown,
+    value: unknown
   ) => void;
   handleChangeInputParam: (
     inputId: string,
     fn: (data: InputItem, value: unknown) => void,
-    value: unknown,
+    value: unknown
   ) => void;
   handleChangeOutputParam: (
     outputId: string,
     fn: (data: OutputItem, value: unknown) => void,
-    value: unknown,
+    value: unknown
   ) => void;
   handleAddOutputLine: () => void;
   handleRemoveOutputLine: (outputId: string) => void;
@@ -273,7 +273,7 @@ export interface UseNodeCommonReturn {
 export interface UseFlowCommonReturn {
   handleAddNode: (
     addNode: AddNodeType,
-    position: PositionType,
+    position: PositionType
   ) => NewNodeType[] | null;
   handleAddToolNode: (tool: ToolType) => void;
   handleAddFlowNode: (flow: FlowType) => void;
@@ -281,7 +281,7 @@ export interface UseFlowCommonReturn {
     addNode: AddNodeType,
     position: PositionType,
     sourceHandle: string | null,
-    currentNode: NewNodeType,
+    currentNode: NewNodeType
   ) => void;
   handleDebugger: () => void;
   resetBeforeAndWillNode: () => void;
@@ -301,7 +301,7 @@ export interface UseNodeInputRenderReturn {
   handleChangeInputParam: (
     inputId: string,
     fn: (data: InputItem, value: unknown) => void,
-    value: unknown,
+    value: unknown
   ) => void;
   handleAddInputLine: () => void;
   handleRemoveInputLine: (inputId: string) => void;
@@ -312,7 +312,7 @@ export interface UseVariableMemoryHandlersReturn {
   handleChangeParam: (
     outputId: string,
     fn: (data: InputItem, value: unknown) => void,
-    value: unknown,
+    value: unknown
   ) => void;
   handleRemoveInputLine: (inputId: string) => void;
 }
@@ -324,4 +324,4 @@ export type {
   FlowType,
   PositionType,
   NewNodeType,
-} from "../drawer/chat-debugger";
+} from '../drawer/chat-debugger';

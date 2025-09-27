@@ -1,10 +1,10 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef } from 'react';
 import {
   listPreviewKnowledgeByPage,
   createHtmlFile,
-} from "@/services/knowledge";
-import { modifyChunks } from "@/utils/utils";
-import cloneDeep from "lodash/cloneDeep";
+} from '@/services/knowledge';
+import { modifyChunks } from '@/utils/utils';
+import cloneDeep from 'lodash/cloneDeep';
 import {
   Chunk,
   FileStatusResponse,
@@ -12,8 +12,8 @@ import {
   KnowledgeItem,
   PageData,
   UploadFile,
-} from "@/types/resource";
-import { useSliceOperations } from "./use-slice-operations";
+} from '@/types/resource';
+import { useSliceOperations } from './use-slice-operations';
 
 let currentFileIds: (string | number)[] = [];
 
@@ -48,7 +48,7 @@ interface UseDataOperationsProps {
  * 数据操作相关的 hook
  */
 export const useDataOperations = (
-  props: UseDataOperationsProps,
+  props: UseDataOperationsProps
 ): {
   linkList: string[];
   total: number;
@@ -102,11 +102,11 @@ export const useDataOperations = (
     setTotal(cacheData.totalCount);
     setViolationTotal((cacheData.extMap?.auditBlockCount as number) || 0);
     if (cacheData?.fileSliceCount) {
-      setSparkFiles((sparkFiles) =>
-        sparkFiles?.map((file) => ({
+      setSparkFiles(sparkFiles =>
+        sparkFiles?.map(file => ({
           ...file,
-          paraCount: cacheData?.fileSliceCount?.[file?.["fileId"] || ""],
-        })),
+          paraCount: cacheData?.fileSliceCount?.[file?.['fileId'] || ''],
+        }))
       );
     }
     if (chunkRef.current) {
@@ -116,9 +116,9 @@ export const useDataOperations = (
 
   const getChunks = (
     failedList: (string | number)[],
-    selectType: string,
+    selectType: string
   ): void => {
-    const fileIds = currentFileIds.filter((item) => !failedList.includes(item));
+    const fileIds = currentFileIds.filter(item => !failedList.includes(item));
     if (fileIds.length === 0) {
       setChunks([]);
       selectTypeCache.current[
@@ -132,7 +132,7 @@ export const useDataOperations = (
         pageSize: 10,
       };
 
-      listPreviewKnowledgeByPage(params).then((data) => {
+      listPreviewKnowledgeByPage(params).then(data => {
         const chunks = modifyChunks(data.pageData || []);
         selectTypeCache.current[
           selectType as keyof typeof selectTypeCache.current
@@ -142,11 +142,11 @@ export const useDataOperations = (
         setTotal(data.totalCount);
         setViolationTotal((data.extMap?.auditBlockCount as number) || 0);
         if (data?.fileSliceCount) {
-          setSparkFiles((sparkFiles) =>
-            sparkFiles?.map((file) => ({
+          setSparkFiles(sparkFiles =>
+            sparkFiles?.map(file => ({
               ...file,
-              paraCount: data?.fileSliceCount?.[file?.["fileId"] || ""],
-            })),
+              paraCount: data?.fileSliceCount?.[file?.['fileId'] || ''],
+            }))
           );
         }
       });
@@ -181,21 +181,21 @@ export const useDataOperations = (
     setSaveDisabled(true);
     setNewSaveDisabled(true);
 
-    if (importType === "web") {
-      const linkArr = linkValue.split("\n");
+    if (importType === 'web') {
+      const linkArr = linkValue.split('\n');
       setLinkList(linkArr);
     }
-    if (importType === "text") {
+    if (importType === 'text') {
       currentFileIds = fileIds;
     } else {
-      const htmlAddressList = linkValue.split("\n");
+      const htmlAddressList = linkValue.split('\n');
       const params = {
         repoId,
         parentId,
         htmlAddressList,
       };
-      createHtmlFile(params).then((data) => {
-        const fileIds = data.map((item) => item.id);
+      createHtmlFile(params).then(data => {
+        const fileIds = data.map(item => item.id);
         currentFileIds = fileIds;
         setFileIds(fileIds);
       });

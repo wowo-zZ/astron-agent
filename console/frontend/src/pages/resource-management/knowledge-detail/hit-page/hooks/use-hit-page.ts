@@ -1,7 +1,7 @@
-import { hitHistoryByPage, hitTest } from "@/services/knowledge";
-import { HitResult, KnowledgeItem } from "@/types/resource";
-import { modifyContent } from "@/utils/utils";
-import React, { useEffect, useRef, useState } from "react";
+import { hitHistoryByPage, hitTest } from '@/services/knowledge';
+import { HitResult, KnowledgeItem } from '@/types/resource';
+import { modifyContent } from '@/utils/utils';
+import React, { useEffect, useRef, useState } from 'react';
 
 export const useHitPage = ({
   repoId,
@@ -26,7 +26,7 @@ export const useHitPage = ({
   history: HitResult[];
 } => {
   const historyRef = useRef<HTMLDivElement | null>(null);
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState('');
   const [searching, setSearching] = useState(false);
   const [answers, setAnswers] = useState<HitResult[]>([]);
   const [detailModal, setDetailModal] = useState(false);
@@ -47,8 +47,8 @@ export const useHitPage = ({
       pageNo: number || pageNumber,
       pageSize: 10,
     };
-    hitHistoryByPage(params).then((data) => {
-      setPageNumber((preNumber) => preNumber + 1);
+    hitHistoryByPage(params).then(data => {
+      setPageNumber(preNumber => preNumber + 1);
       setHistory(data.pageData || []);
       setTotal(data.totalCount);
       if (data.totalCount > 10) {
@@ -78,8 +78,8 @@ export const useHitPage = ({
       pageSize: 10,
     };
     hitHistoryByPage(params)
-      .then((data) => {
-        setPageNumber((preNumber) => preNumber + 1);
+      .then(data => {
+        setPageNumber(preNumber => preNumber + 1);
         const newHistory = [...history, ...(data.pageData || [])];
         //@ts-ignore
         setHistory(newHistory);
@@ -103,17 +103,17 @@ export const useHitPage = ({
         query: searchValue,
       };
       hitTest(params)
-        .then((data) => {
-          const regexPattern = new RegExp(searchValue, "gi");
-          const answers = data.map((item) => {
+        .then(data => {
+          const regexPattern = new RegExp(searchValue, 'gi');
+          const answers = data.map(item => {
             item.knowledge = (item.content || item.knowledge)?.replace(
               regexPattern,
-              '<span style="color:#275EFF;font-weight:600;display:inline-block;padding:4px 0px;background:#dee2f9">$&</span>',
+              '<span style="color:#275EFF;font-weight:600;display:inline-block;padding:4px 0px;background:#dee2f9">$&</span>'
             );
             return {
               ...item,
               knowledge: modifyContent(
-                item as unknown as KnowledgeItem["content"],
+                item as unknown as KnowledgeItem['content']
               ),
               score: roundToTwoDecimalPlaces(item.score),
             };

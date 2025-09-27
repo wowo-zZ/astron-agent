@@ -4,8 +4,8 @@ import React, {
   useReducer,
   useMemo,
   ReactNode,
-} from "react";
-import { ModelInfo, CategoryNode } from "@/types/model";
+} from 'react';
+import { ModelInfo, CategoryNode } from '@/types/model';
 
 // 定义状态类型
 interface ModelState {
@@ -31,20 +31,20 @@ interface ModelState {
 
 // 定义Action类型
 type ModelAction =
-  | { type: "SET_MODELS"; payload: ModelInfo[] }
-  | { type: "SET_CATEGORY_LIST"; payload: CategoryNode[] }
-  | { type: "SET_LOADING"; payload: boolean }
-  | { type: "SET_SHELF_OFF_MODELS"; payload: ModelInfo[] }
-  | { type: "SET_CHECKED_LEAVES"; payload: CategoryNode[] }
-  | { type: "SET_CONTEXT_LENGTH"; payload?: number }
-  | { type: "SET_CONTEXT_MAX_LENGTH"; payload: number }
-  | { type: "SET_SEARCH_INPUT"; payload: string }
-  | { type: "SET_FILTER_TYPE"; payload: number }
-  | { type: "SET_SHOW_SHELF_ONLY"; payload: boolean }
-  | { type: "SET_CREATE_MODAL"; payload: boolean }
-  | { type: "SET_DELETE_MODAL"; payload: boolean }
-  | { type: "SET_CURRENT_EDIT_MODEL"; payload?: ModelInfo }
-  | { type: "RESET_STATE" };
+  | { type: 'SET_MODELS'; payload: ModelInfo[] }
+  | { type: 'SET_CATEGORY_LIST'; payload: CategoryNode[] }
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_SHELF_OFF_MODELS'; payload: ModelInfo[] }
+  | { type: 'SET_CHECKED_LEAVES'; payload: CategoryNode[] }
+  | { type: 'SET_CONTEXT_LENGTH'; payload?: number }
+  | { type: 'SET_CONTEXT_MAX_LENGTH'; payload: number }
+  | { type: 'SET_SEARCH_INPUT'; payload: string }
+  | { type: 'SET_FILTER_TYPE'; payload: number }
+  | { type: 'SET_SHOW_SHELF_ONLY'; payload: boolean }
+  | { type: 'SET_CREATE_MODAL'; payload: boolean }
+  | { type: 'SET_DELETE_MODAL'; payload: boolean }
+  | { type: 'SET_CURRENT_EDIT_MODEL'; payload?: ModelInfo }
+  | { type: 'RESET_STATE' };
 
 // 初始状态
 const initialState: ModelState = {
@@ -55,7 +55,7 @@ const initialState: ModelState = {
   checkedLeaves: [],
   contextLength: undefined,
   contextMaxLength: 100,
-  searchInput: "",
+  searchInput: '',
   filterType: 0,
   showShelfOnly: false,
   createModalOpen: false,
@@ -66,33 +66,33 @@ const initialState: ModelState = {
 // Reducer
 const modelReducer = (state: ModelState, action: ModelAction): ModelState => {
   switch (action.type) {
-    case "SET_MODELS":
+    case 'SET_MODELS':
       return { ...state, models: action.payload };
-    case "SET_CATEGORY_LIST":
+    case 'SET_CATEGORY_LIST':
       return { ...state, categoryList: action.payload };
-    case "SET_LOADING":
+    case 'SET_LOADING':
       return { ...state, loading: action.payload };
-    case "SET_SHELF_OFF_MODELS":
+    case 'SET_SHELF_OFF_MODELS':
       return { ...state, shelfOffModels: action.payload };
-    case "SET_CHECKED_LEAVES":
+    case 'SET_CHECKED_LEAVES':
       return { ...state, checkedLeaves: action.payload };
-    case "SET_CONTEXT_LENGTH":
+    case 'SET_CONTEXT_LENGTH':
       return { ...state, contextLength: action.payload };
-    case "SET_CONTEXT_MAX_LENGTH":
+    case 'SET_CONTEXT_MAX_LENGTH':
       return { ...state, contextMaxLength: action.payload };
-    case "SET_SEARCH_INPUT":
+    case 'SET_SEARCH_INPUT':
       return { ...state, searchInput: action.payload };
-    case "SET_FILTER_TYPE":
+    case 'SET_FILTER_TYPE':
       return { ...state, filterType: action.payload };
-    case "SET_SHOW_SHELF_ONLY":
+    case 'SET_SHOW_SHELF_ONLY':
       return { ...state, showShelfOnly: action.payload };
-    case "SET_CREATE_MODAL":
+    case 'SET_CREATE_MODAL':
       return { ...state, createModalOpen: action.payload };
-    case "SET_DELETE_MODAL":
+    case 'SET_DELETE_MODAL':
       return { ...state, deleteModalOpen: action.payload };
-    case "SET_CURRENT_EDIT_MODEL":
+    case 'SET_CURRENT_EDIT_MODEL':
       return { ...state, currentEditModel: action.payload };
-    case "RESET_STATE":
+    case 'RESET_STATE':
       return initialState;
     default:
       return state;
@@ -135,34 +135,34 @@ export const ModelProvider: React.FC<ModelProviderProps> = ({ children }) => {
   const actions = useMemo(
     () => ({
       setModels: (models: ModelInfo[]): void =>
-        dispatch({ type: "SET_MODELS", payload: models }),
+        dispatch({ type: 'SET_MODELS', payload: models }),
       setCategoryList: (categories: CategoryNode[]): void =>
-        dispatch({ type: "SET_CATEGORY_LIST", payload: categories }),
+        dispatch({ type: 'SET_CATEGORY_LIST', payload: categories }),
       setLoading: (loading: boolean): void =>
-        dispatch({ type: "SET_LOADING", payload: loading }),
+        dispatch({ type: 'SET_LOADING', payload: loading }),
       setShelfOffModels: (models: ModelInfo[]): void =>
-        dispatch({ type: "SET_SHELF_OFF_MODELS", payload: models }),
+        dispatch({ type: 'SET_SHELF_OFF_MODELS', payload: models }),
       setCheckedLeaves: (leaves: CategoryNode[]): void =>
-        dispatch({ type: "SET_CHECKED_LEAVES", payload: leaves }),
+        dispatch({ type: 'SET_CHECKED_LEAVES', payload: leaves }),
       setContextLength: (length?: number): void =>
-        dispatch({ type: "SET_CONTEXT_LENGTH", payload: length }),
+        dispatch({ type: 'SET_CONTEXT_LENGTH', payload: length }),
       setContextMaxLength: (length: number): void =>
-        dispatch({ type: "SET_CONTEXT_MAX_LENGTH", payload: length }),
+        dispatch({ type: 'SET_CONTEXT_MAX_LENGTH', payload: length }),
       setSearchInput: (input: string): void =>
-        dispatch({ type: "SET_SEARCH_INPUT", payload: input }),
+        dispatch({ type: 'SET_SEARCH_INPUT', payload: input }),
       setFilterType: (type: number): void =>
-        dispatch({ type: "SET_FILTER_TYPE", payload: type }),
+        dispatch({ type: 'SET_FILTER_TYPE', payload: type }),
       setShowShelfOnly: (show: boolean): void =>
-        dispatch({ type: "SET_SHOW_SHELF_ONLY", payload: show }),
+        dispatch({ type: 'SET_SHOW_SHELF_ONLY', payload: show }),
       setCreateModal: (open: boolean): void =>
-        dispatch({ type: "SET_CREATE_MODAL", payload: open }),
+        dispatch({ type: 'SET_CREATE_MODAL', payload: open }),
       setDeleteModal: (open: boolean): void =>
-        dispatch({ type: "SET_DELETE_MODAL", payload: open }),
+        dispatch({ type: 'SET_DELETE_MODAL', payload: open }),
       setCurrentEditModel: (model?: ModelInfo): void =>
-        dispatch({ type: "SET_CURRENT_EDIT_MODEL", payload: model }),
-      resetState: (): void => dispatch({ type: "RESET_STATE" }),
+        dispatch({ type: 'SET_CURRENT_EDIT_MODEL', payload: model }),
+      resetState: (): void => dispatch({ type: 'RESET_STATE' }),
     }),
-    [],
+    []
   );
 
   const value = useMemo(
@@ -170,7 +170,7 @@ export const ModelProvider: React.FC<ModelProviderProps> = ({ children }) => {
       state,
       actions,
     }),
-    [state, actions],
+    [state, actions]
   );
 
   return (
@@ -182,7 +182,7 @@ export const ModelProvider: React.FC<ModelProviderProps> = ({ children }) => {
 export const useModelContext = (): ModelContextValue => {
   const context = useContext(ModelContext);
   if (context === undefined) {
-    throw new Error("useModelContext must be used within a ModelProvider");
+    throw new Error('useModelContext must be used within a ModelProvider');
   }
   return context;
 };

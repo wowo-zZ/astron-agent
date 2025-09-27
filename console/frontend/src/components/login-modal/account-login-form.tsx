@@ -1,5 +1,5 @@
-import React, { ReactElement } from "react";
-import { Form, Input } from "antd";
+import React, { ReactElement } from 'react';
+import { Form, Input } from 'antd';
 
 interface AccountLoginFormProps {
   disabled?: boolean;
@@ -13,7 +13,7 @@ const AccountLoginForm = ({
       <Form.Item
         name="username"
         label="账号"
-        rules={[{ required: true, message: "请输入账号" }]}
+        rules={[{ required: true, message: '请输入账号' }]}
         className="mb-4"
       >
         <Input
@@ -27,7 +27,7 @@ const AccountLoginForm = ({
       <Form.Item
         name="password"
         label="密码"
-        rules={[{ required: true, message: "请输入密码" }]}
+        rules={[{ required: true, message: '请输入密码' }]}
         className="mb-4"
       >
         <Input.Password

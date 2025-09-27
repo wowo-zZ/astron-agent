@@ -1,17 +1,17 @@
-import React, { useEffect, useState, useRef, memo } from "react";
-import { Tooltip, Slider, Switch } from "antd";
-import { useMemoizedFn } from "ahooks";
-import { FlowInputNumber } from "@/components/workflow/ui";
-import { useTranslation } from "react-i18next";
+import React, { useEffect, useState, useRef, memo } from 'react';
+import { Tooltip, Slider, Switch } from 'antd';
+import { useMemoizedFn } from 'ahooks';
+import { FlowInputNumber } from '@/components/workflow/ui';
+import { useTranslation } from 'react-i18next';
 
-import debuggerIcon from "@/assets/imgs/workflow/debugger-icon.png";
-import close from "@/assets/imgs/workflow/modal-close.png";
-import questionMark from "@/assets/imgs/common/questionmark.png";
+import debuggerIcon from '@/assets/imgs/workflow/debugger-icon.png';
+import close from '@/assets/imgs/workflow/modal-close.png';
+import questionMark from '@/assets/imgs/common/questionmark.png';
 
 // ----------------- hooks -----------------
 function useClickOutside(
   ref: React.RefObject<HTMLDivElement>,
-  onClose: () => void,
+  onClose: () => void
 ): void | (() => void) {
   useEffect(() => {
     function handleClick(e: MouseEvent): void {
@@ -19,8 +19,8 @@ function useClickOutside(
         onClose();
       }
     }
-    document.body.addEventListener("click", handleClick);
-    return (): void => document.body.removeEventListener("click", handleClick);
+    document.body.addEventListener('click', handleClick);
+    return (): void => document.body.removeEventListener('click', handleClick);
   }, [ref, onClose]);
 }
 
@@ -34,22 +34,22 @@ function useConfigs(currentSelectModel, setConfigs): void {
           currentSelectModel?.config?.serviceBlock?.[
             currentSelectModel.serviceId
           ]?.[0]?.fields ||
-          currentSelectModel?.config?.serviceBlock?.["@@serviceId@@"]?.[0]
+          currentSelectModel?.config?.serviceBlock?.['@@serviceId@@']?.[0]
             ?.fields ||
           [];
-        configs.forEach((item) => {
-          if (item.key === "max_tokens") item.key = "maxTokens";
-          if (item.key === "top_k") item.key = "topK";
-          if (item.key === "search_disable") item.key = "searchDisable";
+        configs.forEach(item => {
+          if (item.key === 'max_tokens') item.key = 'maxTokens';
+          if (item.key === 'top_k') item.key = 'topK';
+          if (item.key === 'search_disable') item.key = 'searchDisable';
         });
         setConfigs(configs);
       } else {
-        const configs = JSON.parse(currentSelectModel?.config || "[]")?.map(
-          (item) => ({
+        const configs = JSON.parse(currentSelectModel?.config || '[]')?.map(
+          item => ({
             ...item,
             desc: item?.name,
             name: item?.key,
-          }),
+          })
         );
         setConfigs(configs);
       }
@@ -75,10 +75,10 @@ function ParamSwitch({
           ? nodeParam?.extraParams?.[item.key]
           : !nodeParam[item.key]
       }
-      onChange={(val) =>
+      onChange={val =>
         handleChangeNodeParam(
           (data, v) => handleDifferentModel(data, item, v),
-          currentSelectModel?.llmSource === 0 ? val : !val,
+          currentSelectModel?.llmSource === 0 ? val : !val
         )
       }
     />
@@ -101,20 +101,20 @@ function ParamRange({
         step={item?.precision || 1}
         value={value}
         className="flex-1 config-slider nodrag"
-        onChange={(val) =>
+        onChange={val =>
           handleChangeNodeParam(
             (data, v) => handleDifferentModel(data, item, v),
-            val,
+            val
           )
         }
       />
       <FlowInputNumber
         className="global-inputnumber-center ml-[18px] pt-1.5 pl-0.5 w-[60px] text-center nodrag"
         value={value}
-        onChange={(val) =>
+        onChange={val =>
           handleChangeNodeParam(
             (data, v) => handleDifferentModel(data, item, v),
-            val,
+            val
           )
         }
         onBlur={() => {
@@ -123,14 +123,14 @@ function ParamRange({
             nodeParam?.extraParams?.[item.key] === null
           ) {
             handleChangeNodeParam(
-              (data) => (data.nodeParam.extraParams[item.key] = item.default),
-              item.default,
+              data => (data.nodeParam.extraParams[item.key] = item.default),
+              item.default
             );
           }
           if (nodeParam?.[item.key] === null) {
             handleChangeNodeParam(
-              (data) => (data.nodeParam[item.key] = item.default),
-              item.default,
+              data => (data.nodeParam[item.key] = item.default),
+              item.default
             );
           }
         }}
@@ -164,7 +164,7 @@ function ParamItem({
             </Tooltip>
           )}
         </div>
-        {item.constraintType === "switch" && (
+        {item.constraintType === 'switch' && (
           <ParamSwitch
             {...{
               item,
@@ -176,7 +176,7 @@ function ParamItem({
           />
         )}
       </div>
-      {item.constraintType === "range" && (
+      {item.constraintType === 'range' && (
         <ParamRange
           {...{ item, nodeParam, handleChangeNodeParam, handleDifferentModel }}
         />
@@ -217,22 +217,22 @@ function ModelParams({
       className="absolute right-[-3px] top-8 border border-[#f5f7fc] bg-[#fff] rounded-lg p-4"
       style={{
         zIndex: 100,
-        width: "calc(100% - 4px)",
-        boxShadow: "0px 4px 10px 0px rgba(0, 0, 0, 0.3)",
+        width: 'calc(100% - 4px)',
+        boxShadow: '0px 4px 10px 0px rgba(0, 0, 0, 0.3)',
       }}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <img src={debuggerIcon} className="w-3 h-3" alt="" />
           <span className="font-medium text-base">
-            {t("workflow.nodes.modelSelect.modelParamsSettings")}
+            {t('workflow.nodes.modelSelect.modelParamsSettings')}
           </span>
         </div>
         <img
           src={close}
           className="w-3 h-3 cursor-pointer"
           alt=""
-          onClick={(e) => {
+          onClick={e => {
             e.stopPropagation();
             setShowModelParmas(false);
           }}
@@ -241,7 +241,7 @@ function ModelParams({
       <div className="flex flex-col gap-2 w-full text-second font-medium mt-4">
         {configs
           ?.filter((item: unknown) =>
-            ["range", "switch"].includes(item.constraintType),
+            ['range', 'switch'].includes(item.constraintType)
           )
           ?.map((item: unknown, index) => (
             <ParamItem

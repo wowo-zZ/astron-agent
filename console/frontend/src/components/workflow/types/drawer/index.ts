@@ -10,7 +10,7 @@ export type {
   VoiceBroadcastInstance,
   DeepPartial,
   AdvancedConfigUpdate,
-} from "./advanced-config";
+} from './advanced-config';
 
 // Chat Debugger 相关类型
 export type {
@@ -79,4 +79,4 @@ export type {
   PositionType,
   NewNodeType,
   IFlyCollectorType,
-} from "./chat-debugger";
+} from './chat-debugger';

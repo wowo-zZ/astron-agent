@@ -1,13 +1,13 @@
-import React, { memo } from "react";
+import React, { memo } from 'react';
 import {
   NodeWrapper,
   NodeHeader,
   NodeContent,
   IteratorChildNode,
-} from "@/components/workflow/nodes/node-common";
-import { useNodeCommon } from "@/components/workflow/hooks/useNodeCommon";
+} from '@/components/workflow/nodes/node-common';
+import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
 
-const BaseNode = memo((props) => {
+const BaseNode = memo(props => {
   const { id, data } = props;
   const { isIteratorChildNode } = useNodeCommon({ id, data });
 

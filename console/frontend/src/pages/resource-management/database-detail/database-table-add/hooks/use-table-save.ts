@@ -1,12 +1,12 @@
-import { useCallback } from "react";
-import { useTranslation } from "react-i18next";
-import { useParams, useNavigate } from "react-router-dom";
-import { message, Modal } from "antd";
-import { cloneDeep } from "lodash";
-import { createTable, updateTable, tableList } from "@/services/database";
-import { useTableAddContext } from "../context/table-add-context";
-import { useTableImportOps } from "./use-table-import-ops";
-import { TableField, OperateType } from "@/types/database";
+import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useParams, useNavigate } from 'react-router-dom';
+import { message, Modal } from 'antd';
+import { cloneDeep } from 'lodash';
+import { createTable, updateTable, tableList } from '@/services/database';
+import { useTableAddContext } from '../context/table-add-context';
+import { useTableImportOps } from './use-table-import-ops';
+import { TableField, OperateType } from '@/types/database';
 
 interface BaseFormValues {
   name: string;
@@ -17,7 +17,7 @@ interface BaseFormValues {
  * 表格保存Hook
  */
 export const useTableSave = (
-  handleUpdate?: () => void,
+  handleUpdate?: () => void
 ): {
   handleOk: () => void;
 } => {
@@ -33,7 +33,7 @@ export const useTableSave = (
       baseForm.validateFields().then((values: BaseFormValues) => {
         let passFlag = true;
 
-        state.dataSource?.forEach((item) => {
+        state.dataSource?.forEach(item => {
           if (!item.name || !item.description) {
             passFlag = false;
           }
@@ -56,7 +56,7 @@ export const useTableSave = (
         actions.setIsCheck(true);
 
         if (state.dataSource.length <= 3) {
-          message.warning(t("database.parameterError"));
+          message.warning(t('database.parameterError'));
           return;
         }
         const { name, description } = values;
@@ -68,18 +68,18 @@ export const useTableSave = (
           if (state.isModule) {
             const finalData = markOperationTypes(
               state.originTableData,
-              tempData,
+              tempData
             );
             fields = finalData;
           } else {
-            fields = tempData.map((it) => {
+            fields = tempData.map(it => {
               it.id = 0;
               return it;
             });
           }
 
           if (state.dataSource.length > 20) {
-            message.error(t("database.fieldCountExceeded"));
+            message.error(t('database.fieldCountExceeded'));
             return;
           }
 
@@ -98,19 +98,19 @@ export const useTableSave = (
             const isModify = fields.some(
               (it: TableField) =>
                 it.operateType === OperateType.ADD ||
-                it.operateType === OperateType.DELETE,
+                it.operateType === OperateType.DELETE
             );
 
             if (isModify) {
               Modal.confirm({
-                title: t("database.tip"),
-                content: t("database.confirmModifyTableStructure"),
+                title: t('database.tip'),
+                content: t('database.confirmModifyTableStructure'),
                 centered: true,
                 onOk: async () => {
                   try {
                     await serviceFunc(params);
                     actions.setSaveLoading(false);
-                    message.success(t("database.saveSuccess"));
+                    message.success(t('database.saveSuccess'));
                     handleUpdate?.();
                   } catch (error) {
                     actions.setSaveLoading(false);
@@ -123,7 +123,7 @@ export const useTableSave = (
             } else {
               await serviceFunc(params);
               actions.setSaveLoading(false);
-              message.success(t("database.saveSuccess"));
+              message.success(t('database.saveSuccess'));
               handleUpdate?.();
             }
           } else {
@@ -132,13 +132,13 @@ export const useTableSave = (
             });
 
             if (tables.length >= 20) {
-              message.error(t("database.tableCountExceeded"));
+              message.error(t('database.tableCountExceeded'));
               actions.setSaveLoading(false);
               return;
             }
 
             await serviceFunc(params);
-            message.success(t("database.saveSuccess"));
+            message.success(t('database.saveSuccess'));
             actions.setSaveLoading(false);
             navigate(-1);
           }
@@ -147,7 +147,7 @@ export const useTableSave = (
         }
       })
       .catch(() => {
-        message.warning(t("database.parameterError"));
+        message.warning(t('database.parameterError'));
       });
   }, [
     handleCheckTableParams,

@@ -1,16 +1,16 @@
-import React, { useState, useMemo, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Input, Button, message } from "antd";
+import React, { useState, useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Input, Button, message } from 'antd';
 
 import EnterpriseCertificationCard, {
   CertificationStatus,
-} from "../enterprise-certification-card";
-import { useTranslation } from "react-i18next";
+} from '../enterprise-certification-card';
+import { useTranslation } from 'react-i18next';
 
-import styles from "./index.module.scss";
+import styles from './index.module.scss';
 
-import useEnterpriseStore from "@/store/enterprise-store";
-import eventBus from "@/utils/event-bus";
+import useEnterpriseStore from '@/store/enterprise-store';
+import eventBus from '@/utils/event-bus';
 
 const TeamInfo = () => {
   const { t } = useTranslation();
@@ -33,16 +33,16 @@ const TeamInfo = () => {
 
   const orderTypes = [
     {
-      type: "团队版",
-      text: t("sidebar.orderTypes.team"),
-      icon: require("@/assets/imgs/trace/trace-team.svg"),
-      alt: t("sidebar.orderTypes.team"),
+      type: '团队版',
+      text: t('sidebar.orderTypes.team'),
+      icon: require('@/assets/imgs/trace/trace-team.svg'),
+      alt: t('sidebar.orderTypes.team'),
     },
     {
-      type: "企业版",
-      text: t("sidebar.orderTypes.enterprise"),
-      icon: require("@/assets/imgs/trace/trace-enterprise.svg"),
-      alt: t("sidebar.orderTypes.enterprise"),
+      type: '企业版',
+      text: t('sidebar.orderTypes.enterprise'),
+      icon: require('@/assets/imgs/trace/trace-enterprise.svg'),
+      alt: t('sidebar.orderTypes.enterprise'),
     },
   ];
 
@@ -51,15 +51,15 @@ const TeamInfo = () => {
     useState<CertificationStatus>(
       certificationType
         ? CertificationStatus.CERTIFIED
-        : CertificationStatus.NOT_CERTIFIED,
+        : CertificationStatus.NOT_CERTIFIED
     );
 
   // 处理升级企业认证
   const handleUpgradeEnterprise = () => {
-    console.log("升级企业认证");
+    console.log('升级企业认证');
     // 模拟升级成功后更新状态
     setCertificationStatus(CertificationStatus.CERTIFIED);
-    message.success("企业认证升级成功！");
+    message.success('企业认证升级成功！');
   };
 
   const currentOrder = useMemo(() => {
@@ -72,8 +72,8 @@ const TeamInfo = () => {
 
   // 立即续费
   const handleRenew = () => {
-    console.log("立即续费");
-    eventBus.emit("showComboModal");
+    console.log('立即续费');
+    eventBus.emit('showComboModal');
   };
 
   return (

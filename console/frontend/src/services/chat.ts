@@ -4,9 +4,9 @@ import {
   ChatHistoryResponse,
   RtasrTokenResponse,
   WebBotInfo,
-} from "@/types/chat";
-import http from "@/utils/http";
-import type { AxiosResponse } from "axios";
+} from '@/types/chat';
+import http from '@/utils/http';
+import type { AxiosResponse } from 'axios';
 
 /**
  * 获取智能体
@@ -16,10 +16,10 @@ import type { AxiosResponse } from "axios";
  */
 export async function getBotInfoApi(
   botId: number,
-  workflowVersion?: string,
+  workflowVersion?: string
 ): Promise<BotInfoType> {
   return http.get(
-    `/chat-list/v1/get-bot-info?botId=${botId}&workflowVersion=${workflowVersion}`,
+    `/chat-list/v1/get-bot-info?botId=${botId}&workflowVersion=${workflowVersion}`
   );
 }
 
@@ -29,7 +29,7 @@ export async function getBotInfoApi(
  * @returns
  */
 export async function getWorkflowBotInfoApi(
-  botId: number,
+  botId: number
 ): Promise<WebBotInfo> {
   return http.get(`/workflow/web/info?botId=${botId}`);
 }
@@ -40,7 +40,7 @@ export async function getWorkflowBotInfoApi(
  * @returns
  */
 export async function getChatHistory(
-  chatId: number,
+  chatId: number
 ): Promise<ChatHistoryResponse[]> {
   return http.get(`/chat-history/all/${chatId}`);
 }
@@ -50,7 +50,7 @@ export async function getChatHistory(
  * @returns
  */
 export async function postChatList(): Promise<BotInfoType[]> {
-  return http.post("/chat-list/all-chat-list");
+  return http.post('/chat-list/all-chat-list');
 }
 
 /**
@@ -79,7 +79,7 @@ export async function postStopChat(streamId: string): Promise<AxiosResponse> {
  */
 export async function clearChatList(
   chatId: number,
-  botId: number,
+  botId: number
 ): Promise<{ id: number }> {
   return http.get(`/chat-message/clear?chatId=${chatId}&botId=${botId}`);
 }
@@ -90,9 +90,9 @@ export async function clearChatList(
  * @returns
  */
 export async function postCreateChat(
-  botId: number,
+  botId: number
 ): Promise<CreateChatResponse> {
-  return http.post("/chat-list/v1/create-chat-list", { botId });
+  return http.post('/chat-list/v1/create-chat-list', { botId });
 }
 
 export const deleteChatList = (params: any) => {
@@ -103,7 +103,7 @@ export const deleteChatList = (params: any) => {
  * @returns
  */
 export async function getRtasrToken(): Promise<RtasrTokenResponse> {
-  return http.post("/rtasr/rtasr-sign");
+  return http.post('/rtasr/rtasr-sign');
 }
 
 /**
@@ -115,12 +115,12 @@ export const getShareAgentKey = (params: {
   relateType: number;
   relateId: number;
 }): Promise<{ shareAgentKey: string }> => {
-  return http.post("/share/get-share-key", params);
+  return http.post('/share/get-share-key', params);
 };
 
 /**根据分享key  创建会话 */
 export const createChatByShareKey = (params: {
   shareAgentKey: string;
 }): Promise<{ id: number }> => {
-  return http.post("/share/add-shared-agent", params);
+  return http.post('/share/add-shared-agent', params);
 };

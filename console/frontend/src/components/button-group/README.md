@@ -14,10 +14,10 @@ ButtonGroup 和 SpaceButton 是一套基于权限控制的按钮组件，专为�
 
 ```typescript
 // 导入按钮组（推荐）
-import ButtonGroup from "@/components/space/ButtonGroup";
+import ButtonGroup from '@/components/space/ButtonGroup';
 
 // 单独导入组件
-import { SpaceButton } from "@/components/space/ButtonGroup";
+import { SpaceButton } from '@/components/space/ButtonGroup';
 
 // 导入类型定义
 import type {
@@ -25,7 +25,7 @@ import type {
   UserRole,
   ButtonGroupProps,
   PermissionConfig,
-} from "@/components/space/ButtonGroup";
+} from '@/components/space/ButtonGroup';
 
 // 导入权限枚举
 import {
@@ -33,7 +33,7 @@ import {
   RoleType,
   ModuleType,
   OperationType,
-} from "@/components/space/ButtonGroup";
+} from '@/components/space/ButtonGroup';
 ```
 
 ## 基础用法
@@ -286,12 +286,12 @@ const SingleButton = () => {
 ### 3. 权限配置示例
 
 ```typescript
-import { PermissionFailureBehavior } from "@/components/ButtonGroup";
+import { PermissionFailureBehavior } from '@/components/ButtonGroup';
 
 const buttons = [
   {
-    key: "edit",
-    text: "编辑",
+    key: 'edit',
+    text: '编辑',
     // 基础模块权限 - 无权限时隐藏（默认行为）
     permission: {
       module: ModuleType.AGENT_MANAGEMENT,
@@ -299,8 +299,8 @@ const buttons = [
     },
   },
   {
-    key: "share",
-    text: "分享",
+    key: 'share',
+    text: '分享',
     // 无权限时禁用而不是隐藏
     permission: {
       module: ModuleType.AGENT_MANAGEMENT,
@@ -309,8 +309,8 @@ const buttons = [
     },
   },
   {
-    key: "delete",
-    text: "删除",
+    key: 'delete',
+    text: '删除',
     // 资源权限 + 所有者检查 - 无权限时隐藏
     permission: {
       module: ModuleType.AGENT_MANAGEMENT,
@@ -321,11 +321,11 @@ const buttons = [
     },
   },
   {
-    key: "superAdmin",
-    text: "超级管理",
+    key: 'superAdmin',
+    text: '超级管理',
     // 自定义权限检查 - 无权限时禁用
     permission: {
-      customCheck: (userRole) => userRole.roleType === RoleType.SUPER_ADMIN,
+      customCheck: userRole => userRole.roleType === RoleType.SUPER_ADMIN,
       failureBehavior: PermissionFailureBehavior.DISABLE,
     },
   },
@@ -370,8 +370,8 @@ const buttons = [
 // ✅ 推荐：清晰的权限配置
 const buttons = [
   {
-    key: "edit",
-    text: "编辑",
+    key: 'edit',
+    text: '编辑',
     permission: {
       module: ModuleType.AGENT_MANAGEMENT,
       operation: OperationType.UPDATE,
@@ -382,9 +382,9 @@ const buttons = [
 // ❌ 不推荐：混合权限逻辑
 const buttons = [
   {
-    key: "edit",
-    text: "编辑",
-    visible: (userRole) => {
+    key: 'edit',
+    text: '编辑',
+    visible: userRole => {
       // 复杂的权限逻辑应该放在 permission.customCheck 中
       return userRole.roleType === RoleType.ADMIN && hasOtherPermission();
     },

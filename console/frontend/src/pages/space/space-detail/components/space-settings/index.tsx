@@ -1,13 +1,13 @@
-import React, { useState, useCallback, useMemo } from "react";
-import { Button, Card, message } from "antd";
+import React, { useState, useCallback, useMemo } from 'react';
+import { Button, Card, message } from 'antd';
 
-import TransferOwnershipModal from "@/components/space/transfer-ownership-modal";
-import DeleteSpaceModal from "@/components/space/delete-space-modal";
-import styles from "./index.module.scss";
-import useSpaceStore from "@/store/space-store";
-import LeaveSpaceModal from "@/components/space/leave-space-modal";
-import { usePermissions } from "@/hooks/use-permissions";
-import { ModuleType, OperationType } from "@/permissions/permission-type";
+import TransferOwnershipModal from '@/components/space/transfer-ownership-modal';
+import DeleteSpaceModal from '@/components/space/delete-space-modal';
+import styles from './index.module.scss';
+import useSpaceStore from '@/store/space-store';
+import LeaveSpaceModal from '@/components/space/leave-space-modal';
+import { usePermissions } from '@/hooks/use-permissions';
+import { ModuleType, OperationType } from '@/permissions/permission-type';
 
 interface SpaceInfo {
   id: string;
@@ -26,11 +26,11 @@ const SpaceSettings: React.FC<{
   const getTextConfig = (userRole: number) => {
     const isOwner = userRole === 1;
     return {
-      deleteSpace: isOwner ? "删除空间" : "离开空间",
+      deleteSpace: isOwner ? '删除空间' : '离开空间',
       deleteDescription: isOwner
-        ? "空间删除后所有资产将无法恢复，请谨慎操作"
-        : "退出空间后将无法访问空间内容，需要重新邀请才能加入",
-      deleteButtonText: isOwner ? "删除空间" : "离开空间",
+        ? '空间删除后所有资产将无法恢复，请谨慎操作'
+        : '退出空间后将无法访问空间内容，需要重新邀请才能加入',
+      deleteButtonText: isOwner ? '删除空间' : '离开空间',
     };
   };
 
@@ -53,12 +53,12 @@ const SpaceSettings: React.FC<{
 
   const handleTransferModalSubmit = useCallback((values: any) => {
     try {
-      console.log("转让所有权:", values);
-      message.success("转让所有权成功");
+      console.log('转让所有权:', values);
+      message.success('转让所有权成功');
       setShowTransferModal(false);
     } catch (error) {
-      message.error("转让所有权失败");
-      console.error("转让所有权失败", error);
+      message.error('转让所有权失败');
+      console.error('转让所有权失败', error);
     }
   }, []);
 
@@ -81,15 +81,15 @@ const SpaceSettings: React.FC<{
   }, []);
 
   const handleDeleteModalSubmit = useCallback((values: any) => {
-    console.log(values, "------------ handleDeleteModalSubmit -----------");
+    console.log(values, '------------ handleDeleteModalSubmit -----------');
   }, []);
 
   const showTransferBtn = useMemo(() => {
     return (
-      spaceType === "team" &&
+      spaceType === 'team' &&
       permissionsUtils?.checks.hasModulePermission(
         ModuleType.SPACE,
-        OperationType.SPACE_TRANSFER,
+        OperationType.SPACE_TRANSFER
       )
     );
   }, [spaceType, permissionsUtils]);
@@ -97,7 +97,7 @@ const SpaceSettings: React.FC<{
   const showDeleteBtn = useMemo(() => {
     return permissionsUtils?.checks.hasModulePermission(
       ModuleType.SPACE,
-      OperationType.SPACE_DELETE,
+      OperationType.SPACE_DELETE
     );
   }, [spaceType, permissionsUtils]);
 

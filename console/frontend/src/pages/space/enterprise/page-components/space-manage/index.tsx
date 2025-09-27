@@ -1,21 +1,21 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
-import { Input, message } from "antd";
-import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
-import classNames from "classnames";
-import { useDebounceFn } from "ahooks";
-import SpaceButton from "@/components/button-group/space-button";
+import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { Input, message } from 'antd';
+import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
+import classNames from 'classnames';
+import { useDebounceFn } from 'ahooks';
+import SpaceButton from '@/components/button-group/space-button';
 
-import SpaceSearch from "@/components/space/space-search";
-import SpaceList from "@/components/space/space-list";
-import SpaceModal from "@/components/space/space-modal";
-import SpaceTab from "@/components/space/space-tab";
+import SpaceSearch from '@/components/space/space-search';
+import SpaceList from '@/components/space/space-list';
+import SpaceModal from '@/components/space/space-modal';
+import SpaceTab from '@/components/space/space-tab';
 
-import styles from "./index.module.scss";
-import { ModuleType, OperationType } from "@/permissions/permission-type";
+import styles from './index.module.scss';
+import { ModuleType, OperationType } from '@/permissions/permission-type';
 
-import { getAllCorporateList, getJoinedCorporateList } from "@/services/space";
-import { useEnterprise } from "@/hooks/use-enterprise";
+import { getAllCorporateList, getJoinedCorporateList } from '@/services/space';
+import { useEnterprise } from '@/hooks/use-enterprise';
 
 interface SpaceItem {
   id: string;
@@ -30,8 +30,8 @@ interface SpaceItem {
 
 const SpaceManage: React.FC = () => {
   const navigate = useNavigate();
-  const activeTabRef = useRef<string>("all");
-  const [searchValue, setSearchValue] = useState<string>("");
+  const activeTabRef = useRef<string>('all');
+  const [searchValue, setSearchValue] = useState<string>('');
   const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
   const [spaceList, setSpaceList] = useState<SpaceItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -55,12 +55,12 @@ const SpaceManage: React.FC = () => {
       ]({ name });
       console.log(
         res,
-        `========== getSpaceList(${activeTabRef.current}) ==========`,
+        `========== getSpaceList(${activeTabRef.current}) ==========`
       );
       setSpaceList(res.data);
     } catch (err: any) {
-      console.log(err, "========== getSpaceList error ==========");
-      message.error(err?.msg || err?.desc || "查询失败");
+      console.log(err, '========== getSpaceList error ==========');
+      message.error(err?.msg || err?.desc || '查询失败');
     } finally {
       setLoading(false);
     }
@@ -68,7 +68,7 @@ const SpaceManage: React.FC = () => {
 
   const handleTabChange = (key: string) => {
     activeTabRef.current = key;
-    setSearchValue("");
+    setSearchValue('');
     querySpaceList();
   };
 
@@ -76,12 +76,12 @@ const SpaceManage: React.FC = () => {
   const { run: debouncedSearch } = useDebounceFn(
     (value: string) => {
       setSearchValue(value);
-      console.log("搜索关键词:", value);
+      console.log('搜索关键词:', value);
       querySpaceList(value);
     },
     {
       wait: 500,
-    },
+    }
   );
 
   const handleSearch = useCallback(
@@ -90,14 +90,14 @@ const SpaceManage: React.FC = () => {
       setSearchValue(value);
       debouncedSearch(value);
     },
-    [debouncedSearch],
+    [debouncedSearch]
   );
 
   const handleSearchSubmit = useCallback(
     (value: string) => {
       debouncedSearch(value);
     },
-    [debouncedSearch],
+    [debouncedSearch]
   );
 
   const handleCreateSpace = () => {
@@ -125,8 +125,8 @@ const SpaceManage: React.FC = () => {
           <div className={styles.tabs}>
             <SpaceTab
               options={[
-                { key: "all", label: "全部空间" },
-                { key: "my", label: "我的空间" },
+                { key: 'all', label: '全部空间' },
+                { key: 'my', label: '我的空间' },
               ]}
               activeKey={activeTabRef.current}
               onChange={handleTabChange}
@@ -137,10 +137,10 @@ const SpaceManage: React.FC = () => {
           <div className={styles.actions}>
             <SpaceButton
               config={{
-                key: "create-space",
-                text: "创建空间",
+                key: 'create-space',
+                text: '创建空间',
                 icon: <PlusOutlined />,
-                type: "primary",
+                type: 'primary',
                 permission: {
                   module: ModuleType.SPACE,
                   operation: OperationType.CREATE,
@@ -152,7 +152,7 @@ const SpaceManage: React.FC = () => {
             />
             <SpaceSearch
               value={searchValue}
-              style={{ borderColor: "#E4EAFF" }}
+              style={{ borderColor: '#E4EAFF' }}
               placeholder="搜索你感兴趣的空间"
               onChange={handleSearch}
               onSearch={handleSearchSubmit}

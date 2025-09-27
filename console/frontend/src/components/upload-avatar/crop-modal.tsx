@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { Modal, message } from "antd";
-import Cropper from "react-easy-crop";
-import { uploadFile } from "@/utils/utils";
-import useUserStore from "@/store/user-store";
+import React, { useState } from 'react';
+import { Modal, message } from 'antd';
+import Cropper from 'react-easy-crop';
+import { uploadFile } from '@/utils/utils';
+import useUserStore from '@/store/user-store';
 
 interface CropModalProps {
   visible: boolean;
@@ -31,14 +31,14 @@ const CropModal: React.FC<CropModalProps> = ({
   };
 
   const onCropComplete = (_croppedArea: any, croppedAreaPixels: any) => {
-    if (typeof window === "undefined") return;
+    if (typeof window === 'undefined') return;
     const image = new window.Image();
-    image.src = uploadedSrc || "";
+    image.src = uploadedSrc || '';
     image.onload = () => {
-      const canvas = document.createElement("canvas");
+      const canvas = document.createElement('canvas');
       canvas.width = croppedAreaPixels.width;
       canvas.height = croppedAreaPixels.height;
-      const ctx = canvas.getContext("2d");
+      const ctx = canvas.getContext('2d');
       ctx &&
         ctx.drawImage(
           image,
@@ -49,21 +49,21 @@ const CropModal: React.FC<CropModalProps> = ({
           0,
           0,
           croppedAreaPixels.width,
-          croppedAreaPixels.height,
+          croppedAreaPixels.height
         );
       canvas.toBlob(
-        (blob) => {
+        blob => {
           const res = new FormData();
           if (!flag) {
-            blob && res.append("file", blob, "cropped-image.jpeg");
+            blob && res.append('file', blob, 'cropped-image.jpeg');
           } else {
-            blob && res.append("avatar", blob, "cropped-image.jpeg");
-            res.append("nickname", userInfo.nickname);
+            blob && res.append('avatar', blob, 'cropped-image.jpeg');
+            res.append('nickname', userInfo.nickname);
           }
           setFormData(res);
         },
-        "image/jpeg",
-        1,
+        'image/jpeg',
+        1
       );
     };
   };
@@ -71,24 +71,24 @@ const CropModal: React.FC<CropModalProps> = ({
   // Convert FormData to File for upload
   const convertFormDataToFile = (formData: FormData): File | null => {
     const fileEntry =
-      (formData.get("file") as File) || (formData.get("avatar") as File);
+      (formData.get('file') as File) || (formData.get('avatar') as File);
     return fileEntry || null;
   };
 
   const handleOk = async () => {
     if (!formData) {
-      message.info("图片处理未完成，请稍候...");
+      message.info('图片处理未完成，请稍候...');
       return;
     }
 
     const file = convertFormDataToFile(formData);
     if (!file) {
-      message.error("无法获取图片文件");
+      message.error('无法获取图片文件');
       return;
     }
 
     try {
-      const result = await uploadFile(file, flag ? "avatar" : "space");
+      const result = await uploadFile(file, flag ? 'avatar' : 'space');
 
       if (flag) {
         // For user avatar upload
@@ -98,7 +98,7 @@ const CropModal: React.FC<CropModalProps> = ({
             avatar: result.url,
           },
         });
-        message.success("修改成功");
+        message.success('修改成功');
       } else {
         // For bot image upload
         if (setCoverUrl) {
@@ -107,7 +107,7 @@ const CropModal: React.FC<CropModalProps> = ({
       }
       handleCancel();
     } catch (error: any) {
-      message.error(error?.message || "上传失败");
+      message.error(error?.message || '上传失败');
     }
   };
 
@@ -125,9 +125,9 @@ const CropModal: React.FC<CropModalProps> = ({
       {uploadedSrc && (
         <div
           style={{
-            height: "500px",
-            overflow: "hidden",
-            position: "relative",
+            height: '500px',
+            overflow: 'hidden',
+            position: 'relative',
           }}
         >
           <Cropper

@@ -1,10 +1,10 @@
-import React, { useCallback } from "react";
-import { Select, Avatar, Button } from "antd";
-import { CloseOutlined } from "@ant-design/icons";
-import classNames from "classnames";
-import styles from "./index.module.scss";
-import { useSpaceI18n } from "@/pages/space/hooks/use-space-i18n";
-import defaultAvatar from "@/assets/imgs/space/creator.png";
+import React, { useCallback } from 'react';
+import { Select, Avatar, Button } from 'antd';
+import { CloseOutlined } from '@ant-design/icons';
+import classNames from 'classnames';
+import styles from './index.module.scss';
+import { useSpaceI18n } from '@/pages/space/hooks/use-space-i18n';
+import defaultAvatar from '@/assets/imgs/space/creator.png';
 
 const { Option } = Select;
 
@@ -29,7 +29,7 @@ const SelectedUserItem: React.FC<SelectedUserItemProps> = React.memo(
       (value: string) => {
         handleRoleChange(user.uid, value);
       },
-      [user.uid, handleRoleChange],
+      [user.uid, handleRoleChange]
     );
 
     const handleRemoveCallback = useCallback(() => {
@@ -50,8 +50,8 @@ const SelectedUserItem: React.FC<SelectedUserItemProps> = React.memo(
           popupMatchSelectWidth={false}
         >
           {memberRoleOptions
-            .filter((option) => option.value != null)
-            .map((option) => (
+            .filter(option => option.value != null)
+            .map(option => (
               <Option key={option.value} value={`${option.value}`}>
                 {option.label}
               </Option>
@@ -66,9 +66,9 @@ const SelectedUserItem: React.FC<SelectedUserItemProps> = React.memo(
         />
       </div>
     );
-  },
+  }
 );
 
-SelectedUserItem.displayName = "SelectedUserItem";
+SelectedUserItem.displayName = 'SelectedUserItem';
 
 export default SelectedUserItem;

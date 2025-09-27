@@ -1,17 +1,17 @@
-import React, { Suspense, JSX } from "react";
-import { Spin } from "antd";
-import { Routes, Route } from "react-router-dom";
+import React, { Suspense, JSX } from 'react';
+import { Spin } from 'antd';
+import { Routes, Route } from 'react-router-dom';
 
-const KnowledgePage = React.lazy(() => import("./knowledge-page"));
-const KnowledgeDetail = React.lazy(() => import("./knowledge-detail"));
-const UploadPage = React.lazy(() => import("./upload-page"));
-const PluginPage = React.lazy(() => import("./plugin-page"));
-const PluginDetail = React.lazy(() => import("./plugin-detail"));
-const PluginCreate = React.lazy(() => import("./plugin-create"));
-const DataBase = React.lazy(() => import("./database"));
-const DataBaseDetail = React.lazy(() => import("./database-detail"));
+const KnowledgePage = React.lazy(() => import('./knowledge-page'));
+const KnowledgeDetail = React.lazy(() => import('./knowledge-detail'));
+const UploadPage = React.lazy(() => import('./upload-page'));
+const PluginPage = React.lazy(() => import('./plugin-page'));
+const PluginDetail = React.lazy(() => import('./plugin-detail'));
+const PluginCreate = React.lazy(() => import('./plugin-create'));
+const DataBase = React.lazy(() => import('./database'));
+const DataBaseDetail = React.lazy(() => import('./database-detail'));
 const DataBaseTableAdd = React.lazy(
-  () => import("./database-detail/database-table-add"),
+  () => import('./database-detail/database-table-add')
 );
 
 function ResourceManagement(): JSX.Element {

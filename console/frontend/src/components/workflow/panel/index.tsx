@@ -1,29 +1,27 @@
-import React, { useState, useMemo, memo, useEffect } from "react";
-import { Panel, MiniMap } from "reactflow";
-import { Tooltip, Popover } from "antd";
-import { cloneDeep } from "lodash";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import dagre from "dagre";
-import { copyFlowAPI } from "@/services/flow";
-import { useMemoizedFn } from "ahooks";
-import { useTranslation } from "react-i18next";
-import { Icons } from "@/components/workflow/icons";
+import React, { useState, useMemo, memo, useEffect } from 'react';
+import { Panel, MiniMap } from 'reactflow';
+import { Tooltip, Popover } from 'antd';
+import { cloneDeep } from 'lodash';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import dagre from 'dagre';
+import { copyFlowAPI } from '@/services/flow';
+import { useMemoizedFn } from 'ahooks';
+import { useTranslation } from 'react-i18next';
+import { Icons } from '@/components/workflow/icons';
 
 // 计算布局
 function useFlowLayout(zoom): { optimizeLayout: () => void } {
-  const showIterativeModal = useFlowsManager(
-    (state) => state.showIterativeModal,
-  );
-  const currentStore = useFlowsManager((state) => state.getCurrentStore());
-  const nodes = currentStore((state) => state.nodes);
-  const edges = currentStore((state) => state.edges);
-  const setNodes = currentStore((state) => state.setNodes);
-  const setEdges = currentStore((state) => state.setEdges);
+  const showIterativeModal = useFlowsManager(state => state.showIterativeModal);
+  const currentStore = useFlowsManager(state => state.getCurrentStore());
+  const nodes = currentStore(state => state.nodes);
+  const edges = currentStore(state => state.edges);
+  const setNodes = currentStore(state => state.setNodes);
+  const setEdges = currentStore(state => state.setEdges);
 
-  const getNodeDimensions = useMemoizedFn((id) => {
+  const getNodeDimensions = useMemoizedFn(id => {
     const nodeElement = showIterativeModal
       ? document
-          .getElementById("iterator-flow-container")
+          .getElementById('iterator-flow-container')
           ?.querySelector(`[data-id="${id}"]`)
       : document.querySelector(`[data-id="${id}"]`);
     if (nodeElement) {
@@ -36,11 +34,11 @@ function useFlowLayout(zoom): { optimizeLayout: () => void } {
   const getLayoutedElements = useMemoizedFn((nodes, edges) => {
     const dagreGraph = new dagre.graphlib.Graph();
     dagreGraph.setDefaultEdgeLabel(() => ({}));
-    dagreGraph.setGraph({ rankdir: "LR", nodesep: 50, ranksep: 100 });
+    dagreGraph.setGraph({ rankdir: 'LR', nodesep: 50, ranksep: 100 });
 
     nodes
-      .filter((node) => showIterativeModal || !node?.data?.parentId)
-      .forEach((node) => {
+      .filter(node => showIterativeModal || !node?.data?.parentId)
+      .forEach(node => {
         const { width, height } = getNodeDimensions(node.id);
         dagreGraph.setNode(node.id, {
           width: width || 172,
@@ -48,15 +46,15 @@ function useFlowLayout(zoom): { optimizeLayout: () => void } {
         });
       });
 
-    edges.forEach((edge) => {
+    edges.forEach(edge => {
       dagreGraph.setEdge(edge.source, edge.target);
     });
 
     dagre.layout(dagreGraph);
 
     nodes
-      .filter((node) => showIterativeModal || !node?.data?.parentId)
-      .forEach((node) => {
+      .filter(node => showIterativeModal || !node?.data?.parentId)
+      .forEach(node => {
         const nodeWithPosition = dagreGraph.node(node.id);
         const scaleZoom = zoom / 100;
         node.position = {
@@ -83,24 +81,22 @@ function useFlowLayout(zoom): { optimizeLayout: () => void } {
 
 function ModeControls(): React.ReactElement {
   const { t } = useTranslation();
-  const controlMode = useFlowsManager((state) => state.controlMode);
-  const setControlMode = useFlowsManager((state) => state.setControlMode);
-  const showIterativeModal = useFlowsManager(
-    (state) => state.showIterativeModal,
-  );
+  const controlMode = useFlowsManager(state => state.controlMode);
+  const setControlMode = useFlowsManager(state => state.setControlMode);
+  const showIterativeModal = useFlowsManager(state => state.showIterativeModal);
   const [showControlMode, setShowControlMode] = useState(false);
   const [hoverControlMode, setHoverControlMode] = useState(false);
 
   useEffect((): void | (() => void) => {
     function clickOutside(event): void {
-      const dom = document.querySelector(".flow-mouser-mode-popover");
+      const dom = document.querySelector('.flow-mouser-mode-popover');
       if (dom && !dom.contains(event.target)) {
         setShowControlMode(false);
       }
     }
-    window.addEventListener("click", clickOutside);
+    window.addEventListener('click', clickOutside);
     return (): void => {
-      window.removeEventListener("click", clickOutside);
+      window.removeEventListener('click', clickOutside);
     };
   }, [showIterativeModal]);
 
@@ -112,20 +108,20 @@ function ModeControls(): React.ReactElement {
         <div className="flex gap-3 mt-3 relative">
           <div
             className={`w-[240px] flex flex-col items-center rounded-lg cursor-pointer h-[182px] control-mode-item ${
-              controlMode === "mouse" ? "active" : ""
+              controlMode === 'mouse' ? 'active' : ''
             }`}
             style={{
-              border: "1px solid #bcc0cc",
-              padding: "13px 0px 20px",
+              border: '1px solid #bcc0cc',
+              padding: '13px 0px 20px',
             }}
             onClick={() => {
-              setControlMode("mouse");
-              localStorage.setItem("controlMode", "mouse");
+              setControlMode('mouse');
+              localStorage.setItem('controlMode', 'mouse');
             }}
           >
             <img
               src={
-                controlMode === "mouse"
+                controlMode === 'mouse'
                   ? Icons.panel.mouseBigActive
                   : Icons.panel.mouseBig
               }
@@ -135,32 +131,32 @@ function ModeControls(): React.ReactElement {
             <h1
               className="mt-2"
               style={{
-                fontSize: "16px",
-                fontWeight: "600",
+                fontSize: '16px',
+                fontWeight: '600',
               }}
             >
-              {t("workflow.promptDebugger.mouseFriendlyMode")}
+              {t('workflow.promptDebugger.mouseFriendlyMode')}
             </h1>
             <p className="mt-1 px-3">
-              {t("workflow.promptDebugger.mouseFriendlyModeDescription")}
+              {t('workflow.promptDebugger.mouseFriendlyModeDescription')}
             </p>
           </div>
           <div
             className={`w-[240px] flex flex-col items-center rounded-lg cursor-pointer h-[182px] control-mode-item ${
-              controlMode === "touch" ? "active" : ""
+              controlMode === 'touch' ? 'active' : ''
             }`}
             style={{
-              border: "1px solid #bcc0cc",
-              padding: "13px 0px 20px",
+              border: '1px solid #bcc0cc',
+              padding: '13px 0px 20px',
             }}
             onClick={() => {
-              setControlMode("touch");
-              localStorage.setItem("controlMode", "touch");
+              setControlMode('touch');
+              localStorage.setItem('controlMode', 'touch');
             }}
           >
             <img
               src={
-                controlMode === "touch"
+                controlMode === 'touch'
                   ? Icons.panel.keyboardBigActive
                   : Icons.panel.keyboardBig
               }
@@ -170,37 +166,37 @@ function ModeControls(): React.ReactElement {
             <h1
               className="mt-2"
               style={{
-                fontSize: "16px",
-                fontWeight: "600",
+                fontSize: '16px',
+                fontWeight: '600',
               }}
             >
-              {t("workflow.promptDebugger.touchFriendlyMode")}
+              {t('workflow.promptDebugger.touchFriendlyMode')}
             </h1>
             <p className="mt-1 px-3 text-center">
-              {t("workflow.promptDebugger.touchFriendlyModeDescription")}
+              {t('workflow.promptDebugger.touchFriendlyModeDescription')}
             </p>
           </div>
         </div>
       }
       open={showControlMode}
-      title={t("workflow.promptDebugger.interactionMode")}
+      title={t('workflow.promptDebugger.interactionMode')}
       placement="topLeft"
     >
       <Tooltip
         title={
-          controlMode === "mouse"
-            ? t("workflow.promptDebugger.mouseFriendlyMode")
-            : t("workflow.promptDebugger.touchFriendlyMode")
+          controlMode === 'mouse'
+            ? t('workflow.promptDebugger.mouseFriendlyMode')
+            : t('workflow.promptDebugger.touchFriendlyMode')
         }
         open={hoverControlMode && !showControlMode}
       >
         <img
           src={
-            controlMode === "mouse" ? Icons.panel.mouse : Icons.panel.keyboard
+            controlMode === 'mouse' ? Icons.panel.mouse : Icons.panel.keyboard
           }
           className="w-5 h-5 cursor-pointer"
           alt=""
-          onClick={(e) => {
+          onClick={e => {
             e.stopPropagation();
             setShowControlMode(!showControlMode);
           }}
@@ -261,17 +257,17 @@ function FlowControls({
   handleRemarkNodeVisible,
 }): React.ReactElement {
   const { t } = useTranslation();
-  const canvasesDisabled = useFlowsManager((state) => state.canvasesDisabled);
-  const currentFlow = useFlowsManager((state) => state.currentFlow);
-  const edgeType = useFlowsManager((state) => state.edgeType);
-  const currentStore = useFlowsManager((state) => state.getCurrentStore());
+  const canvasesDisabled = useFlowsManager(state => state.canvasesDisabled);
+  const currentFlow = useFlowsManager(state => state.currentFlow);
+  const edgeType = useFlowsManager(state => state.edgeType);
+  const currentStore = useFlowsManager(state => state.getCurrentStore());
   const setClearFlowCanvasModalInfo = useFlowsManager(
-    (state) => state.setClearFlowCanvasModalInfo,
+    state => state.setClearFlowCanvasModalInfo
   );
-  const undo = currentStore((state) => state.undo);
+  const undo = currentStore(state => state.undo);
   return (
     <div className="flex items-center gap-4">
-      <Tooltip title={t("workflow.promptDebugger.locateInitialNode")}>
+      <Tooltip title={t('workflow.promptDebugger.locateInitialNode')}>
         <img
           src={Icons.panel.flowPosition}
           className="w-4 h-4 cursor-pointer"
@@ -280,7 +276,7 @@ function FlowControls({
         />
       </Tooltip>
       {!canvasesDisabled && (
-        <Tooltip title={t("workflow.promptDebugger.clearCanvas")}>
+        <Tooltip title={t('workflow.promptDebugger.clearCanvas')}>
           <img
             src={Icons.panel.flowClear}
             className="w-4 h-4 cursor-pointer"
@@ -290,7 +286,7 @@ function FlowControls({
         </Tooltip>
       )}
       {!canvasesDisabled && currentFlow?.publishedData && (
-        <Tooltip title={t("workflow.promptDebugger.restoreToOnlineVersion")}>
+        <Tooltip title={t('workflow.promptDebugger.restoreToOnlineVersion')}>
           <img
             src={Icons.panel.flowReduction}
             className="w-4 h-4 cursor-pointer"
@@ -300,7 +296,7 @@ function FlowControls({
         </Tooltip>
       )}
       {!canvasesDisabled && (
-        <Tooltip title={t("workflow.promptDebugger.createCopy")}>
+        <Tooltip title={t('workflow.promptDebugger.createCopy')}>
           <img
             src={Icons.panel.flowCopy}
             className="w-4 h-4 cursor-pointer"
@@ -309,7 +305,7 @@ function FlowControls({
           />
         </Tooltip>
       )}
-      <Tooltip title={t("workflow.promptDebugger.viewThumbnail")}>
+      <Tooltip title={t('workflow.promptDebugger.viewThumbnail')}>
         <img
           src={Icons.panel.flowAbbreviation}
           className="w-4 h-4 cursor-pointer"
@@ -317,7 +313,7 @@ function FlowControls({
           onClick={() => viewAbbreviation()}
         />
       </Tooltip>
-      <Tooltip title={t("workflow.promptDebugger.adaptiveView")}>
+      <Tooltip title={t('workflow.promptDebugger.adaptiveView')}>
         <img
           src={Icons.panel.flowAdaptive}
           className="w-4 h-4 cursor-pointer"
@@ -325,7 +321,7 @@ function FlowControls({
           onClick={() => viewAdaptive()}
         />
       </Tooltip>
-      <Tooltip title={t("workflow.promptDebugger.optimizeLayout")}>
+      <Tooltip title={t('workflow.promptDebugger.optimizeLayout')}>
         <img
           src={Icons.panel.flowOptimizeLayout}
           className="w-4 h-4 cursor-pointer"
@@ -335,31 +331,31 @@ function FlowControls({
       </Tooltip>
       <Tooltip
         title={
-          edgeType === "curve"
-            ? t("workflow.promptDebugger.switchToPolyline")
-            : t("workflow.promptDebugger.switchToCurve")
+          edgeType === 'curve'
+            ? t('workflow.promptDebugger.switchToPolyline')
+            : t('workflow.promptDebugger.switchToCurve')
         }
       >
         <img
           src={
-            edgeType === "curve"
+            edgeType === 'curve'
               ? Icons.panel.flowCurve
               : Icons.panel.flowPolyline
           }
           className="w-4 h-4 cursor-pointer"
           alt=""
           onClick={() =>
-            changeEdgeLine(edgeType === "curve" ? "polyline" : "curve")
+            changeEdgeLine(edgeType === 'curve' ? 'polyline' : 'curve')
           }
         />
       </Tooltip>
       {!historyVersion && historys?.length > 0 && (
-        <Tooltip title={t("workflow.promptDebugger.undo")}>
+        <Tooltip title={t('workflow.promptDebugger.undo')}>
           <img
             src={Icons.panel.revocation}
             className="w-4 h-4 cursor-pointer"
             alt=""
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               undo();
             }}
@@ -369,8 +365,8 @@ function FlowControls({
       <Tooltip
         title={
           autonomousMode
-            ? t("workflow.promptDebugger.switchToFollowMode")
-            : t("workflow.promptDebugger.switchToAutonomousMode")
+            ? t('workflow.promptDebugger.switchToFollowMode')
+            : t('workflow.promptDebugger.switchToAutonomousMode')
         }
       >
         <img
@@ -385,8 +381,8 @@ function FlowControls({
       <Tooltip
         title={
           showNodeRemarks
-            ? t("workflow.promptDebugger.hideNodeRemarks")
-            : t("workflow.promptDebugger.showNodeRemarks")
+            ? t('workflow.promptDebugger.hideNodeRemarks')
+            : t('workflow.promptDebugger.showNodeRemarks')
         }
       >
         <img
@@ -459,7 +455,7 @@ function FlowToolbar({
               overlayClassName="blue-tooltip"
               title={
                 <div className="relative text-xs">
-                  {t("workflow.promptDebugger.beginnerGuide")}
+                  {t('workflow.promptDebugger.beginnerGuide')}
                   <img
                     src={Icons.panel.beginnerGuideClose}
                     className="absolute w-2.5 h-2.5 cursor-pointer top-[-5px] right-[-20px]"
@@ -469,7 +465,7 @@ function FlowToolbar({
                 </div>
               }
             >
-              <Tooltip title={t("workflow.promptDebugger.helpDocument")}>
+              <Tooltip title={t('workflow.promptDebugger.helpDocument')}>
                 <div className="p-4 bg-[#fff] rounded-lg flex items-center gap-5 h-[52px] flex-shrink-0">
                   <img
                     src={Icons.panel.flowHelpDoc}
@@ -492,19 +488,19 @@ function index({
   setZoom,
   historys,
 }): React.ReactElement {
-  const getCurrentStore = useFlowsManager((state) => state.getCurrentStore);
-  const historyVersion = useFlowsManager((state) => state.historyVersion);
+  const getCurrentStore = useFlowsManager(state => state.getCurrentStore);
+  const historyVersion = useFlowsManager(state => state.historyVersion);
   const currentStore = getCurrentStore();
-  const setEdgeType = useFlowsManager((state) => state.setEdgeType);
-  const currentFlow = useFlowsManager((state) => state.currentFlow);
-  const canPublishSetNot = useFlowsManager((state) => state.canPublishSetNot);
-  const takeSnapshot = currentStore((state) => state.takeSnapshot);
-  const autonomousMode = useFlowsManager((state) => state.autonomousMode);
-  const setAutonomousMode = useFlowsManager((state) => state.setAutonomousMode);
-  const setNodes = currentStore((state) => state.setNodes);
-  const moveToPosition = currentStore((state) => state.moveToPosition);
-  const nodes = currentStore((state) => state.nodes);
-  const setEdges = currentStore((state) => state.setEdges);
+  const setEdgeType = useFlowsManager(state => state.setEdgeType);
+  const currentFlow = useFlowsManager(state => state.currentFlow);
+  const canPublishSetNot = useFlowsManager(state => state.canPublishSetNot);
+  const takeSnapshot = currentStore(state => state.takeSnapshot);
+  const autonomousMode = useFlowsManager(state => state.autonomousMode);
+  const setAutonomousMode = useFlowsManager(state => state.setAutonomousMode);
+  const setNodes = currentStore(state => state.setNodes);
+  const moveToPosition = currentStore(state => state.moveToPosition);
+  const nodes = currentStore(state => state.nodes);
+  const setEdges = currentStore(state => state.setEdges);
   const [showMiniMap, setShowMiniMap] = useState(false);
   const [showBeginnerGuide, setShowBeginnerGuide] = useState(true);
   const [showNodeRemarks, setShowNodeRemarks] = useState(false);
@@ -512,9 +508,9 @@ function index({
 
   const positionStartNode = useMemoizedFn(() => {
     const currentNode = nodes.find(
-      (node) =>
-        node.id?.startsWith("node-start") ||
-        node.id?.startsWith("iteration-node-start"),
+      node =>
+        node.id?.startsWith('node-start') ||
+        node.id?.startsWith('iteration-node-start')
     );
     const zoom = 0.8;
     const xPos = currentNode?.position.x;
@@ -523,7 +519,7 @@ function index({
   });
 
   const viewAbbreviation = useMemoizedFn(() => {
-    setShowMiniMap((showMiniMap) => !showMiniMap);
+    setShowMiniMap(showMiniMap => !showMiniMap);
   });
 
   const viewAdaptive = useMemoizedFn(() => {
@@ -534,14 +530,14 @@ function index({
     setZoom(zoom);
   });
 
-  const changeEdgeLine = useMemoizedFn((edgeType) => {
-    setEdges((edges) =>
-      edges?.map((edge) => ({
+  const changeEdgeLine = useMemoizedFn(edgeType => {
+    setEdges(edges =>
+      edges?.map(edge => ({
         ...edge,
         data: {
           edgeType: edgeType,
         },
-      })),
+      }))
     );
     setEdgeType(edgeType);
   });
@@ -550,24 +546,24 @@ function index({
     takeSnapshot();
     const data = JSON.parse(currentFlow?.publishedData);
     setNodes(
-      data.nodes?.map((node) => ({
+      data.nodes?.map(node => ({
         ...node,
         selected: false,
         data: {
           ...node.data,
-          status: "",
+          status: '',
         },
-      })),
+      }))
     );
     setEdges(data.edges);
     canPublishSetNot();
   });
 
   const handleCopyFlow = useMemoizedFn(() => {
-    copyFlowAPI(currentFlow?.id).then((flow) => {
+    copyFlowAPI(currentFlow?.id).then(flow => {
       window.open(
         `${window?.location.origin}/work_flow/${flow.id}/arrange`,
-        "_blank",
+        '_blank'
       );
     });
   });
@@ -578,24 +574,24 @@ function index({
 
   const handleRemarkNodeVisible = useMemoizedFn(() => {
     setShowNodeRemarks(!showNodeRemarks);
-    setNodes((nodes) =>
-      nodes?.map((node) => {
+    setNodes(nodes =>
+      nodes?.map(node => {
         const data = cloneDeep(node.data);
-        if (Object.hasOwn(data.nodeParam, "remark")) {
+        if (Object.hasOwn(data.nodeParam, 'remark')) {
           data.nodeParam.remarkVisible = !showNodeRemarks;
         }
         return {
           ...node,
           data,
         };
-      }),
+      })
     );
   });
 
   const needGuide = useMemo(() => {
     //存储是否引导过，引导过无需再次引导
-    if (localStorage.getItem("flowGuide")) return false;
-    localStorage.setItem("flowGuide", "true");
+    if (localStorage.getItem('flowGuide')) return false;
+    localStorage.setItem('flowGuide', 'true');
     return true;
   }, []);
 

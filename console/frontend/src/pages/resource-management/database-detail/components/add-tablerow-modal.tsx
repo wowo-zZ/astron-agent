@@ -5,7 +5,7 @@ import {
   useMemo,
   JSX,
   ReactNode,
-} from "react";
+} from 'react';
 import {
   Modal,
   Form,
@@ -16,22 +16,22 @@ import {
   Tooltip,
   message,
   Spin,
-} from "antd";
-import { fieldList, operateTableData } from "@/services/database";
-import { TableField, OperateType } from "@/types/database";
-import questionIcon from "@/assets/imgs/database/question-icon.svg";
-import dayjs from "dayjs";
-import { DatabaseItem } from "@/types/database";
-import { Rule } from "antd/es/form";
-import i18n from "@/locales/i18n";
+} from 'antd';
+import { fieldList, operateTableData } from '@/services/database';
+import { TableField, OperateType } from '@/types/database';
+import questionIcon from '@/assets/imgs/database/question-icon.svg';
+import dayjs from 'dayjs';
+import { DatabaseItem } from '@/types/database';
+import { Rule } from 'antd/es/form';
+import i18n from '@/locales/i18n';
 
 // 常量定义
 const FIELD_TYPES = {
-  STRING: "String",
-  INTEGER: "Integer",
-  NUMBER: "Number",
-  TIME: "Time",
-  BOOLEAN: "Boolean",
+  STRING: 'String',
+  INTEGER: 'Integer',
+  NUMBER: 'Number',
+  TIME: 'Time',
+  BOOLEAN: 'Boolean',
 } as const;
 
 const VALIDATION_PATTERNS = {
@@ -40,7 +40,7 @@ const VALIDATION_PATTERNS = {
 } as const;
 
 const PAGE_SIZE = 200;
-const DATE_FORMAT = "YYYY-MM-DD HH:mm:ss";
+const DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss';
 
 // 格式化字段标签
 const formatFieldLabel = (field: TableField): JSX.Element => {
@@ -62,7 +62,7 @@ const generateFieldValidationRules = (field: TableField): Rule[] => {
   const rules: Rule[] = [
     {
       required: field.isRequired,
-      message: i18n.t("database.fieldCannotBeEmpty", {
+      message: i18n.t('database.fieldCannotBeEmpty', {
         field: field.description,
       }),
     },
@@ -72,13 +72,13 @@ const generateFieldValidationRules = (field: TableField): Rule[] => {
     case FIELD_TYPES.INTEGER:
       rules.push({
         pattern: VALIDATION_PATTERNS.INTEGER,
-        message: i18n.t("database.illegalInput"),
+        message: i18n.t('database.illegalInput'),
       });
       break;
     case FIELD_TYPES.NUMBER:
       rules.push({
         pattern: VALIDATION_PATTERNS.NUMBER,
-        message: i18n.t("database.illegalInput"),
+        message: i18n.t('database.illegalInput'),
       });
       break;
   }
@@ -90,13 +90,13 @@ const generateFieldValidationRules = (field: TableField): Rule[] => {
 const renderFieldComponent = (fieldType: string): JSX.Element => {
   switch (fieldType) {
     case FIELD_TYPES.STRING:
-      return <Input placeholder={i18n.t("database.pleaseEnterField")} />;
+      return <Input placeholder={i18n.t('database.pleaseEnterField')} />;
     case FIELD_TYPES.INTEGER:
-      return <Input placeholder={i18n.t("database.pleaseEnterField")} />;
+      return <Input placeholder={i18n.t('database.pleaseEnterField')} />;
     case FIELD_TYPES.NUMBER:
       return (
         <InputNumber
-          placeholder={i18n.t("database.pleaseEnterField")}
+          placeholder={i18n.t('database.pleaseEnterField')}
           className="w-full"
         />
       );
@@ -105,19 +105,19 @@ const renderFieldComponent = (fieldType: string): JSX.Element => {
         <DatePicker
           showTime
           format={DATE_FORMAT}
-          placeholder={i18n.t("database.pleaseSelectDate")}
+          placeholder={i18n.t('database.pleaseSelectDate')}
           className="w-full"
         />
       );
     case FIELD_TYPES.BOOLEAN:
       return (
-        <Select placeholder={i18n.t("database.pleaseSelect")}>
+        <Select placeholder={i18n.t('database.pleaseSelect')}>
           <Select.Option value="true">true</Select.Option>
           <Select.Option value="false">false</Select.Option>
         </Select>
       );
     default:
-      return <Input placeholder={i18n.t("database.pleaseEnterField")} />;
+      return <Input placeholder={i18n.t('database.pleaseEnterField')} />;
   }
 };
 
@@ -145,14 +145,14 @@ const AddTableRowModal = (props: AddTableRowModalProps): JSX.Element => {
         pageNum: 1,
         pageSize: PAGE_SIZE,
       });
-      const list = res.records.filter((item) => !item.isSystem);
+      const list = res.records.filter(item => !item.isSystem);
       setFieldsList(list);
 
       // 设置表单初始值
       const initialValues: Record<string, unknown> = {};
-      list.forEach((item) => {
+      list.forEach(item => {
         if (
-          typeof item.defaultValue === "number" ||
+          typeof item.defaultValue === 'number' ||
           Boolean(item.defaultValue)
         ) {
           initialValues[item.name] =
@@ -167,7 +167,7 @@ const AddTableRowModal = (props: AddTableRowModalProps): JSX.Element => {
       }
     } catch (error) {
       // 记录错误信息
-      message.error(i18n.t("database.getFieldListFailed"));
+      message.error(i18n.t('database.getFieldListFailed'));
     } finally {
       setFieldListLoading(false);
     }
@@ -198,7 +198,7 @@ const AddTableRowModal = (props: AddTableRowModalProps): JSX.Element => {
       // 格式化表单数据
       const formattedValues = Object.entries(values).reduce(
         (acc, [key, value]) => {
-          if (!value && typeof value !== "number") {
+          if (!value && typeof value !== 'number') {
             acc[key] = null;
           } else if (dayjs.isDayjs(value)) {
             acc[key] = dayjs(value).format(DATE_FORMAT);
@@ -207,7 +207,7 @@ const AddTableRowModal = (props: AddTableRowModalProps): JSX.Element => {
           }
           return acc;
         },
-        {} as Record<string, unknown>,
+        {} as Record<string, unknown>
       );
 
       setLoading(true);
@@ -228,28 +228,28 @@ const AddTableRowModal = (props: AddTableRowModalProps): JSX.Element => {
         setLoading(false);
         setOpen(false);
         handleUpdateTable();
-        message.success(i18n.t("database.addRowSuccess"));
+        message.success(i18n.t('database.addRowSuccess'));
       } catch (error) {
         setLoading(false);
-        message.error(i18n.t("database.addRowFailed"));
+        message.error(i18n.t('database.addRowFailed'));
       }
     },
-    [info.id, dataType, setOpen, handleUpdateTable],
+    [info.id, dataType, setOpen, handleUpdateTable]
   );
 
   // Modal样式配置
   const modalStyles = useMemo(
     () => ({
       body: {
-        maxHeight: "calc(100vh - 200px)",
+        maxHeight: 'calc(100vh - 200px)',
         paddingRight: 4,
-        overflowY: "auto" as const,
+        overflowY: 'auto' as const,
       },
       content: {
         paddingRight: 20,
       },
     }),
-    [],
+    []
   );
 
   // 关闭Modal的处理函数
@@ -270,9 +270,9 @@ const AddTableRowModal = (props: AddTableRowModalProps): JSX.Element => {
   return (
     <Modal
       open={open}
-      title={i18n.t("database.addRow")}
-      okText={i18n.t("database.add")}
-      cancelText={i18n.t("database.cancel")}
+      title={i18n.t('database.addRow')}
+      okText={i18n.t('database.add')}
+      cancelText={i18n.t('database.cancel')}
       confirmLoading={fieldListLoading || loading}
       okButtonProps={{
         autoInsertSpace: false,

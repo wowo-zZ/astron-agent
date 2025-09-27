@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import { Button } from "antd";
-import { useTranslation } from "react-i18next";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
+import React, { useState } from 'react';
+import { Button } from 'antd';
+import { useTranslation } from 'react-i18next';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
 
-import close from "@/assets/imgs/workflow/modal-close.png";
+import close from '@/assets/imgs/workflow/modal-close.png';
 
 // ========= Props 类型 =========
 interface ConfirmModalProps {
@@ -16,12 +16,12 @@ function ConfirmModal({
 }: ConfirmModalProps): React.ReactElement {
   const { t } = useTranslation();
   const setCanvasesDisabled = useFlowsManager(
-    (state) => state.setCanvasesDisabled,
+    state => state.setCanvasesDisabled
   );
   const setShowMultipleCanvasesTip = useFlowsManager(
-    (state) => state.setShowMultipleCanvasesTip,
+    state => state.setShowMultipleCanvasesTip
   );
-  const getFlowDetail = useFlowsManager((state) => state.getFlowDetail);
+  const getFlowDetail = useFlowsManager(state => state.getFlowDetail);
 
   const handleOk = (): void => {
     setConfirmModal(false);
@@ -43,7 +43,7 @@ function ConfirmModal({
         </div>
         <div className="text-sm mt-5 text-center">
           {t(
-            "workflow.nodes.multipleCanvasesTip.continueEditingInCurrentWindow",
+            'workflow.nodes.multipleCanvasesTip.continueEditingInCurrentWindow'
           )}
         </div>
         <div className="flex flex-row-reverse gap-3 mt-7">
@@ -52,7 +52,7 @@ function ConfirmModal({
             style={{ paddingLeft: 48, paddingRight: 48 }}
             onClick={handleOk}
           >
-            {t("workflow.nodes.multipleCanvasesTip.confirm")}
+            {t('workflow.nodes.multipleCanvasesTip.confirm')}
           </Button>
           <Button
             type="text"
@@ -60,7 +60,7 @@ function ConfirmModal({
             style={{ paddingLeft: 48, paddingRight: 48 }}
             onClick={() => setConfirmModal(false)}
           >
-            {t("common.cancel")}
+            {t('common.cancel')}
           </Button>
         </div>
       </div>
@@ -72,7 +72,7 @@ function ConfirmModal({
 function MultipleCanvasesTip(): React.ReactElement | null {
   const { t } = useTranslation();
   const showMultipleCanvasesTip = useFlowsManager(
-    (state) => state.showMultipleCanvasesTip,
+    state => state.showMultipleCanvasesTip
   );
   const [confirmModal, setConfirmModal] = useState<boolean>(false);
 
@@ -83,13 +83,13 @@ function MultipleCanvasesTip(): React.ReactElement | null {
       {confirmModal && <ConfirmModal setConfirmModal={setConfirmModal} />}
       <div className="w-full bg-[#E3EDFF] rounded flex items-center justify-center gap-4 py-2.5 text-xs">
         <div className="text-[#73819B]">
-          {t("workflow.nodes.multipleCanvasesTip.multipleWindowsTip")}
+          {t('workflow.nodes.multipleCanvasesTip.multipleWindowsTip')}
         </div>
         <div
           className="text-[#275EFF] cursor-pointer"
           onClick={() => setConfirmModal(true)}
         >
-          {t("workflow.nodes.multipleCanvasesTip.continueEditing")}
+          {t('workflow.nodes.multipleCanvasesTip.continueEditing')}
         </div>
       </div>
     </>

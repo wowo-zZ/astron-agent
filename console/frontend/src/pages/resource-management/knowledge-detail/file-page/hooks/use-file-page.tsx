@@ -5,32 +5,32 @@ import {
   getFileSummary,
   getRepoUseStatus,
   listKnowledgeByPage,
-} from "@/services/knowledge";
+} from '@/services/knowledge';
 import {
   Chunk,
   FileInfoV2,
   FileItem,
   FileSummaryResponse,
   ListKnowledgeParams,
-} from "@/types/resource";
-import { getRouteId, modifyChunks } from "@/utils/utils";
-import { Modal } from "antd";
-import { debounce } from "lodash";
+} from '@/types/resource';
+import { getRouteId, modifyChunks } from '@/utils/utils';
+import { Modal } from 'antd';
+import { debounce } from 'lodash';
 import React, {
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
-} from "react";
-import { useTranslation } from "react-i18next";
-import { useLocation, useSearchParams } from "react-router-dom";
+} from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocation, useSearchParams } from 'react-router-dom';
 
 // 文件数据管理 Hook
 const useFileData = (
   repoId: string,
   fileId: string | null,
-  statusMap: Record<string, string>,
+  statusMap: Record<string, string>
 ): {
   fileList: FileItem[];
   setFileList: (fileList: FileItem[]) => void;
@@ -47,28 +47,28 @@ const useFileData = (
   const [fileList, setFileList] = useState<FileItem[]>([]);
   const [fileInfo, setFileInfo] = useState<FileInfoV2>({} as FileInfoV2);
   const [parameters, setParameters] = useState<FileSummaryResponse>(
-    {} as FileSummaryResponse,
+    {} as FileSummaryResponse
   );
 
   const getFiles = useCallback((): void => {
-    getFileList(repoId).then((data) => {
+    getFileList(repoId).then(data => {
       setFileList(data);
     });
   }, [repoId]);
 
   const getFileInfo = useCallback((): void => {
     const params = {
-      tag: "CBG-RAG",
-      fileIds: [fileId || ""],
+      tag: 'CBG-RAG',
+      fileIds: [fileId || ''],
     };
-    getFileSummary(params).then((data) => {
+    getFileSummary(params).then(data => {
       setFileInfo((data.fileInfoV2 || {}) as FileInfoV2);
       setParameters(data);
     });
   }, [fileId]);
 
   const otherFiles = useMemo(() => {
-    return fileList.filter((item) => item.id != fileId);
+    return fileList.filter(item => item.id != fileId);
   }, [fileList, fileId]);
 
   const fileStatusMsg = useMemo(() => {
@@ -102,7 +102,7 @@ const useFileData = (
 // Chunks 数据管理 Hook
 const useFileChunks = (
   fileId: string | null,
-  getFileInfo: () => void,
+  getFileInfo: () => void
 ): {
   chunks: Chunk[];
   setChunks: (chunks: Chunk[]) => void;
@@ -136,7 +136,7 @@ const useFileChunks = (
   const [chunks, setChunks] = useState<Chunk[]>([]);
   const [pageNumber, setPageNumber] = useState(1);
   const [hasMore, setHasMore] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState('');
   const [violationTotal, setViolationTotal] = useState(0);
   const [isViolation, setIsViolation] = useState(false);
   const [loadingData, setLoadingData] = useState(false);
@@ -151,14 +151,14 @@ const useFileChunks = (
         chunkRef.current.scrollTop = 0;
       }
       const params: ListKnowledgeParams = {
-        fileIds: [fileId || ""],
+        fileIds: [fileId || ''],
         pageNo: 1,
         pageSize: 20,
         query: value !== undefined ? value?.trim() : searchValue,
       };
       if (isViolation) params.auditType = 1;
       listKnowledgeByPage(params)
-        .then((data) => {
+        .then(data => {
           const newChunks = modifyChunks(data.pageData || []);
           setPageNumber(2);
           setChunks(() => newChunks);
@@ -174,7 +174,7 @@ const useFileChunks = (
           setLoadingData(false);
         });
     },
-    [fileId, searchValue, isViolation],
+    [fileId, searchValue, isViolation]
   );
 
   const moreData = useCallback((): void => {
@@ -182,21 +182,21 @@ const useFileChunks = (
     setLoadingData(true);
 
     const params = {
-      fileIds: [fileId || ""],
+      fileIds: [fileId || ''],
       pageNo: pageNumber,
       pageSize: 20,
       query: searchValue,
     };
     listKnowledgeByPage(params)
-      .then((data) => {
+      .then(data => {
         const newChunks = modifyChunks(data.pageData || []);
         if (data.totalCount > chunks.length + 20) {
           setHasMore(true);
         } else {
           setHasMore(false);
         }
-        setPageNumber((number) => number + 1);
-        setChunks((prevItems) => [...prevItems, ...newChunks]);
+        setPageNumber(number => number + 1);
+        setChunks(prevItems => [...prevItems, ...newChunks]);
         setViolationTotal((data.extMap?.auditBlockCount as number) || 0);
       })
       .finally(() => {
@@ -226,27 +226,27 @@ const useFileChunks = (
       setSearchValue(value);
       fetchData(value);
     }, 500),
-    [fetchData],
+    [fetchData]
   );
 
   const enableChunk = useCallback(
     (record: Chunk, checked: boolean): void => {
       const findChunk =
-        chunks.find((item) => item.id === record.id) || ({} as Chunk);
+        chunks.find(item => item.id === record.id) || ({} as Chunk);
       findChunk.enabled = checked;
       setChunks([...chunks]);
       const params = {
         id: record.id,
         enabled: checked ? 1 : 0,
       };
-      enableKnowledgeAPI(params).then((data) => {
+      enableKnowledgeAPI(params).then(data => {
         if (checked) {
           findChunk.id = data;
           setChunks([...chunks]);
         }
       });
     },
-    [chunks],
+    [chunks]
   );
 
   const resetKnowledge = useCallback((): void => {
@@ -313,9 +313,9 @@ const useFileModals = (): {
   }, []);
 
   useEffect(() => {
-    document.documentElement.addEventListener("click", clickOutside);
+    document.documentElement.addEventListener('click', clickOutside);
     return (): void =>
-      document.documentElement.removeEventListener("click", clickOutside);
+      document.documentElement.removeEventListener('click', clickOutside);
   }, [clickOutside]);
 
   return {
@@ -341,7 +341,7 @@ const useFileActions = (
   parameters: FileSummaryResponse,
   fileStatusMsg: string | null | undefined,
   getFileInfo: () => void,
-  fetchData: (value?: string) => void,
+  fetchData: (value?: string) => void
 ): {
   onEnable: () => Promise<string>;
   showConfirmModal: () => void;
@@ -361,9 +361,9 @@ const useFileActions = (
         .then(() => {
           getFileInfo();
           fetchData();
-          resolve("");
+          resolve('');
         })
-        .catch((error) => reject(error));
+        .catch(error => reject(error));
     });
   }, [
     fileInfo.enabled,
@@ -374,11 +374,11 @@ const useFileActions = (
 
   const showConfirmModal = useCallback((): void => {
     Modal.confirm({
-      title: t("knowledge.confirmDisabled"),
+      title: t('knowledge.confirmDisabled'),
       icon: null,
-      content: "",
-      okText: t("common.confirm"),
-      cancelText: t("common.cancel"),
+      content: '',
+      okText: t('common.confirm'),
+      cancelText: t('common.cancel'),
       centered: true,
       autoFocusButton: null,
       onOk() {
@@ -388,7 +388,7 @@ const useFileActions = (
   }, [t, onEnable]);
 
   const handleValidateWorkflow = useCallback((): void => {
-    getRepoUseStatus({ repoId }).then((status) => {
+    getRepoUseStatus({ repoId }).then(status => {
       if (status) {
         showConfirmModal();
       } else {
@@ -398,7 +398,7 @@ const useFileActions = (
   }, [repoId, showConfirmModal, onEnable]);
 
   const handleEnableFile = useCallback((): void => {
-    if (fileStatusMsg !== "success") return;
+    if (fileStatusMsg !== 'success') return;
     const enable = !!fileInfo.enabled;
     if (enable) {
       handleValidateWorkflow();
@@ -473,9 +473,9 @@ export const useFilePage = ({
   const searchRef = useRef<HTMLInputElement | null>(null);
   const repoId = getRouteId() as string;
   const [searchParams] = useSearchParams();
-  const pid = searchParams.get("parentId");
-  const fileId = searchParams.get("fileId");
-  const tag = searchParams.get("tag");
+  const pid = searchParams.get('parentId');
+  const fileId = searchParams.get('fileId');
+  const tag = searchParams.get('tag');
 
   const fileData = useFileData(repoId, fileId, statusMap);
   const fileChunks = useFileChunks(fileId, fileData.getFileInfo);
@@ -485,7 +485,7 @@ export const useFilePage = ({
     fileData.parameters,
     fileData.fileStatusMsg,
     fileData.getFileInfo,
-    fileChunks.fetchData,
+    fileChunks.fetchData
   );
 
   return {

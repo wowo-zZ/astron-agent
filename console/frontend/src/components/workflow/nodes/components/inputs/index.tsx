@@ -1,24 +1,24 @@
-import React, { useMemo, memo } from "react";
-import { useTranslation } from "react-i18next";
+import React, { useMemo, memo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   FlowNodeInput,
   FlowSelect,
   FlowCascader,
   FLowCollapse,
-} from "@/components/workflow/ui";
-import ChatHistory from "@/components/workflow/nodes/components/chat-history";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import { useNodeCommon } from "@/components/workflow/hooks/useNodeCommon";
+} from '@/components/workflow/ui';
+import ChatHistory from '@/components/workflow/nodes/components/chat-history';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
 
-import inputAddIcon from "@/assets/imgs/workflow/input-add-icon.png";
-import remove from "@/assets/imgs/workflow/input-remove-icon.png";
+import inputAddIcon from '@/assets/imgs/workflow/input-add-icon.png';
+import remove from '@/assets/imgs/workflow/input-remove-icon.png';
 
 function NameField({
   id,
   item,
   handleChangeInputParam,
 }: unknown): React.ReactElement {
-  if (item?.customParameterType === "image_understanding") {
+  if (item?.customParameterType === 'image_understanding') {
     return (
       <div className="flex items-center gap-2">
         <span>{item?.name}</span>
@@ -31,7 +31,7 @@ function NameField({
       nodeId={id}
       maxLength={30}
       value={item.name}
-      onChange={(value) =>
+      onChange={value =>
         handleChangeInputParam(item.id, (data, val) => (data.name = val), value)
       }
     />
@@ -49,22 +49,22 @@ export function TypeSelector({ id, data, item }: unknown): React.ReactElement {
     <FlowSelect
       value={item?.schema?.value?.type}
       options={[
-        { label: t("workflow.nodes.common.input"), value: "literal" },
-        { label: t("workflow.nodes.common.reference"), value: "ref" },
+        { label: t('workflow.nodes.common.input'), value: 'literal' },
+        { label: t('workflow.nodes.common.reference'), value: 'ref' },
       ]}
-      onChange={(value) =>
+      onChange={value =>
         handleChangeInputParam(
           item.id,
           (data, val) => {
             data.schema.value.type = val;
-            if (val === "literal") {
-              data.schema.value.content = "";
-              data.schema.type = "string";
+            if (val === 'literal') {
+              data.schema.value.content = '';
+              data.schema.type = 'string';
             } else {
               data.schema.value.content = {};
             }
           },
-          value,
+          value
         )
       }
     />
@@ -75,7 +75,7 @@ export function ValueField({ id, data, item }: unknown): React.ReactElement {
   const { references, handleChangeInputParam } = useNodeCommon({ id, data });
   const valueType = item?.schema?.value?.type;
 
-  if (valueType === "literal") {
+  if (valueType === 'literal') {
     return (
       <LiteralField
         id={id}
@@ -105,11 +105,11 @@ export function LiteralField({
     <FlowNodeInput
       nodeId={id}
       value={item?.schema?.value?.content}
-      onChange={(value) =>
+      onChange={value =>
         handleChangeInputParam(
           item.id,
           (data, val) => (data.schema.value.content = val),
-          value,
+          value
         )
       }
     />
@@ -121,13 +121,13 @@ function RemoveButton({ id, data, item }: unknown): React.ReactElement {
     useNodeCommon({ id, data });
   if (!allowNoInputParams || canvasesDisabled) return null;
 
-  const isImageParam = item?.customParameterType === "image_understanding";
+  const isImageParam = item?.customParameterType === 'image_understanding';
   return (
     <img
       src={remove}
       className="w-[16px] h-[17px] flex-shrink-0 mt-1.5"
       style={{
-        cursor: isImageParam ? "not-allowed" : "pointer",
+        cursor: isImageParam ? 'not-allowed' : 'pointer',
         opacity: isImageParam ? 0.5 : 1,
       }}
       onClick={() => !isImageParam && handleRemoveLine(item.id)}
@@ -143,10 +143,10 @@ function ReferenceField({
   references,
   handleChangeInputParam,
 }: unknown): React.ReactElement {
-  const currentStore = useFlowsManager((state) => state.getCurrentStore());
-  const checkNode = currentStore((state) => state.checkNode);
+  const currentStore = useFlowsManager(state => state.getCurrentStore());
+  const checkNode = currentStore(state => state.checkNode);
   const autoSaveCurrentFlow = useFlowsManager(
-    (state) => state.autoSaveCurrentFlow,
+    state => state.autoSaveCurrentFlow
   );
   const cascaderValue = item?.schema?.value?.content?.nodeId
     ? [item?.schema?.value?.content?.nodeId, item?.schema?.value?.content?.name]
@@ -168,7 +168,7 @@ function ReferenceField({
         },
         type: node.type,
         fileType: node?.fileType,
-      },
+      }
     );
 
   return (
@@ -200,7 +200,7 @@ function index({ id, data, children }): React.ReactElement {
   const { inputs, isIteratorNode, handleAddInputLine, handleChangeInputParam } =
     useNodeCommon({ id, data });
   const { t } = useTranslation();
-  const canvasesDisabled = useFlowsManager((state) => state.canvasesDisabled);
+  const canvasesDisabled = useFlowsManager(state => state.canvasesDisabled);
 
   const stringSplitMode = useMemo(() => {
     return data?.nodeParam?.mode === 1;
@@ -217,13 +217,13 @@ function index({ id, data, children }): React.ReactElement {
         <div className="px-[18px] rounded-lg overflow-hidden">
           <div className="flex items-center gap-3 text-desc">
             <h4 className="w-1/3">
-              {t("workflow.nodes.common.parameterName")}
+              {t('workflow.nodes.common.parameterName')}
             </h4>
             <h4 className="w-1/4">
-              {isIteratorNode ? " " : t("workflow.nodes.common.parameterValue")}
+              {isIteratorNode ? ' ' : t('workflow.nodes.common.parameterValue')}
             </h4>
             <h4 className="flex-1">
-              {isIteratorNode ? t("workflow.nodes.common.parameterValue") : " "}
+              {isIteratorNode ? t('workflow.nodes.common.parameterValue') : ' '}
             </h4>
             <span className="w-5 h-5"></span>
           </div>
@@ -231,7 +231,7 @@ function index({ id, data, children }): React.ReactElement {
             <ChatHistory id={id} data={data} />
           )}
           <div className="flex flex-col gap-3 mt-4">
-            {inputs.map((item) => (
+            {inputs.map(item => (
               <div key={item.id} className="flex flex-col gap-1">
                 <div className="flex items-start gap-3 overflow-hidden">
                   <div className="flex flex-col flex-shrink-0 w-1/3">
@@ -259,7 +259,7 @@ function index({ id, data, children }): React.ReactElement {
               onClick={() => handleAddInputLine()}
             >
               <img src={inputAddIcon} className="w-3 h-3" alt="" />
-              <span>{t("workflow.nodes.common.add")}</span>
+              <span>{t('workflow.nodes.common.add')}</span>
             </div>
           )}
         </div>

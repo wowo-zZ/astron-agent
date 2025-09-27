@@ -1,13 +1,13 @@
-import useEnterpriseStore from "@/store/enterprise-store";
-import useSpaceStore from "@/store/space-store";
-import { getEnterpriseJoinList } from "@/services/enterprise";
-import { defaultEnterpriseAvatar } from "@/constants/config";
-import { useCallback, useMemo } from "react";
+import useEnterpriseStore from '@/store/enterprise-store';
+import useSpaceStore from '@/store/space-store';
+import { getEnterpriseJoinList } from '@/services/enterprise';
+import { defaultEnterpriseAvatar } from '@/constants/config';
+import { useCallback, useMemo } from 'react';
 import {
   checkNeedCreateTeam,
   visitEnterprise as visitEnterpriseApi,
-} from "@/services/enterprise";
-import { getCorporateCount } from "@/services/space";
+} from '@/services/enterprise';
+import { getCorporateCount } from '@/services/space';
 
 export const useEnterprise = (navigate?: any) => {
   const {
@@ -19,7 +19,7 @@ export const useEnterprise = (navigate?: any) => {
   const { spaceType } = useSpaceStore();
 
   const isTeamSpaceEmpty = useMemo(() => {
-    return spaceType === "team" && !spaceStatistics?.joined;
+    return spaceType === 'team' && !spaceStatistics?.joined;
   }, [spaceType, spaceStatistics]);
 
   const checkNeedCreateTeamFn = useCallback(async () => {
@@ -39,7 +39,7 @@ export const useEnterprise = (navigate?: any) => {
         const res = await getEnterpriseJoinList();
         const joinedList =
           res instanceof Array
-            ? res.map((item) => ({
+            ? res.map(item => ({
                 ...item,
                 avatarUrl: item?.avatarUrl || defaultEnterpriseAvatar,
               }))
@@ -51,7 +51,7 @@ export const useEnterprise = (navigate?: any) => {
         // message.error(err?.msg || err?.desc);
       }
     },
-    [setJoinedEnterpriseList],
+    [setJoinedEnterpriseList]
   );
 
   const getEnterpriseSpaceCount = useCallback(async () => {
@@ -59,7 +59,7 @@ export const useEnterprise = (navigate?: any) => {
       const res: any = await getCorporateCount();
       setSpaceStatistics(res);
     } catch (err) {
-      console.log(err, "getEnterpriseSpaceCount err");
+      console.log(err, 'getEnterpriseSpaceCount err');
       setSpaceStatistics({
         total: 0,
         joined: 0,
@@ -71,7 +71,7 @@ export const useEnterprise = (navigate?: any) => {
     try {
       const res: any = await visitEnterpriseApi(enterpriseId);
     } catch (err) {
-      console.log(err, "visitEnterprise err");
+      console.log(err, 'visitEnterprise err');
     }
   }, []);
 
@@ -91,7 +91,7 @@ export const useEnterprise = (navigate?: any) => {
       getEnterpriseSpaceCount,
       visitEnterprise,
       isTeamSpaceEmpty,
-    ],
+    ]
   );
 
   return returnValues;

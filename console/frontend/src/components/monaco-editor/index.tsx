@@ -3,16 +3,16 @@ import React, {
   useImperativeHandle,
   useRef,
   useEffect,
-} from "react";
-import Editor, { EditorProps, OnMount } from "@monaco-editor/react";
-import { editor } from "monaco-editor";
+} from 'react';
+import Editor, { EditorProps, OnMount } from '@monaco-editor/react';
+import { editor } from 'monaco-editor';
 
-const editorOptions: EditorProps["options"] = {
+const editorOptions: EditorProps['options'] = {
   scrollbar: {
     verticalScrollbarSize: 4,
     horizontalScrollbarSize: 4,
-    vertical: "visible",
-    horizontal: "visible",
+    vertical: 'visible',
+    horizontal: 'visible',
     useShadows: false,
   },
   minimap: { enabled: false }, // 如果不需要代码缩略图，可禁用 minimap
@@ -23,7 +23,7 @@ const Index = forwardRef<
   { scrollToTop: () => void; scrollToBottom: () => void },
   EditorProps & {
     onWheel?: () => void;
-    options?: EditorProps["options"] & { renderIndentGuides?: boolean };
+    options?: EditorProps['options'] & { renderIndentGuides?: boolean };
   }
 >(({ onWheel = null, options = {}, ...rest }, ref) => {
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
@@ -51,13 +51,13 @@ const Index = forwardRef<
     },
   }));
 
-  const handleEditorDidMount: OnMount = (editor) => {
+  const handleEditorDidMount: OnMount = editor => {
     editorRef.current = editor;
 
     const container = editor.getDomNode();
     containerRef.current = container as HTMLDivElement;
     if (container && onWheel) {
-      container.addEventListener("wheel", onWheel);
+      container.addEventListener('wheel', onWheel);
     }
   };
 
@@ -66,7 +66,7 @@ const Index = forwardRef<
 
     return (): void => {
       if (container && onWheel) {
-        container.removeEventListener("wheel", onWheel);
+        container.removeEventListener('wheel', onWheel);
       }
     };
   }, [onWheel]);

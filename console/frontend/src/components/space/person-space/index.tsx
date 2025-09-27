@@ -1,34 +1,34 @@
-import { Input, message, Tooltip } from "antd";
-import styles from "./index.module.scss";
-import { useEffect, useState, useCallback } from "react";
-import SpaceModal from "@/components/space/space-modal";
-import useSpaceStore from "@/store/space-store";
-import { useNavigate } from "react-router-dom";
-import { debounce } from "lodash";
-import searchIcon from "@/assets/imgs/space/space-search.svg";
-import choosedIcon from "@/assets/imgs/space/space-choosed.png";
-import addIcon from "@/assets/imgs/space/add-space.svg";
-import spaceIcon from "@/assets/imgs/space/space-icon.svg";
-import personalIcon from "@/assets/imgs/space/person-space-icon.svg";
-import noDataIcon from "@/assets/imgs/space/no-data-icon.svg";
+import { Input, message, Tooltip } from 'antd';
+import styles from './index.module.scss';
+import { useEffect, useState, useCallback } from 'react';
+import SpaceModal from '@/components/space/space-modal';
+import useSpaceStore from '@/store/space-store';
+import { useNavigate } from 'react-router-dom';
+import { debounce } from 'lodash';
+import searchIcon from '@/assets/imgs/space/space-search.svg';
+import choosedIcon from '@/assets/imgs/space/space-choosed.png';
+import addIcon from '@/assets/imgs/space/add-space.svg';
+import spaceIcon from '@/assets/imgs/space/space-icon.svg';
+import personalIcon from '@/assets/imgs/space/person-space-icon.svg';
+import noDataIcon from '@/assets/imgs/space/no-data-icon.svg';
 import {
   getAllSpace,
   getRecentVisit,
   visitSpace,
   getJoinedCorporateList,
-} from "@/services/space";
-import { useTranslation } from "react-i18next";
-import eventBus from "@/utils/event-bus";
+} from '@/services/space';
+import { useTranslation } from 'react-i18next';
+import eventBus from '@/utils/event-bus';
 //空间角色
 const spaceRole = {
-  "1": "owner",
-  "2": "admin",
-  "3": "member",
+  '1': 'owner',
+  '2': 'admin',
+  '3': 'member',
 } as const;
 
 export const PersonSpace = () => {
   const [isShowAddSpace, setIsShowAddSpace] = useState<boolean>(false);
-  const [searchValue, setSearchValue] = useState(""); // 搜索关键词状态
+  const [searchValue, setSearchValue] = useState(''); // 搜索关键词状态
   const {
     spaceType,
     spaceId,
@@ -43,7 +43,7 @@ export const PersonSpace = () => {
   const [recentList, setRecentList] = useState<any[]>([]);
   const { t } = useTranslation();
   const [allList, setAllList] = useState<any[]>([
-    { id: "", name: t("sidebar.personalSpace"), sub: "" },
+    { id: '', name: t('sidebar.personalSpace'), sub: '' },
   ]);
 
   //添加空间
@@ -57,7 +57,7 @@ export const PersonSpace = () => {
     setIsShowSpacePopover(false);
 
     const spaceManageUrl =
-      spaceType === "team" ? `/enterprise/${enterpriseId}/space` : "/space";
+      spaceType === 'team' ? `/enterprise/${enterpriseId}/space` : '/space';
     navigate(spaceManageUrl);
   };
 
@@ -68,21 +68,21 @@ export const PersonSpace = () => {
       setSpaceName(item.name);
       setSpaceAvatar(item.avatarUrl);
       setIsShowSpacePopover(false);
-      if (item.id === "") {
-        navigate("/space/agent");
-        setSpaceId("");
+      if (item.id === '') {
+        navigate('/space/agent');
+        setSpaceId('');
       } else {
         setSpaceId(item.id);
-        navigate("/space/agent");
+        navigate('/space/agent');
       }
     } catch (err: any) {
-      message.error(err.msg || "空间访问失败");
+      message.error(err.msg || '空间访问失败');
     }
   };
 
   //获取全部空间
   const getSpaceList = (searchValue?: string) => {
-    const isTeamSpace = spaceType === "team";
+    const isTeamSpace = spaceType === 'team';
     const params: any = isTeamSpace ? { name: searchValue } : searchValue;
 
     if (isTeamSpace) {
@@ -91,7 +91,7 @@ export const PersonSpace = () => {
           setAllList(res);
         })
         .catch((err: any) => {
-          message.error(err.msg || "获取空间列表失败");
+          message.error(err.msg || '获取空间列表失败');
         });
     } else {
       getAllSpace(params)
@@ -100,15 +100,15 @@ export const PersonSpace = () => {
             setAllList(res);
           } else {
             const personalSpace = {
-              id: "",
-              name: t("sidebar.personalSpace"),
-              sub: "",
+              id: '',
+              name: t('sidebar.personalSpace'),
+              sub: '',
             };
             setAllList([personalSpace, ...res]);
           }
         })
         .catch((err: any) => {
-          message.error(err.msg || "获取空间列表失败");
+          message.error(err.msg || '获取空间列表失败');
         });
     }
   };
@@ -118,7 +118,7 @@ export const PersonSpace = () => {
     debounce((searchValue: string) => {
       getSpaceList(searchValue);
     }, 300),
-    [],
+    []
   );
 
   //搜索空间
@@ -140,13 +140,13 @@ export const PersonSpace = () => {
         setRecentList(res?.slice(0, 5));
       })
       .catch((err: any) => {
-        message.error(err.msg || "获取最近访问列表失败");
+        message.error(err.msg || '获取最近访问列表失败');
       });
   };
 
   useEffect(() => {
     if (isShowSpacePopover) {
-      setSearchValue("");
+      setSearchValue('');
       // 获取数据
       getSpaceList();
       getRecentVisitList();
@@ -157,7 +157,7 @@ export const PersonSpace = () => {
     <div className={styles.person_space}>
       <div className={styles.person_space_header}>
         <Input
-          placeholder={t("spaceManagement.searchTeamSpace")}
+          placeholder={t('spaceManagement.searchTeamSpace')}
           className={styles.search_input}
           prefix={<img src={searchIcon} alt="search" />}
           value={searchValue}
@@ -167,9 +167,9 @@ export const PersonSpace = () => {
       {recentList.length > 0 && (
         <div className={styles.recent_list}>
           <div className={styles.recent_list_title}>
-            {t("spaceManagement.recent")}
+            {t('spaceManagement.recent')}
           </div>
-          {recentList.map((item) => (
+          {recentList.map(item => (
             <div
               key={item.id}
               className={styles.recent_list_item}
@@ -206,10 +206,10 @@ export const PersonSpace = () => {
       {allList.length > 0 ? (
         <>
           <div className={styles.all_list_title}>
-            {t("spaceManagement.all")}
+            {t('spaceManagement.all')}
           </div>
           <div className={styles.all_list}>
-            {allList.map((item) => (
+            {allList.map(item => (
               <div
                 key={item.id}
                 className={styles.all_list_item}
@@ -228,7 +228,7 @@ export const PersonSpace = () => {
                 </div>
                 <img
                   src={
-                    item.id === "" ? personalIcon : item.avatarUrl || spaceIcon
+                    item.id === '' ? personalIcon : item.avatarUrl || spaceIcon
                   }
                   alt=""
                   className={styles.item_icon}
@@ -241,10 +241,10 @@ export const PersonSpace = () => {
                 >
                   <div className={styles.item_name}>{item.name}</div>
                 </Tooltip>
-                {item.id !== "" && (
+                {item.id !== '' && (
                   <div className={styles.item_owner}>
                     {t(
-                      `spaceManagement.${spaceRole[item.userRole as keyof typeof spaceRole]}`,
+                      `spaceManagement.${spaceRole[item.userRole as keyof typeof spaceRole]}`
                     )}
                   </div>
                 )}
@@ -255,18 +255,18 @@ export const PersonSpace = () => {
       ) : (
         <div className={styles.no_data}>
           <img src={noDataIcon} alt="noData" />
-          <div>{t("spaceManagement.noData")}</div>
+          <div>{t('spaceManagement.noData')}</div>
         </div>
       )}
       <div className={styles.person_space_footer}>
         <div className={styles.add_space} onClick={handleAddSpace}>
           <div className={styles.add_space_content}>
             <img src={addIcon} alt="add" />
-            <div>{t("spaceManagement.addSpace")}</div>
+            <div>{t('spaceManagement.addSpace')}</div>
           </div>
         </div>
         <div className={styles.space_manage} onClick={handleSpaceManage}>
-          {t("spaceManagement.spaceManage")}
+          {t('spaceManagement.spaceManage')}
         </div>
       </div>
       <SpaceModal
@@ -274,7 +274,7 @@ export const PersonSpace = () => {
         mode="create"
         onClose={() => setIsShowAddSpace(false)}
         onSuccess={() => {
-          eventBus.emit("spaceList");
+          eventBus.emit('spaceList');
         }}
         // onSubmit={handleAddSpaceSubmit}
       />

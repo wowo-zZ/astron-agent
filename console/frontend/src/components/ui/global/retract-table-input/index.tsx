@@ -1,8 +1,8 @@
-import React, { useState, ReactElement } from "react";
-import { useTranslation } from "react-i18next";
-import { Input } from "antd";
+import React, { useState, ReactElement } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Input } from 'antd';
 
-import search from "@/assets/imgs/file/icon-zhishi-search.png";
+import search from '@/assets/imgs/file/icon-zhishi-search.png';
 
 type SearchInputProps = {
   onChange?: (_e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -19,7 +19,7 @@ const RetracTableInput: React.FC<SearchInputProps> = ({
 }: SearchInputProps): ReactElement => {
   const { t } = useTranslation();
   const [expand, setExpand] = useState(true);
-  const [internalValue, setInternalValue] = useState("");
+  const [internalValue, setInternalValue] = useState('');
   // 使用受控或非受控逻辑
   const isControlled = propValue !== undefined;
   const value = isControlled ? propValue : internalValue;
@@ -27,7 +27,7 @@ const RetracTableInput: React.FC<SearchInputProps> = ({
     const inputValue = e.target.value;
     // 启用了首字符限制
     if (restrictFirstChar) {
-      if (inputValue === "" || !/^[%_]/.test(inputValue)) {
+      if (inputValue === '' || !/^[%_]/.test(inputValue)) {
         if (!isControlled) {
           setInternalValue(inputValue);
         }
@@ -51,12 +51,12 @@ const RetracTableInput: React.FC<SearchInputProps> = ({
       />
       <Input
         className="global-input search-input p-0 transition-all pl-8"
-        placeholder={flag ? t("common.taskName") : t("common.inputPlaceholder")}
+        placeholder={flag ? t('common.taskName') : t('common.inputPlaceholder')}
         style={{
           borderRadius: 10,
           height: 32,
           fontWeight: 400,
-          background: "#fff !important",
+          background: '#fff !important',
           width: flag ? 160 : expand ? 300 : 32,
         }}
         onChange={handleChange}

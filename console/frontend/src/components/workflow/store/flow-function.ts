@@ -11,10 +11,10 @@ import {
   findItemById,
   handleReplaceNodeId,
   generateReferences,
-} from "@/components/workflow/utils/reactflowUtils";
-import { v4 as uuid } from "uuid";
-import { cloneDeep } from "lodash";
-import useFlowsManager from "./useFlowsManager";
+} from '@/components/workflow/utils/reactflowUtils';
+import { v4 as uuid } from 'uuid';
+import { cloneDeep } from 'lodash';
+import useFlowsManager from './useFlowsManager';
 import {
   Edge,
   EdgeChange,
@@ -25,8 +25,8 @@ import {
   applyNodeChanges,
   MarkerType,
   Connection,
-} from "reactflow";
-import { NodeDataType } from "@/components/workflow/types";
+} from 'reactflow';
+import { NodeDataType } from '@/components/workflow/types';
 
 export const initialStatus = {
   historys: [],
@@ -44,13 +44,13 @@ const undo = (
   get: () => {
     historys: unknown[];
     setHistorys: (callback: (history: unknown[]) => unknown[]) => void;
-  },
+  }
 ): void => {
   const history: unknown = get().historys?.[get().historys.length - 1];
   if (history) {
     const currentStore = useFlowsManager.getState().getCurrentStore();
     currentStore.getState().loadHistory(history?.nodes, history?.edges);
-    get().setHistorys((history) => {
+    get().setHistorys(history => {
       history.pop();
       return cloneDeep(history);
     });
@@ -59,7 +59,7 @@ const undo = (
 
 const setZoom = (
   zoom: number,
-  set: (state: { zoom: number }) => void,
+  set: (state: { zoom: number }) => void
 ): void => {
   set({
     zoom,
@@ -69,7 +69,7 @@ const setZoom = (
 const takeSnapshot = (
   get: () => {
     setHistorys: (callback: (history: unknown[]) => unknown[]) => void;
-  },
+  }
 ): void => {
   const currentStore = useFlowsManager.getState().getCurrentStore();
   const flowStore = currentStore.getState();
@@ -77,16 +77,16 @@ const takeSnapshot = (
     nodes: cloneDeep(flowStore.nodes),
     edges: cloneDeep(flowStore.edges),
   };
-  get().setHistorys((history) => cloneDeep([...history, newState]));
+  get().setHistorys(history => cloneDeep([...history, newState]));
 };
 
 const setHistorys = (
   change: unknown,
   get,
-  set: (state: { historys: unknown[] }) => void,
+  set: (state: { historys: unknown[] }) => void
 ): void => {
   const newChange =
-    typeof change === "function" ? change(get().historys) : change;
+    typeof change === 'function' ? change(get().historys) : change;
   set({
     historys: newChange,
   });
@@ -96,14 +96,14 @@ const moveToPosition = (
   viewport: unknown,
   get: () => {
     reactFlowInstance: { setViewport: (viewport: unknown) => void };
-  },
+  }
 ): void => {
   get().reactFlowInstance.setViewport(viewport);
 };
 
 const setReactFlowInstance = (
   newState: unknown,
-  set: (state: { reactFlowInstance: unknown }) => void,
+  set: (state: { reactFlowInstance: unknown }) => void
 ): void => {
   set({ reactFlowInstance: newState });
 };
@@ -120,10 +120,10 @@ const onEdgesChange = (
     takeSnapshot: () => void;
     removeNodeRef: (source: string, target: string) => void;
   },
-  set: (state: { edges: Edge[] }) => void,
+  set: (state: { edges: Edge[] }) => void
 ): void => {
   const change = changes[0];
-  if (change?.type === "remove") {
+  if (change?.type === 'remove') {
     get()?.takeSnapshot();
     const [source, target] = extractTargetAndSource(change.id);
     get().removeNodeRef(source, target);
@@ -136,9 +136,9 @@ const onEdgesChange = (
 const setNodes = (
   change: unknown,
   get: () => { nodes: Node[]; edges: Edge[] },
-  set: (state: { nodes: Node[]; edges: Edge[] }) => void,
+  set: (state: { nodes: Node[]; edges: Edge[] }) => void
 ): void => {
-  const newChange = typeof change === "function" ? change(get().nodes) : change;
+  const newChange = typeof change === 'function' ? change(get().nodes) : change;
   const newEdges = cloneDeep(get().edges);
   set({
     edges: newEdges,
@@ -149,9 +149,9 @@ const setNodes = (
 const setEdges = (
   change: unknown,
   get: () => { edges: Edge[] },
-  set: (state: { edges: Edge[] }) => void,
+  set: (state: { edges: Edge[] }) => void
 ): void => {
-  const newChange = typeof change === "function" ? change(get().edges) : change;
+  const newChange = typeof change === 'function' ? change(get().edges) : change;
   set({
     edges: newChange,
   });
@@ -164,11 +164,11 @@ const setNode = (
     nodes: Node[];
     setNodes: (callback: (nodes: Node[]) => Node[]) => void;
   },
-  set: (state: { nodes: Node[] }) => void,
+  set: (state: { nodes: Node[] }) => void
 ): void => {
   const newChange =
-    typeof change === "function"
-      ? change(get().nodes.find((node) => node.id === id))
+    typeof change === 'function'
+      ? change(get().nodes.find(node => node.id === id))
       : change;
 
   get().setNodes((oldNodes: Node[]) =>
@@ -177,24 +177,24 @@ const setNode = (
         return newChange;
       }
       return node;
-    }),
+    })
   );
 };
 
 const delayCheckNode = (
   nodeId: string,
   get: () => { nodes: Node[]; setNode: (id: string, node: Node) => void },
-  set: (state: unknown) => void,
+  set: (state: unknown) => void
 ): void => {
   setTimeout(() => {
-    const currentCheckNode = get().nodes.find((node) => node.id === nodeId);
+    const currentCheckNode = get().nodes.find(node => node.id === nodeId);
     const inputsFlag = checkedNodeInputData(
       currentCheckNode?.data?.inputs || [],
-      currentCheckNode,
+      currentCheckNode
     );
     const outputsFlag = checkedNodeOutputData(
       currentCheckNode?.data?.outputs || [],
-      currentCheckNode,
+      currentCheckNode
     );
     const paramsFlag = checkedNodeParams(currentCheckNode);
     const repeatedFlag = true;
@@ -207,16 +207,16 @@ const delayCheckNode = (
 
 const checkNode = (
   nodeId: string,
-  get: () => { nodes: Node[]; setNode: (id: string, node: Node) => void },
+  get: () => { nodes: Node[]; setNode: (id: string, node: Node) => void }
 ): boolean => {
-  const currentCheckNode = get().nodes.find((node) => node.id === nodeId);
+  const currentCheckNode = get().nodes.find(node => node.id === nodeId);
   const inputsFlag = checkedNodeInputData(
     currentCheckNode.data.inputs || [],
-    currentCheckNode,
+    currentCheckNode
   );
   const outputsFlag = checkedNodeOutputData(
     currentCheckNode.data.outputs || [],
-    currentCheckNode,
+    currentCheckNode
   );
   const paramsFlag = checkedNodeParams(currentCheckNode);
   const repeatedFlag = true;
@@ -231,33 +231,33 @@ const copyNode = (
     nodes: Node[];
     setNodes: (callback: (nodes: Node[]) => Node[]) => void;
     takeSnapshot: () => void;
-  },
+  }
 ): void => {
   get()?.takeSnapshot();
-  const currentNode = get().nodes.find((item) => item.id === nodeId);
+  const currentNode = get().nodes.find(item => item.id === nodeId);
   const currentTypeList = get().nodes.filter(
-    (node) =>
-      node.data?.label?.split("_")?.[0] ===
-      currentNode.data?.label?.split("_")?.[0],
+    node =>
+      node.data?.label?.split('_')?.[0] ===
+      currentNode.data?.label?.split('_')?.[0]
   );
   currentNode.selected = false;
   const copyNode = cloneDeep(currentNode);
-  copyNode.id = getNodeId(copyNode.id?.split("::")?.[0]);
+  copyNode.id = getNodeId(copyNode.id?.split('::')?.[0]);
   copyNode.data.label = getNextName(
     currentTypeList,
-    currentNode.data?.label?.split("_")?.[0],
+    currentNode.data?.label?.split('_')?.[0]
   );
-  copyNode.data.inputs = copyNode.data.inputs?.map((input) => ({
+  copyNode.data.inputs = copyNode.data.inputs?.map(input => ({
     id: input?.id,
     name: input?.name,
     required: input?.required,
     type: input?.type,
     schema: {
-      type: "string",
+      type: 'string',
       value: {
         type: input?.schema?.value?.type,
         content:
-          input?.schema?.value?.type === "literal"
+          input?.schema?.value?.type === 'literal'
             ? input?.schema?.value?.content
             : {},
       },
@@ -270,14 +270,14 @@ const copyNode = (
     y: copyNode.position.y + 50,
   };
   copyNode.selected = true;
-  if (currentNode?.nodeType === "iteration") {
+  if (currentNode?.nodeType === 'iteration') {
     const idsMap = {};
     const childNodes = get()?.nodes?.filter(
-      (node) => node?.data?.parentId === currentNode?.id,
+      node => node?.data?.parentId === currentNode?.id
     );
     const newChildNodes = handleReplaceNodeId(
-      childNodes?.map((item) => {
-        const newId = getNodeId(item.id?.split("::")?.[0]);
+      childNodes?.map(item => {
+        const newId = getNodeId(item.id?.split('::')?.[0]);
         idsMap[item.id] = newId;
         return {
           ...item,
@@ -289,39 +289,39 @@ const copyNode = (
           },
         };
       }),
-      idsMap,
+      idsMap
     );
-    const iterationNodeStartKey = Object.keys(idsMap)?.find((item) =>
-      item?.startsWith("iteration-node-start"),
+    const iterationNodeStartKey = Object.keys(idsMap)?.find(item =>
+      item?.startsWith('iteration-node-start')
     );
     copyNode.data.nodeParam.IterationStartNodeId =
       idsMap[iterationNodeStartKey as string];
-    get().setNodes((old) => {
+    get().setNodes(old => {
       return cloneDeep([
-        ...old.map((item) => ({ ...item, selected: false })),
+        ...old.map(item => ({ ...item, selected: false })),
         copyNode,
         ...newChildNodes,
       ]);
     });
-    const childNodesId = childNodes?.map((node) => node?.id);
+    const childNodesId = childNodes?.map(node => node?.id);
     const newEdges = get()
       .edges?.filter(
-        (edge) =>
+        edge =>
           childNodesId?.includes(edge?.target) ||
-          childNodesId?.includes(edge?.source),
+          childNodesId?.includes(edge?.source)
       )
-      ?.map((edge) => ({
+      ?.map(edge => ({
         ...edge,
         id: getEdgeId(idsMap[edge.target], idsMap[edge.source]),
         target: idsMap[edge.target],
         source: idsMap[edge.source],
         selected: false,
       }));
-    get().setEdges((oldEdges) => cloneDeep([...oldEdges, ...newEdges]));
+    get().setEdges(oldEdges => cloneDeep([...oldEdges, ...newEdges]));
   } else {
-    get().setNodes((old) => {
+    get().setNodes(old => {
       return cloneDeep([
-        ...old.map((item) => ({ ...item, selected: false })),
+        ...old.map(item => ({ ...item, selected: false })),
         copyNode,
       ]);
     });
@@ -337,23 +337,22 @@ const deleteNode = (
     setEdges: (edges: Edge[]) => void;
     takeSnapshot: () => void;
     removeNodeRef: (source: string, target: string, edges: Edge[]) => void;
-  },
+  }
 ): void => {
   get()?.takeSnapshot();
-  const currentNode = get().nodes?.find((node) => node?.id === nodeId);
+  const currentNode = get().nodes?.find(node => node?.id === nodeId);
   const willDeleteNodeIds = get()
     .nodes?.filter(
-      (node) =>
-        node?.data?.parentId === currentNode?.id ||
-        node?.id === currentNode?.id,
+      node =>
+        node?.data?.parentId === currentNode?.id || node?.id === currentNode?.id
     )
-    ?.map((node) => node?.id);
+    ?.map(node => node?.id);
   const newEdges = get().edges.filter(
-    (edge) =>
+    edge =>
       !willDeleteNodeIds?.includes(edge.target) &&
-      !willDeleteNodeIds?.includes(edge.source),
+      !willDeleteNodeIds?.includes(edge.source)
   );
-  get().edges.forEach((edge) => {
+  get().edges.forEach(edge => {
     if (
       willDeleteNodeIds?.includes(edge.target) ||
       willDeleteNodeIds?.includes(edge.source)
@@ -362,20 +361,20 @@ const deleteNode = (
     }
   });
   get().setNodes(
-    currentNode?.nodeType !== "iteration"
-      ? get().nodes.filter((node) =>
-          typeof nodeId === "string"
+    currentNode?.nodeType !== 'iteration'
+      ? get().nodes.filter(node =>
+          typeof nodeId === 'string'
             ? node.id !== nodeId
-            : !nodeId.includes(node.id),
+            : !nodeId.includes(node.id)
         )
-      : get().nodes.filter((node) => !willDeleteNodeIds?.includes(node?.id)),
+      : get().nodes.filter(node => !willDeleteNodeIds?.includes(node?.id))
   );
 
   get().setEdges(newEdges);
 
   useFlowsManager.getState().setNodeInfoEditDrawerlInfo({
     open: false,
-    nodeId: "",
+    nodeId: '',
   });
 };
 
@@ -386,10 +385,10 @@ const updateNodeNameStatus = (
     nodes: Node[];
     setNodes: (callback: (nodes: Node[]) => Node[]) => void;
     updateNodeRef: (id: string) => void;
-  },
+  }
 ): void => {
   get().setNodes((nodes: Node[]) => {
-    const targetNode = nodes.find((item) => item?.id === nodeId);
+    const targetNode = nodes.find(item => item?.id === nodeId);
     targetNode.data.labelEdit = !targetNode.data.labelEdit;
     if (targetNode.data.labelEdit) {
       setTimeout(() => {
@@ -410,10 +409,10 @@ const reNameNode = (
   get: () => {
     nodes: Node[];
     setNodes: (callback: (nodes: Node[]) => Node[]) => void;
-  },
+  }
 ): void => {
   get().setNodes((nodes: Node[]) => {
-    const targetNode = nodes.find((item) => item?.id === nodeId);
+    const targetNode = nodes.find(item => item?.id === nodeId);
     targetNode.data.label = value;
     return cloneDeep(nodes);
   });
@@ -425,34 +424,34 @@ const paste = (
     nodes: Node[];
     setNodes: (callback: (nodes: Node[]) => Node[]) => void;
     setEdges: (edges: Edge[]) => void;
-  },
+  }
 ): void => {
   const idsMap: { [key: string]: string } = {};
   let newNodes: Node<NodeDataType>[] = get().nodes;
   const currentTypeNodeList = cloneDeep(get().nodes);
 
-  newNodes = selection?.nodes.map((item) => {
+  newNodes = selection?.nodes.map(item => {
     const currentTypeList = currentTypeNodeList.filter(
-      (node) =>
-        node.data?.label?.split("_")?.[0] === item.data?.label?.split("_")?.[0],
+      node =>
+        node.data?.label?.split('_')?.[0] === item.data?.label?.split('_')?.[0]
     );
-    const newId = getNodeId(item.id.split("::")[0] || "");
+    const newId = getNodeId(item.id.split('::')[0] || '');
     idsMap[item.id] = newId;
     item.data.label = getNextName(
       currentTypeList,
-      item.data?.label?.split("_")?.[0],
+      item.data?.label?.split('_')?.[0]
     );
-    item.data.inputs = item.data.inputs?.map((input) => ({
+    item.data.inputs = item.data.inputs?.map(input => ({
       id: uuid(),
       name: input?.name,
       required: input?.required,
       type: input?.type,
       schema: {
-        type: "string",
+        type: 'string',
         value: {
           type: input?.schema?.value?.type,
           content:
-            input?.schema?.value?.type === "literal"
+            input?.schema?.value?.type === 'literal'
               ? input?.schema?.value?.content
               : {},
         },
@@ -473,14 +472,14 @@ const paste = (
   });
   get().setNodes((old: Node[]) => {
     return cloneDeep([
-      ...old.map((item) => ({ ...item, selected: false })),
+      ...old.map(item => ({ ...item, selected: false })),
       ...newNodes,
     ]);
   });
 
   const newEdges = selection.edges
-    ?.filter((edge) => idsMap[edge.target] && idsMap[edge.source])
-    ?.map((edge) => ({
+    ?.filter(edge => idsMap[edge.target] && idsMap[edge.source])
+    ?.map(edge => ({
       ...edge,
       id: getEdgeId(idsMap[edge.target], idsMap[edge.source]),
       target: idsMap[edge.target],
@@ -495,19 +494,19 @@ const paste = (
 const updateNodeRef = (id: string, get): void => {
   const childrenNodes: string[] = findChildrenNodes(id, get().edges);
 
-  get().setNodes((old) => {
-    old.forEach((item) => {
+  get().setNodes(old => {
+    old.forEach(item => {
       if (!childrenNodes.includes(item.id)) {
         return;
       }
 
       const references = generateReferences(get().nodes, get().edges, item?.id);
 
-      item.data?.inputs?.forEach((input) => {
+      item.data?.inputs?.forEach(input => {
         processInputReference(item, input, references);
       });
 
-      if (item?.nodeType === "iteration") {
+      if (item?.nodeType === 'iteration') {
         updateIterationOutputs(item, old);
       }
     });
@@ -522,57 +521,56 @@ const updateNodeRef = (id: string, get): void => {
 
 function processInputReference(item, input, references): void {
   const node = references?.find(
-    (ref) => ref.value === input.schema.value.content.nodeId,
+    ref => ref.value === input.schema.value.content.nodeId
   );
 
   const reference = findItemById(
     node ? node?.children[0]?.references : [],
-    input.schema.value.content.id,
+    input.schema.value.content.id
   );
 
   if (shouldResetIteration(item, input, reference)) {
     resetContent(input);
   } else if (node && reference) {
     applyReference(item, input, reference);
-  } else if (typeof input.schema.value.content === "object") {
+  } else if (typeof input.schema.value.content === 'object') {
     resetContent(input);
   }
 }
 
 function shouldResetIteration(item, input, reference): boolean {
   return (
-    item?.nodeType === "iteration" &&
-    typeof input.schema.value.content === "object" &&
-    !reference?.type?.includes("array")
+    item?.nodeType === 'iteration' &&
+    typeof input.schema.value.content === 'object' &&
+    !reference?.type?.includes('array')
   );
 }
 
 function resetContent(input): void {
-  input.schema.value.content.name = "";
-  input.schema.value.content.nodeId = "";
+  input.schema.value.content.name = '';
+  input.schema.value.content.nodeId = '';
 }
 
 function applyReference(item, input, reference): void {
   input.schema.value.content.name = reference?.value;
-  if (item?.nodeType !== "plugin" && item?.nodeType !== "flow") {
+  if (item?.nodeType !== 'plugin' && item?.nodeType !== 'flow') {
     input.schema.type = reference?.type;
     input.fileType = reference?.fileType;
   }
 }
 
 function updateIterationOutputs(item, old): void {
-  const outputs = item?.data?.inputs?.map((input) => ({
+  const outputs = item?.data?.inputs?.map(input => ({
     id: input?.id,
     name: input?.name,
     schema: {
-      type: input?.schema?.type?.split("-")?.pop(),
-      default: "",
+      type: input?.schema?.type?.split('-')?.pop(),
+      default: '',
     },
   }));
 
   const iteratorStartNode = old?.find(
-    (node) =>
-      node?.data?.parentId === item?.id && node?.nodeType === "node-start",
+    node => node?.data?.parentId === item?.id && node?.nodeType === 'node-start'
   );
 
   if (iteratorStartNode) {
@@ -592,25 +590,25 @@ const removeNodeRef = (
   souceId: string,
   targetId: string,
   inputEdges?: Edge[],
-  get,
+  get
 ): void => {
   const edges = (inputEdges || get().edges).filter(
-    (edge) => edge.target !== targetId || edge.source !== souceId,
+    edge => edge.target !== targetId || edge.source !== souceId
   );
   const childrenNodes: string[] = findChildrenNodes(
     souceId,
-    inputEdges || get().edges,
+    inputEdges || get().edges
   );
   get().setNodes((old: Node[]) => {
-    old.forEach((node) => {
+    old.forEach(node => {
       if (childrenNodes.includes(node.id)) {
         const parentNodes: string[] = findParentNodes(node.id, edges);
-        node.data?.inputs?.forEach((input) => {
+        node.data?.inputs?.forEach(input => {
           const inputId = input?.schema?.value?.content?.nodeId;
           if (inputId && !parentNodes.includes(inputId)) {
             input.schema.value.content = {
-              name: "",
-              nodeId: "",
+              name: '',
+              nodeId: '',
             };
           }
         });
@@ -624,12 +622,12 @@ const removeNodeRef = (
 // Function to delete node references
 const deleteNodeRef = (id: string, outputId: string, get): void => {
   const childrenNodes: string[] = findChildrenNodes(id, get().edges);
-  get().setNodes((old) => {
-    old.forEach((item) => {
+  get().setNodes(old => {
+    old.forEach(item => {
       if (childrenNodes.includes(item?.id)) {
-        item.data?.inputs?.forEach((input) => {
+        item.data?.inputs?.forEach(input => {
           if (
-            input.schema.value.type === "ref" &&
+            input.schema.value.type === 'ref' &&
             input.schema.value.content.id === outputId
           ) {
             input.schema.value.content = {};
@@ -649,7 +647,7 @@ const switchNodeRef = (connection: Connection, oldEdge: Edge, get): void => {
 
 // Function to add intent ID
 const addIntentId = (connection: Edge, get): void => {
-  const sourceNode = get().nodes?.find((item) => item.id === connection.source);
+  const sourceNode = get().nodes?.find(item => item.id === connection.source);
   get().setNode(connection.source, cloneDeep(sourceNode));
 };
 
@@ -661,16 +659,16 @@ const onConnect = (connection: Connection, get): void => {
     newEdges = addEdge(
       {
         ...connection,
-        type: "customEdge",
+        type: 'customEdge',
         markerEnd: {
           type: MarkerType.Arrow,
-          color: "#275EFF",
+          color: '#275EFF',
         },
         data: {
           edgeType: useFlowsManager.getState().edgeType,
         },
       },
-      oldEdges,
+      oldEdges
     );
     return newEdges;
   });

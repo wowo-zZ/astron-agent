@@ -1,10 +1,10 @@
-import { useState, useMemo, useCallback, JSX } from "react";
-import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
-import { Switch, message } from "antd";
+import { useState, useMemo, useCallback, JSX } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { Switch, message } from 'antd';
 
-import { DeleteModal, CreateModal } from "./modal-component";
-import { enabledModelAPI } from "@/services/model";
+import { DeleteModal, CreateModal } from './modal-component';
+import { enabledModelAPI } from '@/services/model';
 import {
   ModelInfo,
   CategoryNode,
@@ -12,13 +12,13 @@ import {
   ShelfStatus,
   LocalModelStatus,
   ModelCreateType,
-} from "@/types/model";
-import { ResponseBusinessError } from "@/types/global";
+} from '@/types/model';
+import { ResponseBusinessError } from '@/types/global';
 
 function collectNames(nodes: CategoryNode[] = []): string[] {
   const res: string[] = [];
   function dfs(list: CategoryNode[]): void {
-    list.forEach((item) => {
+    list.forEach(item => {
       res.push(item.name);
       if (item.children?.length) {
         dfs(item.children);
@@ -32,35 +32,35 @@ function collectNames(nodes: CategoryNode[] = []): string[] {
 // 检查模型状态
 function checkLocalModelStatus(model: ModelInfo): boolean {
   return [LocalModelStatus.FAILED, LocalModelStatus.PENDING].includes(
-    model.status,
+    model.status
   );
 }
 
 // 获取发布状态样式和文本
 function getPublishStatusInfo(
   status: LocalModelStatus,
-  t: (key: string) => string,
+  t: (key: string) => string
 ): { text: string; className: string } {
   switch (status) {
     case LocalModelStatus.RUNNING:
       return {
-        text: t("model.publishRunning"),
-        className: "bg-[#dfffce] text-[#3DC253]",
+        text: t('model.publishRunning'),
+        className: 'bg-[#dfffce] text-[#3DC253]',
       };
     case LocalModelStatus.PENDING:
       return {
-        text: t("model.publishPending"),
-        className: "bg-[#FFF4E5] text-[#EBA300]",
+        text: t('model.publishPending'),
+        className: 'bg-[#FFF4E5] text-[#EBA300]',
       };
     case LocalModelStatus.FAILED:
       return {
-        text: t("model.publishFailed"),
-        className: "bg-[#FEEDEC] text-[#F74E43]",
+        text: t('model.publishFailed'),
+        className: 'bg-[#FEEDEC] text-[#F74E43]',
       };
     default:
       return {
-        text: "",
-        className: "",
+        text: '',
+        className: '',
       };
   }
 }
@@ -88,12 +88,12 @@ function ModelCardHeader({
             style={{
               background: model.color
                 ? model.color
-                : `url(${model.address || ""}${model.icon}) no-repeat center / cover`,
+                : `url(${model.address || ''}${model.icon}) no-repeat center / cover`,
             }}
           >
             {model.color && (
               <img
-                src={`${model.address || ""}${model.icon}`}
+                src={`${model.address || ''}${model.icon}`}
                 className="w-[28px] h-[28px]"
                 alt=""
               />
@@ -119,28 +119,28 @@ function ModelCardHeader({
             })()}
           <span
             style={{
-              borderRadius: "12.5px",
-              padding: "2px 8px",
-              color: "#fff",
-              marginLeft: "20px",
+              borderRadius: '12.5px',
+              padding: '2px 8px',
+              color: '#fff',
+              marginLeft: '20px',
               background:
                 model.shelfStatus === ShelfStatus.WAIT_OFF_SHELF
-                  ? "#F74E43"
+                  ? '#F74E43'
                   : model.shelfStatus === ShelfStatus.OFF_SHELF
-                    ? "#7F7F7F"
-                    : "",
+                    ? '#7F7F7F'
+                    : '',
             }}
           >
             {model.shelfStatus === ShelfStatus.WAIT_OFF_SHELF
-              ? t("model.toBeOffShelf")
+              ? t('model.toBeOffShelf')
               : model.shelfStatus === ShelfStatus.OFF_SHELF
-                ? t("model.offShelf")
-                : ""}
+                ? t('model.offShelf')
+                : ''}
           </span>
           <p className="text-sm text-gray-500 flex flex-wrap gap-x-2 gap-2 mt-2">
             {modelCategoryTags
-              .filter((name) => name !== t("model.other"))
-              .map((name) => (
+              .filter(name => name !== t('model.other'))
+              .map(name => (
                 <span
                   key={name}
                   className="px-1.5 py-0.5 text-xs rounded-sm bg-[#E4EAFF] opacity-60 text-[#000000]"
@@ -149,12 +149,12 @@ function ModelCardHeader({
                 </span>
               ))}
             {modelScenarioTags
-              .filter((name) => name !== t("model.other"))
-              .map((name) => (
+              .filter(name => name !== t('model.other'))
+              .map(name => (
                 <span
                   key={name}
                   className="px-1.5 py-0.5 text-xs rounded-sm bg-[#E8E8EA] opacity-60"
-                  style={{ color: "#000000" }}
+                  style={{ color: '#000000' }}
                 >
                   {name}
                 </span>
@@ -169,18 +169,18 @@ function ModelCardHeader({
           disabled={checkLocalModelStatus(model)}
           className={
             model.enabled
-              ? "[&_.ant-switch-inner]:bg-[#275EFF]"
-              : "[&_.ant-switch-inner]:bg-gray-400"
+              ? '[&_.ant-switch-inner]:bg-[#275EFF]'
+              : '[&_.ant-switch-inner]:bg-gray-400'
           }
           onChange={(checked, e) => {
             e.stopPropagation();
             setEnabled(checked);
-            enabledModelAPI(model.id, model.llmSource, checked ? "on" : "off")
+            enabledModelAPI(model.id, model.llmSource, checked ? 'on' : 'off')
               .then(() => {
                 message.success(
                   checked
-                    ? t("model.modelEnableSuccess")
-                    : t("model.modelDisableSuccess"),
+                    ? t('model.modelEnableSuccess')
+                    : t('model.modelDisableSuccess')
                 );
                 getModels();
               })
@@ -241,7 +241,7 @@ function ModelCardFooter({
           <div className="relative">
             <button
               className="w-6 h-6 flex items-center justify-center rounded-[4px] font-extrabold text-[20px] text-[#7F7F7F] hover:text-black"
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation();
                 setMenuVisible(!menuVisible);
               }}
@@ -256,11 +256,11 @@ function ModelCardFooter({
                 <button
                   className={`block w-full text-left px-3 py-1 text-sm ${
                     model.status === LocalModelStatus.PENDING
-                      ? "text-gray-400 cursor-not-allowed"
-                      : "hover:bg-gray-100"
+                      ? 'text-gray-400 cursor-not-allowed'
+                      : 'hover:bg-gray-100'
                   }`}
                   disabled={model.status === LocalModelStatus.PENDING}
-                  onClick={(e) => {
+                  onClick={e => {
                     if (model.status === LocalModelStatus.PENDING) return;
                     e.stopPropagation();
                     setModelId(model.id);
@@ -268,34 +268,34 @@ function ModelCardFooter({
                     setMenuVisible(false);
                   }}
                 >
-                  {t("model.editAction")}
+                  {t('model.editAction')}
                 </button>
                 <button
                   className={`block w-full text-left px-3 py-1 text-sm ${
                     checkLocalModelStatus(model)
-                      ? "text-gray-400 cursor-not-allowed"
-                      : "hover:bg-gray-100 text-red-600"
+                      ? 'text-gray-400 cursor-not-allowed'
+                      : 'hover:bg-gray-100 text-red-600'
                   }`}
                   disabled={checkLocalModelStatus(model)}
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation();
                     if (checkLocalModelStatus(model)) return;
                     setDeleteModal(true);
                     setMenuVisible(false);
                   }}
                 >
-                  {t("model.deleteAction")}
+                  {t('model.deleteAction')}
                 </button>
                 {model.status === LocalModelStatus.FAILED && (
                   <button
                     className="block w-full text-left px-3 py-1 hover:bg-gray-100 text-sm text-blue-600"
-                    onClick={(e) => {
+                    onClick={e => {
                       e.stopPropagation();
                       // TODO: 实现重新发布逻辑
                       setMenuVisible(false);
                     }}
                   >
-                    {t("model.republish")}
+                    {t('model.republish')}
                   </button>
                 )}
               </div>
@@ -307,13 +307,13 @@ function ModelCardFooter({
         <CreateModal
           setCreateModal={setCreateModal}
           getModels={getModels}
-          modelId={modelId?.toString() || ""}
+          modelId={modelId?.toString() || ''}
           categoryTree={categoryTree}
         />
       )}
       {deleteModal && (
         <DeleteModal
-          msg={t("model.deleteWarning")}
+          msg={t('model.deleteWarning')}
           setDeleteModal={setDeleteModal}
           currentModel={model}
           getModels={getModels}
@@ -349,9 +349,9 @@ function ModelCard({
   const getTags = useCallback(
     (keys: string[]): string[] => {
       const tags: string[] = [];
-      keys.forEach((key) => {
+      keys.forEach(key => {
         const node = model.categoryTree?.find(
-          (n: CategoryNode) => n.key === key,
+          (n: CategoryNode) => n.key === key
         );
         if (node) {
           tags.push(...collectNames(node.children));
@@ -359,47 +359,47 @@ function ModelCard({
       });
       return tags.filter((v, i, arr) => arr.indexOf(v) === i);
     },
-    [model.categoryTree],
+    [model.categoryTree]
   );
 
   const modelCategoryTags = useMemo(
-    () => getTags(["modelCategory"]),
-    [getTags],
+    () => getTags(['modelCategory']),
+    [getTags]
   );
   const modelScenarioTags = useMemo(
-    () => getTags(["modelScenario"]),
-    [getTags],
+    () => getTags(['modelScenario']),
+    [getTags]
   );
-  const modelProvider = useMemo(() => getTags(["modelProvider"]), [getTags]);
+  const modelProvider = useMemo(() => getTags(['modelProvider']), [getTags]);
   const languageSupport = useMemo(
-    () => getTags(["languageSupport"]),
-    [getTags],
+    () => getTags(['languageSupport']),
+    [getTags]
   );
   const contextLengthTag = useMemo(
-    () => getTags(["contextLengthTag"]),
-    [getTags],
+    () => getTags(['contextLengthTag']),
+    [getTags]
   );
 
   const formatDate = (d: Date): string => {
     const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
     return `${y}-${m}-${day}`;
   };
 
   const bottomTexts = [
     modelProvider?.[0],
-    languageSupport?.[0] && `${t("model.language")}${languageSupport[0]}`,
+    languageSupport?.[0] && `${t('model.language')}${languageSupport[0]}`,
     contextLengthTag?.[0] &&
-      `${t("model.contextLengthLabel")}${contextLengthTag[0]}`,
+      `${t('model.contextLengthLabel')}${contextLengthTag[0]}`,
     model.updateTime &&
-      `${formatDate(new Date(model.updateTime))} ${t("model.updated")}`,
+      `${formatDate(new Date(model.updateTime))} ${t('model.updated')}`,
   ].filter(Boolean);
 
   const handleUse = (): void => {
     navigate(
       `/management/model/detail/${model.id}?llmSource=${model.llmSource}&modelIcon=${model.icon}`,
-      { state: { model, bottomTexts } }, // ← 整个 model 放在 state
+      { state: { model, bottomTexts } } // ← 整个 model 放在 state
     );
   };
 

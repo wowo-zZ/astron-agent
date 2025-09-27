@@ -1,5 +1,5 @@
-import React from "react";
-import rightBlue from "@/assets/imgs/trace/right-blue.svg";
+import React from 'react';
+import rightBlue from '@/assets/imgs/trace/right-blue.svg';
 
 interface TableBodyProps {
   resources: any[];
@@ -22,16 +22,16 @@ export const TableBody: React.FC<TableBodyProps> = ({ resources, styles }) => (
             style={{
               borderBottom:
                 resourceIndex === item.resource.length - 1
-                  ? "2px solid #f2f4f8"
-                  : "none",
+                  ? '2px solid #f2f4f8'
+                  : 'none',
             }}
           >
             <td className={styles.sourceItemTd}>
-              <div style={{ whiteSpace: "pre-line" }}>{resourceItem.name}</div>
+              <div style={{ whiteSpace: 'pre-line' }}>{resourceItem.name}</div>
               {resourceItem?.nameDesc && (
                 <div
                   className={styles.nameDesc}
-                  style={{ whiteSpace: "pre-line" }}
+                  style={{ whiteSpace: 'pre-line' }}
                 >
                   {resourceItem?.nameDesc}
                 </div>
@@ -42,13 +42,13 @@ export const TableBody: React.FC<TableBodyProps> = ({ resources, styles }) => (
                 {itm ? (
                   <div
                     className={styles.sourceItemWrap}
-                    style={{ whiteSpace: "pre-line" }}
+                    style={{ whiteSpace: 'pre-line' }}
                   >
                     {itm?.icon && <img src={rightBlue} />}
-                    {itm.itemTitle ?? "-"}
+                    {itm.itemTitle ?? '-'}
                   </div>
                 ) : (
-                  "-"
+                  '-'
                 )}
               </td>
             ))}

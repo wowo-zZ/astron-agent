@@ -1,11 +1,11 @@
-import { useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
-import { getBotInfo } from "@/services/spark-common";
-import useBotStore from "@/store/bot-store";
-import BotAnalysis from "@/components/config-page-component/bot-analysis";
-import ConfigHeader from "@/components/config-page-component/config-header/ConfigHeader";
+import { useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { getBotInfo } from '@/services/spark-common';
+import useBotStore from '@/store/bot-store';
+import BotAnalysis from '@/components/config-page-component/bot-analysis';
+import ConfigHeader from '@/components/config-page-component/config-header/ConfigHeader';
 
-import styles from "./index.module.scss";
+import styles from './index.module.scss';
 
 const ConfigOverview = ({
   currentRobot,
@@ -17,17 +17,17 @@ const ConfigOverview = ({
   setCurrentTab: any;
 }) => {
   const [searchParams] = useSearchParams();
-  const botId = searchParams.get("botId");
+  const botId = searchParams.get('botId');
   const { detailInfo, setDetailInfo } = useBotStore();
 
   useEffect(() => {
-    getBotInfo({ botId: botId }).then((res) => {
+    getBotInfo({ botId: botId }).then(res => {
       setDetailInfo(res?.data || res); // NOTE: 这里的处理可能不对, 原来是直接用 res 赋值
     });
   }, [botId]);
 
   useEffect(() => {
-    setCurrentTab("overview");
+    setCurrentTab('overview');
   }, []);
 
   return (
@@ -35,7 +35,7 @@ const ConfigOverview = ({
       <ConfigHeader
         coverUrl={detailInfo?.avatar}
         baseinfo={detailInfo}
-        botId={searchParams.get("botId")}
+        botId={searchParams.get('botId')}
         detailInfo={detailInfo}
         currentRobot={currentRobot}
         currentTab={currentTab}

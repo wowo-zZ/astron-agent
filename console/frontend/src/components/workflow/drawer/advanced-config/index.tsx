@@ -4,15 +4,15 @@ import React, {
   useRef,
   useEffect,
   useMemo,
-} from "react";
-import { Drawer, Switch, Input, Upload, message } from "antd";
-import type { UploadProps, UploadFile } from "antd";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import { saveFlowAPI } from "@/services/flow";
-import { debounce, cloneDeep } from "lodash";
-import { isJSON } from "@/utils";
-import OpeningRemarks from "./opening-remarks";
-import { useTranslation } from "react-i18next";
+} from 'react';
+import { Drawer, Switch, Input, Upload, message } from 'antd';
+import type { UploadProps, UploadFile } from 'antd';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import { saveFlowAPI } from '@/services/flow';
+import { debounce, cloneDeep } from 'lodash';
+import { isJSON } from '@/utils';
+import OpeningRemarks from './opening-remarks';
+import { useTranslation } from 'react-i18next';
 import {
   FlowType,
   ChatBackgroundInfo,
@@ -21,10 +21,10 @@ import {
   DrawerStyleType,
   VoiceBroadcastInstance,
   AdvancedConfigUpdate,
-} from "@/components/workflow/types";
+} from '@/components/workflow/types';
 
 // 从统一的图标管理中导入
-import { Icons } from "@/components/workflow/icons";
+import { Icons } from '@/components/workflow/icons';
 
 // 获取 Advanced Config 模块的图标
 const icons = Icons.advancedConfig;
@@ -34,12 +34,12 @@ const { Dragger } = Upload;
 function AdvancedConfiguration(): void {
   const { t } = useTranslation();
 
-  const currentFlow = useFlowsManager((state) => state.currentFlow) as
+  const currentFlow = useFlowsManager(state => state.currentFlow) as
     | FlowType
     | undefined;
-  const open = useFlowsManager((state) => state.advancedConfiguration);
-  const setOpen = useFlowsManager((state) => state.setAdvancedConfiguration);
-  const setCurrentFlow = useFlowsManager((state) => state.setCurrentFlow);
+  const open = useFlowsManager(state => state.advancedConfiguration);
+  const setOpen = useFlowsManager(state => state.setAdvancedConfiguration);
+  const setCurrentFlow = useFlowsManager(state => state.setCurrentFlow);
   const audioRef = useRef<HTMLAudioElement>(null);
   const websocketAudioRef = useRef<VoiceBroadcastInstance | null>(null);
   const [openingRemarksModal, setOpeningRemarksModal] =
@@ -61,9 +61,9 @@ function AdvancedConfiguration(): void {
         height: window?.innerHeight - 80,
       });
     };
-    window.addEventListener("resize", handleAdjustmentDrawerStyle);
+    window.addEventListener('resize', handleAdjustmentDrawerStyle);
     return (): void =>
-      window.removeEventListener("resize", handleAdjustmentDrawerStyle);
+      window.removeEventListener('resize', handleAdjustmentDrawerStyle);
   }, [drawerStyle]);
 
   const advancedConfig = useMemo<AdvancedConfigType>(() => {
@@ -76,8 +76,8 @@ function AdvancedConfiguration(): void {
         needGuide: parsedConfig?.needGuide,
         prologue: {
           enabled: parsedConfig?.prologue?.enabled ?? true,
-          prologueText: parsedConfig?.prologue?.prologueText || "",
-          inputExample: parsedConfig?.prologue?.inputExample || [""],
+          prologueText: parsedConfig?.prologue?.prologueText || '',
+          inputExample: parsedConfig?.prologue?.inputExample || [''],
         },
         feedback: {
           enabled: parsedConfig?.feedback?.enabled ?? true,
@@ -94,8 +94,8 @@ function AdvancedConfiguration(): void {
       return {
         prologue: {
           enabled: true,
-          prologueText: "",
-          inputExample: [""],
+          prologueText: '',
+          inputExample: [''],
         },
         feedback: {
           enabled: true,
@@ -114,7 +114,7 @@ function AdvancedConfiguration(): void {
   const handlePresetQuestionChange = useCallback(
     (index: number, value: string) => {
       handleAdvancedConfigChange(
-        () => (advancedConfig.prologue.inputExample[index] = value),
+        () => (advancedConfig.prologue.inputExample[index] = value)
       );
       updateAdvancedConfigParamsDebounce({
         prologue: {
@@ -122,7 +122,7 @@ function AdvancedConfiguration(): void {
         },
       });
     },
-    [advancedConfig],
+    [advancedConfig]
   );
 
   const updateAdvancedConfigParams = useCallback(
@@ -134,7 +134,7 @@ function AdvancedConfiguration(): void {
       };
       saveFlowAPI(params);
     },
-    [currentFlow?.id, currentFlow?.flowId],
+    [currentFlow?.id, currentFlow?.flowId]
   );
 
   const updateAdvancedConfigParamsDebounce = useCallback(
@@ -146,7 +146,7 @@ function AdvancedConfiguration(): void {
       };
       saveFlowAPI(params);
     }, 500),
-    [currentFlow?.id, currentFlow?.flowId],
+    [currentFlow?.id, currentFlow?.flowId]
   );
 
   const handleAdvancedConfigChange = useCallback(
@@ -159,20 +159,20 @@ function AdvancedConfiguration(): void {
         return cloneDeep(currentFlow);
       });
     },
-    [advancedConfig],
+    [advancedConfig]
   );
 
   function beforeUpload(file: UploadFile): boolean {
     const maxSize = 5 * 1024 * 1024;
     if (file.size && file.size > maxSize) {
-      message.error(t("workflow.advancedConfiguration.uploadFileSizeError"));
+      message.error(t('workflow.advancedConfiguration.uploadFileSizeError'));
       return false;
     }
-    const fileExtension = file?.name?.split(".")?.pop()?.toLowerCase();
+    const fileExtension = file?.name?.split('.')?.pop()?.toLowerCase();
     const isValidFormat =
-      fileExtension && ["png", "jpg", "jpeg"].includes(fileExtension);
+      fileExtension && ['png', 'jpg', 'jpeg'].includes(fileExtension);
     if (!isValidFormat) {
-      message.error(t("workflow.advancedConfiguration.uploadFileFormatError"));
+      message.error(t('workflow.advancedConfiguration.uploadFileFormatError'));
       return false;
     } else {
       return true;
@@ -180,38 +180,38 @@ function AdvancedConfiguration(): void {
   }
 
   const formatFileSize = (sizeInBytes: number): string => {
-    if (sizeInBytes === 0) return "0 B";
+    if (sizeInBytes === 0) return '0 B';
     const k = 1024;
-    const sizes = ["B", "KB", "MB", "GB", "TB"];
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
     const i = Math.floor(Math.log(sizeInBytes) / Math.log(k));
 
     return (
-      parseFloat((sizeInBytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
+      parseFloat((sizeInBytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
     );
   };
 
   const uploadProps: UploadProps = {
-    name: "file",
-    action: "/xingchen-api/image/upload",
+    name: 'file',
+    action: '/xingchen-api/image/upload',
     showUploadList: false,
-    accept: ".png,.jpg,.jpeg",
+    accept: '.png,.jpg,.jpeg',
     beforeUpload,
-    onChange: (info) => {
+    onChange: info => {
       const file = info.file;
-      if (info.file.status === "done") {
+      if (info.file.status === 'done') {
         const response = info.file.response as UploadResponse;
         if (response && response.data && response.code === 0) {
           const data = response.data;
-          const type = file.name?.split(".")?.pop()?.toLowerCase();
+          const type = file.name?.split('.')?.pop()?.toLowerCase();
           const chatBackgroundInfo: ChatBackgroundInfo = {
-            name: file.name || "",
-            type: type || "",
+            name: file.name || '',
+            type: type || '',
             total: formatFileSize(file.size || 0),
             url: data.downloadLink,
           };
           setChatBackgroundInfo(chatBackgroundInfo);
           handleAdvancedConfigChange(
-            () => (advancedConfig.chatBackground.info = chatBackgroundInfo),
+            () => (advancedConfig.chatBackground.info = chatBackgroundInfo)
           );
           updateAdvancedConfigParams({
             chatBackground: {
@@ -219,7 +219,7 @@ function AdvancedConfiguration(): void {
             },
           });
         } else {
-          message.error(response?.message || "上传失败");
+          message.error(response?.message || '上传失败');
         }
       }
     },
@@ -233,7 +233,7 @@ function AdvancedConfiguration(): void {
       open={open}
       mask={false}
       getContainer={() =>
-        document.getElementById("flow-container") || document.body
+        document.getElementById('flow-container') || document.body
       }
     >
       {openingRemarksModal && (
@@ -241,7 +241,7 @@ function AdvancedConfiguration(): void {
           setOpeningRemarksModal={setOpeningRemarksModal}
           setConversationStarter={(value: string) => {
             handleAdvancedConfigChange(
-              () => (advancedConfig.prologue.prologueText = value),
+              () => (advancedConfig.prologue.prologueText = value)
             );
             updateAdvancedConfigParams({
               prologue: {
@@ -255,7 +255,7 @@ function AdvancedConfiguration(): void {
       )}
       <audio
         ref={audioRef}
-        style={{ display: "none" }}
+        style={{ display: 'none' }}
         onEnded={() => {
           const audio = audioRef.current;
           if (audio) {
@@ -267,11 +267,11 @@ function AdvancedConfiguration(): void {
       ></audio>
       <div
         className="w-full h-full py-4 flex flex-col overflow-hidden"
-        onKeyDown={(e) => e.stopPropagation()}
+        onKeyDown={e => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-5">
           <div className="font-semibold text-lg">
-            {t("workflow.advancedConfiguration.title")}
+            {t('workflow.advancedConfiguration.title')}
           </div>
           <img
             src={icons.close}
@@ -281,13 +281,13 @@ function AdvancedConfiguration(): void {
           />
         </div>
         <div className="text-[#999] text-sm font-medium mt-[14px] px-5">
-          {t("workflow.advancedConfiguration.subtitle")}
+          {t('workflow.advancedConfiguration.subtitle')}
         </div>
         <div className="flex-1 overflow-auto flex flex-col mt-8 gap-2.5 px-5">
           <div
             className="bg-[#F7F7FA] rounded-lg"
             style={{
-              padding: "10px 17px 16px 17px",
+              padding: '10px 17px 16px 17px',
             }}
           >
             <div className="w-full flex items-center justify-between">
@@ -298,15 +298,15 @@ function AdvancedConfiguration(): void {
                   alt=""
                 />
                 <div className="font-medium">
-                  {t("workflow.advancedConfiguration.conversationStarter")}
+                  {t('workflow.advancedConfiguration.conversationStarter')}
                 </div>
               </div>
               <Switch
                 className="list-switch config-switch"
                 checked={advancedConfig?.prologue?.enabled}
-                onChange={(value) => {
+                onChange={value => {
                   handleAdvancedConfigChange(
-                    () => (advancedConfig.prologue.enabled = value),
+                    () => (advancedConfig.prologue.enabled = value)
                   );
                   updateAdvancedConfigParams({
                     prologue: {
@@ -318,7 +318,7 @@ function AdvancedConfiguration(): void {
             </div>
             <div className="text-xs font-medium text-[#666] mt-1">
               {t(
-                "workflow.advancedConfiguration.conversationStarterDescription",
+                'workflow.advancedConfiguration.conversationStarterDescription'
               )}
             </div>
             {advancedConfig?.prologue?.enabled && (
@@ -334,21 +334,21 @@ function AdvancedConfiguration(): void {
                       alt=""
                     />
                     <span>
-                      {t("workflow.advancedConfiguration.aiGenerate")}
+                      {t('workflow.advancedConfiguration.aiGenerate')}
                     </span>
                   </div>
                   <Input.TextArea
                     className="mt-2.5 global-textarea pr-6 flow-advanced-configuration-textarea"
                     placeholder={t(
-                      "workflow.advancedConfiguration.openingRemarksPlaceholder",
+                      'workflow.advancedConfiguration.openingRemarksPlaceholder'
                     )}
-                    style={{ height: 96, resize: "none" }}
+                    style={{ height: 96, resize: 'none' }}
                     value={advancedConfig?.prologue?.prologueText}
-                    onChange={(e) => {
+                    onChange={e => {
                       handleAdvancedConfigChange(
                         () =>
                           (advancedConfig.prologue.prologueText =
-                            e?.target?.value),
+                            e?.target?.value)
                       );
                       updateAdvancedConfigParamsDebounce({
                         prologue: {
@@ -362,7 +362,7 @@ function AdvancedConfiguration(): void {
                 <div className="w-full flex items-center justify-between mt-4">
                   <div className="font-medium">
                     {t(
-                      "workflow.advancedConfiguration.openingRemarksPresetQuestions",
+                      'workflow.advancedConfiguration.openingRemarksPresetQuestions'
                     )}
                   </div>
                   {advancedConfig?.prologue?.inputExample?.length < 3 && (
@@ -373,8 +373,8 @@ function AdvancedConfiguration(): void {
                           () =>
                             (advancedConfig.prologue.inputExample = [
                               ...advancedConfig.prologue.inputExample,
-                              "",
-                            ]),
+                              '',
+                            ])
                         );
                         updateAdvancedConfigParams({
                           prologue: {
@@ -389,7 +389,7 @@ function AdvancedConfiguration(): void {
                         className="w-[10px] h-[10px]"
                         alt=""
                       />
-                      <span>{t("workflow.advancedConfiguration.add")}</span>
+                      <span>{t('workflow.advancedConfiguration.add')}</span>
                     </div>
                   )}
                 </div>
@@ -401,14 +401,14 @@ function AdvancedConfiguration(): void {
                           height: 40,
                         }}
                         value={question}
-                        onChange={(e) =>
+                        onChange={e =>
                           handlePresetQuestionChange(
                             index,
-                            e.target.value?.trim(),
+                            e.target.value?.trim()
                           )
                         }
                         placeholder={t(
-                          "workflow.advancedConfiguration.presetQuestionPlaceholder",
+                          'workflow.advancedConfiguration.presetQuestionPlaceholder'
                         )}
                         className="global-input flex-1 shrink-0 mt-1.5 flow-advanced-configuration-input pr-8"
                       />
@@ -421,8 +421,8 @@ function AdvancedConfiguration(): void {
                             handleAdvancedConfigChange(() =>
                               advancedConfig?.prologue?.inputExample?.splice(
                                 index,
-                                1,
-                              ),
+                                1
+                              )
                             );
                             updateAdvancedConfigParams({
                               prologue: {
@@ -434,7 +434,7 @@ function AdvancedConfiguration(): void {
                         />
                       ) : null}
                     </div>
-                  ),
+                  )
                 )}
               </>
             )}
@@ -442,7 +442,7 @@ function AdvancedConfiguration(): void {
           <div
             className="bg-[#F7F7FA] rounded-lg"
             style={{
-              padding: "10px 17px 16px 17px",
+              padding: '10px 17px 16px 17px',
             }}
           >
             <div className="w-full flex items-center justify-between">
@@ -453,17 +453,17 @@ function AdvancedConfiguration(): void {
                   alt=""
                 />
                 <div className="font-medium">
-                  {t("workflow.advancedConfiguration.nextQuestionSuggestion")}
+                  {t('workflow.advancedConfiguration.nextQuestionSuggestion')}
                 </div>
               </div>
               <Switch
                 className="list-switch config-switch"
                 checked={advancedConfig?.suggestedQuestionsAfterAnswer?.enabled}
-                onChange={(value) => {
+                onChange={value => {
                   handleAdvancedConfigChange(
                     () =>
                       (advancedConfig.suggestedQuestionsAfterAnswer.enabled =
-                        value),
+                        value)
                   );
                   updateAdvancedConfigParams({
                     suggestedQuestionsAfterAnswer: {
@@ -475,14 +475,14 @@ function AdvancedConfiguration(): void {
             </div>
             <div className="text-xs font-medium text-[#666] mt-1 max-w-[274px] whitespace-pre-wrap">
               {t(
-                "workflow.advancedConfiguration.nextQuestionSuggestionDescription",
+                'workflow.advancedConfiguration.nextQuestionSuggestionDescription'
               )}
             </div>
           </div>
           <div
             className="bg-[#F7F7FA] rounded-lg"
             style={{
-              padding: "10px 17px 16px 17px",
+              padding: '10px 17px 16px 17px',
             }}
           >
             <div className="w-full flex items-center justify-between">
@@ -493,15 +493,15 @@ function AdvancedConfiguration(): void {
                   alt=""
                 />
                 <div className="font-medium">
-                  {t("workflow.advancedConfiguration.likeAndDislike")}
+                  {t('workflow.advancedConfiguration.likeAndDislike')}
                 </div>
               </div>
               <Switch
                 className="list-switch config-switch"
                 checked={advancedConfig?.feedback?.enabled}
-                onChange={(value) => {
+                onChange={value => {
                   handleAdvancedConfigChange(
-                    () => (advancedConfig.feedback.enabled = value),
+                    () => (advancedConfig.feedback.enabled = value)
                   );
                   updateAdvancedConfigParams({
                     feedback: {
@@ -512,13 +512,13 @@ function AdvancedConfiguration(): void {
               />
             </div>
             <div className="text-xs font-medium text-[#666] mt-1 max-w-[274px] whitespace-pre-wrap">
-              {t("workflow.advancedConfiguration.likeAndDislikeDescription")}
+              {t('workflow.advancedConfiguration.likeAndDislikeDescription')}
             </div>
           </div>
           <div
             className="bg-[#F7F7FA] rounded-lg"
             style={{
-              padding: "10px 17px 16px 17px",
+              padding: '10px 17px 16px 17px',
             }}
           >
             <div className="w-full flex items-center justify-between">
@@ -529,15 +529,15 @@ function AdvancedConfiguration(): void {
                   alt=""
                 />
                 <div className="font-medium">
-                  {t("workflow.advancedConfiguration.setBackground")}
+                  {t('workflow.advancedConfiguration.setBackground')}
                 </div>
               </div>
               <Switch
                 className="list-switch config-switch"
                 checked={advancedConfig?.chatBackground?.enabled}
-                onChange={(value) => {
+                onChange={value => {
                   handleAdvancedConfigChange(
-                    () => (advancedConfig.chatBackground.enabled = value),
+                    () => (advancedConfig.chatBackground.enabled = value)
                   );
                   updateAdvancedConfigParams({
                     chatBackground: {
@@ -548,20 +548,20 @@ function AdvancedConfiguration(): void {
               />
             </div>
             <div className="text-xs font-medium text-[#666] mt-1 max-w-[274px] whitespace-pre-wrap">
-              {t("workflow.advancedConfiguration.setBackgroundDescription")}
+              {t('workflow.advancedConfiguration.setBackgroundDescription')}
             </div>
             {advancedConfig?.chatBackground?.enabled && (
               <div className="w-full pt-4">
                 <Dragger {...uploadProps} className="icon-upload">
                   <img src={icons.uploadAct} className="w-8 h-8" alt="" />
                   <div className="font-medium mt-6">
-                    {t("workflow.advancedConfiguration.dragFileHere")}
+                    {t('workflow.advancedConfiguration.dragFileHere')}
                     <span className="text-[#275EFF]">
-                      {t("workflow.advancedConfiguration.selectFile")}
+                      {t('workflow.advancedConfiguration.selectFile')}
                     </span>
                   </div>
                   <p className="text-desc mt-2">
-                    {t("workflow.advancedConfiguration.fileFormatTip")}
+                    {t('workflow.advancedConfiguration.fileFormatTip')}
                   </p>
                 </Dragger>
                 {chatBackgroundInfo && (
@@ -586,7 +586,7 @@ function AdvancedConfiguration(): void {
                       onClick={() => {
                         setChatBackgroundInfo(null);
                         handleAdvancedConfigChange(
-                          () => (advancedConfig.chatBackground.info = null),
+                          () => (advancedConfig.chatBackground.info = null)
                         );
                         updateAdvancedConfigParams({
                           chatBackground: {

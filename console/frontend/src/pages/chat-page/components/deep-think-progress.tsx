@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import LoadingAnimate from "@/constants/lottie-react/chat-loading.json";
-import Lottie from "lottie-react";
-import { useTranslation } from "react-i18next";
-import { MessageListType } from "@/types/chat";
-import MarkdownRender from "@/components/markdown-render";
+import React, { useState } from 'react';
+import LoadingAnimate from '@/constants/lottie-react/chat-loading.json';
+import Lottie from 'lottie-react';
+import { useTranslation } from 'react-i18next';
+import { MessageListType } from '@/types/chat';
+import MarkdownRender from '@/components/markdown-render';
 
 const DeepThinkProgress: React.FC<{
   answerItem?: MessageListType;
@@ -26,7 +26,7 @@ const DeepThinkProgress: React.FC<{
                 loop={true}
                 className="w-[26px] h-[26px]"
                 rendererSettings={{
-                  preserveAspectRatio: "xMidYMid slice",
+                  preserveAspectRatio: 'xMidYMid slice',
                 }}
               />
             </div>
@@ -54,7 +54,7 @@ const DeepThinkProgress: React.FC<{
   return (
     <div
       className={`text-sm text-[#838a95] my-2.5 ${
-        !open ? "h-6 overflow-hidden" : ""
+        !open ? 'h-6 overflow-hidden' : ''
       }`}
     >
       <div
@@ -63,12 +63,12 @@ const DeepThinkProgress: React.FC<{
           setOpen(!open);
         }}
       >
-        {t("chatPage.deepThinkProgress.title")}
+        {t('chatPage.deepThinkProgress.title')}
         <img
           src="https://openres.xfyun.cn/xfyundoc/2025-04-01/52202e3f-c57f-4820-81ee-361335e861f9/1743475056488/vasvasavs.svg"
           alt=""
           className={`w-2 h-auto ml-1 transition-transform duration-200 ${
-            !open ? "rotate-180" : ""
+            !open ? 'rotate-180' : ''
           }`}
         />
       </div>
@@ -80,7 +80,7 @@ const DeepThinkProgress: React.FC<{
             alt=""
             className="mr-2.5"
           />
-          {t("chatPage.deepThinkProgress.endTip")}
+          {t('chatPage.deepThinkProgress.endTip')}
         </div>
       ) : null}
     </div>

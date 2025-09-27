@@ -1,17 +1,17 @@
-import React, { useMemo, useCallback } from "react";
-import { Select, Button, message, Tooltip } from "antd";
-import { FlowInput } from "@/components/workflow/ui";
-import { useTranslation } from "react-i18next";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
+import React, { useMemo, useCallback } from 'react';
+import { Select, Button, message, Tooltip } from 'antd';
+import { FlowInput } from '@/components/workflow/ui';
+import { useTranslation } from 'react-i18next';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
 
-import formSelect from "@/assets/imgs/main/icon_nav_dropdown.svg";
-import search from "@/assets/imgs/workflow/search-icon.svg";
-import knowledgeIcon from "@/assets/imgs/workflow/knowledgeIcon.png";
-import publishIcon from "@/assets/imgs/workflow/publish-icon.png";
-import toolModalAdd from "@/assets/imgs/workflow/tool-modal-add.png";
-import xingchenIcon from "@/assets/imgs/knowledge/xingchen-icon.svg";
-import xingPuIcon from "@/assets/imgs/knowledge/xingpu-icon.svg";
-import baseVersionIcon from "@/assets/imgs/knowledge/base-version-icon.svg";
+import formSelect from '@/assets/imgs/main/icon_nav_dropdown.svg';
+import search from '@/assets/imgs/workflow/search-icon.svg';
+import knowledgeIcon from '@/assets/imgs/workflow/knowledgeIcon.png';
+import publishIcon from '@/assets/imgs/workflow/publish-icon.png';
+import toolModalAdd from '@/assets/imgs/workflow/tool-modal-add.png';
+import xingchenIcon from '@/assets/imgs/knowledge/xingchen-icon.svg';
+import xingPuIcon from '@/assets/imgs/knowledge/xingpu-icon.svg';
+import baseVersionIcon from '@/assets/imgs/knowledge/base-version-icon.svg';
 
 function index({
   id,
@@ -26,11 +26,11 @@ function index({
   handleAddTool,
 }): React.ReactElement {
   const setKnowledgeDetailModalInfo = useFlowsManager(
-    (state) => state.setKnowledgeDetailModalInfo,
+    state => state.setKnowledgeDetailModalInfo
   );
   const { t } = useTranslation();
   const checkedIds = useMemo(() => {
-    return toolsList?.map((item) => item?.toolId) || [];
+    return toolsList?.map(item => item?.toolId) || [];
   }, [toolsList]);
 
   const handleChangeKnowledge = useCallback(
@@ -39,22 +39,22 @@ function index({
         !checkedIds.includes(knowledge?.coreRepoId || knowledge?.outerRepoId) &&
         checkedIds?.length >= 30
       ) {
-        message.warning(t("workflow.nodes.common.maxAddWarning"));
+        message.warning(t('workflow.nodes.common.maxAddWarning'));
         return;
       }
       handleAddTool({
         ...knowledge,
         toolId: knowledge?.coreRepoId || knowledge?.outerRepoId,
-        type: "knowledge",
+        type: 'knowledge',
         tag: knowledge?.tag,
       });
     },
-    [checkedIds],
+    [checkedIds]
   );
 
   const ragType = useMemo(() => {
     return (
-      toolsList?.filter((item) => item?.type === "knowledge")?.[0]?.tag || ""
+      toolsList?.filter(item => item?.type === 'knowledge')?.[0]?.tag || ''
     );
   }, [toolsList]);
 
@@ -62,14 +62,14 @@ function index({
     <div
       className="h-full flex flex-col overflow-hidden"
       style={{
-        padding: "26px 0 43px",
+        padding: '26px 0 43px',
       }}
     >
       <div className="h-full overflow-hidden flex flex-col">
         <div
           className="flex items-center justify-between mx-auto"
           style={{
-            width: "90%",
+            width: '90%',
             minWidth: 1000,
           }}
         >
@@ -80,15 +80,15 @@ function index({
                 className="p-0"
                 style={{ height: 32, width: 160 }}
                 value={orderBy}
-                onChange={(value) => setOrderBy(value)}
+                onChange={value => setOrderBy(value)}
                 options={[
                   {
-                    label: t("workflow.nodes.relatedKnowledgeModal.createTime"),
-                    value: "create_time",
+                    label: t('workflow.nodes.relatedKnowledgeModal.createTime'),
+                    value: 'create_time',
                   },
                   {
-                    label: t("workflow.nodes.relatedKnowledgeModal.updateTime"),
-                    value: "update_time",
+                    label: t('workflow.nodes.relatedKnowledgeModal.updateTime'),
+                    value: 'update_time',
                   },
                 ]}
               />
@@ -101,7 +101,7 @@ function index({
                 <FlowInput
                   value={searchValue}
                   className="w-[320px] pl-8 h-[32px] text-sm"
-                  placeholder={t("workflow.nodes.common.inputPlaceholder")}
+                  placeholder={t('workflow.nodes.common.inputPlaceholder')}
                   onChange={handleInputChange}
                 />
               </div>
@@ -113,7 +113,7 @@ function index({
                 e.stopPropagation();
                 window.open(
                   `${window.location.origin}/resource/knowledge`,
-                  "_blank",
+                  '_blank'
                 );
               }}
               style={{
@@ -122,7 +122,7 @@ function index({
             >
               <img className="w-3 h-3" src={toolModalAdd} alt="" />
               <span>
-                {t("workflow.nodes.relatedKnowledgeModal.createNewKnowledge")}
+                {t('workflow.nodes.relatedKnowledgeModal.createNewKnowledge')}
               </span>
             </Button>
           </div>
@@ -132,24 +132,24 @@ function index({
             <div
               className="flex items-center font-medium px-4 mx-auto"
               style={{
-                width: "90%",
+                width: '90%',
                 minWidth: 1000,
               }}
             >
               <span className="flex-1">
-                {t("workflow.nodes.knowledgeNode.knowledgeBase")}
+                {t('workflow.nodes.knowledgeNode.knowledgeBase')}
               </span>
               <span className="w-2/5 min-w-[500px]">
-                {orderBy === "create_time"
-                  ? t("workflow.nodes.relatedKnowledgeModal.createTime")
-                  : t("workflow.nodes.relatedKnowledgeModal.updateTime")}
+                {orderBy === 'create_time'
+                  ? t('workflow.nodes.relatedKnowledgeModal.createTime')
+                  : t('workflow.nodes.relatedKnowledgeModal.updateTime')}
               </span>
             </div>
             <div className="flex-1 overflow-auto" ref={toolRef}>
               <div
                 className="h-full mx-auto"
                 style={{
-                  width: "90%",
+                  width: '90%',
                   minWidth: 1000,
                 }}
               >
@@ -170,9 +170,9 @@ function index({
                             <span>{item?.name}</span>
                             <img
                               src={
-                                item?.tag === "CBG-RAG"
+                                item?.tag === 'CBG-RAG'
                                   ? xingchenIcon
-                                  : item?.tag === "AIUI-RAG2"
+                                  : item?.tag === 'AIUI-RAG2'
                                     ? xingPuIcon
                                     : baseVersionIcon
                               }
@@ -192,14 +192,14 @@ function index({
                         <div className="w-1/3 flex items-center gap-1.5 flex-shrink-0">
                           <img src={publishIcon} className="w-3 h-3" alt="" />
                           <p className="text-[#757575] text-xs">
-                            {orderBy === "create_time"
+                            {orderBy === 'create_time'
                               ? t(
-                                  "workflow.nodes.relatedKnowledgeModal.createTimePrefix",
+                                  'workflow.nodes.relatedKnowledgeModal.createTimePrefix'
                                 )
                               : t(
-                                  "workflow.nodes.relatedKnowledgeModal.updateTimePrefix",
-                                )}{" "}
-                            {orderBy === "create_time"
+                                  'workflow.nodes.relatedKnowledgeModal.updateTimePrefix'
+                                )}{' '}
+                            {orderBy === 'create_time'
                               ? item?.createTime
                               : item?.updateTime}
                           </p>
@@ -208,7 +208,7 @@ function index({
                           <Button
                             type="primary"
                             className="flex items-center gap-2"
-                            onClick={(e) => {
+                            onClick={e => {
                               e.stopPropagation();
                               setKnowledgeDetailModalInfo({
                                 ...item,
@@ -222,11 +222,11 @@ function index({
                           </Button>
                           <Tooltip
                             overlayClassName="black-tooltip"
-                            title={t("workflow.nodes.common.knowledgeTypeTip")}
+                            title={t('workflow.nodes.common.knowledgeTypeTip')}
                           >
                             <div
                               className="flex items-center gap-2.5 relative"
-                              onClick={(e) => e.stopPropagation()}
+                              onClick={e => e.stopPropagation()}
                             >
                               <div
                                 onClick={() => {
@@ -235,16 +235,16 @@ function index({
                                 }}
                               >
                                 {checkedIds.includes(
-                                  item?.coreRepoId || item?.outerRepoId,
+                                  item?.coreRepoId || item?.outerRepoId
                                 ) ? (
                                   <div
                                     className="border border-[#D3DBF8] bg-[#fff] py-1 px-6 rounded-lg"
                                     style={{
-                                      height: "32px",
+                                      height: '32px',
                                     }}
                                   >
                                     {t(
-                                      "workflow.nodes.relatedKnowledgeModal.remove",
+                                      'workflow.nodes.relatedKnowledgeModal.remove'
                                     )}
                                   </div>
                                 ) : (
@@ -256,7 +256,7 @@ function index({
                                       height: 32,
                                     }}
                                   >
-                                    {t("workflow.nodes.toolNode.addTool")}
+                                    {t('workflow.nodes.toolNode.addTool')}
                                   </Button>
                                 )}
                               </div>
@@ -269,7 +269,7 @@ function index({
                 ))}
                 {!loading && dataSource.length === 0 && (
                   <p className="mt-3 px-4">
-                    {t("workflow.nodes.relatedKnowledgeModal.noDocuments")}
+                    {t('workflow.nodes.relatedKnowledgeModal.noDocuments')}
                   </p>
                 )}
               </div>

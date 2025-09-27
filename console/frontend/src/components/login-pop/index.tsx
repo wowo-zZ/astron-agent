@@ -1,16 +1,16 @@
-import useUserStore, { UserState } from "@/store/user-store";
-import { ReactElement } from "react";
-import { jumpTologin } from "@/utils/http";
-import { useLocation } from "react-router-dom";
+import useUserStore, { UserState } from '@/store/user-store';
+import { ReactElement } from 'react';
+import { jumpTologin } from '@/utils/http';
+import { useLocation } from 'react-router-dom';
 
-import loginPopImg from "@/assets/imgs/login/login-pop-img.png";
-import styles from "./style.module.scss";
+import loginPopImg from '@/assets/imgs/login/login-pop-img.png';
+import styles from './style.module.scss';
 
 const LoginPop = (): ReactElement => {
   const user = useUserStore((state: UserState) => state.user);
   const location = useLocation();
 
-  const isHomePage = ["/", "/home"].includes(location.pathname);
+  const isHomePage = ['/', '/home'].includes(location.pathname);
 
   return user.nickname || user.login || !isHomePage ? (
     <></>

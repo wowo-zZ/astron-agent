@@ -1,28 +1,28 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
 interface HomeStore {
   botType: number;
-  botOrigin: "sys" | "search" | "home";
+  botOrigin: 'sys' | 'search' | 'home';
   scrollTop: number;
   loadingPage: number;
   searchInputValue: string;
 }
 interface HomeActions {
   setBotType: (botType: number) => void;
-  setBotOrigin: (botOrigin: "sys" | "search" | "home") => void;
+  setBotOrigin: (botOrigin: 'sys' | 'search' | 'home') => void;
   setScrollTop: (scrollTop: number) => void;
   setLoadingPage: (loadingPage: number) => void;
   setSearchInputValue: (searchInputValue: string) => void;
 }
 
-const useHomeStore = create<HomeStore & HomeActions>((set) => ({
+const useHomeStore = create<HomeStore & HomeActions>(set => ({
   botType: 0,
-  botOrigin: "home",
+  botOrigin: 'home',
   scrollTop: 0,
   loadingPage: 1,
-  searchInputValue: "",
+  searchInputValue: '',
   setBotType: (botType: number): void => set({ botType }),
-  setBotOrigin: (botOrigin: "sys" | "search" | "home"): void =>
+  setBotOrigin: (botOrigin: 'sys' | 'search' | 'home'): void =>
     set({ botOrigin }),
   setScrollTop: (scrollTop: number): void => set({ scrollTop }),
   setLoadingPage: (loadingPage: number): void => set({ loadingPage }),

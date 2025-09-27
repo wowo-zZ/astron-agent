@@ -70,7 +70,7 @@ export interface MessageListType {
   message: string;
   reasoning?: string;
   traceSource?: string;
-  sourceType?: "search" | "web_search" | string;
+  sourceType?: 'search' | 'web_search' | string;
   chatFileList?: unknown[] | null;
   reqId?: number | string;
   sid?: string;
@@ -107,7 +107,7 @@ interface ToolItem {
 
 // Web搜索工具项
 interface WebSearchToolItem extends ToolItem {
-  type: "web_search";
+  type: 'web_search';
   web_search: WebSearchResult;
 }
 

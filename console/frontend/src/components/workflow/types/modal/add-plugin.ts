@@ -36,10 +36,10 @@ export interface BotIcon {
 }
 
 // 标签类型
-export type PluginTabType = "offical" | "person" | "";
+export type PluginTabType = 'offical' | 'person' | '';
 
 // 工具操作类型
-export type ToolOperateType = "" | "create" | "edit" | "test" | "detail";
+export type ToolOperateType = '' | 'create' | 'edit' | 'test' | 'detail';
 
 // 当前工具信息接口
 export interface CurrentToolInfo {

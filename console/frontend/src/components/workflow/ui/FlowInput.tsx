@@ -1,7 +1,7 @@
-import React, { useRef, useEffect, memo } from "react";
-import { cn } from "@/utils";
+import React, { useRef, useEffect, memo } from 'react';
+import { cn } from '@/utils';
 
-function FlowInput({ className = "", ...reset }): React.ReactElement {
+function FlowInput({ className = '', ...reset }): React.ReactElement {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect((): void | (() => void) => {
@@ -12,10 +12,10 @@ function FlowInput({ className = "", ...reset }): React.ReactElement {
         event.stopPropagation();
       };
 
-      input.addEventListener("keydown", handleKeyDown);
+      input.addEventListener('keydown', handleKeyDown);
 
       return (): void => {
-        input.removeEventListener("keydown", handleKeyDown);
+        input.removeEventListener('keydown', handleKeyDown);
       };
     }
   }, []);
@@ -24,7 +24,7 @@ function FlowInput({ className = "", ...reset }): React.ReactElement {
     <input
       ref={inputRef}
       placeholder="请输入"
-      className={cn("flow-input nodrag px-2.5", className)}
+      className={cn('flow-input nodrag px-2.5', className)}
       {...reset}
     />
   );

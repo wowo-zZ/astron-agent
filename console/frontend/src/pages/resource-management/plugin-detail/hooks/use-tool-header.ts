@@ -1,7 +1,7 @@
-import { listTools } from "@/services/plugin";
-import { ToolItem } from "@/types/resource";
-import { getActiveKey } from "@/utils/utils";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { listTools } from '@/services/plugin';
+import { ToolItem } from '@/types/resource';
+import { getActiveKey } from '@/utils/utils';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 export const useToolHeader = ({
   toolInfo,
@@ -23,13 +23,13 @@ export const useToolHeader = ({
 } => {
   const optionsRef = useRef<HTMLDivElement | null>(null);
 
-  const [currentTab, setCurrentTab] = useState<string | undefined>("");
+  const [currentTab, setCurrentTab] = useState<string | undefined>('');
   const [showDropList, setShowDropList] = useState(false);
   const [tools, setTools] = useState<ToolItem[]>([]);
   const [isHover, setIsHover] = useState(false);
 
   const showVersionManagement = useMemo(() => {
-    return !!(toolInfo?.id && currentTab !== "setting");
+    return !!(toolInfo?.id && currentTab !== 'setting');
   }, [toolInfo?.id, currentTab]);
 
   useEffect(() => {
@@ -46,14 +46,14 @@ export const useToolHeader = ({
       pageNo: 1,
       pageSize: 9999,
     };
-    listTools(params).then((data) => {
+    listTools(params).then(data => {
       setTools(data.pageData || []);
     });
   }
 
   useEffect(() => {
-    document.body.addEventListener("click", clickOutside);
-    return (): void => document.body.removeEventListener("click", clickOutside);
+    document.body.addEventListener('click', clickOutside);
+    return (): void => document.body.removeEventListener('click', clickOutside);
   }, []);
 
   function clickOutside(event: MouseEvent): void {
@@ -65,7 +65,7 @@ export const useToolHeader = ({
     }
   }
 
-  const filterTools = tools.filter((item) => item.toolId !== toolInfo?.toolId);
+  const filterTools = tools.filter(item => item.toolId !== toolInfo?.toolId);
   return {
     currentTab,
     showDropList,

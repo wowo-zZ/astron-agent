@@ -1,7 +1,7 @@
-import $ from "jquery";
-import { MutableRefObject } from "react";
-import { getTraceList } from "@/utils";
-import { MessageListType, SourceInfoItem } from "@/types/chat";
+import $ from 'jquery';
+import { MutableRefObject } from 'react';
+import { getTraceList } from '@/utils';
+import { MessageListType, SourceInfoItem } from '@/types/chat';
 
 // jQuery 点击事件目标类型
 interface FootnoteTarget extends HTMLElement {
@@ -11,12 +11,12 @@ interface FootnoteTarget extends HTMLElement {
 }
 
 function useBindEvents(
-  lastClickedQA: MutableRefObject<MessageListType | null>,
+  lastClickedQA: MutableRefObject<MessageListType | null>
 ) {
   /** 处理联网搜索 */
   const handleNetSearch = (
     traceSourceList: SourceInfoItem[],
-    index: number,
+    index: number
   ): boolean => {
     let flag = false;
     traceSourceList?.forEach((item: SourceInfoItem, sourceIdx: number) => {
@@ -37,8 +37,8 @@ function useBindEvents(
 
   /** 绑定普通对话的标签点击事件 */
   const bindTagClickEvent = (): void => {
-    $(".custom-footnote").off("click");
-    $(".custom-footnote").on<FootnoteTarget>("click", function (e) {
+    $('.custom-footnote').off('click');
+    $('.custom-footnote').on<FootnoteTarget>('click', function (e) {
       // 由于事件冒泡，所以要将此函数动作后置
       setTimeout(async () => {
         const tagIndexStr = e.target.dataset.index;

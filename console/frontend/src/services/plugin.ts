@@ -1,12 +1,12 @@
-import http from "@/utils/http";
-import { PageData, ToolItem } from "@/types/resource";
-import { DebugToolParams, MCPToolDetail } from "@/types/plugin-store";
-import { message } from "antd";
+import http from '@/utils/http';
+import { PageData, ToolItem } from '@/types/resource';
+import { DebugToolParams, MCPToolDetail } from '@/types/plugin-store';
+import { message } from 'antd';
 
 export async function createTool(params: ToolItem): Promise<unknown> {
   try {
     const response = await http.post(`/tool/create-tool`, params);
-    message.success("操作成功");
+    message.success('操作成功');
     return response as unknown as ToolItem;
   } catch (error: unknown) {
     const errorMessage = (error as Error)?.message;
@@ -18,7 +18,7 @@ export async function createTool(params: ToolItem): Promise<unknown> {
 export async function temporaryTool(params: ToolItem): Promise<ToolItem> {
   try {
     const response = await http.post(`/tool/temporary-tool`, params);
-    message.success("操作成功");
+    message.success('操作成功');
     return response as unknown as ToolItem;
   } catch (error: unknown) {
     const errorMessage = (error as Error)?.message;
@@ -30,7 +30,7 @@ export async function temporaryTool(params: ToolItem): Promise<ToolItem> {
 export async function updateTool(params: ToolItem): Promise<unknown> {
   try {
     const response = await http.put(`/tool/update-tool`, params);
-    message.success("操作成功");
+    message.success('操作成功');
     return response as unknown;
   } catch (error: unknown) {
     const errorMessage = (error as Error)?.message;
@@ -47,7 +47,7 @@ export async function getToolDetail(params: {
   id: string;
   temporary?: boolean;
 }): Promise<ToolItem> {
-  return await http.get("/tool/detail", { params });
+  return await http.get('/tool/detail', { params });
 }
 
 export async function debugTool(params: DebugToolParams): Promise<{
@@ -64,7 +64,7 @@ export async function listTools(params: {
   pageNo: number;
   pageSize: number;
 }): Promise<PageData<ToolItem>> {
-  return await http.get(`/tool/list-tools`, { params, responseType: "json" });
+  return await http.get(`/tool/list-tools`, { params, responseType: 'json' });
 }
 
 export async function getToolDefaultIcon(): Promise<unknown> {
@@ -76,18 +76,18 @@ export async function listToolSquare(params: {
   pageSize: number;
   orderFlag: number;
 }): Promise<PageData<ToolItem>> {
-  return await http.post("/tool/list-tool-square", params);
+  return await http.post('/tool/list-tool-square', params);
 }
 
 export async function getMcpServerList(): Promise<unknown> {
-  return await http.get("/workflow/get-mcp-server-list");
+  return await http.get('/workflow/get-mcp-server-list');
 }
 
 export async function getServerToolDetailAPI(
-  serverId: string,
+  serverId: string
 ): Promise<MCPToolDetail> {
   return await http.get(
-    `/workflow/get-server-tool-detail-locally?serverId=${serverId}`,
+    `/workflow/get-server-tool-detail-locally?serverId=${serverId}`
   );
 }
 
@@ -99,8 +99,8 @@ export async function debugServerToolAPI(params: {
   toolArgs: Record<string, unknown>;
 }): Promise<unknown> {
   try {
-    const response = await http.post("/workflow/debug-server-tool", params);
-    message.success("操作成功");
+    const response = await http.post('/workflow/debug-server-tool', params);
+    message.success('操作成功');
     return response as unknown;
   } catch (error: unknown) {
     const errorMessage = (error as Error)?.message;
@@ -111,10 +111,10 @@ export async function debugServerToolAPI(params: {
 
 export async function workflowGetEnvKey(
   serverId: string,
-  recordId: string,
+  recordId: string
 ): Promise<unknown> {
   return await http.get(
-    `/workflow/get-env-key?serverId=${serverId}&recordId=${recordId}`,
+    `/workflow/get-env-key?serverId=${serverId}&recordId=${recordId}`
   );
 }
 
@@ -127,11 +127,11 @@ export async function workflowPushEnvKey(
     env: null;
     customize: boolean;
   },
-  showMessage = true,
+  showMessage = true
 ): Promise<unknown> {
   try {
-    const response = await http.post("/workflow/push-env-key", params);
-    message.success("操作成功");
+    const response = await http.post('/workflow/push-env-key', params);
+    message.success('操作成功');
     return response as unknown;
   } catch (error: unknown) {
     const errorMessage = (error as Error)?.message;
@@ -153,7 +153,7 @@ export async function getToolVersionList(toolId: string): Promise<
 
 //获取插件最新版本信息
 export async function getToolLatestVersion(
-  toolIds: string[],
+  toolIds: string[]
 ): Promise<unknown> {
   return await http.get(`/tool/get-tool-latest-version?toolIds=${toolIds}`);
 }
@@ -169,8 +169,8 @@ export async function toolFeedback(params: {
   name?: string;
 }): Promise<unknown> {
   try {
-    const response = await http.post("/tool/feedback", params);
-    message.success("操作成功");
+    const response = await http.post('/tool/feedback', params);
+    message.success('操作成功');
     return response as unknown;
   } catch (error: unknown) {
     const errorMessage = (error as Error)?.message;
@@ -182,9 +182,9 @@ export async function toolFeedback(params: {
 // 用户安装插件（如果是OAuth会触发授权）
 export const installPlugin = (
   infoId: number,
-  redirectUri: string,
+  redirectUri: string
 ): Promise<string> => {
   return http.post(
-    `/iflygpt/plugin/user/install?infoId=${infoId}&redirectUri=${redirectUri}`,
+    `/iflygpt/plugin/user/install?infoId=${infoId}&redirectUri=${redirectUri}`
   );
 };

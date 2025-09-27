@@ -5,8 +5,8 @@ import React, {
   useCallback,
   useMemo,
   JSX,
-} from "react";
-import { useTranslation } from "react-i18next";
+} from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Input,
   Button,
@@ -14,8 +14,8 @@ import {
   Select,
   InputNumber,
   ConfigProvider,
-} from "antd";
-import JSEncrypt from "jsencrypt";
+} from 'antd';
+import JSEncrypt from 'jsencrypt';
 import {
   modelCreate,
   deleteModelAPI,
@@ -23,15 +23,15 @@ import {
   getModelDetail,
   getLocalModelList,
   createOrUpdateLocalModel,
-} from "@/services/model";
-import MoreIcons from "@/components/more-icons";
-import globalStore from "@/store/global-store";
-import ModelParamsTable from "./model-params-table";
-import { v4 as uuid } from "uuid";
-import tipsSvg from "@/assets/svgs/tips.svg";
-import close from "@/assets/imgs/common/close.png";
-import dialogDel from "@/assets/imgs/common/delete-red.png";
-import inputAddIcon from "@/assets/imgs/common/add-blue.png";
+} from '@/services/model';
+import MoreIcons from '@/components/more-icons';
+import globalStore from '@/store/global-store';
+import ModelParamsTable from './model-params-table';
+import { v4 as uuid } from 'uuid';
+import tipsSvg from '@/assets/svgs/tips.svg';
+import close from '@/assets/imgs/common/close.png';
+import dialogDel from '@/assets/imgs/common/delete-red.png';
+import inputAddIcon from '@/assets/imgs/common/add-blue.png';
 import {
   ModelInfo,
   CategoryNode,
@@ -42,11 +42,11 @@ import {
   LocalModelFile,
   LocalModelParams,
   ModelCreateType,
-} from "@/types/model";
-import i18next from "i18next";
-import down from "@/assets/svgs/down.svg";
-import up from "@/assets/svgs/up.svg";
-import { ResponseBusinessError } from "@/types/global";
+} from '@/types/model';
+import i18next from 'i18next';
+import down from '@/assets/svgs/down.svg';
+import up from '@/assets/svgs/up.svg';
+import { ResponseBusinessError } from '@/types/global';
 
 const { TextArea } = Input;
 
@@ -61,26 +61,26 @@ const encryptApiKey = (publicKey: string, apiKey: string): string => {
   encrypt.setPublicKey(publicKey);
   const encrypted = encrypt.encrypt(apiKey);
   if (!encrypted) {
-    throw new Error(i18next.t("model.encryptionFailed"));
+    throw new Error(i18next.t('model.encryptionFailed'));
   }
   return encrypted;
 };
 
 const checkParamsTable = (modelParams: ModelConfigParam[]): boolean => {
   let flag = true;
-  modelParams.forEach((item) => {
+  modelParams.forEach(item => {
     if (!item?.key) {
-      item.keyErrMsg = i18next.t("model.pleaseEnterParameterName");
+      item.keyErrMsg = i18next.t('model.pleaseEnterParameterName');
       flag = false;
     } else if (!item?.name) {
-      item.nameErrMsg = i18next.t("model.pleaseEnterParameterDescription");
+      item.nameErrMsg = i18next.t('model.pleaseEnterParameterDescription');
       flag = false;
     } else if (!checkNameConventions(item?.key)) {
-      item.keyErrMsg = i18next.t("model.onlyLettersNumbersDashUnderscore");
+      item.keyErrMsg = i18next.t('model.onlyLettersNumbersDashUnderscore');
       flag = false;
     } else {
-      item.keyErrMsg = "";
-      item.nameErrMsg = "";
+      item.keyErrMsg = '';
+      item.nameErrMsg = '';
     }
   });
   return flag;
@@ -88,10 +88,10 @@ const checkParamsTable = (modelParams: ModelConfigParam[]): boolean => {
 
 const hasDuplicateKeys = (
   arr: ModelConfigParam[],
-  key: keyof ModelConfigParam = "key",
+  key: keyof ModelConfigParam = 'key'
 ): boolean => {
   const seen = new Set();
-  return arr.some((obj) => {
+  return arr.some(obj => {
     if (seen.has(obj[key])) {
       return true;
     }
@@ -104,11 +104,11 @@ const hasDuplicateKeys = (
 const validateFormData = (modelParams: ModelConfigParam[]): boolean => {
   const flag = checkParamsTable(modelParams);
   if (!flag) {
-    message.warning(i18next.t("model.parameterValidationFailed"));
+    message.warning(i18next.t('model.parameterValidationFailed'));
     return false;
   }
   if (hasDuplicateKeys(modelParams)) {
-    message.warning(i18next.t("model.parameterNameCannotBeRepeated"));
+    message.warning(i18next.t('model.parameterNameCannotBeRepeated'));
     return false;
   }
   return true;
@@ -125,7 +125,7 @@ interface BuildSubmitParamsArgs {
 }
 
 const buildSubmitParams = (
-  args: BuildSubmitParamsArgs,
+  args: BuildSubmitParamsArgs
 ): ModelCreateParams & {
   endpoint: string;
   apiKey: string;
@@ -134,11 +134,11 @@ const buildSubmitParams = (
   color: string;
   config: Array<{
     id?: string | number;
-    constraintType: "switch" | "range";
+    constraintType: 'switch' | 'range';
     default: number | boolean;
     constraintContent: Array<{ name: number | string }>;
     name: string;
-    fieldType: "int" | "float" | "boolean";
+    fieldType: 'int' | 'float' | 'boolean';
     initialValue: number | boolean | string;
     key: string;
     required: boolean;
@@ -154,19 +154,19 @@ const buildSubmitParams = (
     description: modelInfo?.modelDesc,
     domain: modelInfo?.domain,
     tag: tags,
-    icon: botIcon.value || "",
+    icon: botIcon.value || '',
     color: botColor,
-    config: modelParams?.map((item) => ({
+    config: modelParams?.map(item => ({
       id: item?.id,
-      constraintType: item?.fieldType === "boolean" ? "switch" : "range",
+      constraintType: item?.fieldType === 'boolean' ? 'switch' : 'range',
       default: item?.default,
       constraintContent:
-        item?.fieldType === "boolean"
+        item?.fieldType === 'boolean'
           ? []
           : [{ name: item?.min || 0 }, { name: item?.max || 0 }],
       name: item?.name,
       fieldType: item?.fieldType,
-      initialValue: item?.fieldType === "boolean" ? false : item?.min || 0,
+      initialValue: item?.fieldType === 'boolean' ? false : item?.min || 0,
       key: item?.key,
       required: item?.required,
       precision: item?.precision,
@@ -186,7 +186,7 @@ interface BuildModelCategoryReqArgs {
 }
 
 const buildModelCategoryReq = (
-  args: BuildModelCategoryReqArgs,
+  args: BuildModelCategoryReqArgs
 ): Record<string, unknown> => {
   const {
     modelTypes,
@@ -200,12 +200,12 @@ const buildModelCategoryReq = (
   const modelCategoryReq: Record<string, unknown> = {};
 
   const otherCategoryId = categoryTree
-    ?.find((t) => t.key === "modelCategory")
-    ?.children?.find((c) => c.name === "其他")?.id;
+    ?.find(t => t.key === 'modelCategory')
+    ?.children?.find(c => c.name === '其他')?.id;
 
   if (modelTypes) {
     modelCategoryReq.categorySystemIds = modelTypes.filter(
-      (id) => id !== otherCategoryId,
+      id => id !== otherCategoryId
     );
   }
   if (modelTypeOtherText) {
@@ -222,12 +222,12 @@ const buildModelCategoryReq = (
   }
 
   const otherSceneId = categoryTree
-    ?.find((t) => t.key === "modelScenario")
-    ?.children?.find((c) => c.name === "其他")?.id;
+    ?.find(t => t.key === 'modelScenario')
+    ?.children?.find(c => c.name === '其他')?.id;
 
   if (modelScenes) {
     modelCategoryReq.sceneSystemIds = modelScenes.filter(
-      (id) => id !== otherSceneId,
+      id => id !== otherSceneId
     );
   }
   if (modelSceneOtherText) {
@@ -281,20 +281,20 @@ const handleLocalModelSubmit = (params: {
 
   // 验证本地模型必填字段
   if (!selectedLocalModel) {
-    message.error(i18next.t("model.selectModel"));
+    message.error(i18next.t('model.selectModel'));
     return;
   }
 
   if (!modelInfo.modelName) {
     message.error(
-      i18next.t("model.pleaseEnter") + i18next.t("model.modelName"),
+      i18next.t('model.pleaseEnter') + i18next.t('model.modelName')
     );
     return;
   }
 
   if (!modelInfo.modelDesc) {
     message.error(
-      i18next.t("model.pleaseEnter") + i18next.t("model.modelDescription"),
+      i18next.t('model.pleaseEnter') + i18next.t('model.modelDescription')
     );
     return;
   }
@@ -305,7 +305,7 @@ const handleLocalModelSubmit = (params: {
     modelName: modelInfo.modelName,
     domain: selectedLocalModel,
     description: modelInfo.modelDesc,
-    icon: botIcon.value || "",
+    icon: botIcon.value || '',
     color: botColor,
     acceleratorCount,
     modelPath: selectedLocalModel,
@@ -327,8 +327,8 @@ const handleLocalModelSubmit = (params: {
   createOrUpdateLocalModel(localModelParams)
     .then(() => {
       const successMessageKey = modelId
-        ? "model.localModelUpdateSuccess"
-        : "model.localModelCreateSuccess";
+        ? 'model.localModelUpdateSuccess'
+        : 'model.localModelCreateSuccess';
       message.success(i18next.t(successMessageKey));
       setCreateModal(false);
       if (getModels) getModels();
@@ -415,14 +415,14 @@ const handleSubmitForm = async (params: {
 
     setLoading(true);
     await modelCreate(submitParams);
-    message.success(i18next.t("model.modelCreateSuccess"));
+    message.success(i18next.t('model.modelCreateSuccess'));
     setCreateModal(false);
     if (getModels) getModels();
   } catch (error) {
     const errorMessage =
       error instanceof Error
         ? error.message
-        : i18next.t("model.modelCreateFailed");
+        : i18next.t('model.modelCreateFailed');
     message.error(errorMessage);
   } finally {
     setLoading(false);
@@ -470,7 +470,7 @@ const SelectLocalModel = ({
       }));
       setLocalModelOptions(options);
     } catch (error) {
-      message.error(t("model.localModelLoadFailed"));
+      message.error(t('model.localModelLoadFailed'));
       setLocalModelOptions([]);
     } finally {
       setLoading(false);
@@ -486,29 +486,29 @@ const SelectLocalModel = ({
       <div className="flex items-center justify-between">
         <div>
           <span className="text-[#F74E43] mr-1">*</span>
-          {t("model.selectModel")}：
-          <span className="text-[#7f7f7f]">{t("model.selectModelTips")}</span>
+          {t('model.selectModel')}：
+          <span className="text-[#7f7f7f]">{t('model.selectModelTips')}</span>
           <a className="text-[#275EFF]" href="https://baidu.com">
-            {t("model.referenceDocument")}
+            {t('model.referenceDocument')}
           </a>
         </div>
       </div>
       <Select
         placeholder={
           loading
-            ? "Loading..."
+            ? 'Loading...'
             : localModelOptions.length === 0
-              ? t("model.noLocalModelsAvailable")
-              : t("model.selectModelPlaceholder")
+              ? t('model.noLocalModelsAvailable')
+              : t('model.selectModelPlaceholder')
         }
         allowClear
-        style={{ width: "100%" }}
+        style={{ width: '100%' }}
         value={selectedModel}
         onChange={onModelChange}
         loading={loading}
         disabled={loading || localModelOptions.length === 0}
         filterOption={(input: string, option?: { label?: string }) =>
-          (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+          (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
         }
         optionLabelProp="label"
       >
@@ -534,21 +534,21 @@ const PerformanceConfiguration = ({
     <div className="flex flex-col gap-2 font-normal text-sm">
       <div className="flex items-center">
         <span className="text-[#F74E43] mr-1">*</span>
-        {t("model.performanceConfiguration")}：
+        {t('model.performanceConfiguration')}：
         <img src={tipsSvg} alt="tips" className="w-4 h-4 ml-1" />
-        {t("model.acceleratorNumber")}
+        {t('model.acceleratorNumber')}
       </div>
       <ConfigProvider
         theme={{
           components: {
             InputNumber: {
               handleVisible: true,
-              handleBorderColor: "transparent",
+              handleBorderColor: 'transparent',
             },
           },
         }}
       >
-        {" "}
+        {' '}
         <InputNumber
           className="w-[200px]"
           min={0}
@@ -599,7 +599,7 @@ const ModelBasicForm = ({
       <div className="flex flex-col gap-2 font-normal text-sm">
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-[#F74E43]">*</span> {t("model.modelName")}：
+            <span className="text-[#F74E43]">*</span> {t('model.modelName')}：
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -608,28 +608,28 @@ const ModelBasicForm = ({
             style={{
               background: botColor
                 ? botColor
-                : `url(${botIcon?.name || ""}${botIcon?.value || ""}) no-repeat center / cover`,
+                : `url(${botIcon?.name || ''}${botIcon?.value || ''}) no-repeat center / cover`,
             }}
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               setShowModal(true);
             }}
           >
             {botColor && (
               <img
-                src={`${botIcon?.name || ""}${botIcon?.value || ""}`}
+                src={`${botIcon?.name || ''}${botIcon?.value || ''}`}
                 className="w-6 h-6"
                 alt=""
               />
             )}
           </div>
           <Input
-            placeholder={t("common.inputPlaceholder")}
+            placeholder={t('common.inputPlaceholder')}
             className="global-input w-full"
             maxLength={50}
             showCount
             value={modelInfo?.modelName}
-            onChange={(e) =>
+            onChange={e =>
               setModelInfo({ ...modelInfo, modelName: e.target.value })
             }
           />
@@ -644,29 +644,27 @@ const ModelBasicForm = ({
         <Input
           maxLength={50}
           showCount
-          placeholder={t("model.enterModelFieldValue")}
+          placeholder={t('model.enterModelFieldValue')}
           className="global-input w-full"
           value={modelInfo?.domain}
-          onChange={(e) =>
-            setModelInfo({ ...modelInfo, domain: e.target.value })
-          }
+          onChange={e => setModelInfo({ ...modelInfo, domain: e.target.value })}
         />
       </div>
       <div className="flex flex-col gap-2 font-normal text-sm">
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-[#F74E43]">*</span>{" "}
-            {t("model.modelDescription")} ：
+            <span className="text-[#F74E43]">*</span>{' '}
+            {t('model.modelDescription')} ：
           </div>
         </div>
         <div className="relative">
           <TextArea
-            placeholder={t("common.inputPlaceholder")}
+            placeholder={t('common.inputPlaceholder')}
             className="global-input w-full"
             maxLength={200}
             style={{ height: 90 }}
             value={modelInfo?.modelDesc}
-            onChange={(e) =>
+            onChange={e =>
               setModelInfo({ ...modelInfo, modelDesc: e.target.value })
             }
           />
@@ -678,17 +676,17 @@ const ModelBasicForm = ({
       <div className="flex flex-col gap-2 font-normal text-sm">
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-[#F74E43]">* </span>{" "}
-            {t("model.interfaceAddress")}：
+            <span className="text-[#F74E43]">* </span>{' '}
+            {t('model.interfaceAddress')}：
           </div>
         </div>
         <Input
           maxLength={100}
           showCount
-          placeholder={t("model.interfaceAddressPlaceholder")}
+          placeholder={t('model.interfaceAddressPlaceholder')}
           className="global-input w-full"
           value={modelInfo?.interfaceAddress}
-          onChange={(e) =>
+          onChange={e =>
             setModelInfo({ ...modelInfo, interfaceAddress: e.target.value })
           }
         />
@@ -696,18 +694,16 @@ const ModelBasicForm = ({
       <div className="flex flex-col gap-2 font-normal text-sm">
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-[#F74E43]">*</span> {t("model.apiKey")}：
+            <span className="text-[#F74E43]">*</span> {t('model.apiKey')}：
           </div>
         </div>
         <Input
           maxLength={100}
           showCount
-          placeholder={t("common.inputPlaceholder")}
+          placeholder={t('common.inputPlaceholder')}
           className="global-input w-full"
           value={modelInfo?.apiKEY}
-          onChange={(e) =>
-            setModelInfo({ ...modelInfo, apiKEY: e.target.value })
-          }
+          onChange={e => setModelInfo({ ...modelInfo, apiKEY: e.target.value })}
         />
       </div>
     </>
@@ -763,18 +759,18 @@ const ModelCategoryForm = ({
         <div className="flex items-center justify-between">
           <div>
             <span className="text-[#F74E43]"></span>
-            {t("model.modelType")}：
+            {t('model.modelType')}：
           </div>
         </div>
         <Select
           mode="multiple"
-          placeholder={t("model.pleaseSelectModelType")}
+          placeholder={t('model.pleaseSelectModelType')}
           allowClear
-          style={{ width: "100%" }}
+          style={{ width: '100%' }}
           value={modelTypes}
           onChange={handleTypeChange}
           filterOption={(input: string, option?: { label?: string }) =>
-            (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
           }
           optionLabelProp="label"
         >
@@ -787,11 +783,11 @@ const ModelCategoryForm = ({
         {hasOtherSelected && (
           <Input
             className="mt-2"
-            placeholder={t("model.pleaseEnterCustomCategory")}
+            placeholder={t('model.pleaseEnterCustomCategory')}
             maxLength={30}
             showCount
             value={modelTypeOtherText}
-            onChange={(e) => setModelTypeOtherText(e.target.value)}
+            onChange={e => setModelTypeOtherText(e.target.value)}
           />
         )}
       </div>
@@ -800,17 +796,17 @@ const ModelCategoryForm = ({
         <div className="flex items-center justify-between">
           <div>
             <span className="text-[#F74E43]"></span>
-            {t("model.languageSupport")}：
+            {t('model.languageSupport')}：
           </div>
         </div>
         <Select
-          placeholder={t("model.pleaseSelectLanageSupport")}
+          placeholder={t('model.pleaseSelectLanageSupport')}
           allowClear
-          style={{ width: "100%" }}
+          style={{ width: '100%' }}
           value={languageSystemId}
-          onChange={(val) => setLanguageSystemId(val)}
+          onChange={val => setLanguageSystemId(val)}
           filterOption={(input: string, option?: { label?: string }) =>
-            (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
           }
           optionLabelProp="label"
         >
@@ -823,7 +819,7 @@ const ModelCategoryForm = ({
               >
                 {opt.label}
               </Select.Option>
-            ),
+            )
           )}
         </Select>
       </div>
@@ -832,17 +828,17 @@ const ModelCategoryForm = ({
         <div className="flex items-center justify-between">
           <div>
             <span className="text-[#F74E43]"></span>
-            {t("model.contextLength")}：
+            {t('model.contextLength')}：
           </div>
         </div>
         <Select
-          placeholder={t("model.pleaseSelectContextLenght")}
+          placeholder={t('model.pleaseSelectContextLenght')}
           allowClear
-          style={{ width: "100%" }}
+          style={{ width: '100%' }}
           value={contextLengthSystemId}
-          onChange={(val) => setContextLengthSystemId(val)}
+          onChange={val => setContextLengthSystemId(val)}
           filterOption={(input: string, option?: { label?: string }) =>
-            (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
           }
           optionLabelProp="label"
         >
@@ -855,7 +851,7 @@ const ModelCategoryForm = ({
               >
                 {opt.label}
               </Select.Option>
-            ),
+            )
           )}
         </Select>
       </div>
@@ -864,18 +860,18 @@ const ModelCategoryForm = ({
         <div className="flex items-center justify-between">
           <div>
             <span className="text-[#F74E43]"></span>
-            {t("model.modelScene")}：
+            {t('model.modelScene')}：
           </div>
         </div>
         <Select
           mode="multiple"
-          placeholder={t("model.pleaseSelectModelScene")}
+          placeholder={t('model.pleaseSelectModelScene')}
           allowClear
-          style={{ width: "100%" }}
+          style={{ width: '100%' }}
           value={modelScenes}
           onChange={handleSceneChange}
           filterOption={(input: string, option?: { label?: string }) =>
-            (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
           }
           optionLabelProp="label"
         >
@@ -888,11 +884,11 @@ const ModelCategoryForm = ({
         {hasSceneOtherSelected && (
           <Input
             className="mt-2"
-            placeholder={t("model.pleaseEnterCustomScene")}
+            placeholder={t('model.pleaseEnterCustomScene')}
             maxLength={30}
             showCount
             value={modelSceneOtherText}
-            onChange={(e) => setModelSceneOtherText(e.target.value)}
+            onChange={e => setModelSceneOtherText(e.target.value)}
           />
         )}
       </div>
@@ -913,15 +909,15 @@ const useModelForm = (): {
 } => {
   const { t } = useTranslation();
   const [modelInfo, setModelInfo] = useState<ModelFormData>({
-    modelName: "",
-    modelDesc: "",
-    interfaceAddress: "",
-    apiKEY: "",
-    domain: "",
+    modelName: '',
+    modelDesc: '',
+    interfaceAddress: '',
+    apiKEY: '',
+    domain: '',
   });
   const [tags, setTags] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
-  const beforeModelKeys = useRef<string>("");
+  const beforeModelKeys = useRef<string>('');
 
   return {
     t,
@@ -937,7 +933,7 @@ const useModelForm = (): {
 
 // 头像管理 Hook
 const useModelAvatar = (
-  modelId?: string,
+  modelId?: string
 ): {
   avatarIcon: Array<{ name?: string; value?: string }>;
   avatarColor: Array<{ name?: string }>;
@@ -946,11 +942,11 @@ const useModelAvatar = (
   botColor: string;
   setBotColor: (color: string) => void;
 } => {
-  const avatarIcon = globalStore((state) => state.avatarIcon);
-  const avatarColor = globalStore((state) => state.avatarColor);
-  const getAvatarConfig = globalStore((state) => state.getAvatarConfig);
+  const avatarIcon = globalStore(state => state.avatarIcon);
+  const avatarColor = globalStore(state => state.avatarColor);
+  const getAvatarConfig = globalStore(state => state.getAvatarConfig);
   const [botIcon, setBotIcon] = useState<{ name?: string; value?: string }>({});
-  const [botColor, setBotColor] = useState("");
+  const [botColor, setBotColor] = useState('');
 
   useEffect(() => {
     getAvatarConfig();
@@ -962,7 +958,7 @@ const useModelAvatar = (
       setBotIcon(avatarIcon[0]);
     !modelId &&
       avatarColor.length > 0 &&
-      setBotColor(avatarColor[0]?.name || "");
+      setBotColor(avatarColor[0]?.name || '');
   }, [avatarIcon, avatarColor, modelId]);
 
   return {
@@ -977,7 +973,7 @@ const useModelAvatar = (
 
 // 模型参数 Hook
 const useModelParams = (
-  modalRef: React.RefObject<HTMLDivElement>,
+  modalRef: React.RefObject<HTMLDivElement>
 ): {
   modelParams: ModelConfigParam[];
   setModelParams: (params: ModelConfigParam[]) => void;
@@ -987,16 +983,16 @@ const useModelParams = (
   const [modelParams, setModelParams] = useState<ModelConfigParam[]>([
     {
       id: uuid(),
-      key: "temperature",
-      name: t("model.temperatureDescription"),
-      fieldType: "float",
+      key: 'temperature',
+      name: t('model.temperatureDescription'),
+      fieldType: 'float',
       precision: 1,
       min: 0,
       max: 2,
       required: false,
       default: 1,
       standard: true,
-      constraintType: "range",
+      constraintType: 'range',
       constraintContent: [],
       initialValue: 1,
     },
@@ -1005,16 +1001,16 @@ const useModelParams = (
   const handleAddData = useCallback(() => {
     const newData: ModelConfigParam = {
       id: uuid(),
-      key: "",
-      name: "",
-      fieldType: "int",
+      key: '',
+      name: '',
+      fieldType: 'int',
       precision: 0,
       min: 0,
       max: 10,
       required: false,
       default: 0,
       standard: false,
-      constraintType: "range",
+      constraintType: 'range',
       constraintContent: [],
       initialValue: 0,
     };
@@ -1023,7 +1019,7 @@ const useModelParams = (
       if (modalRef.current) {
         modalRef.current.scrollTo({
           top: modalRef.current.scrollHeight,
-          behavior: "smooth",
+          behavior: 'smooth',
         });
       }
     }, 0);
@@ -1034,7 +1030,7 @@ const useModelParams = (
 
 // 分类管理 Hook
 const useModelCategories = (
-  categoryTree?: CategoryNode[],
+  categoryTree?: CategoryNode[]
 ): {
   categoryOptions?: Array<{ label: string; value: number }>;
   languageSupportOptions?: Array<{ label: string; value: number }>;
@@ -1058,20 +1054,20 @@ const useModelCategories = (
   handleSceneChange: (next: number[]) => void;
 } => {
   const categoryOptions = categoryTree
-    ?.find((t) => t.key === "modelCategory")
-    ?.children.map((c) => ({ label: c.name, value: c.id }));
+    ?.find(t => t.key === 'modelCategory')
+    ?.children.map(c => ({ label: c.name, value: c.id }));
   const languageSupportOptions = categoryTree
-    ?.find((t) => t.key === "languageSupport")
-    ?.children.map((c) => ({ label: c.name, value: c.id }));
+    ?.find(t => t.key === 'languageSupport')
+    ?.children.map(c => ({ label: c.name, value: c.id }));
   const contextLengthOptions = categoryTree
-    ?.find((t) => t.key === "contextLengthTag")
-    ?.children.map((c) => ({ label: c.name, value: c.id }));
+    ?.find(t => t.key === 'contextLengthTag')
+    ?.children.map(c => ({ label: c.name, value: c.id }));
   const sceneOptions = categoryTree
-    ?.find((t) => t.key === "modelScenario")
-    ?.children.map((c) => ({ label: c.name, value: c.id }));
+    ?.find(t => t.key === 'modelScenario')
+    ?.children.map(c => ({ label: c.name, value: c.id }));
 
   const [modelTypes, setModelTypes] = useState<number[]>([]);
-  const [modelTypeOtherText, setModelTypeOtherText] = useState("");
+  const [modelTypeOtherText, setModelTypeOtherText] = useState('');
   const [languageSystemId, setLanguageSystemId] = useState<
     number | undefined
   >();
@@ -1079,39 +1075,38 @@ const useModelCategories = (
     number | undefined
   >();
   const [modelScenes, setModelScenes] = useState<number[]>([]);
-  const [modelSceneOtherText, setModelSceneOtherText] = useState("");
+  const [modelSceneOtherText, setModelSceneOtherText] = useState('');
 
   const hasOtherSelected = useMemo(
     () =>
       modelTypes.some(
-        (v) => categoryOptions?.find((o) => o.value === v)?.label === "其他",
+        v => categoryOptions?.find(o => o.value === v)?.label === '其他'
       ),
-    [modelTypes, categoryOptions],
+    [modelTypes, categoryOptions]
   );
 
   const hasSceneOtherSelected = useMemo(
     () =>
       modelScenes.some(
-        (v) => sceneOptions?.find((o) => o.value === v)?.label === "其他",
+        v => sceneOptions?.find(o => o.value === v)?.label === '其他'
       ),
-    [modelScenes, sceneOptions],
+    [modelScenes, sceneOptions]
   );
 
   const handleTypeChange = (next: number[]): void => {
     setModelTypes(next);
     const stillHasOther = next.some(
-      (v: number) =>
-        categoryOptions?.find((o) => o.value === v)?.label === "其他",
+      (v: number) => categoryOptions?.find(o => o.value === v)?.label === '其他'
     );
-    if (!stillHasOther) setModelTypeOtherText("");
+    if (!stillHasOther) setModelTypeOtherText('');
   };
 
   const handleSceneChange = (next: number[]): void => {
     setModelScenes(next);
     const stillHasOther = next.some(
-      (v: number) => sceneOptions?.find((o) => o.value === v)?.label === "其他",
+      (v: number) => sceneOptions?.find(o => o.value === v)?.label === '其他'
     );
-    if (!stillHasOther) setModelSceneOtherText("");
+    if (!stillHasOther) setModelSceneOtherText('');
   };
 
   return {
@@ -1141,81 +1136,81 @@ const useModelCategories = (
 // 数据提取辅助函数
 const extractModelTypes = (categoryTree: CategoryNode[]): number[] =>
   categoryTree
-    ?.find((item) => item.key === "modelCategory")
-    ?.children.map((child) => child.id) || [];
+    ?.find(item => item.key === 'modelCategory')
+    ?.children.map(child => child.id) || [];
 
 const extractOtherText = (categoryTree: CategoryNode[], key: string): string =>
   categoryTree
-    ?.find((item) => item.key === key)
-    ?.children?.find((item) => item.name === "其他")?.children?.[0]?.name || "";
+    ?.find(item => item.key === key)
+    ?.children?.find(item => item.name === '其他')?.children?.[0]?.name || '';
 
 const extractSystemId = (
   categoryTree: CategoryNode[],
-  key: string,
+  key: string
 ): number | undefined =>
-  categoryTree?.find((item) => item.key === key)?.children?.[0]?.id;
+  categoryTree?.find(item => item.key === key)?.children?.[0]?.id;
 
 const extractModelScenes = (categoryTree: CategoryNode[]): number[] =>
   categoryTree
-    ?.find((item) => item.key === "modelScenario")
-    ?.children.map((child) => child.id) || [];
+    ?.find(item => item.key === 'modelScenario')
+    ?.children.map(child => child.id) || [];
 
 const updateCategoryStates = (
   data: ModelInfo,
-  categoryState: ReturnType<typeof useModelCategories>,
+  categoryState: ReturnType<typeof useModelCategories>
 ): void => {
   categoryState.setModelTypes(extractModelTypes(data.categoryTree || []));
   categoryState.setModelTypeOtherText(
-    extractOtherText(data.categoryTree || [], "modelCategory"),
+    extractOtherText(data.categoryTree || [], 'modelCategory')
   );
   categoryState.setLanguageSystemId(
-    extractSystemId(data.categoryTree || [], "languageSupport"),
+    extractSystemId(data.categoryTree || [], 'languageSupport')
   );
   categoryState.setContextLengthSystemId(
-    extractSystemId(data.categoryTree || [], "contextLengthTag"),
+    extractSystemId(data.categoryTree || [], 'contextLengthTag')
   );
   categoryState.setModelScenes(extractModelScenes(data.categoryTree || []));
   categoryState.setModelSceneOtherText(
-    extractOtherText(data.categoryTree || [], "modelScenario"),
+    extractOtherText(data.categoryTree || [], 'modelScenario')
   );
 };
 
 const updateBasicInfo = (
   data: ModelInfo,
   formState: ReturnType<typeof useModelForm>,
-  avatarState: ReturnType<typeof useModelAvatar>,
+  avatarState: ReturnType<typeof useModelAvatar>
 ): void => {
   formState.setModelInfo({
-    modelName: data?.name || "",
-    modelDesc: data?.desc || "",
-    interfaceAddress: data?.url || "",
-    apiKEY: data?.apiKey || "",
-    domain: data?.domain || "",
+    modelName: data?.name || '',
+    modelDesc: data?.desc || '',
+    interfaceAddress: data?.url || '',
+    apiKEY: data?.apiKey || '',
+    domain: data?.domain || '',
   });
-  formState.beforeModelKeys.current = data?.apiKey || "";
-  avatarState.setBotIcon({ name: data?.address || "", value: data?.icon });
-  avatarState.setBotColor(data?.color || "");
+  formState.beforeModelKeys.current = data?.apiKey || '';
+  avatarState.setBotIcon({ name: data?.address || '', value: data?.icon });
+  avatarState.setBotColor(data?.color || '');
   formState.setTags(data?.tags || []);
 };
 
 const updateModelParams = (
   data: ModelInfo,
-  paramsState: ReturnType<typeof useModelParams>,
+  paramsState: ReturnType<typeof useModelParams>
 ): void => {
   paramsState.setModelParams(
-    JSON.parse(data?.config || "[]")?.map((item: ModelConfigParam) => ({
+    JSON.parse(data?.config || '[]')?.map((item: ModelConfigParam) => ({
       ...item,
       id: uuid(),
       min: item?.constraintContent?.[0]?.name,
       max: item?.constraintContent?.[1]?.name,
-    })),
+    }))
   );
 };
 
 // 组合主 Hook
 const useCreateModal = (
   modelId?: string,
-  categoryTree?: CategoryNode[],
+  categoryTree?: CategoryNode[]
 ): ReturnType<typeof useModelForm> &
   ReturnType<typeof useModelAvatar> &
   ReturnType<typeof useModelParams> &
@@ -1233,9 +1228,9 @@ const useCreateModal = (
   const modalRef = useRef<HTMLDivElement>(null);
   const [showModal, setShowModal] = useState(false);
   const [modelCreateType, setModelCreateType] = useState<ModelCreateType>(
-    ModelCreateType.THIRD_PARTY,
+    ModelCreateType.THIRD_PARTY
   );
-  const [selectedLocalModel, setSelectedLocalModel] = useState<string>("");
+  const [selectedLocalModel, setSelectedLocalModel] = useState<string>('');
   const [acceleratorCount, setAcceleratorCount] = useState<number>(1);
 
   const formState = useModelForm();
@@ -1250,7 +1245,7 @@ const useCreateModal = (
         modelId: parseInt(modelId),
         llmSource: LLMSource.CUSTOM,
       })
-        .then((data) => {
+        .then(data => {
           updateCategoryStates(data, categoryState);
           updateBasicInfo(data, formState, avatarState);
           updateModelParams(data, paramsState);
@@ -1293,13 +1288,13 @@ const ModelParametersSection = ({
   return (
     <div className="flex flex-col gap-2 font-normal text-sm">
       <div className="w-full flex items-center justify-between">
-        <div>{t("model.modelParameters")}：</div>
+        <div>{t('model.modelParameters')}：</div>
         <div
           className="flex items-center gap-1.5 text-[#275eff] cursor-pointer"
           onClick={handleAddData}
         >
           <img src={inputAddIcon} className="w-2.5 h-2.5" alt="" />
-          <span>{t("model.add")}</span>
+          <span>{t('model.add')}</span>
         </div>
       </div>
       <div>
@@ -1366,7 +1361,7 @@ export function CreateModal({
     }
   };
   return (
-    <div className="mask cursor-default" onClick={(e) => e.stopPropagation()}>
+    <div className="mask cursor-default" onClick={e => e.stopPropagation()}>
       {modalState.showModal && (
         <MoreIcons
           icons={modalState.avatarIcon}
@@ -1381,17 +1376,17 @@ export function CreateModal({
       <div
         className="modalContent text-sm"
         style={{ paddingRight: 0, width: 880 }}
-        onClick={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center justify-between font-medium pr-6 mb-[16px]">
           <span className="font-semibold text-base text-[#3d3d3d]">
-            {t("model.addOpenAI")}
+            {t('model.addOpenAI')}
           </span>
           <img
             src={close}
             className="w-3 h-3 cursor-pointer"
             alt=""
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               setCreateModal(false);
             }}
@@ -1399,7 +1394,7 @@ export function CreateModal({
         </div>
         <div
           className="pr-6 flex flex-col gap-6 overflow-auto"
-          style={{ maxHeight: "60vh" }}
+          style={{ maxHeight: '60vh' }}
           ref={modalState.modalRef}
         >
           {/* <div className="flex">
@@ -1467,7 +1462,7 @@ export function CreateModal({
           {modalState.modelCreateType === ModelCreateType.LOCAL && (
             <PerformanceConfiguration
               acceleratorCount={modalState.acceleratorCount}
-              onAcceleratorCountChange={(value) =>
+              onAcceleratorCountChange={value =>
                 modalState.setAcceleratorCount(value ?? 0)
               }
             />
@@ -1491,17 +1486,17 @@ export function CreateModal({
               !modalState.modelInfo?.apiKEY
             }
           >
-            {modalState.t("common.submit")}
+            {modalState.t('common.submit')}
           </Button>
           <Button
             type="text"
             className="origin-btn px-[48px]"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               setCreateModal(false);
             }}
           >
-            {modalState.t("common.cancel")}
+            {modalState.t('common.cancel')}
           </Button>
         </div>
       </div>
@@ -1522,13 +1517,13 @@ export function DeleteModal({
     setLoading(true);
     deleteModelAPI(currentModel.modelId)
       .then(() => {
-        message.success(t("model.modelDeleteSuccess"));
+        message.success(t('model.modelDeleteSuccess'));
         setDeleteModal(false);
         getModels?.();
       })
-      .catch((error) => {
+      .catch(error => {
         const errorMessage =
-          error instanceof Error ? error.message : t("model.modelDeleteFailed");
+          error instanceof Error ? error.message : t('model.modelDeleteFailed');
         message.error(errorMessage);
       })
       .finally(() => {
@@ -1540,13 +1535,13 @@ export function DeleteModal({
     <div className="mask">
       <div
         className="p-6 absolute bg-[#fff] rounded-2xl top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 text-second font-medium text-md min-w-[310px]"
-        onClick={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center">
           <div className="bg-[#fff5f4] w-10 h-10 flex justify-center items-center rounded-lg">
             <img src={dialogDel} className="w-7 h-7" alt="" />
           </div>
-          <p className="ml-2.5">{t("model.confirmDeleteModel")}</p>
+          <p className="ml-2.5">{t('model.confirmDeleteModel')}</p>
         </div>
         <div className="w-full h-10 bg-[#F9FAFB] text-center mt-7 py-2">
           {currentModel.name}
@@ -1556,26 +1551,26 @@ export function DeleteModal({
           <Button
             type="text"
             loading={loading}
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               handleOk();
             }}
             className="delete-btn"
             style={{ paddingLeft: 24, paddingRight: 24 }}
           >
-            {t("model.delete")}
+            {t('model.delete')}
           </Button>
           <Button
             type="text"
             className="origin-btn"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
 
               setDeleteModal(false);
             }}
             style={{ paddingLeft: 24, paddingRight: 24 }}
           >
-            {t("common.cancel")}
+            {t('common.cancel')}
           </Button>
         </div>
       </div>

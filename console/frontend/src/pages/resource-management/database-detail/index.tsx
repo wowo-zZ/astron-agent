@@ -1,12 +1,12 @@
-import React, { memo } from "react";
-import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import back from "@/assets/imgs/common/back.png";
-import { DatabaseProvider } from "./context/database-context";
-import DatabaseSidebar from "./components/database-sidebar";
-import MainContent from "./components/main-content";
-import ModalComponents from "./components/modal-components";
-import { useDatabaseInitializer } from "./hooks/use-database-initializer";
+import React, { memo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import back from '@/assets/imgs/common/back.png';
+import { DatabaseProvider } from './context/database-context';
+import DatabaseSidebar from './components/database-sidebar';
+import MainContent from './components/main-content';
+import ModalComponents from './components/modal-components';
+import { useDatabaseInitializer } from './hooks/use-database-initializer';
 
 /**
  * 返回按钮组件
@@ -24,15 +24,15 @@ const BackButton: React.FC = memo(() => {
       type="button"
     >
       <img src={back} className="w-[18px] h-[18px]" alt="返回" />
-      <div className="mr-1 font-medium text-4">{t("database.back")}</div>
+      <div className="mr-1 font-medium text-4">{t('database.back')}</div>
       <span className="text-[#7F7F7F] text-[14px]">
-        {t("database.database")}
+        {t('database.database')}
       </span>
     </button>
   );
 });
 
-BackButton.displayName = "BackButton";
+BackButton.displayName = 'BackButton';
 
 /**
  * 数据库详情页面内容组件
@@ -44,7 +44,7 @@ const DatabaseDetailContent: React.FC = memo(() => {
   return (
     <div
       className="w-full h-full flex flex-col overflow-hidden mx-auto pb-6"
-      style={{ width: "85%" }}
+      style={{ width: '85%' }}
     >
       <BackButton />
 
@@ -60,7 +60,7 @@ const DatabaseDetailContent: React.FC = memo(() => {
   );
 });
 
-DatabaseDetailContent.displayName = "DatabaseDetailContent";
+DatabaseDetailContent.displayName = 'DatabaseDetailContent';
 
 /**
  * 数据库详情页面

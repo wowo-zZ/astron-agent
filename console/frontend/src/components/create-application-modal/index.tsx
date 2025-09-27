@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { Modal, Form } from "antd";
-import { useNavigate } from "react-router-dom";
-import { getLanguageCode } from "@/utils/http";
-import AgentCreationModal from "@/components/agent-creation";
-import MakeCreateModal from "@/components/make-creation";
-import { useTranslation } from "react-i18next";
+import React, { useEffect, useState } from 'react';
+import { Modal, Form } from 'antd';
+import { useNavigate } from 'react-router-dom';
+import { getLanguageCode } from '@/utils/http';
+import AgentCreationModal from '@/components/agent-creation';
+import MakeCreateModal from '@/components/make-creation';
+import { useTranslation } from 'react-i18next';
 
-import styles from "./index.module.scss";
-import classNames from "classnames";
+import styles from './index.module.scss';
+import classNames from 'classnames';
 
 interface HeaderFeedbackModalProps {
   visible: boolean;
@@ -23,12 +23,12 @@ const HeaderFeedbackModal: React.FC<HeaderFeedbackModalProps> = ({
   const navigate = useNavigate();
   const [makeModalVisible, setMakeModalVisible] = useState(false);
   const [form] = Form.useForm();
-  const [selectedBox, setSelectedBox] = useState("");
+  const [selectedBox, setSelectedBox] = useState('');
   const [AgentCreationModalVisible, IntelligentModalVisible] =
     useState<boolean>(false); //智能体创建
   const handleBoxClick = (boxName: string): void => {
     setSelectedBox(boxName);
-    if (boxName === "cueWord") {
+    if (boxName === 'cueWord') {
       IntelligentModalVisible(true);
     } else {
       setMakeModalVisible(true);
@@ -36,7 +36,7 @@ const HeaderFeedbackModal: React.FC<HeaderFeedbackModalProps> = ({
   };
 
   const handleCancel = (): void => {
-    setSelectedBox("");
+    setSelectedBox('');
     onCancel();
   };
 
@@ -59,38 +59,38 @@ const HeaderFeedbackModal: React.FC<HeaderFeedbackModalProps> = ({
     >
       <div className={styles.modal_content}>
         <div className={styles.title}>
-          <span>{t("createAgent1.create")}</span>
+          <span>{t('createAgent1.create')}</span>
         </div>
         <div className={styles.intelligentAgents}>
           <div
             className={`${styles.cueWord} ${
-              selectedBox === "cueWord" ? styles.selected : ""
+              selectedBox === 'cueWord' ? styles.selected : ''
             }`}
-            onClick={() => handleBoxClick("cueWord")}
+            onClick={() => handleBoxClick('cueWord')}
           >
             <div className={styles.cueWord_img}>
               <div className={styles.cueWord_left_top}>
-                {t("createAgent1.gettingStarted")}
+                {t('createAgent1.gettingStarted')}
               </div>
             </div>
-            <p>{t("createAgent1.promptCreation")}</p>
-            <span>{t("createAgent1.promptSetup")}</span>
+            <p>{t('createAgent1.promptCreation')}</p>
+            <span>{t('createAgent1.promptSetup')}</span>
           </div>
           <div
             className={`${styles.Workflow} ${
-              selectedBox === "workflow" ? styles.selected : ""
+              selectedBox === 'workflow' ? styles.selected : ''
             }`}
-            onClick={() => handleBoxClick("workflow")}
+            onClick={() => handleBoxClick('workflow')}
           >
             <div
               className={classNames(styles.cueWord_img, styles.Workflow_img)}
             >
               <div className={styles.cueWord_left_top}>
-                {t("createAgent1.advanced")}
+                {t('createAgent1.advanced')}
               </div>
             </div>
-            <p>{t("createAgent1.workflowCreation")}</p>
-            <span>{t("createAgent1.workflowDesign")}</span>
+            <p>{t('createAgent1.workflowCreation')}</p>
+            <span>{t('createAgent1.workflowDesign')}</span>
           </div>
         </div>
       </div>

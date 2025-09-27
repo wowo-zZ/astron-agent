@@ -1,7 +1,7 @@
-import { useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { useDatabaseContext } from "../context/database-context";
-import { dbDetail, tableList } from "@/services/database";
+import { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { useDatabaseContext } from '../context/database-context';
+import { dbDetail, tableList } from '@/services/database';
 
 /**
  * 数据库初始化Hook

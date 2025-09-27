@@ -1,11 +1,11 @@
-import { useNavigate } from "react-router-dom";
-import { Button } from "antd";
-import { useTranslation } from "react-i18next";
+import { useNavigate } from 'react-router-dom';
+import { Button } from 'antd';
+import { useTranslation } from 'react-i18next';
 
-import arrowLeft from "@/assets/imgs/knowledge/icon_zhishi_arrow-left.png";
-import check from "@/assets/imgs/knowledge/icon_steps_check.png";
-import { FileStatusResponse } from "@/types/resource";
-import { FC } from "react";
+import arrowLeft from '@/assets/imgs/knowledge/icon_zhishi_arrow-left.png';
+import check from '@/assets/imgs/knowledge/icon_steps_check.png';
+import { FileStatusResponse } from '@/types/resource';
+import { FC } from 'react';
 
 interface UploadHeaderProps {
   tag: string;
@@ -25,7 +25,7 @@ interface UploadHeaderProps {
   saveLoading: boolean;
 }
 
-const UploadHeader: FC<UploadHeaderProps> = (props) => {
+const UploadHeader: FC<UploadHeaderProps> = props => {
   const { t } = useTranslation();
   const {
     tag,
@@ -50,7 +50,7 @@ const UploadHeader: FC<UploadHeaderProps> = (props) => {
     <div
       className="w-full h-[80px] bg-[#fff] border-b border-[#e2e8ff] flex justify-between px-6 py-5"
       style={{
-        borderRadius: "0px 0px 24px 24px",
+        borderRadius: '0px 0px 24px 24px',
       }}
     >
       <div className="flex items-center">
@@ -61,48 +61,48 @@ const UploadHeader: FC<UploadHeaderProps> = (props) => {
           alt=""
         />
         <h1 className="ml-2 text-2xl font-semibold text-second">
-          {t("knowledge.fileUpload")}
+          {t('knowledge.fileUpload')}
         </h1>
         <div className="flex items-center ml-5">
           <div className="flex items-center px-3 py-1">
             <div
-              className={`w-6 h-6 rounded-full bg-[${step == 1 ? "#275EFF" : "#dee2f9"}] leading-6 text-center text-[#fff] text-xs flex justify-center items-center`}
-              style={{ border: step > 1 ? "1px solid #d3d3d3" : "" }}
+              className={`w-6 h-6 rounded-full bg-[${step == 1 ? '#275EFF' : '#dee2f9'}] leading-6 text-center text-[#fff] text-xs flex justify-center items-center`}
+              style={{ border: step > 1 ? '1px solid #d3d3d3' : '' }}
             >
               {step > 1 ? <img src={check} className="w-3 h-3" /> : 1}
             </div>
             <div
-              className={`ml-2 text-[${step == 1 ? "#275EFF" : "#757575"}] text-sm`}
+              className={`ml-2 text-[${step == 1 ? '#275EFF' : '#757575'}] text-sm`}
             >
-              {t("knowledge.importData")}
+              {t('knowledge.importData')}
             </div>
           </div>
           <div className="ml-2 w-[44px] h-[1px] bg-[#d3d3d3]"></div>
           <div className="flex items-center px-3 py-1">
             <div
-              className={`w-6 h-6 rounded-full bg-[${step == 2 ? "#275EFF" : step > 2 ? "#dee2f9" : ""}] leading-6 text-center text-[${step == 2 ? "#fff" : "#757575"}] text-xs flex justify-center items-center`}
-              style={{ border: step !== 2 ? "1px solid #d3d3d3" : "" }}
+              className={`w-6 h-6 rounded-full bg-[${step == 2 ? '#275EFF' : step > 2 ? '#dee2f9' : ''}] leading-6 text-center text-[${step == 2 ? '#fff' : '#757575'}] text-xs flex justify-center items-center`}
+              style={{ border: step !== 2 ? '1px solid #d3d3d3' : '' }}
             >
               {step > 2 ? <img src={check} className="w-3 h-3" /> : 2}
             </div>
             <div
-              className={`ml-2 text-[${step == 2 ? "#275EFF" : step > 2 ? "#757575" : "#a4a4a4"}] text-sm`}
+              className={`ml-2 text-[${step == 2 ? '#275EFF' : step > 2 ? '#757575' : '#a4a4a4'}] text-sm`}
             >
-              {t("knowledge.dataClean")}
+              {t('knowledge.dataClean')}
             </div>
           </div>
           <div className="ml-2 w-[44px] h-[1px] bg-[#d3d3d3]"></div>
           <div className="flex items-center px-3 py-1">
             <div
-              className={`w-6 h-6 rounded-full bg-[${step == 3 ? "#275EFF" : ""}] leading-6 text-center text-[${step == 3 ? "#fff" : "#757575"}] text-xs flex justify-center items-center`}
-              style={{ border: step !== 3 ? "1px solid #d3d3d3" : "" }}
+              className={`w-6 h-6 rounded-full bg-[${step == 3 ? '#275EFF' : ''}] leading-6 text-center text-[${step == 3 ? '#fff' : '#757575'}] text-xs flex justify-center items-center`}
+              style={{ border: step !== 3 ? '1px solid #d3d3d3' : '' }}
             >
               3
             </div>
             <div
-              className={`ml-2 text-[${step == 3 ? "#275EFF" : "#a4a4a4"}] text-sm`}
+              className={`ml-2 text-[${step == 3 ? '#275EFF' : '#a4a4a4'}] text-sm`}
             >
-              {t("knowledge.processingCompletion")}
+              {t('knowledge.processingCompletion')}
             </div>
           </div>
         </div>
@@ -114,7 +114,7 @@ const UploadHeader: FC<UploadHeaderProps> = (props) => {
           onClick={() => setStep(2)}
           disabled={saveDisabled}
         >
-          {t("knowledge.nextStep")}
+          {t('knowledge.nextStep')}
         </Button>
       )}
       {step === 2 && (
@@ -124,12 +124,12 @@ const UploadHeader: FC<UploadHeaderProps> = (props) => {
             className="h-10 px-4 second-btn"
             onClick={() => {
               // setSliceType('default')
-              setSliceType("");
+              setSliceType('');
               setFailedList([]);
               setStep(1);
             }}
           >
-            {t("knowledge.previousStep")}
+            {t('knowledge.previousStep')}
           </Button>
           <Button
             type="primary"
@@ -140,7 +140,7 @@ const UploadHeader: FC<UploadHeaderProps> = (props) => {
             }}
             disabled={slicing || saveDisabled}
           >
-            {t("knowledge.nextStep")}
+            {t('knowledge.nextStep')}
           </Button>
           <Button
             type="primary"
@@ -149,7 +149,7 @@ const UploadHeader: FC<UploadHeaderProps> = (props) => {
             disabled={newSaveDisabled}
             loading={saveLoading}
           >
-            {t("knowledge.save")}
+            {t('knowledge.save')}
           </Button>
         </div>
       )}
@@ -163,16 +163,16 @@ const UploadHeader: FC<UploadHeaderProps> = (props) => {
                 state: {
                   parentId,
                 },
-              },
+              }
             );
           }}
         >
           <Button
             type="primary"
             className="h-10 px-6 ml-3"
-            disabled={embed === "loading"}
+            disabled={embed === 'loading'}
           >
-            {t("knowledge.goToDocuments")}
+            {t('knowledge.goToDocuments')}
           </Button>
         </div>
       )}

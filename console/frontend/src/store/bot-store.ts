@@ -1,5 +1,5 @@
-import { create } from "zustand";
-import { BotInfo } from "@/types/chat";
+import { create } from 'zustand';
+import { BotInfo } from '@/types/chat';
 
 //指令型智能体
 interface BotStore {
@@ -10,7 +10,7 @@ interface BotActions {
   setDetailInfo: (botInfo: Partial<BotInfo>) => void;
 }
 
-const useBotStore = create<BotStore & BotActions>((set) => ({
+const useBotStore = create<BotStore & BotActions>(set => ({
   detailInfo: {},
   setDetailInfo: (detailInfo: Partial<BotInfo>) => set({ detailInfo }),
 }));

@@ -1,10 +1,10 @@
-import React, { FC, useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { Input, Button, Form } from "antd";
-import { temporaryTool } from "@/services/plugin";
-import MoreIcons from "@/components/modal/more-icons";
-import globalStore from "@/store/global-store";
-import { AvatarType, ToolItem } from "@/types/resource";
+import React, { FC, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Input, Button, Form } from 'antd';
+import { temporaryTool } from '@/services/plugin';
+import MoreIcons from '@/components/modal/more-icons';
+import globalStore from '@/store/global-store';
+import { AvatarType, ToolItem } from '@/types/resource';
 
 const SettingPage: FC<{
   toolId: string;
@@ -12,17 +12,17 @@ const SettingPage: FC<{
   initData: () => void;
 }> = ({ toolId, toolInfo, initData }) => {
   const { t } = useTranslation();
-  const avatarIcon = globalStore((state) => state.avatarIcon);
-  const avatarColor = globalStore((state) => state.avatarColor);
-  const getAvatarConfig = globalStore((state) => state.getAvatarConfig);
+  const avatarIcon = globalStore(state => state.avatarIcon);
+  const avatarColor = globalStore(state => state.avatarColor);
+  const getAvatarConfig = globalStore(state => state.getAvatarConfig);
   const [baseForm] = Form.useForm();
-  const getTools = globalStore((state) => state.getTools);
-  const [name, setName] = useState("");
-  const [desc, setDesc] = useState("");
+  const getTools = globalStore(state => state.getTools);
+  const [name, setName] = useState('');
+  const [desc, setDesc] = useState('');
   const [loading, setLoading] = useState(false);
   const [_, setPermission] = useState(0);
   const [botIcon, setBotIcon] = useState<AvatarType>({});
-  const [botColor, setBotColor] = useState<string>("");
+  const [botColor, setBotColor] = useState<string>('');
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
@@ -33,7 +33,7 @@ const SettingPage: FC<{
     setBotColor(toolInfo.avatarColor);
     setBotIcon({
       name: toolInfo.address,
-      value: toolInfo.icon || "",
+      value: toolInfo.icon || '',
     });
   }, [toolInfo]);
 
@@ -49,7 +49,7 @@ const SettingPage: FC<{
   }, [toolInfo]);
 
   function handleSave(): void {
-    baseForm.validateFields().then((values) => {
+    baseForm.validateFields().then(values => {
       setLoading(true);
       const params = {
         id: toolId,
@@ -71,7 +71,7 @@ const SettingPage: FC<{
     <div
       className="h-full flex flex-col overflow-auto mx-auto p-6 bg-[#fff] rounded-2xl mt-9 pb-12"
       style={{
-        width: "85%",
+        width: '85%',
         minWidth: 1000,
         maxWidth: 1425,
       }}
@@ -94,17 +94,17 @@ const SettingPage: FC<{
             label={
               <span className="text-base font-medium">
                 <span className="text-[#F74E43]">* </span>
-                {t("plugin.pluginName")}
+                {t('plugin.pluginName')}
               </span>
             }
             rules={[
               {
                 required: true,
-                message: t("plugin.pleaseEnterPluginName"),
+                message: t('plugin.pleaseEnterPluginName'),
               },
               {
                 whitespace: true,
-                message: t("plugin.pleaseEnterPluginName"),
+                message: t('plugin.pleaseEnterPluginName'),
               },
             ]}
           >
@@ -115,24 +115,24 @@ const SettingPage: FC<{
                   background: botColor
                     ? botColor
                     : `url(${
-                        botIcon.name || "" + botIcon.value || ""
+                        botIcon.name || '' + botIcon.value || ''
                       }) no-repeat center / cover`,
                 }}
                 onClick={() => setShowModal(true)}
               >
                 {botColor && (
                   <img
-                    src={botIcon.name || "" + botIcon.value || ""}
+                    src={botIcon.name || '' + botIcon.value || ''}
                     className="w-6 h-6"
                     alt=""
                   />
                 )}
               </span>
               <Input
-                placeholder={t("common.inputPlaceholder")}
+                placeholder={t('common.inputPlaceholder')}
                 className="global-input params-input"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={e => setName(e.target.value)}
                 maxLength={20}
                 showCount
               />
@@ -144,27 +144,27 @@ const SettingPage: FC<{
               <div className="flex flex-col gap-1">
                 <span className="text-base font-medium">
                   <span className="text-[#F74E43]">* </span>
-                  {t("plugin.pluginDescription")}
+                  {t('plugin.pluginDescription')}
                 </span>
-                <p className="text-desc">{t("plugin.pluginDescriptionHint")}</p>
+                <p className="text-desc">{t('plugin.pluginDescriptionHint')}</p>
               </div>
             }
             rules={[
               {
                 required: true,
-                message: t("plugin.pleaseEnterPluginDescription"),
+                message: t('plugin.pleaseEnterPluginDescription'),
               },
               {
                 whitespace: true,
-                message: t("plugin.pleaseEnterPluginDescription"),
+                message: t('plugin.pleaseEnterPluginDescription'),
               },
             ]}
           >
             <div className="relative">
               <Input.TextArea
                 value={desc}
-                onChange={(e) => setDesc(e?.target?.value)}
-                placeholder={t("common.inputPlaceholder")}
+                onChange={e => setDesc(e?.target?.value)}
+                placeholder={t('common.inputPlaceholder')}
                 className="global-textarea params-input"
                 style={{
                   height: 108,
@@ -186,7 +186,7 @@ const SettingPage: FC<{
           className="primary-btn ml-3 w-[125px] h-10"
           onClick={() => handleSave()}
         >
-          {t("common.save")}
+          {t('common.save')}
         </Button>
       </div>
     </div>

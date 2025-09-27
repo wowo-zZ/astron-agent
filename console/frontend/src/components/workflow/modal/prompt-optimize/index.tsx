@@ -1,19 +1,19 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
-import { createPortal } from "react-dom";
-import { isJSON } from "@/utils";
-import { useMemoizedFn } from "ahooks";
-import { Input, Button, Spin } from "antd";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import { useNodeCommon } from "@/components/workflow/hooks/useNodeCommon";
-import { WebSocketMessage } from "@/components/workflow/types";
-import { Icons } from "@/components/workflow/icons";
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { createPortal } from 'react-dom';
+import { isJSON } from '@/utils';
+import { useMemoizedFn } from 'ahooks';
+import { Input, Button, Spin } from 'antd';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import { WebSocketMessage } from '@/components/workflow/types';
+import { Icons } from '@/components/workflow/icons';
 
 const wsOrigin =
-  import.meta.env.MODE === "development"
-    ? "dev-agent.xfyun.cn"
+  import.meta.env.MODE === 'development'
+    ? 'dev-agent.xfyun.cn'
     : window.location.host;
 const wsType =
-  import.meta.env.MODE === "development" || import.meta.env.MODE === "test"
+  import.meta.env.MODE === 'development' || import.meta.env.MODE === 'test'
     ? `ws://`
     : `wss://`;
 
@@ -21,41 +21,41 @@ const { TextArea } = Input;
 
 function PromptModal(): React.ReactElement {
   const promptOptimizeModalInfo = useFlowsManager(
-    (state) => state.promptOptimizeModalInfo,
+    state => state.promptOptimizeModalInfo
   );
   const setPromptOptimizeModalInfo = useFlowsManager(
-    (state) => state.setPromptOptimizeModalInfo,
+    state => state.setPromptOptimizeModalInfo
   );
-  const currentFlow = useFlowsManager((state) => state.currentFlow);
+  const currentFlow = useFlowsManager(state => state.currentFlow);
   const setUpdateNodeInputData = useFlowsManager(
-    (state) => state.setUpdateNodeInputData,
+    state => state.setUpdateNodeInputData
   );
   const wsRef = useRef<WebSocket | null>(null);
   const textQueue = useRef<string[]>([]);
-  const wsMessageStatus = useRef<string>("end");
-  const [optimizationPrompt, setOptimizationPrompt] = useState<string>("");
+  const wsMessageStatus = useRef<string>('end');
+  const [optimizationPrompt, setOptimizationPrompt] = useState<string>('');
   const [isReciving, setIsReciving] = useState<boolean>(true);
   const { handleChangeNodeParam, currentNode } = useNodeCommon({
     id: promptOptimizeModalInfo?.nodeId,
   });
   const promptData = useMemo(
     () => currentNode?.data?.nodeParam?.[promptOptimizeModalInfo?.key],
-    [currentNode, promptOptimizeModalInfo],
+    [currentNode, promptOptimizeModalInfo]
   );
   useEffect(() => {
     promptData && handlePromptOptimization();
   }, [promptData]);
 
   const handlePromptOptimization = useMemoizedFn(() => {
-    setOptimizationPrompt(() => "");
-    wsMessageStatus.current = "start";
+    setOptimizationPrompt(() => '');
+    wsMessageStatus.current = 'start';
     setIsReciving(true);
-    const url = wsType + wsOrigin + "/xingchen-api/prompt-enhance";
+    const url = wsType + wsOrigin + '/xingchen-api/prompt-enhance';
     wsRef.current = new WebSocket(url);
     wsRef.current.onopen = (): void => {
       if (wsRef.current) {
         wsRef.current.send(
-          JSON.stringify({ prompt: promptData, name: currentFlow?.name }),
+          JSON.stringify({ prompt: promptData, name: currentFlow?.name })
         );
       }
     };
@@ -63,13 +63,13 @@ function PromptModal(): React.ReactElement {
       if (wsRef.current) {
         wsRef.current.close();
       }
-      wsMessageStatus.current = "end";
+      wsMessageStatus.current = 'end';
     };
     wsRef.current.onerror = (): void => {
       if (wsRef.current) {
         wsRef.current.close();
       }
-      wsMessageStatus.current = "end";
+      wsMessageStatus.current = 'end';
     };
     wsRef.current.onmessage = (e: MessageEvent): void => {
       if (e && e.data) {
@@ -77,10 +77,10 @@ function PromptModal(): React.ReactElement {
           const data: WebSocketMessage = JSON.parse(e.data);
           const content = data?.payload?.choices?.text?.[0]?.content;
           if (content) {
-            textQueue.current = [...textQueue.current, ...content.split("")];
+            textQueue.current = [...textQueue.current, ...content.split('')];
           }
           if (data?.header?.status === 2) {
-            wsMessageStatus.current = "end";
+            wsMessageStatus.current = 'end';
           }
         }
       }
@@ -91,14 +91,14 @@ function PromptModal(): React.ReactElement {
     let timer: ReturnType<typeof setTimeout> | null = null;
     if (isReciving) {
       timer = setInterval((): void => {
-        const value = textQueue.current.slice(0, 1).join("");
+        const value = textQueue.current.slice(0, 1).join('');
         textQueue.current = textQueue.current.slice(1);
         if (value) {
           setOptimizationPrompt(
-            (optimizationPrompt) => optimizationPrompt + value,
+            optimizationPrompt => optimizationPrompt + value
           );
         }
-        if (!textQueue.current.length && wsMessageStatus.current === "end") {
+        if (!textQueue.current.length && wsMessageStatus.current === 'end') {
           setIsReciving(false);
         }
       }, 10);
@@ -118,14 +118,14 @@ function PromptModal(): React.ReactElement {
   }, [optimizationPrompt, isReciving]);
 
   const handleOk = useMemoizedFn(() => {
-    setPromptOptimizeModalInfo({ open: false, nodeId: "", key: "" });
+    setPromptOptimizeModalInfo({ open: false, nodeId: '', key: '' });
     handleChangeNodeParam((data, value) => {
       if (data.nodeParam && promptOptimizeModalInfo?.key) {
         data.nodeParam[promptOptimizeModalInfo.key] = value;
       }
     }, optimizationPrompt);
     setTimeout(() => {
-      setUpdateNodeInputData((updateNodeInputData) => !updateNodeInputData);
+      setUpdateNodeInputData(updateNodeInputData => !updateNodeInputData);
     });
   });
 
@@ -139,7 +139,7 @@ function PromptModal(): React.ReactElement {
         ? createPortal(
             <div
               className="mask"
-              onKeyDown={(e) => e.stopPropagation()}
+              onKeyDown={e => e.stopPropagation()}
               style={{
                 zIndex: 1002,
               }}
@@ -151,8 +151,8 @@ function PromptModal(): React.ReactElement {
                     className="flex items-center gap-1 text-[#275EFF] text-base"
                     onClick={() => !isReciving && handlePromptOptimization()}
                     style={{
-                      opacity: isReciving ? "0.5" : "1",
-                      cursor: isReciving ? "not-allowed" : "pointer",
+                      opacity: isReciving ? '0.5' : '1',
+                      cursor: isReciving ? 'not-allowed' : 'pointer',
                     }}
                   >
                     <img
@@ -172,10 +172,10 @@ function PromptModal(): React.ReactElement {
                     <TextArea
                       className="mt-5 global-textarea"
                       placeholder="模型固定的引导词，通过调整该内容，可以引导模型聊天方向"
-                      style={{ height: 380, resize: "none" }}
+                      style={{ height: 380, resize: 'none' }}
                       value={optimizationPrompt}
                       onChange={(
-                        event: React.ChangeEvent<HTMLTextAreaElement>,
+                        event: React.ChangeEvent<HTMLTextAreaElement>
                       ) =>
                         !isReciving &&
                         setOptimizationPrompt(event.target.value?.trim())
@@ -198,8 +198,8 @@ function PromptModal(): React.ReactElement {
                     onClick={() =>
                       setPromptOptimizeModalInfo({
                         open: false,
-                        nodeId: "",
-                        key: "",
+                        nodeId: '',
+                        key: '',
                       })
                     }
                   >
@@ -208,7 +208,7 @@ function PromptModal(): React.ReactElement {
                 </div>
               </div>
             </div>,
-            document.body,
+            document.body
           )
         : null}
     </>

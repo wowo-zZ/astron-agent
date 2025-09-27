@@ -1,11 +1,11 @@
-import React from "react";
-import { useTranslation } from "react-i18next";
-import { FlowNodeInput, FlowSelect } from "@/components/workflow/ui";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import { useNodeCommon } from "@/components/workflow/hooks/useNodeCommon";
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { FlowNodeInput, FlowSelect } from '@/components/workflow/ui';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
 
-import inputAddIcon from "@/assets/imgs/workflow/input-add-icon.png";
-import remove from "@/assets/imgs/workflow/input-remove-icon.png";
+import inputAddIcon from '@/assets/imgs/workflow/input-add-icon.png';
+import remove from '@/assets/imgs/workflow/input-remove-icon.png';
 
 function index({ id, data }): React.ReactElement {
   const {
@@ -19,19 +19,19 @@ function index({ id, data }): React.ReactElement {
     id,
     data,
   });
-  const canvasesDisabled = useFlowsManager((state) => state.canvasesDisabled);
+  const canvasesDisabled = useFlowsManager(state => state.canvasesDisabled);
   const { t } = useTranslation();
 
   return (
     <div className="rounded-md px-[18px]">
       <div className="flex items-start gap-3 text-desc">
-        <h4 className="w-1/4">{t("workflow.nodes.common.variableName")}</h4>
-        <h4 className="w-1/4">{t("workflow.nodes.common.variableType")}</h4>
-        <h4 className="flex-1">{t("workflow.nodes.common.description")}</h4>
+        <h4 className="w-1/4">{t('workflow.nodes.common.variableName')}</h4>
+        <h4 className="w-1/4">{t('workflow.nodes.common.variableType')}</h4>
+        <h4 className="flex-1">{t('workflow.nodes.common.description')}</h4>
         {outputs.length > 1 && <span className="w-5 h-5"></span>}
       </div>
       <div className="flex flex-col gap-3">
-        {outputs.map((item) => (
+        {outputs.map(item => (
           <div key={item.id} className="flex flex-col gap-1">
             <div className="flex items-start gap-3">
               <div className="flex flex-col w-1/4 flex-shrink-0">
@@ -40,11 +40,11 @@ function index({ id, data }): React.ReactElement {
                   maxLength={30}
                   className="w-full"
                   value={item.name}
-                  onChange={(value) =>
+                  onChange={value =>
                     handleChangeOutputParam(
                       item?.id,
                       (data, value) => (data.name = value),
-                      value,
+                      value
                     )
                   }
                   onBlur={() => handleCustomOutputGenerate()}
@@ -55,45 +55,45 @@ function index({ id, data }): React.ReactElement {
                   value={item?.schema?.type}
                   options={[
                     {
-                      label: "String",
-                      value: "string",
+                      label: 'String',
+                      value: 'string',
                     },
                     {
-                      label: "Integer",
-                      value: "integer",
+                      label: 'Integer',
+                      value: 'integer',
                     },
                     {
-                      label: "Boolean",
-                      value: "boolean",
+                      label: 'Boolean',
+                      value: 'boolean',
                     },
                     {
-                      label: "Number",
-                      value: "number",
+                      label: 'Number',
+                      value: 'number',
                     },
                     {
-                      label: "Array<String>",
-                      value: "array-string",
+                      label: 'Array<String>',
+                      value: 'array-string',
                     },
                     {
-                      label: "Array<Integer>",
-                      value: "array-integer",
+                      label: 'Array<Integer>',
+                      value: 'array-integer',
                     },
                     {
-                      label: "Array<Boolean>",
-                      value: "array-boolean",
+                      label: 'Array<Boolean>',
+                      value: 'array-boolean',
                     },
                     {
-                      label: "Array<Number>",
-                      value: "array-number",
+                      label: 'Array<Number>',
+                      value: 'array-number',
                     },
                   ]}
-                  onChange={(value) =>
+                  onChange={value =>
                     handleChangeOutputParam(
                       item?.id,
                       (data, value) => {
                         data.schema.type = value;
                       },
-                      value,
+                      value
                     )
                   }
                 />
@@ -126,7 +126,7 @@ function index({ id, data }): React.ReactElement {
           onClick={() => handleAddOutputLine()}
         >
           <img src={inputAddIcon} className="w-3 h-3" alt="" />
-          <span>{t("workflow.nodes.common.add")}</span>
+          <span>{t('workflow.nodes.common.add')}</span>
         </div>
       )}
     </div>

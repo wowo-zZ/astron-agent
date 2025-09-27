@@ -1,25 +1,25 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useState } from 'react';
 
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 import {
   getStatusAPI,
   embeddingFiles,
   getFileSummary,
-} from "@/services/knowledge";
-import { typeList } from "@/constants";
-import usePrompt from "@/hooks/use-prompt";
+} from '@/services/knowledge';
+import { typeList } from '@/constants';
+import usePrompt from '@/hooks/use-prompt';
 
-import conglt from "@/assets/imgs/knowledge/conglt.png";
-import restart from "@/assets/imgs/knowledge/bnt_zhishi_restart.png";
-import select from "@/assets/imgs/knowledge/icon_nav_dropdown.png";
+import conglt from '@/assets/imgs/knowledge/conglt.png';
+import restart from '@/assets/imgs/knowledge/bnt_zhishi_restart.png';
+import select from '@/assets/imgs/knowledge/icon_nav_dropdown.png';
 import {
   EmbeddingFilesParams,
   FileStatusResponse,
   FileSummaryResponse,
   RepoItem,
   UploadFile,
-} from "@/types/resource";
-import { ProcessingCompletionInfo } from "./processing-completion-info";
+} from '@/types/resource';
+import { ProcessingCompletionInfo } from './processing-completion-info';
 
 const ProcessingCompletion: FC<{
   tag: string;
@@ -31,7 +31,7 @@ const ProcessingCompletion: FC<{
   setEmbed: (embed: string) => void;
   sparkFiles: UploadFile[];
   parentId: number | string;
-}> = (props) => {
+}> = props => {
   const { t } = useTranslation();
   const {
     tag,
@@ -47,15 +47,15 @@ const ProcessingCompletion: FC<{
   const [failedList, setFailedList] = useState<FileStatusResponse[]>([]);
   const [progress, setProgress] = useState(0);
   const [parameters, setParameters] = useState<FileSummaryResponse>(
-    {} as FileSummaryResponse,
+    {} as FileSummaryResponse
   );
   const [showMore, setShowMore] = useState(false);
   const [isChanged, setIsChanged] = useState(false);
 
-  usePrompt(isChanged, t("knowledge.confirmLeave"));
+  usePrompt(isChanged, t('knowledge.confirmLeave'));
 
   useEffect(() => {
-    if (embed === "loading" || failedList.length) {
+    if (embed === 'loading' || failedList.length) {
       setIsChanged(true);
     } else {
       setIsChanged(false);
@@ -66,7 +66,7 @@ const ProcessingCompletion: FC<{
 
   useEffect(() => {
     let timer: number;
-    if (embed === "loading") {
+    if (embed === 'loading') {
       timer = window.setInterval(() => {
         getFileStatus(timer);
       }, 1000);
@@ -80,19 +80,19 @@ const ProcessingCompletion: FC<{
       tag,
       fileIds,
     };
-    getStatusAPI(params).then((data) => {
+    getStatusAPI(params).then(data => {
       const doneList = data.filter(
-        (item) => item.status === 4 || item.status === 5 || item.status === 4,
+        item => item.status === 4 || item.status === 5 || item.status === 4
       );
-      const failedList = data.filter((item) => item.status === 4);
+      const failedList = data.filter(item => item.status === 4);
       setProgress((doneList.length * 100) / fileIds.length);
       if (doneList.length === fileIds.length) {
         setFailedList(() => failedList);
         window.clearInterval(timer);
         if (failedList.length === doneList.length) {
-          setEmbed("failed");
+          setEmbed('failed');
         } else {
-          setEmbed("success");
+          setEmbed('success');
         }
         getSummary();
       }
@@ -100,20 +100,20 @@ const ProcessingCompletion: FC<{
   }
 
   function getSummary(): void {
-    const failedIds = failedList.map((item) => item.id);
-    const ids = fileIds.filter((item) => !failedIds.includes(item));
+    const failedIds = failedList.map(item => item.id);
+    const ids = fileIds.filter(item => !failedIds.includes(item));
     const params = {
       tag,
       repoId,
       fileIds: ids,
     };
-    getFileSummary(params).then((data) => {
+    getFileSummary(params).then(data => {
       setParameters(data);
     });
   }
 
   function reTry(): void {
-    const fileIds = failedList.map((item) => item.id as string);
+    const fileIds = failedList.map(item => item.id as string);
 
     const params: EmbeddingFilesParams = {
       repoId,
@@ -121,11 +121,11 @@ const ProcessingCompletion: FC<{
       configs: {},
       fileIds,
     };
-    if (tag === "SparkDesk-RAG") {
+    if (tag === 'SparkDesk-RAG') {
       params.sparkFiles = sparkFiles;
     }
     embeddingFiles(params);
-    setEmbed("loading");
+    setEmbed('loading');
     setProgress(0);
   }
 
@@ -135,13 +135,13 @@ const ProcessingCompletion: FC<{
         <div
           className="relative ml-4 w-[400px] px-3.5 py-2.5 bg-[#EFF1F9] flex items-center"
           style={{ borderRadius: 10 }}
-          onClick={(event) => {
+          onClick={event => {
             event.stopPropagation();
             setShowMore(!showMore);
           }}
         >
           <img
-            src={typeList.get(uploadList?.[0]?.type || "")}
+            src={typeList.get(uploadList?.[0]?.type || '')}
             className="w-[22px] h-[22px] flex-shrink-0"
             alt=""
           />
@@ -153,7 +153,7 @@ const ProcessingCompletion: FC<{
           </p>
           {uploadList.length > 1 && (
             <span className="text-desc ml-2">
-              {t("knowledge.filesCount", { count: uploadList.length })}
+              {t('knowledge.filesCount', { count: uploadList.length })}
             </span>
           )}
           {uploadList.length > 1 && (
@@ -161,13 +161,13 @@ const ProcessingCompletion: FC<{
           )}
           {showMore && uploadList.length > 1 && (
             <div className="absolute right-0 top-[42px] list-options py-3.5 pt-2 w-full z-10 max-h-[205px] overflow-auto">
-              {uploadList.slice(1).map((item) => (
+              {uploadList.slice(1).map(item => (
                 <div
                   key={item.id}
                   className="w-full px-5 py-1.5 pr-4 text-desc font-medium hover:bg-[#F9FAFB] flex items-center"
                 >
                   <img
-                    src={typeList.get(item.type || "")}
+                    src={typeList.get(item.type || '')}
                     className="w-4 h-4 flex-shrink-0"
                     alt=""
                   />

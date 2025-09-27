@@ -7,12 +7,12 @@ import {
   useEffect,
   useRef,
   useState,
-} from "react";
-import { createCroppedCanvas } from "./use-image-crop-upload-helpers";
+} from 'react';
+import { createCroppedCanvas } from './use-image-crop-upload-helpers';
 import {
   createFileChangeHandler,
   createCropCompleteHandler,
-} from "./use-image-crop-upload-core";
+} from './use-image-crop-upload-core';
 
 export interface UseImageCropUploadOptions {
   maxSizeMB?: number;
@@ -48,7 +48,7 @@ export interface UseImageCropUploadResult {
   setZoom: Dispatch<SetStateAction<number>>;
   onCropComplete: (
     _croppedArea: unknown,
-    croppedAreaPixels: CroppedAreaPixels,
+    croppedAreaPixels: CroppedAreaPixels
   ) => void;
   uploadedSrc: string;
   compressedSrc: string;
@@ -58,7 +58,7 @@ export interface UseImageCropUploadResult {
 }
 
 export function useImageCropUpload(
-  options?: UseImageCropUploadOptions,
+  options?: UseImageCropUploadOptions
 ): UseImageCropUploadResult {
   const {
     maxSizeMB = 5,
@@ -66,7 +66,7 @@ export function useImageCropUpload(
     compressConvertSize = 1000000,
     logPerf = false,
     buildFormData,
-    formFieldName = "file",
+    formFieldName = 'file',
     t,
     i18nKeys,
   } = options || {};
@@ -75,29 +75,29 @@ export function useImageCropUpload(
   const [visible, setVisible] = useState(false);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
-  const [uploadedSrc, setUploadedSrc] = useState("");
-  const [compressedSrc, setCompressedSrc] = useState("");
+  const [uploadedSrc, setUploadedSrc] = useState('');
+  const [compressedSrc, setCompressedSrc] = useState('');
   const [formData, setFormData] = useState<FormData>();
   const lastCroppedAreaPixelsRef = useRef<CroppedAreaPixels | null>(null);
 
-  const tKeyOnlyImage = i18nKeys?.onlyImage || "configBase.onlyUploadImage";
+  const tKeyOnlyImage = i18nKeys?.onlyImage || 'configBase.onlyUploadImage';
   const tKeyFileTooLarge =
-    i18nKeys?.fileTooLarge || "configBase.fileSizeCannotExceed5MB";
+    i18nKeys?.fileTooLarge || 'configBase.fileSizeCannotExceed5MB';
 
   const reset = useCallback(() => {
     setVisible(false);
     setCrop({ x: 0, y: 0 });
     setZoom(1);
-    setUploadedSrc("");
-    setCompressedSrc("");
+    setUploadedSrc('');
+    setCompressedSrc('');
     setFormData(undefined);
     lastCroppedAreaPixelsRef.current = null;
-    if (inputRef.current) inputRef.current.value = "";
+    if (inputRef.current) inputRef.current.value = '';
   }, []);
 
   const triggerFileSelectPopup = useCallback(() => {
     if (inputRef.current) {
-      inputRef.current.value = "";
+      inputRef.current.value = '';
       inputRef.current.click();
     }
   }, []);
@@ -111,12 +111,12 @@ export function useImageCropUpload(
           setFormData(buildFormData(blob));
         } else {
           const res = new FormData();
-          res.append(formFieldName, blob, "cropped-image.jpeg");
+          res.append(formFieldName, blob, 'cropped-image.jpeg');
           setFormData(res);
         }
       });
     },
-    [buildFormData, formFieldName],
+    [buildFormData, formFieldName]
   );
 
   useEffect(() => {
@@ -142,13 +142,13 @@ export function useImageCropUpload(
   const onCropComplete = createCropCompleteHandler(
     compressedSrc,
     generateCroppedFormData,
-    lastCroppedAreaPixelsRef,
+    lastCroppedAreaPixelsRef
   );
 
   const openModal = useCallback(() => setVisible(true), []);
   const closeModal = useCallback(() => {
     setVisible(false);
-    setUploadedSrc("");
+    setUploadedSrc('');
     setZoom(1);
   }, []);
 

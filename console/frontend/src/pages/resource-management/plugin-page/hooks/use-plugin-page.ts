@@ -1,8 +1,8 @@
-import globalStore from "@/store/global-store";
-import useUserStore, { User } from "@/store/user-store";
-import { ToolItem } from "@/types/resource";
-import { debounce } from "lodash";
-import React, { useCallback, useEffect, useState } from "react";
+import globalStore from '@/store/global-store';
+import useUserStore, { User } from '@/store/user-store';
+import { ToolItem } from '@/types/resource';
+import { debounce } from 'lodash';
+import React, { useCallback, useEffect, useState } from 'react';
 
 export const usePluginPage = (): {
   user: User;
@@ -18,14 +18,14 @@ export const usePluginPage = (): {
   searchValue: string;
   setSearchValue: React.Dispatch<React.SetStateAction<string>>;
 } => {
-  const user = useUserStore((state) => state.user);
-  const tools = globalStore((state) => state.tools);
-  const getTools = globalStore((state) => state.getTools);
+  const user = useUserStore(state => state.user);
+  const tools = globalStore(state => state.tools);
+  const getTools = globalStore(state => state.getTools);
 
   const [isHovered, setIsHovered] = useState<boolean | null>(null);
   const [deleteModal, setDeleteModal] = useState(false);
   const [currentTool, setCurrentTool] = useState<ToolItem>({} as ToolItem);
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState('');
 
   useEffect(() => {
     getTools();
@@ -37,7 +37,7 @@ export const usePluginPage = (): {
       setSearchValue(value);
       getTools(value?.trim());
     }, 500),
-    [searchValue],
+    [searchValue]
   );
 
   return {

@@ -1,35 +1,35 @@
-import axios from "axios";
-import { Base64 } from "js-base64";
-import { casdoorSdk } from "@/config";
-import qs from "qs";
-import { message } from "antd";
-import packageJson from "../../package.json";
-import { zh } from "@/locales/zh";
-import { en } from "@/locales/en";
-import i18n from "@/locales/i18n";
-import eventBus from "@/utils/event-bus";
-import useSpaceStore from "@/store/space-store";
+import axios from 'axios';
+import { Base64 } from 'js-base64';
+import { casdoorSdk } from '@/config';
+import qs from 'qs';
+import { message } from 'antd';
+import packageJson from '../../package.json';
+import { zh } from '@/locales/zh';
+import { en } from '@/locales/en';
+import i18n from '@/locales/i18n';
+import eventBus from '@/utils/event-bus';
+import useSpaceStore from '@/store/space-store';
 import type {
   AxiosRequestConfig,
   InternalAxiosRequestConfig,
   AxiosResponse,
   AxiosError,
-} from "axios";
-import type { ResponseResult } from "@/types/global";
-import { handleLoginRedirect } from "./auth";
+} from 'axios';
+import type { ResponseResult } from '@/types/global';
+import { handleLoginRedirect } from './auth';
 
 /**
  * 获取后端需要的语言代码
  * @returns 语言代码
  */
 export const getLanguageCode = (): string => {
-  const lang = i18n.language || "zh";
+  const lang = i18n.language || 'zh';
 
   // 已经是简化的格式了，直接使用
-  if (lang.toLowerCase().startsWith("zh")) {
-    return "zh";
-  } else if (lang.toLowerCase().startsWith("en")) {
-    return "en";
+  if (lang.toLowerCase().startsWith('zh')) {
+    return 'zh';
+  } else if (lang.toLowerCase().startsWith('en')) {
+    return 'en';
   }
 
   return lang;
@@ -53,23 +53,23 @@ const localeConfig: {
 export const downloadFileWithHeaders = (
   url: string,
   filename: string,
-  extraHeaders: Record<string, string> = {},
+  extraHeaders: Record<string, string> = {}
 ): void => {
   const xhr = new XMLHttpRequest();
-  xhr.open("GET", url, true);
+  xhr.open('GET', url, true);
 
   // 添加space-id
   const spaceId = useSpaceStore.getState().spaceId;
   if (spaceId) {
-    xhr.setRequestHeader("space-id", spaceId);
+    xhr.setRequestHeader('space-id', spaceId);
   }
 
   // 添加enterprise-id (如果是团队空间)
   const spaceType = useSpaceStore.getState().spaceType;
-  if (spaceType === "team") {
+  if (spaceType === 'team') {
     const enterpriseId = useSpaceStore.getState().enterpriseId;
     if (enterpriseId) {
-      xhr.setRequestHeader("enterprise-id", enterpriseId);
+      xhr.setRequestHeader('enterprise-id', enterpriseId);
     }
   }
 
@@ -79,7 +79,7 @@ export const downloadFileWithHeaders = (
   });
 
   // 设置响应类型为blob
-  xhr.responseType = "blob";
+  xhr.responseType = 'blob';
 
   // 加载完成处理
   xhr.onload = function (): void {
@@ -87,7 +87,7 @@ export const downloadFileWithHeaders = (
       // 创建临时URL和a标签触发下载
       const blob = xhr.response;
       const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
+      const link = document.createElement('a');
       link.href = url;
       link.download = filename;
       document.body.appendChild(link);
@@ -124,7 +124,7 @@ export const jumpTologin = (): void => {
  * @returns 封装后错误信息
  */
 export const initServerError = (
-  error: AxiosError,
+  error: AxiosError
 ): { code: number; message: string } => {
   const { response, request } = error;
   const currentLang = getLanguageCode();
@@ -132,20 +132,20 @@ export const initServerError = (
     return {
       code: 100,
       message:
-        localeConfig?.[currentLang]?.serverWrong || "服务器开小差了~稍后再试",
+        localeConfig?.[currentLang]?.serverWrong || '服务器开小差了~稍后再试',
     };
   }
   // 判断如果是401错误 直接跳转至登录页
   if (response?.status === 401) {
     return {
       code: 101,
-      message: "尚未登录，请重新登录",
+      message: '尚未登录，请重新登录',
     };
   }
   return {
     code: 100,
     message:
-      localeConfig?.[currentLang]?.serverWrong || "服务器开小差了~稍后再试",
+      localeConfig?.[currentLang]?.serverWrong || '服务器开小差了~稍后再试',
   };
 };
 /**
@@ -156,20 +156,20 @@ export const initServerError = (
  */
 export const initBusinessError = (
   response: AxiosResponse,
-  result: ResponseResult,
+  result: ResponseResult
 ) => {
   // 添加套餐用量耗尽处理
   if ([11120].includes(result.code)) {
-    eventBus.emit("showUsageExhausted", {
+    eventBus.emit('showUsageExhausted', {
       message: result.message || result?.desc,
     });
   }
   if ([80000, 90000].includes(result.code)) {
     useSpaceStore.setState({
-      spaceId: "",
-      spaceType: "personal",
-      spaceName: "",
-      enterpriseId: "",
+      spaceId: '',
+      spaceType: 'personal',
+      spaceName: '',
+      enterpriseId: '',
     });
     // 登陆异常
     if (!specialRouter.includes(window.location.pathname)) {
@@ -184,31 +184,31 @@ export const initBusinessError = (
   }
   if (
     [80001, 80004].includes(result.code) ||
-    result.message === "空间不存在" ||
-    result?.desc === "空间不存在"
+    result.message === '空间不存在' ||
+    result?.desc === '空间不存在'
   ) {
-    message.error(result?.desc || "获取信息失败", 3, () => {
-      window.location.href = "/space/agent";
+    message.error(result?.desc || '获取信息失败', 3, () => {
+      window.location.href = '/space/agent';
     });
   }
   // 星火注销
-  if (result.code === 99900 && window.location.pathname !== "/spark") {
-    window.location.href = "/spark";
+  if (result.code === 99900 && window.location.pathname !== '/spark') {
+    window.location.href = '/spark';
   }
   // 永久封禁
-  if (result.code === 10004 && window.location.pathname !== "/ban") {
-    window.location.href = "/ban";
+  if (result.code === 10004 && window.location.pathname !== '/ban') {
+    window.location.href = '/ban';
   }
 
   // 24小时封禁
   if (result.code === 10003) {
-    message.error(result?.desc || "获取信息失败", 5, () => {
-      window.location.href = "/spark";
+    message.error(result?.desc || '获取信息失败', 5, () => {
+      window.location.href = '/spark';
     });
   }
 
   // ban页面中的特殊处理，业务上需要code码，直接返回result
-  if (window.location.pathname === "/ban") {
+  if (window.location.pathname === '/ban') {
     return result;
   }
   //这里要reject出去，不然直接返回result跟正常情况下返回的result.data不一致
@@ -221,12 +221,12 @@ export const initBusinessError = (
  * @returns cookie值
  */
 export function getCookie(cookieName: string): string {
-  const name = cookieName + "=";
+  const name = cookieName + '=';
   const decodedCookie: string = decodeURIComponent(document.cookie);
-  const cookieArray: string[] = decodedCookie.split(";");
+  const cookieArray: string[] = decodedCookie.split(';');
   for (let i = 0; i < cookieArray.length; i++) {
-    let cookie: string = cookieArray[i] || "";
-    while (cookie.charAt(0) === " ") {
+    let cookie: string = cookieArray[i] || '';
+    while (cookie.charAt(0) === ' ') {
       cookie = cookie.substring(1);
     }
     if (cookie.indexOf(name) === 0) {
@@ -234,7 +234,7 @@ export function getCookie(cookieName: string): string {
     }
   }
 
-  return "";
+  return '';
 }
 
 /**
@@ -245,7 +245,7 @@ export function getCookie(cookieName: string): string {
  */
 const generateReqKey = (config: AxiosRequestConfig): string => {
   const { method, url, params, data } = config;
-  return [method, url, qs.stringify(params), qs.stringify(data)].join("&");
+  return [method, url, qs.stringify(params), qs.stringify(data)].join('&');
 };
 
 /**
@@ -256,7 +256,7 @@ const addPendingRequest = (config: InternalAxiosRequestConfig): void => {
   const requestKey = generateReqKey(config);
   config.cancelToken =
     config.cancelToken ||
-    new axios.CancelToken((cancel) => {
+    new axios.CancelToken(cancel => {
       if (!pendingRequest.has(requestKey)) {
         pendingRequest.set(requestKey, cancel);
       }
@@ -279,26 +279,26 @@ const removePendingRequest = (config?: AxiosRequestConfig): void => {
 // 超时时间30s
 axios.defaults.timeout = 30000;
 // Ajax请求
-axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
-axios.defaults.headers.common["Content-Type"] = "application/json";
-axios.defaults.headers.common["web-v"] = packageJson?.version ?? "0.0.1";
+axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+axios.defaults.headers.common['Content-Type'] = 'application/json';
+axios.defaults.headers.common['web-v'] = packageJson?.version ?? '0.0.1';
 
 // 设置初始语言头部
-axios.defaults.headers.common["Lang-Code"] = getLanguageCode();
+axios.defaults.headers.common['Lang-Code'] = getLanguageCode();
 
 // 监听语言变化，更新请求头
-i18n.on("languageChanged", () => {
-  axios.defaults.headers.common["Lang-Code"] = getLanguageCode();
+i18n.on('languageChanged', () => {
+  axios.defaults.headers.common['Lang-Code'] = getLanguageCode();
 });
 
 const pendingRequest = new Map(); // 请求对象
-const specialRouter = ["/home"];
+const specialRouter = ['/home'];
 const specialRequestUrl = [
-  "/iflygpt-longcontext/document-operation/web/get-process",
+  '/iflygpt-longcontext/document-operation/web/get-process',
   // NOTE: 首页需要唤起登录弹窗的接口
-  "/u/chat-list/v1/create-chat-list",
-  "/bot/favorite/create",
-  "/agent/getShareKey",
+  '/u/chat-list/v1/create-chat-list',
+  '/bot/favorite/create',
+  '/agent/getShareKey',
 ];
 
 // 请求拦截器
@@ -306,12 +306,12 @@ let refreshingPromise: Promise<void> | null = null;
 
 const decodeJwtExp = (token: string): number | null => {
   try {
-    const payloadPart = token.split(".")[1] || "";
+    const payloadPart = token.split('.')[1] || '';
     const json = Base64.decode(
-      payloadPart.replace(/-/g, "+").replace(/_/g, "/"),
+      payloadPart.replace(/-/g, '+').replace(/_/g, '/')
     );
     const payload = JSON.parse(json) as { exp?: number };
-    return typeof payload.exp === "number" ? payload.exp : null;
+    return typeof payload.exp === 'number' ? payload.exp : null;
   } catch {
     return null;
   }
@@ -330,17 +330,17 @@ axios.interceptors.request.use(
     removePendingRequest(config); // 检查是否存在重复请求，若存在则取消已发的请求
     addPendingRequest(config); // 把当前请求信息添加到pendingRequest对象中
     config.headers = config.headers || {};
-    config.headers.clientType = "11"; //手动设置clientType getCookie("clientType")拿到的和星火一样
-    config.headers.Channel = getCookie("channel");
-    if (useSpaceStore.getState().spaceType === "team") {
-      config.headers["enterprise-id"] = useSpaceStore.getState().enterpriseId;
+    config.headers.clientType = '11'; //手动设置clientType getCookie("clientType")拿到的和星火一样
+    config.headers.Channel = getCookie('channel');
+    if (useSpaceStore.getState().spaceType === 'team') {
+      config.headers['enterprise-id'] = useSpaceStore.getState().enterpriseId;
     }
-    config.headers["space-id"] = useSpaceStore.getState().spaceId;
-    config.headers.clientType = "11"; //手动设置clientType
-    config.headers.Channel = getCookie("channel");
+    config.headers['space-id'] = useSpaceStore.getState().spaceId;
+    config.headers.clientType = '11'; //手动设置clientType
+    config.headers.Channel = getCookie('channel');
     // 刷新 token（PKCE 模式）
-    const currentAccessToken = localStorage.getItem("accessToken");
-    const currentRefreshToken = localStorage.getItem("refreshToken");
+    const currentAccessToken = localStorage.getItem('accessToken');
+    const currentRefreshToken = localStorage.getItem('refreshToken');
 
     if (currentRefreshToken && isAccessTokenExpired(currentAccessToken)) {
       if (!refreshingPromise) {
@@ -349,15 +349,15 @@ axios.interceptors.request.use(
           .then((resp: unknown) => {
             const r = resp as { access_token?: string; refresh_token?: string };
             if (r?.access_token) {
-              localStorage.setItem("accessToken", r.access_token);
+              localStorage.setItem('accessToken', r.access_token);
             }
             if (r?.refresh_token) {
-              localStorage.setItem("refreshToken", r.refresh_token);
+              localStorage.setItem('refreshToken', r.refresh_token);
             }
           })
           .catch(() => {
-            localStorage.removeItem("accessToken");
-            localStorage.removeItem("refreshToken");
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
           })
           .finally(() => {
             refreshingPromise = null;
@@ -366,16 +366,16 @@ axios.interceptors.request.use(
       await refreshingPromise;
     }
 
-    const latestAccessToken = localStorage.getItem("accessToken");
+    const latestAccessToken = localStorage.getItem('accessToken');
     if (latestAccessToken) {
-      config.headers["Authorization"] = "Bearer " + latestAccessToken;
+      config.headers['Authorization'] = 'Bearer ' + latestAccessToken;
     }
     // 确保每个请求都使用最新的语言设置
-    config.headers["Lang-Code"] = getLanguageCode();
+    config.headers['Lang-Code'] = getLanguageCode();
 
     return config;
   },
-  (error: AxiosError) => Promise.reject(error),
+  (error: AxiosError) => Promise.reject(error)
 );
 
 // 响应拦截器即异常处理
@@ -383,7 +383,7 @@ axios.interceptors.response.use(
   (response: AxiosResponse) => {
     removePendingRequest(response.config); // 从pendingRequest对象中移除请求
     const result: ResponseResult<typeof response.data.data> = response.data;
-    if (response.config.responseType === "blob") {
+    if (response.config.responseType === 'blob') {
       return response;
     }
     if (result?.code !== 0) {
@@ -398,14 +398,14 @@ axios.interceptors.response.use(
       console.warn(`已取消的重复请求：${err.message}`);
     }
     return Promise.reject(initServerError(err)); //处理服务器错误如400，401，404等
-  },
+  }
 );
 
 //根据环境与域名设置baseURL：本地localhost走 /xingchen-api，其它走 /
 export const baseURL =
-  typeof window !== "undefined" && window.location.hostname === "localhost"
-    ? "/xingchen-api"
-    : "http://172.29.201.92:8080/";
+  typeof window !== 'undefined' && window.location.hostname === 'localhost'
+    ? '/xingchen-api'
+    : 'http://172.29.201.92:8080/';
 
 axios.defaults.baseURL = baseURL;
 export default axios;

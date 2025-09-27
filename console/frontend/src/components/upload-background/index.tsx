@@ -1,10 +1,10 @@
-import React, { useState, useRef } from "react";
-import { Modal, message } from "antd";
-import Cropper from "react-easy-crop";
-import { uploadBotImg } from "@/services/spark-common";
-import { useSparkCommonStore } from "@/store/spark-store/spark-common";
+import React, { useState, useRef } from 'react';
+import { Modal, message } from 'antd';
+import Cropper from 'react-easy-crop';
+import { uploadBotImg } from '@/services/spark-common';
+import { useSparkCommonStore } from '@/store/spark-store/spark-common';
 
-import styles from "./index.module.scss";
+import styles from './index.module.scss';
 
 interface UploadBackgroundModalProps {
   visible: boolean;
@@ -16,9 +16,9 @@ const UploadBackgroundModal: React.FC<UploadBackgroundModalProps> = ({
   onCancel,
 }) => {
   const inputRef = useRef<any>(null);
-  const setCoverUrlPC = useSparkCommonStore((state) => state.setBackgroundImg);
+  const setCoverUrlPC = useSparkCommonStore(state => state.setBackgroundImg);
   const setCoverUrlApp = useSparkCommonStore(
-    (state) => state.setBackgroundImgApp,
+    state => state.setBackgroundImgApp
   );
 
   const [formData, setFormData] = useState<FormData>();
@@ -27,19 +27,19 @@ const UploadBackgroundModal: React.FC<UploadBackgroundModalProps> = ({
   const [verticalZoom, setVerticalZoom] = useState(1);
   const [horizontalCrop, setHorizontalCrop] = useState({ x: 0, y: 0 });
   const [verticalCrop, setVerticalCrop] = useState({ x: 0, y: 0 });
-  const [uploadedSrc, setUploadedSrc] = useState("");
+  const [uploadedSrc, setUploadedSrc] = useState('');
   const [loading, setLoading] = useState(false);
   const createCroppedImage = (
     croppedAreaPixels: any,
-    setFormDataCallback: (data: FormData) => void,
+    setFormDataCallback: (data: FormData) => void
   ) => {
     const image = new Image();
-    image.src = uploadedSrc || "";
+    image.src = uploadedSrc || '';
     image.onload = () => {
-      const canvas = document.createElement("canvas");
+      const canvas = document.createElement('canvas');
       canvas.width = croppedAreaPixels.width;
       canvas.height = croppedAreaPixels.height;
-      const ctx = canvas.getContext("2d");
+      const ctx = canvas.getContext('2d');
 
       ctx &&
         ctx.drawImage(
@@ -51,50 +51,50 @@ const UploadBackgroundModal: React.FC<UploadBackgroundModalProps> = ({
           0,
           0,
           croppedAreaPixels.width,
-          croppedAreaPixels.height,
+          croppedAreaPixels.height
         );
 
       canvas.toBlob(
-        (blob) => {
+        blob => {
           const res = new FormData();
-          blob && res.append("file", blob, "cropped-image.jpeg");
+          blob && res.append('file', blob, 'cropped-image.jpeg');
           setFormDataCallback(res);
         },
-        "image/jpeg",
-        1,
+        'image/jpeg',
+        1
       );
     };
   };
 
   const onHorizontalCropComplete = (
     _croppedArea: any,
-    croppedAreaPixels: any,
+    croppedAreaPixels: any
   ) => {
     createCroppedImage(croppedAreaPixels, setFormDataPc);
   };
 
   const onVerticalCropComplete = (
     _croppedArea: any,
-    croppedAreaPixels: any,
+    croppedAreaPixels: any
   ) => {
     createCroppedImage(croppedAreaPixels, setFormData);
   };
 
   const processFile = (file: File) => {
-    const supportedTypes = ["image/png", "image/jpg", "image/jpeg"];
+    const supportedTypes = ['image/png', 'image/jpg', 'image/jpeg'];
 
     if (!supportedTypes.includes(file.type)) {
-      message.warning("文件格式不支持");
+      message.warning('文件格式不支持');
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      message.error("文件大小不能超过5MB");
+      message.error('文件大小不能超过5MB');
       return;
     }
 
     const reader = new FileReader();
-    reader.addEventListener("load", () => {
+    reader.addEventListener('load', () => {
       const dataUrl = reader.result as string;
       setUploadedSrc(dataUrl);
     });
@@ -115,7 +115,7 @@ const UploadBackgroundModal: React.FC<UploadBackgroundModalProps> = ({
     if (event.dataTransfer && event.dataTransfer.items) {
       for (let i = 0; i < event.dataTransfer.items.length; i++) {
         const item = event.dataTransfer.items[i];
-        if (item && item.kind === "file") {
+        if (item && item.kind === 'file') {
           const file = item.getAsFile();
           if (file) {
             processFile(file);
@@ -138,7 +138,7 @@ const UploadBackgroundModal: React.FC<UploadBackgroundModalProps> = ({
       title="上传背景图"
       open={visible}
       onCancel={async () => {
-        await setUploadedSrc("");
+        await setUploadedSrc('');
         onCancel();
       }}
     >
@@ -146,7 +146,7 @@ const UploadBackgroundModal: React.FC<UploadBackgroundModalProps> = ({
         <input
           accept="image/png,image/jpg,image/jpeg"
           ref={inputRef}
-          style={{ display: "none" }}
+          style={{ display: 'none' }}
           type="file"
           onChange={handleChange}
         />
@@ -155,12 +155,12 @@ const UploadBackgroundModal: React.FC<UploadBackgroundModalProps> = ({
             className={styles.shangchuangBg}
             onClick={() => {
               if (inputRef.current) {
-                inputRef.current.value = "";
+                inputRef.current.value = '';
                 inputRef.current.click();
               }
             }}
             onDrop={handleDrop}
-            onDragOver={(e) => e.preventDefault()}
+            onDragOver={e => e.preventDefault()}
           />
         )}
         {uploadedSrc && (
@@ -204,14 +204,14 @@ const UploadBackgroundModal: React.FC<UploadBackgroundModalProps> = ({
           {uploadedSrc && (
             <div
               className={styles.peizhiReset}
-              onClick={() => setUploadedSrc("")}
+              onClick={() => setUploadedSrc('')}
             >
               重新上传
             </div>
           )}
           <div
             onClick={async () => {
-              await setUploadedSrc("");
+              await setUploadedSrc('');
               onCancel();
             }}
             className={styles.peizhiCancel}
@@ -237,11 +237,11 @@ const UploadBackgroundModal: React.FC<UploadBackgroundModalProps> = ({
                   setLoading(false);
                 }, 300);
               } catch (error) {
-                message.error("上传失败，请重试");
+                message.error('上传失败，请重试');
               }
             }}
           >
-            {loading ? "上传中..." : "确认"}
+            {loading ? '上传中...' : '确认'}
           </div>
         </div>
       </div>

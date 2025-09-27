@@ -1,10 +1,10 @@
-import React, { memo, FC } from "react";
-import { useTranslation } from "react-i18next";
-import { DeleteModal } from "./components/modal-component";
-import { useNavigate } from "react-router-dom";
-import RetractableInput from "@/components/ui/global/retract-table-input";
-import { jumpTologin } from "@/utils/http";
-import { usePluginPage } from "./hooks/use-plugin-page";
+import React, { memo, FC } from 'react';
+import { useTranslation } from 'react-i18next';
+import { DeleteModal } from './components/modal-component';
+import { useNavigate } from 'react-router-dom';
+import RetractableInput from '@/components/ui/global/retract-table-input';
+import { jumpTologin } from '@/utils/http';
+import { usePluginPage } from './hooks/use-plugin-page';
 
 const PluginPage: FC = () => {
   const { t } = useTranslation();
@@ -32,7 +32,7 @@ const PluginPage: FC = () => {
           setDeleteModal={setDeleteModal}
           getTools={() => {
             if (searchValue) {
-              setSearchValue("");
+              setSearchValue('');
             } else {
               getTools();
             }
@@ -42,7 +42,7 @@ const PluginPage: FC = () => {
       <div
         className="flex justify-between mx-auto max-w-[1425px]"
         style={{
-          width: "calc(0.85 * (100% - 8px))",
+          width: 'calc(0.85 * (100% - 8px))',
         }}
       >
         <div className="font-medium"></div>
@@ -55,22 +55,22 @@ const PluginPage: FC = () => {
         <div
           className="h-full mx-auto max-w-[1425px]"
           style={{
-            width: "85%",
+            width: '85%',
           }}
         >
           <div className="grid lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-3 gap-6">
             <div
               className={`plugin-card-add-container relative ${
                 isHovered === null
-                  ? ""
+                  ? ''
                   : isHovered
-                    ? "plugin-no-hover"
-                    : " plugin-hover"
+                    ? 'plugin-no-hover'
+                    : ' plugin-hover'
               }`}
-              onMouseLeave={(e) => {
+              onMouseLeave={e => {
                 setIsHovered(true);
               }}
-              onMouseEnter={(e) => {
+              onMouseEnter={e => {
                 setIsHovered(false);
               }}
               onClick={() => {
@@ -78,7 +78,7 @@ const PluginPage: FC = () => {
                   return jumpTologin();
                 }
 
-                navigate("/resource/plugin/create");
+                navigate('/resource/plugin/create');
               }}
             >
               <div className="color-mask"></div>
@@ -91,11 +91,11 @@ const PluginPage: FC = () => {
                   className="mt-4 font-semibold add-name"
                   style={{ fontSize: 22 }}
                 >
-                  {t("plugin.createPlugin")}
+                  {t('plugin.createPlugin')}
                 </div>
               </div>
             </div>
-            {tools.map((k) => (
+            {tools.map(k => (
               <div
                 className="common-card-item plugin-card-item group"
                 key={k.id}
@@ -113,12 +113,12 @@ const PluginPage: FC = () => {
                 <div
                   className="px-1.5 py-0.5 rounded-md font-medium text-xs absolute right-[1px] top-[1px]"
                   style={{
-                    background: k.status == 0 ? "#f2f2f2" : "#275eff",
-                    color: k.status == 0 ? "#7F7F7F" : "#FFFFFF",
-                    borderRadius: "0px 18px 0px 8px",
+                    background: k.status == 0 ? '#f2f2f2' : '#275eff',
+                    color: k.status == 0 ? '#7F7F7F' : '#FFFFFF',
+                    borderRadius: '0px 18px 0px 8px',
                   }}
                 >
-                  {k.status == 0 ? t("plugin.draft") : t("plugin.available")}
+                  {k.status == 0 ? t('plugin.draft') : t('plugin.available')}
                 </div>
                 <div className="px-6">
                   <div className="flex items-start gap-4">
@@ -157,7 +157,7 @@ const PluginPage: FC = () => {
                       </div>
                       <div className="text-sm">
                         <span className="rounded bg-[#ebeeff] px-2 py-1 inline-block">
-                          {t("plugin.relatedApplications")}：{k?.botUsedCount}
+                          {t('plugin.relatedApplications')}：{k?.botUsedCount}
                         </span>
                       </div>
                     </div>
@@ -166,15 +166,15 @@ const PluginPage: FC = () => {
                 <div
                   className="flex justify-between items-center mt-6 overflow-hidden overflow-x-auto overflow-y-hidden"
                   style={{
-                    padding: "16px 24px",
-                    borderTop: "1px dashed #e2e8ff",
-                    scrollbarWidth: "none", // 隐藏滚动条
-                    msOverflowStyle: "none", // IE/Edge隐藏滚动条
+                    padding: '16px 24px',
+                    borderTop: '1px dashed #e2e8ff',
+                    scrollbarWidth: 'none', // 隐藏滚动条
+                    msOverflowStyle: 'none', // IE/Edge隐藏滚动条
                   }}
                 >
                   <span className="text-[#7F7F7F] text-xs go-setting flex items-center">
                     <span className="whitespace-nowrap">
-                      {t("common.edit")}
+                      {t('common.edit')}
                     </span>
                     <span className="setting-icon setting-act"></span>
                   </span>
@@ -182,7 +182,7 @@ const PluginPage: FC = () => {
                     <div className="flex items-center text-desc gap-5">
                       <div
                         className="card-delete cursor-pointer flex items-center"
-                        onClick={(e) => {
+                        onClick={e => {
                           e.stopPropagation();
                           setCurrentTool(k);
                           setDeleteModal(true);
@@ -190,7 +190,7 @@ const PluginPage: FC = () => {
                       >
                         <span className="delete-icon"></span>
                         <span className="ml-1 whitespace-nowrap">
-                          {t("common.delete")}
+                          {t('common.delete')}
                         </span>
                       </div>
                     </div>

@@ -1,13 +1,13 @@
-import React, { useRef } from "react";
-import { Card, Tooltip } from "antd";
-import styles from "./index.module.scss";
-import ActionList from "./components/action-list";
-import JoinStatus from "./components/join-status";
+import React, { useRef } from 'react';
+import { Card, Tooltip } from 'antd';
+import styles from './index.module.scss';
+import ActionList from './components/action-list';
+import JoinStatus from './components/join-status';
 
-import spaceAvatar from "@/assets/imgs/space/spaceAvatar.png";
-import creator from "@/assets/imgs/space/creator.svg";
-import member from "@/assets/imgs/space/member.svg";
-import { SpaceType } from "@/permissions/permission-type";
+import spaceAvatar from '@/assets/imgs/space/spaceAvatar.png';
+import creator from '@/assets/imgs/space/creator.svg';
+import member from '@/assets/imgs/space/member.svg';
+import { SpaceType } from '@/permissions/permission-type';
 
 interface SpaceItem {
   id: string;
@@ -52,7 +52,7 @@ const SpaceCard: React.FC<SpaceCardProps> = ({
 
     // 根据4:3比例计算合适的宽度
     const idealWidth = Math.round(
-      Math.sqrt((4 / 3) * lineHeight * totalLength),
+      Math.sqrt((4 / 3) * lineHeight * totalLength)
     );
 
     // 确保宽度在限制范围内
@@ -63,18 +63,18 @@ const SpaceCard: React.FC<SpaceCardProps> = ({
   const getSpaceStatus = (space: SpaceItem): string => {
     //应该可以使用 userRole 判断， 1是所有者，2是管理，3是成员
     if (spaceType !== SpaceType.ENTERPRISE) {
-      return "joined";
+      return 'joined';
     }
 
     switch (space.applyStatus) {
       case 1:
-        return "joined";
+        return 'joined';
       case 2:
-        return "notJoined";
+        return 'notJoined';
       case 3:
-        return "pending";
+        return 'pending';
       default:
-        return "joined";
+        return 'joined';
     }
   };
 
@@ -107,8 +107,8 @@ const SpaceCard: React.FC<SpaceCardProps> = ({
           getPopupContainer={() => document.body}
           overlayStyle={{
             maxWidth: `${calculateTooltipWidth(space.description)}px`,
-            lineHeight: "24px",
-            overflow: "auto",
+            lineHeight: '24px',
+            overflow: 'auto',
           }}
         >
           <p className={styles.spaceDescription}>{space.description}</p>

@@ -1,15 +1,15 @@
-import React from "react";
-import { Button } from "antd";
-import classNames from "classnames";
-import SpaceButton from "./space-button";
-import type { ButtonConfig, ButtonGroupProps } from "./types";
-import styles from "./button-group.module.scss";
+import React from 'react';
+import { Button } from 'antd';
+import classNames from 'classnames';
+import SpaceButton from './space-button';
+import type { ButtonConfig, ButtonGroupProps } from './types';
+import styles from './button-group.module.scss';
 
 const ButtonGroup: React.FC<ButtonGroupProps> = ({
   buttons,
   userRole,
   className,
-  size = "middle",
+  size = 'middle',
   onButtonClick,
   style,
   vertical = false,
@@ -19,7 +19,7 @@ const ButtonGroup: React.FC<ButtonGroupProps> = ({
   // 渲染单个按钮，权限控制由 SpaceButton 组件处理
   const renderButton = (
     buttonConfig: ButtonConfig,
-    index: number,
+    index: number
   ): React.ReactNode => {
     return (
       <SpaceButton
@@ -37,7 +37,7 @@ const ButtonGroup: React.FC<ButtonGroupProps> = ({
   // 渲染所有按钮，过滤掉不显示的按钮（返回null的）
   const renderedButtons = buttons
     .map((button, index) => renderButton(button, index))
-    .filter((button) => button !== null);
+    .filter(button => button !== null);
 
   // 如果没有可显示的按钮，返回null
   if (renderedButtons.length === 0) {
@@ -51,7 +51,7 @@ const ButtonGroup: React.FC<ButtonGroupProps> = ({
     sizeClassName,
     vertical && styles.vertical,
     !split && styles.noSplit,
-    className,
+    className
   );
 
   return (

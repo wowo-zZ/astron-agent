@@ -1,10 +1,10 @@
-import { RefObject } from "react";
-import { useDatabaseContext } from "../context/database-context";
-import { useDatabaseOps } from "./use-database-ops";
-import { useTableOps } from "./use-table-ops";
-import { useDataOps } from "./use-data-ops";
-import { useModalOps } from "./use-modal-ops";
-import { DatabaseItem } from "@/types/database";
+import { RefObject } from 'react';
+import { useDatabaseContext } from '../context/database-context';
+import { useDatabaseOps } from './use-database-ops';
+import { useTableOps } from './use-table-ops';
+import { useDataOps } from './use-data-ops';
+import { useModalOps } from './use-modal-ops';
+import { DatabaseItem } from '@/types/database';
 
 interface DatabaseActionsReturn {
   // 数据库操作
@@ -21,12 +21,12 @@ interface DatabaseActionsReturn {
     type: number,
     page?: number,
     size?: number,
-    isRefresh?: boolean,
+    isRefresh?: boolean
   ) => Promise<void>;
   batchDeleteRows: (
     currentSheet: DatabaseItem | null,
     dataType: number,
-    rows: string[],
+    rows: string[]
   ) => Promise<void>;
   exportTableData: (
     currentSheet: DatabaseItem | null,
@@ -34,16 +34,16 @@ interface DatabaseActionsReturn {
     rowKeys: string[],
     downloadHandler: (res: {
       data?: Blob;
-      headers?: { "content-disposition": string };
-    }) => void,
+      headers?: { 'content-disposition': string };
+    }) => void
   ) => Promise<void>;
   refreshCurrentTableData: () => void;
   handleDataTypeChange: (type: number) => void;
   handlePageChange: (page: number, pageSize: number) => void;
   handleRefreshData: () => void;
   // 模态框控制
-  openModal: (modal: "import" | "createDatabase" | "addRow") => void;
-  closeModal: (modal: "import" | "createDatabase" | "addRow") => void;
+  openModal: (modal: 'import' | 'createDatabase' | 'addRow') => void;
+  closeModal: (modal: 'import' | 'createDatabase' | 'addRow') => void;
   // refs
   testTableRef: RefObject<{
     getSelectRowKeys: () => string[];

@@ -1,7 +1,7 @@
-import { useEffect, useCallback } from "react";
-import { cloneDeep } from "lodash";
-import { useTableAddContext } from "../context/table-add-context";
-import { getDisableFields, fieldList } from "@/services/database";
+import { useEffect, useCallback } from 'react';
+import { cloneDeep } from 'lodash';
+import { useTableAddContext } from '../context/table-add-context';
+import { getDisableFields, fieldList } from '@/services/database';
 
 /**
  * 表格初始化Hook
@@ -28,7 +28,7 @@ export const useTableInitializer = (): void => {
     const loadKeywords = async (): Promise<void> => {
       try {
         const res = await getDisableFields();
-        const keywords = res?.value ? res.value.split(",") : [];
+        const keywords = res?.value ? res.value.split(',') : [];
         actions.setDatabaseKeywords(keywords);
       } catch (error) {
         // 加载关键词失败

@@ -1,19 +1,19 @@
-import React, { useCallback, useRef, useState, useMemo } from "react";
-import { useTranslation } from "react-i18next";
+import React, { useCallback, useRef, useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   FlowTextArea,
   FlowSelect,
   FlowInputNumber,
   FlowUpload,
-} from "@/components/workflow/ui";
-import Ajv from "ajv";
+} from '@/components/workflow/ui';
+import Ajv from 'ajv';
 import {
   renderType,
   generateUploadType,
-} from "@/components/workflow/utils/reactflowUtils";
-import JsonMonacoEditor from "@/components/monaco-editor/JsonMonacoEditor";
-import { typeList } from "@/constants";
-import { cloneDeep } from "lodash";
+} from '@/components/workflow/utils/reactflowUtils';
+import JsonMonacoEditor from '@/components/monaco-editor/JsonMonacoEditor';
+import { typeList } from '@/constants';
+import { cloneDeep } from 'lodash';
 
 // 类型导入
 import {
@@ -22,15 +22,15 @@ import {
   FileUploadResponse,
   FileUploadItem,
   AjvValidationError,
-} from "@/components/workflow/types";
+} from '@/components/workflow/types';
 
 // 从统一的图标管理中导入
-import { Icons } from "@/components/workflow/icons";
+import { Icons } from '@/components/workflow/icons';
 
 // 获取 Chat Input 模块的图标
 const icons = Icons.chatDebugger.chatInput;
 
-const fileTypeFor50 = ["pdf", "excel", "doc", "txt", "ppt", "audio"];
+const fileTypeFor50 = ['pdf', 'excel', 'doc', 'txt', 'ppt', 'audio'];
 
 function ChatInput({
   interruptChat,
@@ -45,27 +45,27 @@ function ChatInput({
     (
       event: ProgressEvent<EventTarget>,
       index: number,
-      fileId: string,
+      fileId: string
     ): void => {
       const target = event.currentTarget as XMLHttpRequest;
       const res: FileUploadResponse = JSON.parse(target.responseText);
       if (res.code === 0) {
-        setStartNodeParams((oldNodeParams) => {
+        setStartNodeParams(oldNodeParams => {
           const defaultValue = oldNodeParams?.[index]?.default;
           if (Array.isArray(defaultValue)) {
             const file = (defaultValue as FileUploadItem[]).find(
-              (item) => item.id === fileId,
+              item => item.id === fileId
             );
             if (file) {
               file.loading = false;
-              file.url = res?.data?.[0] || "";
+              file.url = res?.data?.[0] || '';
             }
           }
           return cloneDeep(oldNodeParams);
         });
       }
     },
-    [setStartNodeParams],
+    [setStartNodeParams]
   );
 
   const handleFileUpload = useCallback(
@@ -75,60 +75,60 @@ function ChatInput({
         name: file.name,
         size: file.size,
         loading: true,
-        url: "",
+        url: '',
       };
 
       if (Array.isArray(startNodeParams[index]?.default) && multiple) {
         (startNodeParams[index].default as FileUploadItem[]).push(
-          fileUploadItem,
+          fileUploadItem
         );
       } else {
         startNodeParams[index].default = [fileUploadItem];
       }
       setStartNodeParams([...startNodeParams]);
     },
-    [startNodeParams, setStartNodeParams],
+    [startNodeParams, setStartNodeParams]
   );
 
   const convertToKBMB = useCallback((bytes: number): string => {
     if (bytes >= 1024 * 1024) {
-      return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
     } else if (bytes >= 1024) {
-      return (bytes / 1024).toFixed(1) + "KB";
+      return (bytes / 1024).toFixed(1) + 'KB';
     } else {
-      return bytes + "B";
+      return bytes + 'B';
     }
   }, []);
 
   const handleDeleteFile = useCallback(
     (index: number, fileId: string): void => {
-      setStartNodeParams((oldStartNodeParams) => {
+      setStartNodeParams(oldStartNodeParams => {
         const defaultValue = oldStartNodeParams[index]?.default;
         if (Array.isArray(defaultValue)) {
           oldStartNodeParams[index].default = (
             defaultValue as FileUploadItem[]
-          ).filter((file) => fileId !== file?.id);
+          ).filter(file => fileId !== file?.id);
         }
         return cloneDeep(oldStartNodeParams);
       });
     },
-    [setStartNodeParams],
+    [setStartNodeParams]
   );
 
   const renderTypeInput = useCallback(
     (input: StartNodeType, index: number): React.ReactElement => {
       const type = input.type;
       if (input?.allowedFileType) {
-        const multiple = type === "array-string";
+        const multiple = type === 'array-string';
         return (
           <>
             <FlowUpload
               multiple={multiple}
-              uploadType={generateUploadType(input?.allowedFileType || "")}
+              uploadType={generateUploadType(input?.allowedFileType || '')}
               {...({
                 uploadComplete: (
                   event: ProgressEvent<EventTarget>,
-                  fileId: string,
+                  fileId: string
                 ) => {
                   uploadComplete(event, index, fileId);
                 },
@@ -137,7 +137,7 @@ function ChatInput({
                 },
               } as unknown)}
               maxSize={
-                input?.allowedFileType === "image"
+                input?.allowedFileType === 'image'
                   ? 3
                   : fileTypeFor50.includes(input?.allowedFileType)
                     ? 50
@@ -146,7 +146,7 @@ function ChatInput({
             />
             {Array.isArray(input?.default) &&
               input.default.length > 0 &&
-              (input.default as FileUploadItem[]).map((file) => (
+              (input.default as FileUploadItem[]).map(file => (
                 <div
                   key={file?.id}
                   className="bg-[#EBF4FD] rounded-lg p-1 pr-4 flex items-center justify-between gap-2"
@@ -161,7 +161,7 @@ function ChatInput({
                         />
                       ) : (
                         <img
-                          src={typeList.get(input?.allowedFileType || "")}
+                          src={typeList.get(input?.allowedFileType || '')}
                           className="w-[16px] h-[13px]"
                           alt=""
                         />
@@ -183,7 +183,7 @@ function ChatInput({
             <div></div>
           </>
         );
-      } else if (type === "string") {
+      } else if (type === 'string') {
         return (
           <FlowTextArea
             style={{
@@ -191,80 +191,80 @@ function ChatInput({
               minHeight: 30,
             }}
             adaptiveHeight={true}
-            placeholder={input?.description || t("common.inputPlaceholder")}
-            value={typeof input?.default === "string" ? input.default : ""}
+            placeholder={input?.description || t('common.inputPlaceholder')}
+            value={typeof input?.default === 'string' ? input.default : ''}
             {...({
               onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) =>
                 handleInputChange(index, e.target.value),
             } as unknown)}
-            onKeyDown={(e) => {
-              if (e.key === "Tab") {
+            onKeyDown={e => {
+              if (e.key === 'Tab') {
                 e.preventDefault();
                 const currentDefault = startNodeParams[index].default;
                 handleInputChange(
                   index,
-                  (typeof currentDefault === "string" ? currentDefault : "") +
-                    "\t",
+                  (typeof currentDefault === 'string' ? currentDefault : '') +
+                    '\t'
                 );
               }
             }}
           />
         );
-      } else if (type === "integer") {
+      } else if (type === 'integer') {
         return (
           <FlowInputNumber
             className="w-full"
-            placeholder={input?.description || t("common.inputPlaceholder")}
+            placeholder={input?.description || t('common.inputPlaceholder')}
             step={1}
             precision={0}
             value={
-              typeof input?.default === "number" ? input.default : undefined
+              typeof input?.default === 'number' ? input.default : undefined
             }
-            onChange={(value) => handleInputChange(index, value || 0)}
+            onChange={value => handleInputChange(index, value || 0)}
           />
         );
-      } else if (type === "number") {
+      } else if (type === 'number') {
         return (
           <FlowInputNumber
             className="w-full"
-            placeholder={input?.description || t("common.inputPlaceholder")}
+            placeholder={input?.description || t('common.inputPlaceholder')}
             value={
-              typeof input?.default === "number" ? input.default : undefined
+              typeof input?.default === 'number' ? input.default : undefined
             }
-            onChange={(value) => handleInputChange(index, value || 0)}
+            onChange={value => handleInputChange(index, value || 0)}
           />
         );
-      } else if (type === "boolean") {
+      } else if (type === 'boolean') {
         return (
           <FlowSelect
-            placeholder={input?.description || t("common.selectPlaceholder")}
+            placeholder={input?.description || t('common.selectPlaceholder')}
             value={input?.default}
             options={[
               {
-                label: "true",
+                label: 'true',
                 value: true,
               },
               {
-                label: "false",
+                label: 'false',
                 value: false,
               },
             ]}
-            onChange={(value) => handleInputChange(index, value)}
+            onChange={value => handleInputChange(index, value)}
           />
         );
-      } else if (type === "object" || type.includes("array")) {
+      } else if (type === 'object' || type.includes('array')) {
         return (
           <>
             <JsonMonacoEditor
-              value={typeof input?.default === "string" ? input.default : "{}"}
-              onChange={(value) => handleInputChange(index, value)}
+              value={typeof input?.default === 'string' ? input.default : '{}'}
+              onChange={value => handleInputChange(index, value)}
             />
             <div className="text-[#F74E43] text-xs">{input.errorMsg}</div>
           </>
         );
       }
     },
-    [startNodeParams],
+    [startNodeParams]
   );
 
   const validateInputJSON = useCallback(
@@ -280,62 +280,62 @@ function ChatInput({
             | null
             | undefined;
           return (
-            (errors?.[0]?.instancePath?.slice(1) ?? "") +
-            " " +
-            (errors?.[0]?.message ?? "")
+            (errors?.[0]?.instancePath?.slice(1) ?? '') +
+            ' ' +
+            (errors?.[0]?.message ?? '')
           ).trim();
         } else {
-          return "";
+          return '';
         }
       } catch {
-        return t("workflow.nodes.validation.invalidJSONFormat");
+        return t('workflow.nodes.validation.invalidJSONFormat');
       }
     },
-    [t],
+    [t]
   );
 
   const handleInputChange = useCallback(
     (index: number, value: string | number | boolean): void => {
       const currentInput: StartNodeType | undefined = startNodeParams.find(
-        (_, i) => index === i,
+        (_, i) => index === i
       );
       if (currentInput) {
         currentInput.default = value;
         if (
-          currentInput?.type === "object" ||
-          currentInput.type.includes("array")
+          currentInput?.type === 'object' ||
+          currentInput.type.includes('array')
         ) {
           if (currentInput?.validationSchema) {
             currentInput.errorMsg = validateInputJSON(
               value as string,
-              currentInput.validationSchema,
+              currentInput.validationSchema
             );
           }
         }
       }
       setStartNodeParams([...startNodeParams]);
     },
-    [startNodeParams, setStartNodeParams, validateInputJSON],
+    [startNodeParams, setStartNodeParams, validateInputJSON]
   );
 
   return (
     <div
       className="flex flex-col gap-1 mt-2"
       style={{
-        maxHeight: "40vh",
-        overflow: "auto",
+        maxHeight: '40vh',
+        overflow: 'auto',
       }}
     >
       {startNodeParams?.length === 1 || interruptChat?.interrupt ? (
         <div className="relative mx-5">
           <textarea
-            disabled={interruptChat?.type === "option"}
+            disabled={interruptChat?.type === 'option'}
             className="user-chat-input pr-3.5 w-full py-3"
             ref={textareRef}
             style={{
-              resize: "none",
+              resize: 'none',
             }}
-            onChange={(e) => {
+            onChange={e => {
               e.stopPropagation();
               const value = e.target.value;
               if (startNodeParams[0]) {
@@ -346,7 +346,7 @@ function ChatInput({
             onKeyDown={handleEnterKey}
             placeholder={
               startNodeParams[0]?.description ||
-              t("workflow.nodes.chatDebugger.tryFlow")
+              t('workflow.nodes.chatDebugger.tryFlow')
             }
           />
         </div>
@@ -363,14 +363,14 @@ function ChatInput({
                 <div className="bg-[#F0F0F0] px-2.5 py-1 rounded text-xs">
                   {renderType(
                     (params as unknown).fileType &&
-                      params.type === "array-string"
+                      params.type === 'array-string'
                       ? `Array<${
                           (params as unknown).allowedFileType
                             ?.slice(0, 1)
                             .toUpperCase() +
                           (params as unknown).allowedFileType?.slice(1)
                         }>`
-                      : (params as unknown).allowedFileType || params.type,
+                      : (params as unknown).allowedFileType || params.type
                   )}
                 </div>
               </div>

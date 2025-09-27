@@ -1,27 +1,27 @@
-import React, { useRef, useEffect, memo, useState } from "react";
-import { cn } from "@/utils";
-import { debounce } from "lodash";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import { useTranslation } from "react-i18next";
-import { useMemoizedFn } from "ahooks";
+import React, { useRef, useEffect, memo, useState } from 'react';
+import { cn } from '@/utils';
+import { debounce } from 'lodash';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import { useTranslation } from 'react-i18next';
+import { useMemoizedFn } from 'ahooks';
 
 function FlowNodeInput({
   nodeId,
-  className = "",
+  className = '',
   value,
   onChange,
   ...reset
 }): React.ReactElement {
   const { t } = useTranslation();
-  const getCurrentStore = useFlowsManager((state) => state.getCurrentStore);
+  const getCurrentStore = useFlowsManager(state => state.getCurrentStore);
   const currentStore = getCurrentStore();
-  const delayCheckNode = currentStore((state) => state.delayCheckNode);
+  const delayCheckNode = currentStore(state => state.delayCheckNode);
   const beforeUpdateNodeInputData = useRef(false);
   const updateNodeInputData = useFlowsManager(
-    (state) => state.updateNodeInputData,
+    state => state.updateNodeInputData
   );
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState('');
 
   useEffect(() => {
     setInputValue(value);
@@ -39,21 +39,21 @@ function FlowNodeInput({
 
     if (input) {
       const handleKeyDown = (
-        event: React.KeyboardEvent<HTMLInputElement>,
+        event: React.KeyboardEvent<HTMLInputElement>
       ): void => {
         event.stopPropagation();
       };
 
       // 需要类型断言，因为原生addEventListener期望的是原生事件
       input.addEventListener(
-        "keydown",
-        handleKeyDown as unknown as EventListener,
+        'keydown',
+        handleKeyDown as unknown as EventListener
       );
 
       return (): void => {
         input.removeEventListener(
-          "keydown",
-          handleKeyDown as unknown as EventListener,
+          'keydown',
+          handleKeyDown as unknown as EventListener
         );
       };
     }
@@ -63,7 +63,7 @@ function FlowNodeInput({
     debounce((value: string) => {
       onChange(value);
       delayCheckNode(nodeId);
-    }, 500),
+    }, 500)
   );
 
   const handleValueChange = useMemoizedFn((value: string): void => {
@@ -74,10 +74,10 @@ function FlowNodeInput({
   return (
     <input
       ref={inputRef}
-      placeholder={t("common.inputPlaceholder")}
-      className={cn("flow-input nodrag px-2.5", className)}
+      placeholder={t('common.inputPlaceholder')}
+      className={cn('flow-input nodrag px-2.5', className)}
       value={inputValue}
-      onChange={(e) => handleValueChange(e.target.value)}
+      onChange={e => handleValueChange(e.target.value)}
       {...reset}
     />
   );

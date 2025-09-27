@@ -1,15 +1,15 @@
-import http from "../utils/http";
+import http from '../utils/http';
 import {
   BotListPage,
   BotType,
   SearchBotParam,
   BotMarketParam,
   BotMarketPage,
-} from "@/types/agent-square";
+} from '@/types/agent-square';
 
 //获取智能体类型
 export const getAgentType = (): Promise<BotType[]> => {
-  return http.get("/home-page/agent-square/get-bot-type-list");
+  return http.get('/home-page/agent-square/get-bot-type-list');
 };
 
 //获取智能体列表
@@ -21,28 +21,28 @@ export const getAgentList = (params: SearchBotParam): Promise<BotListPage> => {
 
 // 收藏bot
 export const collectBot = (
-  params: URLSearchParams,
+  params: URLSearchParams
 ): Promise<{ [key: string]: boolean | number | string }> => {
   return http({
     url: `/bot/favorite/create`,
-    method: "POST",
+    method: 'POST',
     data: params,
     headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
+      'Content-Type': 'application/x-www-form-urlencoded',
     },
   });
 };
 
 // 取消收藏bot
 export const cancelFavorite = (
-  params: URLSearchParams,
+  params: URLSearchParams
 ): Promise<{ [key: string]: boolean | number | string }> => {
   return http({
     url: `/bot/favorite/delete`,
-    method: "POST",
+    method: 'POST',
     data: params,
     headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
+      'Content-Type': 'application/x-www-form-urlencoded',
     },
   });
 };
@@ -54,17 +54,17 @@ export const getAgentShareKey = (params: {
 }): Promise<{
   [key: string]: string | number;
 }> => {
-  return http.post("/agent/getShareKey", params);
+  return http.post('/agent/getShareKey', params);
 };
 
 // 获取收藏列表
 export const getFavoriteList = (params: any) => {
-  return http.post("/bot/favorite/list", params);
+  return http.post('/bot/favorite/list', params);
 };
 
 /* 获取助手市场 */
 export const getBotMarketList = (
-  params: BotMarketParam,
+  params: BotMarketParam
 ): Promise<BotMarketPage> => {
   return http.post(`/bot/page`, params);
 };
@@ -83,7 +83,7 @@ export interface BotDetailResponse {
 }
 
 export const getBotInfoByBotId = (
-  botId: number,
+  botId: number
 ): Promise<BotDetailResponse> => {
   return http.get(`/bot/detail/${botId}`);
 };

@@ -1,14 +1,14 @@
-import { cloneDeep } from "lodash";
-import { Edge, EdgeChange, Node, NodeChange, Connection } from "reactflow";
-import { create } from "zustand";
-import { NodeDataType } from "@/components/workflow/types";
-import { FlowStoreType } from "../types/zustand/flow";
+import { cloneDeep } from 'lodash';
+import { Edge, EdgeChange, Node, NodeChange, Connection } from 'reactflow';
+import { create } from 'zustand';
+import { NodeDataType } from '@/components/workflow/types';
+import { FlowStoreType } from '../types/zustand/flow';
 import {
   getNodeId,
   getEdgeId,
   getNextName,
-} from "@/components/workflow/utils/reactflowUtils";
-import { v4 as uuid } from "uuid";
+} from '@/components/workflow/utils/reactflowUtils';
+import { v4 as uuid } from 'uuid';
 import {
   initialStatus,
   setZoom,
@@ -36,7 +36,7 @@ import {
   updateNodeRef,
   switchNodeRef,
   addIntentId,
-} from "./flow-function";
+} from './flow-function';
 
 const paste = async (
   selection: { nodes: Node[]; edges: Edge[] },
@@ -44,7 +44,7 @@ const paste = async (
     nodes: Node[];
     setNodes: (callback: (nodes: Node[]) => Node[]) => void;
     setEdges: (edges: Edge[]) => void;
-  },
+  }
 ): Promise<void> => {
   try {
     const text = await navigator.clipboard.readText();
@@ -53,29 +53,29 @@ const paste = async (
     let newNodes: Node<NodeDataType>[] = get().nodes;
     const currentTypeNodeList = cloneDeep(get().nodes);
 
-    newNodes = selection?.nodes.map((item) => {
+    newNodes = selection?.nodes.map(item => {
       const currentTypeList = currentTypeNodeList.filter(
-        (node) =>
-          node.data?.label?.split("_")?.[0] ===
-          item.data?.label?.split("_")?.[0],
+        node =>
+          node.data?.label?.split('_')?.[0] ===
+          item.data?.label?.split('_')?.[0]
       );
-      const newId = getNodeId(item.id?.split("::")?.[0]);
+      const newId = getNodeId(item.id?.split('::')?.[0]);
       idsMap[item.id] = newId;
       item.data.label = getNextName(
         currentTypeList,
-        item.data?.label?.split("_")?.[0],
+        item.data?.label?.split('_')?.[0]
       );
-      item.data.inputs = item.data.inputs?.map((input) => ({
+      item.data.inputs = item.data.inputs?.map(input => ({
         id: uuid(),
         name: input?.name,
         required: input?.required,
         type: input?.type,
         schema: {
-          type: "string",
+          type: 'string',
           value: {
             type: input?.schema?.value?.type,
             content:
-              input?.schema?.value?.type === "literal"
+              input?.schema?.value?.type === 'literal'
                 ? input?.schema?.value?.content
                 : {},
           },
@@ -101,15 +101,15 @@ const paste = async (
       }
       return newItem;
     });
-    get().setNodes((old) => {
+    get().setNodes(old => {
       return cloneDeep([
-        ...old.map((item) => ({ ...item, selected: false })),
+        ...old.map(item => ({ ...item, selected: false })),
         ...newNodes,
       ]);
     });
     const newEdges = selection.edges
-      ?.filter((edge) => idsMap[edge.target] && idsMap[edge.source])
-      ?.map((edge) => ({
+      ?.filter(edge => idsMap[edge.target] && idsMap[edge.source])
+      ?.map(edge => ({
         ...edge,
         id: getEdgeId(idsMap[edge.target], idsMap[edge.source]),
         target: idsMap[edge.target],
@@ -117,10 +117,10 @@ const paste = async (
         selected: false,
       }));
 
-    get().setEdges((oldEdges) => cloneDeep([...oldEdges, ...newEdges]));
+    get().setEdges(oldEdges => cloneDeep([...oldEdges, ...newEdges]));
 
     setTimeout(() => {
-      newNodes.forEach((item) => {
+      newNodes.forEach(item => {
         get().updateNodeRef(item.id);
       });
     }, 500);
@@ -155,7 +155,7 @@ const useFlowStore = create<FlowStoreType>((set, get) => ({
   deleteNode: (nodeId: string): void => deleteNode(nodeId, get),
   updateNodeNameStatus: (
     nodeId: string,
-    labelInputId: string | undefined,
+    labelInputId: string | undefined
   ): void => updateNodeNameStatus(nodeId, labelInputId, get),
   reNameNode: (nodeId: string, value: string): void =>
     reNameNode(nodeId, value, get),
@@ -166,7 +166,7 @@ const useFlowStore = create<FlowStoreType>((set, get) => ({
   removeNodeRef: (
     souceId: string,
     targetId: string,
-    inputEdges?: Edge[],
+    inputEdges?: Edge[]
   ): void => removeNodeRef(souceId, targetId, inputEdges, get),
   deleteNodeRef: (id: string, outputId: string): void =>
     deleteNodeRef(id, outputId, get),

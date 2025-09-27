@@ -1,6 +1,6 @@
-import Compressor from "compressorjs";
-import { message } from "antd";
-import { CroppedAreaPixels } from "./use-image-crop-upload";
+import Compressor from 'compressorjs';
+import { message } from 'antd';
+import { CroppedAreaPixels } from './use-image-crop-upload';
 
 // File validation helpers
 export const validateImageFile = (
@@ -8,13 +8,13 @@ export const validateImageFile = (
   maxSizeMB: number,
   t?: (key: string, params?: Record<string, any>) => string,
   tKeyOnlyImage?: string,
-  tKeyFileTooLarge?: string,
+  tKeyFileTooLarge?: string
 ): boolean => {
-  if (!file.type.startsWith("image/")) {
+  if (!file.type.startsWith('image/')) {
     if (t && tKeyOnlyImage) {
       message.error(t(tKeyOnlyImage));
     } else {
-      message.error("只能上传图片");
+      message.error('只能上传图片');
     }
     return false;
   }
@@ -35,7 +35,7 @@ export const validateImageFile = (
 export const compressImageFile = (
   imageFile: File,
   quality: number,
-  convertSize: number,
+  convertSize: number
 ): Promise<File> => {
   return new Promise<File>((resolve, reject) => {
     new Compressor(imageFile, {
@@ -44,11 +44,11 @@ export const compressImageFile = (
       success(result: any) {
         const newFile: any = new File(
           [result],
-          result.name || "compressed-image.jpeg",
+          result.name || 'compressed-image.jpeg',
           {
             type: result.type,
             lastModified: result.lastModified,
-          },
+          }
         );
         resolve(newFile);
       },
@@ -63,15 +63,15 @@ export const compressImageFile = (
 export const createCroppedCanvas = (
   imageSrc: string,
   croppedAreaPixels: CroppedAreaPixels,
-  onComplete: (blob: Blob) => void,
+  onComplete: (blob: Blob) => void
 ): void => {
   const image = new window.Image();
   image.src = imageSrc;
   image.onload = () => {
-    const canvas = document.createElement("canvas");
+    const canvas = document.createElement('canvas');
     canvas.width = croppedAreaPixels.width;
     canvas.height = croppedAreaPixels.height;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
 
     if (ctx) {
       const scaleX = image.width / (image as any).naturalWidth;
@@ -86,18 +86,18 @@ export const createCroppedCanvas = (
         0,
         0,
         croppedAreaPixels.width,
-        croppedAreaPixels.height,
+        croppedAreaPixels.height
       );
     }
 
     canvas.toBlob(
-      (blob) => {
+      blob => {
         if (blob) {
           onComplete(blob);
         }
       },
-      "image/jpeg",
-      1,
+      'image/jpeg',
+      1
     );
   };
 };
@@ -106,7 +106,7 @@ export const createCroppedCanvas = (
 export const logPerformance = (
   label: string,
   times: Record<string, number>,
-  logPerf: boolean,
+  logPerf: boolean
 ): void => {
   if (logPerf) {
     // eslint-disable-next-line no-console

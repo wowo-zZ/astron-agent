@@ -1,4 +1,4 @@
-import { AxiosResponse } from "axios";
+import { AxiosResponse } from 'axios';
 //define the pagination data of response
 type ResponseResultPage<T = unknown> = {
   pageData: T[];
@@ -35,7 +35,7 @@ declare global {
       callback: (res: {
         status: string;
         data: { gee_token: string; local_id: string };
-      }) => void,
+      }) => void
     ) => void;
   }
 }

@@ -1,14 +1,14 @@
-import React, { useMemo, useState, useCallback, useEffect } from "react";
-import { Handle, Position } from "reactflow";
-import { Tooltip } from "antd";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import { useFlowCommon } from "@/components/workflow/hooks/useFlowCommon";
+import React, { useMemo, useState, useCallback, useEffect } from 'react';
+import { Handle, Position } from 'reactflow';
+import { Tooltip } from 'antd';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import { useFlowCommon } from '@/components/workflow/hooks/useFlowCommon';
 
-import nodeListAdd from "@/assets/imgs/workflow/node-list-add.png";
+import nodeListAdd from '@/assets/imgs/workflow/node-list-add.png';
 
 export const TargetHandle = ({
   isConnectable,
-  id = "",
+  id = '',
 }): React.ReactElement => {
   return (
     <Handle
@@ -24,45 +24,43 @@ export const TargetHandle = ({
 export const SourceHandle = ({
   isConnectable,
   nodeId,
-  id = "",
+  id = '',
 }): React.ReactElement => {
   const { handleEdgeAddNode } = useFlowCommon();
-  const nodeList = useFlowsManager((state) => state.nodeList);
-  const currentStore = useFlowsManager((state) => state.getCurrentStore());
-  const showIterativeModal = useFlowsManager(
-    (state) => state.showIterativeModal,
-  );
-  const nodes = currentStore((state) => state.nodes);
-  const setNodes = currentStore((state) => state.setNodes);
-  const reactFlowInstance = currentStore((state) => state.reactFlowInstance);
+  const nodeList = useFlowsManager(state => state.nodeList);
+  const currentStore = useFlowsManager(state => state.getCurrentStore());
+  const showIterativeModal = useFlowsManager(state => state.showIterativeModal);
+  const nodes = currentStore(state => state.nodes);
+  const setNodes = currentStore(state => state.setNodes);
+  const reactFlowInstance = currentStore(state => state.reactFlowInstance);
   const [showNodesList, setShowNodesList] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (): void => {
       setShowNodesList(false);
     };
-    window.addEventListener("click", handleClickOutside);
-    return (): void => window.removeEventListener("click", handleClickOutside);
+    window.addEventListener('click', handleClickOutside);
+    return (): void => window.removeEventListener('click', handleClickOutside);
   }, []);
   const currentNode = useMemo(() => {
-    return nodes?.find((node) => node.id === nodeId);
+    return nodes?.find(node => node.id === nodeId);
   }, [nodeId, nodes]);
 
   const canAddNodes = useMemo(() => {
     return nodeList
-      ?.filter((node) => node?.name !== "固定节点")
-      ?.flatMap((item) => item?.nodes)
+      ?.filter(node => node?.name !== '固定节点')
+      ?.flatMap(item => item?.nodes)
       ?.filter(
-        (item) =>
+        item =>
           !showIterativeModal ||
-          (showIterativeModal && item?.nodeType !== "iteration"),
+          (showIterativeModal && item?.nodeType !== 'iteration')
       );
   }, [nodeList, showIterativeModal]);
 
   const generatePosition = useCallback(() => {
     const nodeElement = showIterativeModal
       ? document
-          .getElementById("iterator-flow-container")
+          .getElementById('iterator-flow-container')
           ?.querySelector(`[data-id= "${nodeId}"]`)
       : document.querySelector(`[data-id= "${nodeId}"]`);
     const { width = 0 } = nodeElement?.getBoundingClientRect() ?? {};
@@ -80,21 +78,21 @@ export const SourceHandle = ({
     (node): void => {
       handleEdgeAddNode(node, generatePosition(), id, currentNode);
     },
-    [currentNode, reactFlowInstance, showIterativeModal, nodeId, id],
+    [currentNode, reactFlowInstance, showIterativeModal, nodeId, id]
   );
 
   const handleShowNodesList = useCallback(
     (e: React.MouseEvent<HTMLDivElement>): void => {
       e.stopPropagation();
       setShowNodesList(!showNodesList);
-      setNodes((nodes) =>
-        nodes?.map((node) => ({
+      setNodes(nodes =>
+        nodes?.map(node => ({
           ...node,
           selected: !showNodesList && node?.id === nodeId ? true : false,
-        })),
+        }))
       );
     },
-    [showNodesList, setShowNodesList, setNodes, nodeId],
+    [showNodesList, setShowNodesList, setNodes, nodeId]
   );
 
   const addNodeIcon = useMemo(() => {
@@ -164,10 +162,10 @@ export const SourceHandle = ({
         <div
           className="absolute  top-1/2 right-[-20px] transform translate-x-full -translate-y-1/2 rounded-lg p-2 bg-[#fff]"
           style={{
-            width: "280px",
+            width: '280px',
             zIndex: 1001,
-            boxShadow: "0px 2px 4px 0px rgba(46,51,68,0.04)",
-            border: "1px solid #E0E3E7",
+            boxShadow: '0px 2px 4px 0px rgba(46,51,68,0.04)',
+            border: '1px solid #E0E3E7',
           }}
         >
           {canAddNodes?.map((node, index) => (

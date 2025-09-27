@@ -1,34 +1,34 @@
-import React, { memo, useState, useEffect, useRef, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-import { Input, message, Popover, Select, Tooltip } from "antd";
-import { throttle } from "lodash";
-import { enableBotFavorite } from "@/services/agent"; // NOTE: 需更换接口
-import { useTranslation } from "react-i18next";
+import React, { memo, useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Input, message, Popover, Select, Tooltip } from 'antd';
+import { throttle } from 'lodash';
+import { enableBotFavorite } from '@/services/agent'; // NOTE: 需更换接口
+import { useTranslation } from 'react-i18next';
 import {
   getAgentList,
   copyBot,
   GetAgentListParams,
   GetAgentListResponse,
-} from "@/services/agent";
-import DeleteBot from "./components/delete-bot";
-import CreateApplicationModal from "@/components/create-application-modal";
-import { debounce } from "lodash";
-import RetractableInput from "@/components/ui/global/retract-table-input";
-import useChat from "@/hooks/use-chat";
-import useUserStore from "@/store/user-store";
-import { jumpTologin, downloadFileWithHeaders } from "@/utils/http";
+} from '@/services/agent';
+import DeleteBot from './components/delete-bot';
+import CreateApplicationModal from '@/components/create-application-modal';
+import { debounce } from 'lodash';
+import RetractableInput from '@/components/ui/global/retract-table-input';
+import useChat from '@/hooks/use-chat';
+import useUserStore from '@/store/user-store';
+import { jumpTologin, downloadFileWithHeaders } from '@/utils/http';
 
-import iconNew from "@/assets/imgs/main/icon_bot_new.png";
-import search from "@/assets/imgs/knowledge/icon_zhishi_search.png";
-import favorite from "@/assets/imgs/main/favorite.png";
-import unfavorite from "@/assets/imgs/main/icon_bot_tag@2x.png";
-import formSelect from "@/assets/imgs/main/icon_nav_dropdown.svg";
-import agentOperationMore from "@/assets/imgs/main/agent-operation-more.svg";
+import iconNew from '@/assets/imgs/main/icon_bot_new.png';
+import search from '@/assets/imgs/knowledge/icon_zhishi_search.png';
+import favorite from '@/assets/imgs/main/favorite.png';
+import unfavorite from '@/assets/imgs/main/icon_bot_tag@2x.png';
+import formSelect from '@/assets/imgs/main/icon_nav_dropdown.svg';
+import agentOperationMore from '@/assets/imgs/main/agent-operation-more.svg';
 
-import styles from "./index.module.scss";
-import useSpaceStore from "@/store/space-store";
-import { getInputsType } from "@/services/flow";
-import { handleShare } from "@/utils";
+import styles from './index.module.scss';
+import useSpaceStore from '@/store/space-store';
+import { getInputsType } from '@/services/flow';
+import { handleShare } from '@/utils';
 
 function index() {
   const typePublished = [1, 2, 4]; // 已发布状态
@@ -44,12 +44,12 @@ function index() {
   const [botDetail, setBotDetail] = useState<any>({});
   const [isHovered, setIsHovered] = useState<any>(null);
   const [appInfoModal, setAppInfoModal] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState('');
   const [robots, setRobots] = useState<any>([]);
   const [pageIndex, setPageIndex] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [status, setStatus] = useState(0);
-  const [sort, setSort] = useState("createTime");
+  const [sort, setSort] = useState('createTime');
   const [version, setVersion] = useState(0);
   const [ApplicationModalVisible, setCreateModalVisible] =
     useState<boolean>(false); //创建应用
@@ -65,15 +65,15 @@ function index() {
    */
   const statusMap = [
     {
-      label: t("agentPage.agentPage.allStatus"),
+      label: t('agentPage.agentPage.allStatus'),
       value: null,
     },
     {
-      label: t("agentPage.agentPage.published"),
+      label: t('agentPage.agentPage.published'),
       value: [1, 2, 4],
     },
     {
-      label: t("agentPage.agentPage.unpublished"),
+      label: t('agentPage.agentPage.unpublished'),
       value: [0],
     },
     // {
@@ -81,7 +81,7 @@ function index() {
     //   value: [1],
     // },
     {
-      label: t("agentPage.agentPage.rejected"),
+      label: t('agentPage.agentPage.rejected'),
       value: [3],
     },
   ];
@@ -90,8 +90,8 @@ function index() {
     const handleOutsideClick = (e: MouseEvent) => {
       setOperationId(null);
     };
-    window.addEventListener("click", handleOutsideClick);
-    return () => window.removeEventListener("click", handleOutsideClick);
+    window.addEventListener('click', handleOutsideClick);
+    return () => window.removeEventListener('click', handleOutsideClick);
   }, []);
 
   useEffect(() => {
@@ -162,7 +162,7 @@ function index() {
     getAgentList(params)
       .then((data: GetAgentListResponse) => {
         setRobots([...robots, ...(data?.pageData ?? [])]);
-        setPageIndex((pageIndex) => pageIndex + 1);
+        setPageIndex(pageIndex => pageIndex + 1);
         if (robots.length + 20 < data.totalCount) {
           setHasMore(true);
         } else {
@@ -173,12 +173,12 @@ function index() {
   }
 
   const getRobotsDebounce = useCallback(
-    debounce((e) => {
+    debounce(e => {
       const value = e.target.value;
       setSearchValue(value);
       getRobots(value);
     }, 500),
-    [searchValue],
+    [searchValue]
   );
 
   function jumpChat(e: React.MouseEvent<HTMLDivElement>, id: string): void {
@@ -188,17 +188,17 @@ function index() {
 
   function jumpConfig(e: React.MouseEvent<HTMLDivElement>, id: string): void {
     e.stopPropagation();
-    navigate("/space/config/" + id + "/base");
+    navigate('/space/config/' + id + '/base');
   }
 
   const handleBotFavorite = useCallback(
-    throttle((robot) => {
+    throttle(robot => {
       const params = {
         botId: robot.id,
         favoriteFlag: robot?.isFavorite ? 1 : 0,
       };
 
-      enableBotFavorite(params).then((data) => {
+      enableBotFavorite(params).then(data => {
         setRobots((robots: any[]) => {
           const currentBot = robots.find((item: any) => item.id === robot.id);
           currentBot.isFavorite = !currentBot.isFavorite;
@@ -208,7 +208,7 @@ function index() {
         });
       });
     }, 1000),
-    [],
+    []
   );
 
   /** 复制操作 */
@@ -216,7 +216,7 @@ function index() {
     debounce((botId?: number) => {
       copyBot({ botId })
         .then(() => {
-          message.success(t("agentPage.agentPage.copySuccess"));
+          message.success(t('agentPage.agentPage.copySuccess'));
           // if (searchValue) {
           //   setSearchValue('');
           // } else {
@@ -224,18 +224,18 @@ function index() {
           // }
           getRobots();
         })
-        .catch((err) => {
+        .catch(err => {
           console.error(err);
           err?.msg && message.error(err.msg);
         });
     }, 500),
-    [status, searchValue],
+    [status, searchValue]
   );
 
   //  分享智能体
   const handleShareAgent = async (
     botName: string,
-    botId: number,
+    botId: number
   ): Promise<void> => {
     await handleShare(botName, botId, t);
   };
@@ -264,67 +264,67 @@ function index() {
         <div
           className="flex justify-between mx-auto max-w-[1425px]"
           style={{
-            width: "calc(0.85 * (100% - 8px))",
+            width: 'calc(0.85 * (100% - 8px))',
           }}
         >
           <div className={styles.modelTitle}>
-            {t("agentPage.agentPage.myAgents")}
+            {t('agentPage.agentPage.myAgents')}
           </div>
           <div
             className="flex items-center gap-4"
-            style={{ marginRight: "4px" }}
+            style={{ marginRight: '4px' }}
           >
             <Select
               suffixIcon={<img src={formSelect} className="w-4 h-4 " />}
               className="search-select"
-              style={{ height: 32, width: 160, marginRight: "8px" }}
+              style={{ height: 32, width: 160, marginRight: '8px' }}
               value={version}
-              onChange={(value) => {
+              onChange={value => {
                 setVersion(value);
                 setPageIndex(1);
               }}
               options={[
-                { label: t("agentPage.agentPage.allTypes"), value: 0 },
-                { label: t("agentPage.agentPage.instructionType"), value: 1 },
-                { label: t("agentPage.agentPage.workflowType"), value: 3 },
+                { label: t('agentPage.agentPage.allTypes'), value: 0 },
+                { label: t('agentPage.agentPage.instructionType'), value: 1 },
+                { label: t('agentPage.agentPage.workflowType'), value: 3 },
               ]}
             />
             <Select
               suffixIcon={<img src={formSelect} className="w-4 h-4 " />}
               className="search-select"
-              style={{ height: 32, width: 160, marginRight: "8px" }}
+              style={{ height: 32, width: 160, marginRight: '8px' }}
               value={sort}
-              onChange={(value) => {
+              onChange={value => {
                 setSort(value);
                 setPageIndex(1);
               }}
               options={[
                 {
-                  label: t("agentPage.agentPage.sortByCreateTime"),
-                  value: "createTime",
+                  label: t('agentPage.agentPage.sortByCreateTime'),
+                  value: 'createTime',
                 },
                 {
-                  label: t("agentPage.agentPage.sortByUpdateTime"),
-                  value: "updateTime",
+                  label: t('agentPage.agentPage.sortByUpdateTime'),
+                  value: 'updateTime',
                 },
               ]}
             />
             <Select
               suffixIcon={<img src={formSelect} className="w-4 h-4 " />}
               className="search-select"
-              style={{ height: 32, width: 160, marginRight: "8px" }}
+              style={{ height: 32, width: 160, marginRight: '8px' }}
               value={status}
-              onChange={(value) => {
+              onChange={value => {
                 setStatus(value);
                 setPageIndex(1);
               }}
               options={[
-                { label: t("agentPage.agentPage.allStatus"), value: 0 },
-                { label: t("agentPage.agentPage.published"), value: 1 },
-                { label: t("agentPage.agentPage.unpublished"), value: 2 },
+                { label: t('agentPage.agentPage.allStatus'), value: 0 },
+                { label: t('agentPage.agentPage.published'), value: 1 },
+                { label: t('agentPage.agentPage.unpublished'), value: 2 },
                 // NOTE: 发布中并入已发布, 仅从状态说明中做区分 -- 09.01
                 // { label: t('agentPage.agentPage.publishing'), value: 1 },
-                { label: t("agentPage.agentPage.rejected"), value: 3 },
+                { label: t('agentPage.agentPage.rejected'), value: 3 },
               ]}
             />
             <RetractableInput
@@ -338,7 +338,7 @@ function index() {
           <div
             className="w-full h-full mx-auto max-w-[1425px]"
             style={{
-              width: "85%",
+              width: '85%',
             }}
             ref={robotRef}
             onScroll={handleScroll}
@@ -347,15 +347,15 @@ function index() {
               <div
                 className={`common-card-add-container relative ${
                   isHovered === null
-                    ? ""
+                    ? ''
                     : isHovered
-                      ? "knowledge-no-hover"
-                      : " knowledge-hover"
+                      ? 'knowledge-no-hover'
+                      : ' knowledge-hover'
                 }`}
-                onMouseLeave={(e) => {
+                onMouseLeave={e => {
                   setIsHovered(true);
                 }}
-                onMouseEnter={(e) => {
+                onMouseEnter={e => {
                   setIsHovered(false);
                 }}
                 onClick={() => {
@@ -375,7 +375,7 @@ function index() {
                     className="mt-4 font-semibold add-name"
                     style={{ fontSize: 22 }}
                   >
-                    {t("agentPage.agentPage.createNewAgent")}
+                    {t('agentPage.agentPage.createNewAgent')}
                   </div>
                 </div>
               </div>
@@ -387,7 +387,7 @@ function index() {
                     k.version === 1
                       ? navigate(`/space/config/base?botId=${k?.botId}`)
                       : navigate(
-                          `/work_flow/${k?.maasId}/arrange?botId=${k?.botId}`,
+                          `/work_flow/${k?.maasId}/arrange?botId=${k?.botId}`
                         );
                   }}
                 >
@@ -417,12 +417,12 @@ function index() {
                       <Tooltip
                         title={
                           k.botStatus === 2
-                            ? t("agentPage.agentPage.searchableInMarketplace")
+                            ? t('agentPage.agentPage.searchableInMarketplace')
                             : k.botStatus === -9 || k.botStatus === 0
-                              ? t("agentPage.agentPage.personalUseOnly")
+                              ? t('agentPage.agentPage.personalUseOnly')
                               : k.botStatus === 1 || k.botStatus === 4
-                                ? t("agentPage.agentPage.underReview")
-                                : t("agentPage.agentPage.needsModification") +
+                                ? t('agentPage.agentPage.underReview')
+                                : t('agentPage.agentPage.needsModification') +
                                   k.blockReason
                         }
                       >
@@ -434,28 +434,28 @@ function index() {
                               k.botStatus === 2 ||
                               k.botStatus === 1 ||
                               k.botStatus === 4
-                                ? "#CFF4E1"
+                                ? '#CFF4E1'
                                 : k.botStatus === -9 || k.botStatus === 0
-                                  ? "#E6E6E8"
-                                  : "#FEEDEC",
+                                  ? '#E6E6E8'
+                                  : '#FEEDEC',
                             color:
                               k.botStatus === 2 ||
                               k.botStatus === 1 ||
                               k.botStatus === 4
-                                ? "#477D62"
+                                ? '#477D62'
                                 : k.botStatus === -9 || k.botStatus === 0
-                                  ? "#666666"
-                                  : "#F74E43",
-                            borderRadius: "0px 18px 0px 8px",
+                                  ? '#666666'
+                                  : '#F74E43',
+                            borderRadius: '0px 18px 0px 8px',
                           }}
                         >
                           {k.botStatus === 2 ||
                           k.botStatus === 1 ||
                           k.botStatus === 4
-                            ? t("agentPage.agentPage.published")
+                            ? t('agentPage.agentPage.published')
                             : k.botStatus === -9 || k.botStatus === 0
-                              ? t("agentPage.agentPage.unpublished")
-                              : t("agentPage.agentPage.rejected")}
+                              ? t('agentPage.agentPage.unpublished')
+                              : t('agentPage.agentPage.rejected')}
                         </div>
                       </Tooltip>
                     </div>
@@ -464,30 +464,30 @@ function index() {
                   <div className="flex ml-24 gap-4">
                     <div className={styles.angentType}>
                       {k.version === 1
-                        ? t("home.instructionType")
-                        : t("home.workflowType")}
+                        ? t('home.instructionType')
+                        : t('home.workflowType')}
                     </div>
                   </div>
 
                   <div
                     className="flex justify-between items-center mt-3"
                     style={{
-                      padding: "17px 24px 0 24px",
-                      borderTop: "1px dashed #e2e8ff",
-                      scrollbarWidth: "none", // 隐藏滚动条
-                      msOverflowStyle: "none", // IE/Edge隐藏滚动条
+                      padding: '17px 24px 0 24px',
+                      borderTop: '1px dashed #e2e8ff',
+                      scrollbarWidth: 'none', // 隐藏滚动条
+                      msOverflowStyle: 'none', // IE/Edge隐藏滚动条
                     }}
                   >
                     <span className="text-[#7F7F7F] text-xs go-setting flex items-center">
                       <span className="whitespace-nowrap">
-                        {t("agentPage.agentPage.goToEdit")}
+                        {t('agentPage.agentPage.goToEdit')}
                       </span>
                       <span className="setting-icon setting-act"></span>
                     </span>
                     <div className="flex items-center text-desc flex-1 max-w-[210px] justify-between">
                       <div
                         className="card-chat cursor-pointer flex items-center"
-                        onClick={(e) => {
+                        onClick={e => {
                           e.stopPropagation();
                           if (k.version === 3) {
                             getInputsType({ botId: k.botId }).then(
@@ -495,18 +495,18 @@ function index() {
                                 // 合并不支持对话的条件
                                 if (
                                   (res.length === 2 &&
-                                    res[1].fileType === "file" &&
-                                    res[1].schema.type === "array-string") ||
+                                    res[1].fileType === 'file' &&
+                                    res[1].schema.type === 'array-string') ||
                                   (res.length === 2 &&
-                                    res[1].fileType !== "file") ||
+                                    res[1].fileType !== 'file') ||
                                   res.length > 2
                                 ) {
                                   return message.info(
-                                    t("agentPage.agentPage.notSupported"),
+                                    t('agentPage.agentPage.notSupported')
                                   );
                                 }
                                 handleToChat(k.botId);
-                              },
+                              }
                             );
                           } else {
                             handleToChat(k.botId);
@@ -517,12 +517,12 @@ function index() {
                           className={`chat-icon chat-act ${styles.only_css}`}
                         ></span>
                         <span className="ml-1 whitespace-nowrap">
-                          {t("agentPage.agentPage.chat")}
+                          {t('agentPage.agentPage.chat')}
                         </span>
                       </div>
                       <div
                         className="card-chat cursor-pointer flex items-center"
-                        onClick={(e) => {
+                        onClick={e => {
                           e.stopPropagation();
                           handleShareAgent(k.botName, k.botId);
                         }}
@@ -531,25 +531,25 @@ function index() {
                           className={`share-icon ${styles.only_css}`}
                         ></span>
                         <span className="ml-1 whitespace-nowrap">
-                          {t("agentPage.agentPage.share")}
+                          {t('agentPage.agentPage.share')}
                         </span>
                       </div>
                       <div
                         className="card-chat cursor-pointer flex items-center"
-                        onClick={(e) => {
+                        onClick={e => {
                           e.stopPropagation();
                           copyBotNow(k.botId);
                         }}
                       >
                         <span className={`copy-icon ${styles.only_css}`}></span>
                         <span className="ml-1 whitespace-nowrap">
-                          {t("agentPage.agentPage.copy")}
+                          {t('agentPage.agentPage.copy')}
                         </span>
                       </div>
                       {(![1, 4].includes(k?.botStatus) || k?.version === 3) && (
                         <div
                           className="w-6 h-6 bg-[#F2F5FE] rounded flex items-center justify-center relative"
-                          onClick={(e) => {
+                          onClick={e => {
                             e.stopPropagation();
                             if (operationId === k.botId) {
                               setOperationId(null);
@@ -557,7 +557,7 @@ function index() {
                               setOperationId(k.botId);
                             }
                           }}
-                          onMouseEnter={(e) => {
+                          onMouseEnter={e => {
                             e.stopPropagation();
                             setOperationId(k.botId);
                           }}
@@ -573,7 +573,7 @@ function index() {
                               style={{
                                 zIndex: 1,
                               }}
-                              onMouseLeave={(e) => {
+                              onMouseLeave={e => {
                                 e.stopPropagation();
                                 setOperationId(null);
                               }}
@@ -583,30 +583,30 @@ function index() {
                                   className="p-1 rounded hover:bg-[#F2F5FE] block"
                                   href={`${window.location.origin}/workflow/export/${k?.maasId}`}
                                   download={`${k?.botName}.yml`}
-                                  onClick={(e) => {
+                                  onClick={e => {
                                     e?.stopPropagation();
                                     e.preventDefault();
                                     setOperationId(null);
                                     downloadFileWithHeaders(
                                       `${window.location.origin}/workflow/export/${k?.maasId}`,
-                                      `${k?.botName}.yml`,
+                                      `${k?.botName}.yml`
                                     );
                                   }}
                                 >
-                                  {t("agentPage.agentPage.export")}
+                                  {t('agentPage.agentPage.export')}
                                 </a>
                               )}
                               {![1, 4].includes(k?.botStatus) && (
                                 <div
                                   className="p-1 rounded hover:bg-[#F2F5FE] text-[#F74E43]"
-                                  onClick={(e) => {
+                                  onClick={e => {
                                     e.stopPropagation();
                                     setBotDetail(k);
                                     setDeleteModal(true);
                                     setOperationId(null);
                                   }}
                                 >
-                                  {t("agentPage.agentPage.delete")}
+                                  {t('agentPage.agentPage.delete')}
                                 </div>
                               )}
                             </div>

@@ -1,6 +1,6 @@
-import React from "react";
-import { Button } from "antd";
-import { useTranslation } from "react-i18next";
+import React from 'react';
+import { Button } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 interface ActionButtonsProps {
   isModule?: boolean;
@@ -26,7 +26,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       style={{ paddingBottom: !isModule ? 40 : 0 }}
     >
       <Button type="text" className="px-6 origin-btn" onClick={onCancel}>
-        {t("database.cancel")}
+        {t('database.cancel')}
       </Button>
       <Button
         type="primary"
@@ -34,7 +34,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         loading={saveLoading}
         onClick={onSave}
       >
-        {t("database.save")}
+        {t('database.save')}
       </Button>
     </div>
   );

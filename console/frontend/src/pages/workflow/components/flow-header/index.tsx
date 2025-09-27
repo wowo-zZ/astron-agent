@@ -1,18 +1,18 @@
-import React, { useMemo, useState, ReactNode, memo } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import FlowEdit from "@/components/workflow/modal/flow-edit";
-import dayjs from "dayjs";
+import React, { useMemo, useState, ReactNode, memo } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import FlowEdit from '@/components/workflow/modal/flow-edit';
+import dayjs from 'dayjs';
 
-import arrowLeft from "@/assets/imgs/knowledge/workflow-back.png";
-import flowEditIcon from "@/assets/imgs/workflow/flow-edit-icon.png";
-import flowSuccessIcon from "@/assets/imgs/workflow/flow-success-icon.png";
-import flowRunningIcon from "@/assets/imgs/workflow/flow-running-icon.png";
-import flowFailedIcon from "@/assets/imgs/workflow/flow-failed-icon.png";
+import arrowLeft from '@/assets/imgs/knowledge/workflow-back.png';
+import flowEditIcon from '@/assets/imgs/workflow/flow-edit-icon.png';
+import flowSuccessIcon from '@/assets/imgs/workflow/flow-success-icon.png';
+import flowRunningIcon from '@/assets/imgs/workflow/flow-running-icon.png';
+import flowFailedIcon from '@/assets/imgs/workflow/flow-failed-icon.png';
 
 interface FlowHeaderProps {
-  currentTab?: "arrange" | "overview";
+  currentTab?: 'arrange' | 'overview';
   children?: ReactNode;
 }
 
@@ -23,24 +23,24 @@ interface FlowStatusProps {
 
 const FlowStatus: React.FC<FlowStatusProps> = ({ flowResult, t }) => {
   const statusStyle = useMemo(() => {
-    if (!flowResult?.status) return { background: "", color: "", icon: "" };
+    if (!flowResult?.status) return { background: '', color: '', icon: '' };
     switch (flowResult.status) {
-      case "running":
+      case 'running':
         return {
-          background: "#FEE4CD",
-          color: "#966941",
+          background: '#FEE4CD',
+          color: '#966941',
           icon: flowRunningIcon,
         };
-      case "success":
+      case 'success':
         return {
-          background: "#D6FEC8",
-          color: "#44974B",
+          background: '#D6FEC8',
+          color: '#44974B',
           icon: flowSuccessIcon,
         };
       default:
         return {
-          background: "#FFD2D2",
-          color: "#F74E43",
+          background: '#FFD2D2',
+          color: '#F74E43',
           icon: flowFailedIcon,
         };
     }
@@ -56,16 +56,16 @@ const FlowStatus: React.FC<FlowStatusProps> = ({ flowResult, t }) => {
       <img
         src={statusStyle.icon}
         alt=""
-        className={`w-3 h-3 ${flowResult.status === "running" ? "flow-rotate-center" : ""}`}
+        className={`w-3 h-3 ${flowResult.status === 'running' ? 'flow-rotate-center' : ''}`}
       />
       <span>
-        {flowResult.status === "running"
-          ? t("workflow.nodes.header.testRunning")
-          : flowResult.status === "success"
-            ? t("workflow.nodes.header.runCompleted")
-            : t("workflow.nodes.header.runFailed")}
+        {flowResult.status === 'running'
+          ? t('workflow.nodes.header.testRunning')
+          : flowResult.status === 'success'
+            ? t('workflow.nodes.header.runCompleted')
+            : t('workflow.nodes.header.runFailed')}
       </span>
-      {flowResult.status !== "running" && (
+      {flowResult.status !== 'running' && (
         <>
           <span>{flowResult.timeCost}s</span>
           <span
@@ -80,7 +80,7 @@ const FlowStatus: React.FC<FlowStatusProps> = ({ flowResult, t }) => {
 };
 
 interface FlowTabsProps {
-  currentTab: "arrange" | "overview";
+  currentTab: 'arrange' | 'overview';
   id: string;
   t: unknown;
   navigate: ReturnType<typeof useNavigate>;
@@ -88,18 +88,18 @@ interface FlowTabsProps {
 
 const FlowTabs: React.FC<FlowTabsProps> = ({ currentTab, id, t, navigate }) => (
   <div className="flex items-center justify-center w-1/4 gap-4">
-    {["arrange", "overview"].map((tab) => (
+    {['arrange', 'overview'].map(tab => (
       <div
         key={tab}
         className={`flex items-center justify-center py-2.5 px-8 rounded-xl font-medium cursor-pointer ${
-          currentTab === tab ? "config-tabs-active" : "config-tabs-normal"
+          currentTab === tab ? 'config-tabs-active' : 'config-tabs-normal'
         }`}
         onClick={() => navigate(`/work_flow/${id}/${tab}`, { replace: true })}
       >
         <span className={`${tab}-icon`}></span>
         <span className="ml-2">
           {t(
-            `workflow.nodes.header.${tab === "arrange" ? "arrange" : "analysis"}`,
+            `workflow.nodes.header.${tab === 'arrange' ? 'arrange' : 'analysis'}`
           )}
         </span>
       </div>
@@ -108,30 +108,28 @@ const FlowTabs: React.FC<FlowTabsProps> = ({ currentTab, id, t, navigate }) => (
 );
 
 const FlowHeader: React.FC<FlowHeaderProps> = ({
-  currentTab = "arrange",
+  currentTab = 'arrange',
   children,
 }) => {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const currentFlow = useFlowsManager((state) => state.currentFlow);
-  const flowResult = useFlowsManager((state) => state.flowResult);
-  const historyVersion = useFlowsManager((state) => state.historyVersion);
-  const historyVersionData = useFlowsManager(
-    (state) => state.historyVersionData,
-  );
+  const currentFlow = useFlowsManager(state => state.currentFlow);
+  const flowResult = useFlowsManager(state => state.flowResult);
+  const historyVersion = useFlowsManager(state => state.historyVersion);
+  const historyVersionData = useFlowsManager(state => state.historyVersionData);
 
   const [editModal, setEditModal] = useState(false);
 
   return (
-    <div onKeyDown={(e) => e.stopPropagation()}>
+    <div onKeyDown={e => e.stopPropagation()}>
       {editModal && currentFlow && (
         <FlowEdit currentFlow={currentFlow} setEditModal={setEditModal} />
       )}
       <div
         className="w-full h-[80px] bg-[#fff] border-b border-[#e2e8ff] flex justify-between px-6 py-5"
-        style={{ borderRadius: "0px 0px 24px 24px" }}
+        style={{ borderRadius: '0px 0px 24px 24px' }}
       >
         {/* 左侧返回 + 名称 */}
         <div className="relative flex items-center flex-1 gap-2">
@@ -173,9 +171,9 @@ const FlowHeader: React.FC<FlowHeaderProps> = ({
                 </p>
                 {historyVersion == false && (
                   <div className="text-[14px] text-[#9E9E9E] rounded-sm flex items-center jusity-center">
-                    {t("workflow.nodes.header.autoSaved")}{" "}
+                    {t('workflow.nodes.header.autoSaved')}{' '}
                     {dayjs(currentFlow?.updateTime)?.format(
-                      "YYYY-MM-DD HH:mm:ss",
+                      'YYYY-MM-DD HH:mm:ss'
                     )}
                   </div>
                 )}

@@ -1,13 +1,13 @@
-import React, { FC } from "react";
-import { Progress } from "antd";
-import GlobalMarkDown from "@/components/global-markdown";
+import React, { FC } from 'react';
+import { Progress } from 'antd';
+import GlobalMarkDown from '@/components/global-markdown';
 
-import order from "@/assets/imgs/knowledge/icon_zhishi_order.png";
-import text from "@/assets/imgs/knowledge/icon_zhishi_text.png";
-import target from "@/assets/imgs/knowledge/icon_zhishi_target_act_1.png";
-import { typeList } from "@/constants";
-import { generateType } from "@/utils/utils";
-import { HitResult } from "@/types/resource";
+import order from '@/assets/imgs/knowledge/icon_zhishi_order.png';
+import text from '@/assets/imgs/knowledge/icon_zhishi_text.png';
+import target from '@/assets/imgs/knowledge/icon_zhishi_target_act_1.png';
+import { typeList } from '@/constants';
+import { generateType } from '@/utils/utils';
+import { HitResult } from '@/types/resource';
 
 export const DetailModal: FC<{
   setDetailModal: (value: boolean) => void;
@@ -22,8 +22,8 @@ export const DetailModal: FC<{
             <span
               className="ml-1 text-xs text-[#F6B728]"
               style={{
-                fontFamily: "SF Pro Text, SF Pro Text-600",
-                fontStyle: "italic",
+                fontFamily: 'SF Pro Text, SF Pro Text-600',
+                fontStyle: 'italic',
               }}
             >
               00{currentFile.index + 1}
@@ -45,8 +45,8 @@ export const DetailModal: FC<{
             <span
               className="text-[#275EFF] font-medium ml-2"
               style={{
-                fontFamily: "SF Pro Text, SF Pro Text-600",
-                fontStyle: "italic",
+                fontFamily: 'SF Pro Text, SF Pro Text-600',
+                fontStyle: 'italic',
               }}
             >
               {currentFile.score}
@@ -62,8 +62,8 @@ export const DetailModal: FC<{
               src={typeList.get(
                 generateType(
                   currentFile.fileInfo &&
-                    currentFile.fileInfo.type?.toLowerCase(),
-                ) || "",
+                    currentFile.fileInfo.type?.toLowerCase()
+                ) || ''
               )}
               className="w-4 h-4 flex-shrink-0"
               alt=""

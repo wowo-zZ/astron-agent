@@ -1,26 +1,26 @@
-import React, { useMemo, useState, memo, useEffect } from "react";
-import { v4 as uuid } from "uuid";
-import { useTranslation } from "react-i18next";
-import { FLowCollapse } from "@/components/workflow/ui";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import { capitalizeFirstLetter } from "@/components/workflow/utils/reactflowUtils";
-import { Select, Radio } from "antd";
-import { cn } from "@/utils";
-import { useNodeCommon } from "@/components/workflow/hooks/useNodeCommon";
+import React, { useMemo, useState, memo, useEffect } from 'react';
+import { v4 as uuid } from 'uuid';
+import { useTranslation } from 'react-i18next';
+import { FLowCollapse } from '@/components/workflow/ui';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import { capitalizeFirstLetter } from '@/components/workflow/utils/reactflowUtils';
+import { Select, Radio } from 'antd';
+import { cn } from '@/utils';
+import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
 
-import inputAddIcon from "@/assets/imgs/workflow/input-add-icon.png";
-import remove from "@/assets/imgs/workflow/input-remove-icon.png";
+import inputAddIcon from '@/assets/imgs/workflow/input-add-icon.png';
+import remove from '@/assets/imgs/workflow/input-remove-icon.png';
 
 function index({ id, data, allFields, from, children }): React.ReactElement {
   const { handleChangeNodeParam } = useNodeCommon({ id, data });
   const { t } = useTranslation();
-  const historyVersion = useFlowsManager((state) => state.historyVersion);
+  const historyVersion = useFlowsManager(state => state.historyVersion);
   const [showParams, setShowParams] = useState(true);
   const [addDataOptions, setAddDataOptions] = useState<unknown[]>([]);
   const [fieldList, setFieldList] = useState([]);
 
   const originOptions = useMemo(() => {
-    return allFields.map((field) => {
+    return allFields.map(field => {
       return {
         value: uuid(),
         name: field.name,
@@ -45,16 +45,16 @@ function index({ id, data, allFields, from, children }): React.ReactElement {
 
   useEffect(() => {
     if (!originOptions.length) return;
-    if (from === "query") {
+    if (from === 'query') {
       const list = assignList
-        .map((item) => {
-          const current = originOptions.find((i) => i.name === item);
+        .map(item => {
+          const current = originOptions.find(i => i.name === item);
           if (!current) return null;
           return {
             id: uuid(),
             name: current.name,
             type: current.type,
-            order: "asc",
+            order: 'asc',
           };
         })
         .filter(Boolean);
@@ -64,10 +64,10 @@ function index({ id, data, allFields, from, children }): React.ReactElement {
         updateFieldList(list);
       }
     }
-    if (from === "sort") {
+    if (from === 'sort') {
       const list = orderList
-        .map((item) => {
-          const current = originOptions.find((i) => i.name === item.fieldName);
+        .map(item => {
+          const current = originOptions.find(i => i.name === item.fieldName);
           if (!current) return null;
           return {
             id: uuid(),
@@ -86,25 +86,25 @@ function index({ id, data, allFields, from, children }): React.ReactElement {
   }, [assignList, orderList, originOptions]);
 
   const handleRemoveLine = (id): void => {
-    const newList = fieldList.filter((it) => it.id != id);
+    const newList = fieldList.filter(it => it.id != id);
     setFieldList(newList);
     updateFieldList(newList);
   };
 
   const handleAddSelect = (value): void => {
-    const findRes = addDataOptions.find((it) => it.value == value);
+    const findRes = addDataOptions.find(it => it.value == value);
     fieldList.push({
       id: uuid(),
       name: findRes.name,
       type: findRes.type,
-      order: "asc",
+      order: 'asc',
     });
     setFieldList([...fieldList]);
     updateFieldList([...fieldList]);
   };
 
   const sortChange = (e, it): void => {
-    const current = fieldList.find((cit) => cit.id == it.id);
+    const current = fieldList.find(cit => cit.id == it.id);
     current.order = e.target.value;
     setFieldList([...fieldList]);
     updateFieldList([...fieldList]);
@@ -112,20 +112,20 @@ function index({ id, data, allFields, from, children }): React.ReactElement {
 
   const updateFieldList = (newFieldLsit): void => {
     if (historyVersion) return;
-    if (from == "query") {
+    if (from == 'query') {
       handleChangeNodeParam(
         (data, value) => (data.nodeParam.assignmentList = value),
-        newFieldLsit.map((it) => it.name),
+        newFieldLsit.map(it => it.name)
       );
     } else {
       handleChangeNodeParam(
         (data, value) => (data.nodeParam.orderData = value),
-        newFieldLsit.map((it) => {
+        newFieldLsit.map(it => {
           return {
             fieldName: it.name,
             order: it.order,
           };
-        }),
+        })
       );
     }
     updateOptions(newFieldLsit);
@@ -134,7 +134,7 @@ function index({ id, data, allFields, from, children }): React.ReactElement {
   const updateOptions = (list): void => {
     const addOpts: unknown = [];
     for (let i = 0; i < originOptions.length; i++) {
-      const isExit = list.some((item) => item.name === originOptions[i].name);
+      const isExit = list.some(item => item.name === originOptions[i].name);
       if (!isExit) {
         addOpts.push(originOptions[i]);
       }
@@ -156,14 +156,14 @@ function index({ id, data, allFields, from, children }): React.ReactElement {
         <div className="px-[18px] rounded-lg overflow-hidden">
           <div className="flex items-center gap-3 text-desc">
             <h4 className="w-1/3">
-              {t("workflow.nodes.databaseNode.queryParameterName")}
+              {t('workflow.nodes.databaseNode.queryParameterName')}
             </h4>
             <span className="w-5 h-5"></span>
           </div>
           <div className="flex flex-col gap-3 mt-4 mb-2">
-            {fieldList.map((item) => {
+            {fieldList.map(item => {
               return (
-                item.type != "range" && (
+                item.type != 'range' && (
                   <div key={item.id} className="flex flex-col gap-1">
                     <div className="flex items-center gap-3 overflow-hidden">
                       <div className="flex flex-shrink-0 w-1/3">
@@ -182,18 +182,18 @@ function index({ id, data, allFields, from, children }): React.ReactElement {
                         </div>
                       </div>
 
-                      {from == "sort" && (
+                      {from == 'sort' && (
                         <div className="flex justify-end flex-1 overflow-hidden">
                           <Radio.Group
                             value={item?.order || null}
-                            onChange={(e) => sortChange(e, item)}
+                            onChange={e => sortChange(e, item)}
                             defaultValue="asc"
                           >
                             <Radio.Button value="asc">
-                              {t("workflow.nodes.databaseNode.ascending")}
+                              {t('workflow.nodes.databaseNode.ascending')}
                             </Radio.Button>
                             <Radio.Button value="desc">
-                              {t("workflow.nodes.databaseNode.descending")}
+                              {t('workflow.nodes.databaseNode.descending')}
                             </Radio.Button>
                           </Radio.Group>
                         </div>
@@ -203,7 +203,7 @@ function index({ id, data, allFields, from, children }): React.ReactElement {
                         src={remove}
                         className="w-[16px] h-[17px] flex-none"
                         style={{
-                          cursor: "pointer",
+                          cursor: 'pointer',
                           opacity: 1,
                         }}
                         onClick={() => {
@@ -229,16 +229,16 @@ function index({ id, data, allFields, from, children }): React.ReactElement {
 
           <Select
             disabled={!addDataOptions.length}
-            className={cn("flow-select nodrag w-1/3")}
+            className={cn('flow-select nodrag w-1/3')}
             dropdownAlign={{ offset: [0, 0] }}
             placeholder={
               <div className="text-[#275EFF] text-xs font-medium mt-1 inline-flex items-center cursor-pointer gap-1.5">
                 <img src={inputAddIcon} className="w-3 h-3" alt="" />
-                <span>{t("workflow.nodes.databaseNode.queryAdd")}</span>
+                <span>{t('workflow.nodes.databaseNode.queryAdd')}</span>
               </div>
             }
             options={addDataOptions}
-            onChange={(value) => handleAddSelect(value)}
+            onChange={value => handleAddSelect(value)}
           />
         </div>
       }

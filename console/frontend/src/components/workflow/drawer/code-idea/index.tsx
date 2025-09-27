@@ -1,17 +1,17 @@
-import React, { useState, useEffect, useRef, useMemo, memo } from "react";
-import { Drawer, message, Spin, Tooltip, Input } from "antd";
-import { LoadingOutlined } from "@ant-design/icons";
-import { useTranslation } from "react-i18next";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import { codeRun } from "@/services/flow";
-import useUserStore from "@/store/user-store";
-import { isJSON } from "@/utils";
-import { fetchEventSource } from "@microsoft/fetch-event-source";
-import { getCommonConfig } from "@/services/common";
-import MonacoEditor from "@/components/monaco-editor";
-import { useMemoizedFn } from "ahooks";
-import JsonMonacoEditor from "@/components/monaco-editor/JsonMonacoEditor";
-import { useNodeCommon } from "@/components/workflow/hooks/useNodeCommon";
+import React, { useState, useEffect, useRef, useMemo, memo } from 'react';
+import { Drawer, message, Spin, Tooltip, Input } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import { codeRun } from '@/services/flow';
+import useUserStore from '@/store/user-store';
+import { isJSON } from '@/utils';
+import { fetchEventSource } from '@microsoft/fetch-event-source';
+import { getCommonConfig } from '@/services/common';
+import MonacoEditor from '@/components/monaco-editor';
+import { useMemoizedFn } from 'ahooks';
+import JsonMonacoEditor from '@/components/monaco-editor/JsonMonacoEditor';
+import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
 
 // 类型导入
 import {
@@ -23,10 +23,10 @@ import {
   AICodeParams,
   AICodeResponse,
   FlowType,
-} from "@/components/workflow/types";
+} from '@/components/workflow/types';
 
 // 从统一的图标管理中导入
-import { Icons } from "@/components/workflow/icons";
+import { Icons } from '@/components/workflow/icons';
 
 // 获取 Code IDEA 模块的图标
 const icons = Icons.codeIdea;
@@ -35,59 +35,59 @@ function CodeIDEA(): React.ReactElement {
   const { t } = useTranslation();
   const editorRef = useRef<unknown>(null);
   const textQueue = useRef<string[]>([]);
-  const wsMessageStatus = useRef<string>("end");
-  const temporaryStorageCode = useRef<string>("");
-  const user = useUserStore((state) => state.user);
-  const canvasesDisabled = useFlowsManager((state) => state.canvasesDisabled);
-  const setShowNodeList = useFlowsManager((state) => state.setShowNodeList);
-  const currentFlow = useFlowsManager((state) => state.currentFlow) as FlowType;
+  const wsMessageStatus = useRef<string>('end');
+  const temporaryStorageCode = useRef<string>('');
+  const user = useUserStore(state => state.user);
+  const canvasesDisabled = useFlowsManager(state => state.canvasesDisabled);
+  const setShowNodeList = useFlowsManager(state => state.setShowNodeList);
+  const currentFlow = useFlowsManager(state => state.currentFlow) as FlowType;
   const codeIDEADrawerlInfo = useFlowsManager(
-    (state) => state.codeIDEADrawerlInfo,
+    state => state.codeIDEADrawerlInfo
   ) as CodeIDEADrawerlInfo;
   const setCodeIDEADrawerlInfo = useFlowsManager(
-    (state) => state.setCodeIDEADrawerlInfo,
+    state => state.setCodeIDEADrawerlInfo
   );
-  const [input, setInput] = useState("");
-  const [output, setOutput] = useState("");
+  const [input, setInput] = useState('');
+  const [output, setOutput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [prompt, setPrompt] = useState("");
+  const [prompt, setPrompt] = useState('');
   const [aiCodeInputShow, setAiCodeInputShow] = useState(false);
   const [isReciving, setIsReciving] = useState(true);
-  const [rePrompt, setRePrompt] = useState("");
+  const [rePrompt, setRePrompt] = useState('');
   const [showPythonPackageModal, setShowPythonPackageModal] = useState(false);
-  const [errCodeMsg, setErrCodeMsg] = useState("");
-  const [codeRunningStatus, setCodeRunningStatus] = useState("");
+  const [errCodeMsg, setErrCodeMsg] = useState('');
+  const [codeRunningStatus, setCodeRunningStatus] = useState('');
   const [generateAIcode, setGenerateAIcode] = useState(false);
   const [userWheel, setUserWheel] = useState(false);
   const id = useMemo(
     () => codeIDEADrawerlInfo.nodeId,
-    [codeIDEADrawerlInfo.nodeId],
+    [codeIDEADrawerlInfo.nodeId]
   );
   const open = useMemo(
     () => codeIDEADrawerlInfo.open,
-    [codeIDEADrawerlInfo.open],
+    [codeIDEADrawerlInfo.open]
   );
   const { handleChangeNodeParam, currentNode, inputs } = useNodeCommon({
     id,
   });
   const value = useMemo(
     () => currentNode?.data?.nodeParam?.code,
-    [currentNode],
+    [currentNode]
   );
 
   useEffect(() => {
     const handleKeyDown = (e: Event): void =>
       (e as KeyboardEvent).stopPropagation();
-    const dom = document.querySelector(".ant-drawer");
+    const dom = document.querySelector('.ant-drawer');
     if (dom) {
-      dom.addEventListener("keydown", handleKeyDown);
+      dom.addEventListener('keydown', handleKeyDown);
     }
-    return (): void => dom?.removeEventListener("keydown", handleKeyDown);
+    return (): void => dom?.removeEventListener('keydown', handleKeyDown);
   }, [open]);
 
   const handleGenerateOutput = useMemoizedFn((): void => {
     if (!isJSON(input)) {
-      message.warning(t("workflow.nodes.codeIDEA.toolInputMustBeJson"));
+      message.warning(t('workflow.nodes.codeIDEA.toolInputMustBeJson'));
       return;
     }
     setLoading(true);
@@ -102,7 +102,7 @@ function CodeIDEA(): React.ReactElement {
       }
     }
     const params: CodeRunParams = {
-      code: value || "",
+      code: value || '',
       variables,
       app_id: currentFlow?.appId,
       uid: user?.uid.toString(),
@@ -113,22 +113,22 @@ function CodeIDEA(): React.ReactElement {
         if (res.code === 0) {
           setOutput(JSON.stringify(res?.data, null, 2));
           message.success(res?.message);
-          setErrCodeMsg("");
-          setCodeRunningStatus("success");
+          setErrCodeMsg('');
+          setCodeRunningStatus('success');
         } else {
           message.error(res?.message);
-          setErrCodeMsg(res?.message || "");
-          setCodeRunningStatus("fail");
+          setErrCodeMsg(res?.message || '');
+          setCodeRunningStatus('fail');
         }
       })
       .finally((): void => setLoading(false));
   });
 
   const generateRandomString = useMemoizedFn((): string => {
-    const alphabet = "abcdefghijklmnopqrstuvwxyz";
+    const alphabet = 'abcdefghijklmnopqrstuvwxyz';
     const length = Math.floor(Math.random() * 8) + 5;
 
-    let result = "";
+    let result = '';
     for (let i = 0; i < length; i++) {
       const randomIndex = Math.floor(Math.random() * alphabet.length);
       result += alphabet[randomIndex];
@@ -141,9 +141,9 @@ function CodeIDEA(): React.ReactElement {
     return (
       inputs?.map(
         (input): VarData => ({
-          name: input?.name || "",
+          name: input?.name || '',
           type: input?.schema?.type,
-        }),
+        })
       ) || []
     );
   }, [inputs]);
@@ -153,7 +153,7 @@ function CodeIDEA(): React.ReactElement {
     const match = functionString.match(pattern);
 
     if (match) {
-      return match[1].replace(/\s+/g, "").split(",");
+      return match[1].replace(/\s+/g, '').split(',');
     }
     return [];
   });
@@ -162,16 +162,16 @@ function CodeIDEA(): React.ReactElement {
     (inputPrompt?: string, codeRevision = false): void => {
       if (isReciving) return;
       const controller = new AbortController();
-      const vars = extractInputs(value || "");
+      const vars = extractInputs(value || '');
       const params: AICodeParams = {
-        code: value || "",
+        code: value || '',
         prompt: inputPrompt || prompt,
         var: JSON.stringify(
-          varDatas?.filter((item) => vars?.includes(item?.name)),
+          varDatas?.filter(item => vars?.includes(item?.name))
         ),
-        errMsg: codeRevision ? errCodeMsg : "",
+        errMsg: codeRevision ? errCodeMsg : '',
       };
-      wsMessageStatus.current = "start";
+      wsMessageStatus.current = 'start';
       if (editorRef.current) {
         editorRef.current.scrollToTop();
       }
@@ -179,12 +179,12 @@ function CodeIDEA(): React.ReactElement {
       setIsReciving(true);
       setGenerateAIcode(false);
       if (prompt) setRePrompt(prompt);
-      setPrompt("");
-      handleChangeNodeParam((data, value) => (data.nodeParam.code = value), "");
-      fetchEventSource("/xingchen-api/prompt/ai-code", {
-        method: "POST",
+      setPrompt('');
+      handleChangeNodeParam((data, value) => (data.nodeParam.code = value), '');
+      fetchEventSource('/xingchen-api/prompt/ai-code', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(params),
         signal: controller.signal,
@@ -197,20 +197,20 @@ function CodeIDEA(): React.ReactElement {
             const data: AICodeResponse = JSON.parse(e.data);
             const content = data?.payload?.message?.content;
             if (content) {
-              textQueue.current = [...textQueue.current, ...content.split("")];
+              textQueue.current = [...textQueue.current, ...content.split('')];
             }
             if (data?.header?.status === 2) {
-              wsMessageStatus.current = "end";
+              wsMessageStatus.current = 'end';
             }
           }
         },
       });
-    },
+    }
   );
 
   const handleSendMessage = useMemoizedFn((): void => {
     if (!prompt?.trim()) {
-      message.warning(t("workflow.nodes.codeIDEA.aiDescriptionRequired"));
+      message.warning(t('workflow.nodes.codeIDEA.aiDescriptionRequired'));
       return;
     }
     handleAiCode();
@@ -220,18 +220,18 @@ function CodeIDEA(): React.ReactElement {
     let timer: ReturnType<typeof setTimeout> | null = null;
     if (isReciving) {
       timer = setInterval(() => {
-        const content = textQueue.current.slice(0, 1).join("");
+        const content = textQueue.current.slice(0, 1).join('');
         textQueue.current = textQueue.current.slice(1);
         if (content) {
           handleChangeNodeParam(
             (data, value) => (data.nodeParam.code = value),
-            (value || "") + content,
+            (value || '') + content
           );
           if (editorRef.current && !userWheel) {
             editorRef.current.scrollToBottom();
           }
         }
-        if (!textQueue.current.length && wsMessageStatus.current === "end") {
+        if (!textQueue.current.length && wsMessageStatus.current === 'end') {
           setIsReciving(false);
           setGenerateAIcode(true);
         }
@@ -252,7 +252,7 @@ function CodeIDEA(): React.ReactElement {
   }, [isReciving, value, userWheel]);
 
   const handleCloseDrawer = useMemoizedFn((): void => {
-    setCodeIDEADrawerlInfo({ open: false, nodeId: "" });
+    setCodeIDEADrawerlInfo({ open: false, nodeId: '' });
     setShowNodeList(true);
   });
 
@@ -266,7 +266,7 @@ function CodeIDEA(): React.ReactElement {
     >
       <div
         className="flex flex-col h-full gap-[10px] bg-[#000] relative"
-        onKeyDown={(e) => e.stopPropagation()}
+        onKeyDown={e => e.stopPropagation()}
       >
         {showPythonPackageModal && (
           <CodeIDEAMask setShowPythonPackageModal={setShowPythonPackageModal} />
@@ -274,18 +274,18 @@ function CodeIDEA(): React.ReactElement {
         <div className="flex items-center justify-between px-[14px] py-5 bg-[#41414d]">
           <div className="flex items-center gap-4 font-semibold text-lg">
             <span className="text-[#fff]">
-              {t("workflow.nodes.codeIDEA.language")}
+              {t('workflow.nodes.codeIDEA.language')}
             </span>
             <span className="text-[#8D8DB0] flex items-center gap-2">
               <span>python</span>
               <span className="w-[1px] h-[10px] bg-[#8D8DB0] mt-1"></span>
               <div className="flex items-center gap-2 text-[#fff] text-sm mt-1">
-                <span>{t("workflow.nodes.codeIDEA.pythonPackages")}</span>
+                <span>{t('workflow.nodes.codeIDEA.pythonPackages')}</span>
                 <div
                   className="flex items-center gap-2 cursor-pointer text-[#275EFF]"
                   onClick={() => setShowPythonPackageModal(true)}
                 >
-                  <span>{t("workflow.nodes.codeIDEA.viewDetails")}</span>
+                  <span>{t('workflow.nodes.codeIDEA.viewDetails')}</span>
                   <img
                     src={icons.arrowLeft}
                     className="w-[6px] h-[12px]"
@@ -305,7 +305,7 @@ function CodeIDEA(): React.ReactElement {
                 }}
               >
                 <img src={icons.aiCode} className="w-5 h-5" alt="" />
-                <span>{t("workflow.nodes.codeIDEA.aiCode")}</span>
+                <span>{t('workflow.nodes.codeIDEA.aiCode')}</span>
               </div>
             )}
             {!aiCodeInputShow && (
@@ -322,18 +322,18 @@ function CodeIDEA(): React.ReactElement {
           <MonacoEditor
             {...({
               ref: editorRef,
-              defaultLanguage: "python",
+              defaultLanguage: 'python',
               value: value,
               onChange: (value: string) =>
                 handleChangeNodeParam(
                   (data, value) => (data.nodeParam.code = value),
-                  value,
+                  value
                 ),
               options: {
                 readOnly: canvasesDisabled,
                 suggestOnTriggerCharacters: true,
                 quickSuggestions: true,
-                renderWhitespace: "all",
+                renderWhitespace: 'all',
               },
             } as unknown)}
           />
@@ -344,19 +344,19 @@ function CodeIDEA(): React.ReactElement {
               className="mx-[30px] px-5 h-[127px] flex flex-col justify-center gap-2.5 pr-[42px] relative"
               style={{
                 backgroundImage: `url(${icons.aiCodeBg})`,
-                backgroundSize: "100% 100%",
-                backgroundRepeat: "no-repeat",
+                backgroundSize: '100% 100%',
+                backgroundRepeat: 'no-repeat',
               }}
             >
               {isReciving && (
                 <div
                   className="absolute top-[-30px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 flex items-center gap-2 justify-center text-[#fff]"
                   style={{
-                    width: "138px",
-                    height: "48px",
+                    width: '138px',
+                    height: '48px',
                     backgroundImage: `url(${icons.runningBg})`,
-                    backgroundSize: "contain",
-                    backgroundRepeat: "no-repeat",
+                    backgroundSize: 'contain',
+                    backgroundRepeat: 'no-repeat',
                   }}
                 >
                   {value ? (
@@ -374,8 +374,8 @@ function CodeIDEA(): React.ReactElement {
                   )}
                   <span>
                     {value
-                      ? t("workflow.nodes.codeIDEA.generating")
-                      : t("workflow.nodes.codeIDEA.aiThinking")}
+                      ? t('workflow.nodes.codeIDEA.generating')
+                      : t('workflow.nodes.codeIDEA.aiThinking')}
                   </span>
                 </div>
               )}
@@ -387,18 +387,18 @@ function CodeIDEA(): React.ReactElement {
                   setAiCodeInputShow(false);
                   handleChangeNodeParam(
                     (data, value) => (data.nodeParam.code = value),
-                    temporaryStorageCode.current,
+                    temporaryStorageCode.current
                   );
                   setIsReciving(false);
-                  setPrompt("");
+                  setPrompt('');
                   setGenerateAIcode(false);
                 }}
               />
               <Input
                 className="code-idea-input"
-                placeholder={t("workflow.nodes.codeIDEA.inputPlaceholder")}
+                placeholder={t('workflow.nodes.codeIDEA.inputPlaceholder')}
                 value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
+                onChange={e => setPrompt(e.target.value)}
                 onPressEnter={() => handleSendMessage()}
               />
               <div className="flex items-center justify-between text-[#ffffffb3] text-sm">
@@ -406,8 +406,8 @@ function CodeIDEA(): React.ReactElement {
                   <div
                     className="flex items-center gap-2.5"
                     style={{
-                      height: "32px",
-                      lineHeight: "32px",
+                      height: '32px',
+                      lineHeight: '32px',
                     }}
                   >
                     <div
@@ -417,20 +417,20 @@ function CodeIDEA(): React.ReactElement {
                         setGenerateAIcode(false);
                       }}
                     >
-                      {t("workflow.nodes.codeIDEA.accept")}
+                      {t('workflow.nodes.codeIDEA.accept')}
                     </div>
                     <div
                       className="bg-[#383c43] px-[36px] rounded-lg cursor-pointer hover:text-[#fff] hover:bg-[#5b696a]"
                       onClick={() => {
                         handleChangeNodeParam(
                           (data, value) => (data.nodeParam.code = value),
-                          temporaryStorageCode.current,
+                          temporaryStorageCode.current
                         );
                         setIsReciving(false);
                         setGenerateAIcode(false);
                       }}
                     >
-                      {t("workflow.nodes.codeIDEA.reject")}
+                      {t('workflow.nodes.codeIDEA.reject')}
                     </div>
                     <div className="bg-[#383a44] hover:bg-[#5b696a] w-[32px] h-[32px] rounded-lg flex items-center justify-center cursor-pointer">
                       <img
@@ -447,16 +447,16 @@ function CodeIDEA(): React.ReactElement {
                 <div
                   className="flex items-center justify-center gap-1 cursor-pointer"
                   style={{
-                    width: "104px",
-                    height: "36px",
+                    width: '104px',
+                    height: '36px',
                     backgroundImage: `url(${icons.aiSend})`,
-                    backgroundSize: "contain",
-                    backgroundRepeat: "no-repeat",
+                    backgroundSize: 'contain',
+                    backgroundRepeat: 'no-repeat',
                   }}
                   onClick={() => handleSendMessage()}
                 >
                   <img src={icons.codeRun} className="w-3 h-3.5" alt="" />
-                  <span>{t("workflow.nodes.codeIDEA.send")}</span>
+                  <span>{t('workflow.nodes.codeIDEA.send')}</span>
                 </div>
               </div>
             </div>
@@ -466,17 +466,17 @@ function CodeIDEA(): React.ReactElement {
           <div
             className="flex items-center gap-5 px-[30px] mx-auto max-h-[340px]"
             style={{
-              height: "31vh",
+              height: '31vh',
             }}
           >
             <div className="flex-1 bg-[#25252C] rounded-lg p-5 h-full">
               <div className="flex items-center justify-between text-base mb-4">
                 <div className="text-[#8D8DB0]">
-                  {t("workflow.nodes.codeIDEA.inputTest")}
+                  {t('workflow.nodes.codeIDEA.inputTest')}
                 </div>
                 <div className="flex items-center gap-4">
                   <Tooltip
-                    title={t("workflow.nodes.codeIDEA.autoGenerate")}
+                    title={t('workflow.nodes.codeIDEA.autoGenerate')}
                     overlayClassName="black-tooltip config-secret"
                   >
                     <img
@@ -490,8 +490,8 @@ function CodeIDEA(): React.ReactElement {
                               input: generateRandomString(),
                             },
                             null,
-                            2,
-                          ),
+                            2
+                          )
                         )
                       }
                     />
@@ -501,57 +501,57 @@ function CodeIDEA(): React.ReactElement {
                     onClick={() => !loading && handleGenerateOutput()}
                   >
                     <img src={icons.codeRun} className="w-3 h-3.5" alt="" />
-                    <span>{t("workflow.nodes.codeIDEA.run")}</span>
+                    <span>{t('workflow.nodes.codeIDEA.run')}</span>
                   </div>
                 </div>
               </div>
               <JsonMonacoEditor
                 value={input}
-                onChange={(value) => setInput(value)}
+                onChange={value => setInput(value)}
               />
             </div>
             <div
               className="flex-1 bg-[#25252C] rounded-lg p-5 h-full"
               style={{
                 border:
-                  codeRunningStatus === "success"
-                    ? "1px solid #4f986f"
-                    : codeRunningStatus === "fail"
-                      ? "1px solid #f74e43"
-                      : "",
+                  codeRunningStatus === 'success'
+                    ? '1px solid #4f986f'
+                    : codeRunningStatus === 'fail'
+                      ? '1px solid #f74e43'
+                      : '',
                 boxShadow:
-                  codeRunningStatus === "success"
-                    ? "0px 0px 26px 2px rgba(79,152,111,0.62) inset"
-                    : codeRunningStatus === "fail"
-                      ? "0px 0px 26px 2px rgba(247,78,67,0.26) inset"
-                      : "",
+                  codeRunningStatus === 'success'
+                    ? '0px 0px 26px 2px rgba(79,152,111,0.62) inset'
+                    : codeRunningStatus === 'fail'
+                      ? '0px 0px 26px 2px rgba(247,78,67,0.26) inset'
+                      : '',
               }}
             >
               <div className="flex items-center justify-between text-base mb-4">
                 <div className="text-[#8D8DB0]">
-                  {t("workflow.nodes.codeIDEA.outputResult")}
+                  {t('workflow.nodes.codeIDEA.outputResult')}
                 </div>
-                {codeRunningStatus === "success" ? (
+                {codeRunningStatus === 'success' ? (
                   <div className="flex items-center gap-1 text-[#5CAA7E]">
                     <img
                       src={icons.runSuccess}
                       className="w-[15px] h-[15px]"
                       alt=""
                     />
-                    <span>{t("workflow.nodes.codeIDEA.runSuccess")}</span>
+                    <span>{t('workflow.nodes.codeIDEA.runSuccess')}</span>
                   </div>
                 ) : null}
               </div>
               {loading ? (
                 <Spin indicator={<LoadingOutlined spin />} />
-              ) : codeRunningStatus === "fail" ? (
+              ) : codeRunningStatus === 'fail' ? (
                 <pre className="text-sm text-[#F74E43] w-[599px] h-[118px] bg-[#fff] rounded-lg py-1 px-2">
                   {errCodeMsg}
                 </pre>
               ) : (
                 <JsonMonacoEditor
                   value={output}
-                  onChange={(value) => setOutput(value)}
+                  onChange={value => setOutput(value)}
                 />
               )}
             </div>
@@ -566,14 +566,14 @@ function CodeIDEAMask({
   setShowPythonPackageModal,
 }: CodeIDEAMaskProps): React.ReactElement {
   const { t } = useTranslation();
-  const [codeIDEAPackage, setCodeIDEAPackage] = useState<string>("");
+  const [codeIDEAPackage, setCodeIDEAPackage] = useState<string>('');
 
   useEffect(() => {
     const params = {
-      category: "WORKFLOW",
-      code: "python-dependency",
+      category: 'WORKFLOW',
+      code: 'python-dependency',
     };
-    getCommonConfig(params).then((data) => {
+    getCommonConfig(params).then(data => {
       setCodeIDEAPackage(JSON.stringify(JSON.parse(data?.value), null, 2));
     });
   }, []);
@@ -583,12 +583,12 @@ function CodeIDEAMask({
       <div
         className="bg-[#25252C] text-[#fff] rounded-2xl border border-[#48484E] px-[10px] py-[20px] flex flex-col overflow-hidden gap-3.5"
         style={{
-          width: "520px",
-          height: "54vh",
+          width: '520px',
+          height: '54vh',
         }}
       >
         <div className="flex items-center justify-between px-[10px]">
-          <div>{t("workflow.nodes.codeIDEA.viewDetails")}</div>
+          <div>{t('workflow.nodes.codeIDEA.viewDetails')}</div>
           <img
             src={icons.close}
             className="w-3 h-3 cursor-pointer"

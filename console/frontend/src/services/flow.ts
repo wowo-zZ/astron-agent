@@ -1,11 +1,11 @@
-import http from "@/utils/http";
+import http from '@/utils/http';
 
 export async function listFlows(params): Promise<unknown> {
-  return http.get("/workflow/list", { params });
+  return http.get('/workflow/list', { params });
 }
 
 export async function createFlowAPI(params): Promise<unknown> {
-  return http.post("/workflow", params);
+  return http.post('/workflow', params);
 }
 
 export async function deleteFlowAPI(id: number): Promise<unknown> {
@@ -18,7 +18,7 @@ export async function getFlowDetailAPI(id: string): Promise<unknown> {
 
 export async function getFlowModelList(appId, nodeType): Promise<unknown> {
   return http.get(
-    `/llm/auth-list?appId=${appId}&nodeType=${nodeType}&scene=workflow`,
+    `/llm/auth-list?appId=${appId}&nodeType=${nodeType}&scene=workflow`
   );
 }
 
@@ -27,15 +27,15 @@ export async function copyFlowAPI(id): Promise<unknown> {
 }
 
 export async function saveFlowAPI(params): Promise<unknown> {
-  return http.put("/workflow", params);
+  return http.put('/workflow', params);
 }
 
 export async function buildFlowAPI(params): Promise<unknown> {
-  return http.post("/workflow/build", params);
+  return http.post('/workflow/build', params);
 }
 
 export async function addComparisons(params): Promise<unknown> {
-  return http.post("/workflow/add-comparisons", params);
+  return http.post('/workflow/add-comparisons', params);
 }
 
 export async function nodeDebug(nodeId, params): Promise<unknown> {
@@ -43,7 +43,7 @@ export async function nodeDebug(nodeId, params): Promise<unknown> {
 }
 
 export async function saveDialogueAPI(params): Promise<unknown> {
-  return http.post("/workflow/dialog", params);
+  return http.post('/workflow/dialog', params);
 }
 
 export async function getDialogueAPI(id, type): Promise<unknown> {
@@ -51,7 +51,7 @@ export async function getDialogueAPI(id, type): Promise<unknown> {
 }
 
 export async function publishFlowAPI(params): Promise<unknown> {
-  return http.post("/workflow/publish", params);
+  return http.post('/workflow/publish', params);
 }
 
 export async function isCanPublish(id): Promise<unknown> {
@@ -63,33 +63,33 @@ export async function canPublishSetNotAPI(id): Promise<unknown> {
 }
 
 export async function codeRun(params): Promise<unknown> {
-  return http.post("/workflow/code/run", params);
+  return http.post('/workflow/code/run', params);
 }
 
 export async function squareListFlows(params): Promise<unknown> {
-  return http.get("/workflow/square", { params });
+  return http.get('/workflow/square', { params });
 }
 
 export async function copyPublicFlowAPI(params): Promise<unknown> {
-  return http.post("/workflow/public-copy", params);
+  return http.post('/workflow/public-copy', params);
 }
 
 export async function addChatToSet(data): Promise<unknown> {
-  return http.post("/eval/set/ver/data/change", data);
+  return http.post('/eval/set/ver/data/change', data);
 }
 
 export async function flowsNodeTemplate(): Promise<unknown> {
-  return http.get("/workflow/node-template");
+  return http.get('/workflow/node-template');
 }
 
 //获取文本节点分割符列表
 export async function textNodeConfigList(): Promise<unknown> {
-  return http.get("/textNode/config/list");
+  return http.get('/textNode/config/list');
 }
 
 //添加文本节点分割符
 export async function textNodeConfigSave(params): Promise<unknown> {
-  return http.post("/textNode/config/save", params);
+  return http.post('/textNode/config/save', params);
 }
 
 //清空文本节点分割符
@@ -111,7 +111,7 @@ export async function getAiuiAgents(searchKey): Promise<unknown> {
 
 //渠道发布
 export async function channelPublish(params): Promise<unknown> {
-  return http.post("/workflow/release", params);
+  return http.post('/workflow/release', params);
 }
 
 export async function getReleaseBulletin(flowId): Promise<unknown> {
@@ -120,33 +120,33 @@ export async function getReleaseBulletin(flowId): Promise<unknown> {
 
 export async function getReleaseChannelInfo(flowId, channel): Promise<unknown> {
   return http.get(
-    `/workflow/release/channel-info?flowId=${flowId}&channel=${channel}`,
+    `/workflow/release/channel-info?flowId=${flowId}&channel=${channel}`
   );
 }
 
 export async function regenAksk(params): Promise<unknown> {
-  return http.post("/common/regen-aksk", params);
+  return http.post('/common/regen-aksk', params);
 }
 
 export async function getReleaseChannelStatus(
   flowId,
-  channel,
+  channel
 ): Promise<unknown> {
   return http.get(
-    `/workflow/release/status?flowId=${flowId}&channel=${channel}`,
+    `/workflow/release/status?flowId=${flowId}&channel=${channel}`
   );
 }
 
 export async function getAgentStrategyAPI(): Promise<unknown> {
-  return http.get("/workflow/get-agent-strategy");
+  return http.get('/workflow/get-agent-strategy');
 }
 
 export async function getKnowledgeProStrategyAPI(): Promise<unknown> {
-  return http.get("/workflow/get-knowledge-pro-strategy");
+  return http.get('/workflow/get-knowledge-pro-strategy');
 }
 
 export async function workflowCategories(): Promise<unknown> {
-  return http.post("/bot/get-list");
+  return http.post('/bot/get-list');
 }
 
 export async function getBotStatisticsInfoByBotld(botId): Promise<unknown> {
@@ -155,53 +155,53 @@ export async function getBotStatisticsInfoByBotld(botId): Promise<unknown> {
 
 // 编辑已上架bot
 export async function getBotUsage(params): Promise<unknown> {
-  return http.post("/bot/get-use-count", params);
+  return http.post('/bot/get-use-count', params);
 }
 
 // 错误数据看板
 export async function getErrorNodeList(params): Promise<unknown> {
-  return http.post("/u/bot/v2/data-analysis/error-node-list", params);
+  return http.post('/u/bot/v2/data-analysis/error-node-list', params);
 }
 
 //获取bot详情
 export async function getBotInfo(params): Promise<unknown> {
-  return http.post("/bot/bot-detail", params);
+  return http.post('/bot/bot-detail', params);
 }
 
 //同步flow数据到开放平台
 export async function getInputsType(params): Promise<unknown> {
-  return http.post("/workflow/bot/get-inputs-type", params);
+  return http.post('/workflow/bot/get-inputs-type', params);
 }
 
 //工作流导入
 export async function workflowImport(params): Promise<unknown> {
-  return http.post("/workflow/import", params, {
+  return http.post('/workflow/import', params, {
     headers: {
-      "Content-Type": "multipart/form-data",
+      'Content-Type': 'multipart/form-data',
     },
   });
 }
 
 //工作流临时版本删除
 export async function workflowDeleteComparisons(params): Promise<unknown> {
-  return http.post("/workflow/delete-comparisons", params);
+  return http.post('/workflow/delete-comparisons', params);
 }
 
 // 获取测评任务状态
 export async function getEvaluateStatus(params): Promise<unknown> {
-  return http.get("/eval/task/get-status", { params });
+  return http.get('/eval/task/get-status', { params });
 }
 
 // 工作流一键更新
 export async function getLatestWorkflow(params): Promise<unknown> {
-  return http.get("/workflow/get-max-version", { params });
+  return http.get('/workflow/get-max-version', { params });
 }
 
 //workflow上传流式图片接口
 export async function commonUploadUserIcon(params): Promise<unknown> {
-  return http.post("/common/upload/user-icon", params, {
+  return http.post('/common/upload/user-icon', params, {
     headers: {
-      "Content-Type": "multipart/form-data",
+      'Content-Type': 'multipart/form-data',
     },
   });
 }

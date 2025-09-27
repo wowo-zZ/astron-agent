@@ -1,13 +1,13 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect } from 'react';
 import {
   Chunk,
   FileStatusResponse,
   FlexibleType,
   UploadFile,
-} from "@/types/resource";
-import { useConfigManagement } from "./use-config-management";
-import { useDataOperations } from "./use-data-operations";
-import { usePagination } from "./use-pagination";
+} from '@/types/resource';
+import { useConfigManagement } from './use-config-management';
+import { useDataOperations } from './use-data-operations';
+import { usePagination } from './use-pagination';
 
 interface UseDataCleanProps {
   tag: string;
@@ -33,7 +33,7 @@ interface UseDataCleanProps {
 }
 
 export const useDataClean = (
-  props: UseDataCleanProps,
+  props: UseDataCleanProps
 ): {
   chunkRef: React.RefObject<HTMLDivElement>;
   configDetail: {

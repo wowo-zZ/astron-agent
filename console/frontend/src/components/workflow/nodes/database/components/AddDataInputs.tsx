@@ -1,51 +1,51 @@
-import React, { useMemo, useCallback, useState, memo, useEffect } from "react";
-import { cloneDeep, isEqual } from "lodash";
-import { v4 as uuid } from "uuid";
-import { useTranslation } from "react-i18next";
+import React, { useMemo, useCallback, useState, memo, useEffect } from 'react';
+import { cloneDeep, isEqual } from 'lodash';
+import { v4 as uuid } from 'uuid';
+import { useTranslation } from 'react-i18next';
 import {
   FlowNodeInput,
   FlowSelect,
   FlowCascader,
   FLowCollapse,
-} from "@/components/workflow/ui";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
+} from '@/components/workflow/ui';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
 
-import inputAddIcon from "@/assets/imgs/workflow/input-add-icon.png";
-import remove from "@/assets/imgs/workflow/input-remove-icon.png";
+import inputAddIcon from '@/assets/imgs/workflow/input-add-icon.png';
+import remove from '@/assets/imgs/workflow/input-remove-icon.png';
 
-import desciptionIcon from "@/assets/imgs/workflow/desciption-icon.png";
-import { capitalizeFirstLetter } from "@/components/workflow/utils/reactflowUtils";
-import { Tooltip, Select } from "antd";
-import { cn } from "@/utils";
+import desciptionIcon from '@/assets/imgs/workflow/desciption-icon.png';
+import { capitalizeFirstLetter } from '@/components/workflow/utils/reactflowUtils';
+import { Tooltip, Select } from 'antd';
+import { cn } from '@/utils';
 
 function index({ id, data, fields, children }): React.ReactElement {
   const { t } = useTranslation();
-  const getCurrentStore = useFlowsManager((state) => state.getCurrentStore);
+  const getCurrentStore = useFlowsManager(state => state.getCurrentStore);
   const currentStore = getCurrentStore();
-  const canPublishSetNot = useFlowsManager((state) => state.canPublishSetNot);
+  const canPublishSetNot = useFlowsManager(state => state.canPublishSetNot);
   const autoSaveCurrentFlow = useFlowsManager(
-    (state) => state.autoSaveCurrentFlow,
+    state => state.autoSaveCurrentFlow
   );
-  const historyVersion = useFlowsManager((state) => state.historyVersion);
-  const nodes = currentStore((state) => state.nodes);
-  const setNode = currentStore((state) => state.setNode);
-  const checkNode = currentStore((state) => state.checkNode);
-  const delayCheckNode = currentStore((state) => state.delayCheckNode);
-  const takeSnapshot = currentStore((state) => state.takeSnapshot);
+  const historyVersion = useFlowsManager(state => state.historyVersion);
+  const nodes = currentStore(state => state.nodes);
+  const setNode = currentStore(state => state.setNode);
+  const checkNode = currentStore(state => state.checkNode);
+  const delayCheckNode = currentStore(state => state.delayCheckNode);
+  const takeSnapshot = currentStore(state => state.takeSnapshot);
   const [showParams, setShowParams] = useState(true);
   const [addDataOptions, setAddDataOptions] = useState<unknown[]>([]);
 
   const imageUnderstandingModel = useMemo(() => {
     return (
-      data?.nodeParam?.serviceId === "image_understanding" ||
+      data?.nodeParam?.serviceId === 'image_understanding' ||
       data?.nodeParam?.multiMode
     );
   }, [data]);
 
   const handleChangeParam = useCallback(
     (inputId, key, fn, value): void => {
-      setNode(id, (old) => {
-        const currentInput = old.data[key].find((item) => item.id === inputId);
+      setNode(id, old => {
+        const currentInput = old.data[key].find(item => item.id === inputId);
         fn(currentInput, value);
         return {
           ...cloneDeep(old),
@@ -54,12 +54,12 @@ function index({ id, data, fields, children }): React.ReactElement {
       autoSaveCurrentFlow();
       canPublishSetNot();
     },
-    [setNode, canPublishSetNot, nodes, autoSaveCurrentFlow],
+    [setNode, canPublishSetNot, nodes, autoSaveCurrentFlow]
   );
 
   const handleChangeNodeParam = useCallback(
     (field, value): void => {
-      setNode(id, (old) => {
+      setNode(id, old => {
         old.data.nodeParam[field] = value;
         return {
           ...cloneDeep(old),
@@ -68,22 +68,22 @@ function index({ id, data, fields, children }): React.ReactElement {
       autoSaveCurrentFlow();
       canPublishSetNot();
     },
-    [setNode, canPublishSetNot, nodes, autoSaveCurrentFlow],
+    [setNode, canPublishSetNot, nodes, autoSaveCurrentFlow]
   );
 
   const handleAddLine = useCallback(
     (it): void => {
       takeSnapshot();
-      setNode(id, (old) => {
+      setNode(id, old => {
         old.data.inputs.push({
           id: uuid(),
-          name: it.name || "",
+          name: it.name || '',
           required: it.required,
           description: it.description,
           schema: {
             type: it.type,
             value: {
-              type: "ref",
+              type: 'ref',
               content: {},
             },
           },
@@ -94,14 +94,14 @@ function index({ id, data, fields, children }): React.ReactElement {
       });
       canPublishSetNot();
     },
-    [setNode, canPublishSetNot, takeSnapshot],
+    [setNode, canPublishSetNot, takeSnapshot]
   );
 
   const handleRemoveLine = useCallback(
     (inputId): void => {
       takeSnapshot();
-      setNode(id, (old) => {
-        const index = old.data.inputs?.findIndex((item) => item.id === inputId);
+      setNode(id, old => {
+        const index = old.data.inputs?.findIndex(item => item.id === inputId);
         old.data.inputs.splice(index, 1);
 
         return {
@@ -111,18 +111,18 @@ function index({ id, data, fields, children }): React.ReactElement {
       canPublishSetNot();
       delayCheckNode(id);
     },
-    [setNode, canPublishSetNot, takeSnapshot],
+    [setNode, canPublishSetNot, takeSnapshot]
   );
 
   const references = useMemo(() => {
     if (imageUnderstandingModel) {
       return (
-        data?.references?.map((node) => ({
+        data?.references?.map(node => ({
           ...node,
-          children: node.children.map((child) => ({
+          children: node.children.map(child => ({
             ...child,
             references: child.references.filter(
-              (ref) => ref.fileType !== "image",
+              ref => ref.fileType !== 'image'
             ),
           })),
         })) || []
@@ -133,12 +133,12 @@ function index({ id, data, fields, children }): React.ReactElement {
 
   const imageReferences = useMemo(() => {
     return (
-      data?.references?.map((node) => ({
+      data?.references?.map(node => ({
         ...node,
-        children: node.children.map((child) => ({
+        children: node.children.map(child => ({
           ...child,
           references: child.references.filter(
-            (ref) => ref.fileType === "image" && ref?.type === "string",
+            ref => ref.fileType === 'image' && ref?.type === 'string'
           ),
         })),
       })) || []
@@ -202,7 +202,7 @@ function index({ id, data, fields, children }): React.ReactElement {
   const inputs = useMemo(() => {
     const inputList = [];
     if (data.inputs.length) {
-      return data.inputs.filter((item) => {
+      return data.inputs.filter(item => {
         return !isUUIDv4(item.name);
       });
     }
@@ -212,11 +212,11 @@ function index({ id, data, fields, children }): React.ReactElement {
   useEffect(() => {
     if (mode === 1) {
       const tempAdd = fields
-        .filter((field) => {
-          const isExit = inputs.some((input) => input.name === field.name);
+        .filter(field => {
+          const isExit = inputs.some(input => input.name === field.name);
           return !isExit;
         })
-        .map((it) => {
+        .map(it => {
           if (!it.required) {
             return {
               value: uuid(),
@@ -232,11 +232,11 @@ function index({ id, data, fields, children }): React.ReactElement {
     }
     if (mode === 2) {
       const tempAdd = fields
-        .filter((field) => {
-          const isExit = inputs.some((input) => input.name === field.name);
+        .filter(field => {
+          const isExit = inputs.some(input => input.name === field.name);
           return !isExit;
         })
-        .map((it) => {
+        .map(it => {
           return {
             value: uuid(),
             name: it.name,
@@ -257,10 +257,10 @@ function index({ id, data, fields, children }): React.ReactElement {
   }
 
   const handleAddSelect = (value): void => {
-    handleAddLine(addDataOptions.find((it) => it.value == value));
+    handleAddLine(addDataOptions.find(it => it.value == value));
     addDataOptions.splice(
-      addDataOptions.findIndex((it) => it.value == value),
-      1,
+      addDataOptions.findIndex(it => it.value == value),
+      1
     );
     setAddDataOptions([...addDataOptions]);
     delayCheckNode(id);
@@ -269,11 +269,11 @@ function index({ id, data, fields, children }): React.ReactElement {
   useEffect(() => {
     const prevList = data.nodeParam.assignmentList;
     const list = data.inputs
-      .filter((it) => !isUUIDv4(it.name))
-      .map((it) => it.name);
+      .filter(it => !isUUIDv4(it.name))
+      .map(it => it.name);
     const isRefresh = isEqual(list, prevList);
     if (data?.nodeParam?.mode == 2 && !isRefresh && !historyVersion) {
-      handleChangeNodeParam("assignmentList", list);
+      handleChangeNodeParam('assignmentList', list);
     }
   }, [addDataOptions]);
 
@@ -291,18 +291,18 @@ function index({ id, data, fields, children }): React.ReactElement {
         <div className="px-[18px] rounded-lg overflow-hidden">
           <div className="flex items-center gap-3 text-desc">
             <h4 className="w-1/3">
-              {t("workflow.nodes.databaseNode.parameterName")}
+              {t('workflow.nodes.databaseNode.parameterName')}
             </h4>
             <h4 className="w-1/4">
-              {t("workflow.nodes.databaseNode.fieldType")}
+              {t('workflow.nodes.databaseNode.fieldType')}
             </h4>
             <h4 className="flex-1">
-              {t("workflow.nodes.databaseNode.fieldValue")}
+              {t('workflow.nodes.databaseNode.fieldValue')}
             </h4>
             <span className="w-5 h-5"></span>
           </div>
           <div className="flex flex-col gap-3 mt-4">
-            {inputs.map((item) => {
+            {inputs.map(item => {
               return (
                 <div key={item.id} className="flex flex-col gap-1">
                   <div className="flex items-start gap-3 overflow-hidden">
@@ -343,43 +343,43 @@ function index({ id, data, fields, children }): React.ReactElement {
                         value={item?.schema?.value?.type}
                         options={[
                           {
-                            label: t("workflow.nodes.databaseNode.literal"),
-                            value: "literal",
+                            label: t('workflow.nodes.databaseNode.literal'),
+                            value: 'literal',
                           },
                           {
-                            label: t("workflow.nodes.databaseNode.reference"),
-                            value: "ref",
+                            label: t('workflow.nodes.databaseNode.reference'),
+                            value: 'ref',
                           },
                         ]}
-                        onChange={(value) =>
+                        onChange={value =>
                           handleChangeParam(
                             item.id,
-                            "inputs",
+                            'inputs',
                             (data, value) => {
                               data.schema.value.type = value;
-                              if (value === "literal") {
-                                data.schema.value.content = "";
+                              if (value === 'literal') {
+                                data.schema.value.content = '';
                               } else {
                                 data.schema.value.content = {};
                               }
                             },
-                            value,
+                            value
                           )
                         }
                       />
                     </div>
                     <div className="flex flex-col flex-1 overflow-hidden">
-                      {item?.schema?.value?.type === "literal" ? (
+                      {item?.schema?.value?.type === 'literal' ? (
                         <FlowNodeInput
                           nodeId={id}
                           value={item?.schema?.value?.content}
-                          onChange={(value) =>
+                          onChange={value =>
                             handleChangeParam(
                               item.id,
-                              "inputs",
+                              'inputs',
                               (data, value) =>
                                 (data.schema.value.content = value),
-                              value,
+                              value
                             )
                           }
                         />
@@ -394,14 +394,14 @@ function index({ id, data, fields, children }): React.ReactElement {
                               : []
                           }
                           options={
-                            item?.customParameterType === "image_understanding"
+                            item?.customParameterType === 'image_understanding'
                               ? imageReferences
                               : references
                           }
-                          handleTreeSelect={(node) =>
+                          handleTreeSelect={node =>
                             handleChangeParam(
                               item.id,
-                              "inputs",
+                              'inputs',
                               (data, value) => {
                                 data.schema.value.content = value.content;
                                 // data.schema.type = value.type;
@@ -414,11 +414,11 @@ function index({ id, data, fields, children }): React.ReactElement {
                                   name: node.value,
                                 },
                                 type:
-                                  node?.parentType === "array-object"
+                                  node?.parentType === 'array-object'
                                     ? `array-${node.type}`
                                     : node.type,
                                 fileType: node?.fileType,
-                              },
+                              }
                             )
                           }
                           onBlur={() => {
@@ -434,11 +434,11 @@ function index({ id, data, fields, children }): React.ReactElement {
                         className="w-[16px] h-[17px] flex-shrink-0 mt-1.5"
                         style={{
                           cursor:
-                            item?.customParameterType === "image_understanding"
-                              ? "not-allowed"
-                              : "pointer",
+                            item?.customParameterType === 'image_understanding'
+                              ? 'not-allowed'
+                              : 'pointer',
                           opacity:
-                            item?.customParameterType === "image_understanding"
+                            item?.customParameterType === 'image_understanding'
                               ? 0.5
                               : 1,
                         }}
@@ -474,16 +474,16 @@ function index({ id, data, fields, children }): React.ReactElement {
           <Select
             disabled={!addDataOptions.length}
             style={{ width: 220 }}
-            className={cn("flow-select nodrag w-full")}
+            className={cn('flow-select nodrag w-full')}
             dropdownAlign={{ offset: [0, 0] }}
             placeholder={
               <div className="text-[#275EFF] text-xs font-medium mt-1 inline-flex items-center cursor-pointer gap-1.5">
                 <img src={inputAddIcon} className="w-3 h-3" alt="" />
-                <span>{t("workflow.nodes.databaseNode.add")}</span>
+                <span>{t('workflow.nodes.databaseNode.add')}</span>
               </div>
             }
             options={addDataOptions}
-            onChange={(value) => handleAddSelect(value)}
+            onChange={value => handleAddSelect(value)}
           />
           {mode === 2 && (
             <div className="flex items-center mt-1 text-xs text-[#F74E43]">

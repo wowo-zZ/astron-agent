@@ -5,16 +5,16 @@ import React, {
   useRef,
   useMemo,
   useEffect,
-} from "react";
-import { Spin } from "antd";
-import IntegerStep from "./integer-step";
+} from 'react';
+import { Spin } from 'antd';
+import IntegerStep from './integer-step';
 import {
   CategoryNode,
   CategoryAsideRef,
   CategoryAsideProps,
   CategorySource,
-} from "@/types/model";
-import { useTranslation } from "react-i18next";
+} from '@/types/model';
+import { useTranslation } from 'react-i18next';
 // 提取渲染节点函数参数接口
 interface RenderNodeParams {
   node: CategoryNode;
@@ -37,7 +37,7 @@ const renderCategoryNode = ({
   const hasChild = node.children.length > 0;
   const indent = depth * 5;
 
-  if (node.key === "contextLengthTag") return null;
+  if (node.key === 'contextLengthTag') return null;
 
   return (
     <div key={`${node.key}-${node.id}`}>
@@ -65,14 +65,14 @@ const renderCategoryNode = ({
 
       {hasChild && (
         <div className="pl-4">
-          {node.children.map((child) =>
+          {node.children.map(child =>
             renderCategoryNode({
               node: child,
               depth: depth + 1,
               checkedLeafMap,
               handleCheck,
               styles,
-            }),
+            })
           )}
         </div>
       )}
@@ -91,7 +91,7 @@ const CategoryAside = forwardRef<CategoryAsideRef, CategoryAsideProps>(
       setContextMaxLength,
       loading = false,
     },
-    ref,
+    ref
   ) => {
     const { t } = useTranslation();
 
@@ -103,12 +103,12 @@ const CategoryAside = forwardRef<CategoryAsideRef, CategoryAsideProps>(
       Map<number, CategoryNode>
     >(() => {
       const map = new Map<number, CategoryNode>();
-      defaultCheckedNodes.forEach((n) => map.set(n.id, n));
+      defaultCheckedNodes.forEach(n => map.set(n.id, n));
       return map;
     });
 
     const [sliderValue, setSliderValue] = useState<number | undefined>(
-      defaultContextLength,
+      defaultContextLength
     );
 
     /* ---------- 供父组件调用的方法 ---------- */
@@ -132,21 +132,21 @@ const CategoryAside = forwardRef<CategoryAsideRef, CategoryAsideProps>(
     };
 
     const oneLevelNameStyle = {
-      fontFamily: "PingFang SC, -apple-system, BlinkMacSystemFont, sans-serif", // 苹方
+      fontFamily: 'PingFang SC, -apple-system, BlinkMacSystemFont, sans-serif', // 苹方
       fontSize: 14,
       fontWeight: 700,
-      lineHeight: "16px",
-      letterSpacing: "normal",
-      color: "#333333",
+      lineHeight: '16px',
+      letterSpacing: 'normal',
+      color: '#333333',
     };
 
     const childNameStyle = {
-      fontFamily: "PingFang SC",
+      fontFamily: 'PingFang SC',
       fontSize: 14,
-      fontWeight: "normal",
-      lineHeight: "16px",
-      letterSpacing: "normal",
-      color: "#333333",
+      fontWeight: 'normal',
+      lineHeight: '16px',
+      letterSpacing: 'normal',
+      color: '#333333',
     };
 
     // 找出所有 contextLengthTag 叶子，并提取最大数字
@@ -154,7 +154,7 @@ const CategoryAside = forwardRef<CategoryAsideRef, CategoryAsideProps>(
       const leaves: CategoryNode[] = [];
       function dfs(list: CategoryNode[]): void {
         list.forEach((n): void => {
-          if (n.key === "contextLengthTag" && !n.children.length) {
+          if (n.key === 'contextLengthTag' && !n.children.length) {
             leaves.push(n);
           }
           if (n.children.length) dfs(n.children);
@@ -182,18 +182,18 @@ const CategoryAside = forwardRef<CategoryAsideRef, CategoryAsideProps>(
       <Spin spinning={loading} size="default">
         <div className="p-4 ">
           <div>
-            {tree.map((node) =>
+            {tree.map(node =>
               renderCategoryNode({
                 node,
                 depth: 0,
                 checkedLeafMap,
                 handleCheck,
                 styles: { oneLevelNameStyle, childNameStyle },
-              }),
+              })
             )}
 
             <span className=" flex pl-7 pt-1" style={oneLevelNameStyle}>
-              {t("model.contextLength")}
+              {t('model.contextLength')}
             </span>
             {contextLengthLeaves.length > 0 && (
               <div className="flex items-center py-2 px-3">
@@ -212,7 +212,7 @@ const CategoryAside = forwardRef<CategoryAsideRef, CategoryAsideProps>(
 
             {/* -------------- 模型状态-------------- */}
             <span className="flex pl-7 pt-1" style={oneLevelNameStyle}>
-              {t("model.modelStatus")}
+              {t('model.modelStatus')}
             </span>
 
             {/* "已下架" */}
@@ -225,8 +225,8 @@ const CategoryAside = forwardRef<CategoryAsideRef, CategoryAsideProps>(
                   // 这里把"已下架"当作一个特殊节点 id = -1
                   const dummy: CategoryNode = {
                     id: -1,
-                    key: "offShelf",
-                    name: t("model.offShelf"),
+                    key: 'offShelf',
+                    name: t('model.offShelf'),
                     sortOrder: 0,
                     children: [],
                     source: CategorySource.SYSTEM,
@@ -234,7 +234,7 @@ const CategoryAside = forwardRef<CategoryAsideRef, CategoryAsideProps>(
                   handleCheck(dummy, checked);
                 }}
               />
-              <span style={childNameStyle}>{t("model.offShelf")}</span>
+              <span style={childNameStyle}>{t('model.offShelf')}</span>
             </div>
 
             {/* "即将下架" */}
@@ -247,8 +247,8 @@ const CategoryAside = forwardRef<CategoryAsideRef, CategoryAsideProps>(
                   // 把"即将下架"当作一个特殊节点 id = -2
                   const dummy: CategoryNode = {
                     id: -2,
-                    key: "toBeOffShelf",
-                    name: t("model.toBeOffShelf"),
+                    key: 'toBeOffShelf',
+                    name: t('model.toBeOffShelf'),
                     sortOrder: 0,
                     children: [],
                     source: CategorySource.SYSTEM,
@@ -256,15 +256,15 @@ const CategoryAside = forwardRef<CategoryAsideRef, CategoryAsideProps>(
                   handleCheck(dummy, checked);
                 }}
               />
-              <span style={childNameStyle}>{t("model.toBeOffShelf")}</span>
+              <span style={childNameStyle}>{t('model.toBeOffShelf')}</span>
             </div>
           </div>
         </div>
       </Spin>
     );
-  },
+  }
 );
 
-CategoryAside.displayName = "CategoryAside";
+CategoryAside.displayName = 'CategoryAside';
 
 export default CategoryAside;

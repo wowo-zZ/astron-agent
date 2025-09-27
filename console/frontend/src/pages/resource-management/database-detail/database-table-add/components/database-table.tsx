@@ -1,33 +1,33 @@
-import React, { useRef, useImperativeHandle, forwardRef, JSX } from "react";
-import { Table, Input, Select, Switch, DatePicker, InputNumber } from "antd";
-import { useTranslation } from "react-i18next";
-import dayjs from "dayjs";
-import formSelect from "@/assets/imgs/common/arrow-down.png";
-import remove from "@/assets/imgs/common/input-remove.png";
-import { ColumnType } from "antd/es/table";
-import { TableField } from "@/types/database";
-import { Dayjs } from "dayjs";
+import React, { useRef, useImperativeHandle, forwardRef, JSX } from 'react';
+import { Table, Input, Select, Switch, DatePicker, InputNumber } from 'antd';
+import { useTranslation } from 'react-i18next';
+import dayjs from 'dayjs';
+import formSelect from '@/assets/imgs/common/arrow-down.png';
+import remove from '@/assets/imgs/common/input-remove.png';
+import { ColumnType } from 'antd/es/table';
+import { TableField } from '@/types/database';
+import { Dayjs } from 'dayjs';
 
 const typeOptions = [
   {
-    label: "String",
-    value: "String",
+    label: 'String',
+    value: 'String',
   },
   {
-    label: "Number",
-    value: "Number",
+    label: 'Number',
+    value: 'Number',
   },
   {
-    label: "Integer",
-    value: "Integer",
+    label: 'Integer',
+    value: 'Integer',
   },
   {
-    label: "Time",
-    value: "Time",
+    label: 'Time',
+    value: 'Time',
   },
   {
-    label: "Boolean",
-    value: "Boolean",
+    label: 'Boolean',
+    value: 'Boolean',
   },
 ];
 
@@ -35,13 +35,13 @@ const createNameColumn = (
   handleInputParamsChange: (
     id: number | null,
     key: string,
-    value: string | number | boolean | string[] | null | undefined,
+    value: string | number | boolean | string[] | null | undefined
   ) => void,
   handleCheckInput: (
     currentParam: TableField,
     key: keyof TableField,
-    errMsg: string,
-  ) => boolean,
+    errMsg: string
+  ) => boolean
 ): ColumnType<TableField> => {
   const { t } = useTranslation();
   return {
@@ -49,34 +49,34 @@ const createNameColumn = (
       <div className="flex items-center gap-2">
         <span>
           <span className="text-[#F74E43] text-xs">* </span>
-          {t("database.fieldName")}
+          {t('database.fieldName')}
         </span>
       </div>
     ),
-    dataIndex: "name",
-    key: "name",
-    width: "20%",
+    dataIndex: 'name',
+    key: 'name',
+    width: '20%',
     render: (name: string, record: TableField) => (
       <div className="flex flex-col w-full gap-1">
         <Input
-          placeholder={t("database.pleaseEnterFieldNameInput")}
+          placeholder={t('database.pleaseEnterFieldNameInput')}
           className="params-input w-[90%]"
           value={name}
           disabled={record?.isSystem}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-            handleInputParamsChange(record.id, "name", e.target.value);
+            handleInputParamsChange(record.id, 'name', e.target.value);
             handleCheckInput(
               record,
-              "name",
-              t("database.pleaseEnterFieldNameInput"),
+              'name',
+              t('database.pleaseEnterFieldNameInput')
             );
           }}
           maxLength={60}
           onBlur={() => {
             handleCheckInput(
               record,
-              "name",
-              t("database.pleaseEnterFieldNameInput"),
+              'name',
+              t('database.pleaseEnterFieldNameInput')
             );
           }}
         />
@@ -94,8 +94,8 @@ const createTypeColumn = (
   handleInputParamsChange: (
     id: number,
     key: string,
-    value: string | number | boolean | string[] | null | undefined,
-  ) => void,
+    value: string | number | boolean | string[] | null | undefined
+  ) => void
 ): ColumnType<TableField> => {
   const { t } = useTranslation();
   return {
@@ -103,24 +103,24 @@ const createTypeColumn = (
       <div className="flex items-center gap-2">
         <span>
           <span className="text-[#F74E43] text-xs">* </span>
-          {t("database.fieldType")}
+          {t('database.fieldType')}
         </span>
       </div>
     ),
-    dataIndex: "type",
-    key: "type",
-    width: "15%",
+    dataIndex: 'type',
+    key: 'type',
+    width: '15%',
     render: (type: string, record: TableField) => (
       <Select
         suffixIcon={<img src={formSelect} className="w-4 h-4" />}
-        placeholder={t("database.pleaseSelectType")}
+        placeholder={t('database.pleaseSelectType')}
         className="w-[90%] params-select"
         disabled={record?.isSystem}
         options={typeOptions}
         value={type}
         onChange={(value: string) => {
-          handleInputParamsChange(record?.id, "type", value);
-          handleInputParamsChange(record?.id, "defaultValue", "");
+          handleInputParamsChange(record?.id, 'type', value);
+          handleInputParamsChange(record?.id, 'defaultValue', '');
         }}
       />
     ),
@@ -131,13 +131,13 @@ const createDescriptionColumn = (
   handleInputParamsChange: (
     id: number | null,
     key: string,
-    value: string | number | boolean | string[] | null | undefined,
+    value: string | number | boolean | string[] | null | undefined
   ) => void,
   handleCheckInput: (
     currentParam: TableField,
     key: keyof TableField,
-    errMsg: string,
-  ) => boolean,
+    errMsg: string
+  ) => boolean
 ): ColumnType<TableField> => {
   const { t } = useTranslation();
   return {
@@ -145,36 +145,36 @@ const createDescriptionColumn = (
       <div className="flex items-center gap-2">
         <span>
           <span className="text-[#F74E43] text-xs">* </span>
-          {t("database.fieldDescription")}
+          {t('database.fieldDescription')}
         </span>
       </div>
     ),
-    dataIndex: "description",
-    key: "description",
+    dataIndex: 'description',
+    key: 'description',
     render: (description: string, record: TableField) => (
       <div className="flex flex-col gap-1">
         <Input
-          placeholder={t("database.pleaseEnterDescription")}
+          placeholder={t('database.pleaseEnterDescription')}
           className="params-input w-[90%]"
           disabled={record?.isSystem}
           value={description}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             handleInputParamsChange(
               record.id ?? 0,
-              "description",
-              e.target.value,
+              'description',
+              e.target.value
             );
             handleCheckInput(
               record,
-              "description",
-              t("database.pleaseEnterDescription"),
+              'description',
+              t('database.pleaseEnterDescription')
             );
           }}
           onBlur={() =>
             handleCheckInput(
               record,
-              "description",
-              t("database.pleaseEnterDescription"),
+              'description',
+              t('database.pleaseEnterDescription')
             )
           }
         />
@@ -194,79 +194,79 @@ const createDefaultValueColumn = (
   handleInputParamsChange: (
     id: number,
     key: string,
-    value: string | number | boolean | string[] | null | undefined,
-  ) => void,
+    value: string | number | boolean | string[] | null | undefined
+  ) => void
 ): ColumnType<TableField> => {
   const { t } = useTranslation();
   return {
     title: (
       <div className="flex items-center gap-2">
-        <span>{t("database.defaultValue")}</span>
+        <span>{t('database.defaultValue')}</span>
       </div>
     ),
-    dataIndex: "defaultValue",
-    key: "defaultValue",
-    width: "20%",
+    dataIndex: 'defaultValue',
+    key: 'defaultValue',
+    width: '20%',
     render: (defaultValue: string, record: TableField) => (
       <div className="w-[90%]">
-        {record.type === "String" && (
+        {record.type === 'String' && (
           <Input
-            placeholder={t("database.defaultValue")}
+            placeholder={t('database.defaultValue')}
             disabled={record?.isSystem}
             className="params-input w-[100%]"
             value={defaultValue}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               handleInputParamsChange(
                 record?.id,
-                "defaultValue",
-                e.target.value,
+                'defaultValue',
+                e.target.value
               );
             }}
           />
         )}
-        {record?.type === "Boolean" && (
+        {record?.type === 'Boolean' && (
           <Select
-            placeholder={t("database.defaultValue")}
-            style={{ width: "100%" }}
+            placeholder={t('database.defaultValue')}
+            style={{ width: '100%' }}
             value={defaultValue || null}
             className="params-select"
             onChange={(value: string) =>
-              handleInputParamsChange(record?.id, "defaultValue", value)
+              handleInputParamsChange(record?.id, 'defaultValue', value)
             }
           >
-            <Select.Option value={"true"}>true</Select.Option>
-            <Select.Option value={"false"}>false</Select.Option>
+            <Select.Option value={'true'}>true</Select.Option>
+            <Select.Option value={'false'}>false</Select.Option>
           </Select>
         )}
-        {record?.type === "Time" && (
+        {record?.type === 'Time' && (
           <DatePicker
             showTime
             format="YYYY-MM-DD HH:mm:ss"
             className="params-select-time"
             disabled={record?.isSystem}
-            placeholder={t("database.defaultValue")}
-            style={{ width: "100%" }}
+            placeholder={t('database.defaultValue')}
+            style={{ width: '100%' }}
             value={record?.defaultValue ? dayjs(record?.defaultValue) : null}
             onChange={(_date: Dayjs, dateString: string | string[]) => {
               handleInputParamsChange(
                 record?.id,
-                "defaultValue",
-                dateString as string,
+                'defaultValue',
+                dateString as string
               );
             }}
           />
         )}
-        {(record?.type === "Number" || record?.type === "Integer") && (
+        {(record?.type === 'Number' || record?.type === 'Integer') && (
           <InputNumber
-            style={{ width: "100%" }}
-            placeholder={t("database.defaultValue")}
+            style={{ width: '100%' }}
+            placeholder={t('database.defaultValue')}
             className="params-input-number"
             disabled={record?.isSystem}
-            controls={record.type === "Number"}
-            precision={record.type === "Number" ? undefined : 0}
+            controls={record.type === 'Number'}
+            precision={record.type === 'Number' ? undefined : 0}
             value={record.defaultValue ? Number(record.defaultValue) : null}
             onChange={(value: number | null) =>
-              handleInputParamsChange(record?.id, "defaultValue", value)
+              handleInputParamsChange(record?.id, 'defaultValue', value)
             }
           />
         )}
@@ -279,19 +279,19 @@ const createRequiredColumn = (
   handleInputParamsChange: (
     id: number | null,
     key: string,
-    value: string | number | boolean | string[] | null | undefined,
-  ) => void,
+    value: string | number | boolean | string[] | null | undefined
+  ) => void
 ): ColumnType<TableField> => {
   const { t } = useTranslation();
   return {
     title: (
       <div className="flex items-center gap-2">
-        <span>{t("database.isRequired")}</span>
+        <span>{t('database.isRequired')}</span>
       </div>
     ),
-    dataIndex: "isRequired",
-    key: "isRequired",
-    width: "10%",
+    dataIndex: 'isRequired',
+    key: 'isRequired',
+    width: '10%',
     render: (required: boolean, record: TableField) => (
       <div className="h-[32px] flex items-center">
         <Switch
@@ -299,7 +299,7 @@ const createRequiredColumn = (
           className="list-switch"
           checked={required}
           onChange={(checked: boolean) =>
-            handleInputParamsChange(record?.id, "isRequired", checked)
+            handleInputParamsChange(record?.id, 'isRequired', checked)
           }
         />
       </div>
@@ -308,24 +308,24 @@ const createRequiredColumn = (
 };
 
 const createOperationColumn = (
-  onDel: (record: TableField) => void,
+  onDel: (record: TableField) => void
 ): ColumnType<TableField> => {
   const { t } = useTranslation();
   return {
     title: (
       <div className="flex items-center gap-2">
-        <span>{t("database.operation")}</span>
+        <span>{t('database.operation')}</span>
       </div>
     ),
-    key: "operation",
+    key: 'operation',
     width: 62,
-    align: "center" as const,
+    align: 'center' as const,
     render: (_: unknown, record: TableField) => (
       <div className="h-[32px] flex items-center justify-center">
         <img
           className="w-4 h-4 cursor-pointer"
           style={{
-            cursor: record.isSystem ? "not-allowed" : "pointer",
+            cursor: record.isSystem ? 'not-allowed' : 'pointer',
           }}
           src={remove}
           onClick={() => {
@@ -345,14 +345,14 @@ const createColumns = (
   handleInputParamsChange: (
     id: number | null,
     key: string,
-    value: string | number | boolean | string[] | null | undefined,
+    value: string | number | boolean | string[] | null | undefined
   ) => void,
   handleCheckInput: (
     currentParam: TableField,
     key: keyof TableField,
-    errMsg: string,
+    errMsg: string
   ) => boolean,
-  onDel: (record: TableField) => void,
+  onDel: (record: TableField) => void
 ): ColumnType<TableField>[] => [
   createNameColumn(handleInputParamsChange, handleCheckInput),
   createTypeColumn(handleInputParamsChange),
@@ -373,31 +373,31 @@ function DataBaseTable(
     handleInputParamsChange: (
       id: number | null,
       key: string,
-      value: string | number | boolean | string[] | null | undefined,
+      value: string | number | boolean | string[] | null | undefined
     ) => void;
     handleCheckInput: (
       currentParam: TableField,
       key: keyof TableField,
-      errMsg: string,
+      errMsg: string
     ) => boolean;
     onDel: (record: TableField) => void;
   },
   ref: React.ForwardedRef<{
     scrollTableBottom: () => void;
-  }>,
+  }>
 ): JSX.Element {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const tableRef = useRef<any>(null);
   const columns = createColumns(
     handleInputParamsChange,
     handleCheckInput,
-    onDel,
+    onDel
   );
 
   const scrollTableBottom = (): void => {
     window.setTimeout(() => {
       const tableDome =
-        tableRef.current?.firstChild?.querySelector(".ant-table-body");
+        tableRef.current?.firstChild?.querySelector('.ant-table-body');
       if (tableDome) {
         tableDome.scrollTop = tableDome.scrollHeight;
       }
@@ -409,7 +409,7 @@ function DataBaseTable(
     () => ({
       scrollTableBottom,
     }),
-    [ref],
+    [ref]
   );
 
   return (
@@ -419,7 +419,7 @@ function DataBaseTable(
       pagination={false}
       columns={columns}
       dataSource={dataSource}
-      rowKey={(record) => record?.id ?? 0}
+      rowKey={record => record?.id ?? 0}
       scroll={{ y: 64 * 5 }}
     />
   );

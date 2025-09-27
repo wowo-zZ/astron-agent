@@ -1,10 +1,10 @@
-import { ReactElement, useState } from "react";
-import collapseGrayIcon from "@/assets/imgs/sidebar/collapseGray.svg";
-import SidebarLogo from "./sidebar-logo";
-import CreateButton from "./create-button";
-import BottomLogin from "./bottom-login";
-import PersonalCenter from "./personal-center";
-import MenuList from "./menu-list";
+import { ReactElement, useState } from 'react';
+import collapseGrayIcon from '@/assets/imgs/sidebar/collapseGray.svg';
+import SidebarLogo from './sidebar-logo';
+import CreateButton from './create-button';
+import BottomLogin from './bottom-login';
+import PersonalCenter from './personal-center';
+import MenuList from './menu-list';
 
 interface User {
   nickname?: string;
@@ -33,12 +33,12 @@ interface SidebarProps {
 }
 
 const Sidebar = ({
-  className = "",
+  className = '',
 
   // Logo props
   isEnterprise = false,
   enterpriseLogo,
-  languageCode = "zh",
+  languageCode = 'zh',
 
   // Create button props
   isLogin = false,
@@ -59,8 +59,8 @@ const Sidebar = ({
         relative bg-white flex flex-col flex-shrink-0 p-4 h-full
         ${
           isCollapsed
-            ? "w-[76px] items-center justify-between"
-            : "w-[232px] rounded-r-3xl"
+            ? 'w-[76px] items-center justify-between'
+            : 'w-[232px] rounded-r-3xl'
         }
         ${className}
       `}
@@ -83,7 +83,7 @@ const Sidebar = ({
           className={`
             transform rotate-180 transition-all duration-300 cursor-pointer z-[998]
             group-hover:brightness-0 group-hover:saturate-100 group-hover:invert
-            ${isCollapsed ? "rotate-[360deg]" : "rotate-180"}
+            ${isCollapsed ? 'rotate-[360deg]' : 'rotate-180'}
           `}
         />
       </div>

@@ -1,4 +1,4 @@
-import { NodeDebuggingStatus } from "@/components/workflow/nodes/components/node-debugger";
+import { NodeDebuggingStatus } from '@/components/workflow/nodes/components/node-debugger';
 import React, {
   useCallback,
   useEffect,
@@ -6,7 +6,7 @@ import React, {
   useState,
   useMemo,
   memo,
-} from "react";
+} from 'react';
 import {
   FlowInput,
   FlowSelect,
@@ -14,36 +14,36 @@ import {
   FLowCollapse,
   FlowUpload,
   FlowInputNumber,
-} from "@/components/workflow/ui";
-import { useFlowTypeRender } from "@/components/workflow/hooks/useFlowTypeRender";
+} from '@/components/workflow/ui';
+import { useFlowTypeRender } from '@/components/workflow/hooks/useFlowTypeRender';
 import {
   SourceHandle,
   TargetHandle,
-} from "@/components/workflow/nodes/components/handle";
-import { v4 as uuid } from "uuid";
-import { cloneDeep } from "lodash";
-import { Dropdown } from "antd";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import { useTranslation } from "react-i18next";
-import { useNodeCommon } from "@/components/workflow/hooks/useNodeCommon";
-import { Iterator } from "@/components/workflow/nodes/iterator";
-import { IfElse } from "@/components/workflow/nodes/if-else";
-import { DecisionMaking } from "@/components/workflow/nodes/decision-making";
-import { Knowledge } from "@/components/workflow/nodes/knowledge";
-import { QuestionAnswer } from "@/components/workflow/nodes/question-answer";
-import { Agent } from "@/components/workflow/nodes/agent";
-import Remark from "@/components/workflow/nodes/components/remark";
-import NodeOperation from "@/components/workflow/nodes/components/node-operation";
-import ModelSelect from "@/components/workflow/nodes/components/model-select";
-import { Icons } from "@/components/workflow/icons";
-import { typeList } from "@/constants";
-import { convertToKBMB } from "@/components/workflow/utils/reactflowUtils";
-import JsonMonacoEditor from "@/components/monaco-editor/JsonMonacoEditor";
-import { generateUploadType } from "@/components/workflow/utils/reactflowUtils";
+} from '@/components/workflow/nodes/components/handle';
+import { v4 as uuid } from 'uuid';
+import { cloneDeep } from 'lodash';
+import { Dropdown } from 'antd';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import { useTranslation } from 'react-i18next';
+import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import { Iterator } from '@/components/workflow/nodes/iterator';
+import { IfElse } from '@/components/workflow/nodes/if-else';
+import { DecisionMaking } from '@/components/workflow/nodes/decision-making';
+import { Knowledge } from '@/components/workflow/nodes/knowledge';
+import { QuestionAnswer } from '@/components/workflow/nodes/question-answer';
+import { Agent } from '@/components/workflow/nodes/agent';
+import Remark from '@/components/workflow/nodes/components/remark';
+import NodeOperation from '@/components/workflow/nodes/components/node-operation';
+import ModelSelect from '@/components/workflow/nodes/components/model-select';
+import { Icons } from '@/components/workflow/icons';
+import { typeList } from '@/constants';
+import { convertToKBMB } from '@/components/workflow/utils/reactflowUtils';
+import JsonMonacoEditor from '@/components/monaco-editor/JsonMonacoEditor';
+import { generateUploadType } from '@/components/workflow/utils/reactflowUtils';
 
-import dotSvg from "@/assets/imgs/workflow/dot.svg";
+import dotSvg from '@/assets/imgs/workflow/dot.svg';
 
-export const Inputs = memo(({ label = "输入", inputs }) => {
+export const Inputs = memo(({ label = '输入', inputs }) => {
   const elementRef = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -51,15 +51,15 @@ export const Inputs = memo(({ label = "输入", inputs }) => {
     const hasError = item?.nameErrMsg || item?.schema?.value?.contentErrMsg;
 
     const containerStyle = {
-      backgroundColor: hasError ? "#F0AE784D" : "#F2F5FE",
-      color: hasError ? "#ff7300" : "",
+      backgroundColor: hasError ? '#F0AE784D' : '#F2F5FE',
+      color: hasError ? '#ff7300' : '',
     };
 
     const labelStyle = {
-      color: hasError ? "#f4c69e" : "#7F7F7F",
+      color: hasError ? '#f4c69e' : '#7F7F7F',
     };
 
-    const displayName = item?.name?.trim() ? item?.name : "未定义";
+    const displayName = item?.name?.trim() ? item?.name : '未定义';
 
     return (
       <div
@@ -75,10 +75,10 @@ export const Inputs = memo(({ label = "输入", inputs }) => {
 
   const items = [
     {
-      key: "1",
+      key: '1',
       label: (
         <div className="p-1 w-[300px] flex items-center gap-1 flex-wrap">
-          {inputs?.map((item) => (
+          {inputs?.map(item => (
             <ItemBadge item={item} />
           ))}
         </div>
@@ -102,7 +102,7 @@ export const Inputs = memo(({ label = "输入", inputs }) => {
         className="flex items-center gap-1.5 overflow-hidden relative"
         ref={elementRef}
       >
-        {inputs?.map((item) => (
+        {inputs?.map(item => (
           <ItemBadge item={item} />
         ))}
         {showDropdown && (
@@ -111,7 +111,7 @@ export const Inputs = memo(({ label = "输入", inputs }) => {
               className="w-[93px] h-[20px]"
               style={{
                 background:
-                  "linear-gradient(90deg, rgba(255, 255, 255, 0) 0px, rgb(252, 252, 255) 78%)",
+                  'linear-gradient(90deg, rgba(255, 255, 255, 0) 0px, rgb(252, 252, 255) 78%)',
               }}
             ></div>
             <div className="bg-[#F2F5FE] flex items-center justify-center rounded overflow-hidden absolute right-0 top-[2px]">
@@ -130,7 +130,7 @@ export const Inputs = memo(({ label = "输入", inputs }) => {
   );
 });
 
-export const Outputs = memo(({ data, label = "输出", outputs }) => {
+export const Outputs = memo(({ data, label = '输出', outputs }) => {
   const { t } = useTranslation();
   const elementRef = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -141,18 +141,18 @@ export const Outputs = memo(({ data, label = "输出", outputs }) => {
         key={item?.id}
         className="flex items-center gap-0.5 px-1 py-0.5 rounded text-base font-medium"
         style={{
-          backgroundColor: item?.nameErrMsg ? "#F0AE784D" : "#F2F5FE",
-          color: item?.nameErrMsg ? "#ff7300" : "",
+          backgroundColor: item?.nameErrMsg ? '#F0AE784D' : '#F2F5FE',
+          color: item?.nameErrMsg ? '#ff7300' : '',
         }}
       >
         <span
           style={{
-            color: item?.nameErrMsg ? "#f4c69e" : "#7F7F7F",
+            color: item?.nameErrMsg ? '#f4c69e' : '#7F7F7F',
           }}
         >
           {useFlowTypeRender(item)}
         </span>
-        <span>{item?.name?.trim() ? item?.name : "未定义"}</span>
+        <span>{item?.name?.trim() ? item?.name : '未定义'}</span>
       </div>
     );
   };
@@ -164,21 +164,21 @@ export const Outputs = memo(({ data, label = "输出", outputs }) => {
       ? [
           {
             id: uuid(),
-            name: "errorCode",
+            name: 'errorCode',
             schema: {
-              type: "string",
-              default: t("workflow.exceptionHandling.errorCode"),
+              type: 'string',
+              default: t('workflow.exceptionHandling.errorCode'),
             },
-            nameErrMsg: "",
+            nameErrMsg: '',
           },
           {
             id: uuid(),
-            name: "errorMessage",
+            name: 'errorMessage',
             schema: {
-              type: "string",
-              default: t("workflow.exceptionHandling.errorMessage"),
+              type: 'string',
+              default: t('workflow.exceptionHandling.errorMessage'),
             },
-            nameErrMsg: "",
+            nameErrMsg: '',
           },
         ]
       : [];
@@ -190,10 +190,10 @@ export const Outputs = memo(({ data, label = "输出", outputs }) => {
 
   const items = [
     {
-      key: "1",
+      key: '1',
       label: (
         <div className="p-1 w-[300px] flex items-center gap-1 flex-wrap">
-          {finallyOutputs?.map((item) => (
+          {finallyOutputs?.map(item => (
             <ItemBadge item={item} />
           ))}
         </div>
@@ -217,7 +217,7 @@ export const Outputs = memo(({ data, label = "输出", outputs }) => {
         className="flex items-center gap-1.5 overflow-hidden relative"
         ref={elementRef}
       >
-        {finallyOutputs?.map((item) => (
+        {finallyOutputs?.map(item => (
           <ItemBadge item={item} />
         ))}
         {showDropdown && (
@@ -226,7 +226,7 @@ export const Outputs = memo(({ data, label = "输出", outputs }) => {
               className="w-[93px] h-[20px]"
               style={{
                 background:
-                  "linear-gradient(90deg, rgba(255, 255, 255, 0) 0px, rgb(252, 252, 255) 78%)",
+                  'linear-gradient(90deg, rgba(255, 255, 255, 0) 0px, rgb(252, 252, 255) 78%)',
               }}
             ></div>
             <div className="bg-[#F2F5FE] flex items-center justify-center rounded overflow-hidden absolute right-0 top-[2px]">
@@ -246,22 +246,22 @@ export const Outputs = memo(({ data, label = "输出", outputs }) => {
 });
 
 export const Label = memo(
-  ({ data, id, maxWidth = 130, labelInput = "labelInput" }) => {
+  ({ data, id, maxWidth = 130, labelInput = 'labelInput' }) => {
     const { isStartOrEndNode } = useNodeCommon({ id, data });
-    const getCurrentStore = useFlowsManager((state) => state.getCurrentStore);
+    const getCurrentStore = useFlowsManager(state => state.getCurrentStore);
     const autoSaveCurrentFlow = useFlowsManager(
-      (state) => state.autoSaveCurrentFlow,
+      state => state.autoSaveCurrentFlow
     );
-    const canPublishSetNot = useFlowsManager((state) => state.canPublishSetNot);
+    const canPublishSetNot = useFlowsManager(state => state.canPublishSetNot);
     const currentStore = getCurrentStore();
-    const setNode = currentStore((state) => state.setNode);
+    const setNode = currentStore(state => state.setNode);
     const updateNodeNameStatus = currentStore(
-      (state) => state.updateNodeNameStatus,
+      state => state.updateNodeNameStatus
     );
 
     const handleChangeNodeParam = useCallback(
       (fn, value) => {
-        setNode(id, (old) => {
+        setNode(id, old => {
           fn(old.data, value);
           return {
             ...cloneDeep(old),
@@ -270,7 +270,7 @@ export const Label = memo(
         autoSaveCurrentFlow();
         canPublishSetNot();
       },
-      [id, autoSaveCurrentFlow],
+      [id, autoSaveCurrentFlow]
     );
 
     const labelInputId = useMemo(() => {
@@ -284,10 +284,10 @@ export const Label = memo(
             nodeId={id}
             id={labelInputId}
             value={data?.label}
-            onChange={(value) =>
+            onChange={value =>
               handleChangeNodeParam(
                 (data, value) => (data.label = value),
-                value,
+                value
               )
             }
             onBlur={() => {
@@ -314,7 +314,7 @@ export const Label = memo(
         )}
       </>
     );
-  },
+  }
 );
 
 export const ExceptionContent = memo(({ id, data }) => {
@@ -376,7 +376,7 @@ export const IteratorChildNode = memo<IteratorChildNodeProps>(
         />
       </div>
     );
-  },
+  }
 );
 
 interface NodeHeaderProps {
@@ -446,12 +446,12 @@ export const NodeContent = memo<NodeContentProps>(({ id, data }) => {
   return (
     <div
       style={{
-        display: "grid",
-        gridTemplateColumns: "auto minmax(0, 1fr)",
-        gap: "6px",
+        display: 'grid',
+        gridTemplateColumns: 'auto minmax(0, 1fr)',
+        gap: '6px',
         fontSize: 12,
         marginTop: 8,
-        padding: "0 14px",
+        padding: '0 14px',
       }}
     >
       {showInputs && <Inputs inputs={data?.inputs} />}
@@ -530,7 +530,7 @@ const UploadedFile = ({
             />
           ) : (
             <img
-              src={typeList.get(params?.fileType || "") || ""}
+              src={typeList.get(params?.fileType || '') || ''}
               className="w-[16px] h-[13px]"
               alt=""
             />
@@ -542,7 +542,7 @@ const UploadedFile = ({
       <img
         src={Icons.singleNodeDebugging.remove}
         className="w-[16px] h-[17px] mt-1.5 opacity-50 cursor-pointer"
-        onClick={() => handleDeleteFile(index, file?.id || "")}
+        onClick={() => handleDeleteFile(index, file?.id || '')}
         alt=""
       />
     </div>
@@ -554,9 +554,9 @@ const renderFileUpload = (
   index,
   uploadComplete,
   handleFileUpload,
-  handleDeleteFile,
+  handleDeleteFile
 ): React.ReactElement => {
-  const multiple = params?.schema?.type === "array-string";
+  const multiple = params?.schema?.type === 'array-string';
   return (
     <>
       <FlowUpload
@@ -567,10 +567,10 @@ const renderFileUpload = (
             uploadComplete(event, index, fileId),
           handleFileUpload: (file, fileId) =>
             handleFileUpload(file, index, multiple, fileId),
-          maxSize: params?.fileType === "image" ? 3 : 20,
+          maxSize: params?.fileType === 'image' ? 3 : 20,
         } as unknown)}
       />
-      {params?.default?.map((file) => (
+      {params?.default?.map(file => (
         <UploadedFile
           params={params}
           file={file}
@@ -586,11 +586,11 @@ const renderString = (params, index, handleChangeParam): React.ReactElement => (
   <FlowInput
     value={params?.default}
     className="pt-0.5"
-    onChange={(e) =>
+    onChange={e =>
       handleChangeParam(
         index,
-        (d) => (d.default = e.target.value),
-        e.target.value,
+        d => (d.default = e.target.value),
+        e.target.value
       )
     }
   />
@@ -599,15 +599,15 @@ const renderString = (params, index, handleChangeParam): React.ReactElement => (
 const renderInteger = (
   params,
   index,
-  handleChangeParam,
+  handleChangeParam
 ): React.ReactElement => (
   <FlowInputNumber
     step={1}
     precision={0}
     value={params?.default}
     className="pt-0.5 w-full"
-    onChange={(value) =>
-      handleChangeParam(index, (d) => (d.default = value), value)
+    onChange={value =>
+      handleChangeParam(index, d => (d.default = value), value)
     }
   />
 );
@@ -616,8 +616,8 @@ const renderNumber = (params, index, handleChangeParam): React.ReactElement => (
   <FlowInputNumber
     value={params?.default}
     className="pt-0.5 w-full"
-    onChange={(value) =>
-      handleChangeParam(index, (d) => (d.default = value), value)
+    onChange={value =>
+      handleChangeParam(index, d => (d.default = value), value)
     }
   />
 );
@@ -625,16 +625,16 @@ const renderNumber = (params, index, handleChangeParam): React.ReactElement => (
 const renderBoolean = (
   params,
   index,
-  handleChangeParam,
+  handleChangeParam
 ): React.ReactElement => (
   <FlowSelect
     value={params?.default}
     options={[
-      { label: "true", value: true },
-      { label: "false", value: false },
+      { label: 'true', value: true },
+      { label: 'false', value: false },
     ]}
-    onChange={(value) =>
-      handleChangeParam(index, (d) => (d.default = value), value)
+    onChange={value =>
+      handleChangeParam(index, d => (d.default = value), value)
     }
   />
 );
@@ -642,12 +642,12 @@ const renderBoolean = (
 const renderJsonEditor = (
   params,
   index,
-  handleChangeParam,
+  handleChangeParam
 ): React.ReactElement => (
   <JsonMonacoEditor
     value={params?.default}
-    onChange={(value) =>
-      handleChangeParam(index, (d) => (d.default = value), value)
+    onChange={value =>
+      handleChangeParam(index, d => (d.default = value), value)
     }
   />
 );
@@ -655,7 +655,7 @@ const renderJsonEditor = (
 export const renderParamInput = (
   params: unknown,
   index: number,
-  fnc,
+  fnc
 ): React.ReactElement | null => {
   const {
     handleChangeParam,
@@ -670,21 +670,21 @@ export const renderParamInput = (
       index,
       uploadComplete,
       handleFileUpload,
-      handleDeleteFile,
+      handleDeleteFile
     );
 
   switch (type) {
-    case "string":
+    case 'string':
       return renderString(params, index, handleChangeParam);
-    case "integer":
+    case 'integer':
       return renderInteger(params, index, handleChangeParam);
-    case "number":
+    case 'number':
       return renderNumber(params, index, handleChangeParam);
-    case "boolean":
+    case 'boolean':
       return renderBoolean(params, index, handleChangeParam);
-    case "object":
+    case 'object':
     default:
-      if (type?.includes("array"))
+      if (type?.includes('array'))
         return renderJsonEditor(params, index, handleChangeParam);
       return null;
   }

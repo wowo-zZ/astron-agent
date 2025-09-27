@@ -1,8 +1,8 @@
-import { useCallback, useState } from "react";
-import http from "@/utils/http";
-import { login, logOutAPI, queryCurrentUser } from "@/services/login";
-import type { CheckAccountParams } from "@/services/login";
-import type { User } from "@/store/user-store";
+import { useCallback, useState } from 'react';
+import http from '@/utils/http';
+import { login, logOutAPI, queryCurrentUser } from '@/services/login';
+import type { CheckAccountParams } from '@/services/login';
+import type { User } from '@/store/user-store';
 
 interface LoginState {
   loading: boolean;
@@ -20,25 +20,25 @@ interface TokenStorage {
 
 // 简化的 token 存储管理
 export const tokenStorage: TokenStorage = {
-  getAccessToken: () => localStorage.getItem("accessToken"),
-  getRefreshToken: () => localStorage.getItem("refreshToken"),
+  getAccessToken: () => localStorage.getItem('accessToken'),
+  getRefreshToken: () => localStorage.getItem('refreshToken'),
 
-  setTokens: (tokens) => {
-    localStorage.setItem("accessToken", tokens.accessToken);
-    localStorage.setItem("refreshToken", tokens.refreshToken);
+  setTokens: tokens => {
+    localStorage.setItem('accessToken', tokens.accessToken);
+    localStorage.setItem('refreshToken', tokens.refreshToken);
   },
 
   clearTokens: () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
   },
 
   isAccessTokenExpired: () => {
-    const token = localStorage.getItem("accessToken");
+    const token = localStorage.getItem('accessToken');
     if (!token) return true;
 
     try {
-      const payload = JSON.parse(window.atob(token.split(".")[1] || ""));
+      const payload = JSON.parse(window.atob(token.split('.')[1] || ''));
       return Date.now() >= payload.exp * 1000;
     } catch {
       return true;
@@ -46,11 +46,11 @@ export const tokenStorage: TokenStorage = {
   },
 
   isRefreshTokenExpired: () => {
-    const token = localStorage.getItem("refreshToken");
+    const token = localStorage.getItem('refreshToken');
     if (!token) return true;
 
     try {
-      const payload = JSON.parse(window.atob(token.split(".")[1] || ""));
+      const payload = JSON.parse(window.atob(token.split('.')[1] || ''));
       return Date.now() >= payload.exp * 1000;
     } catch {
       return true;
@@ -73,11 +73,11 @@ const useLogin = (): {
   });
 
   const setLoading = (loading: boolean): void => {
-    setState((prev) => ({ ...prev, loading }));
+    setState(prev => ({ ...prev, loading }));
   };
 
   const setError = (error: string | null): void => {
-    setState((prev) => ({ ...prev, error }));
+    setState(prev => ({ ...prev, error }));
   };
 
   // 登录
@@ -97,7 +97,7 @@ const useLogin = (): {
 
       return response;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Login failed";
+      const errorMessage = err instanceof Error ? err.message : 'Login failed';
       setError(errorMessage);
       throw err;
     } finally {
@@ -114,7 +114,7 @@ const useLogin = (): {
       await logOutAPI();
       tokenStorage.clearTokens();
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Logout failed";
+      const errorMessage = err instanceof Error ? err.message : 'Logout failed';
       setError(errorMessage);
       throw err;
     } finally {
@@ -131,7 +131,7 @@ const useLogin = (): {
       return await queryCurrentUser();
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : "Failed to get user info";
+        err instanceof Error ? err.message : 'Failed to get user info';
       setError(errorMessage);
       throw err;
     } finally {
@@ -149,7 +149,7 @@ const useLogin = (): {
     }
 
     try {
-      const response = await http.post("/api/auth/refresh", {
+      const response = await http.post('/api/auth/refresh', {
         refreshToken: refreshTokenValue,
       });
 

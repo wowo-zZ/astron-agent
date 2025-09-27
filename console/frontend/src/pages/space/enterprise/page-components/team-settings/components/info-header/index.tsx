@@ -1,22 +1,22 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Input, Button, message, Tooltip } from "antd";
-import { EditOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
-import SpaceButton from "@/components/button-group/space-button";
-import { ModuleType, OperationType } from "@/permissions/permission-type";
-import styles from "./index.module.scss";
+import React, { useState, useRef, useEffect } from 'react';
+import { Input, Button, message, Tooltip } from 'antd';
+import { EditOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
+import SpaceButton from '@/components/button-group/space-button';
+import { ModuleType, OperationType } from '@/permissions/permission-type';
+import styles from './index.module.scss';
 
-import creator from "@/assets/imgs/space/creator.png";
-import defaultUploadIcon from "@/assets/imgs/space/upload.png";
-import yes from "@/assets/imgs/personal-center/yes.svg";
-import no from "@/assets/imgs/personal-center/no.svg";
-import useEnterpriseStore from "@/store/enterprise-store";
-import { useEnterprise } from "@/hooks/use-enterprise";
+import creator from '@/assets/imgs/space/creator.png';
+import defaultUploadIcon from '@/assets/imgs/space/upload.png';
+import yes from '@/assets/imgs/personal-center/yes.svg';
+import no from '@/assets/imgs/personal-center/no.svg';
+import useEnterpriseStore from '@/store/enterprise-store';
+import { useEnterprise } from '@/hooks/use-enterprise';
 
 import {
   updateEnterpriseName,
   updateEnterpriseAvatar,
-} from "@/services/enterprise";
-import UploadImage from "../upload-image";
+} from '@/services/enterprise';
+import UploadImage from '../upload-image';
 
 const InfoHeader = () => {
   const {
@@ -25,7 +25,7 @@ const InfoHeader = () => {
   } = useEnterpriseStore();
   const { getJoinedEnterpriseList } = useEnterprise();
   const [isEditing, setIsEditing] = useState(false);
-  const [editValue, setEditValue] = useState("");
+  const [editValue, setEditValue] = useState('');
   const [reUploadImg, setReUploadImg] = useState(false);
   const [triggerChild, setTriggerChild] = useState(false);
   const [inputWidth, setInputWidth] = useState(200); // 默认宽度
@@ -49,15 +49,15 @@ const InfoHeader = () => {
   const handleConfirm = async () => {
     const newName = editValue.trim();
 
-    if (newName === "") {
-      message.error("团队名称不能为空");
+    if (newName === '') {
+      message.error('团队名称不能为空');
       return;
     }
 
     try {
       await updateEnterpriseName({ name: newName });
       setEnterpriseInfo({ name: newName });
-      message.success("修改成功");
+      message.success('修改成功');
       setIsEditing(false);
       getJoinedEnterpriseList();
     } catch (err: any) {
@@ -73,9 +73,9 @@ const InfoHeader = () => {
 
   // 处理输入框回车
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       handleConfirm();
-    } else if (e.key === "Escape") {
+    } else if (e.key === 'Escape') {
       handleCancel();
     }
   };
@@ -122,7 +122,7 @@ const InfoHeader = () => {
             <div className={styles.editSection}>
               <Input
                 value={editValue}
-                onChange={(e) => setEditValue(e.target.value)}
+                onChange={e => setEditValue(e.target.value)}
                 onKeyDown={handleKeyPress}
                 placeholder="请输入团队名称"
                 maxLength={50}
@@ -135,14 +135,14 @@ const InfoHeader = () => {
               <span
                 ref={measureRef}
                 style={{
-                  visibility: "hidden",
-                  position: "absolute",
-                  whiteSpace: "pre",
-                  fontSize: "14px", // 需要与Input的字体大小保持一致
-                  padding: "4px 11px", // 需要与Input的padding保持一致
+                  visibility: 'hidden',
+                  position: 'absolute',
+                  whiteSpace: 'pre',
+                  fontSize: '14px', // 需要与Input的字体大小保持一致
+                  padding: '4px 11px', // 需要与Input的padding保持一致
                 }}
               >
-                {editValue || "请输入团队名称"}
+                {editValue || '请输入团队名称'}
               </span>
               <div className={styles.editActions}>
                 <Button
@@ -168,20 +168,20 @@ const InfoHeader = () => {
                   infoContentRef.current || document.body
                 }
                 overlayStyle={{
-                  maxWidth: "50vw",
-                  maxHeight: "100vh",
-                  overflow: "auto",
+                  maxWidth: '50vw',
+                  maxHeight: '100vh',
+                  overflow: 'auto',
                 }}
               >
                 <h2 className={styles.teamNameText}>{name}</h2>
               </Tooltip>
               <SpaceButton
                 config={{
-                  key: "edit",
-                  text: "",
+                  key: 'edit',
+                  text: '',
                   icon: <EditOutlined />,
-                  type: "text",
-                  size: "small",
+                  type: 'text',
+                  size: 'small',
                   onClick: handleEdit,
                   permission: {
                     module: ModuleType.SPACE,
@@ -201,16 +201,16 @@ const InfoHeader = () => {
         </div>
       </div>
       <UploadImage
-        onSuccess={(res) => {
+        onSuccess={res => {
           setTriggerChild(false);
           updateEnterpriseAvatar(res)
-            .then((_) => {
-              message.success("头像已上传!");
+            .then(_ => {
+              message.success('头像已上传!');
               setEnterpriseInfo({ avatarUrl: res });
               getJoinedEnterpriseList();
             })
-            .catch((e) => {
-              message.error(e?.msg || "上传失败或套餐已过期");
+            .catch(e => {
+              message.error(e?.msg || '上传失败或套餐已过期');
             });
         }}
         onClose={() => {

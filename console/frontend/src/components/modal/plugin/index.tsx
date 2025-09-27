@@ -6,35 +6,35 @@ import {
   Radio,
   Tooltip,
   FormInstance,
-} from "antd";
-import { debounce } from "lodash";
-import JsonMonacoEditor from "@/components/monaco-editor/json-monaco-editor";
-import ToolInputParameters from "@/components/table/tool-input-parameters";
-import ToolInputParametersDetail from "@/components/table/tool-input-parameters-detail";
-import ToolOutputParameters from "@/components/table/tool-output-parameters";
-import ToolOutputParametersDetail from "@/components/table/tool-output-parameters-detail";
-import DebuggerTable from "@/components/table/debugger-table";
-import { isJSON } from "@/utils/utils";
-import { useTranslation } from "react-i18next";
+} from 'antd';
+import { debounce } from 'lodash';
+import JsonMonacoEditor from '@/components/monaco-editor/json-monaco-editor';
+import ToolInputParameters from '@/components/table/tool-input-parameters';
+import ToolInputParametersDetail from '@/components/table/tool-input-parameters-detail';
+import ToolOutputParameters from '@/components/table/tool-output-parameters';
+import ToolOutputParametersDetail from '@/components/table/tool-output-parameters-detail';
+import DebuggerTable from '@/components/table/debugger-table';
+import { isJSON } from '@/utils/utils';
+import { useTranslation } from 'react-i18next';
 
-import publishIcon from "@/assets/imgs/workflow/publish-icon.png";
-import noAuthorizationRequired from "@/assets/imgs/plugin/no-authorization-required.png";
-import toolModalChecked from "@/assets/imgs/workflow/tool-modal-checked.png";
-import serviceIcon from "@/assets/imgs/plugin/service-icon.png";
-import questionCircle from "@/assets/imgs/workflow/question-circle.png";
-import createToolStep from "@/assets/imgs/workflow/create-tool-step.png";
-import toolArrowLeft from "@/assets/imgs/workflow/tool-arrow-left.png";
-import toolCreateUser from "@/assets/imgs/workflow/tool-create-user.png";
-import { AvatarType, InputParamsData, ToolItem } from "@/types/resource";
-import MoreIcons from "../more-icons";
-import { useToolDebugger } from "./hooks/use-tool-debugger";
-import React, { FC, forwardRef, useEffect, useState } from "react";
+import publishIcon from '@/assets/imgs/workflow/publish-icon.png';
+import noAuthorizationRequired from '@/assets/imgs/plugin/no-authorization-required.png';
+import toolModalChecked from '@/assets/imgs/workflow/tool-modal-checked.png';
+import serviceIcon from '@/assets/imgs/plugin/service-icon.png';
+import questionCircle from '@/assets/imgs/workflow/question-circle.png';
+import createToolStep from '@/assets/imgs/workflow/create-tool-step.png';
+import toolArrowLeft from '@/assets/imgs/workflow/tool-arrow-left.png';
+import toolCreateUser from '@/assets/imgs/workflow/tool-create-user.png';
+import { AvatarType, InputParamsData, ToolItem } from '@/types/resource';
+import MoreIcons from '../more-icons';
+import { useToolDebugger } from './hooks/use-tool-debugger';
+import React, { FC, forwardRef, useEffect, useState } from 'react';
 
 import {
   BaseFormData,
   ParamsFormData,
   useCreateTool,
-} from "./hooks/use-create-tool";
+} from './hooks/use-create-tool';
 
 // 步骤指示器组件
 const StepIndicator: React.FC<{
@@ -52,8 +52,8 @@ const StepIndicator: React.FC<{
           <div
             className="w-4 h-4 rounded-full text-center text-[#fff]"
             style={{
-              lineHeight: "16px",
-              background: step === 1 ? "#275eff" : "#333333",
+              lineHeight: '16px',
+              background: step === 1 ? '#275eff' : '#333333',
             }}
           >
             1
@@ -61,20 +61,20 @@ const StepIndicator: React.FC<{
           <span
             className="font-medium text-lg"
             style={{
-              color: step === 1 ? "#275eff" : "",
-              lineHeight: "28px",
+              color: step === 1 ? '#275eff' : '',
+              lineHeight: '28px',
             }}
           >
-            {t("plugin.fillBasicInfo")}
+            {t('plugin.fillBasicInfo')}
           </span>
         </div>
         <div
           className="w-full h-[7px] mt-1"
           style={{
-            background: step === 1 ? "#275eff" : "#E2E3E5",
+            background: step === 1 ? '#275eff' : '#E2E3E5',
           }}
         ></div>
-        <p className="text-desc mt-2.5">{t("plugin.fillPluginIntro")}</p>
+        <p className="text-desc mt-2.5">{t('plugin.fillPluginIntro')}</p>
       </div>
       <img className="w-[14px] h-[12px]" src={createToolStep} alt="" />
       <div className="flex-1">
@@ -85,8 +85,8 @@ const StepIndicator: React.FC<{
           <div
             className="w-4 h-4 rounded-full text-center text-[#fff]"
             style={{
-              lineHeight: "16px",
-              background: step === 2 ? "#275eff" : "#333333",
+              lineHeight: '16px',
+              background: step === 2 ? '#275eff' : '#333333',
             }}
           >
             2
@@ -94,20 +94,20 @@ const StepIndicator: React.FC<{
           <span
             className="font-medium text-lg"
             style={{
-              color: step === 2 ? "#275eff" : "",
-              lineHeight: "28px",
+              color: step === 2 ? '#275eff' : '',
+              lineHeight: '28px',
             }}
           >
-            {t("plugin.addPlugin")}
+            {t('plugin.addPlugin')}
           </span>
         </div>
         <div
           className="w-full h-[7px] mt-1"
           style={{
-            background: step === 2 ? "#275eff" : "#E2E3E5",
+            background: step === 2 ? '#275eff' : '#E2E3E5',
           }}
         ></div>
-        <p className="text-desc mt-2.5">{t("plugin.submitPluginParams")}</p>
+        <p className="text-desc mt-2.5">{t('plugin.submitPluginParams')}</p>
       </div>
       <img className="w-[14px] h-[12px]" src={createToolStep} alt="" />
       <div className="flex-1">
@@ -118,8 +118,8 @@ const StepIndicator: React.FC<{
           <div
             className="w-4 h-4 rounded-full text-center text-[#fff]"
             style={{
-              lineHeight: "16px",
-              background: step === 3 ? "#275eff" : "#333333",
+              lineHeight: '16px',
+              background: step === 3 ? '#275eff' : '#333333',
             }}
           >
             3
@@ -127,20 +127,20 @@ const StepIndicator: React.FC<{
           <span
             className="font-medium text-lg"
             style={{
-              color: step === 3 ? "#275eff" : "",
-              lineHeight: "28px",
+              color: step === 3 ? '#275eff' : '',
+              lineHeight: '28px',
             }}
           >
-            {t("plugin.debugAndVerify")}
+            {t('plugin.debugAndVerify')}
           </span>
         </div>
         <div
           className="w-full h-[7px] mt-1"
           style={{
-            background: step === 3 ? "#275eff" : "#E2E3E5",
+            background: step === 3 ? '#275eff' : '#E2E3E5',
           }}
         ></div>
-        <p className="text-desc mt-2.5">{t("plugin.debugAndVerifyDesc")}</p>
+        <p className="text-desc mt-2.5">{t('plugin.debugAndVerifyDesc')}</p>
       </div>
     </div>
   );
@@ -156,15 +156,15 @@ const AuthorizationFields: React.FC = () => {
         label={
           <div className="flex flex-col gap-1">
             <span className="text-sm font-medium">
-              <span className="text-[#F74E43]">*</span> {t("plugin.position")}
+              <span className="text-[#F74E43]">*</span> {t('plugin.position')}
             </span>
-            <p className="text-desc">{t("plugin.headerOrQuery")}</p>
+            <p className="text-desc">{t('plugin.headerOrQuery')}</p>
           </div>
         }
         rules={[
           {
             required: true,
-            message: t("plugin.pleaseEnterLocation"),
+            message: t('plugin.pleaseEnterLocation'),
           },
         ]}
       >
@@ -173,11 +173,11 @@ const AuthorizationFields: React.FC = () => {
             <div
               className="w-full flex justify-between items-center gap-2.5"
               style={{
-                padding: "11px 4px",
+                padding: '11px 4px',
               }}
             >
               <div className="text-[#333333] font-medium">
-                {t("plugin.header")}
+                {t('plugin.header')}
               </div>
               <div className="w-[18px] h-[18px] rounded-full bg-[#fff] border border-[#CACEE0] flex items-center justify-center checked-icon-container">
                 <img
@@ -192,11 +192,11 @@ const AuthorizationFields: React.FC = () => {
             <div
               className="w-full flex justify-between items-center gap-2.5"
               style={{
-                padding: "11px 4px",
+                padding: '11px 4px',
               }}
             >
               <div className="text-[#333333] font-medium">
-                {t("plugin.query")}
+                {t('plugin.query')}
               </div>
               <div className="w-[18px] h-[18px] rounded-full bg-[#fff] border border-[#CACEE0] flex items-center justify-center checked-icon-container">
                 <img
@@ -214,25 +214,25 @@ const AuthorizationFields: React.FC = () => {
         label={
           <div className="flex flex-col gap-1">
             <span className="text-sm font-medium">
-              <span className="text-[#F74E43]">*</span>{" "}
-              {t("plugin.parameterName")}
+              <span className="text-[#F74E43]">*</span>{' '}
+              {t('plugin.parameterName')}
             </span>
-            <p className="text-desc">{t("plugin.parameterNameDesc")}</p>
+            <p className="text-desc">{t('plugin.parameterNameDesc')}</p>
           </div>
         }
         rules={[
           {
             required: true,
-            message: t("plugin.pleaseEnterParameterName"),
+            message: t('plugin.pleaseEnterParameterName'),
           },
           {
             pattern: /^[a-zA-Z_][a-zA-Z0-9_]*$/,
-            message: t("common.onlyLettersNumbersUnderscore"),
+            message: t('common.onlyLettersNumbersUnderscore'),
           },
         ]}
       >
         <Input
-          placeholder={t("common.inputPlaceholder")}
+          placeholder={t('common.inputPlaceholder')}
           className="global-input params-input"
         />
       </Form.Item>
@@ -241,21 +241,21 @@ const AuthorizationFields: React.FC = () => {
         label={
           <div className="flex flex-col gap-1">
             <span className="text-sm font-medium">
-              <span className="text-[#F74E43]">*</span>{" "}
-              {t("plugin.serviceToken")}
+              <span className="text-[#F74E43]">*</span>{' '}
+              {t('plugin.serviceToken')}
             </span>
-            <p className="text-desc">{t("plugin.serviceTokenDesc")}</p>
+            <p className="text-desc">{t('plugin.serviceTokenDesc')}</p>
           </div>
         }
         rules={[
           {
             required: true,
-            message: t("plugin.pleaseEnterServiceToken"),
+            message: t('plugin.pleaseEnterServiceToken'),
           },
         ]}
       >
         <Input
-          placeholder={t("common.inputPlaceholder")}
+          placeholder={t('common.inputPlaceholder')}
           className="global-input params-input"
         />
       </Form.Item>
@@ -280,17 +280,17 @@ const PluginBasicFields: React.FC<{
         name="name"
         label={
           <span className="text-sm font-medium">
-            <span className="text-[#F74E43]">*</span> {t("plugin.pluginName")}
+            <span className="text-[#F74E43]">*</span> {t('plugin.pluginName')}
           </span>
         }
         rules={[
           {
             required: true,
-            message: t("plugin.pleaseEnterPluginName"),
+            message: t('plugin.pleaseEnterPluginName'),
           },
           {
             whitespace: true,
-            message: t("plugin.pleaseEnterPluginName"),
+            message: t('plugin.pleaseEnterPluginName'),
           },
         ]}
       >
@@ -301,14 +301,14 @@ const PluginBasicFields: React.FC<{
               background: botColor
                 ? botColor
                 : `url(${
-                    (botIcon.name || "") + (botIcon.value || "")
+                    (botIcon.name || '') + (botIcon.value || '')
                   }) no-repeat center / cover`,
             }}
             onClick={() => setShowModal(true)}
           >
             {botColor && (
               <img
-                src={(botIcon.name || "") + (botIcon.value || "")}
+                src={(botIcon.name || '') + (botIcon.value || '')}
                 className="w-6 h-6"
                 alt=""
               />
@@ -317,10 +317,10 @@ const PluginBasicFields: React.FC<{
           <Input
             maxLength={20}
             showCount
-            placeholder={t("common.inputPlaceholder")}
+            placeholder={t('common.inputPlaceholder')}
             className="global-input"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={e => setName(e.target.value)}
           />
         </div>
       </Form.Item>
@@ -330,32 +330,32 @@ const PluginBasicFields: React.FC<{
           <div className="flex flex-col gap-1">
             <span className="text-sm font-medium">
               <span className="text-[#F74E43]">*</span>
-              {t("plugin.pluginDescription")}
+              {t('plugin.pluginDescription')}
             </span>
-            <p className="text-desc">{t("plugin.describePlugin")}</p>
+            <p className="text-desc">{t('plugin.describePlugin')}</p>
           </div>
         }
         rules={[
           {
             required: true,
-            message: t("plugin.pleaseEnterPluginDescription"),
+            message: t('plugin.pleaseEnterPluginDescription'),
           },
           {
             whitespace: true,
-            message: t("plugin.pleaseEnterPluginDescription"),
+            message: t('plugin.pleaseEnterPluginDescription'),
           },
         ]}
       >
         <div className="relative">
           <Input.TextArea
-            placeholder={t("common.inputPlaceholder")}
+            placeholder={t('common.inputPlaceholder')}
             className="global-textarea params-input"
             style={{
               height: 78,
             }}
             maxLength={200}
             value={desc}
-            onChange={(e) => setDesc(e.target.value)}
+            onChange={e => setDesc(e.target.value)}
           />
           <div className="absolute bottom-3 right-3 ant-input-limit ">
             {desc?.length || 0} / 200
@@ -378,23 +378,23 @@ const AuthTypeSelector: React.FC<{
       name="authType"
       label={
         <span className="text-sm font-medium">
-          <span className="text-[#F74E43]">*</span>{" "}
-          {t("plugin.authorizationMethod")}
+          <span className="text-[#F74E43]">*</span>{' '}
+          {t('plugin.authorizationMethod')}
         </span>
       }
       rules={[
         {
           required: true,
-          message: t("plugin.pleaseEnterAuthorizationMethod"),
+          message: t('plugin.pleaseEnterAuthorizationMethod'),
         },
       ]}
     >
       <Radio.Group
-        onChange={(e) => {
+        onChange={e => {
           setAuthType(e.target.value);
           if (e.target.value === 2) {
             baseForm.setFieldsValue({
-              location: "header",
+              location: 'header',
             });
           }
         }}
@@ -403,20 +403,20 @@ const AuthTypeSelector: React.FC<{
           <div
             className="w-full flex justify-between items-start gap-2.5 relative"
             style={{
-              padding: "24px 4px",
+              padding: '24px 4px',
             }}
           >
             <div className="flex-1 flex flex-col mt-[-6px]">
               <div
                 className="text-[#333333] font-medium"
                 style={{
-                  color: authType === 1 ? "#275EFF" : "",
+                  color: authType === 1 ? '#275EFF' : '',
                 }}
               >
-                {t("plugin.noAuthorization")}
+                {t('plugin.noAuthorization')}
               </div>
               <p className="text-desc">
-                {t("plugin.useAPIWithoutAuthorization")}
+                {t('plugin.useAPIWithoutAuthorization')}
               </p>
             </div>
             <div className="absolute right-[-15px] bottom-0">
@@ -432,19 +432,19 @@ const AuthTypeSelector: React.FC<{
           <div
             className="w-full flex justify-between items-start gap-2.5 relative"
             style={{
-              padding: "24px 4px",
+              padding: '24px 4px',
             }}
           >
             <div className="flex-1 flex flex-col mt-[-6px]">
               <div
                 className="text-[#333333] font-medium"
                 style={{
-                  color: authType === 2 ? "#275EFF" : "",
+                  color: authType === 2 ? '#275EFF' : '',
                 }}
               >
-                {t("plugin.service")}
+                {t('plugin.service')}
               </div>
-              <p className="text-desc">{t("plugin.authorizationRequired")}</p>
+              <p className="text-desc">{t('plugin.authorizationRequired')}</p>
             </div>
             <div className="absolute right-[-15px] bottom-0">
               <img src={serviceIcon} className="w-[80px] h-[85px]" alt="" />
@@ -501,27 +501,27 @@ const BasicInfoForm: React.FC<{
         name="endPoint"
         label={
           <span className="text-sm font-medium">
-            <span className="text-[#F74E43]">*</span> {t("plugin.pluginPath")}
+            <span className="text-[#F74E43]">*</span> {t('plugin.pluginPath')}
           </span>
         }
         rules={[
           {
             required: true,
-            message: t("plugin.pleaseEnterPluginPath"),
+            message: t('plugin.pleaseEnterPluginPath'),
           },
           {
             whitespace: true,
-            message: t("plugin.pleaseEnterPluginPath"),
+            message: t('plugin.pleaseEnterPluginPath'),
           },
           {
             pattern:
               /^(https?:\/\/)?((([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}|(\d{1,3}\.){3}\d{1,3})(:\d+)?(\/[-a-zA-Z0-9@:%_+.~#?&//={}]*)?(\?[;&a-zA-Z0-9%_+.~#?&//=]*)?(#[-a-zA-Z0-9@:%_+.~#?&//=]*)?)$/i,
-            message: t("plugin.pleaseEnterValidUrl"),
+            message: t('plugin.pleaseEnterValidUrl'),
           },
         ]}
       >
         <Input
-          placeholder={t("common.inputPlaceholder")}
+          placeholder={t('common.inputPlaceholder')}
           className="global-input params-input"
         />
       </Form.Item>
@@ -531,17 +531,17 @@ const BasicInfoForm: React.FC<{
         label={
           <div className="flex items-center gap-1">
             <span className="text-sm font-medium">
-              <span className="text-[#F74E43]">*</span>{" "}
-              {t("plugin.requestMethod")}
+              <span className="text-[#F74E43]">*</span>{' '}
+              {t('plugin.requestMethod')}
             </span>
             <Tooltip
               title={
                 <div className="whitespace-pre-wrap">
-                  {`${t("plugin.getDesc")}\n${t(
-                    "plugin.postDesc",
-                  )}\n${t("plugin.putDesc")}\n${t(
-                    "plugin.deleteDesc",
-                  )}\n${t("plugin.patchDesc")}`}
+                  {`${t('plugin.getDesc')}\n${t(
+                    'plugin.postDesc'
+                  )}\n${t('plugin.putDesc')}\n${t(
+                    'plugin.deleteDesc'
+                  )}\n${t('plugin.patchDesc')}`}
                 </div>
               }
               overlayClassName="black-tooltip config-secret"
@@ -553,33 +553,33 @@ const BasicInfoForm: React.FC<{
         rules={[
           {
             required: true,
-            message: t("plugin.pleaseSelectRequestMethod"),
+            message: t('plugin.pleaseSelectRequestMethod'),
           },
         ]}
       >
         <Select
-          placeholder={t("common.pleaseSelect")}
+          placeholder={t('common.pleaseSelect')}
           className="global-select params-select"
           options={[
             {
-              label: t("plugin.getMethod"),
-              value: "get",
+              label: t('plugin.getMethod'),
+              value: 'get',
             },
             {
-              label: t("plugin.postMethod"),
-              value: "post",
+              label: t('plugin.postMethod'),
+              value: 'post',
             },
             {
-              label: t("plugin.putMethod"),
-              value: "put",
+              label: t('plugin.putMethod'),
+              value: 'put',
             },
             {
-              label: t("plugin.deleteMethod"),
-              value: "delete",
+              label: t('plugin.deleteMethod'),
+              value: 'delete',
             },
             {
-              label: t("plugin.patchMethod"),
-              value: "patch",
+              label: t('plugin.patchMethod'),
+              value: 'patch',
             },
           ]}
         />
@@ -648,17 +648,17 @@ const DebuggerForm: React.FC<{
         setDebuggerParamsData={setDebuggerParamsData}
       />
       <div className="w-full flex items-center justify-between mt-6">
-        <span className="text-base font-medium">{t("plugin.debugResult")}</span>
+        <span className="text-base font-medium">{t('plugin.debugResult')}</span>
         <Button
           loading={debugLoading}
           type="primary"
           style={{
-            height: "36px",
+            height: '36px',
           }}
           className="flex items-center w-[80px] gap-1.5 text-[#275eff] cursor-pointer"
           onClick={handleDebuggerTool}
         >
-          <span>{t("plugin.debug")}</span>
+          <span>{t('plugin.debug')}</span>
         </Button>
       </div>
       <div className="mt-6">
@@ -699,7 +699,7 @@ const ActionButtons: React.FC<{
     <div
       className="mx-auto"
       style={{
-        width: "85%",
+        width: '85%',
         minWidth: 1000,
         maxWidth: 1425,
       }}
@@ -716,7 +716,7 @@ const ActionButtons: React.FC<{
             className="origin-btn px-6"
             onClick={debounce(onHold, 500)}
           >
-            {t("plugin.hold")}
+            {t('plugin.hold')}
           </Button>
         )}
         {step > 1 && (
@@ -725,7 +725,7 @@ const ActionButtons: React.FC<{
             className="origin-btn px-6"
             onClick={() => handlePreStep()}
           >
-            {t("plugin.previousStep")}
+            {t('plugin.previousStep')}
           </Button>
         )}
         {step < 3 ? (
@@ -734,7 +734,7 @@ const ActionButtons: React.FC<{
             className="px-6"
             onClick={() => handleNextStep()}
           >
-            {t("plugin.nextStep")}
+            {t('plugin.nextStep')}
           </Button>
         ) : (
           <Button
@@ -743,7 +743,7 @@ const ActionButtons: React.FC<{
             className="px-6"
             onClick={() => handlePublishTool()}
           >
-            {currentToolId ? t("plugin.save") : t("plugin.publish")}
+            {currentToolId ? t('plugin.save') : t('plugin.publish')}
           </Button>
         )}
       </div>
@@ -755,7 +755,7 @@ export const CreateTool = forwardRef<
   {
     updateToolInfo: (
       selectedCard: ToolItem,
-      shouldUpdateToolInfo: boolean,
+      shouldUpdateToolInfo: boolean
     ) => void;
   },
   {
@@ -784,7 +784,7 @@ export const CreateTool = forwardRef<
       setBotColor,
       selectedCard,
     },
-    ref,
+    ref
   ) => {
     const { t } = useTranslation();
 
@@ -833,7 +833,7 @@ export const CreateTool = forwardRef<
       ref: ref as React.RefObject<{
         updateToolInfo: (
           selectedCard: ToolItem,
-          shouldUpdateToolInfo: boolean,
+          shouldUpdateToolInfo: boolean
         ) => void;
       }>,
     });
@@ -855,7 +855,7 @@ export const CreateTool = forwardRef<
           <div
             className="h-full mx-auto flex flex-col"
             style={{
-              width: "85%",
+              width: '85%',
               minWidth: 1000,
               maxWidth: 1425,
             }}
@@ -869,7 +869,7 @@ export const CreateTool = forwardRef<
                   onClick={() => handleCreateToolDone()}
                 />
                 <div className="flex items-center gap-1 text-[#666A73]">
-                  <span>{t("plugin.editPlugin")}</span>
+                  <span>{t('plugin.editPlugin')}</span>
                   <span>/</span>
                   <span className="text-[#333]">{name}</span>
                 </div>
@@ -883,7 +883,7 @@ export const CreateTool = forwardRef<
                 className="w-full h-full"
                 style={{
                   pointerEvents:
-                    selectedCard?.id && step !== 3 ? "none" : "auto",
+                    selectedCard?.id && step !== 3 ? 'none' : 'auto',
                 }}
               >
                 {step === 1 && (
@@ -937,7 +937,7 @@ export const CreateTool = forwardRef<
         />
       </div>
     );
-  },
+  }
 );
 
 export const ToolDebugger: FC<{
@@ -970,7 +970,7 @@ export const ToolDebugger: FC<{
     <div
       className="h-full flex flex-col gap-[40px] mx-auto overflow-auto p-6 bg-[#FFFFFF] rounded-2xl mt-9"
       style={{
-        width: "85%",
+        width: '85%',
         minWidth: 1000,
         maxWidth: 1425,
       }}
@@ -984,7 +984,7 @@ export const ToolDebugger: FC<{
             onClick={() => handleClearData()}
           />
           <div className="flex items-center gap-1 text-[#666A73]">
-            <span>{t("plugin.debugPlugin")}</span>
+            <span>{t('plugin.debugPlugin')}</span>
             <span>/</span>
             <span className="text-[#333]">{currentToolInfo?.name}</span>
           </div>
@@ -998,7 +998,7 @@ export const ToolDebugger: FC<{
           />
           <div className="w-full flex items-center justify-between mt-6">
             <span className="text-base font-medium">
-              {t("plugin.debugResult")}
+              {t('plugin.debugResult')}
             </span>
             <Button
               loading={debugLoading}
@@ -1006,10 +1006,10 @@ export const ToolDebugger: FC<{
               className="flex items-center w-[80px] gap-1.5 text-[#275eff] cursor-pointer"
               onClick={handleDebuggerTool}
               style={{
-                height: "36px",
+                height: '36px',
               }}
             >
-              <span>{t("plugin.debug")}</span>
+              <span>{t('plugin.debug')}</span>
             </Button>
           </div>
           <div className="mt-6">
@@ -1035,7 +1035,7 @@ export const ToolDetail: FC<{
   const { t } = useTranslation();
   const [inputParamsData, setInputParamsData] = useState<InputParamsData[]>([]);
   const [outputParamsData, setOutputParamsData] = useState<InputParamsData[]>(
-    [],
+    []
   );
 
   useEffect(() => {
@@ -1052,13 +1052,13 @@ export const ToolDetail: FC<{
     <div
       className="w-full h-full flex flex-col gap-[20px] overflow-hidden"
       style={{
-        padding: "65px 0px 43px",
+        padding: '65px 0px 43px',
       }}
     >
       <div
         className="flex items-center gap-2 mx-auto"
         style={{
-          width: "90%",
+          width: '90%',
         }}
       >
         <img
@@ -1069,7 +1069,7 @@ export const ToolDetail: FC<{
         />
         <div className="flex items-center gap-1 text-[#666A73]">
           <span className="text-sm font-normal">
-            {t("plugin.pluginDetail")}
+            {t('plugin.pluginDetail')}
           </span>
           <span>/</span>
           <span className="text-[#333]">{currentToolInfo?.name}</span>
@@ -1079,8 +1079,8 @@ export const ToolDetail: FC<{
         <div
           className="h-full mx-auto"
           style={{
-            width: "90%",
-            minWidth: "1000px",
+            width: '90%',
+            minWidth: '1000px',
           }}
         >
           <div className="flex items-center gap-[28px]">
@@ -1126,7 +1126,7 @@ export const ToolDetail: FC<{
                 <div className="flex items-center gap-1">
                   <img src={publishIcon} alt="" className="w-3 h-3" />
                   <p className="text-[#757575] text-xs">
-                    {t("plugin.publishedAt")} {currentToolInfo?.updateTime}
+                    {t('plugin.publishedAt')} {currentToolInfo?.updateTime}
                   </p>
                 </div>
                 <div
@@ -1135,20 +1135,20 @@ export const ToolDetail: FC<{
                     handleToolDebugger();
                   }}
                 >
-                  {t("workflow.nodes.toolNode.test")}
+                  {t('workflow.nodes.toolNode.test')}
                 </div>
               </div>
             </div>
           </div>
           <div className="text-base font-medium">
-            {t("plugin.pluginParams")}
+            {t('plugin.pluginParams')}
           </div>
           <div className="text-xs font-medium mt-5">
-            {t("plugin.inputParams")}
+            {t('plugin.inputParams')}
           </div>
           <ToolInputParametersDetail inputParamsData={inputParamsData} />
           <div className="text-xs font-medium mt-5">
-            {t("plugin.outputParams")}
+            {t('plugin.outputParams')}
           </div>
           <ToolOutputParametersDetail outputParamsData={outputParamsData} />
         </div>

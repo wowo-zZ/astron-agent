@@ -1,32 +1,32 @@
-import React, { useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { Button, Tooltip } from "antd";
+import React, { useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button, Tooltip } from 'antd';
 import {
   ShareAltOutlined,
   UserAddOutlined,
   EditOutlined,
   ArrowLeftOutlined,
-} from "@ant-design/icons";
+} from '@ant-design/icons';
 import ButtonGroup, {
   SpaceButton,
   PermissionFailureBehavior,
-} from "@/components/button-group";
-import type { ButtonConfig } from "@/components/button-group";
-import spaceAvatar from "@/assets/imgs/space/spaceAvatar.png";
-import BackIcon from "@/assets/imgs/sparkImg/back.svg";
-import styles from "./index.module.scss";
+} from '@/components/button-group';
+import type { ButtonConfig } from '@/components/button-group';
+import spaceAvatar from '@/assets/imgs/space/spaceAvatar.png';
+import BackIcon from '@/assets/imgs/sparkImg/back.svg';
+import styles from './index.module.scss';
 
-import { useSpaceI18n } from "@/pages/space/hooks/use-space-i18n";
-import { ModuleType, OperationType } from "@/permissions/permission-type";
-import { useSpaceType } from "@/hooks/use-space-type";
-import { roleToRoleType } from "@/pages/space/config";
+import { useSpaceI18n } from '@/pages/space/hooks/use-space-i18n';
+import { ModuleType, OperationType } from '@/permissions/permission-type';
+import { useSpaceType } from '@/hooks/use-space-type';
+import { roleToRoleType } from '@/pages/space/config';
 
 interface SpaceInfo {
   id: string;
   name: string;
   description: string;
   avatarUrl?: string;
-  role: "owner" | "admin" | "member";
+  role: 'owner' | 'admin' | 'member';
   memberCount: number;
   totalMembers: number;
   ownerName: string;
@@ -58,12 +58,12 @@ const DetailHeader: React.FC<DetailHeaderProps> = ({
   // 标题区域按钮配置
   const titleButtons: ButtonConfig[] = [
     {
-      key: "edit",
-      text: "",
+      key: 'edit',
+      text: '',
       icon: <EditOutlined />,
-      type: "text",
-      size: "small",
-      tooltip: "编辑空间信息",
+      type: 'text',
+      size: 'small',
+      tooltip: '编辑空间信息',
       permission: {
         module: ModuleType.SPACE,
         operation: OperationType.SPACE_SETTINGS,
@@ -76,10 +76,10 @@ const DetailHeader: React.FC<DetailHeaderProps> = ({
   // 操作按钮配置
   const actionButtons: ButtonConfig[] = [
     {
-      key: "share",
-      text: "分享",
+      key: 'share',
+      text: '分享',
       icon: <ShareAltOutlined />,
-      type: "default",
+      type: 'default',
       permission: {
         customCheck: () => {
           // return spaceInfo.userRole === 1 || spaceInfo.userRole === 2;
@@ -90,10 +90,10 @@ const DetailHeader: React.FC<DetailHeaderProps> = ({
       onClick: () => onShare(),
     },
     {
-      key: "addMember",
-      text: "添加成员",
+      key: 'addMember',
+      text: '添加成员',
       icon: <UserAddOutlined />,
-      type: "primary",
+      type: 'primary',
       permission: {
         module: ModuleType.SPACE,
         operation: OperationType.ADD_MEMBERS,
@@ -123,9 +123,9 @@ const DetailHeader: React.FC<DetailHeaderProps> = ({
               <h1 className={styles.title}>{spaceInfo.name}</h1>
             </Tooltip>
             <SpaceButton
-              config={titleButtons[0] || { key: "", text: "" }}
+              config={titleButtons[0] || { key: '', text: '' }}
               className={styles.editBtn}
-              style={{ color: "#999" }}
+              style={{ color: '#999' }}
             />
             <span className={styles.roleTag}>
               {getRoleText(roleToRoleType(spaceInfo.userRole))}
@@ -136,9 +136,9 @@ const DetailHeader: React.FC<DetailHeaderProps> = ({
             placement="bottomLeft"
             getPopupContainer={() => infoContentRef.current || document.body}
             overlayStyle={{
-              maxWidth: "60vw",
-              maxHeight: "calc(100vh - 180px)",
-              overflow: "auto",
+              maxWidth: '60vw',
+              maxHeight: 'calc(100vh - 180px)',
+              overflow: 'auto',
             }}
           >
             <p className={styles.description}>{spaceInfo.description}</p>

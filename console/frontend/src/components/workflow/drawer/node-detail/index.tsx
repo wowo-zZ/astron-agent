@@ -1,12 +1,12 @@
-import React, { useMemo, useEffect, useState } from "react";
-import { Drawer } from "antd";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import { useMemoizedFn } from "ahooks";
-import NodeOperation from "@/components/workflow/nodes/components/node-operation";
-import { Label } from "@/components/workflow/nodes/node-common";
-import cloneDeep from "lodash/cloneDeep";
-import { nodeTypeComponentMap } from "@/components/workflow/constant";
-import { useNodeCommon } from "@/components/workflow/hooks/useNodeCommon";
+import React, { useMemo, useEffect, useState } from 'react';
+import { Drawer } from 'antd';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import { useMemoizedFn } from 'ahooks';
+import NodeOperation from '@/components/workflow/nodes/components/node-operation';
+import { Label } from '@/components/workflow/nodes/node-common';
+import cloneDeep from 'lodash/cloneDeep';
+import { nodeTypeComponentMap } from '@/components/workflow/constant';
+import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
 
 // 类型导入
 import {
@@ -15,23 +15,23 @@ import {
   NodeDetailComponent,
   NodeCommonResult,
   ReactFlowNode,
-} from "@/components/workflow/types";
+} from '@/components/workflow/types';
 
 // 从统一的图标管理中导入
-import { Icons } from "@/components/workflow/icons";
+import { Icons } from '@/components/workflow/icons';
 
 // 获取 Node Detail 模块的图标
 const icons = Icons.nodeDetail;
 
 function index(): React.ReactElement {
   const nodeInfoEditDrawerlInfo = useFlowsManager(
-    (state) => state.nodeInfoEditDrawerlInfo,
+    state => state.nodeInfoEditDrawerlInfo
   ) as NodeInfoEditDrawerlInfo;
   const setNodeInfoEditDrawerlInfo = useFlowsManager(
-    (state) => state.setNodeInfoEditDrawerlInfo,
+    state => state.setNodeInfoEditDrawerlInfo
   ) as (info: NodeInfoEditDrawerlInfo) => void;
-  const currentStore = useFlowsManager((state) => state.getCurrentStore());
-  const nodes = currentStore((state) => state.nodes) as ReactFlowNode[];
+  const currentStore = useFlowsManager(state => state.getCurrentStore());
+  const nodes = currentStore(state => state.nodes) as ReactFlowNode[];
   const [rootStyle, setRootStyle] = useState<RootStyle>({
     height: (window?.innerHeight ?? 0) - 80,
     top: 80,
@@ -46,15 +46,15 @@ function index(): React.ReactElement {
         right: 0,
       });
     };
-    window.addEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
     return (): void => {
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
   const nodeInfo = useMemo<NodeDetailComponent | undefined>(() => {
     return nodes?.find(
-      (item: ReactFlowNode) => item?.id === nodeInfoEditDrawerlInfo.nodeId,
+      (item: ReactFlowNode) => item?.id === nodeInfoEditDrawerlInfo.nodeId
     );
   }, [nodes, nodeInfoEditDrawerlInfo.nodeId]);
 
@@ -64,7 +64,7 @@ function index(): React.ReactElement {
     nodeDesciption,
     isCodeNode,
   }: NodeCommonResult = useNodeCommon({
-    id: nodeInfo?.id || "",
+    id: nodeInfo?.id || '',
     data: nodeInfo?.data,
   });
 
@@ -86,7 +86,7 @@ function index(): React.ReactElement {
   return (
     <Drawer
       rootClassName={`advanced-configuration-container node-info-edit-container ${
-        isCodeNode ? "code-node-edit-container" : ""
+        isCodeNode ? 'code-node-edit-container' : ''
       }`}
       placement="right"
       open={nodeInfoEditDrawerlInfo?.open}
@@ -104,9 +104,9 @@ function index(): React.ReactElement {
             <Label
               {...({
                 data,
-                id: nodeInfo?.id || "",
+                id: nodeInfo?.id || '',
                 maxWidth: 250,
-                labelInput: "labelInput1",
+                labelInput: 'labelInput1',
               } as unknown)}
             />
             {renderTypeOneClickUpdate()}
@@ -114,7 +114,7 @@ function index(): React.ReactElement {
           <div className="flex items-center gap-3">
             {showNodeOperation && (
               <NodeOperation
-                id={nodeInfo?.id || ""}
+                id={nodeInfo?.id || ''}
                 data={nodeInfo?.data}
                 labelInput="labelInput1"
               />
@@ -128,8 +128,8 @@ function index(): React.ReactElement {
                 setNodeInfoEditDrawerlInfo(
                   cloneDeep({
                     open: false,
-                    nodeId: "",
-                  }),
+                    nodeId: '',
+                  })
                 );
               }}
             />

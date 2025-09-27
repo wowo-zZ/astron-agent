@@ -1,21 +1,21 @@
-import React, { useEffect, useState, memo } from "react";
-import { Button, Spin } from "antd";
-import { useTranslation } from "react-i18next";
-import { useMemoizedFn } from "ahooks";
-import { useParams, useLocation } from "react-router-dom";
-import BtnGroups from "./components/btn-groups";
-import FlowHeader from "./components/flow-header";
-import MultipleCanvasesTip from "./components/multiple-canvases-tip";
-import NodeList from "./components/node-list";
-import FlowContainer from "./components/flow-container";
-import FlowModal from "./components/flow-modal";
-import FlowDrawer from "./components/flow-drawer";
-import CommunityQRCode from "./components/community-qr-code";
+import React, { useEffect, useState, memo } from 'react';
+import { Button, Spin } from 'antd';
+import { useTranslation } from 'react-i18next';
+import { useMemoizedFn } from 'ahooks';
+import { useParams, useLocation } from 'react-router-dom';
+import BtnGroups from './components/btn-groups';
+import FlowHeader from './components/flow-header';
+import MultipleCanvasesTip from './components/multiple-canvases-tip';
+import NodeList from './components/node-list';
+import FlowContainer from './components/flow-container';
+import FlowModal from './components/flow-modal';
+import FlowDrawer from './components/flow-drawer';
+import CommunityQRCode from './components/community-qr-code';
 
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import useFlowStore from "@/components/workflow/store/useFlowStore";
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowStore from '@/components/workflow/store/useFlowStore';
 
-import chatResultClose from "@/assets/imgs/workflow/chat-result-close.png";
+import chatResultClose from '@/assets/imgs/workflow/chat-result-close.png';
 
 // ========= Props 类型 =========
 interface IndexProps {
@@ -23,36 +23,36 @@ interface IndexProps {
 }
 
 // ========= 组件 =========
-const Index: React.FC<IndexProps> = ({ currentTab = "arrange" }) => {
+const Index: React.FC<IndexProps> = ({ currentTab = 'arrange' }) => {
   const { t } = useTranslation();
   const { id } = useParams();
   const location = useLocation();
   // store hooks
-  const currentFlow = useFlowsManager((state) => state.currentFlow);
-  const setModels = useFlowsManager((state) => state.setModels);
+  const currentFlow = useFlowsManager(state => state.currentFlow);
+  const setModels = useFlowsManager(state => state.setModels);
   const setCanvasesDisabled = useFlowsManager(
-    (state) => state.setCanvasesDisabled,
+    state => state.setCanvasesDisabled
   );
-  const showNodeList = useFlowsManager((state) => state.showNodeList);
-  const setShowNodeList = useFlowsManager((state) => state.setShowNodeList);
+  const showNodeList = useFlowsManager(state => state.showNodeList);
+  const setShowNodeList = useFlowsManager(state => state.setShowNodeList);
   const setFlowChatResultOpen = useFlowsManager(
-    (state) => state.setFlowChatResultOpen,
+    state => state.setFlowChatResultOpen
   );
-  const initFlowData = useFlowsManager((state) => state.initFlowData);
-  const resetFlowsManager = useFlowsManager((state) => state.resetFlowsManager);
-  const setFlowResult = useFlowsManager((state) => state.setFlowResult);
-  const setEdgeType = useFlowsManager((state) => state.setEdgeType);
-  const loadingModels = useFlowsManager((state) => state.loadingModels);
-  const loadingNodesData = useFlowsManager((state) => state.loadingNodesData);
-  const setHistorys = useFlowStore((state) => state.setHistorys);
-  const setNodes = useFlowStore((state) => state.setNodes);
-  const setEdges = useFlowStore((state) => state.setEdges);
-  const zoom = useFlowStore((state) => state.zoom);
-  const setZoom = useFlowStore((state) => state.setZoom);
+  const initFlowData = useFlowsManager(state => state.initFlowData);
+  const resetFlowsManager = useFlowsManager(state => state.resetFlowsManager);
+  const setFlowResult = useFlowsManager(state => state.setFlowResult);
+  const setEdgeType = useFlowsManager(state => state.setEdgeType);
+  const loadingModels = useFlowsManager(state => state.loadingModels);
+  const loadingNodesData = useFlowsManager(state => state.loadingNodesData);
+  const setHistorys = useFlowStore(state => state.setHistorys);
+  const setNodes = useFlowStore(state => state.setNodes);
+  const setEdges = useFlowStore(state => state.setEdges);
+  const zoom = useFlowStore(state => state.zoom);
+  const setZoom = useFlowStore(state => state.setZoom);
 
   // 本地状态
   const [publishModal, setPublishModal] = useState<boolean>(false);
-  const historyVersion = useFlowsManager((state) => state.historyVersion);
+  const historyVersion = useFlowsManager(state => state.historyVersion);
 
   useEffect(() => {
     id && initFlowData(id);
@@ -68,17 +68,17 @@ const Index: React.FC<IndexProps> = ({ currentTab = "arrange" }) => {
     setNodes(
       data.nodes?.map((node: unknown) => ({
         ...node,
-        type: "custom",
-        nodeType: node?.id?.split("::")?.[0],
+        type: 'custom',
+        nodeType: node?.id?.split('::')?.[0],
         selected: false,
         data: {
           ...node.data,
-          status: "",
+          status: '',
         },
-      })),
+      }))
     );
     setEdges(data.edges);
-    setEdgeType(data.edges?.[0]?.data?.edgeType || "curve");
+    setEdgeType(data.edges?.[0]?.data?.edgeType || 'curve');
   });
 
   // currentFlow 改变时，刷新 nodes/edges
@@ -105,9 +105,9 @@ const Index: React.FC<IndexProps> = ({ currentTab = "arrange" }) => {
 
   const handleCancelBuildFlow = useMemoizedFn(() => {
     setFlowResult({
-      status: "",
-      timeCost: "",
-      totalTokens: "",
+      status: '',
+      timeCost: '',
+      totalTokens: '',
     });
     setShowNodeList(true);
     setCanvasesDisabled(false);
@@ -122,8 +122,8 @@ const Index: React.FC<IndexProps> = ({ currentTab = "arrange" }) => {
       <div
         className="fixed right-0 top-[80px] bg-[#EBEFF4] border border-[#DFE4ED] mt-5"
         style={{
-          borderRadius: "21px 0 0 21px",
-          padding: "10px 17px 10px 28px",
+          borderRadius: '21px 0 0 21px',
+          padding: '10px 17px 10px 28px',
           zIndex: 998,
         }}
       >
@@ -147,7 +147,7 @@ const Index: React.FC<IndexProps> = ({ currentTab = "arrange" }) => {
             className="origin-btn px-[36px]"
             onClick={() => handleCancelBuildFlow()}
           >
-            {t("common.cancel")}
+            {t('common.cancel')}
           </Button>
         )}
       </FlowHeader>

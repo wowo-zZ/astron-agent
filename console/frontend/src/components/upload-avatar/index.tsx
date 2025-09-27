@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import UploadDisplay from "./upload-display";
-import CropModal from "./crop-modal";
+import React, { useState } from 'react';
+import UploadDisplay from './upload-display';
+import CropModal from './crop-modal';
 
 const ImageCropUpload = ({
   name,
@@ -16,7 +16,7 @@ const ImageCropUpload = ({
   flag?: boolean;
 }) => {
   const [visible, setVisible] = useState(false);
-  const [uploadedSrc, setUploadedSrc] = useState("");
+  const [uploadedSrc, setUploadedSrc] = useState('');
 
   const handleImageSelected = (imageUrl: string) => {
     setUploadedSrc(imageUrl);
@@ -25,7 +25,7 @@ const ImageCropUpload = ({
 
   const handleCancel = () => {
     setVisible(false);
-    setUploadedSrc("");
+    setUploadedSrc('');
   };
 
   return (

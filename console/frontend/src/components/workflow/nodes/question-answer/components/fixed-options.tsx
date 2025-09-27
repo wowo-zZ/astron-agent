@@ -1,41 +1,41 @@
-import React, { useMemo, useCallback } from "react";
-import { cloneDeep } from "lodash";
-import { v4 as uuid } from "uuid";
-import { FlowSelect, FlowTemplateEditor } from "@/components/workflow/ui";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import { useTranslation } from "react-i18next";
+import React, { useMemo, useCallback } from 'react';
+import { cloneDeep } from 'lodash';
+import { v4 as uuid } from 'uuid';
+import { FlowSelect, FlowTemplateEditor } from '@/components/workflow/ui';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import { useTranslation } from 'react-i18next';
 
-import inputAddIcon from "@/assets/imgs/workflow/input-add-icon.png";
-import remove from "@/assets/imgs/workflow/input-remove-icon.png";
+import inputAddIcon from '@/assets/imgs/workflow/input-add-icon.png';
+import remove from '@/assets/imgs/workflow/input-remove-icon.png';
 
 function index({ id, data, nodeParam }): React.ReactElement {
   const { t } = useTranslation();
-  const getCurrentStore = useFlowsManager((state) => state.getCurrentStore);
+  const getCurrentStore = useFlowsManager(state => state.getCurrentStore);
   const currentStore = getCurrentStore();
-  const setNode = currentStore((state) => state.setNode);
+  const setNode = currentStore(state => state.setNode);
   const autoSaveCurrentFlow = useFlowsManager(
-    (state) => state.autoSaveCurrentFlow,
+    state => state.autoSaveCurrentFlow
   );
-  const canPublishSetNot = useFlowsManager((state) => state.canPublishSetNot);
-  const delayCheckNode = currentStore((state) => state.delayCheckNode);
-  const takeSnapshot = currentStore((state) => state.takeSnapshot);
-  const edges = currentStore((state) => state.edges);
-  const setEdges = currentStore((state) => state.setEdges);
-  const removeNodeRef = currentStore((state) => state.removeNodeRef);
+  const canPublishSetNot = useFlowsManager(state => state.canPublishSetNot);
+  const delayCheckNode = currentStore(state => state.delayCheckNode);
+  const takeSnapshot = currentStore(state => state.takeSnapshot);
+  const edges = currentStore(state => state.edges);
+  const setEdges = currentStore(state => state.setEdges);
+  const removeNodeRef = currentStore(state => state.removeNodeRef);
 
   const optionAnswer = useMemo(() => {
-    return nodeParam?.optionAnswer?.filter((item) => item.type === 2);
+    return nodeParam?.optionAnswer?.filter(item => item.type === 2);
   }, [nodeParam?.optionAnswer]);
 
   const optionDefaultAnswer = useMemo(() => {
-    return nodeParam?.optionAnswer?.find((item) => item.type === 1);
+    return nodeParam?.optionAnswer?.find(item => item.type === 1);
   }, [nodeParam?.optionAnswer]);
 
   const handleChangeOptionParma = useCallback(
     (optionId, key, value) => {
-      setNode(id, (old) => {
+      setNode(id, old => {
         const currentOption = old?.data?.nodeParam?.optionAnswer?.find(
-          (item) => item?.id === optionId,
+          item => item?.id === optionId
         );
         currentOption[key] = value;
         return {
@@ -45,16 +45,14 @@ function index({ id, data, nodeParam }): React.ReactElement {
       autoSaveCurrentFlow();
       canPublishSetNot();
     },
-    [id],
+    [id]
   );
 
   const handleAddLine = useCallback(() => {
     takeSnapshot();
-    setNode(id, (old) => {
+    setNode(id, old => {
       const optionAnswer = old.data.nodeParam.optionAnswer;
-      const filterOptionAnswer = optionAnswer?.filter(
-        (item) => item.type === 2,
-      );
+      const filterOptionAnswer = optionAnswer?.filter(item => item.type === 2);
       const length = old?.data?.nodeParam?.needReply
         ? optionAnswer?.length
         : optionAnswer?.length - 1;
@@ -63,11 +61,11 @@ function index({ id, data, nodeParam }): React.ReactElement {
         name: String.fromCharCode(
           filterOptionAnswer?.[
             filterOptionAnswer?.length - 1
-          ]?.name?.charCodeAt(0) + 1,
+          ]?.name?.charCodeAt(0) + 1
         ),
         type: 2,
-        content: "",
-        content_type: "string",
+        content: '',
+        content_type: 'string',
       });
       return {
         ...cloneDeep(old),
@@ -77,11 +75,11 @@ function index({ id, data, nodeParam }): React.ReactElement {
   }, [setNode, canPublishSetNot, takeSnapshot]);
 
   const handleRemoveLine = useCallback(
-    (optionId) => {
+    optionId => {
       takeSnapshot();
-      setNode(id, (old) => {
+      setNode(id, old => {
         old.data.nodeParam.optionAnswer = old.data.nodeParam.optionAnswer
-          ?.filter((item) => item?.id !== optionId)
+          ?.filter(item => item?.id !== optionId)
           ?.map((item, index) =>
             item?.type === 1
               ? {
@@ -89,27 +87,25 @@ function index({ id, data, nodeParam }): React.ReactElement {
                 }
               : {
                   ...item,
-                  name: String.fromCharCode("A".charCodeAt(0) + index),
-                },
+                  name: String.fromCharCode('A'.charCodeAt(0) + index),
+                }
           );
         return {
           ...cloneDeep(old),
         };
       });
       canPublishSetNot();
-      const edge = edges.find((edge) => edge.sourceHandle === optionId);
+      const edge = edges.find(edge => edge.sourceHandle === optionId);
       const othersEdges = edges.filter(
-        (item) => item.source !== edge?.source && item.target === edge?.target,
+        item => item.source !== edge?.source && item.target === edge?.target
       );
       if (othersEdges.length > 0) {
         removeNodeRef(edge.source, edge.target);
       }
-      setEdges((edges) =>
-        edges.filter((edge) => edge.sourceHandle !== optionId),
-      );
+      setEdges(edges => edges.filter(edge => edge.sourceHandle !== optionId));
       canPublishSetNot();
     },
-    [edges, setNode, canPublishSetNot, takeSnapshot],
+    [edges, setNode, canPublishSetNot, takeSnapshot]
   );
 
   return (
@@ -117,17 +113,17 @@ function index({ id, data, nodeParam }): React.ReactElement {
       <div className="flex flex-col gap-2">
         <div className="flex items-start gap-3 text-desc">
           <h4 className="w-[30px]">
-            {t("workflow.nodes.questionAnswerNode.option")}
+            {t('workflow.nodes.questionAnswerNode.option')}
           </h4>
           <h4 className="w-[100px]">
-            {t("workflow.nodes.questionAnswerNode.optionType")}
+            {t('workflow.nodes.questionAnswerNode.optionType')}
           </h4>
           <h4 className="flex-1">
-            {t("workflow.nodes.questionAnswerNode.optionContent")}
+            {t('workflow.nodes.questionAnswerNode.optionContent')}
           </h4>
           {optionAnswer.length > 1 && <span className="w-5 h-5"></span>}
         </div>
-        {optionAnswer?.map((item) => (
+        {optionAnswer?.map(item => (
           <div key={item?.id} className="flex flex-col gap-1 relative">
             <div className="flex items-start gap-3 text-desc">
               <div className="p-1.5 border border-[#E4EAFF] rounded-md text-[#275EFF] text-xs font-medium">
@@ -135,19 +131,19 @@ function index({ id, data, nodeParam }): React.ReactElement {
               </div>
               <div className="w-[100px]">
                 <FlowSelect
-                  value={item?.["content_type"]}
+                  value={item?.['content_type']}
                   options={[
                     {
-                      label: "String",
-                      value: "string",
+                      label: 'String',
+                      value: 'string',
                     },
                     {
-                      label: "Image",
-                      value: "image",
+                      label: 'Image',
+                      value: 'image',
                     },
                   ]}
-                  onChange={(value) =>
-                    handleChangeOptionParma(item?.id, "content_type", value)
+                  onChange={value =>
+                    handleChangeOptionParma(item?.id, 'content_type', value)
                   }
                 />
               </div>
@@ -156,13 +152,13 @@ function index({ id, data, nodeParam }): React.ReactElement {
                   data={data}
                   onBlur={() => delayCheckNode(id)}
                   value={item?.content}
-                  onChange={(value) =>
-                    handleChangeOptionParma(item?.id, "content", value)
+                  onChange={value =>
+                    handleChangeOptionParma(item?.id, 'content', value)
                   }
                   placeholder={t(
-                    "workflow.nodes.questionAnswerNode.contentPlaceholder",
+                    'workflow.nodes.questionAnswerNode.contentPlaceholder'
                   )}
-                  minHeight={"0px"}
+                  minHeight={'0px'}
                 />
               </div>
               {optionAnswer.length > 1 && (
@@ -187,16 +183,16 @@ function index({ id, data, nodeParam }): React.ReactElement {
             onClick={() => handleAddLine()}
           >
             <img src={inputAddIcon} className="w-3 h-3" alt="" />
-            <span>{t("workflow.nodes.questionAnswerNode.addOption")}</span>
+            <span>{t('workflow.nodes.questionAnswerNode.addOption')}</span>
           </div>
         )}
         {optionDefaultAnswer && (
           <div className="relative flex items-center gap-2 mt-3">
             <span className="text-[#275EFF] text-xs font-medium">
-              {t("workflow.nodes.questionAnswerNode.other")}
+              {t('workflow.nodes.questionAnswerNode.other')}
             </span>
             <div className="flex-1 border border-[#E4EAFF] rounded-lg px-3 py-1 text-[#CBCBCD] text-xs">
-              ({t("workflow.nodes.questionAnswerNode.otherOptionDescription")})
+              ({t('workflow.nodes.questionAnswerNode.otherOptionDescription')})
             </div>
           </div>
         )}

@@ -4,9 +4,9 @@ import React, {
   useCallback,
   useMemo,
   useRef,
-} from "react";
-import { createPortal } from "react-dom";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
+} from 'react';
+import { createPortal } from 'react-dom';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
 import {
   getKnowledgeDetail,
   queryFileList,
@@ -16,11 +16,11 @@ import {
   enableKnowledgeAPI,
   enableFlieAPI,
   listFileDirectoryTree,
-} from "@/services/knowledge";
-import { modifyChunks } from "@/utils";
-import { debounce, cloneDeep } from "lodash";
-import { fileType, generateType } from "@/utils";
-import { useTranslation } from "react-i18next";
+} from '@/services/knowledge';
+import { modifyChunks } from '@/utils';
+import { debounce, cloneDeep } from 'lodash';
+import { fileType, generateType } from '@/utils';
+import { useTranslation } from 'react-i18next';
 import {
   Input,
   Button,
@@ -31,11 +31,11 @@ import {
   Tag,
   Switch,
   TableColumnsType,
-} from "antd";
-import { typeList } from "@/constants";
-import { useMemoizedFn } from "ahooks";
-import { generateKnowledgeOutput } from "@/components/workflow/utils/reactflowUtils";
-import MarkdownRender from "@/components/markdown-render";
+} from 'antd';
+import { typeList } from '@/constants';
+import { useMemoizedFn } from 'ahooks';
+import { generateKnowledgeOutput } from '@/components/workflow/utils/reactflowUtils';
+import MarkdownRender from '@/components/markdown-render';
 import {
   KnowledgeDetailProps,
   EditChunkProps,
@@ -46,24 +46,24 @@ import {
   KnowledgeDetailModalInfo,
   FileInfo,
   ChunkItem,
-} from "@/components/workflow/types";
-import { Icons } from "@/components/workflow/icons";
+} from '@/components/workflow/types';
+import { Icons } from '@/components/workflow/icons';
 
 // 标签类型样式映射
 const tagTypeClass = new Map([
-  [1, "tag-type-1"],
-  [2, "tag-type-2"],
-  [3, "tag-type-3"],
-  [4, "tag-type-4"],
+  [1, 'tag-type-1'],
+  [2, 'tag-type-2'],
+  [3, 'tag-type-3'],
+  [4, 'tag-type-4'],
 ]);
 
 let eventSource: EventSource | null = null;
 
 function KnowledgePreviewModal(): React.ReactElement {
   const knowledgeDetailModalOpen = useFlowsManager(
-    (state) => state.knowledgeDetailModalInfo?.open,
+    state => state.knowledgeDetailModalInfo?.open
   );
-  const [currentTab, setCurrentTab] = useState("knowledge");
+  const [currentTab, setCurrentTab] = useState('knowledge');
   const [parentId, setParentId] = useState(-1);
   const [fileId, setFileId] = useState(-1);
 
@@ -76,10 +76,10 @@ function KnowledgePreviewModal(): React.ReactElement {
               style={{
                 zIndex: 1002,
               }}
-              onClick={(e) => e?.stopPropagation()}
+              onClick={e => e?.stopPropagation()}
             >
               <div className="p-6 pr-0 absolute bg-[#fff] rounded-2xl top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 text-second font-medium text-md min-w-[820px] h-[80vh] flex flex-col w-3/4">
-                {currentTab === "knowledge" && (
+                {currentTab === 'knowledge' && (
                   <KnowledgeDetail
                     parentId={parentId}
                     setParentId={setParentId}
@@ -87,7 +87,7 @@ function KnowledgePreviewModal(): React.ReactElement {
                     setFileId={setFileId}
                   />
                 )}
-                {currentTab === "file" && (
+                {currentTab === 'file' && (
                   <FileDetail
                     fileId={fileId}
                     setCurrentTab={setCurrentTab}
@@ -96,7 +96,7 @@ function KnowledgePreviewModal(): React.ReactElement {
                 )}
               </div>
             </div>,
-            document.body,
+            document.body
           )
         : null}
     </>
@@ -111,24 +111,24 @@ function KnowledgeDetail({
 }: KnowledgeDetailProps): React.ReactElement {
   const { t } = useTranslation();
   const knowledgeDetailModalInfo = useFlowsManager(
-    (state) => state.knowledgeDetailModalInfo,
+    state => state.knowledgeDetailModalInfo
   );
   const setKnowledgeDetailModalInfo = useFlowsManager(
-    (state) => state.setKnowledgeDetailModalInfo,
+    state => state.setKnowledgeDetailModalInfo
   );
-  const getCurrentStore = useFlowsManager((state) => state.getCurrentStore);
+  const getCurrentStore = useFlowsManager(state => state.getCurrentStore);
   const autoSaveCurrentFlow = useFlowsManager(
-    (state) => state.autoSaveCurrentFlow,
+    state => state.autoSaveCurrentFlow
   );
-  const canPublishSetNot = useFlowsManager((state) => state.canPublishSetNot);
+  const canPublishSetNot = useFlowsManager(state => state.canPublishSetNot);
   const currentStore = getCurrentStore();
-  const nodes = currentStore((state) => state.nodes);
-  const setNode = currentStore((state) => state.setNode);
-  const checkNode = currentStore((state) => state.checkNode);
+  const nodes = currentStore(state => state.nodes);
+  const setNode = currentStore(state => state.setNode);
+  const checkNode = currentStore(state => state.checkNode);
   const [knowledgeDetail, setKnowledgeDetail] = useState<{ name: string }>({
-    name: "",
+    name: '',
   });
-  const [searchValue, setSearchValue] = useState<string>("");
+  const [searchValue, setSearchValue] = useState<string>('');
   const [searchData, setSearchData] = useState<KnowledgeFileItem[]>([]);
   const [directoryTree, setDirectoryTree] = useState<DirectoryItem[]>([]);
   const [pagination, setPagination] = useState<PaginationState>({
@@ -141,44 +141,43 @@ function KnowledgeDetail({
 
   const repoId = useMemo(
     () => knowledgeDetailModalInfo.repoId,
-    [knowledgeDetailModalInfo],
+    [knowledgeDetailModalInfo]
   );
   const tag = useMemo(
     () => (knowledgeDetailModalInfo as KnowledgeDetailModalInfo).tag,
-    [knowledgeDetailModalInfo],
+    [knowledgeDetailModalInfo]
   );
   const id = useMemo(
     () => knowledgeDetailModalInfo?.nodeId,
-    [knowledgeDetailModalInfo],
+    [knowledgeDetailModalInfo]
   );
   const repoList = useMemo(() => {
-    return nodes?.find((item) => item.id === id)?.data.nodeParam.repoList || [];
+    return nodes?.find(item => item.id === id)?.data.nodeParam.repoList || [];
   }, [nodes, knowledgeDetailModalInfo?.nodeId]);
   const checkedIds = useMemo(() => {
-    return repoList?.map((item) => item?.id) || [];
+    return repoList?.map(item => item?.id) || [];
   }, [repoList]);
   const ragType = useMemo(() => {
-    return repoList?.[0]?.tag || "";
+    return repoList?.[0]?.tag || '';
   }, [repoList]);
   const isPro = useMemo(() => {
-    return id?.startsWith("knowledge-pro-base");
+    return id?.startsWith('knowledge-pro-base');
   }, [id]);
   const columns: TableColumnsType<KnowledgeFileItem> = [
     {
-      title: t("knowledge.fileName"),
-      dataIndex: "name",
-      key: "name",
+      title: t('knowledge.fileName'),
+      dataIndex: 'name',
+      key: 'name',
       render: (name, record): React.ReactElement => {
         return (
           <div className="flex items-center">
-            {record.type === "folder" ? (
+            {record.type === 'folder' ? (
               <img src={typeList.get(record.type)} className="w-10 h-10" />
             ) : (
               <div className="w-10 h-10 rounded-full bg-[#F0F3F9] flex justify-center items-center">
                 <img
                   src={typeList.get(
-                    generateType((record.type || "").toLowerCase()) ||
-                      "default",
+                    generateType((record.type || '').toLowerCase()) || 'default'
                   )}
                   className="w-[22px] h-[22px]"
                   alt=""
@@ -190,7 +189,7 @@ function KnowledgeDetail({
               title={name}
               dangerouslySetInnerHTML={{ __html: name }}
             ></span>
-            {record.type === "folder" && (
+            {record.type === 'folder' && (
               <img
                 src={Icons.knowledgeDetail.rightarow}
                 className="w-5 h-5 ml-1"
@@ -203,21 +202,21 @@ function KnowledgeDetail({
     },
     {
       width: 100,
-      title: t("knowledge.characterCount"),
-      dataIndex: "number",
-      key: "number",
+      title: t('knowledge.characterCount'),
+      dataIndex: 'number',
+      key: 'number',
       render: (_, record): string | undefined => {
         return record.isFile ? record.fileInfoV2?.charCount : undefined;
       },
     },
     {
       width: 100,
-      title: t("knowledge.hitCount"),
-      dataIndex: "hitCount",
-      key: "hitCount",
+      title: t('knowledge.hitCount'),
+      dataIndex: 'hitCount',
+      key: 'hitCount',
       render: (hitCount): number => {
         return (
-          <div style={{ color: hitCount ? "#2f2f2f" : "#a4a4a4" }}>
+          <div style={{ color: hitCount ? '#2f2f2f' : '#a4a4a4' }}>
             {hitCount}
           </div>
         );
@@ -225,19 +224,19 @@ function KnowledgeDetail({
     },
     {
       width: 180,
-      title: t("knowledge.uploadTime"),
-      dataIndex: "createTime",
-      key: "createTime",
+      title: t('knowledge.uploadTime'),
+      dataIndex: 'createTime',
+      key: 'createTime',
     },
     {
       width: 100,
-      title: "启用",
-      dataIndex: "enabled",
-      key: "enabled",
+      title: '启用',
+      dataIndex: 'enabled',
+      key: 'enabled',
       render: (enabled, item): React.ReactElement | null => {
         return item.isFile ? (
           <Switch
-            disabled={["block", "review"].includes(item.auditSuggest || "")}
+            disabled={['block', 'review'].includes(item.auditSuggest || '')}
             size="small"
             checked={item.fileInfoV2?.enabled}
             onChange={(checked, event) => enableFile(item, event)}
@@ -257,14 +256,14 @@ function KnowledgeDetail({
       fileId: parentId,
       repoId,
     };
-    listFileDirectoryTree(params).then((data) => {
+    listFileDirectoryTree(params).then(data => {
       setDirectoryTree(data);
     });
   }
 
   function enableFile(
     record: KnowledgeFileItem,
-    event: React.MouseEvent,
+    event: React.MouseEvent
   ): void {
     event.stopPropagation();
     const enabled = record.fileInfoV2?.enabled ? 0 : 1;
@@ -274,16 +273,16 @@ function KnowledgeDetail({
     };
     enableFlieAPI(params).then(() => {
       if (searchValue) {
-        setSearchData((files) => {
-          const currentFile = searchData.find((item) => item.id === record.id);
+        setSearchData(files => {
+          const currentFile = searchData.find(item => item.id === record.id);
           if (currentFile?.fileInfoV2) {
             currentFile.fileInfoV2.enabled = enabled === 1;
           }
           return [...files];
         });
       } else {
-        setDataResource((files) => {
-          const currentFile = files.find((item) => item.id === record.id);
+        setDataResource(files => {
+          const currentFile = files.find(item => item.id === record.id);
           if (currentFile?.fileInfoV2) {
             currentFile.fileInfoV2.enabled = enabled === 1;
           }
@@ -297,7 +296,7 @@ function KnowledgeDetail({
     if (repoId && tag) {
       getKnowledgeDetail(
         knowledgeDetailModalInfo.repoId,
-        (knowledgeDetailModalInfo as KnowledgeDetailModalInfo).tag || "",
+        (knowledgeDetailModalInfo as KnowledgeDetailModalInfo).tag || ''
       ).then((res: unknown) => {
         setKnowledgeDetail(res);
       });
@@ -310,14 +309,14 @@ function KnowledgeDetail({
       setSearchValue(value);
       searchFileDebounce(value);
     },
-    [repoId, parentId],
+    [repoId, parentId]
   );
 
   const searchFileDebounce = useCallback(
-    debounce((value) => {
+    debounce(value => {
       searchFile(value);
     }, 500),
-    [repoId, parentId],
+    [repoId, parentId]
   );
 
   function searchFile(searchValue: string): void {
@@ -328,8 +327,8 @@ function KnowledgeDetail({
 
     eventSource = new EventSource(
       `/xingchen-api/file/search-file?fileName=${encodeURIComponent(
-        searchValue,
-      )}&repoId=${repoId}&pid=${parentId}&tag=${tag}`,
+        searchValue
+      )}&repoId=${repoId}&pid=${parentId}&tag=${tag}`
     );
 
     eventSource.onerror = function (): void {
@@ -338,18 +337,18 @@ function KnowledgeDetail({
       }
     };
 
-    eventSource.addEventListener("data", function (e): void {
+    eventSource.addEventListener('data', function (e): void {
       const item = JSON.parse(e.data);
       item.type = fileType(item);
-      const regexPattern = new RegExp(searchValue, "gi");
+      const regexPattern = new RegExp(searchValue, 'gi');
       item.name = item.name.replaceAll(
         regexPattern,
-        '<span style="color:#275EFF;font-weight:600;display:inline-block;padding:4px 0px;background:#dee2f9">$&</span>',
+        '<span style="color:#275EFF;font-weight:600;display:inline-block;padding:4px 0px;background:#dee2f9">$&</span>'
       );
-      setSearchData((resultList) => [...resultList, item]);
+      setSearchData(resultList => [...resultList, item]);
     });
 
-    eventSource.addEventListener("bye", function (): void {
+    eventSource.addEventListener('bye', function (): void {
       if (eventSource) {
         eventSource.close();
       }
@@ -366,7 +365,7 @@ function KnowledgeDetail({
       pageSize: pagination.pageSize,
     };
     queryFileList(params)
-      .then((data) => {
+      .then(data => {
         const files = data.pageData.map((item: unknown) => ({
           ...item,
           type: fileType(item),
@@ -374,7 +373,7 @@ function KnowledgeDetail({
           tagDtoList: item.tagDtoList,
         }));
         setDataResource(files);
-        setPagination((prevPagination) => ({
+        setPagination(prevPagination => ({
           ...prevPagination,
           total: data.totalCount,
         }));
@@ -385,20 +384,20 @@ function KnowledgeDetail({
   const handleKnowledgesChange = useMemoizedFn((knowledge: unknown): void => {
     autoSaveCurrentFlow();
     if (isPro) {
-      setNode(id, (old) => {
+      setNode(id, old => {
         const findKnowledgeIndex = old.data.nodeParam.repoList?.findIndex(
-          (item) => item.id === knowledge.id,
+          item => item.id === knowledge.id
         );
         if (findKnowledgeIndex === -1) {
           old.data.nodeParam.repoIds.push(
-            knowledge.coreRepoId || knowledge.outerRepoId,
+            knowledge.coreRepoId || knowledge.outerRepoId
           );
           old.data.nodeParam.repoList.push(knowledge);
         } else {
           old.data.nodeParam.repoIds.splice(findKnowledgeIndex, 1);
           old.data.nodeParam.repoList.splice(findKnowledgeIndex, 1);
         }
-        if (knowledge?.tag === "AIUI-RAG2") {
+        if (knowledge?.tag === 'AIUI-RAG2') {
           old.data.nodeParam.repoType = 1;
         } else {
           old.data.nodeParam.repoType = 2;
@@ -408,13 +407,13 @@ function KnowledgeDetail({
         };
       });
     } else {
-      setNode(id, (old) => {
+      setNode(id, old => {
         const findKnowledgeIndex = old.data.nodeParam.repoList?.findIndex(
-          (item) => item.id === knowledge.id,
+          item => item.id === knowledge.id
         );
         if (findKnowledgeIndex === -1) {
           old.data.nodeParam.repoId.push(
-            knowledge.coreRepoId || knowledge.outerRepoId,
+            knowledge.coreRepoId || knowledge.outerRepoId
           );
           old.data.nodeParam.repoList.push(knowledge);
         } else {
@@ -434,20 +433,20 @@ function KnowledgeDetail({
 
   function handleRowClick(record: KnowledgeFileItem): void {
     if (record.isFile) {
-      setCurrentTab("file");
+      setCurrentTab('file');
       setFileId(record.fileId || 0);
     } else {
       setParentId(record.id);
-      setPagination((prevPagination) => ({
+      setPagination(prevPagination => ({
         ...prevPagination,
         current: 1,
       }));
-      setSearchValue("");
+      setSearchValue('');
     }
   }
 
   function rowProps(record: KnowledgeFileItem): React.ReactElement {
-    return tag !== "SparkDesk-RAG"
+    return tag !== 'SparkDesk-RAG'
       ? {
           onClick: () => handleRowClick(record),
         }
@@ -476,8 +475,8 @@ function KnowledgeDetail({
           onClick={() =>
             setKnowledgeDetailModalInfo({
               open: false,
-              nodeId: "",
-              repoId: "",
+              nodeId: '',
+              repoId: '',
             })
           }
         />
@@ -505,7 +504,7 @@ function KnowledgeDetail({
               ))}
               <span className="bg-[#F0F3F9] rounded-md py-1 px-2 text-desc ml-2">
                 {pagination.total}
-                {t("knowledge.items")}
+                {t('knowledge.items')}
               </span>
             </div>
           )}
@@ -517,7 +516,7 @@ function KnowledgeDetail({
             />
             <Input
               className="global-input w-[320px] pl-10"
-              placeholder={t("knowledge.pleaseEnter")}
+              placeholder={t('knowledge.pleaseEnter')}
               value={searchValue}
               onChange={handleInputChange}
             />
@@ -525,7 +524,7 @@ function KnowledgeDetail({
         </div>
         <Tooltip
           overlayClassName="black-tooltip"
-          title={t("workflow.nodes.relatedKnowledgeModal.knowledgeTypeTip")}
+          title={t('workflow.nodes.relatedKnowledgeModal.knowledgeTypeTip')}
         >
           {checkedIds.includes(repoId) ? (
             <Button
@@ -534,7 +533,7 @@ function KnowledgeDetail({
                 handleKnowledgesChange(knowledgeDetailModalInfo);
               }}
             >
-              {t("workflow.nodes.relatedKnowledgeModal.remove")}
+              {t('workflow.nodes.relatedKnowledgeModal.remove')}
             </Button>
           ) : (
             <Button
@@ -544,7 +543,7 @@ function KnowledgeDetail({
                 handleKnowledgesChange(knowledgeDetailModalInfo);
               }}
             >
-              {t("workflow.nodes.relatedKnowledgeModal.add")}
+              {t('workflow.nodes.relatedKnowledgeModal.add')}
             </Button>
           )}
         </Tooltip>
@@ -578,12 +577,12 @@ function KnowledgeDetail({
                 className="document-table h-full"
                 onRow={rowProps}
                 pagination={false}
-                rowKey={(record) => record.id}
+                rowKey={record => record.id}
               />
             </div>
             <div className="flex items-center justify-center h-[80px] px-6 relative">
               <div className="text-[#979797] text-sm pt-4 absolute left-6">
-                {t("effectEvaluation.totalDataItems", {
+                {t('effectEvaluation.totalDataItems', {
                   count: pagination?.total,
                 })}
               </div>
@@ -612,25 +611,23 @@ function EditChunk({
   const { t } = useTranslation();
   const [folderTags, setFolderTags] = useState<string[]>([]);
   const [othersTag, setOtherTags] = useState([]);
-  const [tagValue, setTagValue] = useState("");
+  const [tagValue, setTagValue] = useState('');
   const [checked, setChecked] = useState(false);
   const [moreTags, setMoreTags] = useState(false);
 
   useEffect(() => {
     const currentTags = currentChunk.tagDtoList
-      .filter((item) => item.type === 4)
-      .map((item) => item.tagName);
-    const remainTags = currentChunk.tagDtoList.filter(
-      (item) => item.type !== 4,
-    );
-    setTagValue(currentTags.join("，"));
+      .filter(item => item.type === 4)
+      .map(item => item.tagName);
+    const remainTags = currentChunk.tagDtoList.filter(item => item.type !== 4);
+    setTagValue(currentTags.join('，'));
     setOtherTags(remainTags);
     setChecked(currentChunk.enabled ? true : false);
   }, []);
 
   useEffect(() => {
     if (tagValue) {
-      const tagArr = tagValue.split(/[,，]/).filter((item) => item);
+      const tagArr = tagValue.split(/[,，]/).filter(item => item);
       setFolderTags([...tagArr]);
 
       if (tagArr.length + othersTag.length > 5) {
@@ -657,8 +654,8 @@ function EditChunk({
             <span
               className="ml-1 text-xs text-[#F6B728]"
               style={{
-                fontFamily: "SF Pro Text, SF Pro Text-600",
-                fontStyle: "italic",
+                fontFamily: 'SF Pro Text, SF Pro Text-600',
+                fontStyle: 'italic',
               }}
             >
               00{currentChunk.index}
@@ -695,24 +692,24 @@ function EditChunk({
             <div className="flex items-center">
               <span
                 className={`w-[9px] h-[9px] ${
-                  checked ? "bg-[#13A10E]" : "bg-[#757575]"
+                  checked ? 'bg-[#13A10E]' : 'bg-[#757575]'
                 } rounded-full`}
               ></span>
               <span
                 className={`${
-                  checked ? "text-[#13A10E]" : "text-[#757575]"
+                  checked ? 'text-[#13A10E]' : 'text-[#757575]'
                 } text-sm ml-2`}
               >
-                {checked ? t("knowledge.enabled") : t("knowledge.disabled")}
+                {checked ? t('knowledge.enabled') : t('knowledge.disabled')}
               </span>
             </div>
             <Switch
-              disabled={["block", "review"].includes(
-                currentChunk.auditSuggest || "",
+              disabled={['block', 'review'].includes(
+                currentChunk.auditSuggest || ''
               )}
               size="small"
               checked={checked}
-              onChange={(checked) => {
+              onChange={checked => {
                 setChecked(checked);
                 enableChunk(currentChunk, checked);
               }}
@@ -767,7 +764,7 @@ function EditChunk({
               className="rounded-md border border-[#D7DFE9] px-4 py-1 text-second text-sm cursor-pointer"
               onClick={() => setEditModal(false)}
             >
-              {t("common.cancel")}
+              {t('common.cancel')}
             </div>
           </div>
         </div>
@@ -786,15 +783,15 @@ function FileDetail({
   const { t } = useTranslation();
   const loadingRef = useRef<boolean>(false);
   const knowledgeDetailModalInfo = useFlowsManager(
-    (state) => state.knowledgeDetailModalInfo,
+    state => state.knowledgeDetailModalInfo
   );
   const setKnowledgeDetailModalInfo = useFlowsManager(
-    (state) => state.setKnowledgeDetailModalInfo,
+    state => state.setKnowledgeDetailModalInfo
   );
   const [fileList, setFileList] = useState<KnowledgeFileItem[]>([]);
   const [showMore, setShowMore] = useState<boolean>(false);
   const [fileInfo, setFileInfo] = useState<FileInfo>({} as FileInfo);
-  const [searchValue, setSearchValue] = useState<string>("");
+  const [searchValue, setSearchValue] = useState<string>('');
   const [isViolation, setIsViolation] = useState<boolean>(false);
   const [parameters, setParameters] = useState<unknown>({});
   const [loadingData, setLoadingData] = useState<boolean>(false);
@@ -807,15 +804,15 @@ function FileDetail({
 
   const repoId = useMemo(
     () => knowledgeDetailModalInfo.repoId,
-    [knowledgeDetailModalInfo],
+    [knowledgeDetailModalInfo]
   );
   const tag = useMemo(
     () => (knowledgeDetailModalInfo as KnowledgeDetailModalInfo).tag,
-    [knowledgeDetailModalInfo],
+    [knowledgeDetailModalInfo]
   );
 
   const otherFiles = useMemo(() => {
-    return fileList.filter((item) => item.id !== fileId);
+    return fileList.filter(item => item.id !== fileId);
   }, [fileList, fileId]);
 
   useEffect(() => {
@@ -823,7 +820,7 @@ function FileDetail({
   }, []);
 
   function getFiles(): void {
-    getFileList(repoId).then((data) => {
+    getFileList(repoId).then(data => {
       setFileList(data);
     });
   }
@@ -837,7 +834,7 @@ function FileDetail({
       tag,
       fileIds: [fileId],
     };
-    getFileSummary(params).then((data) => {
+    getFileSummary(params).then(data => {
       setFileInfo(data.fileInfoV2);
       setParameters(data);
     });
@@ -858,7 +855,7 @@ function FileDetail({
     };
     if (isViolation) params.auditType = 1;
     listKnowledgeByPage(params)
-      .then((data) => {
+      .then(data => {
         const newChunks = modifyChunks(data.pageData);
         setPageNumber(2);
         setChunks(() => newChunks);
@@ -880,7 +877,7 @@ function FileDetail({
       setSearchValue(value);
       fetchData(value);
     }, 500),
-    [searchValue],
+    [searchValue]
   );
 
   function handleScroll(): void {
@@ -909,15 +906,15 @@ function FileDetail({
       query: searchValue,
     };
     listKnowledgeByPage(params)
-      .then((data) => {
+      .then(data => {
         const newChunks = modifyChunks(data.pageData);
         if (data.totalCount > chunks.length + 20) {
           setHasMore(true);
         } else {
           setHasMore(false);
         }
-        setPageNumber((number) => number + 1);
-        setChunks((prevItems) => [...prevItems, ...newChunks]);
+        setPageNumber(number => number + 1);
+        setChunks(prevItems => [...prevItems, ...newChunks]);
       })
       .finally(() => {
         loadingRef.current = false;
@@ -926,7 +923,7 @@ function FileDetail({
   }
 
   function enableChunk(record: ChunkItem, checked: boolean): void {
-    const findChunk = chunks.find((item) => item.id === record.id);
+    const findChunk = chunks.find(item => item.id === record.id);
     if (findChunk) {
       findChunk.enabled = checked;
     }
@@ -935,7 +932,7 @@ function FileDetail({
       id: record.id,
       enabled: checked ? 1 : 0,
     };
-    enableKnowledgeAPI(params).then((data) => {
+    enableKnowledgeAPI(params).then(data => {
       if (checked && findChunk) {
         findChunk.id = data;
         setChunks([...chunks]);
@@ -944,9 +941,9 @@ function FileDetail({
   }
 
   useEffect(() => {
-    document.documentElement.addEventListener("click", clickOutside);
+    document.documentElement.addEventListener('click', clickOutside);
     return (): void =>
-      document.documentElement.removeEventListener("click", clickOutside);
+      document.documentElement.removeEventListener('click', clickOutside);
   }, []);
 
   function clickOutside(): void {
@@ -972,15 +969,15 @@ function FileDetail({
           <img
             src={Icons.knowledgeDetail.arrowLeft}
             className="w-7 h-7 cursor-pointer"
-            onClick={() => setCurrentTab("knowledge")}
+            onClick={() => setCurrentTab('knowledge')}
             alt=""
           />
           <span
             className="flex justify-between items-center py-2 px-3.5 bg-[#F9FAFB] w-[400px] relative rounded-lg"
             style={{
-              cursor: otherFiles.length > 0 ? "pointer" : "auto",
+              cursor: otherFiles.length > 0 ? 'pointer' : 'auto',
             }}
-            onClick={(event) => {
+            onClick={event => {
               event.stopPropagation();
               setShowMore(!showMore);
             }}
@@ -988,8 +985,8 @@ function FileDetail({
             <div className="w-full flex items-center flex-1">
               <img
                 src={typeList.get(
-                  generateType((fileInfo?.type || "").toLowerCase()) ||
-                    "default",
+                  generateType((fileInfo?.type || '').toLowerCase()) ||
+                    'default'
                 )}
                 className="w-[22px] h-[22px] flex-shrink-0"
                 alt=""
@@ -1010,24 +1007,24 @@ function FileDetail({
             )}
             {showMore && otherFiles.length > 0 && (
               <div className="absolute right-0 top-[42px] list-options py-3.5 pt-2 w-full z-50 max-h-[205px] overflow-auto">
-                {otherFiles.map((item) => (
+                {otherFiles.map(item => (
                   <div
                     key={item.id}
                     className="w-full px-5 py-1.5 pr-4 text-desc font-medium hover:bg-[#F9FAFB] flex items-center cursor-pointer"
                     onClick={() => {
                       if (searchRef.current) {
-                        searchRef.current.value = "";
-                        searchRef.current.setAttribute("placeholder", "请输入");
+                        searchRef.current.value = '';
+                        searchRef.current.setAttribute('placeholder', '请输入');
                       }
-                      setSearchValue("");
+                      setSearchValue('');
                       setIsViolation(false);
                       setFileId(item.id);
                     }}
                   >
                     <img
                       src={typeList.get(
-                        generateType((item.type || "").toLowerCase()) ||
-                          "default",
+                        generateType((item.type || '').toLowerCase()) ||
+                          'default'
                       )}
                       className="w-4 h-4 flex-shrink-0"
                       alt=""
@@ -1051,8 +1048,8 @@ function FileDetail({
           onClick={() =>
             setKnowledgeDetailModalInfo({
               open: false,
-              nodeId: "",
-              repoId: "",
+              nodeId: '',
+              repoId: '',
             })
           }
         />
@@ -1070,7 +1067,7 @@ function FileDetail({
                 <input
                   ref={searchRef}
                   className="global-input ml-3 w-[320px] pl-10 h-10"
-                  placeholder={t("knowledge.pleaseEnter")}
+                  placeholder={t('knowledge.pleaseEnter')}
                   onChange={fetchDataDebounce}
                 />
               </div>
@@ -1094,9 +1091,9 @@ function FileDetail({
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
-                        {["block", "review"].includes(item.auditSuggest) && (
+                        {['block', 'review'].includes(item.auditSuggest) && (
                           <div className="rounded border border-[#FFA19B] bg-[#fff5f4] px-2 py-1 text-[#E92215] text-xs mr-2.5">
-                            {t("knowledge.violation")}
+                            {t('knowledge.violation')}
                           </div>
                         )}
                         <img
@@ -1106,7 +1103,7 @@ function FileDetail({
                         />
                         <span
                           className="ml-1 text-xs text-[#F6B728]"
-                          style={{ fontFamily: "SF Pro Text, SF Pro Text-600" }}
+                          style={{ fontFamily: 'SF Pro Text, SF Pro Text-600' }}
                         >
                           00{index + 1}
                         </span>
@@ -1118,7 +1115,7 @@ function FileDetail({
                               alt=""
                             />
                             <span className="text-desc ml-1">
-                              {t("knowledge.manual")}
+                              {t('knowledge.manual')}
                             </span>
                           </div>
                         )}
@@ -1143,18 +1140,18 @@ function FileDetail({
                         <div className="flex items-center">
                           <span
                             className={`w-2 h-2 ${
-                              item.enabled ? "bg-[#13A10E]" : "bg-[#757575]"
+                              item.enabled ? 'bg-[#13A10E]' : 'bg-[#757575]'
                             } rounded-full`}
                           ></span>
                           <span className="text-desc ml-1.5">
                             {item.enabled
-                              ? t("knowledge.enabled")
-                              : t("knowledge.disabled")}
+                              ? t('knowledge.enabled')
+                              : t('knowledge.disabled')}
                           </span>
                         </div>
                         <Switch
-                          disabled={["block", "review"].includes(
-                            item.auditSuggest,
+                          disabled={['block', 'review'].includes(
+                            item.auditSuggest
                           )}
                           size="small"
                           checked={item.enabled ? true : false}
@@ -1174,13 +1171,13 @@ function FileDetail({
                       />
                     </div>
                     <div className="justify-between items-start mt-2 hidden group-hover:flex w-full">
-                      {["block", "review"].includes(item.auditSuggest) ? (
+                      {['block', 'review'].includes(item.auditSuggest) ? (
                         <div className="flex-1 flex overflow-hidden">
                           <span
                             className="flex-1 text-overflow font-semibold text-sm"
                             title={item.auditDetail}
                           >
-                            {t("knowledge.violationReason", {
+                            {t('knowledge.violationReason', {
                               reason: item.auditDetail,
                             })}
                           </span>
@@ -1222,7 +1219,7 @@ function FileDetail({
                             !moreTagsId.includes(item.id) && (
                               <span
                                 className="rounded-md inline-block bg-[#F0F3F9] px-2 py-1 h-6 text-desc mb-1 cursor-pointer"
-                                onClick={(e) => {
+                                onClick={e => {
                                   e.stopPropagation();
                                   moreTagsId.push(item.id);
                                   setMoreTagsId([...moreTagsId]);
@@ -1243,26 +1240,26 @@ function FileDetail({
         </div>
         <div
           className="h-full border-l border-[#E2E8FF] transition-all overflow-auto"
-          style={{ width: "16%" }}
+          style={{ width: '16%' }}
         >
           <div className="w-full h-full px-6">
             <h2 className="text-second font-semibold text-2xl">
-              {t("knowledge.technicalParameters")}
+              {t('knowledge.technicalParameters')}
             </h2>
             <div className="mt-3 flex flex-col gap-3">
               <div className="flex flex-col">
                 <div className="text-second font-medium">
-                  {t("knowledge.segmentIdentifier")}
+                  {t('knowledge.segmentIdentifier')}
                 </div>
                 <p className="text-[#757575] text-xl font-medium">
                   {parameters.sliceType === 0
-                    ? t("knowledge.automatic")
-                    : t("knowledge.customized")}
+                    ? t('knowledge.automatic')
+                    : t('knowledge.customized')}
                 </p>
               </div>
               <div className="flex flex-col">
                 <div className="text-second font-medium">
-                  {t("knowledge.hitCount")}
+                  {t('knowledge.hitCount')}
                 </div>
                 <p className="text-[#757575] text-xl font-medium">
                   {parameters.hitCount}
@@ -1270,27 +1267,27 @@ function FileDetail({
               </div>
               <div className="flex flex-col">
                 <div className="text-second font-medium">
-                  {t("knowledge.paragraphLength")}
+                  {t('knowledge.paragraphLength')}
                 </div>
                 <p className="text-[#757575] text-xl font-medium">
-                  {parameters.lengthRange && parameters.lengthRange[1]}{" "}
-                  {t("knowledge.characters")}
+                  {parameters.lengthRange && parameters.lengthRange[1]}{' '}
+                  {t('knowledge.characters')}
                 </p>
               </div>
               <div className="flex flex-col">
                 <div className="text-second font-medium">
-                  {t("knowledge.averageParagraphLength")}
+                  {t('knowledge.averageParagraphLength')}
                 </div>
                 <p className="text-[#757575] text-xl font-medium">
-                  {parameters.knowledgeAvgLength} {t("knowledge.characters")}
+                  {parameters.knowledgeAvgLength} {t('knowledge.characters')}
                 </p>
               </div>
               <div className="flex flex-col">
                 <div className="text-second font-medium">
-                  {t("knowledge.paragraphCount")}
+                  {t('knowledge.paragraphCount')}
                 </div>
                 <p className="text-[#757575] text-xl font-medium">
-                  {parameters.knowledgeCount} {t("knowledge.paragraphs")}
+                  {parameters.knowledgeCount} {t('knowledge.paragraphs')}
                 </p>
               </div>
             </div>

@@ -1,8 +1,8 @@
-import React from "react";
-import classNames from "classnames";
-import unchooseBox from "@/assets/imgs/space/unchoose-box.svg";
-import chooseBox from "@/assets/imgs/space/choose-box.svg";
-import styles from "./index.module.scss";
+import React from 'react';
+import classNames from 'classnames';
+import unchooseBox from '@/assets/imgs/space/unchoose-box.svg';
+import chooseBox from '@/assets/imgs/space/choose-box.svg';
+import styles from './index.module.scss';
 
 interface CusCheckBoxProps {
   checked: boolean;
@@ -30,7 +30,7 @@ const CusCheckBox: React.FC<CusCheckBoxProps> = ({
       className={classNames(
         styles.checkboxWrapper,
         disabled && styles.disabled,
-        className,
+        className
       )}
       onClick={handleClick}
     >

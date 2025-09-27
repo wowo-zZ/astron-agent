@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { Input } from "antd";
-import styles from "./index.module.scss";
-import search from "@/assets/imgs/file/icon_zhishi_search.png";
-import classNames from "classnames";
+import React, { useState } from 'react';
+import { Input } from 'antd';
+import styles from './index.module.scss';
+import search from '@/assets/imgs/file/icon_zhishi_search.png';
+import classNames from 'classnames';
 
 interface SpaceSearchProps {
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -18,7 +18,7 @@ interface SpaceSearchProps {
 const SpaceSearch: React.FC<SpaceSearchProps> = ({
   onChange,
   value: propValue,
-  placeholder = "搜索用户名",
+  placeholder = '搜索用户名',
   onSearch,
   className,
   retractable = false,
@@ -26,7 +26,7 @@ const SpaceSearch: React.FC<SpaceSearchProps> = ({
   ...restProps
 }) => {
   const [expand, setExpand] = useState(!retractable); // 当不启用收缩功能时，默认展开
-  const [internalValue, setInternalValue] = useState("");
+  const [internalValue, setInternalValue] = useState('');
 
   // 使用受控或非受控逻辑
   const isControlled = propValue !== undefined;
@@ -55,7 +55,7 @@ const SpaceSearch: React.FC<SpaceSearchProps> = ({
   };
 
   const handlePressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && value) {
+    if (e.key === 'Enter' && value) {
       onSearch?.(value as string);
     }
   };
@@ -66,7 +66,7 @@ const SpaceSearch: React.FC<SpaceSearchProps> = ({
         styles.spaceSearch,
         !retractable && styles.notRetractable,
         noBorder && styles.noBorder,
-        className,
+        className
       )}
     >
       <img
@@ -79,9 +79,9 @@ const SpaceSearch: React.FC<SpaceSearchProps> = ({
         className={classNames(
           styles.searchInput,
           (expand || !retractable) && styles.expanded,
-          !(expand || !retractable) && styles.collapsed,
+          !(expand || !retractable) && styles.collapsed
         )}
-        placeholder={expand || !retractable ? placeholder : ""}
+        placeholder={expand || !retractable ? placeholder : ''}
         value={value}
         onChange={handleChange}
         onPressEnter={handlePressEnter}

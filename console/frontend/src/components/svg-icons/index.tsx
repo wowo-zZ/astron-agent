@@ -1,6 +1,6 @@
-import React from "react";
-import Icon from "@ant-design/icons";
-import type { CustomIconComponentProps } from "@ant-design/icons/lib/components/Icon";
+import React from 'react';
+import Icon from '@ant-design/icons';
+import type { CustomIconComponentProps } from '@ant-design/icons/lib/components/Icon';
 
 const LogoutSvg = () => (
   <svg
@@ -2351,13 +2351,13 @@ const SafeIcon = (props: Partial<CustomIconComponentProps>) => (
   <Icon component={SafeSvg} {...props} />
 );
 const HeaderMenuFeedbackSvgIcon = (
-  props: Partial<CustomIconComponentProps>,
+  props: Partial<CustomIconComponentProps>
 ) => <Icon component={HeaderMenuFeedbackSvg} {...props} />;
 const HeaderMenuQaSvgIcon = (props: Partial<CustomIconComponentProps>) => (
   <Icon component={HeaderMenuQaSvg} {...props} />
 );
 const HeaderMenuRecommendSvgIcon = (
-  props: Partial<CustomIconComponentProps>,
+  props: Partial<CustomIconComponentProps>
 ) => <Icon component={HeaderMenuRecommendSvg} {...props} />;
 
 const CopyIcon = (props: Partial<CustomIconComponentProps>) => (

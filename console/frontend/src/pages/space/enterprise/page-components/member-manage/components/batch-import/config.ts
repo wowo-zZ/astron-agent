@@ -1,11 +1,11 @@
-import { ModuleType, OperationType } from "@/permissions/permission-type";
-import type { ButtonConfig } from "@/components/button-group/types";
+import { ModuleType, OperationType } from '@/permissions/permission-type';
+import type { ButtonConfig } from '@/components/button-group/types';
 
 // 导入步骤枚举
 export enum ImportStep {
-  BEFORE_IMPORT = "before", // 导入前
-  UPLOADING = "uploading", // 上传中
-  IMPORT_RESULT = "import_result", // 导入后（显示结果）
+  BEFORE_IMPORT = 'before', // 导入前
+  UPLOADING = 'uploading', // 上传中
+  IMPORT_RESULT = 'import_result', // 导入后（显示结果）
 }
 
 // 组件属性接口
@@ -16,10 +16,10 @@ export interface BatchImportProps {
 
 // 批量导入按钮配置
 const batchImportButtonConfig: ButtonConfig = {
-  key: "batchImport",
-  text: "批量导入",
-  type: "primary",
-  size: "small",
+  key: 'batchImport',
+  text: '批量导入',
+  type: 'primary',
+  size: 'small',
   permission: {
     module: ModuleType.SPACE,
     operation: OperationType.ADD_MEMBERS,
@@ -28,16 +28,16 @@ const batchImportButtonConfig: ButtonConfig = {
 
 // 导入模板按钮配置
 const importTemplateButtonConfig: ButtonConfig = {
-  key: "importTemplate",
-  text: "导入模板",
-  type: "link",
+  key: 'importTemplate',
+  text: '导入模板',
+  type: 'link',
 };
 
 // 解析结果按钮配置
 const exportResultButtonConfig: ButtonConfig = {
-  key: "exportResult",
-  text: "解析结果",
-  type: "link",
+  key: 'exportResult',
+  text: '解析结果',
+  type: 'link',
 };
 
 export const btnConfigs = {

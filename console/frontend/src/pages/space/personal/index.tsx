@@ -1,17 +1,17 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { Button, message } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
-import { useDebounceFn } from "ahooks";
-import eventBus from "@/utils/event-bus";
-import SpaceSearch from "@/components/space/space-search";
-import SpaceList from "@/components/space/space-list";
-import SpaceModal from "@/components/space/space-modal";
-import SpaceTab from "@/components/space/space-tab";
-import PersonalSpaceCard from "./components/personal-space-card";
+import React, { useEffect, useState, useCallback } from 'react';
+import { Button, message } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
+import { useDebounceFn } from 'ahooks';
+import eventBus from '@/utils/event-bus';
+import SpaceSearch from '@/components/space/space-search';
+import SpaceList from '@/components/space/space-list';
+import SpaceModal from '@/components/space/space-modal';
+import SpaceTab from '@/components/space/space-tab';
+import PersonalSpaceCard from './components/personal-space-card';
 
-import styles from "./index.module.scss";
-import { getAllSpace } from "@/services/space";
+import styles from './index.module.scss';
+import { getAllSpace } from '@/services/space';
 
 interface SpaceItem {
   id: string;
@@ -25,8 +25,8 @@ interface SpaceItem {
 
 const SpaceManage: React.FC = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<string>("all");
-  const [searchValue, setSearchValue] = useState<string>("");
+  const [activeTab, setActiveTab] = useState<string>('all');
+  const [searchValue, setSearchValue] = useState<string>('');
   const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
   const [spaceList, setSpaceList] = useState<SpaceItem[]>([]); //展示的空间
   const [mySpaceList, setMySpaceList] = useState<SpaceItem[]>([]); //我创建的
@@ -41,7 +41,7 @@ const SpaceManage: React.FC = () => {
         // 拿到自己的空间
         const mySpaces = res.filter((space: any) => space.userRole === 1);
         setMySpaceList(mySpaces);
-        if (activeTab === "all") {
+        if (activeTab === 'all') {
           setSpaceList(res);
         } else {
           setSpaceList(mySpaces);
@@ -55,15 +55,15 @@ const SpaceManage: React.FC = () => {
   useEffect(() => {
     // 初始化数据
     getSpaceList();
-    eventBus.on("spaceList", getSpaceList);
+    eventBus.on('spaceList', getSpaceList);
     return () => {
-      eventBus.off("spaceList", getSpaceList);
+      eventBus.off('spaceList', getSpaceList);
     };
   }, []);
 
   const handleTabChange = (key: string) => {
     setActiveTab(key);
-    if (key === "all") {
+    if (key === 'all') {
       setSpaceList(allSpaceList);
     } else {
       setSpaceList(mySpaceList);
@@ -78,7 +78,7 @@ const SpaceManage: React.FC = () => {
     },
     {
       wait: 500,
-    },
+    }
   );
 
   const handleSearch = useCallback(
@@ -86,14 +86,14 @@ const SpaceManage: React.FC = () => {
       const value = e.target.value;
       debouncedSearch(value);
     },
-    [debouncedSearch],
+    [debouncedSearch]
   );
 
   const handleSearchSubmit = useCallback(
     (value: string) => {
       debouncedSearch(value);
     },
-    [debouncedSearch],
+    [debouncedSearch]
   );
 
   const handleCreateSpace = () => {
@@ -115,8 +115,8 @@ const SpaceManage: React.FC = () => {
           <div className={styles.tabs}>
             <SpaceTab
               options={[
-                { key: "all", label: "全部空间" },
-                { key: "my", label: "我创建的" },
+                { key: 'all', label: '全部空间' },
+                { key: 'my', label: '我创建的' },
               ]}
               activeKey={activeTab}
               onChange={handleTabChange}
@@ -148,7 +148,7 @@ const SpaceManage: React.FC = () => {
             dataSource={spaceList}
             loading={loading}
             activeTab={activeTab}
-            prefix={activeTab === "all" ? <PersonalSpaceCard /> : null}
+            prefix={activeTab === 'all' ? <PersonalSpaceCard /> : null}
           />
         </div>
       </div>

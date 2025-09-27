@@ -1,19 +1,19 @@
-import { useState, useEffect, memo, useCallback, JSX } from "react";
-import type React from "react";
-import { useNavigate } from "react-router-dom";
-import useUserStore from "@/store/user-store";
-import databaseStore from "@/store/database-store";
-import CreateDatabase from "./components/create-database";
-import DeleteModal from "./components/delete-database";
-import DatabaseGrid from "./components/database-grid";
-import { jumpTologin } from "@/utils/http";
-import { DatabaseItem, CreateDbParams } from "@/types/database";
-import { useDatabaseList } from "./hooks/use-database-list";
+import { useState, useEffect, memo, useCallback, JSX } from 'react';
+import type React from 'react';
+import { useNavigate } from 'react-router-dom';
+import useUserStore from '@/store/user-store';
+import databaseStore from '@/store/database-store';
+import CreateDatabase from './components/create-database';
+import DeleteModal from './components/delete-database';
+import DatabaseGrid from './components/database-grid';
+import { jumpTologin } from '@/utils/http';
+import { DatabaseItem, CreateDbParams } from '@/types/database';
+import { useDatabaseList } from './hooks/use-database-list';
 
 // 数据库管理页面
 const DataBase = (): JSX.Element => {
-  const setDatabase = databaseStore((state) => state.setDatabase); // 当前数据库
-  const user = useUserStore((state) => state.user);
+  const setDatabase = databaseStore(state => state.setDatabase); // 当前数据库
+  const user = useUserStore(state => state.user);
   const navigate = useNavigate();
   const [botDetail, setBotDetail] = useState<DatabaseItem | null>(null); // 正在删除的数据库
   const [deleteModal, setDeleteModal] = useState(false); // 删除弹窗
@@ -40,13 +40,13 @@ const DataBase = (): JSX.Element => {
   // 搜索处理函数
   const handleSearchChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>): void => {
-      setSearchValue(e?.target?.value || "");
+      setSearchValue(e?.target?.value || '');
       setPagination({
         pageNum: 1,
         pageSize: 20,
       });
     },
-    [setSearchValue, setPagination],
+    [setSearchValue, setPagination]
   );
 
   // 创建数据库点击处理
@@ -63,7 +63,7 @@ const DataBase = (): JSX.Element => {
       setDatabase(database);
       navigate(`/resource/database/${database?.id}`);
     },
-    [setDatabase, navigate],
+    [setDatabase, navigate]
   );
 
   // 删除点击处理
@@ -73,7 +73,7 @@ const DataBase = (): JSX.Element => {
       setBotDetail(database);
       setDeleteModal(true);
     },
-    [],
+    []
   );
 
   // 创建数据库成功处理
@@ -85,13 +85,13 @@ const DataBase = (): JSX.Element => {
       };
       await createDatabaseOk(params);
     },
-    [createDatabaseOk],
+    [createDatabaseOk]
   );
 
   // 删除后刷新列表
   const handleAfterDelete = useCallback((): void => {
     if (searchValue) {
-      setSearchValue("");
+      setSearchValue('');
     } else {
       getList();
     }
@@ -111,7 +111,7 @@ const DataBase = (): JSX.Element => {
       {createDatabaseOpen && (
         <CreateDatabase
           open={createDatabaseOpen}
-          type={"add"}
+          type={'add'}
           handleCancel={(): void => {
             setCreateDatabaseOpen(false);
           }}

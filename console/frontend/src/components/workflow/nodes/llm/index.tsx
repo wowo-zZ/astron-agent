@@ -1,33 +1,33 @@
-import React, { memo } from "react";
+import React, { memo } from 'react';
 import {
   FlowSelect,
   FlowTemplateEditor,
   FLowCollapse,
-} from "@/components/workflow/ui";
-import { v4 as uuid } from "uuid";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import Inputs from "@/components/workflow/nodes/components/inputs";
-import Outputs from "@/components/workflow/nodes/components/outputs";
-import ExceptionHandling from "@/components/workflow/nodes/components/exception-handling";
-import { useTranslation } from "react-i18next";
+} from '@/components/workflow/ui';
+import { v4 as uuid } from 'uuid';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import Inputs from '@/components/workflow/nodes/components/inputs';
+import Outputs from '@/components/workflow/nodes/components/outputs';
+import ExceptionHandling from '@/components/workflow/nodes/components/exception-handling';
+import { useTranslation } from 'react-i18next';
 import {
   checkedNodeOutputData,
   generateOrUpdateObject,
-} from "@/components/workflow/utils/reactflowUtils";
-import { isJSON } from "@/utils";
-import { useNodeCommon } from "@/components/workflow/hooks/useNodeCommon";
-import { ModelSection } from "@/components/workflow/nodes/node-common";
-import { EnabledChatHistory } from "@/components/workflow/nodes/components/single-input";
+} from '@/components/workflow/utils/reactflowUtils';
+import { isJSON } from '@/utils';
+import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import { ModelSection } from '@/components/workflow/nodes/node-common';
+import { EnabledChatHistory } from '@/components/workflow/nodes/components/single-input';
 
-import promptOptimizationIcon from "@/assets/imgs/workflow/prompt-optimization-icon.png";
-import promptLibraryIcon from "@/assets/imgs/workflow/prompt-library-icon.svg";
+import promptOptimizationIcon from '@/assets/imgs/workflow/prompt-optimization-icon.png';
+import promptLibraryIcon from '@/assets/imgs/workflow/prompt-library-icon.svg';
 
 const InputSection = ({ id, data }): React.ReactElement => {
   const { t } = useTranslation();
   return (
     <Inputs id={id} data={data}>
       <div className="flex-1 flex items-center justify-between text-base font-medium">
-        <div>{t("common.input")}</div>
+        <div>{t('common.input')}</div>
         <EnabledChatHistory id={id} data={data} />
       </div>
     </Inputs>
@@ -40,22 +40,22 @@ const PromptSection = ({
   handleChangeNodeParam,
 }): React.ReactElement => {
   const { t } = useTranslation();
-  const canvasesDisabled = useFlowsManager((state) => state.canvasesDisabled);
+  const canvasesDisabled = useFlowsManager(state => state.canvasesDisabled);
   const setSelectPromptModalInfo = useFlowsManager(
-    (state) => state.setSelectPromptModalInfo,
+    state => state.setSelectPromptModalInfo
   );
   const setPromptOptimizeModalInfo = useFlowsManager(
-    (state) => state.setPromptOptimizeModalInfo,
+    state => state.setPromptOptimizeModalInfo
   );
-  const currentStore = useFlowsManager((state) => state.getCurrentStore());
-  const delayCheckNode = currentStore((state) => state.delayCheckNode);
+  const currentStore = useFlowsManager(state => state.getCurrentStore());
+  const delayCheckNode = currentStore(state => state.delayCheckNode);
 
   return (
     <FLowCollapse
       label={
         <div className="flex items-center justify-between">
           <h4 className="text-base font-medium">
-            {t("workflow.nodes.largeModelNode.prompt")}
+            {t('workflow.nodes.largeModelNode.prompt')}
           </h4>
           {!canvasesDisabled && (
             <div
@@ -69,7 +69,7 @@ const PromptSection = ({
                 className="w-[14px] h-[14px]"
                 alt=""
               />
-              <span>{t("workflow.nodes.largeModelNode.promptLibrary")}</span>
+              <span>{t('workflow.nodes.largeModelNode.promptLibrary')}</span>
             </div>
           )}
         </div>
@@ -78,18 +78,18 @@ const PromptSection = ({
         <div className="rounded-md px-[18px] pb-3 pointer-events-auto">
           {/* System Prompt */}
           <div className="my-2 flex items-center justify-between">
-            <span>{t("workflow.nodes.largeModelNode.systemPrompt")}</span>
+            <span>{t('workflow.nodes.largeModelNode.systemPrompt')}</span>
             {!canvasesDisabled && data?.nodeParam?.systemTemplate?.trim() && (
               <img
                 src={promptOptimizationIcon}
                 className="w-[18px] h-[18px] cursor-pointer"
                 alt=""
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation();
                   setPromptOptimizeModalInfo({
                     open: true,
                     nodeId: id,
-                    key: "systemTemplate",
+                    key: 'systemTemplate',
                   });
                 }}
               />
@@ -99,31 +99,31 @@ const PromptSection = ({
             data={data}
             onBlur={() => delayCheckNode(id)}
             value={data?.nodeParam?.systemTemplate}
-            onChange={(value) =>
+            onChange={value =>
               handleChangeNodeParam(
                 (data, value) => (data.nodeParam.systemTemplate = value),
-                value,
+                value
               )
             }
             placeholder={t(
-              "workflow.nodes.largeModelNode.systemPromptPlaceholder",
+              'workflow.nodes.largeModelNode.systemPromptPlaceholder'
             )}
           />
 
           {/* User Prompt */}
           <div className="mb-2 mt-3 flex items-center justify-between">
-            <span>{t("workflow.nodes.largeModelNode.userPrompt")}</span>
+            <span>{t('workflow.nodes.largeModelNode.userPrompt')}</span>
             {!canvasesDisabled && data?.nodeParam?.template?.trim() && (
               <img
                 src={promptOptimizationIcon}
                 className="w-[18px] h-[18px] cursor-pointer"
                 alt=""
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation();
                   setPromptOptimizeModalInfo({
                     open: true,
                     nodeId: id,
-                    key: "template",
+                    key: 'template',
                   });
                 }}
               />
@@ -133,14 +133,14 @@ const PromptSection = ({
             data={data}
             onBlur={() => delayCheckNode(id)}
             value={data?.nodeParam?.template}
-            onChange={(value) =>
+            onChange={value =>
               handleChangeNodeParam(
                 (data, value) => (data.nodeParam.template = value),
-                value,
+                value
               )
             }
             placeholder={t(
-              "workflow.nodes.largeModelNode.userPromptPlaceholder",
+              'workflow.nodes.largeModelNode.userPromptPlaceholder'
             )}
           />
           <p className="text-xs text-[#F74E43]">
@@ -159,35 +159,35 @@ const OutputSection = ({
 }): React.ReactElement => {
   const { currentNode, isThinkModel } = useNodeCommon({ id, data });
   const { t } = useTranslation();
-  const canvasesDisabled = useFlowsManager((state) => state.canvasesDisabled);
-  const currentStore = useFlowsManager((state) => state.getCurrentStore());
-  const updateNodeRef = currentStore((state) => state.updateNodeRef);
+  const canvasesDisabled = useFlowsManager(state => state.canvasesDisabled);
+  const currentStore = useFlowsManager(state => state.getCurrentStore());
+  const updateNodeRef = currentStore(state => state.updateNodeRef);
   return (
     <Outputs id={id} data={data}>
       <div className="flex-1 flex items-center justify-between">
-        <div className="text-base font-medium">{t("common.output")}</div>
+        <div className="text-base font-medium">{t('common.output')}</div>
         <div
           className="w-[180px] flex items-center gap-2"
-          onClick={(e) => e.stopPropagation()}
+          onClick={e => e.stopPropagation()}
           style={{
-            pointerEvents: canvasesDisabled ? "none" : "auto",
+            pointerEvents: canvasesDisabled ? 'none' : 'auto',
           }}
         >
-          <span>{t("workflow.nodes.largeModelNode.outputFormat")}</span>
+          <span>{t('workflow.nodes.largeModelNode.outputFormat')}</span>
           <div className="flex-1">
             <FlowSelect
               value={data?.nodeParam?.respFormat}
               options={[
                 {
-                  label: "text",
+                  label: 'text',
                   value: 0,
                 },
                 {
-                  label: "json",
+                  label: 'json',
                   value: 2,
                 },
               ]}
-              onChange={(value) =>
+              onChange={value =>
                 handleChangeNodeParam((data, value) => {
                   data.nodeParam.respFormat = value;
                   if (data.nodeParam.respFormat === 0) {
@@ -195,22 +195,22 @@ const OutputSection = ({
                       ? [
                           {
                             id: uuid(),
-                            customParameterType: "deepseekr1",
-                            name: "REASONING_CONTENT",
-                            nameErrMsg: "",
+                            customParameterType: 'deepseekr1',
+                            name: 'REASONING_CONTENT',
+                            nameErrMsg: '',
                             schema: {
                               default: t(
-                                "workflow.nodes.largeModelNode.modelThinkingProcess",
+                                'workflow.nodes.largeModelNode.modelThinkingProcess'
                               ),
-                              type: "string",
+                              type: 'string',
                             },
                           },
                           {
                             id: uuid(),
-                            name: "output",
+                            name: 'output',
                             schema: {
-                              type: "string",
-                              default: "",
+                              type: 'string',
+                              default: '',
                             },
                           },
                           ...data.outputs,
@@ -218,10 +218,10 @@ const OutputSection = ({
                       : [
                           {
                             id: uuid(),
-                            name: "output",
+                            name: 'output',
                             schema: {
-                              type: "string",
-                              default: "",
+                              type: 'string',
+                              default: '',
                             },
                           },
                         ];
@@ -229,9 +229,9 @@ const OutputSection = ({
                   }
                   if (!checkedNodeOutputData(data?.outputs, currentNode)) {
                     const customOutput = JSON.stringify(
-                      { output: "" },
+                      { output: '' },
                       null,
-                      2,
+                      2
                     );
                     if (data?.retryConfig) {
                       data.retryConfig.customOutput = customOutput;
@@ -241,17 +241,17 @@ const OutputSection = ({
                       };
                     }
                     data.nodeParam.setAnswerContentErrMsg =
-                      "输出中变量名校验不通过,自动生成JSON失败";
+                      '输出中变量名校验不通过,自动生成JSON失败';
                   } else {
                     const customOutput = JSON.stringify(
                       generateOrUpdateObject(
                         data?.outputs,
                         isJSON(data?.retryConfig?.customOutput)
                           ? JSON.parse(data?.retryConfig?.customOutput)
-                          : null,
+                          : null
                       ),
                       null,
-                      2,
+                      2
                     );
                     if (data?.retryConfig) {
                       data.retryConfig.customOutput = customOutput;
@@ -260,7 +260,7 @@ const OutputSection = ({
                         customOutput,
                       };
                     }
-                    data.nodeParam.setAnswerContentErrMsg = "";
+                    data.nodeParam.setAnswerContentErrMsg = '';
                   }
                 }, value)
               }

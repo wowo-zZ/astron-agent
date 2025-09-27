@@ -1,20 +1,20 @@
-import React, { useMemo, memo } from "react";
+import React, { useMemo, memo } from 'react';
 import {
   FlowSelect,
   FlowTemplateEditor,
   FLowCollapse,
-} from "@/components/workflow/ui";
-import { Checkbox } from "antd";
-import { v4 as uuid } from "uuid";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import InputParams from "@/components/workflow/nodes/components/inputs";
-import OutputParams from "./components/output-params";
-import FixedOptions from "./components/fixed-options";
-import AnswerSettings from "./components/answer-settings";
-import { useTranslation } from "react-i18next";
-import { useNodeCommon } from "@/components/workflow/hooks/useNodeCommon";
-import { SourceHandle } from "@/components/workflow/nodes/components/handle";
-import { ModelSection } from "@/components/workflow/nodes/node-common";
+} from '@/components/workflow/ui';
+import { Checkbox } from 'antd';
+import { v4 as uuid } from 'uuid';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import InputParams from '@/components/workflow/nodes/components/inputs';
+import OutputParams from './components/output-params';
+import FixedOptions from './components/fixed-options';
+import AnswerSettings from './components/answer-settings';
+import { useTranslation } from 'react-i18next';
+import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import { SourceHandle } from '@/components/workflow/nodes/components/handle';
+import { ModelSection } from '@/components/workflow/nodes/node-common';
 
 const QuestionSection = memo(
   ({ id, data, delayCheckNode, handleChangeNodeParam }): React.ReactElement => {
@@ -23,7 +23,7 @@ const QuestionSection = memo(
       <FLowCollapse
         label={
           <h4 className="text-base font-medium">
-            {t("workflow.nodes.questionAnswerNode.questionContent")}
+            {t('workflow.nodes.questionAnswerNode.questionContent')}
           </h4>
         }
         content={
@@ -32,14 +32,14 @@ const QuestionSection = memo(
               data={data}
               onBlur={() => delayCheckNode(id)}
               value={data?.nodeParam?.question}
-              onChange={(value) =>
+              onChange={value =>
                 handleChangeNodeParam(
-                  (d) => (d.nodeParam.question = value),
-                  value,
+                  d => (d.nodeParam.question = value),
+                  value
                 )
               }
               placeholder={t(
-                "workflow.nodes.questionAnswerNode.questionPlaceholder",
+                'workflow.nodes.questionAnswerNode.questionPlaceholder'
               )}
             />
             <p className="text-xs text-[#F74E43]">
@@ -49,7 +49,7 @@ const QuestionSection = memo(
         }
       />
     );
-  },
+  }
 );
 
 const AnswerModeSection = memo(
@@ -70,7 +70,7 @@ const AnswerModeSection = memo(
         <FLowCollapse
           label={
             <div className="flex items-center justify-between">
-              <span>{t("workflow.nodes.questionAnswerNode.answerMode")}</span>
+              <span>{t('workflow.nodes.questionAnswerNode.answerMode')}</span>
               {!canvasesDisabled && (
                 <AnswerSettings
                   data={data}
@@ -83,29 +83,29 @@ const AnswerModeSection = memo(
             <div className="px-[18px]">
               <FlowSelect
                 value={nodeParam?.answerType}
-                onChange={(value) => {
-                  const edge = edges?.find((item) => item?.source === id);
+                onChange={value => {
+                  const edge = edges?.find(item => item?.source === id);
                   if (edge) removeNodeRef(edge.source, edge.target);
 
-                  handleChangeNodeParam((d) => {
+                  handleChangeNodeParam(d => {
                     d.nodeParam.answerType = value;
-                    if (value === "option") {
+                    if (value === 'option') {
                       d.outputs = [
                         {
-                          schema: { default: "", type: "string" },
-                          name: "query",
+                          schema: { default: '', type: 'string' },
+                          name: 'query',
                           id: uuid(),
                           required: true,
                         },
                         {
-                          schema: { default: "", type: "string" },
-                          name: "id",
+                          schema: { default: '', type: 'string' },
+                          name: 'id',
                           id: uuid(),
                           required: true,
                         },
                         {
-                          schema: { default: "", type: "string" },
-                          name: "content",
+                          schema: { default: '', type: 'string' },
+                          name: 'content',
                           id: uuid(),
                           required: true,
                         },
@@ -113,14 +113,14 @@ const AnswerModeSection = memo(
                     } else {
                       d.outputs = [
                         {
-                          schema: { default: "", type: "string" },
-                          name: "query",
+                          schema: { default: '', type: 'string' },
+                          name: 'query',
                           id: uuid(),
                           required: true,
                         },
                         {
-                          schema: { default: "", type: "string" },
-                          name: "content",
+                          schema: { default: '', type: 'string' },
+                          name: 'content',
                           id: uuid(),
                           required: true,
                         },
@@ -128,36 +128,36 @@ const AnswerModeSection = memo(
                       if (nodeParam?.directAnswer?.handleResponse) {
                         d.outputs.push({
                           id: uuid(),
-                          name: "",
-                          schema: { type: "string" },
+                          name: '',
+                          schema: { type: 'string' },
                           required: true,
                         });
                       }
                     }
-                    setEdges((e) => e?.filter((item) => item?.source !== id));
+                    setEdges(e => e?.filter(item => item?.source !== id));
                   }, value);
                 }}
                 options={[
                   {
-                    label: t("workflow.nodes.questionAnswerNode.directReply"),
-                    value: "direct",
+                    label: t('workflow.nodes.questionAnswerNode.directReply'),
+                    value: 'direct',
                   },
                   {
-                    label: t("workflow.nodes.questionAnswerNode.optionReply"),
-                    value: "option",
+                    label: t('workflow.nodes.questionAnswerNode.optionReply'),
+                    value: 'option',
                   },
                 ]}
               />
             </div>
           }
         />
-        {nodeParam?.answerType === "option" && (
+        {nodeParam?.answerType === 'option' && (
           <div className="relative intent-collapse-expand">
             <FLowCollapse
               isIntentCollapse={true}
               label={
                 <div>
-                  {t("workflow.nodes.questionAnswerNode.setOptionContent")}
+                  {t('workflow.nodes.questionAnswerNode.setOptionContent')}
                 </div>
               }
               content={
@@ -168,7 +168,7 @@ const AnswerModeSection = memo(
         )}
       </>
     );
-  },
+  }
 );
 
 const OutputSection = memo(
@@ -187,14 +187,14 @@ const OutputSection = memo(
         label={
           <div className="flex-1 flex items-center justify-between">
             <div className="text-base font-medium">
-              {t("workflow.nodes.common.output")}
+              {t('workflow.nodes.common.output')}
             </div>
-            {!canvasesDisabled && nodeParam?.answerType === "direct" && (
+            {!canvasesDisabled && nodeParam?.answerType === 'direct' && (
               <div
                 className="flex items-center gap-2 cursor-pointer"
-                onClick={(e) => {
+                onClick={e => {
                   e?.stopPropagation();
-                  handleChangeNodeParam((d) => {
+                  handleChangeNodeParam(d => {
                     d.nodeParam.directAnswer.handleResponse =
                       !data.nodeParam.directAnswer.handleResponse;
                     d.outputs = d.nodeParam.directAnswer.handleResponse
@@ -202,8 +202,8 @@ const OutputSection = memo(
                           ...d.outputs.slice(0, 2),
                           {
                             id: uuid(),
-                            name: "",
-                            schema: { type: "string" },
+                            name: '',
+                            schema: { type: 'string' },
                             required: true,
                           },
                         ]
@@ -215,7 +215,7 @@ const OutputSection = memo(
                 <Checkbox checked={nodeParam?.directAnswer?.handleResponse} />
                 <span>
                   {t(
-                    "workflow.nodes.questionAnswerNode.extractFieldsFromUserReply",
+                    'workflow.nodes.questionAnswerNode.extractFieldsFromUserReply'
                   )}
                 </span>
               </div>
@@ -225,21 +225,21 @@ const OutputSection = memo(
         content={<OutputParams id={id} data={data} />}
       />
     );
-  },
+  }
 );
 
-export const QuestionAnswerDetail = memo((props) => {
+export const QuestionAnswerDetail = memo(props => {
   const { id, data } = props;
   const { handleChangeNodeParam, nodeParam } = useNodeCommon({ id, data });
   const { t } = useTranslation();
-  const getCurrentStore = useFlowsManager((state) => state.getCurrentStore);
+  const getCurrentStore = useFlowsManager(state => state.getCurrentStore);
   const currentStore = getCurrentStore();
-  const canvasesDisabled = useFlowsManager((state) => state.canvasesDisabled);
-  const delayCheckNode = currentStore((state) => state.delayCheckNode);
-  const edges = currentStore((state) => state.edges);
-  const setEdges = currentStore((state) => state.setEdges);
-  const removeNodeRef = currentStore((state) => state.removeNodeRef);
-  const updateNodeRef = currentStore((state) => state.updateNodeRef);
+  const canvasesDisabled = useFlowsManager(state => state.canvasesDisabled);
+  const delayCheckNode = currentStore(state => state.delayCheckNode);
+  const edges = currentStore(state => state.edges);
+  const setEdges = currentStore(state => state.setEdges);
+  const removeNodeRef = currentStore(state => state.removeNodeRef);
+  const updateNodeRef = currentStore(state => state.updateNodeRef);
 
   return (
     <div className="p-[14px] pb-[6px]">
@@ -247,7 +247,7 @@ export const QuestionAnswerDetail = memo((props) => {
         <ModelSection id={id} data={data} />
         <InputParams id={id} data={data}>
           <div className="flex-1 flex items-center justify-between text-base font-medium">
-            <div>{t("workflow.nodes.questionAnswerNode.input")}</div>
+            <div>{t('workflow.nodes.questionAnswerNode.input')}</div>
           </div>
         </InputParams>
         <QuestionSection
@@ -266,13 +266,13 @@ export const QuestionAnswerDetail = memo((props) => {
           setEdges={setEdges}
           removeNodeRef={removeNodeRef}
         />
-        {nodeParam?.answerType === "option" && (
+        {nodeParam?.answerType === 'option' && (
           <div className="relative intent-collapse-expand">
             <FLowCollapse
               isIntentCollapse={true}
               label={
                 <div>
-                  {t("workflow.nodes.questionAnswerNode.setOptionContent")}
+                  {t('workflow.nodes.questionAnswerNode.setOptionContent')}
                 </div>
               }
               content={
@@ -299,8 +299,8 @@ const QuestionContent = ({ question }): React.ReactElement => {
   return (
     <>
       <div className="text-[#333] text-right">提问内容</div>
-      <span style={{ color: hasContent ? "" : "#B3B7C6" }}>
-        {hasContent ? question : "未配置提问内容"}
+      <span style={{ color: hasContent ? '' : '#B3B7C6' }}>
+        {hasContent ? question : '未配置提问内容'}
       </span>
     </>
   );
@@ -309,14 +309,14 @@ const QuestionContent = ({ question }): React.ReactElement => {
 const AnswerType = ({ type }): React.ReactElement => (
   <>
     <span className="text-[#333] text-right">问答类型</span>
-    <span>{type === "direct" ? "直接回复" : "选项回复"}</span>
+    <span>{type === 'direct' ? '直接回复' : '选项回复'}</span>
   </>
 );
 
 const OptionAnswers = ({ id, answers, isConnectable }): React.ReactElement => {
   if (!answers?.length) return null;
 
-  return answers.map((item) => (
+  return answers.map(item => (
     <div key={item.id} className="contents">
       <div></div>
       <div className="flex items-center gap-2 relative exception-handle-edge">
@@ -363,13 +363,13 @@ export const QuestionAnswer = memo(({ id, data }): React.ReactElement => {
   const { isConnectable } = useNodeCommon({ id, data });
 
   const optionAnswer = useMemo(
-    () => data?.nodeParam?.optionAnswer?.filter((item) => item.type === 2),
-    [data?.nodeParam?.optionAnswer],
+    () => data?.nodeParam?.optionAnswer?.filter(item => item.type === 2),
+    [data?.nodeParam?.optionAnswer]
   );
 
   const optionDefaultAnswer = useMemo(
-    () => data?.nodeParam?.optionAnswer?.find((item) => item.type === 1),
-    [data?.nodeParam?.optionAnswer],
+    () => data?.nodeParam?.optionAnswer?.find(item => item.type === 1),
+    [data?.nodeParam?.optionAnswer]
   );
 
   return (
@@ -377,7 +377,7 @@ export const QuestionAnswer = memo(({ id, data }): React.ReactElement => {
       <QuestionContent question={data?.nodeParam?.question} />
       <AnswerType type={data?.nodeParam?.answerType} />
 
-      {data?.nodeParam?.answerType === "option" && (
+      {data?.nodeParam?.answerType === 'option' && (
         <>
           <OptionAnswers
             id={id}

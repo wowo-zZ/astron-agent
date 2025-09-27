@@ -1,10 +1,10 @@
-import React, { memo } from "react";
-import { Tooltip } from "antd";
-import { FlowSelect } from "@/components/workflow/ui";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import useUserStore from "@/store/user-store";
-import { useTranslation } from "react-i18next";
-import { useNodeCommon } from "@/components/workflow/hooks/useNodeCommon";
+import React, { memo } from 'react';
+import { Tooltip } from 'antd';
+import { FlowSelect } from '@/components/workflow/ui';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useUserStore from '@/store/user-store';
+import { useTranslation } from 'react-i18next';
+import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
 
 function index({ id, data }): React.ReactElement {
   const { handleChangeNodeParam, nodeParam, models } = useNodeCommon({
@@ -12,10 +12,10 @@ function index({ id, data }): React.ReactElement {
     data,
   });
   const { t } = useTranslation();
-  const user = useUserStore((state) => state.user);
-  const getCurrentStore = useFlowsManager((state) => state.getCurrentStore);
+  const user = useUserStore(state => state.user);
+  const getCurrentStore = useFlowsManager(state => state.getCurrentStore);
   const currentStore = getCurrentStore();
-  const updateNodeRef = currentStore((state) => state.updateNodeRef);
+  const updateNodeRef = currentStore(state => state.updateNodeRef);
 
   return (
     <div className="rounded-md relative">
@@ -24,12 +24,12 @@ function index({ id, data }): React.ReactElement {
           <FlowSelect
             value={
               nodeParam?.llmId ||
-              models.find((model) => model.serviceId === nodeParam?.serviceId)
+              models.find(model => model.serviceId === nodeParam?.serviceId)
                 ?.llmId
             }
-            onChange={(value) => {
+            onChange={value => {
               const currentModel = models.find(
-                (model) => model.llmId === value || model.serviceId === value,
+                model => model.llmId === value || model.serviceId === value
               );
               handleChangeNodeParam((data, value) => {
                 data.nodeParam.uid = user?.uid.toString();
@@ -42,39 +42,39 @@ function index({ id, data }): React.ReactElement {
                 data.nodeParam.url = value.url;
                 data.nodeParam.patchId = value.patchId;
                 if (value.llmSource === 0) {
-                  data.nodeParam.source = "openai";
+                  data.nodeParam.source = 'openai';
                 } else {
-                  Reflect.deleteProperty(data.nodeParam, "source");
+                  Reflect.deleteProperty(data.nodeParam, 'source');
                 }
                 updateNodeRef(id);
               }, currentModel);
             }}
-            dropdownRender={(menu) => (
+            dropdownRender={menu => (
               <div
                 className="overscroll-contain"
-                onWheel={(e) => e.stopPropagation()}
+                onWheel={e => e.stopPropagation()}
               >
                 {menu}
                 <div
                   className="text-[#275EFF] text-center text-xs cursor-pointer"
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation();
                     window.open(
-                      "https://training.xfyun.cn/modelSquare",
-                      "_blank",
+                      'https://training.xfyun.cn/modelSquare',
+                      '_blank'
                     );
                   }}
                   style={{
-                    height: "30px",
-                    lineHeight: "30px",
+                    height: '30px',
+                    lineHeight: '30px',
                   }}
                 >
-                  {t("workflow.nodes.modelSelect.selectMoreModels")}
+                  {t('workflow.nodes.modelSelect.selectMoreModels')}
                 </div>
               </div>
             )}
           >
-            {models.map((model) => (
+            {models.map(model => (
               <FlowSelect.Option key={model.llmId} value={model.llmId}>
                 <div className="w-full flex items-start justify-between overflow-hidden">
                   <div className="flex items-start gap-2 flex-1 overflow-hidden">
@@ -118,7 +118,7 @@ function index({ id, data }): React.ReactElement {
                         >
                           <span
                             className="rounded text-xss bg-[#ecefff] px-2 text-[333] text-sm"
-                            onClick={(event) => event.stopPropagation()}
+                            onClick={event => event.stopPropagation()}
                           >
                             +{model?.tag?.length - 2}
                           </span>

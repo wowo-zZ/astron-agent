@@ -5,12 +5,12 @@ import React, {
   forwardRef,
   useImperativeHandle,
   useRef,
-} from "react";
-import { Table, message } from "antd";
-import type { ColumnsType, TableProps } from "antd/es/table";
-import ButtonGroup, { ButtonConfig } from "@/components/button-group";
-import Empty from "@/components/space/empty";
-import styles from "./index.module.scss";
+} from 'react';
+import { Table, message } from 'antd';
+import type { ColumnsType, TableProps } from 'antd/es/table';
+import ButtonGroup, { ButtonConfig } from '@/components/button-group';
+import Empty from '@/components/space/empty';
+import styles from './index.module.scss';
 
 // 分页配置接口
 export interface PaginationConfig {
@@ -22,12 +22,12 @@ export interface PaginationConfig {
   showTotal?: (total: number, range: [number, number]) => string;
   pageSizeOptions?: string[];
   position?: (
-    | "topLeft"
-    | "topCenter"
-    | "topRight"
-    | "bottomLeft"
-    | "bottomCenter"
-    | "bottomRight"
+    | 'topLeft'
+    | 'topCenter'
+    | 'topRight'
+    | 'bottomLeft'
+    | 'bottomCenter'
+    | 'bottomRight'
   )[];
 }
 
@@ -39,16 +39,16 @@ export interface SpaceColumnConfig<T = any> {
   width?: number | string;
   render?: (value: any, record: T, index: number) => React.ReactNode;
   sorter?: boolean | ((a: T, b: T) => number);
-  sortOrder?: "ascend" | "descend" | null;
-  fixed?: "left" | "right";
-  align?: "left" | "center" | "right";
+  sortOrder?: 'ascend' | 'descend' | null;
+  fixed?: 'left' | 'right';
+  align?: 'left' | 'center' | 'right';
 }
 
 // 操作列配置接口
 export interface ActionColumnConfig<T = any> {
   title?: string;
   width?: number | string;
-  fixed?: "left" | "right";
+  fixed?: 'left' | 'right';
   getActionButtons: (record: T, index: number) => ButtonConfig[];
 }
 
@@ -89,7 +89,7 @@ export interface SpaceTableProps<T = any> {
   rowKey?: string | ((record: T) => string);
   loading?: boolean;
   className?: string;
-  scroll?: TableProps<T>["scroll"];
+  scroll?: TableProps<T>['scroll'];
 
   // 外部查询参数
   extraParams?: Record<string, any>;
@@ -99,7 +99,7 @@ export interface SpaceTableProps<T = any> {
   onError?: (error: any) => void;
 
   // 自定义空状态
-  locale?: TableProps<T>["locale"];
+  locale?: TableProps<T>['locale'];
 }
 
 // 添加 ref 方法接口
@@ -116,12 +116,12 @@ const SpaceTable = forwardRef(function SpaceTable<
     columns,
     actionColumn,
     pagination: paginationConfig,
-    rowKey = "id",
+    rowKey = 'id',
     loading: externalLoading,
     className,
     scroll = {
       scrollToFirstRowOnChange: true,
-      y: "max(120px, calc(100% - 60px))",
+      y: 'max(120px, calc(100% - 60px))',
     },
     extraParams = {},
     onSuccess,
@@ -140,8 +140,8 @@ const SpaceTable = forwardRef(function SpaceTable<
     showSizeChanger: true,
     showQuickJumper: false,
     showTotal: (total, range) => `共 ${total} 项数据`,
-    pageSizeOptions: ["10", "20", "50"],
-    position: ["bottomCenter"],
+    pageSizeOptions: ['10', '20', '50'],
+    position: ['bottomCenter'],
     ...paginationConfig,
   });
   const extraParamsRef = useRef(extraParams);
@@ -163,10 +163,10 @@ const SpaceTable = forwardRef(function SpaceTable<
         };
 
         const result = await queryData(params);
-        console.log(result, "============= space => loadData ===========");
+        console.log(result, '============= space => loadData ===========');
         if (result.success !== false) {
           setData(result.data);
-          setPagination((prev) => ({
+          setPagination(prev => ({
             ...prev,
             total: result.total,
             ...(paginationParams || {}),
@@ -174,7 +174,7 @@ const SpaceTable = forwardRef(function SpaceTable<
 
           onSuccess?.(result.data, result.total);
         } else {
-          throw new Error("查询失败");
+          throw new Error('查询失败');
         }
       } catch (error) {
         onError?.(error);
@@ -189,7 +189,7 @@ const SpaceTable = forwardRef(function SpaceTable<
       onError,
       pagination.current,
       pagination.pageSize,
-    ],
+    ]
   );
 
   useEffect(() => {
@@ -226,7 +226,7 @@ const SpaceTable = forwardRef(function SpaceTable<
 
   // 构建最终的列配置
   const finalColumns: ColumnsType<T> = [
-    ...columns.map((col) => ({
+    ...columns.map(col => ({
       title: col.title,
       dataIndex: col.dataIndex,
       key: col.key,
@@ -240,14 +240,14 @@ const SpaceTable = forwardRef(function SpaceTable<
     ...(actionColumn
       ? [
           {
-            title: actionColumn.title || "操作",
-            key: "action",
+            title: actionColumn.title || '操作',
+            key: 'action',
             width: actionColumn.width || 200,
             fixed: actionColumn.fixed,
             render: (_: any, record: T, index: number) => {
               const actionButtons = actionColumn.getActionButtons(
                 record,
-                index,
+                index
               );
 
               return (
@@ -262,11 +262,11 @@ const SpaceTable = forwardRef(function SpaceTable<
   ];
 
   return (
-    <div className={styles.spaceTable} style={{ height: "100%" }}>
-      <div className={styles.tableContainer} style={{ height: "100%" }}>
+    <div className={styles.spaceTable} style={{ height: '100%' }}>
+      <div className={styles.tableContainer} style={{ height: '100%' }}>
         <Table<T>
-          style={{ height: "100%" }}
-          className={`xingchen-table space ${styles.table} ${className || ""}`}
+          style={{ height: '100%' }}
+          className={`xingchen-table space ${styles.table} ${className || ''}`}
           columns={finalColumns}
           dataSource={data}
           rowKey={rowKey}
@@ -287,7 +287,7 @@ const SpaceTable = forwardRef(function SpaceTable<
     </div>
   );
 }) as <T extends Record<string, any> = any>(
-  props: SpaceTableProps<T> & { ref?: React.ForwardedRef<SpaceTableRef> },
+  props: SpaceTableProps<T> & { ref?: React.ForwardedRef<SpaceTableRef> }
 ) => React.ReactElement;
 
 export default SpaceTable;

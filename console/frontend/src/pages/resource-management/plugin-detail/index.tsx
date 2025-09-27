@@ -5,30 +5,30 @@ import React, {
   useRef,
   useCallback,
   FC,
-} from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
-import { getToolDetail } from "@/services/plugin";
-import { getRouteId } from "@/utils/utils";
-import { useNavigate } from "react-router-dom";
-import ToolHeader from "./components/tool-header";
-import VersionManagement from "@/components/drawer/plugin/version-management";
-import { CreateTool } from "@/components/modal/plugin";
-import { ToolDebugger } from "@/components/modal/plugin";
-import SettingPage from "./setting-page";
-import { ToolItem } from "../../../types/resource";
+} from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
+import { getToolDetail } from '@/services/plugin';
+import { getRouteId } from '@/utils/utils';
+import { useNavigate } from 'react-router-dom';
+import ToolHeader from './components/tool-header';
+import VersionManagement from '@/components/drawer/plugin/version-management';
+import { CreateTool } from '@/components/modal/plugin';
+import { ToolDebugger } from '@/components/modal/plugin';
+import SettingPage from './setting-page';
+import { ToolItem } from '../../../types/resource';
 
 const PluginDetail: FC = () => {
   const createToolRef = useRef<{
     updateToolInfo: (
       selectedCard: ToolItem,
-      shouldUpdateToolInfo: boolean,
+      shouldUpdateToolInfo: boolean
     ) => void;
   }>(null);
   const toolId = getRouteId() as string;
   const location = useLocation();
   const [toolInfo, setToolInfo] = useState<ToolItem>({} as ToolItem);
   const [botIcon, setBotIcon] = useState<{ name?: string; value?: string }>({});
-  const [botColor, setBotColor] = useState<string>("");
+  const [botColor, setBotColor] = useState<string>('');
   const [open, setOpen] = useState(false);
   const [selectedCard, setSelectedCard] = useState<ToolItem>({} as ToolItem); //选中card的id
   const navigate = useNavigate();
@@ -55,13 +55,13 @@ const PluginDetail: FC = () => {
         {
           ...data,
         },
-        !selectedCard?.id,
+        !selectedCard?.id
       );
       setSelectedCard({
         ...data,
       });
     },
-    [selectedCard?.id],
+    [selectedCard?.id]
   );
 
   return (
@@ -88,7 +88,7 @@ const PluginDetail: FC = () => {
                 ref={createToolRef}
                 showHeader={false}
                 currentToolInfo={toolInfo}
-                handleCreateToolDone={() => navigate("/resource/plugin")}
+                handleCreateToolDone={() => navigate('/resource/plugin')}
                 step={step}
                 setStep={setStep}
                 botIcon={botIcon}

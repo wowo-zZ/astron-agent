@@ -1,30 +1,30 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { getCommonConfig } from "@/services/common";
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { getCommonConfig } from '@/services/common';
 import {
   getAgentType,
   getAgentList,
   collectBot,
   cancelFavorite,
-} from "@/services/agent-square";
-import styles from "./index.module.scss";
-import { Input, message, Spin, Tooltip } from "antd";
-import classnames from "classnames";
-import eventBus from "@/utils/event-bus";
-import { debounce } from "lodash";
-import useChat from "@/hooks/use-chat";
-import useUserStore from "@/store/user-store";
-import useHomeStore from "@/store/home-store";
-import { getLanguageCode } from "@/utils/http";
-import { BotType, Bot, SearchBotParam, Banner } from "@/types/agent-square";
-import type { ResponseResultPage } from "@/types/global";
-import { handleShare } from "@/utils";
+} from '@/services/agent-square';
+import styles from './index.module.scss';
+import { Input, message, Spin, Tooltip } from 'antd';
+import classnames from 'classnames';
+import eventBus from '@/utils/event-bus';
+import { debounce } from 'lodash';
+import useChat from '@/hooks/use-chat';
+import useUserStore from '@/store/user-store';
+import useHomeStore from '@/store/home-store';
+import { getLanguageCode } from '@/utils/http';
+import { BotType, Bot, SearchBotParam, Banner } from '@/types/agent-square';
+import type { ResponseResultPage } from '@/types/global';
+import { handleShare } from '@/utils';
 
 const PAGE_SIZE = 10;
 
 const PAGE_INFO_ORIGIN: SearchBotParam = {
-  search: "",
+  search: '',
   pageIndex: 1,
   pageSize: PAGE_SIZE,
   type: 0,
@@ -38,38 +38,38 @@ const HomePage: React.FC = () => {
   const [bannerList] = useState<Banner[]>([
     // NOTE: isOpen: 是否新开页面跳转
     {
-      src: "https://openres.xfyun.cn/xfyundoc/2025-09-01/ec2409cf-17cc-4276-b8f3-acdca4abac42/1756696685915/agentRewardBanner.png",
+      src: 'https://openres.xfyun.cn/xfyundoc/2025-09-01/ec2409cf-17cc-4276-b8f3-acdca4abac42/1756696685915/agentRewardBanner.png',
       srcEn:
-        "https://openres.xfyun.cn/xfyundoc/2025-09-01/ec2409cf-17cc-4276-b8f3-acdca4abac42/1756696685915/agentRewardBanner.png",
+        'https://openres.xfyun.cn/xfyundoc/2025-09-01/ec2409cf-17cc-4276-b8f3-acdca4abac42/1756696685915/agentRewardBanner.png',
       url: `${window.location.origin}/activitySummer`,
       isOpen: false,
     },
     // NOTE: 0728新banner 4张
     {
-      src: "https://openres.xfyun.cn/xfyundoc/2025-07-28/1b4d1b3b-5fc0-44e5-938a-f11cd399ea09/1753666916737/banner01-07.28.jpg",
+      src: 'https://openres.xfyun.cn/xfyundoc/2025-07-28/1b4d1b3b-5fc0-44e5-938a-f11cd399ea09/1753666916737/banner01-07.28.jpg',
       srcEn:
-        "https://openres.xfyun.cn/xfyundoc/2025-07-29/e6c12f1d-9e5c-4623-b668-d05d2d826a1f/1753771451925/banner-en02.jpg",
+        'https://openres.xfyun.cn/xfyundoc/2025-07-29/e6c12f1d-9e5c-4623-b668-d05d2d826a1f/1753771451925/banner-en02.jpg',
       url: `${window.location.origin}/chat?sharekey=e1e62e4027b882aa7a43d4b25ed4974c&botId=2963659`,
       isOpen: false,
     },
     {
-      src: "https://openres.xfyun.cn/xfyundoc/2025-07-28/057e265c-d206-42a0-bcc4-e35d1a5950ad/1753666916740/banner02-07.28.jpg",
+      src: 'https://openres.xfyun.cn/xfyundoc/2025-07-28/057e265c-d206-42a0-bcc4-e35d1a5950ad/1753666916740/banner02-07.28.jpg',
       srcEn:
-        "https://openres.xfyun.cn/xfyundoc/2025-07-29/453698ff-0f08-41d7-b847-9db6640852c6/1753771451926/banner-en03.jpg",
+        'https://openres.xfyun.cn/xfyundoc/2025-07-29/453698ff-0f08-41d7-b847-9db6640852c6/1753771451926/banner-en03.jpg',
       url: `${window.location.origin}/chat?sharekey=b17abc6f0d4a356ed09a9fe1631ffd2c&botId=2958065`,
       isOpen: false,
     },
     {
-      src: "https://openres.xfyun.cn/xfyundoc/2025-07-28/d88084c2-16c8-4210-b5cb-7ef3e298a1bb/1753666916741/banner03-07.28.jpg",
+      src: 'https://openres.xfyun.cn/xfyundoc/2025-07-28/d88084c2-16c8-4210-b5cb-7ef3e298a1bb/1753666916741/banner03-07.28.jpg',
       srcEn:
-        "https://openres.xfyun.cn/xfyundoc/2025-07-29/0d319c45-816c-4d5b-a94c-91bc489c374d/1753771451926/banner-en04.jpg",
+        'https://openres.xfyun.cn/xfyundoc/2025-07-29/0d319c45-816c-4d5b-a94c-91bc489c374d/1753771451926/banner-en04.jpg',
       url: `${window.location.origin}/chat?sharekey=003e4873f478e5f1f9ed82930d0bb4e7&botId=2216831`,
       isOpen: false,
     },
     {
-      src: "https://openres.xfyun.cn/xfyundoc/2025-07-28/79576df5-7d4c-4cf0-b7cf-b1c343acc11a/1753666916742/banner04-07.28.jpg",
+      src: 'https://openres.xfyun.cn/xfyundoc/2025-07-28/79576df5-7d4c-4cf0-b7cf-b1c343acc11a/1753666916742/banner04-07.28.jpg',
       srcEn:
-        "https://openres.xfyun.cn/xfyundoc/2025-07-29/4818e1ba-8af5-4374-8238-db7250a14e84/1753771451927/banner-en05.jpg",
+        'https://openres.xfyun.cn/xfyundoc/2025-07-29/4818e1ba-8af5-4374-8238-db7250a14e84/1753771451927/banner-en05.jpg',
       url: `${window.location.origin}/chat?sharekey=9991b23791117619a3c3608a44c1c499&botId=2813049`,
       isOpen: false,
     },
@@ -102,17 +102,17 @@ const HomePage: React.FC = () => {
 
   // 根据语言环境过滤并选择banner图片
   const filteredBanners: Banner[] = bannerList
-    .filter((banner: Banner) => currentLang !== "en" || banner.srcEn)
+    .filter((banner: Banner) => currentLang !== 'en' || banner.srcEn)
     .map((banner: Banner) => ({
       ...banner,
-      src: currentLang === "en" ? banner.srcEn : banner.src,
+      src: currentLang === 'en' ? banner.srcEn : banner.src,
     }));
 
   // 处理banner点击事件
   const handleBannerClick = (item: Banner): void => {
     if (item.url) {
       if (item.isOpen) {
-        window.open(item.url, "_blank");
+        window.open(item.url, '_blank');
       } else {
         window.location.href = item.url;
       }
@@ -127,18 +127,18 @@ const HomePage: React.FC = () => {
     setPageInfo({
       ...pageInfo,
       type: res[0]?.typeKey || 0,
-      search: searchInputValue || "",
+      search: searchInputValue || '',
     });
   };
 
   // 搜索框前缀图标
   const prefixIcon = (): React.ReactNode => {
-    return <img src={require("@/assets/svgs/search.svg")} alt="" />;
+    return <img src={require('@/assets/svgs/search.svg')} alt="" />;
   };
 
   //开始搜索
   const handleStartSearch = (value: string, pageInfo: SearchBotParam) => {
-    setBotOrigin("search");
+    setBotOrigin('search');
     setSearchLoading(true);
     setAgentList([]);
     setPageInfo({
@@ -154,12 +154,12 @@ const HomePage: React.FC = () => {
     setPageInfo({
       ...pageInfo,
       type,
-      search: "",
+      search: '',
       pageIndex: 1,
     });
     setHasMore(true);
     setSearchLoading(true);
-    setSearchInputValue("");
+    setSearchInputValue('');
     setBotType(type);
   };
 
@@ -182,8 +182,8 @@ const HomePage: React.FC = () => {
         .then(() => {
           setLoadingPage(loadingPage + 1);
         })
-        .catch((err) => {
-          console.error("加载更多失败:", err);
+        .catch(err => {
+          console.error('加载更多失败:', err);
         });
     }
   };
@@ -194,7 +194,7 @@ const HomePage: React.FC = () => {
    * @returns
    */
   const loadMore = (customPageIndex?: number): Promise<void> => {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       setLoading(true);
       const currentPageIndex = customPageIndex || pageInfo.pageIndex + 1;
       const newPageInfo = {
@@ -211,16 +211,16 @@ const HomePage: React.FC = () => {
   const loadAgentListAll = (): void => {
     getAgentList({ ...pageInfo })
       .then((res: ResponseResultPage<Bot>) => {
-        setAgentList((prevList) => {
+        setAgentList(prevList => {
           const newList = [...prevList, ...res.pageData];
           setHasMore(res.totalCount > newList.length);
           return newList;
         });
         setSearchLoading(false);
       })
-      .catch((err) => {
+      .catch(err => {
         setSearchLoading(false);
-        message.error(err?.msg || "网络出小差了，请稍后再试~");
+        message.error(err?.msg || '网络出小差了，请稍后再试~');
       })
       .finally(() => {
         setLoading(false);
@@ -235,16 +235,16 @@ const HomePage: React.FC = () => {
    */
   const handleCollect = (
     item: Bot,
-    e: React.MouseEvent<HTMLDivElement>,
+    e: React.MouseEvent<HTMLDivElement>
   ): void => {
     e.stopPropagation();
     const form: URLSearchParams = new URLSearchParams();
-    form.append("botId", item?.botId.toString());
+    form.append('botId', item?.botId.toString());
     if (!item?.isFavorite) {
       collectBot(form)
         .then(() => {
-          message.success(t("home.collectionSuccess"));
-          eventBus.emit("getFavoriteBotList");
+          message.success(t('home.collectionSuccess'));
+          eventBus.emit('getFavoriteBotList');
           setAgentList((agents: Bot[]) => {
             const currentBot: Bot | undefined =
               agents.find((t: Bot) => t.botId === item.botId) || ({} as Bot);
@@ -252,14 +252,14 @@ const HomePage: React.FC = () => {
             return [...agents];
           });
         })
-        .catch((err) => {
-          message.error(err?.msg || "网络出小差了，请稍后再试~");
+        .catch(err => {
+          message.error(err?.msg || '网络出小差了，请稍后再试~');
         });
     } else {
       cancelFavorite(form)
         .then(() => {
-          message.success(t("home.cancelCollectionSuccess"));
-          eventBus.emit("getFavoriteBotList");
+          message.success(t('home.cancelCollectionSuccess'));
+          eventBus.emit('getFavoriteBotList');
           setAgentList((agents: Bot[]) => {
             const currentBot: Bot | undefined =
               agents.find((t: Bot) => t.botId === item.botId) || ({} as Bot);
@@ -267,8 +267,8 @@ const HomePage: React.FC = () => {
             return [...agents];
           });
         })
-        .catch((err) => {
-          message.error(err?.msg || "网络出小差了，请稍后再试~");
+        .catch(err => {
+          message.error(err?.msg || '网络出小差了，请稍后再试~');
         });
     }
   };
@@ -282,8 +282,8 @@ const HomePage: React.FC = () => {
 
   useEffect(() => {
     const params = {
-      category: "DOCUMENT_LINK",
-      code: "SparkBotHelpDoc",
+      category: 'DOCUMENT_LINK',
+      code: 'SparkBotHelpDoc',
     };
     if (user?.login || user?.uid) {
       getCommonConfig(params);
@@ -295,7 +295,7 @@ const HomePage: React.FC = () => {
     debounce((value, pageInfo) => {
       handleStartSearch(value, pageInfo);
     }, 500), // 500ms延迟
-    [handleBotTypeChange, handleStartSearch],
+    [handleBotTypeChange, handleStartSearch]
   );
   const debouncedSearchRef = useRef(handleSearch);
 
@@ -304,7 +304,7 @@ const HomePage: React.FC = () => {
     debounce((scrollTop: number) => {
       setScrollTop(scrollTop);
     }, 100),
-    [setScrollTop],
+    [setScrollTop]
   );
 
   // 监听scrollTop变化，如果有待处理的botType变更，则执行
@@ -341,7 +341,7 @@ const HomePage: React.FC = () => {
                 <div
                   className={classnames(
                     styles.recent_card_list,
-                    styles.recent_recent,
+                    styles.recent_recent
                   )}
                 >
                   {agentList.map((item: Bot, index: number) => (
@@ -365,13 +365,13 @@ const HomePage: React.FC = () => {
                           >
                             <span>{item?.botName}</span>
                           </Tooltip>
-                          <div onClick={(e) => e.stopPropagation()}>
+                          <div onClick={e => e.stopPropagation()}>
                             <div onClick={() => handleShareAgent(item)} />
                             <div
                               className={classnames({
                                 [styles.collect as string]: !!item?.isFavorite,
                               })}
-                              onClick={(e) => {
+                              onClick={e => {
                                 handleCollect(item, e);
                               }}
                             />
@@ -388,21 +388,21 @@ const HomePage: React.FC = () => {
                         <div className={styles.tags}>
                           {[1, 5].includes(item?.version as number) && (
                             <div className={styles.itag}>
-                              {t("home.instructionType")}
+                              {t('home.instructionType')}
                             </div>
                           )}
                           {[2, 3, 4].includes(item?.version as number) && (
                             <div className={styles.itag}>
-                              {t("home.workflowType")}
+                              {t('home.workflowType')}
                             </div>
                           )}
                         </div>
                         <div className={styles.author}>
                           <img
-                            src={require("@/assets/svgs/author.svg")}
+                            src={require('@/assets/svgs/author.svg')}
                             alt=""
                           />
-                          <span>{item?.creator || "@讯飞星火"}</span>
+                          <span>{item?.creator || '@讯飞星火'}</span>
                           {/* <img src={require('@/assets/svgs/fire.svg')} alt="" />
                           <span>{item?.hotNum}</span> */}
                         </div>
@@ -416,16 +416,16 @@ const HomePage: React.FC = () => {
                 <div className={styles.empty_state}>
                   <img
                     src={
-                      "https://openres.xfyun.cn/xfyundoc/2024-01-03/2e6bdf58-f307-4765-9dfa-157813ea5875/1704248820240/%E7%BB%841%402x.png"
+                      'https://openres.xfyun.cn/xfyundoc/2024-01-03/2e6bdf58-f307-4765-9dfa-157813ea5875/1704248820240/%E7%BB%841%402x.png'
                     }
                     alt=""
                   />
                   <span
                     onClick={() => {
-                      eventBus.emit("createBot");
+                      eventBus.emit('createBot');
                     }}
                   >
-                    {t("home.noRelatedSearchResults")}
+                    {t('home.noRelatedSearchResults')}
                   </span>
                 </div>
               </div>
@@ -448,25 +448,25 @@ const HomePage: React.FC = () => {
           <div className={styles.all_agent_title_left}>
             {/* NOTE: 这里的 友伴 需要翻译吗 */}
             {botTypes
-              ?.filter?.((item) => item.typeName !== "友伴")
+              ?.filter?.(item => item.typeName !== '友伴')
               .map((item: BotType) => (
                 <div
                   key={item.typeKey}
-                  className={classnames(styles.bot_type_item, "relative", {
+                  className={classnames(styles.bot_type_item, 'relative', {
                     [styles.activeTab as string]: botType === item.typeKey,
                   })}
                   onClick={() => {
                     handleBotTypeChange(item.typeKey);
                     // 记录发现频道已点击
-                    if (item.typeName === "发现") {
-                      localStorage.setItem("discoveryClicked", "true");
+                    if (item.typeName === '发现') {
+                      localStorage.setItem('discoveryClicked', 'true');
                     }
                   }}
                 >
                   {item.typeName}
                   {/* 发现频道小红点 */}
-                  {item.typeName === "发现" &&
-                    !localStorage.getItem("discoveryClicked") &&
+                  {item.typeName === '发现' &&
+                    !localStorage.getItem('discoveryClicked') &&
                     new Date() < new Date(2025, 7, 24) && (
                       <span className="absolute top-[4px] right-[2px] w-2 h-2 bg-red-500 rounded-full"></span>
                     )}
@@ -475,9 +475,9 @@ const HomePage: React.FC = () => {
           </div>
           <div className={styles.all_agent_title_right}>
             <Input
-              placeholder={t("home.searchPlaceholder")}
+              placeholder={t('home.searchPlaceholder')}
               value={searchInputValue}
-              onChange={(e) => {
+              onChange={e => {
                 handleValueChange(e);
               }}
               prefix={prefixIcon()}

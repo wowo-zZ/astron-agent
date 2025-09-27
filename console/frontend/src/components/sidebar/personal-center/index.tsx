@@ -1,18 +1,18 @@
-import { FC, useState } from "react";
-import { Input, message, Modal } from "antd";
-import styles from "./index.module.scss";
+import { FC, useState } from 'react';
+import { Input, message, Modal } from 'antd';
+import styles from './index.module.scss';
 // import UploadAvatar from '@/components/upload-avatar';
-import useUserStore from "@/store/user-store";
-import user from "@/assets/imgs/personal-center/user.svg";
-import copy from "@/assets/imgs/personal-center/copy.svg";
-import edit from "@/assets/imgs/personal-center/edit.svg";
-import yes from "@/assets/imgs/personal-center/yes.svg";
-import no from "@/assets/imgs/personal-center/no.svg";
-import act from "@/assets/imgs/personal-center/act.png";
-import fire from "@/assets/imgs/personal-center/fire.png";
-import { copyText } from "@/utils/spark-utils";
-import { uploadUserProfile } from "@/services/spark-common";
-import UploadAvatar from "@/components/upload-avatar";
+import useUserStore from '@/store/user-store';
+import user from '@/assets/imgs/personal-center/user.svg';
+import copy from '@/assets/imgs/personal-center/copy.svg';
+import edit from '@/assets/imgs/personal-center/edit.svg';
+import yes from '@/assets/imgs/personal-center/yes.svg';
+import no from '@/assets/imgs/personal-center/no.svg';
+import act from '@/assets/imgs/personal-center/act.png';
+import fire from '@/assets/imgs/personal-center/fire.png';
+import { copyText } from '@/utils/spark-utils';
+import { uploadUserProfile } from '@/services/spark-common';
+import UploadAvatar from '@/components/upload-avatar';
 
 interface PersonalCenterProps {
   open: boolean;
@@ -39,7 +39,7 @@ const PersonalCenterHeader: FC<{
                 placeholder="请输入昵称"
                 showCount
                 maxLength={20}
-                onChange={(e) => {
+                onChange={e => {
                   setInfoName(e.target.value);
                 }}
               />
@@ -54,14 +54,14 @@ const PersonalCenterHeader: FC<{
               <img
                 onClick={() => {
                   const formData = new FormData();
-                  formData.append("nickname", infoName);
+                  formData.append('nickname', infoName);
                   uploadUserProfile(formData)
                     // uploadUserProfile({
                     //   nickname: infoName,
                     //   avatar: userInfo.avatar,
                     // })
-                    .then((res) => {
-                      message.success("修改成功");
+                    .then(res => {
+                      message.success('修改成功');
                       // 更新用户信息
                       useUserStore.setState({
                         user: {
@@ -71,7 +71,7 @@ const PersonalCenterHeader: FC<{
                       });
                       setShowInput(false);
                     })
-                    .catch((err) => {
+                    .catch(err => {
                       message.error(err.msg);
                     });
                 }}
@@ -107,7 +107,7 @@ const PersonalCenterHeader: FC<{
             onClick={() => {
               copyText({
                 text: `${userInfo?.uid}`,
-                successText: "复制成功",
+                successText: '复制成功',
               });
             }}
             className={styles.copy}

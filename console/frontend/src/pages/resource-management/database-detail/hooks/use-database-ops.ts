@@ -1,10 +1,10 @@
-import { useCallback } from "react";
-import { message } from "antd";
-import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
-import { useDatabaseContext } from "../context/database-context";
-import { dbDetail, update } from "@/services/database";
-import { DatabaseItem } from "@/types/database";
+import { useCallback } from 'react';
+import { message } from 'antd';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
+import { useDatabaseContext } from '../context/database-context';
+import { dbDetail, update } from '@/services/database';
+import { DatabaseItem } from '@/types/database';
 
 /**
  * 数据库详情操作Hook
@@ -36,12 +36,12 @@ export const useDatabaseOps = (): {
           avatarColor: params.avatarColor || undefined,
         });
         await getDbDetail();
-        message.success(t("database.dataUpdated"));
+        message.success(t('database.dataUpdated'));
       } catch (error) {
         // 更新数据库失败
       }
     },
-    [getDbDetail, t],
+    [getDbDetail, t]
   );
 
   return { getDbDetail, updateDatabase };

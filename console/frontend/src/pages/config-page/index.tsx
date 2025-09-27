@@ -1,13 +1,13 @@
-import { useState } from "react";
-import { Routes, Route } from "react-router-dom";
-import Overview from "@/components/config-page-component/config-overview";
-import BaseConfig from "@/components/config-page-component/config-base";
+import { useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
+import Overview from '@/components/config-page-component/config-overview';
+import BaseConfig from '@/components/config-page-component/config-base';
 
-import styles from "./index.module.scss";
+import styles from './index.module.scss';
 
 const index = () => {
   const [currentRobot, setCurrentRobot] = useState<any>({});
-  const [currentTab, setCurrentTab] = useState("overview");
+  const [currentTab, setCurrentTab] = useState('overview');
 
   return (
     <div className={styles.config_page_container}>

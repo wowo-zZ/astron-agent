@@ -1,7 +1,7 @@
-import { create } from "zustand";
-import { getUserInfoMe } from "@/services/login";
-import { SpaceType, RoleType } from "@/types/permission";
-import { tokenStorage } from "@/hooks/use-login";
+import { create } from 'zustand';
+import { getUserInfoMe } from '@/services/login';
+import { SpaceType, RoleType } from '@/types/permission';
+import { tokenStorage } from '@/hooks/use-login';
 
 export interface User {
   id: number;
@@ -28,7 +28,7 @@ export interface UserState {
   setUserRole: (
     _spaceType: SpaceType,
     _roleType: RoleType,
-    _spaceId?: string,
+    _spaceId?: string
   ) => void;
   getUserRole: () => {
     spaceType: SpaceType;
@@ -50,13 +50,13 @@ const useUserStore = create<UserState>((set, get) => ({
       const userData = await getUserInfoMe();
       set({ user: userData });
     } catch (error) {
-      console.error("获取用户信息失败", error);
+      console.error('获取用户信息失败', error);
     }
   },
   setUserRole: (
     _spaceType: SpaceType,
     _roleType: RoleType,
-    _spaceId?: string,
+    _spaceId?: string
   ): void => {
     set((state: UserState) => ({
       user: {

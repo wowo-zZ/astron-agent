@@ -1,13 +1,13 @@
-import React, { FC } from "react";
-import { Table } from "antd";
+import React, { FC } from 'react';
+import { Table } from 'antd';
 
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 
-import { InputParamsData } from "@/types/resource";
+import { InputParamsData } from '@/types/resource';
 
-import { useDebuggerTable } from "./hooks/use-debugger-table";
-import { useRenderInput } from "./hooks/use-render-input";
-import { useColumns } from "./hooks/use-columns";
+import { useDebuggerTable } from './hooks/use-debugger-table';
+import { useRenderInput } from './hooks/use-render-input';
+import { useColumns } from './hooks/use-columns';
 
 const DebuggerTable: FC<{
   debuggerParamsData: InputParamsData[];
@@ -42,7 +42,7 @@ const DebuggerTable: FC<{
       <div className="w-full flex items-center gap-1 justify-between">
         {showTitle && (
           <span className="text-base font-medium">
-            {t("workflow.nodes.toolNode.parameterConfiguration")}
+            {t('workflow.nodes.toolNode.parameterConfiguration')}
           </span>
         )}
       </div>
@@ -55,12 +55,12 @@ const DebuggerTable: FC<{
           expandIcon: customExpandIcon,
           expandedRowKeys,
         }}
-        rowKey={(record) => record?.id}
+        rowKey={record => record?.id}
         locale={{
           emptyText: (
-            <div style={{ padding: "20px" }}>
+            <div style={{ padding: '20px' }}>
               <p className="text-[#333333]">
-                {t("workflow.nodes.toolNode.noData")}
+                {t('workflow.nodes.toolNode.noData')}
               </p>
             </div>
           ),

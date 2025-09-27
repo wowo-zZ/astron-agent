@@ -1,13 +1,13 @@
-import React, { useState } from "react";
-import { Input, Button, Select, InputNumber } from "antd";
-import { cloneDeep } from "lodash";
-import { workflowPushEnvKey } from "@/services/plugin";
-import MarkdownRender from "@/components/markdown-render";
-import { useTranslation } from "react-i18next";
+import React, { useState } from 'react';
+import { Input, Button, Select, InputNumber } from 'antd';
+import { cloneDeep } from 'lodash';
+import { workflowPushEnvKey } from '@/services/plugin';
+import MarkdownRender from '@/components/markdown-render';
+import { useTranslation } from 'react-i18next';
 
-import close from "@/assets/imgs/workflow/modal-close.png";
-import mcpEnvKeyVisible from "@/assets/imgs/mcp/mcp-envKey-visible.svg";
-import mcpEnvKeyHidden from "@/assets/imgs/mcp/mcp-envKey-hidden.svg";
+import close from '@/assets/imgs/workflow/modal-close.png';
+import mcpEnvKeyVisible from '@/assets/imgs/mcp/mcp-envKey-visible.svg';
+import mcpEnvKeyHidden from '@/assets/imgs/mcp/mcp-envKey-hidden.svg';
 
 export function ActivateMCPModal({
   mcpDetail,
@@ -29,13 +29,13 @@ export function ActivateMCPModal({
       mcpId: mcpDetail.id,
       serverName: mcpDetail.name,
       serverDesc: mcpDetail.brief,
-      recordId: mcpDetail["record_id"],
+      recordId: mcpDetail['record_id'],
       env,
       customize: true,
     };
     setLoading(true);
     workflowPushEnvKey(params, true)
-      .then((data) => {
+      .then(data => {
         handleMcpModalParamsOk(data);
         setActiveMcpModal(false);
       })
@@ -43,7 +43,7 @@ export function ActivateMCPModal({
   };
 
   const handleInputParamsChange = (argIndex, value): void => {
-    setEnvKeyParameters((parameters) => {
+    setEnvKeyParameters(parameters => {
       const parameter = parameters?.find((item, index) => index === argIndex);
       parameter.default = value;
       return cloneDeep(parameters);
@@ -55,8 +55,8 @@ export function ActivateMCPModal({
       return (
         <Select
           className="global-select"
-          placeholder={t("workflow.nodes.common.selectPlaceholder")}
-          options={arg?.enum?.map((item) => ({
+          placeholder={t('workflow.nodes.common.selectPlaceholder')}
+          options={arg?.enum?.map(item => ({
             label: item,
             value: item,
           }))}
@@ -65,39 +65,39 @@ export function ActivateMCPModal({
         />
       );
     }
-    if (arg.type === "string") {
+    if (arg.type === 'string') {
       return (
         <Input.Password
           className="global-input w-full"
-          placeholder={t("workflow.nodes.common.inputPlaceholder")}
+          placeholder={t('workflow.nodes.common.inputPlaceholder')}
           value={arg?.default}
           onChange={(e): void => handleInputParamsChange(index, e.target.value)}
-          iconRender={(visible) => {
+          iconRender={visible => {
             return (
               <img
                 src={visible ? mcpEnvKeyVisible : mcpEnvKeyHidden}
                 className="w-5 h-5"
                 alt=""
                 style={{
-                  cursor: "pointer",
+                  cursor: 'pointer',
                 }}
               />
             );
           }}
         />
       );
-    } else if (arg.type === "boolean") {
+    } else if (arg.type === 'boolean') {
       return (
         <Select
           className="global-select"
-          placeholder={t("workflow.nodes.common.selectPlaceholder")}
+          placeholder={t('workflow.nodes.common.selectPlaceholder')}
           options={[
             {
-              label: "true",
+              label: 'true',
               value: true,
             },
             {
-              label: "false",
+              label: 'false',
               value: false,
             },
           ]}
@@ -105,11 +105,11 @@ export function ActivateMCPModal({
           onChange={(value): void => handleInputParamsChange(index, value)}
         />
       );
-    } else if (arg.type === "int") {
+    } else if (arg.type === 'int') {
       return (
         <InputNumber
           className="global-input pt-1 w-full"
-          placeholder={t("workflow.nodes.common.inputPlaceholder")}
+          placeholder={t('workflow.nodes.common.inputPlaceholder')}
           value={arg?.default}
           onChange={(value): void => handleInputParamsChange(index, value)}
         />
@@ -122,7 +122,7 @@ export function ActivateMCPModal({
       <div className="modal-container w-[640px] pr-0">
         <div className="w-full flex items-center justify-between pr-6">
           <div className="modal-h1-title">
-            {t("workflow.nodes.mcpDetail.activateMcpService")}
+            {t('workflow.nodes.mcpDetail.activateMcpService')}
           </div>
           <img
             src={close}
@@ -156,21 +156,21 @@ export function ActivateMCPModal({
             className="origin-btn w-[104px]"
             onClick={(): void => setActiveMcpModal(false)}
           >
-            {t("workflow.nodes.common.cancel")}
+            {t('workflow.nodes.common.cancel')}
           </Button>
           <Button
             loading={loading}
             disabled={envKeyParameters?.some(
-              (arg) =>
+              arg =>
                 arg.require &&
-                typeof arg.default === "string" &&
-                !arg.default?.trim(),
+                typeof arg.default === 'string' &&
+                !arg.default?.trim()
             )}
             type="primary"
             className="w-[104px]"
             onClick={handleOk}
           >
-            {t("workflow.nodes.mcpDetail.confirmActivate")}
+            {t('workflow.nodes.mcpDetail.confirmActivate')}
           </Button>
         </div>
       </div>

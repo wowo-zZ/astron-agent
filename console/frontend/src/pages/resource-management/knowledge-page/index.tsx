@@ -1,8 +1,8 @@
-import React, { memo, FC } from "react";
-import { DeleteModal, CreateModal } from "./components/modal-component";
-import folderIcon from "@/assets/imgs/knowledge/folder_icon.svg";
-import { useKnowledgePage } from "./hooks/use-knowledge-page";
-import { KnowledgeContent } from "./components/knowledge-content";
+import React, { memo, FC } from 'react';
+import { DeleteModal, CreateModal } from './components/modal-component';
+import folderIcon from '@/assets/imgs/knowledge/folder_icon.svg';
+import { useKnowledgePage } from './hooks/use-knowledge-page';
+import { KnowledgeContent } from './components/knowledge-content';
 
 const KnowledgePage: FC = () => {
   const {
@@ -29,7 +29,7 @@ const KnowledgePage: FC = () => {
           currentKnowledge={currentKnowledge}
           getKnowledges={() => {
             if (searchValue) {
-              setSearchValue("");
+              setSearchValue('');
             } else {
               getKnowledges();
             }

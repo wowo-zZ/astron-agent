@@ -1,23 +1,23 @@
-import React, { memo, useEffect } from "react";
-import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
-import { Form } from "antd";
-import DataBaseTable from "./components/database-table";
-import ImportDataModal from "../../database/components/import-data-modal";
-import { DatabaseItem } from "@/types/database";
+import React, { memo, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { Form } from 'antd';
+import DataBaseTable from './components/database-table';
+import ImportDataModal from '../../database/components/import-data-modal';
+import { DatabaseItem } from '@/types/database';
 import {
   TableAddProvider,
   useTableAddState,
   useTableAddForm,
   useTableAddRef,
   useTableAddContext,
-} from "./context/table-add-context";
-import { useTableActions } from "./hooks/use-table-actions";
-import { useTableInitializer } from "./hooks/use-table-initializer";
-import { TableForm } from "./components/table-form";
-import { FieldActions } from "./components/field-actions";
-import { ActionButtons } from "./components/action-buttons";
-import { BackButton } from "./components/back-button";
+} from './context/table-add-context';
+import { useTableActions } from './hooks/use-table-actions';
+import { useTableInitializer } from './hooks/use-table-initializer';
+import { TableForm } from './components/table-form';
+import { FieldActions } from './components/field-actions';
+import { ActionButtons } from './components/action-buttons';
+import { BackButton } from './components/back-button';
 
 interface DataBaseTableAddProps {
   isModule?: boolean;
@@ -61,7 +61,7 @@ const DataBaseTableAddContent: React.FC<{ handleUpdate?: () => void }> = memo(
       <div
         className="flex flex-col w-full h-full mx-auto overflow-hidden"
         style={{
-          width: state.isModule ? "100%" : "85%",
+          width: state.isModule ? '100%' : '85%',
         }}
       >
         {!state.isModule && <BackButton onBack={handleNavigateBack} />}
@@ -88,7 +88,7 @@ const DataBaseTableAddContent: React.FC<{ handleUpdate?: () => void }> = memo(
 
             {state.dataSource.length < 4 && state.isCheck && (
               <div className="text-[12px] text-[#ff4d4f] mt-2">
-                {t("database.atLeastOneCustomField")}
+                {t('database.atLeastOneCustomField')}
               </div>
             )}
           </div>
@@ -110,10 +110,10 @@ const DataBaseTableAddContent: React.FC<{ handleUpdate?: () => void }> = memo(
         />
       </div>
     );
-  },
+  }
 );
 
-DataBaseTableAddContent.displayName = "DataBaseTableAddContent";
+DataBaseTableAddContent.displayName = 'DataBaseTableAddContent';
 
 /**
  * 初始化组件
@@ -133,7 +133,7 @@ const DataBaseTableAddInitializer: React.FC<{
   return <DataBaseTableAddContent handleUpdate={handleUpdate} />;
 });
 
-DataBaseTableAddInitializer.displayName = "DataBaseTableAddInitializer";
+DataBaseTableAddInitializer.displayName = 'DataBaseTableAddInitializer';
 
 /**
  * 表格添加主组件 - 完全优化版本

@@ -4,22 +4,22 @@ import {
   listFileDirectoryTree,
   queryFileList,
   retry,
-} from "@/services/knowledge";
-import { FileDirectoryTreeResponse, FileItem } from "@/types/resource";
-import { fileType } from "@/utils/utils";
-import { useDebounceFn, useRequest } from "ahooks";
+} from '@/services/knowledge';
+import { FileDirectoryTreeResponse, FileItem } from '@/types/resource';
+import { fileType } from '@/utils/utils';
+import { useDebounceFn, useRequest } from 'ahooks';
 import React, {
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
-} from "react";
-import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
-import { fetchEventSource } from "@microsoft/fetch-event-source";
-import { debounce } from "lodash";
-import { Modal } from "antd";
+} from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { fetchEventSource } from '@microsoft/fetch-event-source';
+import { debounce } from 'lodash';
+import { Modal } from 'antd';
 
 // 文档数据管理 Hook
 const useDocumentData = ({
@@ -57,10 +57,10 @@ const useDocumentData = ({
 
   const getDirectoryTree = useCallback((): void => {
     const params = {
-      fileId: parentId || "",
+      fileId: parentId || '',
       repoId,
     };
-    listFileDirectoryTree(params).then((data) => {
+    listFileDirectoryTree(params).then(data => {
       setDirectoryTree(data);
     });
   }, [parentId, repoId]);
@@ -82,7 +82,7 @@ const useDocumentData = ({
       tagDtoList: item.tagDtoList,
     }));
     setDataResource(files as FileItem[]);
-    setPagination((prevPagination) => ({
+    setPagination(prevPagination => ({
       ...prevPagination,
       total: data.totalCount,
     }));
@@ -152,7 +152,7 @@ const useDocumentSearch = ({
   handleInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   requestSearchFilesRun: (value: string) => void;
 } => {
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState('');
   const [searchData, setSearchData] = useState<FileItem[]>([]);
   const controllerRef = useRef<AbortController | null>(null);
 
@@ -167,15 +167,15 @@ const useDocumentSearch = ({
       controllerRef.current = new AbortController();
 
       // 获取访问令牌
-      const accessToken = localStorage.getItem("accessToken");
+      const accessToken = localStorage.getItem('accessToken');
       const headers: Record<string, string> = {};
       if (accessToken) {
-        headers["Authorization"] = `Bearer ${accessToken}`;
+        headers['Authorization'] = `Bearer ${accessToken}`;
       }
 
       await fetchEventSource(
         `/xingchen-api/file/search-file?fileName=${encodeURIComponent(
-          searchValue,
+          searchValue
         )}&repoId=${repoId}&pid=${parentId}&tag=${tag}`,
         {
           signal: controllerRef?.current?.signal,
@@ -188,20 +188,20 @@ const useDocumentSearch = ({
             }
           },
           onmessage(event) {
-            if (event.data === "bye") {
+            if (event.data === 'bye') {
               controllerRef.current?.abort();
               controllerRef.current = null;
               return;
             }
             const item = JSON.parse(event.data);
             item.type = fileType(item);
-            const regexPattern = new RegExp(searchValue, "gi");
+            const regexPattern = new RegExp(searchValue, 'gi');
             item.name = item.name.replaceAll(
               regexPattern,
-              '<span style="color:#275EFF;font-weight:600;display:inline-block;padding:4px 0px;background:#dee2f9">$&</span>',
+              '<span style="color:#275EFF;font-weight:600;display:inline-block;padding:4px 0px;background:#dee2f9">$&</span>'
             );
 
-            setSearchData((resultList) => [...resultList, item]);
+            setSearchData(resultList => [...resultList, item]);
           },
           onerror(error) {
             setLoading(false);
@@ -209,10 +209,10 @@ const useDocumentSearch = ({
             controllerRef.current = null;
           },
           openWhenHidden: true,
-        },
+        }
       );
     },
-    [tag, repoId, parentId, setLoading],
+    [tag, repoId, parentId, setLoading]
   );
 
   const { run: requestSearchFilesRun, cancel: searchRunCancel } = useRequest(
@@ -223,7 +223,7 @@ const useDocumentSearch = ({
       pollingWhenHidden: false,
       pollingErrorRetryCount: 3,
       refreshOnWindowFocus: false,
-    },
+    }
   );
 
   const searchFileDebounce = useCallback(
@@ -243,7 +243,7 @@ const useDocumentSearch = ({
       requestSearchFilesRun,
       searchRunCancel,
       requestRun,
-    ],
+    ]
   );
 
   const handleInputChange = useCallback(
@@ -252,7 +252,7 @@ const useDocumentSearch = ({
       setSearchValue(value);
       searchFileDebounce(value);
     },
-    [searchFileDebounce],
+    [searchFileDebounce]
   );
 
   return {
@@ -282,7 +282,7 @@ const useDocumentModals = (): {
   const [deleteModal, setDeleteModal] = useState(false);
   const [tagsModal, setTagsModal] = useState(false);
   const [currentFile, setCurrentFile] = useState<FileItem>({} as FileItem);
-  const [modalType, setModalType] = useState("create");
+  const [modalType, setModalType] = useState('create');
 
   return {
     addFolderModal,
@@ -335,18 +335,16 @@ const useDocumentActions = ({
       };
       enableFlieAPI(params).then(() => {
         if (searchValue) {
-          setSearchData((files) => {
-            const currentFile = searchData.find(
-              (item) => item.id === record.id,
-            );
+          setSearchData(files => {
+            const currentFile = searchData.find(item => item.id === record.id);
             if (currentFile?.fileInfoV2) {
               currentFile.fileInfoV2.enabled = enabled;
             }
             return [...files];
           });
         } else {
-          setDataResource((files) => {
-            const currentFile = files.find((item) => item.id === record.id);
+          setDataResource(files => {
+            const currentFile = files.find(item => item.id === record.id);
             if (currentFile?.fileInfoV2) {
               currentFile.fileInfoV2.enabled = enabled;
             }
@@ -355,7 +353,7 @@ const useDocumentActions = ({
         }
       });
     },
-    [searchValue, searchData, setSearchData, setDataResource],
+    [searchValue, searchData, setSearchData, setDataResource]
   );
 
   const retrySegmentation = useCallback(
@@ -381,17 +379,17 @@ const useDocumentActions = ({
           setLoading(false);
         });
     },
-    [tag, searchValue, requestSearchFilesRun, requestRun, setLoading],
+    [tag, searchValue, requestSearchFilesRun, requestRun, setLoading]
   );
 
   const showConfirmModal = useCallback(
     (record: FileItem): void => {
       Modal.confirm({
-        title: t("knowledge.confirmDisabled"),
+        title: t('knowledge.confirmDisabled'),
         icon: null,
-        content: "",
-        okText: t("common.confirm"),
-        cancelText: t("common.cancel"),
+        content: '',
+        okText: t('common.confirm'),
+        cancelText: t('common.cancel'),
         centered: true,
         autoFocusButton: null,
         onOk() {
@@ -399,12 +397,12 @@ const useDocumentActions = ({
         },
       });
     },
-    [t, enableFile],
+    [t, enableFile]
   );
 
   const handleValidateWorkflow = useCallback(
     (record: FileItem): void => {
-      getRepoUseStatus({ repoId: record.appId || "" }).then((status) => {
+      getRepoUseStatus({ repoId: record.appId || '' }).then(status => {
         if (status) {
           showConfirmModal(record);
         } else {
@@ -412,7 +410,7 @@ const useDocumentActions = ({
         }
       });
     },
-    [showConfirmModal, enableFile],
+    [showConfirmModal, enableFile]
   );
 
   const { run } = useDebounceFn(
@@ -424,7 +422,7 @@ const useDocumentActions = ({
         enableFile(record);
       }
     },
-    { wait: 1000, leading: true, trailing: false },
+    { wait: 1000, leading: true, trailing: false }
   );
 
   return {
@@ -466,29 +464,29 @@ const useDocumentPagination = ({
     (record: FileItem): void => {
       if (record.isFile) {
         navigate(
-          `/resource/knowledge/detail/${repoId}/file?parentId=${pid}&fileId=${record.fileId}&tag=${tag}`,
+          `/resource/knowledge/detail/${repoId}/file?parentId=${pid}&fileId=${record.fileId}&tag=${tag}`
         );
       } else {
         setParentId(record.id);
-        setPagination((prevPagination) => ({
+        setPagination(prevPagination => ({
           ...prevPagination,
           current: 1,
         }));
-        setSearchValue("");
+        setSearchValue('');
       }
     },
-    [navigate, repoId, pid, tag, setParentId, setPagination, setSearchValue],
+    [navigate, repoId, pid, tag, setParentId, setPagination, setSearchValue]
   );
 
   const rowProps = useCallback(
     (record: FileItem): { onClick?: () => void } | {} => {
-      return tag !== "SparkDesk-RAG"
+      return tag !== 'SparkDesk-RAG'
         ? {
             onClick: () => handleRowClick(record),
           }
         : {};
     },
-    [tag, handleRowClick],
+    [tag, handleRowClick]
   );
 
   const handleTableChange = useCallback(
@@ -497,7 +495,7 @@ const useDocumentPagination = ({
       pagination.pageSize = pageSize;
       setPagination({ ...pagination });
     },
-    [pagination, setPagination],
+    [pagination, setPagination]
   );
 
   return {
@@ -509,7 +507,7 @@ const useDocumentPagination = ({
 
 // UI 相关 Hook
 const useDocumentUI = (
-  tag: string,
+  tag: string
 ): {
   loading: boolean;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -522,9 +520,9 @@ const useDocumentUI = (
   const [loading, setLoading] = useState(false);
 
   const allowUploadFileContent = useMemo(() => {
-    return tag === "AIUI-RAG2"
-      ? t("knowledge.xingchenFormatSupport")
-      : t("knowledge.sparkFormatSupport");
+    return tag === 'AIUI-RAG2'
+      ? t('knowledge.xingchenFormatSupport')
+      : t('knowledge.sparkFormatSupport');
   }, [tag, t]);
 
   const clickOutside = useCallback((event: MouseEvent): void => {
@@ -537,8 +535,8 @@ const useDocumentUI = (
   }, []);
 
   useEffect(() => {
-    document.body.addEventListener("click", clickOutside);
-    return (): void => document.body.removeEventListener("click", clickOutside);
+    document.body.addEventListener('click', clickOutside);
+    return (): void => document.body.removeEventListener('click', clickOutside);
   }, [clickOutside]);
 
   return {

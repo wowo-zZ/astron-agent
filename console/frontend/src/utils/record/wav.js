@@ -9,11 +9,11 @@ https://developer.mozilla.org/en-US/docs/Web/HTML/Supported_media_formats
 编码原理：给pcm数据加上一个44直接的wav头即成wav文件；pcm数据就是Recorder中的buffers原始数据（重新采样），16位时为LE小端模式（Little Endian），实质上是未经过任何编码处理
 */
 (function () {
-  "use strict";
+  'use strict';
 
   Recorder.prototype.enc_wav = {
     stable: true,
-    testmsg: "支持位数8位、16位（填在比特率里面），采样率取值无限制",
+    testmsg: '支持位数8位、16位（填在比特率里面），采样率取值无限制',
   };
   Recorder.prototype.wav = function (res, True, False, assignSampleRate) {
     var This = this,
@@ -42,13 +42,13 @@ https://developer.mozilla.org/en-US/docs/Web/HTML/Supported_media_formats
     };
 
     /* RIFF identifier */
-    writeString("RIFF");
+    writeString('RIFF');
     /* RIFF chunk length */
     write32(36 + dataLength);
     /* RIFF type */
-    writeString("WAVE");
+    writeString('WAVE');
     /* format chunk identifier */
-    writeString("fmt ");
+    writeString('fmt ');
     /* format chunk length */
     write32(16);
     /* sample format (raw) */
@@ -64,7 +64,7 @@ https://developer.mozilla.org/en-US/docs/Web/HTML/Supported_media_formats
     /* bits per sample */
     write16(bitRate);
     /* data chunk identifier */
-    writeString("data");
+    writeString('data');
     /* data chunk length */
     write32(dataLength);
     // 写入采样数据
@@ -79,6 +79,6 @@ https://developer.mozilla.org/en-US/docs/Web/HTML/Supported_media_formats
         data.setInt16(offset, res[i], true);
       }
     }
-    True(new Blob([data.buffer], { type: "audio/wav" }));
+    True(new Blob([data.buffer], { type: 'audio/wav' }));
   };
 })();

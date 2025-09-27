@@ -41,7 +41,7 @@ export interface ToolItem {
   id?: string;
   toolId: string;
   name: string;
-  type: "tool" | "knowledge" | "mcp";
+  type: 'tool' | 'knowledge' | 'mcp';
   icon?: string;
   tag?: string;
   isLatest?: boolean;

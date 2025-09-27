@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
-import { fetchEventSource } from "@microsoft/fetch-event-source";
-import { isJSON } from "@/utils";
-import { Button, Spin, Input } from "antd";
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { fetchEventSource } from '@microsoft/fetch-event-source';
+import { isJSON } from '@/utils';
+import { Button, Spin, Input } from 'antd';
 
-import reTry from "@/assets/imgs/knowledge/bnt_zhishi_restart.png";
+import reTry from '@/assets/imgs/knowledge/bnt_zhishi_restart.png';
 
 const { TextArea } = Input;
 
@@ -14,9 +14,9 @@ function OpeningRemarksModal({
   isFlow = false,
 }): React.ReactElement {
   const textQueue = useRef<string[]>([]);
-  const wsMessageStatus = useRef<string>("end");
+  const wsMessageStatus = useRef<string>('end');
   const [optimizationOpeningRemarks, setOptimizationOpeningRemarks] =
-    useState("");
+    useState('');
   const [isReciving, setIsReciving] = useState(true);
 
   useEffect(() => {
@@ -24,30 +24,30 @@ function OpeningRemarksModal({
   }, [currentRobot]);
 
   function handlePromptOptimization(): void {
-    setOptimizationOpeningRemarks(() => "");
-    wsMessageStatus.current = "start";
+    setOptimizationOpeningRemarks(() => '');
+    wsMessageStatus.current = 'start';
     setIsReciving(true);
     const controller = new AbortController();
-    fetchEventSource("/xingchen-api/prompt/ai-generate", {
+    fetchEventSource('/xingchen-api/prompt/ai-generate', {
       openWhenHidden: true,
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        Accept: "text/event-stream",
+        'Content-Type': 'application/json',
+        Accept: 'text/event-stream',
       },
       signal: controller.signal,
       body: JSON.stringify({
-        [isFlow ? "flowId" : "botId"]: currentRobot.id,
-        code: "prologue",
+        [isFlow ? 'flowId' : 'botId']: currentRobot.id,
+        code: 'prologue',
       }),
       onmessage(e) {
         if (e && e.data) {
           if (e.data && isJSON(e.data)) {
             const data = JSON.parse(e.data);
             const content = data?.payload?.message?.content;
-            textQueue.current = [...textQueue.current, ...content.split("")];
+            textQueue.current = [...textQueue.current, ...content.split('')];
             if (data?.header?.status === 2) {
-              wsMessageStatus.current = "end";
+              wsMessageStatus.current = 'end';
             }
           }
         }
@@ -56,7 +56,7 @@ function OpeningRemarksModal({
         controller.abort();
       },
       onclose() {
-        wsMessageStatus.current = "end";
+        wsMessageStatus.current = 'end';
       },
     });
   }
@@ -65,14 +65,14 @@ function OpeningRemarksModal({
     let timer: ReturnType<typeof setTimeout> | null = null;
     if (isReciving) {
       timer = setInterval(() => {
-        const value = textQueue.current.slice(0, 1).join("");
+        const value = textQueue.current.slice(0, 1).join('');
         textQueue.current = textQueue.current.slice(1);
         if (value) {
           setOptimizationOpeningRemarks(
-            (optimizationPrompt) => optimizationPrompt + value,
+            optimizationPrompt => optimizationPrompt + value
           );
         }
-        if (!textQueue.current.length && wsMessageStatus.current === "end") {
+        if (!textQueue.current.length && wsMessageStatus.current === 'end') {
           setIsReciving(false);
         }
       }, 10);
@@ -105,8 +105,8 @@ function OpeningRemarksModal({
             className="flex items-center gap-1 text-[#275EFF] text-base"
             onClick={() => !isReciving && handlePromptOptimization()}
             style={{
-              opacity: isReciving ? "0.5" : "1",
-              cursor: isReciving ? "not-allowed" : "pointer",
+              opacity: isReciving ? '0.5' : '1',
+              cursor: isReciving ? 'not-allowed' : 'pointer',
             }}
           >
             <img src={reTry} className="w-4 h-4" alt="" />
@@ -122,9 +122,9 @@ function OpeningRemarksModal({
             <TextArea
               className="mt-5 global-textarea"
               placeholder="模型固定的引导词，通过调整该内容，可以引导模型聊天方向"
-              style={{ height: 380, resize: "none" }}
+              style={{ height: 380, resize: 'none' }}
               value={optimizationOpeningRemarks}
-              onChange={(event) =>
+              onChange={event =>
                 !isReciving &&
                 setOptimizationOpeningRemarks(event.target.value?.trim())
               }

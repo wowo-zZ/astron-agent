@@ -1,7 +1,7 @@
-import { Node } from "reactflow";
-import { FlowType, ErrNodeType } from "../..";
-import { FlowStoreType } from "../flow";
-import { UseBoundStore, StoreApi } from "zustand";
+import { Node } from 'reactflow';
+import { FlowType, ErrNodeType } from '../..';
+import { FlowStoreType } from '../flow';
+import { UseBoundStore, StoreApi } from 'zustand';
 
 export type FlowsManagerStoreType = {
   clearFlowCanvasModalInfo: {
@@ -24,15 +24,15 @@ export type FlowsManagerStoreType = {
   setBeforeNode: (beforeNode: unknown) => void;
   cycleEdges: unknown[];
   setCycleEdges: (
-    update: unknown[] | ((oldState: unknown[]) => unknown[]),
+    update: unknown[] | ((oldState: unknown[]) => unknown[])
   ) => void;
   decisionNodeTransformationModal: boolean;
   setDecisionNodeTransformationModal: (
-    decisionNodeTransformationModal: boolean,
+    decisionNodeTransformationModal: boolean
   ) => void;
   chatHistoryTransformationModal: boolean;
   setChatHistoryTransformationModal: (
-    chatHistoryTransformationModal: boolean,
+    chatHistoryTransformationModal: boolean
   ) => void;
   autonomousMode: boolean;
   setAutonomousMode: (autonomousMode: boolean) => void;
@@ -104,7 +104,7 @@ export type FlowsManagerStoreType = {
   questionAnswerModels: unknown[];
   nodeList: unknown[];
   setNodeList: (
-    update: unknown[] | ((oldState: unknown[]) => unknown[]),
+    update: unknown[] | ((oldState: unknown[]) => unknown[])
   ) => void;
   flows: Array<FlowType>;
   setFlows: (flows: FlowType[]) => void;
@@ -134,7 +134,7 @@ export type FlowsManagerStoreType = {
   initFlowData: (id: string) => Promise<void>;
   currentFlow: FlowType | undefined;
   setCurrentFlow: (
-    update: (FlowType | unknown) | ((oldState: FlowType) => FlowType),
+    update: (FlowType | unknown) | ((oldState: FlowType) => FlowType)
   ) => void;
   nodeTemplate: unknown;
   setNodeTemplate: (nodeTemplate: unknown) => void;

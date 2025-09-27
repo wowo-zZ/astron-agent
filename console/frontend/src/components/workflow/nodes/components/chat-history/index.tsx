@@ -1,28 +1,28 @@
-import React, { useCallback } from "react";
-import { FLowTree } from "@/components/workflow/ui";
-import { InputNumber, Tooltip } from "antd";
-import { renderType } from "@/components/workflow/utils/reactflowUtils";
-import { cloneDeep } from "lodash";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import { useTranslation } from "react-i18next";
+import React, { useCallback } from 'react';
+import { FLowTree } from '@/components/workflow/ui';
+import { InputNumber, Tooltip } from 'antd';
+import { renderType } from '@/components/workflow/utils/reactflowUtils';
+import { cloneDeep } from 'lodash';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import { useTranslation } from 'react-i18next';
 
-import arrowUp from "@/assets/imgs/chat/arrow_up.png";
-import arrowDown from "@/assets/imgs/chat/arrow_down.png";
-import questionMark from "@/assets/imgs/common/questionmark.png";
+import arrowUp from '@/assets/imgs/chat/arrow_up.png';
+import arrowDown from '@/assets/imgs/chat/arrow_down.png';
+import questionMark from '@/assets/imgs/common/questionmark.png';
 
 function index({ id, data }): React.ReactElement {
   const { t } = useTranslation();
-  const getCurrentStore = useFlowsManager((state) => state.getCurrentStore);
+  const getCurrentStore = useFlowsManager(state => state.getCurrentStore);
   const currentStore = getCurrentStore();
   const autoSaveCurrentFlow = useFlowsManager(
-    (state) => state.autoSaveCurrentFlow,
+    state => state.autoSaveCurrentFlow
   );
-  const canPublishSetNot = useFlowsManager((state) => state.canPublishSetNot);
-  const setNode = currentStore((state) => state.setNode);
+  const canPublishSetNot = useFlowsManager(state => state.canPublishSetNot);
+  const setNode = currentStore(state => state.setNode);
 
   const handleChangeNodeParam = useCallback(
-    (value) => {
-      setNode(id, (old) => {
+    value => {
+      setNode(id, old => {
         if (old?.data?.nodeParam?.enableChatHistoryV2) {
           old.data.nodeParam.enableChatHistoryV2.rounds = value;
         } else {
@@ -38,10 +38,10 @@ function index({ id, data }): React.ReactElement {
       autoSaveCurrentFlow();
       canPublishSetNot();
     },
-    [id, autoSaveCurrentFlow],
+    [id, autoSaveCurrentFlow]
   );
 
-  const titleRender = useCallback((nodeData) => {
+  const titleRender = useCallback(nodeData => {
     const type = nodeData?.schema?.type || nodeData?.type;
     return (
       <div className="flex items-center gap-2">
@@ -55,26 +55,26 @@ function index({ id, data }): React.ReactElement {
 
   const treeData = [
     {
-      key: "1",
-      label: "history",
+      key: '1',
+      label: 'history',
       schema: {
-        type: "array-object",
+        type: 'array-object',
       },
       children: [
         {
-          key: "2",
-          label: "role",
-          type: "string",
+          key: '2',
+          label: 'role',
+          type: 'string',
         },
         {
-          key: "3",
-          label: "content_type",
-          type: "string",
+          key: '3',
+          label: 'content_type',
+          type: 'string',
         },
         {
-          key: "4",
-          label: "content",
-          type: "string",
+          key: '4',
+          label: 'content',
+          type: 'string',
         },
       ],
     },
@@ -83,8 +83,8 @@ function index({ id, data }): React.ReactElement {
   return (
     <div
       className="w-full flex items-start mt-4 gap-3"
-      onClick={(e) => e.stopPropagation()}
-      onKeyDown={(e) => e.stopPropagation()}
+      onClick={e => e.stopPropagation()}
+      onKeyDown={e => e.stopPropagation()}
     >
       <div className="w-1/3">
         <FLowTree
@@ -94,9 +94,9 @@ function index({ id, data }): React.ReactElement {
         />
       </div>
       <div className="flex-1 flex items-center gap-1">
-        <span className="text-xs">{t("common.conversationRounds")}</span>
+        <span className="text-xs">{t('common.conversationRounds')}</span>
         <Tooltip
-          title={t("common.conversationRoundsDescription")}
+          title={t('common.conversationRoundsDescription')}
           overlayClassName="black-tooltip"
         >
           <img src={questionMark} width={16} className="ml-1" alt="" />

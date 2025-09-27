@@ -1,15 +1,15 @@
-import React from "react";
+import React from 'react';
 import {
   SpaceType,
   RoleType,
   ModuleType,
   OperationType,
-} from "@/permissions/permission-type";
+} from '@/permissions/permission-type';
 
 // 权限失败时的行为枚举
 export enum PermissionFailureBehavior {
-  HIDE = "hide", // 隐藏按钮（默认行为）
-  DISABLE = "disable", // 禁用按钮但仍显示
+  HIDE = 'hide', // 隐藏按钮（默认行为）
+  DISABLE = 'disable', // 禁用按钮但仍显示
 }
 
 // 用户角色接口
@@ -40,8 +40,8 @@ export interface ButtonConfig {
   key: string;
   text: string;
   icon?: React.ReactNode;
-  type?: "primary" | "default" | "dashed" | "link" | "text";
-  size?: "large" | "middle" | "small";
+  type?: 'primary' | 'default' | 'dashed' | 'link' | 'text';
+  size?: 'large' | 'middle' | 'small';
   disabled?: boolean;
   tooltip?: string;
   danger?: boolean;
@@ -65,7 +65,7 @@ export interface ButtonGroupProps {
 
   // 样式配置
   className?: string;
-  size?: "large" | "middle" | "small";
+  size?: 'large' | 'middle' | 'small';
 
   // 统一的点击事件处理（可选，单个按钮的onClick优先级更高）
   onButtonClick?: (buttonKey: string, event: React.MouseEvent) => void;
@@ -86,7 +86,7 @@ export interface ButtonGroupProps {
 // 按钮点击事件类型
 export type ButtonClickHandler = (
   buttonKey: string,
-  event: React.MouseEvent,
+  event: React.MouseEvent
 ) => void;
 
 // 权限检查函数类型
@@ -101,4 +101,4 @@ export {
   RoleType,
   ModuleType,
   OperationType,
-} from "@/permissions/permission-type";
+} from '@/permissions/permission-type';

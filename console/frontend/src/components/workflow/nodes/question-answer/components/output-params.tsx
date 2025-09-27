@@ -1,51 +1,51 @@
-import React, { useMemo, useState } from "react";
-import { Checkbox } from "antd";
+import React, { useMemo, useState } from 'react';
+import { Checkbox } from 'antd';
 import {
   FlowNodeInput,
   FlowSelect,
   FlowNodeTextArea,
   FlowInputNumber,
-} from "@/components/workflow/ui";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import { generateTypeDefault } from "@/utils";
-import { useTranslation } from "react-i18next";
-import { useNodeCommon } from "@/components/workflow/hooks/useNodeCommon";
+} from '@/components/workflow/ui';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import { generateTypeDefault } from '@/utils';
+import { useTranslation } from 'react-i18next';
+import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
 
-import inputAddIcon from "@/assets/imgs/workflow/input-add-icon.png";
-import remove from "@/assets/imgs/workflow/input-remove-icon.png";
+import inputAddIcon from '@/assets/imgs/workflow/input-add-icon.png';
+import remove from '@/assets/imgs/workflow/input-remove-icon.png';
 
 const outputTypeList = [
   {
-    label: "String",
-    value: "string",
+    label: 'String',
+    value: 'string',
   },
   {
-    label: "Integer",
-    value: "integer",
+    label: 'Integer',
+    value: 'integer',
   },
   {
-    label: "Boolean",
-    value: "boolean",
+    label: 'Boolean',
+    value: 'boolean',
   },
   {
-    label: "Number",
-    value: "number",
+    label: 'Number',
+    value: 'number',
   },
   {
-    label: "Array<String>",
-    value: "array-string",
+    label: 'Array<String>',
+    value: 'array-string',
   },
   {
-    label: "Array<Integer>",
-    value: "array-integer",
+    label: 'Array<Integer>',
+    value: 'array-integer',
   },
   {
-    label: "Array<Boolean>",
-    value: "array-boolean",
+    label: 'Array<Boolean>',
+    value: 'array-boolean',
   },
   {
-    label: "Array<Number>",
-    value: "array-number",
+    label: 'Array<Number>',
+    value: 'array-number',
   },
 ];
 
@@ -58,70 +58,70 @@ export const RenderInput = ({
   const { t } = useTranslation();
   const type = item?.schema?.type;
 
-  if (type === "string") {
+  if (type === 'string') {
     return (
       <FlowNodeInput
         nodeId={id}
         maxLength={30}
         className="w-full"
         value={item?.schema?.default}
-        onChange={(value) =>
+        onChange={value =>
           handleChangeOutputParam(
             item?.id,
             (data, v) => (data.schema.default = v),
-            value,
+            value
           )
         }
       />
     );
   }
-  if (type === "boolean") {
+  if (type === 'boolean') {
     return (
       <FlowSelect
-        placeholder={t("workflow.nodes.common.selectPlaceholder")}
+        placeholder={t('workflow.nodes.common.selectPlaceholder')}
         options={[
-          { label: "true", value: true },
-          { label: "false", value: false },
+          { label: 'true', value: true },
+          { label: 'false', value: false },
         ]}
         value={item?.schema?.default}
-        onChange={(value) =>
+        onChange={value =>
           handleChangeOutputParam(
             item?.id,
             (data, v) => (data.schema.default = v),
-            value,
+            value
           )
         }
       />
     );
   }
-  if (type === "integer") {
+  if (type === 'integer') {
     return (
       <FlowInputNumber
         className="w-full flow-node-inputNumber-white"
         step={1}
         precision={0}
         value={item?.schema?.default}
-        onChange={(value) =>
+        onChange={value =>
           handleChangeOutputParam(
             item?.id,
             (data, v) => (data.schema.default = v),
-            value,
+            value
           )
         }
       />
     );
   }
-  if (type === "number") {
+  if (type === 'number') {
     return (
       <FlowInputNumber
         className="w-full flow-node-inputNumber-white"
-        placeholder={t("workflow.nodes.common.inputPlaceholder")}
+        placeholder={t('workflow.nodes.common.inputPlaceholder')}
         value={item?.schema?.default}
-        onChange={(value) =>
+        onChange={value =>
           handleChangeOutputParam(
             item?.id,
             (data, v) => (data.schema.default = v),
-            value,
+            value
           )
         }
       />
@@ -130,7 +130,7 @@ export const RenderInput = ({
   return (
     <div
       className="border border-[#e4eaff] bg-[#fff] px-[11px] h-[32px] rounded-lg cursor-pointer"
-      style={{ lineHeight: "32px" }}
+      style={{ lineHeight: '32px' }}
       onClick={() =>
         setDefaultValueModalInfo({
           open: true,
@@ -160,19 +160,19 @@ export const RenderTypeInput = ({
     rows={focusTextareaId === output.id ? 3 : 1}
     style={{
       height: focusTextareaId === output.id ? 86 : 30,
-      overflow: focusTextareaId === output.id ? "auto" : "hidden",
+      overflow: focusTextareaId === output.id ? 'auto' : 'hidden',
       paddingTop: 2,
     }}
     value={output?.schema?.description}
-    onChange={(value) =>
+    onChange={value =>
       handleChangeOutputParam(
         output.id,
         (data, v) => (data.schema.description = v),
-        value,
+        value
       )
     }
     onBlur={() => {
-      setFocusTextareaId("");
+      setFocusTextareaId('');
       delayCheckNode(id);
     }}
     onFocus={() => setFocusTextareaId(output.id)}
@@ -184,7 +184,7 @@ const FixedOutputs = ({ fixedOutputs }): React.ReactElement => {
 
   return (
     <div className="flex flex-col gap-3">
-      {fixedOutputs.map((item) => (
+      {fixedOutputs.map(item => (
         <div key={item.id} className="flex flex-col gap-1">
           <div className="flex items-start gap-3">
             <div className="flex flex-col w-1/4 flex-shrink-0">
@@ -220,13 +220,13 @@ const ExtractionOutputs = ({
 }): React.ReactElement => {
   if (!extractionOutputs?.length) return null;
 
-  const currentStore = useFlowsManager((state) => state.getCurrentStore());
-  const delayUpdateNodeRef = currentStore((state) => state.delayUpdateNodeRef);
-  const updateNodeRef = currentStore((state) => state.updateNodeRef);
+  const currentStore = useFlowsManager(state => state.getCurrentStore());
+  const delayUpdateNodeRef = currentStore(state => state.delayUpdateNodeRef);
+  const updateNodeRef = currentStore(state => state.updateNodeRef);
 
   return (
     <div className="flex flex-col gap-3">
-      {extractionOutputs.map((item) => (
+      {extractionOutputs.map(item => (
         <div key={item.id} className="flex flex-col gap-1">
           <div className="flex items-start gap-3 overflow-hidden">
             <div className="flex flex-col w-[100px] flex-shrink-0">
@@ -235,11 +235,11 @@ const ExtractionOutputs = ({
                 maxLength={30}
                 className="w-full"
                 value={item.name}
-                onChange={(value) =>
+                onChange={value =>
                   handleChangeOutputParam(
                     item?.id,
                     (data, value) => (data.name = value),
-                    value,
+                    value
                   )
                 }
                 onBlur={() => {
@@ -254,14 +254,14 @@ const ExtractionOutputs = ({
                 onBlur={() => {
                   updateNodeRef(id);
                 }}
-                onChange={(value) =>
+                onChange={value =>
                   handleChangeOutputParam(
                     item?.id,
                     (data, value) => {
                       data.schema.type = value;
                       data.schema.default = generateTypeDefault(value);
                     },
-                    value,
+                    value
                   )
                 }
               />
@@ -288,16 +288,16 @@ const ExtractionOutputs = ({
               <Checkbox
                 checked={item.required}
                 style={{
-                  width: "16px",
-                  height: "16px",
-                  background: "#F9FAFB",
+                  width: '16px',
+                  height: '16px',
+                  background: '#F9FAFB',
                 }}
-                onChange={(e) => {
+                onChange={e => {
                   e.stopPropagation();
                   handleChangeOutputParam(
                     item?.id,
                     (data, value) => (data.required = value),
-                    e.target.checked,
+                    e.target.checked
                   );
                 }}
               />
@@ -332,17 +332,17 @@ function index({ id, data }): React.ReactElement {
     outputs,
   } = useNodeCommon({ id, data });
   const { t } = useTranslation();
-  const getCurrentStore = useFlowsManager((state) => state.getCurrentStore);
+  const getCurrentStore = useFlowsManager(state => state.getCurrentStore);
   const currentStore = getCurrentStore();
   const setDefaultValueModalInfo = useFlowsManager(
-    (state) => state.setDefaultValueModalInfo,
+    state => state.setDefaultValueModalInfo
   );
-  const delayCheckNode = currentStore((state) => state.delayCheckNode);
-  const canvasesDisabled = useFlowsManager((state) => state.canvasesDisabled);
-  const [focusTextareaId, setFocusTextareaId] = useState("");
+  const delayCheckNode = currentStore(state => state.delayCheckNode);
+  const canvasesDisabled = useFlowsManager(state => state.canvasesDisabled);
+  const [focusTextareaId, setFocusTextareaId] = useState('');
 
   const fixedOutputs = useMemo(() => {
-    return data?.nodeParam?.answerType === "direct"
+    return data?.nodeParam?.answerType === 'direct'
       ? outputs.slice(0, 2)
       : outputs;
   }, [outputs, data]);
@@ -354,34 +354,34 @@ function index({ id, data }): React.ReactElement {
   return (
     <div className="rounded-md px-[18px]">
       <div className="flex items-start gap-3 text-desc">
-        <h4 className="w-1/4">{t("workflow.nodes.common.variableName")}</h4>
-        <h4 className="w-1/4">{t("workflow.nodes.common.variableType")}</h4>
-        <h4 className="flex-1">{t("workflow.nodes.common.description")}</h4>
+        <h4 className="w-1/4">{t('workflow.nodes.common.variableName')}</h4>
+        <h4 className="w-1/4">{t('workflow.nodes.common.variableType')}</h4>
+        <h4 className="flex-1">{t('workflow.nodes.common.description')}</h4>
       </div>
       <div className="flex flex-col gap-3">
         <FixedOutputs fixedOutputs={fixedOutputs} />
       </div>
-      {data?.nodeParam?.answerType === "direct" &&
+      {data?.nodeParam?.answerType === 'direct' &&
         data?.nodeParam?.directAnswer?.handleResponse && (
           <div className="flex flex-col gap-3 my-3">
             <div className="text-base font-medium">
-              {t("workflow.nodes.questionAnswerNode.parameterExtraction")}
+              {t('workflow.nodes.questionAnswerNode.parameterExtraction')}
             </div>
             <div className="flex items-start gap-3 text-desc">
               <h4 className="w-[100px]">
-                {t("workflow.nodes.common.variableName")}
+                {t('workflow.nodes.common.variableName')}
               </h4>
               <h4 className="w-[100px]">
-                {t("workflow.nodes.common.variableType")}
+                {t('workflow.nodes.common.variableType')}
               </h4>
               <h4 className="flex-1">
-                {t("workflow.nodes.common.description")}
+                {t('workflow.nodes.common.description')}
               </h4>
               <h4 className="flex-1">
-                {t("workflow.nodes.questionAnswerNode.defaultValue")}
+                {t('workflow.nodes.questionAnswerNode.defaultValue')}
               </h4>
               <h4 className="w-[50px]">
-                {t("workflow.nodes.questionAnswerNode.required")}
+                {t('workflow.nodes.questionAnswerNode.required')}
               </h4>
               {extractionOutputs.length > 1 && (
                 <span className="w-5 h-5"></span>
@@ -403,7 +403,7 @@ function index({ id, data }): React.ReactElement {
                 onClick={() => handleAddOutputLine()}
               >
                 <img src={inputAddIcon} className="w-3 h-3" alt="" />
-                <span>{t("workflow.nodes.common.add")}</span>
+                <span>{t('workflow.nodes.common.add')}</span>
               </div>
             )}
           </div>

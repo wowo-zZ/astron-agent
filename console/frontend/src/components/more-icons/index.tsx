@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   Button,
   Upload,
@@ -7,17 +7,17 @@ import {
   message,
   UploadProps,
   Spin,
-} from "antd";
-import { UploadChangeParam, UploadFile } from "antd/es/upload/interface";
-import { useTranslation } from "react-i18next";
-import { avatarImageGenerate } from "@/services/common";
+} from 'antd';
+import { UploadChangeParam, UploadFile } from 'antd/es/upload/interface';
+import { useTranslation } from 'react-i18next';
+import { avatarImageGenerate } from '@/services/common';
 
-import { avatarGenerationMethods } from "@/constants";
-import uploadAct from "@/assets/imgs/common/upload-file.png";
-import zoomIn from "@/assets/imgs/common/zoom-in.png";
-import zoomOut from "@/assets/imgs/common/zoom-out.png";
-import close from "@/assets/imgs/common/close.png";
-import placeholderImage from "@/assets/imgs/common/ai-chat-placeholder.png";
+import { avatarGenerationMethods } from '@/constants';
+import uploadAct from '@/assets/imgs/common/upload-file.png';
+import zoomIn from '@/assets/imgs/common/zoom-in.png';
+import zoomOut from '@/assets/imgs/common/zoom-out.png';
+import close from '@/assets/imgs/common/close.png';
+import placeholderImage from '@/assets/imgs/common/ai-chat-placeholder.png';
 
 const { Dragger } = Upload;
 
@@ -77,10 +77,10 @@ function TabNavigation({
       {avatarGenerationMethods.map((item, index) => (
         <div
           key={index}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg cursor-pointer ${[activeTab, hoverTab].includes(item.activeTab) ? "text-[#275EFF] bg-[#F6F9FF]" : ""}`}
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg cursor-pointer ${[activeTab, hoverTab].includes(item.activeTab) ? 'text-[#275EFF] bg-[#F6F9FF]' : ''}`}
           onMouseEnter={() => setHoverTab(item.activeTab)}
-          onMouseLeave={() => setHoverTab("")}
-          onClick={(e) => {
+          onMouseLeave={() => setHoverTab('')}
+          onClick={e => {
             e.stopPropagation();
             setActiveTab(item.activeTab);
           }}
@@ -117,10 +117,10 @@ function GalleryTab({
 }: GalleryTabProps): React.JSX.Element {
   const { t } = useTranslation();
   const iconCategories = [
-    { code: "common", title: t("common.moreIcons.categories.common") },
-    { code: "sport", title: t("common.moreIcons.categories.sport") },
-    { code: "plant", title: t("common.moreIcons.categories.plant") },
-    { code: "explore", title: t("common.moreIcons.categories.explore") },
+    { code: 'common', title: t('common.moreIcons.categories.common') },
+    { code: 'sport', title: t('common.moreIcons.categories.sport') },
+    { code: 'plant', title: t('common.moreIcons.categories.plant') },
+    { code: 'explore', title: t('common.moreIcons.categories.explore') },
   ];
 
   const renderIconCategory = (category: {
@@ -140,15 +140,15 @@ function GalleryTab({
               className="icons-item cursor-pointer"
               style={{
                 background:
-                  previewIcon.value === item.value ? previewColor : "",
+                  previewIcon.value === item.value ? previewColor : '',
               }}
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation();
                 setPreviewIcon(item);
               }}
             >
               <img
-                src={(item.name || "") + (item.value || "")}
+                src={(item.name || '') + (item.value || '')}
                 className="w-8 h-8"
                 alt=""
               />
@@ -188,8 +188,8 @@ function GenerateTab({
         className="w-full h-[165px] flex items-center justify-center rounded-lg"
         style={{
           background:
-            "linear-gradient(90deg, rgba(223, 231, 253, 0.26) 0%, rgba(239, 227, 253, 0.81) 100%)",
-          border: "1px solid #E4EAFF",
+            'linear-gradient(90deg, rgba(223, 231, 253, 0.26) 0%, rgba(239, 227, 253, 0.81) 100%)',
+          border: '1px solid #E4EAFF',
         }}
       >
         <Spin spinning={loading}>
@@ -209,17 +209,17 @@ function GenerateTab({
           className="user-chat-input w-full"
           maxLength={80}
           value={generateImageDescription}
-          onChange={(e) => setGenerateImageDescription(e.target.value)}
-          onPressEnter={(e) => {
+          onChange={e => setGenerateImageDescription(e.target.value)}
+          onPressEnter={e => {
             e.stopPropagation();
             e.preventDefault();
             generateImage();
           }}
-          placeholder={t("common.moreIcons.aiGeneration.placeholder")}
+          placeholder={t('common.moreIcons.aiGeneration.placeholder')}
         />
         <div className="send-btns">
           <span
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               generateImage();
             }}
@@ -246,23 +246,23 @@ function ColorPicker({
   activeTab,
 }: ColorPickerProps): React.JSX.Element {
   const { t } = useTranslation();
-  if (activeTab !== "gallery") {
+  if (activeTab !== 'gallery') {
     return <></>;
   }
 
   return (
     <div className="mt-7">
       <div className="text-[#101828] text-xs font-medium mb-2">
-        {t("common.moreIcons.selectStyle")}
+        {t('common.moreIcons.selectStyle')}
       </div>
       <div className="flex gap-1 flex-wrap">
         {colors.map((item: ColorItem, index: number) => (
           <div
             key={index}
-            className={`w-10 h-10 rounded-lg p-[5px] cursor-pointer ${previewColor === item.name ? "color-item-active" : ""}`}
-            onClick={(e) => {
+            className={`w-10 h-10 rounded-lg p-[5px] cursor-pointer ${previewColor === item.name ? 'color-item-active' : ''}`}
+            onClick={e => {
               e.stopPropagation();
-              setPreviewColor(item.name || "");
+              setPreviewColor(item.name || '');
             }}
           >
             <div
@@ -296,13 +296,13 @@ function UploadTab({
           <Dragger {...uploadProps} className="icon-upload">
             <img src={uploadAct} className="w-8 h-8" alt="" />
             <div className="font-medium mt-6">
-              {t("common.moreIcons.upload.dragOrSelect")}
+              {t('common.moreIcons.upload.dragOrSelect')}
               <span className="text-[#275EFF]">
-                {t("common.moreIcons.upload.chooseFiles")}
+                {t('common.moreIcons.upload.chooseFiles')}
               </span>
             </div>
             <p className="text-desc mt-2">
-              {t("common.moreIcons.upload.supportFormat")}
+              {t('common.moreIcons.upload.supportFormat')}
             </p>
           </Dragger>
         </Spin>
@@ -336,22 +336,22 @@ function ActionButtons({
         type="primary"
         disabled={checkEnableSave}
         className="px-[24px]"
-        onClick={(e) => {
+        onClick={e => {
           e.stopPropagation();
           handleOk();
         }}
       >
-        {t("common.save")}
+        {t('common.save')}
       </Button>
       <Button
         type="text"
         className="origin-btn px-[24px]"
-        onClick={(e) => {
+        onClick={e => {
           e.stopPropagation();
           setShowModal(false);
         }}
       >
-        {t("common.cancel")}
+        {t('common.cancel')}
       </Button>
     </div>
   );
@@ -371,16 +371,16 @@ function Image(props: ImageProps): React.JSX.Element {
               className="icon-image-container"
               style={{
                 background: `url(${imageUrl}) no-repeat center`,
-                backgroundSize: "cover",
+                backgroundSize: 'cover',
                 transform: `scale(${scale})`,
-                transformOrigin: "center center",
+                transformOrigin: 'center center',
               }}
             >
               <div
                 className="icon-image-container-mask"
                 style={{
                   transform: `scale(${1 / scale})`,
-                  transformOrigin: "center center",
+                  transformOrigin: 'center center',
                 }}
               >
                 <div className="border-4 border-[#275EFF] rounded-xl w-full h-full overflow-hidden">
@@ -388,9 +388,9 @@ function Image(props: ImageProps): React.JSX.Element {
                     className="icon-image-origin"
                     style={{
                       background: `url(${imageUrl}) no-repeat center`,
-                      backgroundSize: "cover",
+                      backgroundSize: 'cover',
                       transform: `scale(${scale})`,
-                      transformOrigin: "center center",
+                      transformOrigin: 'center center',
                     }}
                   ></div>
                 </div>
@@ -414,7 +414,7 @@ function Image(props: ImageProps): React.JSX.Element {
               step={0.1}
               value={scale}
               className="flex-1 config-slider"
-              onChange={(value) => setScale(value)}
+              onChange={value => setScale(value)}
             />
           </div>
           <img
@@ -443,19 +443,19 @@ function index(props: IndexProps): React.JSX.Element {
   const { t } = useTranslation();
 
   const [previewIcon, setPreviewIcon] = useState<BotIcon>({});
-  const [previewColor, setPreviewColor] = useState("");
-  const [activeTab, setActiveTab] = useState<string | undefined>("gallery");
-  const [hoverTab, setHoverTab] = useState<string | undefined>("");
+  const [previewColor, setPreviewColor] = useState('');
+  const [activeTab, setActiveTab] = useState<string | undefined>('gallery');
+  const [hoverTab, setHoverTab] = useState<string | undefined>('');
   const [uploadImageObject, setUploadImageObject] =
     useState<ImageGenerateResponse>({
-      downloadLink: "",
-      s3Key: "",
+      downloadLink: '',
+      s3Key: '',
     });
-  const [generateImageDescription, setGenerateImageDescription] = useState("");
+  const [generateImageDescription, setGenerateImageDescription] = useState('');
   const [generateImageObject, setGenerateImageObject] =
     useState<ImageGenerateResponse>({
-      downloadLink: "",
-      s3Key: "",
+      downloadLink: '',
+      s3Key: '',
     });
   const [loading, setLoading] = useState(false);
   const [uploadLoading, setUploadLoading] = useState(false);
@@ -471,7 +471,7 @@ function index(props: IndexProps): React.JSX.Element {
         setPreviewIcon(firstIcon);
       }
       if (firstColor) {
-        setPreviewColor(firstColor.name || "");
+        setPreviewColor(firstColor.name || '');
       }
     }
   }, [botColor, botIcon, icons, colors]);
@@ -479,27 +479,27 @@ function index(props: IndexProps): React.JSX.Element {
   function generateImage(): void {
     if (loading) return;
     if (!generateImageDescription?.trim()) {
-      message.error(t("common.moreIcons.validation.descriptionEmpty"));
+      message.error(t('common.moreIcons.validation.descriptionEmpty'));
       return;
     }
     setLoading(true);
     avatarImageGenerate(generateImageDescription)
-      .then((data) => {
+      .then(data => {
         setGenerateImageObject(data as unknown as ImageGenerateResponse);
       })
       .finally(() => setLoading(false));
   }
 
   function handleOk(): void {
-    if (activeTab === "gallery") {
+    if (activeTab === 'gallery') {
       setBotIcon(previewIcon);
       setBotColor(previewColor);
-    } else if (activeTab === "upload") {
+    } else if (activeTab === 'upload') {
       setBotIcon({ ...botIcon, value: uploadImageObject.s3Key });
-      setBotColor("");
+      setBotColor('');
     } else {
       setBotIcon({ ...botIcon, value: generateImageObject.s3Key });
-      setBotColor("");
+      setBotColor('');
     }
 
     setShowModal(false);
@@ -508,17 +508,17 @@ function index(props: IndexProps): React.JSX.Element {
   function beforeUpload(file: UploadFile): boolean {
     const maxSize = 2 * 1024 * 1024;
     if (file.size && file.size > maxSize) {
-      message.error(t("common.moreIcons.validation.fileSizeExceed"));
+      message.error(t('common.moreIcons.validation.fileSizeExceed'));
       return false;
     }
-    const fileExtension = file.type?.split("/").pop();
+    const fileExtension = file.type?.split('/').pop();
     const isJpgOrPng =
       fileExtension &&
-      ["jpg", "jpeg", "png", "gif", "webp", "bmp", "tiff"].includes(
-        fileExtension,
+      ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'tiff'].includes(
+        fileExtension
       );
     if (!isJpgOrPng) {
-      message.error(t("common.moreIcons.validation.invalidFormat"));
+      message.error(t('common.moreIcons.validation.invalidFormat'));
       return false;
     } else {
       return true;
@@ -526,18 +526,18 @@ function index(props: IndexProps): React.JSX.Element {
   }
 
   const uploadProps: UploadProps = {
-    name: "file",
-    action: "http://172.29.201.92:8080/image/upload",
+    name: 'file',
+    action: 'http://172.29.201.92:8080/image/upload',
     showUploadList: false,
-    accept: ".png,.jpg,.jpeg,.gif,.webp,.bmp,.tiff",
+    accept: '.png,.jpg,.jpeg,.gif,.webp,.bmp,.tiff',
     beforeUpload,
     headers: {
-      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
     },
     onChange: (info: UploadChangeParam<UploadFile>): void => {
-      if (info.file.status === "uploading") {
+      if (info.file.status === 'uploading') {
         setUploadLoading(true);
-      } else if (info.file.status === "done") {
+      } else if (info.file.status === 'done') {
         setUploadLoading(false);
         if (
           info.file.response &&
@@ -549,33 +549,33 @@ function index(props: IndexProps): React.JSX.Element {
         } else {
           message.error(info.file.response.message);
         }
-      } else if (info.file.status === "error") {
+      } else if (info.file.status === 'error') {
         setUploadLoading(false);
-        message.error(t("common.moreIcons.upload.uploadFailed"));
+        message.error(t('common.moreIcons.upload.uploadFailed'));
       }
     },
   };
 
   const checkEnableSave = useMemo(() => {
     return (
-      (activeTab === "upload" && !uploadImageObject.downloadLink) ||
-      (activeTab === "chat" && !generateImageObject.downloadLink)
+      (activeTab === 'upload' && !uploadImageObject.downloadLink) ||
+      (activeTab === 'chat' && !generateImageObject.downloadLink)
     );
   }, [activeTab, uploadImageObject, generateImageObject]);
 
   return (
     <div
       className="mask text-second text-sm font-medium"
-      onClick={(e) => e.stopPropagation()}
+      onClick={e => e.stopPropagation()}
     >
       <div className="p-6 absolute bg-[#fff] rounded-2xl top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 text-second font-medium text-md w-[720px]">
         <div className="text-second text-base font-semibold mb-4 flex items-center justify-between">
-          <span>{t("common.moreIcons.selectIcon")}</span>
+          <span>{t('common.moreIcons.selectIcon')}</span>
           <img
             src={close}
             className="w-3 h-3 cursor-pointer"
             alt=""
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               setShowModal(false);
             }}
@@ -587,7 +587,7 @@ function index(props: IndexProps): React.JSX.Element {
           setActiveTab={setActiveTab}
           setHoverTab={setHoverTab}
         />
-        {activeTab === "gallery" && (
+        {activeTab === 'gallery' && (
           <GalleryTab
             icons={icons}
             previewIcon={previewIcon}
@@ -601,14 +601,14 @@ function index(props: IndexProps): React.JSX.Element {
           setPreviewColor={setPreviewColor}
           activeTab={activeTab}
         />
-        {activeTab === "upload" && (
+        {activeTab === 'upload' && (
           <UploadTab
             uploadImageObject={uploadImageObject}
             uploadProps={uploadProps}
             uploadLoading={uploadLoading}
           />
         )}
-        {activeTab === "chat" && (
+        {activeTab === 'chat' && (
           <GenerateTab
             generateImageDescription={generateImageDescription}
             setGenerateImageDescription={setGenerateImageDescription}

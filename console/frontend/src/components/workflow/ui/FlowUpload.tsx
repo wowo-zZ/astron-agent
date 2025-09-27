@@ -1,10 +1,10 @@
-import React from "react";
-import { Upload, message } from "antd";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import { v4 as uuid } from "uuid";
+import React from 'react';
+import { Upload, message } from 'antd';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import { v4 as uuid } from 'uuid';
 
 const { Dragger } = Upload;
-import uploadAct from "@/assets/imgs/knowledge/icon_zhishi_upload_act.png";
+import uploadAct from '@/assets/imgs/knowledge/icon_zhishi_upload_act.png';
 
 interface FlowUploadProps {
   multiple?: boolean;
@@ -21,32 +21,32 @@ const FlowUpload: React.FC<FlowUploadProps> = ({
   handleFileUpload,
   maxSize,
 }): React.ReactElement => {
-  const currentFlow = useFlowsManager((state) => state.currentFlow);
+  const currentFlow = useFlowsManager(state => state.currentFlow);
 
   const beforeUpload = (file: File): boolean => {
     if (!file.size) {
-      message.error("上传文件不能为空！");
+      message.error('上传文件不能为空！');
       return false;
     } else if (file.size > maxSize * 1024 * 1024) {
       message.error(`上传文件大小不能超出${maxSize}M！`);
       return false;
     }
-    const infoArr = file.name.split(".");
+    const infoArr = file.name.split('.');
     const type = infoArr?.pop()?.toLowerCase();
-    const isValid = uploadType.includes(type || "");
-    if (!isValid) message.error("文件格式不正确");
+    const isValid = uploadType.includes(type || '');
+    if (!isValid) message.error('文件格式不正确');
     return isValid;
   };
 
   const fileUpload = (event: unknown): void => {
     const file = event.file as File;
     const fileId = uuid();
-    const url = "/xingchen-api/workflow/uploadFile";
+    const url = '/xingchen-api/workflow/uploadFile';
     const form = new FormData();
-    form.append("files", file);
-    form.append("flowId", currentFlow?.flowId || "");
+    form.append('files', file);
+    form.append('flowId', currentFlow?.flowId || '');
     const xhr = new XMLHttpRequest();
-    xhr.open("post", url);
+    xhr.open('post', url);
     xhr.onload = (event: ProgressEvent<EventTarget>): void => {
       uploadComplete(event, fileId);
     };
@@ -56,17 +56,17 @@ const FlowUpload: React.FC<FlowUploadProps> = ({
 
   const handleDrop = (event: React.DragEvent<HTMLDivElement>): boolean => {
     const file = event?.dataTransfer?.files?.[0];
-    const infoArr = file?.name?.split(".");
+    const infoArr = file?.name?.split('.');
     const type = infoArr?.pop();
-    const isValid = uploadType?.includes(type || "");
-    if (!isValid) message.error("文件格式不正确");
+    const isValid = uploadType?.includes(type || '');
+    if (!isValid) message.error('文件格式不正确');
     return isValid;
   };
 
   const fileProps = {
-    name: "file",
+    name: 'file',
     showUploadList: false,
-    accept: uploadType.map((item) => `.${item}`).join(","),
+    accept: uploadType.map(item => `.${item}`).join(','),
     beforeUpload,
     customRequest: fileUpload,
     multiple,
@@ -81,7 +81,7 @@ const FlowUpload: React.FC<FlowUploadProps> = ({
           拖拽文件至此，或者<span className="text-[#275EFF]">选择文件</span>
         </div>
         <span className="text-desc mt-2">
-          文件支持{uploadType?.join("、")}格式，大小不超过{maxSize}MB
+          文件支持{uploadType?.join('、')}格式，大小不超过{maxSize}MB
         </span>
       </div>
     </Dragger>

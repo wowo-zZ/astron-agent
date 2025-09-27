@@ -1,31 +1,31 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
-import { Select, message, Modal } from "antd";
-import { UserOutlined } from "@ant-design/icons";
-import { useSpaceI18n } from "@/pages/space/hooks/use-space-i18n";
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Select, message, Modal } from 'antd';
+import { UserOutlined } from '@ant-design/icons';
+import { useSpaceI18n } from '@/pages/space/hooks/use-space-i18n';
 import SpaceTable, {
   SpaceColumnConfig,
   ActionColumnConfig,
   QueryParams,
   QueryResult,
   SpaceTableRef,
-} from "@/components/space/space-table";
-import { ButtonConfig } from "@/components/button-group";
-import { ModuleType, OperationType } from "@/permissions/permission-type";
-import { usePermissions } from "@/hooks/use-permissions";
-import useUserStore from "@/store/user-store";
+} from '@/components/space/space-table';
+import { ButtonConfig } from '@/components/button-group';
+import { ModuleType, OperationType } from '@/permissions/permission-type';
+import { usePermissions } from '@/hooks/use-permissions';
+import useUserStore from '@/store/user-store';
 
-import styles from "./index.module.scss";
+import styles from './index.module.scss';
 import {
   getSpaceMemberList,
   updateUserRole,
   deleteUser,
-} from "@/services/space";
+} from '@/services/space';
 
 import {
   OWNER_ROLE,
   roleToRoleType,
   roleTypeToRole,
-} from "@/pages/space/config";
+} from '@/pages/space/config';
 
 const { Option } = Select;
 
@@ -46,8 +46,8 @@ interface MemberManagementProps {
 
 const MemberManagement: React.FC<MemberManagementProps> = ({
   spaceId,
-  searchValue: externalSearchValue = "",
-  roleFilter: externalRoleFilter = "all",
+  searchValue: externalSearchValue = '',
+  roleFilter: externalRoleFilter = 'all',
 }) => {
   const { user } = useUserStore();
   const { roleTextMap, memberRoleOptions } = useSpaceI18n();
@@ -56,12 +56,12 @@ const MemberManagement: React.FC<MemberManagementProps> = ({
 
   // 查询成员数据的函数
   const queryMembers = async (
-    params: QueryParams,
+    params: QueryParams
   ): Promise<QueryResult<Member>> => {
     try {
       const { current, pageSize, searchValue, roleFilter } = params;
       const res: any = await getSpaceMemberList({
-        nickname: searchValue || "",
+        nickname: searchValue || '',
         pageNum: current,
         pageSize: pageSize,
         role: Number(roleTypeToRole(roleFilter)),
@@ -84,16 +84,16 @@ const MemberManagement: React.FC<MemberManagementProps> = ({
 
   const handleDeleteMember = (uid: number, username: string) => {
     Modal.confirm({
-      title: "确认删除",
+      title: '确认删除',
       content: `确定要删除成员 "${username}" 吗？`,
-      okText: "确定",
-      cancelText: "取消",
+      okText: '确定',
+      cancelText: '取消',
       onOk: async () => {
         try {
           // 模拟API调用
           await deleteUser({ uid: uid });
           tableRef.current?.reload();
-          message.success("删除成功");
+          message.success('删除成功');
         } catch (error: any) {
           message.error(error?.msg || error?.desc);
         }
@@ -104,7 +104,7 @@ const MemberManagement: React.FC<MemberManagementProps> = ({
   const handleRoleChange = async (uid: number, newRole: string) => {
     try {
       await updateUserRole({ uid: uid, role: Number(newRole) });
-      message.success("角色更新成功");
+      message.success('角色更新成功');
 
       // 判断如果是操作自己，则刷新页面
       if (Number(uid) === Number(user?.uid)) {
@@ -126,7 +126,7 @@ const MemberManagement: React.FC<MemberManagementProps> = ({
         role
       );
     },
-    [roleTextMap],
+    [roleTextMap]
   );
 
   // 获取成员操作按钮配置
@@ -137,10 +137,10 @@ const MemberManagement: React.FC<MemberManagementProps> = ({
     // - member(3) 不能删除任何人
     const buttons: ButtonConfig[] = [
       {
-        key: "delete",
-        text: "删除",
-        type: "link",
-        size: "small",
+        key: 'delete',
+        text: '删除',
+        type: 'link',
+        size: 'small',
         // danger: true,
         permission: {
           module: ModuleType.SPACE,
@@ -151,7 +151,7 @@ const MemberManagement: React.FC<MemberManagementProps> = ({
               permissionInfo?.checks.canRemoveMembers(ModuleType.SPACE) &&
               !permissionInfo?.checks.canDeleteResource(
                 ModuleType.SPACE,
-                `${member.uid}`,
+                `${member.uid}`
               )
             );
           },
@@ -166,9 +166,9 @@ const MemberManagement: React.FC<MemberManagementProps> = ({
   // 列配置
   const columns: SpaceColumnConfig<Member>[] = [
     {
-      title: "用户名",
-      dataIndex: "nickname",
-      key: "nickname",
+      title: '用户名',
+      dataIndex: 'nickname',
+      key: 'nickname',
       render: (text: string, record: Member) => (
         <div className={styles.usernameCell}>
           <span>{text}</span>
@@ -176,15 +176,15 @@ const MemberManagement: React.FC<MemberManagementProps> = ({
       ),
     },
     {
-      title: "角色",
-      dataIndex: "role",
-      key: "role",
+      title: '角色',
+      dataIndex: 'role',
+      key: 'role',
       render: (role: string, record: Member) => {
         const showText =
           role == OWNER_ROLE ||
           !permissionInfo?.checks.hasModulePermission(
             ModuleType.SPACE,
-            OperationType.MODIFY_MEMBER_PERMISSIONS,
+            OperationType.MODIFY_MEMBER_PERMISSIONS
           );
 
         if (showText) {
@@ -194,11 +194,11 @@ const MemberManagement: React.FC<MemberManagementProps> = ({
         return (
           <Select
             value={role}
-            onChange={(value) => handleRoleChange(record.uid, value)}
+            onChange={value => handleRoleChange(record.uid, value)}
             className={styles.roleSelect}
             popupMatchSelectWidth={false}
           >
-            {memberRoleOptions.map((option) => (
+            {memberRoleOptions.map(option => (
               <Option key={option.value} value={option.value}>
                 {option.label}
               </Option>
@@ -208,9 +208,9 @@ const MemberManagement: React.FC<MemberManagementProps> = ({
       },
     },
     {
-      title: "加入时间",
-      dataIndex: "createTime",
-      key: "createTime",
+      title: '加入时间',
+      dataIndex: 'createTime',
+      key: 'createTime',
       render: (text: string) => (
         <span className={styles.createTime}>{text}</span>
       ),
@@ -219,7 +219,7 @@ const MemberManagement: React.FC<MemberManagementProps> = ({
 
   // 操作列配置
   const actionColumn: ActionColumnConfig<Member> = {
-    title: "操作",
+    title: '操作',
     width: 200,
     getActionButtons: (record: Member) => getMemberActionButtons(record),
   };

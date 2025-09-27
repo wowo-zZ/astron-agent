@@ -1,13 +1,13 @@
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 import {
   ModelInfo,
   LLMSource,
   ShelfStatus,
   ModelType,
   ModelCreateType,
-} from "@/types/model";
-import React from "react";
-import i18next from "i18next";
+} from '@/types/model';
+import React from 'react';
+import i18next from 'i18next';
 
 interface ModelInfoDisplayProps {
   modelDetail: ModelInfo | null;
@@ -20,21 +20,21 @@ interface ModelInfoDisplayProps {
 
 // 辅助函数
 const getShelfStatusStyle = (shelfStatus?: number): string => {
-  if (shelfStatus === ShelfStatus.WAIT_OFF_SHELF) return "#F74E43";
-  if (shelfStatus === ShelfStatus.OFF_SHELF) return "#7F7F7F";
-  return "transparent";
+  if (shelfStatus === ShelfStatus.WAIT_OFF_SHELF) return '#F74E43';
+  if (shelfStatus === ShelfStatus.OFF_SHELF) return '#7F7F7F';
+  return 'transparent';
 };
 
 const getShelfStatusText = (shelfStatus?: number): string => {
   if (shelfStatus === ShelfStatus.WAIT_OFF_SHELF)
-    return i18next.t("model.toBeOffShelf");
-  if (shelfStatus === ShelfStatus.OFF_SHELF) return i18next.t("model.offShelf");
-  return "";
+    return i18next.t('model.toBeOffShelf');
+  if (shelfStatus === ShelfStatus.OFF_SHELF) return i18next.t('model.offShelf');
+  return '';
 };
 
 const renderModelIcon = (
   modelDetail: ModelInfo | null,
-  modelIcon: string | null,
+  modelIcon: string | null
 ): React.JSX.Element => {
   if (modelDetail?.llmSource === LLMSource.CUSTOM) {
     return (
@@ -43,12 +43,12 @@ const renderModelIcon = (
         style={{
           background: modelDetail.color
             ? modelDetail.color
-            : `url(${modelDetail.address || ""}${modelDetail.icon}) no-repeat center / cover`,
+            : `url(${modelDetail.address || ''}${modelDetail.icon}) no-repeat center / cover`,
         }}
       >
         {modelDetail.color && (
           <img
-            src={`${modelDetail.address || ""}${modelDetail.icon}`}
+            src={`${modelDetail.address || ''}${modelDetail.icon}`}
             className="w-[48px] h-[48px]"
             alt=""
           />
@@ -60,7 +60,7 @@ const renderModelIcon = (
   return (
     <div className="w-[72px] h-[72px] flex justify-center items-center rounded-lg flex-shrink-0 border border-[#E2E8FF]">
       <img
-        src={modelDetail?.icon || modelIcon || ""}
+        src={modelDetail?.icon || modelIcon || ''}
         alt=""
         className="w-[72px] h-[72px]"
       />
@@ -71,13 +71,13 @@ const renderModelIcon = (
 const renderTags = (
   tags: string[],
   bgColor: string,
-  textStyle?: React.CSSProperties,
+  textStyle?: React.CSSProperties
 ): React.JSX.Element => {
   return (
     <>
       {tags
-        .filter((name) => name !== i18next.t("model.other"))
-        .map((name) => (
+        .filter(name => name !== i18next.t('model.other'))
+        .map(name => (
           <span
             key={name}
             className={`px-1.5 py-0.5 text-xs rounded-sm ${bgColor} opacity-60`}
@@ -119,7 +119,7 @@ const ModelInfoDisplay: React.FC<ModelInfoDisplayProps> = ({
                   className="shrink-0 px-2 py-0.5 text-xs text-white rounded-full whitespace-nowrap"
                   style={{
                     backgroundColor: getShelfStatusStyle(
-                      modelDetail.shelfStatus,
+                      modelDetail.shelfStatus
                     ),
                   }}
                 >
@@ -129,11 +129,11 @@ const ModelInfoDisplay: React.FC<ModelInfoDisplayProps> = ({
             </div>
 
             <p className="text-sm text-gray-500 flex flex-wrap gap-x-2 gap-2">
-              {renderTags(modelCategoryTags, "bg-[#E4EAFF]", {
-                color: "#000000",
+              {renderTags(modelCategoryTags, 'bg-[#E4EAFF]', {
+                color: '#000000',
               })}
-              {renderTags(modelScenarioTags, "bg-[#E8E8EA]", {
-                color: "#000000",
+              {renderTags(modelScenarioTags, 'bg-[#E8E8EA]', {
+                color: '#000000',
               })}
             </p>
           </div>
@@ -141,14 +141,14 @@ const ModelInfoDisplay: React.FC<ModelInfoDisplayProps> = ({
         {modelDetail?.updateTime && (
           <div className="flex items-center gap-2.5 text-desc">
             <div>
-              {t("model.updatedAt")} {modelDetail?.updateTime}
+              {t('model.updatedAt')} {modelDetail?.updateTime}
             </div>
           </div>
         )}
       </div>
       <div className="text-desc mt-3 text-sm">{modelDetail?.desc}</div>
       <div className="text-desc mt-3 text-sm">
-        {bottomTexts?.join("\u00A0\u00A0\u00A0\u00A0\u00A0")}
+        {bottomTexts?.join('\u00A0\u00A0\u00A0\u00A0\u00A0')}
       </div>
     </>
   );

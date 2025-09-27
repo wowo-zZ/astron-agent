@@ -1,13 +1,13 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Drawer, Button, Timeline, Card, Tabs, Empty } from "antd";
+import React, { useState, useRef, useEffect } from 'react';
+import { Drawer, Button, Timeline, Card, Tabs, Empty } from 'antd';
 import {
   getVersionList,
   restoreVersion,
   getPublicResult,
-} from "@/services/common";
-import { useMemoizedFn } from "ahooks";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import { useFlowCommon } from "@/components/workflow/hooks/useFlowCommon";
+} from '@/services/common';
+import { useMemoizedFn } from 'ahooks';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import { useFlowCommon } from '@/components/workflow/hooks/useFlowCommon';
 
 // 类型导入
 import {
@@ -19,24 +19,24 @@ import {
   TabType,
   ReactFlowNode,
   FlowType,
-} from "@/components/workflow/types";
+} from '@/components/workflow/types';
 
 // 从统一的图标管理中导入
-import { Icons } from "@/components/workflow/icons";
+import { Icons } from '@/components/workflow/icons';
 
 // 获取 Version Management 模块的图标
 const icons = Icons.versionManagement;
 
-import "./version-management.css";
-import useFlowStore from "@/components/workflow/store/useFlowStore";
-import dayjs from "dayjs";
-import FeedbackDialog from "@/components/workflow/modal/feedback-dialog";
-import { getFeedbackList } from "@/services/common";
-import { useTranslation } from "react-i18next";
+import './version-management.css';
+import useFlowStore from '@/components/workflow/store/useFlowStore';
+import dayjs from 'dayjs';
+import FeedbackDialog from '@/components/workflow/modal/feedback-dialog';
+import { getFeedbackList } from '@/services/common';
+import { useTranslation } from 'react-i18next';
 
 const TAB_TYPE: TabType = {
-  version: "1",
-  feedback: "2",
+  version: '1',
+  feedback: '2',
 };
 
 function VersionManagement({
@@ -46,21 +46,19 @@ function VersionManagement({
 }: VersionManagementProps): React.ReactElement {
   const { t } = useTranslation();
   const { handleDebugger } = useFlowCommon();
-  const setNodes = useFlowStore((state) => state.setNodes);
-  const setEdges = useFlowStore((state) => state.setEdges);
-  const initFlowData = useFlowsManager((state) => state.initFlowData);
-  const setEdgeType = useFlowsManager((state) => state.setEdgeType);
-  const currentFlow = useFlowsManager((state) => state.currentFlow) as FlowType;
+  const setNodes = useFlowStore(state => state.setNodes);
+  const setEdges = useFlowStore(state => state.setEdges);
+  const initFlowData = useFlowsManager(state => state.initFlowData);
+  const setEdgeType = useFlowsManager(state => state.setEdgeType);
+  const currentFlow = useFlowsManager(state => state.currentFlow) as FlowType;
   const setUpdateNodeInputData = useFlowsManager(
-    (state) => state.setUpdateNodeInputData,
+    state => state.setUpdateNodeInputData
   );
-  const setIsallowEdit = useFlowsManager((state) => state.setCanvasesDisabled);
-  const setHistoryVersion = useFlowsManager((state) => state.setHistoryVersion);
-  const historyVersionData = useFlowsManager(
-    (state) => state.historyVersionData,
-  );
+  const setIsallowEdit = useFlowsManager(state => state.setCanvasesDisabled);
+  const setHistoryVersion = useFlowsManager(state => state.setHistoryVersion);
+  const historyVersionData = useFlowsManager(state => state.historyVersionData);
   const setHistoryVersionData = useFlowsManager(
-    (state) => state.setHistoryVersionData,
+    state => state.setHistoryVersionData
   );
   const [drawerStyle, setDrawerStyle] = useState<DrawerStyle>({
     height: (window?.innerHeight ?? 0) - 80,
@@ -69,30 +67,30 @@ function VersionManagement({
     zIndex: 998,
   });
   const [versionList, setVersionList] = useState<VersionItem[]>([]);
-  const [selectedCardId, setSelectedCardId] = useState<string>(""); //选中card的id
+  const [selectedCardId, setSelectedCardId] = useState<string>(''); //选中card的id
   const [isOverlayVisible, setIsOverlayVisible] = useState<boolean>(false);
   const [selectedVersionData, setSelectedVersionData] =
     useState<VersionItem | null>(null);
   const [publicResultData, setPublicResultData] = useState<
     PublicResultItem[] | null
   >(null);
-  const [restoreVerName, setRestoreVerName] = useState<string>("");
-  const [activeKey, setActiveKey] = useState<string>(TAB_TYPE["version"]);
-  const [selectedQsId, setSelectedQsId] = useState<string>("");
+  const [restoreVerName, setRestoreVerName] = useState<string>('');
+  const [activeKey, setActiveKey] = useState<string>(TAB_TYPE['version']);
+  const [selectedQsId, setSelectedQsId] = useState<string>('');
   const [visible, setVisible] = useState<boolean>(false);
   const [feedbackList, setFeedbackList] = useState<FeedbackItem[]>([]);
   const feedbackItem = useRef<FeedbackItem>({
-    id: "",
-    createTime: "",
-    picUrl: "",
-    description: "",
+    id: '',
+    createTime: '',
+    picUrl: '',
+    description: '',
   });
 
   const queryFeedbackList = async (flowId: string): Promise<void> => {
     if (!flowId) return;
     const data: FeedbackItem[] = await getFeedbackList({ flowId });
     setFeedbackList(data);
-    setSelectedQsId(data.length ? data[0]?.id || "" : "");
+    setSelectedQsId(data.length ? data[0]?.id || '' : '');
   };
 
   useEffect(() => {
@@ -109,9 +107,9 @@ function VersionManagement({
         height: (window?.innerHeight ?? 0) - 80,
       }));
     };
-    window.addEventListener("resize", handleAdjustmentDrawerStyle);
+    window.addEventListener('resize', handleAdjustmentDrawerStyle);
     return (): void =>
-      window.removeEventListener("resize", handleAdjustmentDrawerStyle);
+      window.removeEventListener('resize', handleAdjustmentDrawerStyle);
   }, [drawerStyle]);
 
   // get-version-list
@@ -126,12 +124,12 @@ function VersionManagement({
       const data = await getVersionList(params);
       setVersionList(data.records);
     };
-    setActiveKey(TAB_TYPE["version"]);
+    setActiveKey(TAB_TYPE['version']);
     if (open) {
       queryFeedbackList(currentFlow?.flowId);
     }
     fetchVersionList();
-    setSelectedCardId(historyVersionData?.id || currentFlow?.flowId || "");
+    setSelectedCardId(historyVersionData?.id || currentFlow?.flowId || '');
   }, [currentFlow?.flowId, open, historyVersionData]);
 
   // 还原当前版本
@@ -141,12 +139,12 @@ function VersionManagement({
       id: selectedCardId,
     };
     restoreVersion(params).then((): void => {
-      setSelectedCardId(String(currentFlow?.flowId || ""));
+      setSelectedCardId(String(currentFlow?.flowId || ''));
       //记录还原版本
       const versionData = versionList.find(
-        (item: VersionItem) => item?.id === selectedCardId,
+        (item: VersionItem) => item?.id === selectedCardId
       );
-      setRestoreVerName(versionData?.name ?? "");
+      setRestoreVerName(versionData?.name ?? '');
       initFlowData(currentFlow?.id);
       setHistoryVersionData(null);
       setHistoryVersion(false);
@@ -179,13 +177,13 @@ function VersionManagement({
         selected: false,
         data: {
           ...node.data,
-          status: "",
+          status: '',
         },
-      })),
+      }))
     );
 
     setEdges(data.edges);
-    setEdgeType(data.edges?.[0]?.data?.edgeType || "curve");
+    setEdgeType(data.edges?.[0]?.data?.edgeType || 'curve');
   });
 
   // hand-card-click
@@ -193,7 +191,7 @@ function VersionManagement({
     //default-workflow-container  or version-workflow-container
     if (cardId == currentFlow?.flowId) {
       setHistoryVersionData(null);
-      handleSetNodesAndEdges(currentFlow?.originData || "");
+      handleSetNodesAndEdges(currentFlow?.originData || '');
 
       setHistoryVersion(false);
       //允许编辑
@@ -202,7 +200,7 @@ function VersionManagement({
       setHistoryVersion(true);
 
       const versionData = versionList.find(
-        (item: VersionItem) => item?.id === cardId,
+        (item: VersionItem) => item?.id === cardId
       );
       //全局设置历史版本数据
       setHistoryVersionData(versionData || null);
@@ -217,7 +215,7 @@ function VersionManagement({
     setSelectedCardId(cardId);
     setTimeout(() => {
       setUpdateNodeInputData(
-        (updateNodeInputData: boolean) => !updateNodeInputData,
+        (updateNodeInputData: boolean) => !updateNodeInputData
       );
     }, 0);
   });
@@ -243,15 +241,15 @@ function VersionManagement({
   const getPlatformLabel = (type: number): string => {
     switch (type) {
       case 1:
-        return t("workflow.versionManagement.iflytekVoicePlatform");
+        return t('workflow.versionManagement.iflytekVoicePlatform');
       case 2:
-        return t("workflow.versionManagement.iflytekCloudPlatform");
+        return t('workflow.versionManagement.iflytekCloudPlatform');
       case 3:
-        return t("workflow.versionManagement.wechatOfficialAccount");
+        return t('workflow.versionManagement.wechatOfficialAccount');
       case 4:
-        return t("workflow.versionManagement.mcpPlatform");
+        return t('workflow.versionManagement.mcpPlatform');
       default:
-        return t("workflow.versionManagement.unknownPlatform");
+        return t('workflow.versionManagement.unknownPlatform');
     }
   };
 
@@ -269,17 +267,17 @@ function VersionManagement({
         open={open}
         mask={false}
         getContainer={() =>
-          document.getElementById("flow-container") || document.body
+          document.getElementById('flow-container') || document.body
         }
         onClose={() => {
-          setActiveKey(TAB_TYPE["version"]);
+          setActiveKey(TAB_TYPE['version']);
         }}
       >
         <div className="flex flex-col w-full h-full p-5 overflow-hidden">
           {/* 1.title */}
           <div className="flex items-center justify-between mb-[12px]">
             <div className="text-lg font-semibold">
-              {t("workflow.versionManagement.title")}
+              {t('workflow.versionManagement.title')}
             </div>
             <img
               src={icons.close}
@@ -292,12 +290,12 @@ function VersionManagement({
             activeKey={activeKey}
             size="small"
             className="flex flex-col flex-1 h-0 overflow-hidden version-feedback-tabs"
-            tabBarStyle={{ margin: "0 0 24px 0" }}
+            tabBarStyle={{ margin: '0 0 24px 0' }}
             tabBarGutter={40}
-            onChange={(key) => setActiveKey(key)}
+            onChange={key => setActiveKey(key)}
           >
             <Tabs.TabPane
-              tab={t("workflow.versionManagement.versionRecord")}
+              tab={t('workflow.versionManagement.versionRecord')}
               key="1"
             >
               {/* 2.list */}
@@ -317,28 +315,28 @@ function VersionManagement({
                     }
                   >
                     <Card
-                      title={t("workflow.versionManagement.draftVersion")}
+                      title={t('workflow.versionManagement.draftVersion')}
                       bordered={true}
                       style={{
                         borderColor:
                           selectedCardId === currentFlow?.flowId
-                            ? "#275EFF"
-                            : "#e8e8e8",
+                            ? '#275EFF'
+                            : '#e8e8e8',
                       }}
                       onClick={() => handleCardClick(currentFlow?.flowId)}
                       hoverable
                     >
                       <div className="px-3 pb-[6px]">
-                        {restoreVerName != "" && (
+                        {restoreVerName != '' && (
                           <span>
-                            {t("workflow.versionManagement.restoredFrom")}
+                            {t('workflow.versionManagement.restoredFrom')}
                             {restoreVerName}版本
                           </span>
                         )}
                       </div>
                     </Card>
                   </Timeline.Item>
-                  {versionList.map((item) => (
+                  {versionList.map(item => (
                     <Timeline.Item
                       key={item.id}
                       dot={
@@ -354,27 +352,27 @@ function VersionManagement({
                       }
                     >
                       <Card
-                        title={`${t("workflow.versionManagement.version")}${
+                        title={`${t('workflow.versionManagement.version')}${
                           item.name
                         }`}
                         bordered={true}
                         style={{
                           borderColor:
-                            selectedCardId === item.id ? "#275EFF" : "#e8e8e8",
-                          cursor: "pointer",
+                            selectedCardId === item.id ? '#275EFF' : '#e8e8e8',
+                          cursor: 'pointer',
                         }}
                         onClick={() => handleCardClick(item.id)}
                         hoverable
                       >
                         <div className="px-3 pb-[6px]">
                           <p>
-                            {t("workflow.versionManagement.versionId")}
+                            {t('workflow.versionManagement.versionId')}
                             {item.versionNum}
                           </p>
                           <p>
-                            {t("workflow.versionManagement.publishTime")}
+                            {t('workflow.versionManagement.publishTime')}
                             {dayjs(item.createdTime)?.format(
-                              "YYYY-MM-DD HH:mm:ss",
+                              'YYYY-MM-DD HH:mm:ss'
                             )}
                           </p>
                         </div>
@@ -387,7 +385,7 @@ function VersionManagement({
                             }}
                           >
                             <span>
-                              {t("workflow.versionManagement.publishResult")}
+                              {t('workflow.versionManagement.publishResult')}
                             </span>
                             <img
                               src={icons.releaseResult}
@@ -400,7 +398,7 @@ function VersionManagement({
                               className="pr-2 cursor-pointer"
                               onClick={() => handleDebugger()}
                             >
-                              {t("workflow.versionManagement.previewDebug")}
+                              {t('workflow.versionManagement.previewDebug')}
                             </span>
                           </div>
                         </div>
@@ -411,7 +409,7 @@ function VersionManagement({
               </div>
             </Tabs.TabPane>
             <Tabs.TabPane
-              tab={t("workflow.versionManagement.feedbackRecord")}
+              tab={t('workflow.versionManagement.feedbackRecord')}
               key="2"
             >
               {!feedbackList.length ? (
@@ -419,7 +417,7 @@ function VersionManagement({
               ) : (
                 <div className="flex flex-1 overflow-auto version-list feedback-list">
                   <Timeline mode="left" className="w-full">
-                    {feedbackList.map((item) => (
+                    {feedbackList.map(item => (
                       <Timeline.Item
                         key={item.id}
                         dot={
@@ -438,20 +436,20 @@ function VersionManagement({
                           bordered={true}
                           style={{
                             borderColor:
-                              selectedQsId === item.id ? "#275EFF" : "#e8e8e8",
-                            cursor: "pointer",
-                            width: "98%",
+                              selectedQsId === item.id ? '#275EFF' : '#e8e8e8',
+                            cursor: 'pointer',
+                            width: '98%',
                           }}
                           onClick={() => setSelectedQsId(item.id)}
                           hoverable
                         >
                           <div className="relative px-[16px] py-[12px] text-[#7F7F7F]">
                             <div className="mb-[4px] leading-[20px]">
-                              {t("workflow.versionManagement.questionId")}
+                              {t('workflow.versionManagement.questionId')}
                               <span className="text-[#333333]">{item.id}</span>
                             </div>
                             <div className="leading-[20px]">
-                              {t("workflow.versionManagement.publishTime")}
+                              {t('workflow.versionManagement.publishTime')}
                               <span className="text-[#333333]">
                                 {item.createTime}
                               </span>
@@ -460,7 +458,7 @@ function VersionManagement({
                               className="absolute right-[16px] top-[12px] text-[#275EFF]"
                               onClick={() => handleViewDetail(item)}
                             >
-                              {t("workflow.versionManagement.detail")}
+                              {t('workflow.versionManagement.detail')}
                             </div>
                           </div>
                         </Card>
@@ -473,7 +471,7 @@ function VersionManagement({
           </Tabs>
 
           {/* 3.bottom-btn */}
-          {activeKey === TAB_TYPE["version"] && (
+          {activeKey === TAB_TYPE['version'] && (
             <div className="flex mt-[30px]">
               <Button
                 type="primary"
@@ -486,7 +484,7 @@ function VersionManagement({
                   !selectedCardId || selectedCardId === currentFlow?.flowId
                 }
               >
-                {t("workflow.versionManagement.restoreThisVersion")}
+                {t('workflow.versionManagement.restoreThisVersion')}
               </Button>
             </div>
           )}
@@ -497,7 +495,7 @@ function VersionManagement({
           <div className="max-w-[90vw] max-h-[85vm] min-h-[420px] bg-white rounded-[16px] border-[1px] border-white p-6 flex flex-col">
             <div className="flex items-center justify-between">
               <span className="text-[16px] font-semibold">
-                {t("workflow.versionManagement.publishResultTitle")}
+                {t('workflow.versionManagement.publishResultTitle')}
               </span>
               <img
                 src={icons.close}
@@ -510,22 +508,22 @@ function VersionManagement({
             </div>
             <div className="flex text-[14px] text-[#7F7F7F] gap-8 mt-6">
               <span>
-                {t("workflow.versionManagement.version")}
+                {t('workflow.versionManagement.version')}
                 {selectedVersionData?.name}
               </span>
               <span>
-                {t("workflow.versionManagement.versionId")}
+                {t('workflow.versionManagement.versionId')}
                 {selectedVersionData?.versionNum}
               </span>
               <span>
-                {t("workflow.versionManagement.publishTime")}
+                {t('workflow.versionManagement.publishTime')}
                 {dayjs(selectedVersionData?.createdTime)?.format(
-                  "YYYY-MM-DD HH:mm:ss",
+                  'YYYY-MM-DD HH:mm:ss'
                 )}
               </span>
             </div>
             <div className="flex mt-6 text-[14px] text-[#333333]">
-              <span>{t("workflow.versionManagement.publishPlatform")}</span>
+              <span>{t('workflow.versionManagement.publishPlatform')}</span>
             </div>
             <div className="border border-[#E4EAFF] rounded-[8px] mt-2 flex flex-1 py-[17px] px-[24px] flex items-start overflow-y-auto">
               {publicResultData && publicResultData.length > 0 ? (
@@ -544,24 +542,24 @@ function VersionManagement({
                         </div>
                         <span
                           className={`text-[14px] ${
-                            item.publishResult === "成功"
-                              ? "text-[#1FC92D]"
-                              : "text-[#FF4D4F]"
+                            item.publishResult === '成功'
+                              ? 'text-[#1FC92D]'
+                              : 'text-[#FF4D4F]'
                           }`}
                         >
-                          {item.publishResult === "成功"
-                            ? t("workflow.versionManagement.publishSuccess")
-                            : item.publishResult === "审核中"
-                              ? t("workflow.versionManagement.publishing")
-                              : t("workflow.versionManagement.publishFailed")}
+                          {item.publishResult === '成功'
+                            ? t('workflow.versionManagement.publishSuccess')
+                            : item.publishResult === '审核中'
+                              ? t('workflow.versionManagement.publishing')
+                              : t('workflow.versionManagement.publishFailed')}
                         </span>
                       </div>
-                    ),
+                    )
                   )}
                 </div>
               ) : (
                 <div className="text-[#7F7F7F]">
-                  {t("workflow.versionManagement.noPublishRecord")}
+                  {t('workflow.versionManagement.noPublishRecord')}
                 </div>
               )}
             </div>
@@ -572,8 +570,8 @@ function VersionManagement({
         visible={visible}
         detail={{
           ...feedbackItem.current,
-          picUrl: feedbackItem.current.picUrl || "",
-          description: feedbackItem.current.description || "",
+          picUrl: feedbackItem.current.picUrl || '',
+          description: feedbackItem.current.description || '',
         }}
         onCancel={() => setVisible(false)}
         detailMode={true}

@@ -1,13 +1,13 @@
-import { useEffect } from "react";
-import useOrderStore from "@/store/spark-store/order-store";
+import { useEffect } from 'react';
+import useOrderStore from '@/store/spark-store/order-store';
 import {
   getOrderList,
   getResourceUsage,
   getUserMeta,
   getTeamMeta,
   getSpecialUser,
-} from "@/services/order";
-import useSpaceStore from "@/store/space-store";
+} from '@/services/order';
+import useSpaceStore from '@/store/space-store';
 
 /** ## 用户订单数据 hooks
  * @description 根据订单状态、有效期(暂无)筛选出用户当前套餐
@@ -24,7 +24,7 @@ export default function useOrderData() {
     setIsSpecialUser,
   } = useOrderStore();
 
-  const spaceType = useSpaceStore((state) => state.spaceType);
+  const spaceType = useSpaceStore(state => state.spaceType);
 
   useEffect(() => {
     setSpaceTypeAtom(spaceType);
@@ -36,26 +36,26 @@ export default function useOrderData() {
    */
   const fetchOrderList = async () => {
     try {
-      const params = { page: "1", pageSize: "50" };
+      const params = { page: '1', pageSize: '50' };
       const res = await getOrderList(params);
       setUserOrderList(res);
     } catch (error) {
-      console.error("获取订单列表失败:", error);
-      setUserOrderType("free");
+      console.error('获取订单列表失败:', error);
+      setUserOrderType('free');
     }
   };
 
   /** ## 获取当前用户套餐 -- 根据个人版还是空间版做区分 */
   const fetchUserMeta = async () => {
     try {
-      const res = await (spaceType === "team" ? getTeamMeta() : getUserMeta());
+      const res = await (spaceType === 'team' ? getTeamMeta() : getUserMeta());
       // console.log('🚀 ~ useOrderData.ts:115 ~ res:', res);
 
       if (res?.length > 0) {
         setUserOrderMeta(res);
       }
     } catch (error) {
-      console.error("获取用户套餐失败:", error);
+      console.error('获取用户套餐失败:', error);
     }
   };
 

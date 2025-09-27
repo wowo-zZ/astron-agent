@@ -1,42 +1,42 @@
-import React from "react";
-import { createPortal } from "react-dom";
-import { Button } from "antd";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import { useTranslation } from "react-i18next";
-import { Icons } from "@/components/workflow/icons";
-import { useMemoizedFn } from "ahooks";
-import { getNodeId } from "@/components/workflow/utils/reactflowUtils";
-import { v4 as uuid } from "uuid";
-import { cloneDeep } from "lodash";
+import React from 'react';
+import { createPortal } from 'react-dom';
+import { Button } from 'antd';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import { useTranslation } from 'react-i18next';
+import { Icons } from '@/components/workflow/icons';
+import { useMemoizedFn } from 'ahooks';
+import { getNodeId } from '@/components/workflow/utils/reactflowUtils';
+import { v4 as uuid } from 'uuid';
+import { cloneDeep } from 'lodash';
 
 function useDeleteCanvas(): () => void {
   const setNodeInfoEditDrawerlInfo = useFlowsManager(
-    (state) => state.setNodeInfoEditDrawerlInfo,
+    state => state.setNodeInfoEditDrawerlInfo
   );
-  const nodeList = useFlowsManager((state) => state.nodeList);
-  const canPublishSetNot = useFlowsManager((state) => state.canPublishSetNot);
-  const currentStore = useFlowsManager((state) => state.getCurrentStore());
+  const nodeList = useFlowsManager(state => state.nodeList);
+  const canPublishSetNot = useFlowsManager(state => state.canPublishSetNot);
+  const currentStore = useFlowsManager(state => state.getCurrentStore());
   const setClearFlowCanvasModalInfo = useFlowsManager(
-    (state) => state.setClearFlowCanvasModalInfo,
+    state => state.setClearFlowCanvasModalInfo
   );
-  const setNodes = currentStore((state) => state.setNodes);
-  const setEdges = currentStore((state) => state.setEdges);
-  const takeSnapshot = currentStore((state) => state.takeSnapshot);
+  const setNodes = currentStore(state => state.setNodes);
+  const setEdges = currentStore(state => state.setEdges);
+  const takeSnapshot = currentStore(state => state.takeSnapshot);
 
   return useMemoizedFn(() => {
     takeSnapshot();
     const initialNodes = nodeList?.find(
-      (node) => node?.name === "固定节点",
+      node => node?.name === '固定节点'
     )?.nodes;
-    initialNodes.forEach((node) => {
+    initialNodes.forEach(node => {
       node.id = getNodeId(node?.idType);
-      node.type = "custom";
-      node.nodeType = node.id.split("::")[0];
-      node.data.inputs = node.data.inputs.map((input) => ({
+      node.type = 'custom';
+      node.nodeType = node.id.split('::')[0];
+      node.data.inputs = node.data.inputs.map(input => ({
         ...input,
         id: uuid(),
       }));
-      node.data.outputs = node.data.outputs.map((output) => ({
+      node.data.outputs = node.data.outputs.map(output => ({
         ...output,
         id: uuid(),
       }));
@@ -46,7 +46,7 @@ function useDeleteCanvas(): () => void {
     canPublishSetNot();
     setNodeInfoEditDrawerlInfo({
       open: false,
-      nodeId: "",
+      nodeId: '',
     });
     setClearFlowCanvasModalInfo({
       open: false,
@@ -57,12 +57,12 @@ function useDeleteCanvas(): () => void {
 export default function DeleteModal(): React.ReactElement {
   const deleteCanvas = useDeleteCanvas();
   const { t } = useTranslation();
-  const currentFlow = useFlowsManager((state) => state.currentFlow);
+  const currentFlow = useFlowsManager(state => state.currentFlow);
   const clearFlowCanvasModalInfo = useFlowsManager(
-    (state) => state.clearFlowCanvasModalInfo,
+    state => state.clearFlowCanvasModalInfo
   );
   const setClearFlowCanvasModalInfo = useFlowsManager(
-    (state) => state.setClearFlowCanvasModalInfo,
+    state => state.setClearFlowCanvasModalInfo
   );
 
   return (
@@ -85,14 +85,14 @@ export default function DeleteModal(): React.ReactElement {
                     />
                   </div>
                   <p className="ml-2.5">
-                    {t("workflow.promptDebugger.confirmClearCanvas")}
+                    {t('workflow.promptDebugger.confirmClearCanvas')}
                   </p>
                 </div>
                 <div className="w-full h-10 bg-[#F9FAFB] text-center mt-7 py-2">
                   {currentFlow?.name}
                 </div>
                 <p className="mt-6 text-desc max-w-[310px]">
-                  {t("workflow.promptDebugger.canvasClearDescription")}
+                  {t('workflow.promptDebugger.canvasClearDescription')}
                 </p>
                 <div className="flex flex-row-reverse gap-3 mt-7">
                   <Button
@@ -101,7 +101,7 @@ export default function DeleteModal(): React.ReactElement {
                     className="delete-btn"
                     style={{ paddingLeft: 24, paddingRight: 24 }}
                   >
-                    {t("workflow.nodes.toolNode.delete")}
+                    {t('workflow.nodes.toolNode.delete')}
                   </Button>
                   <Button
                     type="text"
@@ -113,12 +113,12 @@ export default function DeleteModal(): React.ReactElement {
                     }
                     style={{ paddingLeft: 24, paddingRight: 24 }}
                   >
-                    {t("workflow.promptDebugger.cancel")}
+                    {t('workflow.promptDebugger.cancel')}
                   </Button>
                 </div>
               </div>
             </div>,
-            document.body,
+            document.body
           )
         : null}
     </>

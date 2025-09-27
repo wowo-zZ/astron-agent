@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { CloseOutlined } from "@ant-design/icons";
-import RetractableInput from "@/components/ui/global/retract-table-input";
-import { Select } from "antd";
-import { ModelInfo } from "@/types/model";
+import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { CloseOutlined } from '@ant-design/icons';
+import RetractableInput from '@/components/ui/global/retract-table-input';
+import { Select } from 'antd';
+import { ModelInfo } from '@/types/model';
 
 interface ModelManagementHeaderProps {
   activeTab: string;
@@ -56,12 +56,12 @@ const ModelManagementHeader: React.FC<ModelManagementHeaderProps> = ({
   const handleClose = (): void => {
     setClosed(true);
     setShowShelfOnly(false);
-    if (activeTab === "officialModel") {
-      sessionStorage.removeItem("officialModelQueckFilter");
+    if (activeTab === 'officialModel') {
+      sessionStorage.removeItem('officialModelQueckFilter');
     }
 
-    if (activeTab === "personalModel") {
-      sessionStorage.removeItem("personalModelQueckFilter");
+    if (activeTab === 'personalModel') {
+      sessionStorage.removeItem('personalModelQueckFilter');
     }
   };
 
@@ -71,14 +71,14 @@ const ModelManagementHeader: React.FC<ModelManagementHeaderProps> = ({
         <div className="flex items-center gap-3 w-full">
           {/* 标题 */}
           <h1 className="font-medium text-[20px] text-[#333] leading-none">
-            {t("model.modelManagement")}
+            {t('model.modelManagement')}
           </h1>
 
           {/* 警告条 */}
           {offCount > 0 && !closed && (
             <div className="flex-1 min-w-0 flex items-center justify-center bg-[#FEEDEC] text-[#F74E43] text-sm rounded-xl px-3 py-1">
               <span className="flex-1 text-center">
-                {t("model.modelWillStopService")}
+                {t('model.modelWillStopService')}
               </span>
 
               {/* 快速筛选 */}
@@ -86,7 +86,7 @@ const ModelManagementHeader: React.FC<ModelManagementHeaderProps> = ({
                 className="ml-auto mr-2 text-[#275eff] cursor-pointer hover:underline"
                 onClick={() => refreshModels?.()}
               >
-                {t("model.quickFilter")}
+                {t('model.quickFilter')}
               </span>
 
               {/* 关闭按钮 */}
@@ -128,15 +128,15 @@ const ModelManagementHeader: React.FC<ModelManagementHeaderProps> = ({
 
           {/* 右侧控件 */}
           <div className="ml-auto flex items-center gap-4">
-            {activeTab === "personalModel" && (
+            {activeTab === 'personalModel' && (
               <Select
-                placeholder={t("model.pleaseSelect")}
+                placeholder={t('model.pleaseSelect')}
                 value={filterType}
                 style={{ width: 120 }}
                 options={[
-                  { label: t("model.all"), value: 0 },
-                  { label: t("model.thirdPartyModel"), value: 1 },
-                  { label: t("model.localModel"), value: 2 },
+                  { label: t('model.all'), value: 0 },
+                  { label: t('model.thirdPartyModel'), value: 1 },
+                  { label: t('model.localModel'), value: 2 },
                 ]}
                 onChange={handleTypeChange}
               />

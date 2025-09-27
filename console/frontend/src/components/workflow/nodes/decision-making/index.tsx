@@ -1,22 +1,22 @@
-import React, { useMemo, useCallback, memo } from "react";
-import { useTranslation } from "react-i18next";
-import { cloneDeep } from "lodash";
-import { v4 as uuid } from "uuid";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
+import React, { useMemo, useCallback, memo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { cloneDeep } from 'lodash';
+import { v4 as uuid } from 'uuid';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
 import {
   FlowNodeInput,
   FlowNodeTextArea,
   FLowCollapse,
   FlowTemplateEditor,
-} from "@/components/workflow/ui";
-import SingleInput from "../components/single-input";
-import { SourceHandle } from "@/components/workflow/nodes/components/handle";
-import ExceptionHandling from "@/components/workflow/nodes/components/exception-handling";
-import { ModelSection } from "@/components/workflow/nodes/node-common";
-import { useNodeCommon } from "@/components/workflow/hooks/useNodeCommon";
-import FixedOutputs from "@/components/workflow/nodes/components/fixed-outputs";
+} from '@/components/workflow/ui';
+import SingleInput from '../components/single-input';
+import { SourceHandle } from '@/components/workflow/nodes/components/handle';
+import ExceptionHandling from '@/components/workflow/nodes/components/exception-handling';
+import { ModelSection } from '@/components/workflow/nodes/node-common';
+import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import FixedOutputs from '@/components/workflow/nodes/components/fixed-outputs';
 
-import remove from "@/assets/imgs/workflow/input-remove-icon.png";
+import remove from '@/assets/imgs/workflow/input-remove-icon.png';
 
 const AdvancedConfigSection = ({
   id,
@@ -30,7 +30,7 @@ const AdvancedConfigSection = ({
     <FLowCollapse
       label={
         <h4 className="text-base font-medium">
-          {t("workflow.nodes.decisionMakingNode.advancedConfiguration")}
+          {t('workflow.nodes.decisionMakingNode.advancedConfiguration')}
         </h4>
       }
       content={
@@ -39,14 +39,14 @@ const AdvancedConfigSection = ({
             data={data}
             onBlur={() => delayCheckNode(id)}
             value={data?.nodeParam?.promptPrefix}
-            onChange={(value) =>
+            onChange={value =>
               handleChangeNodeParam(
                 (data, value) => (data.nodeParam.promptPrefix = value),
-                value,
+                value
               )
             }
             placeholder={t(
-              "workflow.nodes.decisionMakingNode.systemPromptPlaceholder",
+              'workflow.nodes.decisionMakingNode.systemPromptPlaceholder'
             )}
           />
           <p className="text-xs text-[#F74E43]">
@@ -72,22 +72,22 @@ const IntentSection = ({
   delayCheckNode,
 }): React.ReactElement => {
   const { t } = useTranslation();
-  const intentOrderList = t("workflow.nodes.flow.intentNumbers", {
+  const intentOrderList = t('workflow.nodes.flow.intentNumbers', {
     returnObjects: true,
   }) as string[];
 
   const handleAddIntent = useCallback(() => {
     takeSnapshot();
-    setNode(id, (old) => {
+    setNode(id, old => {
       old.data.nodeParam.intentChains.splice(
         old.data.nodeParam.intentChains.length - 1,
         0,
         {
           intentType: 2,
-          id: "intent-one-of::" + uuid(),
-          name: "",
-          description: "",
-        },
+          id: 'intent-one-of::' + uuid(),
+          name: '',
+          description: '',
+        }
       );
       return { ...cloneDeep(old) };
     });
@@ -95,17 +95,17 @@ const IntentSection = ({
   }, [id, setNode, takeSnapshot, canPublishSetNot]);
 
   const handleRemoveIntent = useCallback(
-    (intentChainId) => {
+    intentChainId => {
       takeSnapshot();
-      setNode(id, (old) => {
+      setNode(id, old => {
         old.data.nodeParam.intentChains =
-          old.data.nodeParam.intentChains.filter((i) => i.id !== intentChainId);
+          old.data.nodeParam.intentChains.filter(i => i.id !== intentChainId);
         return { ...cloneDeep(old) };
       });
-      const edge = edges.find((edge) => edge.sourceHandle === intentChainId);
+      const edge = edges.find(edge => edge.sourceHandle === intentChainId);
       edge && removeNodeRef(edge.source, edge.target);
-      setEdges((edges) =>
-        edges.filter((edge) => edge.sourceHandle !== intentChainId),
+      setEdges(edges =>
+        edges.filter(edge => edge.sourceHandle !== intentChainId)
       );
       canPublishSetNot();
     },
@@ -117,14 +117,14 @@ const IntentSection = ({
       takeSnapshot,
       removeNodeRef,
       canPublishSetNot,
-    ],
+    ]
   );
 
   return (
     <FLowCollapse
       label={
         <h4 className="text-base font-medium">
-          {t("workflow.nodes.decisionMakingNode.intent")}
+          {t('workflow.nodes.decisionMakingNode.intent')}
         </h4>
       }
       content={
@@ -139,13 +139,13 @@ const IntentSection = ({
                   <>
                     <div className="flex items-start gap-2.5">
                       <div className="w-2/5">
-                        {t("workflow.nodes.decisionMakingNode.intentNumber", {
+                        {t('workflow.nodes.decisionMakingNode.intentNumber', {
                           index: intentOrderList[index],
                         })}
                       </div>
                       <div className="flex-1">
                         {t(
-                          "workflow.nodes.decisionMakingNode.intentDescription",
+                          'workflow.nodes.decisionMakingNode.intentDescription'
                         )}
                       </div>
                       {intentChains.length > 2 && (
@@ -158,15 +158,15 @@ const IntentSection = ({
                           nodeId={id}
                           value={intent.name}
                           className="flex-1"
-                          onChange={(value) =>
+                          onChange={value =>
                             handleChangeParam(
                               intent.id,
                               (d, v) => (d.name = v),
-                              value,
+                              value
                             )
                           }
                           placeholder={t(
-                            "workflow.nodes.decisionMakingNode.intentNamePlaceholder",
+                            'workflow.nodes.decisionMakingNode.intentNamePlaceholder'
                           )}
                         />
                         <p className="text-xs text-[#F74E43]">
@@ -179,15 +179,15 @@ const IntentSection = ({
                           adaptiveHeight={true}
                           readOnly={canvasesDisabled}
                           value={intent.description}
-                          onChange={(value) =>
+                          onChange={value =>
                             handleChangeParam(
                               intent.id,
                               (d, v) => (d.description = v),
-                              value,
+                              value
                             )
                           }
                           placeholder={t(
-                            "workflow.nodes.decisionMakingNode.intentDescriptionPlaceholder",
+                            'workflow.nodes.decisionMakingNode.intentDescriptionPlaceholder'
                           )}
                           onBlur={() => delayCheckNode(id)}
                         />
@@ -208,7 +208,7 @@ const IntentSection = ({
                 ) : (
                   <div className="flex">
                     <span className="text-[#275EFF] flex-shrink-0">
-                      {t("workflow.nodes.decisionMakingNode.defaultIntent")}
+                      {t('workflow.nodes.decisionMakingNode.defaultIntent')}
                     </span>
                   </div>
                 )}
@@ -220,7 +220,7 @@ const IntentSection = ({
               className="mt-4 text-[#275EFF] text-center"
               onClick={handleAddIntent}
             >
-              {t("workflow.nodes.decisionMakingNode.addIntentKeyword")}
+              {t('workflow.nodes.decisionMakingNode.addIntentKeyword')}
             </div>
           )}
         </div>
@@ -229,31 +229,31 @@ const IntentSection = ({
   );
 };
 
-export const DecisionMakingDetail = memo((props) => {
+export const DecisionMakingDetail = memo(props => {
   const { id, data } = props;
   const { handleChangeNodeParam } = useNodeCommon({
     id,
     data,
   });
-  const getCurrentStore = useFlowsManager((state) => state.getCurrentStore);
+  const getCurrentStore = useFlowsManager(state => state.getCurrentStore);
   const currentStore = getCurrentStore();
-  const canvasesDisabled = useFlowsManager((state) => state.canvasesDisabled);
+  const canvasesDisabled = useFlowsManager(state => state.canvasesDisabled);
   const autoSaveCurrentFlow = useFlowsManager(
-    (state) => state.autoSaveCurrentFlow,
+    state => state.autoSaveCurrentFlow
   );
-  const setNode = currentStore((state) => state.setNode);
-  const delayCheckNode = currentStore((state) => state.delayCheckNode);
-  const takeSnapshot = currentStore((state) => state.takeSnapshot);
-  const edges = currentStore((state) => state.edges);
-  const setEdges = currentStore((state) => state.setEdges);
-  const removeNodeRef = currentStore((state) => state.removeNodeRef);
-  const canPublishSetNot = useFlowsManager((state) => state.canPublishSetNot);
+  const setNode = currentStore(state => state.setNode);
+  const delayCheckNode = currentStore(state => state.delayCheckNode);
+  const takeSnapshot = currentStore(state => state.takeSnapshot);
+  const edges = currentStore(state => state.edges);
+  const setEdges = currentStore(state => state.setEdges);
+  const removeNodeRef = currentStore(state => state.removeNodeRef);
+  const canPublishSetNot = useFlowsManager(state => state.canPublishSetNot);
 
   const handleChangeParam = useCallback(
     (intentId, fn, value) => {
-      setNode(id, (old) => {
+      setNode(id, old => {
         const currentIntent = old.data.nodeParam.intentChains.find(
-          (item) => item.id === intentId,
+          item => item.id === intentId
         );
         fn(currentIntent, value);
         return {
@@ -263,7 +263,7 @@ export const DecisionMakingDetail = memo((props) => {
       autoSaveCurrentFlow();
       canPublishSetNot();
     },
-    [setNode, canPublishSetNot, takeSnapshot, autoSaveCurrentFlow],
+    [setNode, canPublishSetNot, takeSnapshot, autoSaveCurrentFlow]
   );
 
   const intentChains = useMemo(() => {
@@ -305,7 +305,7 @@ export const DecisionMakingDetail = memo((props) => {
 
 export const DecisionMaking = memo(({ id, data }) => {
   const { t } = useTranslation();
-  const intentOrderList = t("workflow.nodes.flow.intentNumbers", {
+  const intentOrderList = t('workflow.nodes.flow.intentNumbers', {
     returnObjects: true,
   }) as string[];
   const { isConnectable } = useNodeCommon({ id, data });
@@ -320,8 +320,8 @@ export const DecisionMaking = memo(({ id, data }) => {
         <>
           <span className="text-[#333] text-right">
             {index === intentChains.length - 1
-              ? t("workflow.nodes.decisionMakingNode.defaultIntent")
-              : t("workflow.nodes.decisionMakingNode.intentNumber", {
+              ? t('workflow.nodes.decisionMakingNode.defaultIntent')
+              : t('workflow.nodes.decisionMakingNode.intentNumber', {
                   index: intentOrderList[index],
                 })}
           </span>
@@ -330,14 +330,14 @@ export const DecisionMaking = memo(({ id, data }) => {
               className="text-overflow max-w-[300px]"
               title={
                 index === intentChains.length - 1
-                  ? ""
+                  ? ''
                   : item.name
                     ? item?.name
-                    : "未配置内容"
+                    : '未配置内容'
               }
             >
               {index === intentChains.length - 1 ? (
-                ""
+                ''
               ) : item.name ? (
                 item?.name
               ) : (

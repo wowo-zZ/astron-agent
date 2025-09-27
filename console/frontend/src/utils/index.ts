@@ -1,9 +1,9 @@
-import qs from "qs";
-import { message } from "antd";
-import { localeConfig } from "@/locales/localeConfig";
-import { getLanguageCode } from "@/utils/http";
-import { v4 as uuid } from "uuid";
-import clsx, { ClassValue } from "clsx";
+import qs from 'qs';
+import { message } from 'antd';
+import { localeConfig } from '@/locales/localeConfig';
+import { getLanguageCode } from '@/utils/http';
+import { v4 as uuid } from 'uuid';
+import clsx, { ClassValue } from 'clsx';
 import {
   BotInfoType,
   ChatHistoryResponse,
@@ -11,33 +11,33 @@ import {
   SourceInfoItem,
   ToolItemUnion,
   WebSearchOutput,
-} from "@/types/chat";
-import Compressor from "compressorjs";
-import { getShareAgentKey } from "@/services/chat";
+} from '@/types/chat';
+import Compressor from 'compressorjs';
+import { getShareAgentKey } from '@/services/chat';
 // 将对象转换为URL参数字符串
 const objectToQueryString = (params: Record<string, any>): string => {
   if (!params || Object.keys(params).length === 0) {
-    return "";
+    return '';
   }
-  return "?" + qs.stringify(params);
+  return '?' + qs.stringify(params);
 };
 
 // 图片转Base64的函数
 const imageToBase64 = (
   imageUrl: string,
   isMounted: () => boolean,
-  onPlaceholder: () => void,
+  onPlaceholder: () => void
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
     const img = new window.Image();
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
 
     const timeout = window.setTimeout((): void => {
       if (isMounted()) {
         onPlaceholder();
       }
-      reject(new Error("Image loading timeout"));
+      reject(new Error('Image loading timeout'));
     }, 10000);
 
     img.onload = (): void => {
@@ -48,13 +48,13 @@ const imageToBase64 = (
 
         if (ctx) {
           ctx.drawImage(img, 0, 0);
-          const base64 = canvas.toDataURL("image/png", 0.9);
+          const base64 = canvas.toDataURL('image/png', 0.9);
           resolve(base64);
         } else {
           if (isMounted()) {
             onPlaceholder();
           }
-          reject(new Error("Canvas context not available"));
+          reject(new Error('Canvas context not available'));
         }
       } catch (error) {
         if (isMounted()) {
@@ -69,13 +69,13 @@ const imageToBase64 = (
       if (isMounted()) {
         onPlaceholder();
       }
-      reject(new Error("Image loading failed"));
+      reject(new Error('Image loading failed'));
     };
 
-    img.crossOrigin = "anonymous";
+    img.crossOrigin = 'anonymous';
     const timestamp = Date.now();
     const random = Math.random().toString(36).substring(7);
-    const separator = imageUrl.includes("?") ? "&" : "?";
+    const separator = imageUrl.includes('?') ? '&' : '?';
     const noCacheUrl = `${imageUrl}${separator}_t=${timestamp}&_r=${random}`;
     img.src = noCacheUrl;
   });
@@ -93,16 +93,16 @@ const copyText = async (options: {
   const languageCode = getLanguageCode();
   const props = { origin: true, ...options };
   const typeList = [
-    "metadata",
-    "plugin_debug_param",
-    "plugin_debug_response",
-    "plugin_cards",
-    "plugin_chat_file",
+    'metadata',
+    'plugin_debug_param',
+    'plugin_debug_response',
+    'plugin_cards',
+    'plugin_chat_file',
   ];
-  const regex = new RegExp("```(" + typeList.join("|") + ")\n(.*?)\n```", "g");
+  const regex = new RegExp('```(' + typeList.join('|') + ')\n(.*?)\n```', 'g');
 
   // 创建一个临时 div 来解码 HTML 实体
-  const decodedText = props.text?.replace(regex, "");
+  const decodedText = props.text?.replace(regex, '');
   try {
     // 使用现代的 Clipboard API
     await navigator.clipboard.writeText(decodedText);
@@ -114,21 +114,21 @@ const copyText = async (options: {
     }
   } catch (err) {
     // 降级方案：如果 Clipboard API 不可用，使用传统方法
-    const textarea = document.createElement("textarea");
-    textarea.style.position = "fixed";
-    textarea.style.opacity = "0";
+    const textarea = document.createElement('textarea');
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
     textarea.value = decodedText;
     document.body.appendChild(textarea);
     textarea.select();
     try {
-      document.execCommand("copy");
+      document.execCommand('copy');
       if (!props.successText) {
         message.info(localeConfig?.[languageCode]?.copyDone);
       } else {
         message.info(props.successText);
       }
     } catch (e) {
-      message.error("复制失败");
+      message.error('复制失败');
     } finally {
       document.body.removeChild(textarea);
     }
@@ -136,14 +136,14 @@ const copyText = async (options: {
 };
 
 function getCookie(cookieName: string): string {
-  const name = cookieName + "=";
+  const name = cookieName + '=';
   const decodedCookie = decodeURIComponent(document.cookie);
-  const cookieArray = decodedCookie.split(";");
+  const cookieArray = decodedCookie.split(';');
 
   for (let i = 0; i < cookieArray.length; i++) {
     let cookie = cookieArray[i];
     if (!cookie) continue;
-    while (cookie.charAt(0) === " ") {
+    while (cookie.charAt(0) === ' ') {
       cookie = cookie.substring(1);
     }
     if (cookie.indexOf(name) === 0) {
@@ -151,7 +151,7 @@ function getCookie(cookieName: string): string {
     }
   }
 
-  return "";
+  return '';
 }
 
 /**
@@ -160,7 +160,7 @@ function getCookie(cookieName: string): string {
 const isJSON = (str: string): boolean => {
   try {
     const obj = JSON.parse(str);
-    return typeof obj === "object" && obj !== null;
+    return typeof obj === 'object' && obj !== null;
   } catch {
     return false;
   }
@@ -173,7 +173,7 @@ const fileType = (file: {
   isFile: boolean;
   fileInfoV2?: { type?: string };
 }): string => {
-  return file.isFile ? (file.fileInfoV2?.type ?? "unknown") : "folder";
+  return file.isFile ? (file.fileInfoV2?.type ?? 'unknown') : 'folder';
 };
 
 /**
@@ -192,16 +192,16 @@ function modifyChunks(
       auditDetail?: Array<{ category_description: string }>;
     };
     [key: string]: unknown;
-  }>,
+  }>
 ): Record<string, unknown>[] {
-  return chunks.map((item) => ({
+  return chunks.map(item => ({
     ...item,
     markdownContent: modifyContent(item.content),
     content: item.content?.content || item.content?.knowledge,
     auditSuggest: item.content?.auditSuggest,
     auditDetail: item.content?.auditDetail
-      ?.map((d: Record<string, string>) => d["category_description"])
-      ?.join(","),
+      ?.map((d: Record<string, string>) => d['category_description'])
+      ?.join(','),
   }));
 }
 
@@ -217,15 +217,15 @@ function modifyContent(chunk: {
   >;
 }): string {
   const regex = /[{<]unused.+?[>}]/g;
-  let content = chunk?.content || chunk?.knowledge || "";
+  let content = chunk?.content || chunk?.knowledge || '';
   const matches = content.match(regex);
   const references = chunk.references ?? {};
 
   if (matches && matches.length) {
-    matches.forEach((item) => {
+    matches.forEach(item => {
       const refKey = item.slice(1, -1);
       const imageInfo = references[refKey];
-      if (imageInfo?.format === "image") {
+      if (imageInfo?.format === 'image') {
         content = content.replace(item, `![image](${imageInfo.link})`);
       } else if (imageInfo?.content) {
         content = content.replace(item, imageInfo.content);
@@ -246,12 +246,12 @@ function cn(...inputs: ClassValue[]): string {
  * 根据类型生成默认值
  */
 const generateTypeDefault = (
-  type: string,
+  type: string
 ): string | boolean | number | unknown[] => {
-  if (type === "string") return "";
-  if (type === "integer") return 0;
-  if (type === "boolean") return false;
-  if (type === "number") return 0;
+  if (type === 'string') return '';
+  if (type === 'integer') return 0;
+  if (type === 'boolean') return false;
+  if (type === 'number') return 0;
   return [];
 };
 
@@ -259,14 +259,14 @@ const generateTypeDefault = (
  * 根据文件后缀生成类型
  */
 const generateType = (suffix: string): string | undefined => {
-  if (["pdf"].includes(suffix)) return "pdf";
-  if (["doc", "docx"].includes(suffix)) return "doc";
-  if (["jpg", "jpeg", "png", "bmp"].includes(suffix)) return "image";
-  if (["txt"].includes(suffix)) return "txt";
-  if (["md"].includes(suffix)) return "md";
-  if (["ppt", "pptx"].includes(suffix)) return "ppt";
-  if (["xlsx", "xls", "csv"].includes(suffix)) return "excel";
-  if (["html"].includes(suffix)) return "html";
+  if (['pdf'].includes(suffix)) return 'pdf';
+  if (['doc', 'docx'].includes(suffix)) return 'doc';
+  if (['jpg', 'jpeg', 'png', 'bmp'].includes(suffix)) return 'image';
+  if (['txt'].includes(suffix)) return 'txt';
+  if (['md'].includes(suffix)) return 'md';
+  if (['ppt', 'pptx'].includes(suffix)) return 'ppt';
+  if (['xlsx', 'xls', 'csv'].includes(suffix)) return 'excel';
+  if (['html'].includes(suffix)) return 'html';
   return undefined;
 };
 
@@ -274,10 +274,10 @@ const generateType = (suffix: string): string | undefined => {
  * 类型判断工具函数
  */
 const getValueType = (value: unknown): string => {
-  if (value === null) return "string";
-  if (Array.isArray(value)) return "array";
-  if (typeof value === "number") {
-    return Number.isInteger(value) ? "integer" : "number";
+  if (value === null) return 'string';
+  if (Array.isArray(value)) return 'array';
+  if (typeof value === 'number') {
+    return Number.isInteger(value) ? 'integer' : 'number';
   }
   return typeof value;
 };
@@ -286,44 +286,44 @@ const getValueType = (value: unknown): string => {
  * JSON 转换成数组结构
  */
 const transformJsonToArray = (
-  data: Record<string, unknown>,
+  data: Record<string, unknown>
 ): Record<string, unknown>[] => {
   const processData = (
     input: unknown,
     parentType: string,
-    isTopLevel = false,
+    isTopLevel = false
   ): Record<string, unknown> => {
     const baseAttributes = {
-      description: "",
+      description: '',
       from: 2,
-      location: "query",
+      location: 'query',
       open: true,
       required: true,
-      ...(!isTopLevel && parentType === "array" && { arraySon: true }),
+      ...(!isTopLevel && parentType === 'array' && { arraySon: true }),
     };
 
     if (Array.isArray(input)) {
-      const children = input.map((item) => {
+      const children = input.map(item => {
         const type = getValueType(item);
 
-        if (type !== "object" && type !== "array") {
+        if (type !== 'object' && type !== 'array') {
           return {
             id: uuid(),
-            name: "[Array Item]",
+            name: '[Array Item]',
             default: item,
             type,
             arraySon: true,
-            fatherType: "array",
+            fatherType: 'array',
             ...baseAttributes,
           };
         }
 
         return {
           id: uuid(),
-          name: "[Array Item]",
-          ...processData(item, "array"),
+          name: '[Array Item]',
+          ...processData(item, 'array'),
           arraySon: true,
-          fatherType: "array",
+          fatherType: 'array',
           ...baseAttributes,
         };
       });
@@ -331,23 +331,23 @@ const transformJsonToArray = (
       return {
         id: uuid(),
         default: input,
-        type: "array",
+        type: 'array',
         children,
         ...(!isTopLevel && { fatherType: parentType }),
         ...baseAttributes,
       };
     }
 
-    if (typeof input === "object" && input !== null) {
+    if (typeof input === 'object' && input !== null) {
       const children = Object.entries(input).map(([key, value]) => {
         const type = getValueType(value);
 
-        if (type === "object" || type === "array") {
+        if (type === 'object' || type === 'array') {
           return {
             id: uuid(),
             name: key,
-            ...processData(value, "object"),
-            fatherType: "object",
+            ...processData(value, 'object'),
+            fatherType: 'object',
             ...baseAttributes,
           };
         }
@@ -357,14 +357,14 @@ const transformJsonToArray = (
           name: key,
           default: value,
           type,
-          fatherType: "object",
+          fatherType: 'object',
           ...baseAttributes,
         };
       });
 
       return {
         id: uuid(),
-        type: "object",
+        type: 'object',
         children,
         ...(!isTopLevel && { fatherType: parentType }),
         ...baseAttributes,
@@ -380,24 +380,24 @@ const transformJsonToArray = (
     };
   };
 
-  if (typeof data !== "object" || data === null || Array.isArray(data)) {
+  if (typeof data !== 'object' || data === null || Array.isArray(data)) {
     return [];
   }
 
   return Object.entries(data).map(([key, value]) => {
     const type = getValueType(value);
 
-    if (type === "object" || type === "array") {
+    if (type === 'object' || type === 'array') {
       return {
         id: uuid(),
         name: key,
         ...processData(value, type, true),
-        description: "",
+        description: '',
         from: 2,
-        location: "query",
+        location: 'query',
         open: true,
         required: true,
-        ...(type !== "object" && { startDisabled: false }),
+        ...(type !== 'object' && { startDisabled: false }),
       };
     }
 
@@ -406,9 +406,9 @@ const transformJsonToArray = (
       name: key,
       default: value,
       type,
-      description: "",
+      description: '',
       from: 2,
-      location: "query",
+      location: 'query',
       open: true,
       required: true,
       startDisabled: !value,
@@ -425,7 +425,7 @@ const extractAllIdsOptimized = (data: unknown): string[] => {
 
   while (stack.length) {
     const node = stack.pop();
-    if (node.type === "array" || node.type === "object") {
+    if (node.type === 'array' || node.type === 'object') {
       ids.push(node.id);
     }
     if (node.children) {
@@ -436,8 +436,8 @@ const extractAllIdsOptimized = (data: unknown): string[] => {
   return ids;
 };
 
-type PrimitiveType = "string" | "number" | "boolean" | "null" | "undefined";
-type ComplexType = "object" | "array";
+type PrimitiveType = 'string' | 'number' | 'boolean' | 'null' | 'undefined';
+type ComplexType = 'object' | 'array';
 type ValueType = PrimitiveType | ComplexType;
 
 interface FormattedItem {
@@ -459,64 +459,64 @@ interface FormattedItem {
 const convertToDesiredFormat = (
   data: Record<string, unknown>,
   parentType: ValueType | null = null,
-  isArraySon = false,
+  isArraySon = false
 ): FormattedItem[] => {
   return Object.entries(data).map(([key, value]) => {
     const type = getValueType(value);
-    const isComplexType = type === "object" || type === "array";
+    const isComplexType = type === 'object' || type === 'array';
 
     const baseItem: FormattedItem = {
       id: uuid(),
       name: key,
-      description: isComplexType ? "" : value === null ? "" : String(value),
+      description: isComplexType ? '' : value === null ? '' : String(value),
       type: type as ValueType,
       open: true,
-      nameErrMsg: "",
-      descriptionErrMsg: "",
+      nameErrMsg: '',
+      descriptionErrMsg: '',
     };
 
-    if (parentType === "array" || isArraySon) {
+    if (parentType === 'array' || isArraySon) {
       baseItem.fatherType = parentType ?? undefined;
       baseItem.arraySon = true;
     }
 
     if (isComplexType) {
-      if (type === "array" && Array.isArray(value)) {
+      if (type === 'array' && Array.isArray(value)) {
         baseItem.children = value.map((item): FormattedItem => {
           const itemType: ValueType =
-            typeof item === "object" && item !== null && !Array.isArray(item)
-              ? "object"
+            typeof item === 'object' && item !== null && !Array.isArray(item)
+              ? 'object'
               : (typeof item as ValueType);
 
           return {
             id: uuid(),
-            name: "[Array Item]",
-            description: typeof item === "object" ? "" : String(item),
+            name: '[Array Item]',
+            description: typeof item === 'object' ? '' : String(item),
             type: itemType,
             open: true,
-            fatherType: "array",
+            fatherType: 'array',
             arraySon: true,
-            descriptionErrMsg: "",
-            nameErrMsg: "",
+            descriptionErrMsg: '',
+            nameErrMsg: '',
             children:
-              typeof item === "object" && item !== null
+              typeof item === 'object' && item !== null
                 ? convertToDesiredFormat(
                     item as Record<string, unknown>,
-                    "array",
-                    true,
+                    'array',
+                    true
                   )
                 : undefined,
           };
         });
       } else if (
-        type === "object" &&
-        typeof value === "object" &&
+        type === 'object' &&
+        typeof value === 'object' &&
         value !== null
       ) {
         baseItem.children = convertToDesiredFormat(
           value as Record<string, unknown>,
-          "object",
-          isArraySon,
+          'object',
+          isArraySon
         );
       }
     }
@@ -537,15 +537,15 @@ const formatHistoryToMessages = (chatHistoryList: ChatHistoryResponse[]) => {
       history.historyList.forEach((msg: any) => {
         const formattedMessage = {
           ...msg,
-          reqId: msg.reqId ? "BOT" : "USER",
+          reqId: msg.reqId ? 'BOT' : 'USER',
         };
         formattedMessages.push(formattedMessage);
       });
       if (index < chatHistoryList.length - 1) {
         formattedMessages.push({
           id: new Date().getTime(),
-          reqId: "START",
-          message: "全新的开始",
+          reqId: 'START',
+          message: '全新的开始',
         });
       }
     }
@@ -574,7 +574,7 @@ const getTraceList = (traceSource: string): SourceInfoItem[] => {
 
     return sourceInfoList;
   } catch (e) {
-    console.error("Failed to parse traceSource:", e);
+    console.error('Failed to parse traceSource:', e);
     return [];
   }
 };
@@ -589,7 +589,7 @@ const getTraceList = (traceSource: string): SourceInfoItem[] => {
 const compressImage = (
   imageFile: any,
   quality = 0.6,
-  convertSize = 3000000,
+  convertSize = 3000000
 ) => {
   return new Promise((resolve, reject) => {
     new Compressor(imageFile, {
@@ -597,7 +597,7 @@ const compressImage = (
       convertSize,
       success(result) {
         if (result.size > 3 * 1024 * 1024) {
-          reject("图片太大，请换个试试");
+          reject('图片太大，请换个试试');
           return;
         }
         const newFile: any = new File([result], imageFile?.name, {
@@ -625,7 +625,7 @@ const compressImage = (
 export const handleShare = async (
   botName: string,
   botId: number,
-  t: (key: string, options?: any) => string,
+  t: (key: string, options?: any) => string
 ): Promise<void> => {
   try {
     // 1. 获取分享key
@@ -634,7 +634,7 @@ export const handleShare = async (
       relateId: botId,
     });
 
-    const shareUrl = t("shareModal.shareOriginModal.shareText", {
+    const shareUrl = t('shareModal.shareOriginModal.shareText', {
       botName: botName,
       origin: window.location.origin,
       botId: botId,
@@ -642,10 +642,10 @@ export const handleShare = async (
     });
 
     // 2. 复制分享链接
-    copyText({ text: shareUrl, successText: t("home.copyLinkDone") });
+    copyText({ text: shareUrl, successText: t('home.copyLinkDone') });
   } catch (err) {
-    message.error((err as Error)?.message || "分享失败，请稍后再试~");
-    console.warn("分享失败:", err);
+    message.error((err as Error)?.message || '分享失败，请稍后再试~');
+    console.warn('分享失败:', err);
   }
 };
 

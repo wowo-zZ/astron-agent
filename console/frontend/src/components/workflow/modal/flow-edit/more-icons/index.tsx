@@ -1,13 +1,13 @@
-import React, { useEffect, useState, useMemo } from "react";
-import { Button, Upload, Slider, Input, message, Spin } from "antd";
-import { avatarImageGenerate } from "@/services/common";
+import React, { useEffect, useState, useMemo } from 'react';
+import { Button, Upload, Slider, Input, message, Spin } from 'antd';
+import { avatarImageGenerate } from '@/services/common';
 
-import { avatarGenerationMethods } from "@/constants";
-import uploadAct from "@/assets/imgs/knowledge/icon_zhishi_upload_act.png";
-import zoomIn from "@/assets/imgs/main/icon_zoomin.png";
-import zoomOut from "@/assets/imgs/main/icon_zoomout.png";
-import placeholderImage from "@/assets/imgs/common/ai_chat_placeholder.png";
-import close from "@/assets/imgs/workflow/modal-close.png";
+import { avatarGenerationMethods } from '@/constants';
+import uploadAct from '@/assets/imgs/knowledge/icon_zhishi_upload_act.png';
+import zoomIn from '@/assets/imgs/main/icon_zoomin.png';
+import zoomOut from '@/assets/imgs/main/icon_zoomout.png';
+import placeholderImage from '@/assets/imgs/common/ai_chat_placeholder.png';
+import close from '@/assets/imgs/workflow/modal-close.png';
 
 const { Dragger } = Upload;
 
@@ -25,16 +25,16 @@ function Image(props): React.ReactElement {
               className="icon-image-container"
               style={{
                 background: `url(${imageUrl}) no-repeat center`,
-                backgroundSize: "cover",
+                backgroundSize: 'cover',
                 transform: `scale(${scale})`,
-                transformOrigin: "center center",
+                transformOrigin: 'center center',
               }}
             >
               <div
                 className="icon-image-container-mask"
                 style={{
                   transform: `scale(${1 / scale})`,
-                  transformOrigin: "center center",
+                  transformOrigin: 'center center',
                 }}
               >
                 <div className="border-4 border-[#275EFF] rounded-xl w-full h-full overflow-hidden">
@@ -42,9 +42,9 @@ function Image(props): React.ReactElement {
                     className="icon-image-origin"
                     style={{
                       background: `url(${imageUrl}) no-repeat center`,
-                      backgroundSize: "cover",
+                      backgroundSize: 'cover',
                       transform: `scale(${scale})`,
-                      transformOrigin: "center center",
+                      transformOrigin: 'center center',
                     }}
                   ></div>
                 </div>
@@ -68,7 +68,7 @@ function Image(props): React.ReactElement {
               step={0.1}
               value={scale}
               className="flex-1 config-slider"
-              onChange={(value) => setScale(value)}
+              onChange={value => setScale(value)}
             />
           </div>
           <img
@@ -95,17 +95,17 @@ function index(props): React.ReactElement {
   } = props;
 
   const [previewIcon, setPreviewIcon] = useState<unknown>({});
-  const [previewColor, setPreviewColor] = useState("");
-  const [activeTab, setActiveTab] = useState<string | undefined>("upload");
-  const [hoverTab, setHoverTab] = useState<string | undefined>("");
+  const [previewColor, setPreviewColor] = useState('');
+  const [activeTab, setActiveTab] = useState<string | undefined>('upload');
+  const [hoverTab, setHoverTab] = useState<string | undefined>('');
   const [uploadImageObject, setUploadImageObject] = useState({
-    downloadLink: "",
-    s3Key: "",
+    downloadLink: '',
+    s3Key: '',
   });
-  const [generateImageDescription, setGenerateImageDescription] = useState("");
+  const [generateImageDescription, setGenerateImageDescription] = useState('');
   const [generateImageObject, setGenerateImageObject] = useState({
-    downloadLink: "",
-    s3Key: "",
+    downloadLink: '',
+    s3Key: '',
   });
   const [loading, setLoading] = useState(false);
 
@@ -122,24 +122,24 @@ function index(props): React.ReactElement {
   function generateImage(): void {
     if (loading) return;
     if (!generateImageDescription?.trim()) {
-      message.error("描述不能为空！");
+      message.error('描述不能为空！');
       return;
     }
     setLoading(true);
     avatarImageGenerate(generateImageDescription)
-      .then((data) => {
+      .then(data => {
         setGenerateImageObject(data);
       })
       .finally(() => setLoading(false));
   }
 
   function handleOk(): void {
-    if (activeTab === "upload") {
+    if (activeTab === 'upload') {
       setBotIcon({ ...botIcon, value: uploadImageObject.downloadLink });
-      setBotColor("");
+      setBotColor('');
     } else {
       setBotIcon({ ...botIcon, value: generateImageObject.downloadLink });
-      setBotColor("");
+      setBotColor('');
     }
     setShowModal(false);
   }
@@ -147,20 +147,20 @@ function index(props): React.ReactElement {
   function beforeUpload(file): boolean {
     const maxSize = 2 * 1024 * 1024;
     if (file.size > maxSize) {
-      message.error("上传文件大小不能超出2M！");
+      message.error('上传文件大小不能超出2M！');
       return false;
     }
     const isJpgOrPng = [
-      "jpg",
-      "jpeg",
-      "png",
-      "gif",
-      "webp",
-      "bmp",
-      "tiff",
-    ].includes(file.type.split("/").pop());
+      'jpg',
+      'jpeg',
+      'png',
+      'gif',
+      'webp',
+      'bmp',
+      'tiff',
+    ].includes(file.type.split('/').pop());
     if (!isJpgOrPng) {
-      message.error("请上传JPG和PNG等格式的图片文件");
+      message.error('请上传JPG和PNG等格式的图片文件');
       return false;
     } else {
       return true;
@@ -168,13 +168,13 @@ function index(props): React.ReactElement {
   }
 
   const uploadProps = {
-    name: "file",
-    action: "/xingchen-api/image/upload",
+    name: 'file',
+    action: '/xingchen-api/image/upload',
     showUploadList: false,
-    accept: ".png,.jpg,.jpeg,.gif,.webp,.bmp,.tiff",
+    accept: '.png,.jpg,.jpeg,.gif,.webp,.bmp,.tiff',
     beforeUpload,
     onChange: (info): void => {
-      if (info.file.status === "done") {
+      if (info.file.status === 'done') {
         if (
           info.file.response &&
           info.file.response.data &&
@@ -191,15 +191,13 @@ function index(props): React.ReactElement {
 
   const checkEnableSave = useMemo(() => {
     return (
-      (activeTab === "upload" && !uploadImageObject.downloadLink) ||
-      (activeTab === "chat" && !generateImageObject.downloadLink)
+      (activeTab === 'upload' && !uploadImageObject.downloadLink) ||
+      (activeTab === 'chat' && !generateImageObject.downloadLink)
     );
   }, [activeTab, uploadImageObject, generateImageObject]);
 
   const avatarFilterGenerationMethods = useMemo(() => {
-    return avatarGenerationMethods.filter(
-      (item) => item.activeTab !== "gallery",
-    );
+    return avatarGenerationMethods.filter(item => item.activeTab !== 'gallery');
   }, [avatarGenerationMethods]);
 
   return (
@@ -218,9 +216,9 @@ function index(props): React.ReactElement {
           {avatarFilterGenerationMethods.map((item, index) => (
             <div
               key={index}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg cursor-pointer ${[activeTab, hoverTab].includes(item.activeTab) ? "text-[#275EFF] bg-[#F6F9FF]" : ""}`}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg cursor-pointer ${[activeTab, hoverTab].includes(item.activeTab) ? 'text-[#275EFF] bg-[#F6F9FF]' : ''}`}
               onMouseEnter={() => setHoverTab(item.activeTab)}
-              onMouseLeave={() => setHoverTab("")}
+              onMouseLeave={() => setHoverTab('')}
               onClick={() => setActiveTab(item.activeTab)}
             >
               <img
@@ -236,7 +234,7 @@ function index(props): React.ReactElement {
             </div>
           ))}
         </div>
-        {activeTab === "gallery" && (
+        {activeTab === 'gallery' && (
           <>
             <div className="h-[160px] overflow-auto mt-7">
               <div className="text-[#101828] text-xs font-medium mb-1">
@@ -244,14 +242,14 @@ function index(props): React.ReactElement {
               </div>
               <div className="flex gap-4 flex-wrap">
                 {icons
-                  .filter((item) => item.code === "common")
+                  .filter(item => item.code === 'common')
                   .map((item, index) => (
                     <div
                       key={index}
                       className="icons-item cursor-pointer"
                       style={{
                         background:
-                          previewIcon.value === item.value ? previewColor : "",
+                          previewIcon.value === item.value ? previewColor : '',
                       }}
                       onClick={() => setPreviewIcon(item)}
                     >
@@ -268,14 +266,14 @@ function index(props): React.ReactElement {
               </div>
               <div className="flex gap-4 flex-wrap">
                 {icons
-                  .filter((item) => item.code === "sport")
+                  .filter(item => item.code === 'sport')
                   .map((item, index) => (
                     <div
                       key={index}
                       className="icons-item cursor-pointer"
                       style={{
                         background:
-                          previewIcon.value === item.value ? previewColor : "",
+                          previewIcon.value === item.value ? previewColor : '',
                       }}
                       onClick={() => setPreviewIcon(item)}
                     >
@@ -292,14 +290,14 @@ function index(props): React.ReactElement {
               </div>
               <div className="flex gap-4 flex-wrap">
                 {icons
-                  .filter((item) => item.code === "plant")
+                  .filter(item => item.code === 'plant')
                   .map((item, index) => (
                     <div
                       key={index}
                       className="icons-item cursor-pointer"
                       style={{
                         background:
-                          previewIcon.value === item.value ? previewColor : "",
+                          previewIcon.value === item.value ? previewColor : '',
                       }}
                       onClick={() => setPreviewIcon(item)}
                     >
@@ -316,14 +314,14 @@ function index(props): React.ReactElement {
               </div>
               <div className="flex gap-4 flex-wrap">
                 {icons
-                  .filter((item) => item.code === "explore")
+                  .filter(item => item.code === 'explore')
                   .map((item, index) => (
                     <div
                       key={index}
                       className="icons-item cursor-pointer"
                       style={{
                         background:
-                          previewIcon.value === item.value ? previewColor : "",
+                          previewIcon.value === item.value ? previewColor : '',
                       }}
                       onClick={() => setPreviewIcon(item)}
                     >
@@ -343,7 +341,7 @@ function index(props): React.ReactElement {
               {colors.map((item, index) => (
                 <div
                   key={index}
-                  className={`w-[40px] h-[40px] flex justify-center items-center ${item.name === previewColor ? "color-item-active" : ""} cursor-pointer`}
+                  className={`w-[40px] h-[40px] flex justify-center items-center ${item.name === previewColor ? 'color-item-active' : ''} cursor-pointer`}
                   onClick={() => setPreviewColor(item.name)}
                 >
                   <span
@@ -355,7 +353,7 @@ function index(props): React.ReactElement {
             </div>
           </>
         )}
-        {activeTab === "upload" && (
+        {activeTab === 'upload' && (
           <div className="mt-8">
             {!uploadImageObject.downloadLink && (
               <Dragger {...uploadProps} className="icon-upload">
@@ -377,14 +375,14 @@ function index(props): React.ReactElement {
             )}
           </div>
         )}
-        {activeTab === "chat" && (
+        {activeTab === 'chat' && (
           <div className="mt-6">
             <div
               className="w-full h-[165px] flex items-center justify-center rounded-lg"
               style={{
                 background:
-                  "linear-gradient(90deg, rgba(223, 231, 253, 0.26) 0%, rgba(239, 227, 253, 0.81) 100%)",
-                border: "1px solid #E4EAFF",
+                  'linear-gradient(90deg, rgba(223, 231, 253, 0.26) 0%, rgba(239, 227, 253, 0.81) 100%)',
+                border: '1px solid #E4EAFF',
               }}
             >
               <Spin spinning={loading}>
@@ -404,8 +402,8 @@ function index(props): React.ReactElement {
                 className="user-chat-input w-full"
                 maxLength={80}
                 value={generateImageDescription}
-                onChange={(e) => setGenerateImageDescription(e.target.value)}
-                onPressEnter={(e) => {
+                onChange={e => setGenerateImageDescription(e.target.value)}
+                onPressEnter={e => {
                   e.stopPropagation();
                   e.preventDefault();
                   generateImage();

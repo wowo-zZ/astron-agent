@@ -1,5 +1,5 @@
-import { useState, memo, JSX } from "react";
-import { useTranslation } from "react-i18next";
+import { useState, memo, JSX } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface CreateDatabaseCardProps {
   onClick: () => void;
@@ -14,7 +14,7 @@ const CreateDatabaseCard = ({
   return (
     <div
       className={`common-card-add-container relative ${
-        isHovered ? " knowledge-hover" : "knowledge-no-hover"
+        isHovered ? ' knowledge-hover' : 'knowledge-no-hover'
       }`}
       onMouseLeave={(): void => setIsHovered(false)}
       onMouseEnter={(): void => setIsHovered(true)}
@@ -27,7 +27,7 @@ const CreateDatabaseCard = ({
           <span className="add-icon"></span>
         </div>
         <div className="mt-4 font-semibold add-name text-[22px]">
-          {t("database.createDatabase")}
+          {t('database.createDatabase')}
         </div>
       </div>
     </div>

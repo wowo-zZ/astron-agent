@@ -1,46 +1,46 @@
-import React, { useMemo, useState, memo, useEffect } from "react";
+import React, { useMemo, useState, memo, useEffect } from 'react';
 import {
   FlowSelect,
   FlowTemplateEditor,
   FLowCollapse,
-} from "@/components/workflow/ui";
-import { Cascader } from "antd";
-import { v4 as uuid } from "uuid";
-import cloneDeep from "lodash/cloneDeep";
-import { useTranslation } from "react-i18next";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import Inputs from "@/components/workflow/nodes/components/inputs";
-import AddDataInputs from "./components/AddDataInputs";
-import QueryField from "./components/QueryField";
-import QueryLimit from "./components/QueryLimit";
-import OutputDatabase from "./components/OutputDatabase";
-import CasesInputs from "./components/CasesInputs";
-import ExceptionHandling from "../components/exception-handling";
-import { useNodeCommon } from "@/components/workflow/hooks/useNodeCommon";
+} from '@/components/workflow/ui';
+import { Cascader } from 'antd';
+import { v4 as uuid } from 'uuid';
+import cloneDeep from 'lodash/cloneDeep';
+import { useTranslation } from 'react-i18next';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import Inputs from '@/components/workflow/nodes/components/inputs';
+import AddDataInputs from './components/AddDataInputs';
+import QueryField from './components/QueryField';
+import QueryLimit from './components/QueryLimit';
+import OutputDatabase from './components/OutputDatabase';
+import CasesInputs from './components/CasesInputs';
+import ExceptionHandling from '../components/exception-handling';
+import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
 
-import formSelect from "@/assets/imgs/main/icon_nav_dropdown.svg";
+import formSelect from '@/assets/imgs/main/icon_nav_dropdown.svg';
 
-import styles from "./index.module.scss";
-import { allTableList, fieldList } from "@/services/database";
+import styles from './index.module.scss';
+import { allTableList, fieldList } from '@/services/database';
 
-export const DatabaseDetail = memo((props) => {
+export const DatabaseDetail = memo(props => {
   const { id, data } = props;
   const { handleChangeNodeParam } = useNodeCommon({ id, data });
   const { t } = useTranslation();
-  const getCurrentStore = useFlowsManager((state) => state.getCurrentStore);
+  const getCurrentStore = useFlowsManager(state => state.getCurrentStore);
   const currentStore = getCurrentStore();
-  const canvasesDisabled = useFlowsManager((state) => state.canvasesDisabled);
+  const canvasesDisabled = useFlowsManager(state => state.canvasesDisabled);
   const autoSaveCurrentFlow = useFlowsManager(
-    (state) => state.autoSaveCurrentFlow,
+    state => state.autoSaveCurrentFlow
   );
-  const delayCheckNode = currentStore((state) => state.delayCheckNode);
-  const historyVersion = useFlowsManager((state) => state.historyVersion);
-  const setNode = currentStore((state) => state.setNode);
+  const delayCheckNode = currentStore(state => state.delayCheckNode);
+  const historyVersion = useFlowsManager(state => state.historyVersion);
+  const setNode = currentStore(state => state.setNode);
   const updateNodeNameStatus = currentStore(
-    (state) => state.updateNodeNameStatus,
+    state => state.updateNodeNameStatus
   );
-  const canPublishSetNot = useFlowsManager((state) => state.canPublishSetNot);
-  const updateNodeRef = currentStore((state) => state.updateNodeRef);
+  const canPublishSetNot = useFlowsManager(state => state.canPublishSetNot);
+  const updateNodeRef = currentStore(state => state.updateNodeRef);
   const [allFields, setAllFields] = useState([]);
   const [tab, setTab] = useState(1);
   const [handleMode, setHandleMode] = useState(0);
@@ -48,10 +48,10 @@ export const DatabaseDetail = memo((props) => {
   const [allTable, setAllTable] = useState<unknown>([]);
 
   useEffect(() => {
-    allTableList().then((list) => {
-      const arr = list.map((item) => {
+    allTableList().then(list => {
+      const arr = list.map(item => {
         item.children = item.children
-          ? item.children.map((inner) => {
+          ? item.children.map(inner => {
               inner.id = inner.value;
               inner.value = inner.label;
               return inner;
@@ -72,13 +72,13 @@ export const DatabaseDetail = memo((props) => {
   }, [data]);
 
   const getFields = (list, dbId, tableName): void => {
-    const currentTable = list.filter((item) => item.value === dbId);
+    const currentTable = list.filter(item => item.value === dbId);
     if (!currentTable.length) {
       setFields([]);
       return;
     }
     const currentSheet = currentTable[0].children.find(
-      (item) => item.value === tableName,
+      item => item.value === tableName
     );
     if (!currentSheet) {
       setFields([]);
@@ -89,9 +89,9 @@ export const DatabaseDetail = memo((props) => {
       pageNum: 1,
       pageSize: 200,
     })
-      .then((res) => {
-        const filterFields = res.records.filter((field) => !field.isSystem);
-        const fields = filterFields.map((item) => {
+      .then(res => {
+        const filterFields = res.records.filter(field => !field.isSystem);
+        const fields = filterFields.map(item => {
           return {
             id: item.id,
             name: item.name,
@@ -101,10 +101,10 @@ export const DatabaseDetail = memo((props) => {
           };
         });
         setAllFields(
-          res.records.map((item) => ({
+          res.records.map(item => ({
             ...item,
             type: item.type.toLowerCase(),
-          })),
+          }))
         );
         setFields(fields);
         if (
@@ -113,14 +113,14 @@ export const DatabaseDetail = memo((props) => {
           !historyVersion
         ) {
           const initInputs = fields
-            .map((item) => {
+            .map(item => {
               if (item.required) {
                 return {
                   ...item,
                   schema: {
                     type: item.type,
                     value: {
-                      type: "ref",
+                      type: 'ref',
                       content: {},
                     },
                   },
@@ -130,7 +130,7 @@ export const DatabaseDetail = memo((props) => {
             .filter(Boolean);
           handleChangeNodeParam(
             (data, value) => (data.inputs = value),
-            initInputs,
+            initInputs
           );
         }
       })
@@ -159,7 +159,7 @@ export const DatabaseDetail = memo((props) => {
     handleChangeNodeParam((data, value) => (data.nodeParam.dbId = value), dbId);
     handleChangeNodeParam(
       (data, value) => (data.nodeParam.tableName = value),
-      null,
+      null
     );
     setFields([]);
     setAllFields([]);
@@ -167,7 +167,7 @@ export const DatabaseDetail = memo((props) => {
 
   const modeChange = (value): void => {
     setHandleMode(value);
-    setNode(id, (old) => {
+    setNode(id, old => {
       old.data.nodeParam.mode = value;
       old.data.nodeParam.assignmentList = [];
       old.data.nodeParam.orderData = [];
@@ -176,12 +176,12 @@ export const DatabaseDetail = memo((props) => {
         old.data.inputs = [
           {
             id: uuid(),
-            name: "input",
+            name: 'input',
             schema: {
-              type: "string",
+              type: 'string',
               value: {
                 content: {},
-                type: "ref",
+                type: 'ref',
               },
             },
           },
@@ -193,10 +193,10 @@ export const DatabaseDetail = memo((props) => {
             return {
               ...it,
               schema: {
-                type: it?.type || "string",
+                type: it?.type || 'string',
                 value: {
                   content: {},
-                  type: "ref",
+                  type: 'ref',
                 },
               },
             };
@@ -209,12 +209,12 @@ export const DatabaseDetail = memo((props) => {
       } else {
         old.data.outputs[2] = {
           id: uuid(),
-          name: "outputList",
-          nameErrMsg: "",
+          name: 'outputList',
+          nameErrMsg: '',
           schema: {
-            default: t("workflow.nodes.databaseNode.executionResult"),
+            default: t('workflow.nodes.databaseNode.executionResult'),
             properties: [],
-            type: "array-object",
+            type: 'array-object',
           },
         };
       }
@@ -239,7 +239,7 @@ export const DatabaseDetail = memo((props) => {
   }, [data]);
 
   const handleSheetChange = (valArray): void => {
-    setNode(id, (old) => {
+    setNode(id, old => {
       old.data.nodeParam.dbId = valArray[0];
       old.data.nodeParam.tableName = valArray[1];
       const mode = old.data.nodeParam.mode;
@@ -247,12 +247,12 @@ export const DatabaseDetail = memo((props) => {
         old.data.inputs = [
           {
             id: uuid(),
-            name: "input",
+            name: 'input',
             schema: {
-              type: "string",
+              type: 'string',
               value: {
                 content: {},
-                type: "ref",
+                type: 'ref',
               },
             },
           },
@@ -265,12 +265,12 @@ export const DatabaseDetail = memo((props) => {
       } else {
         old.data.outputs[2] = {
           id: uuid(),
-          name: "outputList",
-          nameErrMsg: "",
+          name: 'outputList',
+          nameErrMsg: '',
           schema: {
-            default: t("workflow.nodes.databaseNode.executionResult"),
+            default: t('workflow.nodes.databaseNode.executionResult'),
             properties: [],
-            type: "array-object",
+            type: 'array-object',
           },
         };
       }
@@ -295,7 +295,7 @@ export const DatabaseDetail = memo((props) => {
       <div className="p-[14px] pb-[6px]">
         <FLowCollapse
           id={id}
-          activeKey={data?.shrink ? "" : "1"}
+          activeKey={data?.shrink ? '' : '1'}
           className="flow-collapse-node-container"
           label={
             <div className="w-full">
@@ -309,38 +309,38 @@ export const DatabaseDetail = memo((props) => {
                 <div className="flex justify-between items-center gap-2 bg-[#E9EDF6] p-[3px] rounded-[8px] mt-[8px] mb-[12px]">
                   <div
                     className={`${styles.tabItem} ${
-                      tab === 1 ? styles.activeItem : ""
+                      tab === 1 ? styles.activeItem : ''
                     }`}
                     style={{
-                      pointerEvents: canvasesDisabled ? "none" : "auto",
+                      pointerEvents: canvasesDisabled ? 'none' : 'auto',
                     }}
                     onClick={handleCustomSQL}
                   >
-                    {t("workflow.nodes.databaseNode.customSQL")}
+                    {t('workflow.nodes.databaseNode.customSQL')}
                   </div>
                   <div
                     className={`${styles.tabItem} ${
-                      tab === 2 ? styles.activeItem : ""
+                      tab === 2 ? styles.activeItem : ''
                     }`}
                     style={{
-                      pointerEvents: canvasesDisabled ? "none" : "auto",
+                      pointerEvents: canvasesDisabled ? 'none' : 'auto',
                     }}
                     onClick={handleformdata}
                   >
-                    {t("workflow.nodes.databaseNode.formDataProcessing")}
+                    {t('workflow.nodes.databaseNode.formDataProcessing')}
                   </div>
                 </div>
 
                 {tab == 1 && (
                   <div
                     className="flex items-baseline gap-2"
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={e => e.stopPropagation()}
                     style={{
-                      pointerEvents: canvasesDisabled ? "none" : "auto",
+                      pointerEvents: canvasesDisabled ? 'none' : 'auto',
                     }}
                   >
                     <span>
-                      {t("workflow.nodes.databaseNode.selectDatabase")}
+                      {t('workflow.nodes.databaseNode.selectDatabase')}
                     </span>
                     <div className="flex-1 w-0">
                       <FlowSelect
@@ -361,13 +361,13 @@ export const DatabaseDetail = memo((props) => {
                   <>
                     <div
                       className="flex items-baseline gap-2 mb-[12px]"
-                      onClick={(e) => e.stopPropagation()}
+                      onClick={e => e.stopPropagation()}
                       style={{
-                        pointerEvents: canvasesDisabled ? "none" : "auto",
+                        pointerEvents: canvasesDisabled ? 'none' : 'auto',
                       }}
                     >
                       <span>
-                        {t("workflow.nodes.databaseNode.selectDataTable")}
+                        {t('workflow.nodes.databaseNode.selectDataTable')}
                       </span>
                       <div className="flex-1 w-0">
                         <Cascader
@@ -382,24 +382,24 @@ export const DatabaseDetail = memo((props) => {
                             <img src={formSelect} className="w-4 h-4" />
                           }
                           placeholder={t(
-                            "workflow.nodes.databaseNode.pleaseSelect",
+                            'workflow.nodes.databaseNode.pleaseSelect'
                           )}
                           // fieldNames={{ label: "name", value: "id", children: "children" }}
-                          className={"flow-select nodrag w-full"}
+                          className={'flow-select nodrag w-full'}
                           // showCheckedStrategy={Cascader.SHOW_CHILD}
                           // dropdownAlign={{ offset: [0, 0] }}
                           // popupClassName="custom-cascader-popup"
                           onChange={handleSheetChange}
-                          dropdownRender={(menu) => (
+                          dropdownRender={menu => (
                             <div
-                              onWheel={(e) => {
+                              onWheel={e => {
                                 e.stopPropagation();
                               }}
                             >
                               {menu}
                             </div>
                           )}
-                          getPopupContainer={(triggerNode) =>
+                          getPopupContainer={triggerNode =>
                             triggerNode.parentNode
                           }
                           onBlur={() => delayCheckNode(id)}
@@ -412,13 +412,13 @@ export const DatabaseDetail = memo((props) => {
 
                     <div
                       className="flex items-center gap-2"
-                      onClick={(e) => e.stopPropagation()}
+                      onClick={e => e.stopPropagation()}
                       style={{
-                        pointerEvents: canvasesDisabled ? "none" : "auto",
+                        pointerEvents: canvasesDisabled ? 'none' : 'auto',
                       }}
                     >
                       <span>
-                        {t("workflow.nodes.databaseNode.processingMode")}
+                        {t('workflow.nodes.databaseNode.processingMode')}
                       </span>
                       <div className="flex-1">
                         <FlowSelect
@@ -426,22 +426,22 @@ export const DatabaseDetail = memo((props) => {
                           onBlur={() => delayCheckNode(id)}
                           options={[
                             {
-                              label: t("workflow.nodes.databaseNode.addData"),
+                              label: t('workflow.nodes.databaseNode.addData'),
                               value: 1,
                             },
                             {
                               label: t(
-                                "workflow.nodes.databaseNode.updateData",
+                                'workflow.nodes.databaseNode.updateData'
                               ),
                               value: 2,
                             },
                             {
-                              label: t("workflow.nodes.databaseNode.queryData"),
+                              label: t('workflow.nodes.databaseNode.queryData'),
                               value: 3,
                             },
                             {
                               label: t(
-                                "workflow.nodes.databaseNode.deleteData",
+                                'workflow.nodes.databaseNode.deleteData'
                               ),
                               value: 4,
                             },
@@ -461,13 +461,13 @@ export const DatabaseDetail = memo((props) => {
                 <>
                   <Inputs id={id} data={data}>
                     <div className="flex items-center justify-between flex-1 text-base font-medium">
-                      <div>{t("workflow.nodes.databaseNode.input")}</div>
+                      <div>{t('workflow.nodes.databaseNode.input')}</div>
                     </div>
                   </Inputs>
                   <FLowCollapse
                     label={
                       <div className="flex items-center justify-between text-base font-medium">
-                        <div>{t("workflow.nodes.databaseNode.sql")}</div>
+                        <div>{t('workflow.nodes.databaseNode.sql')}</div>
                         {/* <div className="flex items-center gap-2 cursor-pointer" onClick={() => setAiModalOpen(!aiModalOpen)}>
                               <img src={aiCreateIcon} className="w-[14px] h-[14px]" alt="" />
                               <div className={styles.ai_text}>AI生成</div>
@@ -480,15 +480,15 @@ export const DatabaseDetail = memo((props) => {
                           data={data}
                           onBlur={() => delayCheckNode(id)}
                           value={nodeParam?.sql}
-                          onChange={(value) =>
+                          onChange={value =>
                             handleChangeNodeParam(
                               (data, value) => (data.nodeParam.sql = value),
-                              value,
+                              value
                             )
                           }
                           placeholder={
                             <div className="leading-[18px] whitespace-pre-wrap font-normal">
-                              {t("workflow.nodes.databaseNode.sqlPlaceholder")}
+                              {t('workflow.nodes.databaseNode.sqlPlaceholder')}
                             </div>
                           }
                           minHeight="154px"
@@ -509,7 +509,7 @@ export const DatabaseDetail = memo((props) => {
                       <AddDataInputs id={id} data={data} fields={fields}>
                         <div className="flex items-center justify-between flex-1 text-base font-medium">
                           <div>
-                            {t("workflow.nodes.databaseNode.setAddData")}
+                            {t('workflow.nodes.databaseNode.setAddData')}
                           </div>
                         </div>
                       </AddDataInputs>
@@ -527,7 +527,7 @@ export const DatabaseDetail = memo((props) => {
                       >
                         <div className="flex items-center justify-between flex-1 text-base font-medium">
                           <div>
-                            {t("workflow.nodes.databaseNode.setDataRange")}
+                            {t('workflow.nodes.databaseNode.setDataRange')}
                           </div>
                         </div>
                       </CasesInputs>
@@ -535,7 +535,7 @@ export const DatabaseDetail = memo((props) => {
                       <AddDataInputs id={id} data={data} fields={fields}>
                         <div className="flex items-center justify-between flex-1 text-base font-medium">
                           <div>
-                            {t("workflow.nodes.databaseNode.setUpdateData")}
+                            {t('workflow.nodes.databaseNode.setUpdateData')}
                           </div>
                         </div>
                       </AddDataInputs>
@@ -553,7 +553,7 @@ export const DatabaseDetail = memo((props) => {
                       >
                         <div className="flex items-center justify-between flex-1 text-base font-medium">
                           <div>
-                            {t("workflow.nodes.databaseNode.setDataRange")}
+                            {t('workflow.nodes.databaseNode.setDataRange')}
                           </div>
                         </div>
                       </CasesInputs>
@@ -562,12 +562,12 @@ export const DatabaseDetail = memo((props) => {
                         id={id}
                         data={data}
                         allFields={allFields}
-                        from={"query"}
-                        key={"query"}
+                        from={'query'}
+                        key={'query'}
                       >
                         <div className="flex items-center justify-between flex-1 text-base font-medium">
                           <div>
-                            {t("workflow.nodes.databaseNode.queryResultFields")}
+                            {t('workflow.nodes.databaseNode.queryResultFields')}
                           </div>
                         </div>
                       </QueryField>
@@ -576,18 +576,18 @@ export const DatabaseDetail = memo((props) => {
                         id={id}
                         data={data}
                         allFields={allFields}
-                        from={"sort"}
-                        key={"sort"}
+                        from={'sort'}
+                        key={'sort'}
                       >
                         <div className="flex items-center justify-between flex-1 text-base font-medium">
-                          <div>{t("workflow.nodes.databaseNode.sort")}</div>
+                          <div>{t('workflow.nodes.databaseNode.sort')}</div>
                         </div>
                       </QueryField>
 
                       <QueryLimit id={id} data={data}>
                         <div className="flex items-center justify-between flex-1 text-base font-medium">
                           <div>
-                            {t("workflow.nodes.databaseNode.queryLimit")}
+                            {t('workflow.nodes.databaseNode.queryLimit')}
                           </div>
                         </div>
                       </QueryLimit>
@@ -605,7 +605,7 @@ export const DatabaseDetail = memo((props) => {
                       >
                         <div className="flex items-center justify-between flex-1 text-base font-medium">
                           <div>
-                            {t("workflow.nodes.databaseNode.setDataRange")}
+                            {t('workflow.nodes.databaseNode.setDataRange')}
                           </div>
                         </div>
                       </CasesInputs>
@@ -616,7 +616,7 @@ export const DatabaseDetail = memo((props) => {
 
               <OutputDatabase id={id} data={data} key={handleMode}>
                 <div className="text-base font-medium">
-                  {t("workflow.nodes.databaseNode.output")}
+                  {t('workflow.nodes.databaseNode.output')}
                 </div>
               </OutputDatabase>
               <ExceptionHandling id={id} data={data} />

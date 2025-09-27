@@ -1,23 +1,23 @@
-import React, { useState, FC } from "react";
-import { useSearchParams } from "react-router-dom";
-import UploadHeader from "./components/upload-header";
-import ImportData from "./components/import-data";
-import DataClean from "./components/data-clean";
-import ProcessingCompletion from "./components/processing-completion";
+import React, { useState, FC } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import UploadHeader from './components/upload-header';
+import ImportData from './components/import-data';
+import DataClean from './components/data-clean';
+import ProcessingCompletion from './components/processing-completion';
 
 import {
   FileStatusResponse,
   FlexibleType,
   RepoItem,
   UploadFile,
-} from "@/types/resource";
-import { useUploadPage } from "./hooks/use-upload-page";
+} from '@/types/resource';
+import { useUploadPage } from './hooks/use-upload-page';
 
 const UploadPage: FC = () => {
   const [searchParams] = useSearchParams();
-  const tag = searchParams.get("tag") || "CBG-RAG";
-  const parentId = searchParams.get("parentId");
-  const repoId = searchParams.get("repoId");
+  const tag = searchParams.get('tag') || 'CBG-RAG';
+  const parentId = searchParams.get('parentId');
+  const repoId = searchParams.get('repoId');
   const [step, setStep] = useState(1);
   const [uploadList, setUploadList] = useState<UploadFile[]>([]);
   const [defaultConfig, setDefaultConfig] = useState({});
@@ -25,12 +25,12 @@ const UploadPage: FC = () => {
   const [lengthRange, setLengthRange] = useState<number[]>([]);
   const [knowledgeDetail, setKnowledge] = useState<RepoItem>({} as RepoItem);
   const [fileIds, setFileIds] = useState<(number | string)[]>([]);
-  const [importType, setImportType] = useState("text");
-  const [linkValue, setLinkValue] = useState("");
+  const [importType, setImportType] = useState('text');
+  const [linkValue, setLinkValue] = useState('');
   const [saveDisabled, setSaveDisabled] = useState(true);
-  const [sliceType, setSliceType] = useState(""); // default
+  const [sliceType, setSliceType] = useState(''); // default
   const [slicing, setSlicing] = useState(false);
-  const [embed, setEmbed] = useState("loading");
+  const [embed, setEmbed] = useState('loading');
   const [failedList, setFailedList] = useState<FileStatusResponse[]>([]);
   const [sparkFiles, setSparkFiles] = useState<UploadFile[]>([]);
   const [seperatorsOptions, setSeperatorsOptions] = useState<
@@ -60,8 +60,8 @@ const UploadPage: FC = () => {
     <div className="flex flex-col w-full h-full gap-6 px-6">
       <UploadHeader
         tag={tag}
-        parentId={parentId || ""}
-        repoId={repoId || ""}
+        parentId={parentId || ''}
+        repoId={repoId || ''}
         step={step}
         sliceType={sliceType}
         setStep={setStep}
@@ -80,8 +80,8 @@ const UploadPage: FC = () => {
           {step === 1 && (
             <ImportData
               tag={tag}
-              parentId={parentId || ""}
-              repoId={repoId || ""}
+              parentId={parentId || ''}
+              repoId={repoId || ''}
               setStep={setStep}
               uploadList={uploadList}
               setUploadList={setUploadList}
@@ -101,7 +101,7 @@ const UploadPage: FC = () => {
               uploadList={uploadList}
               setUploadList={setUploadList}
               setStep={setStep}
-              repoId={repoId || ""}
+              repoId={repoId || ''}
               lengthRange={lengthRange}
               defaultConfig={defaultConfig}
               customConfig={customConfig}
@@ -109,7 +109,7 @@ const UploadPage: FC = () => {
               setFileIds={setFileIds}
               importType={importType}
               linkValue={linkValue}
-              parentId={parentId || ""}
+              parentId={parentId || ''}
               slicing={slicing}
               setSlicing={setSlicing}
               sliceType={sliceType}
@@ -125,8 +125,8 @@ const UploadPage: FC = () => {
           {step === 3 && (
             <ProcessingCompletion
               tag={tag}
-              repoId={repoId || ""}
-              parentId={parentId || ""}
+              repoId={repoId || ''}
+              parentId={parentId || ''}
               uploadList={uploadList}
               knowledgeDetail={knowledgeDetail}
               fileIds={fileIds}

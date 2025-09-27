@@ -1,16 +1,16 @@
-import React from "react";
-import { useTranslation } from "react-i18next";
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   FlowNodeInput,
   FlowSelect,
   FlowCascader,
-} from "@/components/workflow/ui";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import { useNodeCommon } from "@/components/workflow/hooks/useNodeCommon";
-import { useVariableMemoryHandlers } from "@/components/workflow/hooks/useVariableMemoryHandlers";
+} from '@/components/workflow/ui';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import { useVariableMemoryHandlers } from '@/components/workflow/hooks/useVariableMemoryHandlers';
 
-import inputAddIcon from "@/assets/imgs/workflow/input-add-icon.png";
-import remove from "@/assets/imgs/workflow/input-remove-icon.png";
+import inputAddIcon from '@/assets/imgs/workflow/input-add-icon.png';
+import remove from '@/assets/imgs/workflow/input-remove-icon.png';
 
 const NameInput = ({
   id,
@@ -18,15 +18,15 @@ const NameInput = ({
   handleChangeParam,
   updateVariableMemoryNodeRef,
 }): React.ReactElement => {
-  const currentStore = useFlowsManager((state) => state.getCurrentStore());
-  const delayCheckNode = currentStore((state) => state.delayCheckNode);
+  const currentStore = useFlowsManager(state => state.getCurrentStore());
+  const delayCheckNode = currentStore(state => state.delayCheckNode);
 
   return (
     <FlowNodeInput
       nodeId={id}
       maxLength={30}
       value={item.name}
-      onChange={(value) =>
+      onChange={value =>
         handleChangeParam(item.id, (data, value) => (data.name = value), value)
       }
       onBlur={() => {
@@ -44,17 +44,17 @@ const TypeSelect = ({ item, handleChangeParam }): React.ReactElement => {
     <FlowSelect
       value={item?.schema?.value?.type}
       options={[
-        { label: t("workflow.nodes.common.input"), value: "literal" },
-        { label: t("workflow.nodes.common.reference"), value: "ref" },
+        { label: t('workflow.nodes.common.input'), value: 'literal' },
+        { label: t('workflow.nodes.common.reference'), value: 'ref' },
       ]}
-      onChange={(value) =>
+      onChange={value =>
         handleChangeParam(
           item?.id,
           (data, value) => {
             data.schema.value.type = value;
-            data.schema.value.content = value === "literal" ? "" : {};
+            data.schema.value.content = value === 'literal' ? '' : {};
           },
-          value,
+          value
         )
       }
     />
@@ -70,11 +70,11 @@ const LiteralInput = ({
   <FlowNodeInput
     nodeId={id}
     value={item?.schema?.value?.content}
-    onChange={(value) =>
+    onChange={value =>
       handleChangeParam(
         item?.id,
         (data, value) => (data.schema.value.content = value),
-        value,
+        value
       )
     }
     onBlur={updateVariableMemoryNodeRef}
@@ -88,8 +88,8 @@ const RefInput = ({
   handleChangeParam,
   updateVariableMemoryNodeRef,
 }): React.ReactElement => {
-  const currentStore = useFlowsManager((state) => state.getCurrentStore());
-  const checkNode = currentStore((state) => state.checkNode);
+  const currentStore = useFlowsManager(state => state.getCurrentStore());
+  const checkNode = currentStore(state => state.checkNode);
 
   return (
     <FlowCascader
@@ -102,7 +102,7 @@ const RefInput = ({
           : []
       }
       options={references}
-      handleTreeSelect={(node) =>
+      handleTreeSelect={node =>
         handleChangeParam(
           item?.id,
           (data, value) => {
@@ -118,7 +118,7 @@ const RefInput = ({
             },
             type: node.type,
             fileType: node?.fileType,
-          },
+          }
         )
       }
       onBlur={() => {
@@ -136,7 +136,7 @@ const ValueInput = ({
   handleChangeParam,
   updateVariableMemoryNodeRef,
 }): React.ReactElement => {
-  if (item?.schema?.value?.type === "literal") {
+  if (item?.schema?.value?.type === 'literal') {
     return (
       <LiteralInput
         id={id}
@@ -229,19 +229,19 @@ function index({ id, data, currentNodes }): React.ReactElement {
     data,
   });
   const { t } = useTranslation();
-  const canvasesDisabled = useFlowsManager((state) => state.canvasesDisabled);
+  const canvasesDisabled = useFlowsManager(state => state.canvasesDisabled);
 
   return (
     <div className="rounded-md px-[18px]">
       {/* <h4>输入</h4> */}
       <div className="flex items-center gap-3 text-desc">
-        <h4 className="w-1/4">{t("workflow.nodes.common.parameterName")}</h4>
-        <h4 className="w-1/4">{t("workflow.nodes.common.parameterValue")}</h4>
+        <h4 className="w-1/4">{t('workflow.nodes.common.parameterName')}</h4>
+        <h4 className="w-1/4">{t('workflow.nodes.common.parameterValue')}</h4>
         <h4 className="flex-1"></h4>
         <span className="w-5 h-5"></span>
       </div>
       <div className="flex flex-col gap-3">
-        {inputs.map((item) => (
+        {inputs.map(item => (
           <InputItem
             item={item}
             currentNodes={currentNodes}
@@ -256,7 +256,7 @@ function index({ id, data, currentNodes }): React.ReactElement {
           onClick={() => handleAddInputLine()}
         >
           <img src={inputAddIcon} className="w-3 h-3" alt="" />
-          <span>{t("workflow.nodes.variableMemoryNode.add")}</span>
+          <span>{t('workflow.nodes.variableMemoryNode.add')}</span>
         </div>
       )}
     </div>

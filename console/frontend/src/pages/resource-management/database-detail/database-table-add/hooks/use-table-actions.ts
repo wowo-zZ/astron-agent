@@ -1,8 +1,8 @@
-import { useTableAddContext } from "../context/table-add-context";
-import { useTableDataSource } from "./use-table-datasource";
-import { useTableFieldValidation } from "./use-table-field-validation";
-import { useTableSave } from "./use-table-save";
-import { DatabaseItem, TableField } from "@/types/database";
+import { useTableAddContext } from '../context/table-add-context';
+import { useTableDataSource } from './use-table-datasource';
+import { useTableFieldValidation } from './use-table-field-validation';
+import { useTableSave } from './use-table-save';
+import { DatabaseItem, TableField } from '@/types/database';
 
 interface TableActionsReturn {
   // 数据源操作
@@ -10,7 +10,7 @@ interface TableActionsReturn {
   handleInputParamsChange: (
     id: number | null,
     key: string,
-    value: string | number | boolean | string[] | null | undefined,
+    value: string | number | boolean | string[] | null | undefined
   ) => void;
   handleUpdateSheet: (data?: DatabaseItem[]) => void;
   handleDeleteField: (record: TableField) => void;
@@ -19,7 +19,7 @@ interface TableActionsReturn {
   handleValidateInput: (
     currentParam: TableField,
     key: keyof TableField,
-    errMsg: string,
+    errMsg: string
   ) => boolean;
 
   // 保存操作
@@ -35,7 +35,7 @@ interface TableActionsReturn {
  * 表格操作主Hook - 整合所有操作
  */
 export const useTableActions = (
-  handleUpdate?: () => void,
+  handleUpdate?: () => void
 ): TableActionsReturn => {
   const { actions } = useTableAddContext();
 

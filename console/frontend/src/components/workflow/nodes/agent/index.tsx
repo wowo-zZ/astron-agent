@@ -5,41 +5,41 @@ import React, {
   memo,
   useRef,
   useEffect,
-} from "react";
+} from 'react';
 import {
   FlowSelect,
   FlowTemplateEditor,
   FLowCollapse,
   FlowInput,
   FlowInputNumber,
-} from "@/components/workflow/ui";
-import { Checkbox, Tooltip } from "antd";
-import { useTranslation } from "react-i18next";
-import { v4 as uuid } from "uuid";
-import { cloneDeep } from "lodash";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import Inputs from "../components/inputs";
-import Outputs from "../components/outputs";
-import ModelSelect from "./components/model-select";
-import AddTools from "./components/add-tool";
-import ExceptionHandling from "../components/exception-handling";
-import { getToolLatestVersion } from "@/services/plugin";
-import { useNodeCommon } from "@/components/workflow/hooks/useNodeCommon";
-import { isValidURL } from "@/components/workflow/utils/reactflowUtils";
+} from '@/components/workflow/ui';
+import { Checkbox, Tooltip } from 'antd';
+import { useTranslation } from 'react-i18next';
+import { v4 as uuid } from 'uuid';
+import { cloneDeep } from 'lodash';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import Inputs from '../components/inputs';
+import Outputs from '../components/outputs';
+import ModelSelect from './components/model-select';
+import AddTools from './components/add-tool';
+import ExceptionHandling from '../components/exception-handling';
+import { getToolLatestVersion } from '@/services/plugin';
+import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import { isValidURL } from '@/components/workflow/utils/reactflowUtils';
 import {
   AgentProps,
   AgentDetailProps,
   ToolItem,
   AddressItem,
-} from "@/components/workflow/types";
-import { Icons } from "@/components/workflow/icons";
+} from '@/components/workflow/types';
+import { Icons } from '@/components/workflow/icons';
 
 export const Agent = memo(({ data }: AgentProps) => {
-  const agentStrategy = useFlowsManager((state) => state.agentStrategy);
+  const agentStrategy = useFlowsManager(state => state.agentStrategy);
 
   const agentStrategyName = useMemo(() => {
     return agentStrategy?.find(
-      (item) => item?.code === data?.nodeParam?.modelConfig?.agentStrategy,
+      item => item?.code === data?.nodeParam?.modelConfig?.agentStrategy
     )?.name;
   }, [data?.nodeParam?.modelConfig?.agentStrategy, agentStrategy]);
 
@@ -59,19 +59,19 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
   });
   const { t } = useTranslation();
   const isMounted = useRef<boolean>(false);
-  const getCurrentStore = useFlowsManager((state) => state.getCurrentStore);
+  const getCurrentStore = useFlowsManager(state => state.getCurrentStore);
   const currentStore = getCurrentStore();
-  const canvasesDisabled = useFlowsManager((state) => state.canvasesDisabled);
+  const canvasesDisabled = useFlowsManager(state => state.canvasesDisabled);
   const autoSaveCurrentFlow = useFlowsManager(
-    (state) => state.autoSaveCurrentFlow,
+    state => state.autoSaveCurrentFlow
   );
-  const agentStrategy = useFlowsManager((state) => state.agentStrategy);
+  const agentStrategy = useFlowsManager(state => state.agentStrategy);
   const setSelectAgentPromptModalInfo = useFlowsManager(
-    (state) => state.setSelectAgentPromptModalInfo,
+    state => state.setSelectAgentPromptModalInfo
   );
-  const delayCheckNode = currentStore((state) => state.delayCheckNode);
-  const setNode = currentStore((state) => state.setNode);
-  const canPublishSetNot = useFlowsManager((state) => state.canPublishSetNot);
+  const delayCheckNode = currentStore(state => state.delayCheckNode);
+  const setNode = currentStore(state => state.setNode);
+  const canPublishSetNot = useFlowsManager(state => state.canPublishSetNot);
   const textareaRef = useRef<null | HTMLDivElement>(null);
   const [addressList, setAddressList] = useState<AddressItem[]>([]);
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -90,13 +90,13 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
           data?.nodeParam?.plugin?.mcpServerUrls?.map((item: string) => ({
             id: uuid(),
             value: item,
-          })) || [],
+          })) || []
         );
       } else {
         setAddressList([
           {
             id: uuid(),
-            value: "",
+            value: '',
           },
         ]);
       }
@@ -106,7 +106,7 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
 
   const handleChangeAddress = useCallback(
     (id: string, value: string) => {
-      const currentAddress = addressList?.find((item) => item?.id === id);
+      const currentAddress = addressList?.find(item => item?.id === id);
       if (currentAddress) {
         currentAddress.value = value;
       }
@@ -114,23 +114,23 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
       handleChangeNodeParam(
         (data: unknown, value: unknown) =>
           (data.nodeParam.plugin.mcpServerUrls = value),
-        addressList?.map((item) => item?.value)?.filter((item) => item),
+        addressList?.map(item => item?.value)?.filter(item => item)
       );
     },
-    [addressList],
+    [addressList]
   );
 
   const handleRemoveAddress = useCallback(
     (id: string) => {
-      const newAddressList = addressList.filter((item) => item?.id !== id);
+      const newAddressList = addressList.filter(item => item?.id !== id);
       setAddressList([...newAddressList]);
       handleChangeNodeParam(
         (data: unknown, value: unknown) =>
           (data.nodeParam.plugin.mcpServerUrls = value),
-        newAddressList?.map((item) => item?.value)?.filter((item) => item),
+        newAddressList?.map(item => item?.value)?.filter(item => item)
       );
     },
-    [addressList],
+    [addressList]
   );
 
   const handleToolChange = useCallback(
@@ -138,19 +138,19 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
       autoSaveCurrentFlow();
       setNode(id, (old: unknown) => {
         const findTool = old.data.nodeParam?.plugin?.toolsList?.find(
-          (item) =>
+          item =>
             item.toolId === tool.toolId ||
-            item?.match?.repoIds?.[0] === tool?.toolId,
+            item?.match?.repoIds?.[0] === tool?.toolId
         );
         if (!findTool) {
-          if (tool?.type === "mcp") {
+          if (tool?.type === 'mcp') {
             old.data.nodeParam.plugin.mcpServerIds.push(tool.toolId);
-          } else if (tool?.type === "tool") {
+          } else if (tool?.type === 'tool') {
             old.data.nodeParam.plugin.tools.push({
               tool_id: tool.toolId,
-              version: tool.version || "V1.0",
+              version: tool.version || 'V1.0',
             });
-          } else if (tool?.type === "knowledge") {
+          } else if (tool?.type === 'knowledge') {
             if (old.data.nodeParam.plugin?.knowledge) {
               old.data.nodeParam.plugin.knowledge.push({
                 name: tool?.name,
@@ -159,7 +159,7 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
                 match: {
                   repoIds: [tool?.toolId],
                 },
-                repoType: tool?.tag === "AIUI-RAG2" ? 1 : 2,
+                repoType: tool?.tag === 'AIUI-RAG2' ? 1 : 2,
               });
             } else {
               old.data.nodeParam.plugin.knowledge = [
@@ -170,7 +170,7 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
                   match: {
                     repoIds: [tool?.toolId],
                   },
-                  repoType: tool?.tag === "AIUI-RAG2" ? 1 : 2,
+                  repoType: tool?.tag === 'AIUI-RAG2' ? 1 : 2,
                 },
               ];
             }
@@ -183,26 +183,26 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
             tag: tool?.tag,
           });
         } else {
-          if (findTool?.type === "mcp") {
+          if (findTool?.type === 'mcp') {
             old.data.nodeParam.plugin.mcpServerIds =
               old.data.nodeParam.plugin.mcpServerIds.filter(
-                (item) => item !== tool?.toolId,
+                item => item !== tool?.toolId
               );
-          } else if (findTool?.type === "tool") {
+          } else if (findTool?.type === 'tool') {
             old.data.nodeParam.plugin.tools =
               old.data.nodeParam.plugin.tools.filter(
-                (item) =>
-                  item !== tool?.toolId && item?.["tool_id"] !== tool?.toolId,
+                item =>
+                  item !== tool?.toolId && item?.['tool_id'] !== tool?.toolId
               );
-          } else if (findTool?.type === "knowledge") {
+          } else if (findTool?.type === 'knowledge') {
             old.data.nodeParam.plugin.knowledge =
               old.data.nodeParam.plugin.knowledge.filter(
-                (item) => item?.match?.repoIds?.[0] !== tool?.toolId,
+                item => item?.match?.repoIds?.[0] !== tool?.toolId
               );
           }
           old.data.nodeParam.plugin.toolsList =
             old.data.nodeParam.plugin.toolsList.filter(
-              (item) => item?.toolId !== tool?.toolId,
+              item => item?.toolId !== tool?.toolId
             );
         }
         return {
@@ -211,14 +211,14 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
       });
       canPublishSetNot();
     },
-    [setNode, canPublishSetNot, autoSaveCurrentFlow],
+    [setNode, canPublishSetNot, autoSaveCurrentFlow]
   );
 
   const orderToolsList = useMemo(() => {
     return [
-      ...toolsList.filter((item) => item?.type === "knowledge"),
-      ...toolsList.filter((item) => item?.type === "tool"),
-      ...toolsList.filter((item) => item?.type === "mcp"),
+      ...toolsList.filter(item => item?.type === 'knowledge'),
+      ...toolsList.filter(item => item?.type === 'tool'),
+      ...toolsList.filter(item => item?.type === 'mcp'),
     ];
   }, [toolsList]);
 
@@ -228,14 +228,14 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
         setNode(id, (old: unknown) => {
           const newTools = old?.data?.nodeParam?.plugin?.tools?.filter(
             (item: unknown) =>
-              item?.tool_id !== tool?.toolId && item !== tool?.toolId,
+              item?.tool_id !== tool?.toolId && item !== tool?.toolId
           );
           const currentTool = old?.data?.nodeParam?.plugin?.toolsList?.find(
-            (item: unknown) => item?.toolId === tool?.toolId,
+            (item: unknown) => item?.toolId === tool?.toolId
           );
           newTools.push({
             tool_id: tool?.toolId,
-            version: data?.[tool?.toolId || ""] || "V1.0",
+            version: data?.[tool?.toolId || ''] || 'V1.0',
           });
           old.data.nodeParam.plugin.tools = newTools;
           if (currentTool) {
@@ -250,7 +250,7 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
         canPublishSetNot();
       });
     },
-    [setNode, id, autoSaveCurrentFlow, canPublishSetNot],
+    [setNode, id, autoSaveCurrentFlow, canPublishSetNot]
   );
 
   return (
@@ -281,15 +281,15 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
           />
           <Inputs id={id} data={data}>
             <div className="flex-1 flex items-center justify-between text-base font-medium">
-              <div>{t("workflow.nodes.agentNode.input")}</div>
+              <div>{t('workflow.nodes.agentNode.input')}</div>
               <div
                 style={{
-                  pointerEvents: canvasesDisabled ? "none" : "auto",
+                  pointerEvents: canvasesDisabled ? 'none' : 'auto',
                 }}
               >
                 <div
                   className="flex items-center gap-1.5 text-[#999999] text-xs cursor-pointer"
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation();
                     handleChangeNodeParam((data: unknown, value: unknown) => {
                       if (data?.nodeParam?.enableChatHistoryV2) {
@@ -305,12 +305,12 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
                   <Checkbox
                     checked={nodeParam?.enableChatHistoryV2?.isEnabled || false}
                     style={{
-                      width: "16px",
-                      height: "16px",
-                      background: "#F9FAFB",
+                      width: '16px',
+                      height: '16px',
+                      background: '#F9FAFB',
                     }}
                   />
-                  <span>{t("workflow.nodes.agentNode.chatHistory")}</span>
+                  <span>{t('workflow.nodes.agentNode.chatHistory')}</span>
                 </div>
               </div>
             </div>
@@ -319,7 +319,7 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
             label={
               <div className="flex items-center justify-between">
                 <div className="text-base font-medium flex items-center">
-                  <span>{t("workflow.nodes.agentNode.agentStrategy")}</span>
+                  <span>{t('workflow.nodes.agentNode.agentStrategy')}</span>
                 </div>
               </div>
             }
@@ -327,15 +327,15 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
               <div className="rounded-md px-[18px] pb-3 pointer-events-auto">
                 <FlowSelect
                   value={data?.nodeParam?.modelConfig?.agentStrategy}
-                  onChange={(value) =>
+                  onChange={value =>
                     handleChangeNodeParam(
                       (data: unknown, value: unknown) =>
                         (data.nodeParam.modelConfig.agentStrategy = value),
-                      value,
+                      value
                     )
                   }
                 >
-                  {agentStrategy?.map((item) => (
+                  {agentStrategy?.map(item => (
                     <FlowSelect.Option key={item?.code} value={item?.code}>
                       <div className="flex items-center gap-1">
                         <div className="text-xs">{item?.name}</div>
@@ -360,9 +360,9 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
             label={
               <div className="flex items-center justify-between">
                 <div className="text-base font-medium flex items-center gap-1">
-                  <span>{t("workflow.nodes.agentNode.pluginList")}</span>
+                  <span>{t('workflow.nodes.agentNode.pluginList')}</span>
                   <Tooltip
-                    title={t("workflow.nodes.common.pluginLimitTip")}
+                    title={t('workflow.nodes.common.pluginLimitTip')}
                     overlayClassName="black-tooltip"
                   >
                     <img src={Icons.agent.questionMark} width={12} alt="" />
@@ -370,7 +370,7 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
                 </div>
                 <div
                   className="text-[#275EFF] text-xs font-medium mt-1 inline-flex items-center cursor-pointer gap-1.5 pl-6"
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation();
                     setShowModal(true);
                   }}
@@ -380,14 +380,14 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
                     className="w-3 h-3"
                     alt=""
                   />
-                  <span>{t("workflow.nodes.agentNode.addPlugin")}</span>
+                  <span>{t('workflow.nodes.agentNode.addPlugin')}</span>
                 </div>
               </div>
             }
             content={
               <div>
                 <div className="rounded-md px-[18px] pb-3 pointer-events-auto flex flex-col gap-2 max-h-[300px] overflow-auto">
-                  {orderToolsList.map((tool) => (
+                  {orderToolsList.map(tool => (
                     <div
                       key={tool.id}
                       className="py-2 px-2.5 bg-[#fff] flex items-center gap-2.5 rounded-md"
@@ -396,9 +396,9 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
                         {/* <img src={tool?.type === 'tool' ? toolIcon : (tool?.icon || mcpIcon)} className='w-7 h-7' alt="" /> */}
                         <img
                           src={
-                            tool?.type === "tool"
+                            tool?.type === 'tool'
                               ? Icons.agent.toolIcon
-                              : tool?.type === "knowledge"
+                              : tool?.type === 'knowledge'
                                 ? Icons.agent.knowledgeIcon
                                 : tool?.icon
                           }
@@ -412,18 +412,18 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
                           {tool.name}
                         </p>
                         <div className="bg-[#F0F0F0] rounded py-1 px-2 text-xs ml-4">
-                          {tool?.type === "tool"
-                            ? t("workflow.nodes.agentNode.tool")
-                            : tool?.type === "knowledge"
-                              ? t("workflow.nodes.agentNode.knowledgeBase")
-                              : t("workflow.nodes.agentNode.mcpServer")}
+                          {tool?.type === 'tool'
+                            ? t('workflow.nodes.agentNode.tool')
+                            : tool?.type === 'knowledge'
+                              ? t('workflow.nodes.agentNode.knowledgeBase')
+                              : t('workflow.nodes.agentNode.mcpServer')}
                         </div>
                         {tool?.isLatest === false && (
                           <div
                             className="bg-[#1FC92D] flex items-center gap-1 cursor-pointer ml-2"
                             style={{
-                              padding: "2px 15px 2px 2px",
-                              borderRadius: "10px",
+                              padding: '2px 15px 2px 2px',
+                              borderRadius: '10px',
                             }}
                             onClick={() => handleUpdateTool(tool as unknown)}
                           >
@@ -433,7 +433,7 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
                               alt=""
                             />
                             <span className="text-white text-xs">
-                              {t("workflow.nodes.agentNode.update")}
+                              {t('workflow.nodes.agentNode.update')}
                             </span>
                           </div>
                         )}
@@ -441,7 +441,7 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
                       {!canvasesDisabled && (
                         <div
                           className="w-[18px] h-[18px] rounded-full bg-[#F7F7F7] flex items-center justify-center cursor-pointer"
-                          onClick={(e) => {
+                          onClick={e => {
                             e.stopPropagation();
                             handleToolChange(tool as unknown);
                           }}
@@ -464,10 +464,10 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
               <div className="flex items-center justify-between">
                 <div className="text-base font-medium flex items-center gap-1">
                   <span>
-                    {t("workflow.nodes.agentNode.customMcpServerAddress")}
+                    {t('workflow.nodes.agentNode.customMcpServerAddress')}
                   </span>
                   <Tooltip
-                    title={t("workflow.nodes.common.mcpServerTip")}
+                    title={t('workflow.nodes.common.mcpServerTip')}
                     overlayClassName="black-tooltip"
                   >
                     <img src={Icons.agent.questionMark} width={12} alt="" />
@@ -477,9 +477,9 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
                   <div
                     className="text-[#275EFF] text-xs font-medium mt-1 inline-flex items-center cursor-pointer gap-1.5 pl-6"
                     onClick={() => {
-                      setAddressList((addressList) => [
+                      setAddressList(addressList => [
                         ...addressList,
-                        { id: uuid(), value: "" },
+                        { id: uuid(), value: '' },
                       ]);
                     }}
                   >
@@ -488,23 +488,23 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
                       className="w-3 h-3"
                       alt=""
                     />
-                    <span>{t("workflow.nodes.agentNode.addAddress")}</span>
+                    <span>{t('workflow.nodes.agentNode.addAddress')}</span>
                   </div>
                 )}
               </div>
             }
             content={
               <div className="rounded-md px-[18px] pb-3 pointer-events-auto flex flex-col gap-2">
-                {addressList.map((item) => (
+                {addressList.map(item => (
                   <div key={item?.id} className="flex flex-col gap-1">
                     <div className="flex items-center gap-2">
                       <FlowInput
                         className="flex-1"
                         placeholder={t(
-                          "workflow.nodes.agentNode.mcpServerConfig",
+                          'workflow.nodes.agentNode.mcpServerConfig'
                         )}
                         value={item?.value}
-                        onChange={(e) =>
+                        onChange={e =>
                           handleChangeAddress(item?.id, e.target.value)
                         }
                       />
@@ -519,7 +519,7 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
                     </div>
                     {!isValidURL(item?.value) && (
                       <div className="text-[#FF4D4F] text-xs font-medium">
-                        {t("workflow.nodes.agentNode.invalidUrl")}
+                        {t('workflow.nodes.agentNode.invalidUrl')}
                       </div>
                     )}
                   </div>
@@ -531,7 +531,7 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
             label={
               <div className="flex items-center justify-between">
                 <h4 className="text-base font-medium">
-                  {t("workflow.nodes.agentNode.prompt")}
+                  {t('workflow.nodes.agentNode.prompt')}
                 </h4>
                 {!canvasesDisabled && (
                   <div
@@ -548,7 +548,7 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
                       className="w-[14px] h-[14px]"
                       alt=""
                     />
-                    <span>{t("workflow.nodes.agentNode.promptLibrary")}</span>
+                    <span>{t('workflow.nodes.agentNode.promptLibrary')}</span>
                   </div>
                 )}
               </div>
@@ -556,63 +556,63 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
             content={
               <div className="rounded-md px-[18px] pb-3 pointer-events-auto">
                 <div className="mb-4">
-                  {t("workflow.nodes.agentNode.roleSetting")}
+                  {t('workflow.nodes.agentNode.roleSetting')}
                 </div>
                 <FlowTemplateEditor
                   ref={textareaRef}
                   data={data}
                   onBlur={() => delayCheckNode(id)}
                   value={nodeParam?.instruction?.answer}
-                  onChange={(value) =>
+                  onChange={value =>
                     handleChangeNodeParam(
                       (data: unknown, value: unknown) =>
                         (data.nodeParam.instruction.answer = value),
-                      value,
+                      value
                     )
                   }
                   placeholder={t(
-                    "workflow.nodes.agentNode.thinkingStepsPlaceholder",
+                    'workflow.nodes.agentNode.thinkingStepsPlaceholder'
                   )}
                 />
                 <div className="my-4">
-                  {t("workflow.nodes.agentNode.thinkingSteps")}
+                  {t('workflow.nodes.agentNode.thinkingSteps')}
                 </div>
                 <FlowTemplateEditor
                   ref={textareaRef}
                   data={data}
                   onBlur={() => delayCheckNode(id)}
                   value={nodeParam?.instruction?.reasoning}
-                  onChange={(value) =>
+                  onChange={value =>
                     handleChangeNodeParam(
                       (data: unknown, value: unknown) =>
                         (data.nodeParam.instruction.reasoning = value),
-                      value,
+                      value
                     )
                   }
                   placeholder={t(
-                    "workflow.nodes.agentNode.thinkingStepsPlaceholder",
+                    'workflow.nodes.agentNode.thinkingStepsPlaceholder'
                   )}
                 />
                 <div className="my-4">
                   <span className="text-[#F74E43] text-lg font-medium h-5">
                     *
                   </span>
-                  <span>{t("workflow.nodes.agentNode.userQuery")}</span>
+                  <span>{t('workflow.nodes.agentNode.userQuery')}</span>
                 </div>
                 <FlowTemplateEditor
                   ref={textareaRef}
                   data={data}
                   onBlur={() => delayCheckNode(id)}
                   value={nodeParam?.instruction?.query}
-                  onChange={(value) =>
+                  onChange={value =>
                     handleChangeNodeParam(
                       (data: unknown, value: unknown) =>
                         (data.nodeParam.instruction.query = value),
-                      value,
+                      value
                     )
                   }
                   placeholder={t(
-                    "workflow.nodes.agentNode.userPromptPlaceholder",
+                    'workflow.nodes.agentNode.userPromptPlaceholder'
                   )}
                 />
                 <p className="text-xs text-[#F74E43]">
@@ -624,11 +624,11 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
           <div className="bg-[#f8faff] px-[18px] py-2.5 rounded-md flex items-center justify-between">
             <div className="flex items-center gap-1">
               <div className="text-base font-medium">
-                {t("workflow.nodes.agentNode.maxLoopCount")}
+                {t('workflow.nodes.agentNode.maxLoopCount')}
               </div>
               <Tooltip
-                title={t("workflow.nodes.agentNode.maxLoopCountTip")}
-                getPopupContainer={(triggerNode) =>
+                title={t('workflow.nodes.agentNode.maxLoopCountTip')}
+                getPopupContainer={triggerNode =>
                   triggerNode?.parentNode as HTMLElement
                 }
               >
@@ -648,7 +648,7 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
                       (data.nodeParam.maxLoopCount = value),
                     (data.nodeParam?.maxLoopCount || 1) - 1 > 0
                       ? (data.nodeParam?.maxLoopCount || 1) - 1
-                      : 1,
+                      : 1
                   )
                 }
               >
@@ -660,11 +660,11 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
               </div>
               <FlowInputNumber
                 value={data?.nodeParam?.maxLoopCount}
-                onChange={(value) =>
+                onChange={value =>
                   handleChangeNodeParam(
                     (data: unknown, value: unknown) =>
                       (data.nodeParam.maxLoopCount = value),
-                    value,
+                    value
                   )
                 }
                 onBlur={() => {
@@ -672,7 +672,7 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
                     handleChangeNodeParam(
                       (data: unknown, value: unknown) =>
                         (data.nodeParam.maxLoopCount = value),
-                      10,
+                      10
                     );
                   }
                 }}
@@ -690,7 +690,7 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
                       (data.nodeParam.maxLoopCount = value),
                     (data.nodeParam?.maxLoopCount || 1) + 1 <= 100
                       ? (data.nodeParam?.maxLoopCount || 1) + 1
-                      : 100,
+                      : 100
                   )
                 }
               >
@@ -711,7 +711,7 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
           >
             <div className="flex-1 flex items-center justify-between">
               <div className="text-base font-medium">
-                {t("workflow.nodes.agentNode.output")}
+                {t('workflow.nodes.agentNode.output')}
               </div>
             </div>
           </Outputs>

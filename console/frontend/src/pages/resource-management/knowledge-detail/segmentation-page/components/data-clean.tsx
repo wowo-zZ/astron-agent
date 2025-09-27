@@ -1,28 +1,28 @@
-import React, { FC } from "react";
-import { Button, Input, InputNumber, Select } from "antd";
+import React, { FC } from 'react';
+import { Button, Input, InputNumber, Select } from 'antd';
 
-import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { typeList } from "@/constants";
-import { downloadExcel, generateType } from "@/utils/utils";
-import Lottie from "lottie-react";
-import GlobalMarkDown from "@/components/global-markdown";
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { typeList } from '@/constants';
+import { downloadExcel, generateType } from '@/utils/utils';
+import Lottie from 'lottie-react';
+import GlobalMarkDown from '@/components/global-markdown';
 
-import jiexiAnimation from "@/constants/lottie-react/jiexi.json";
-import setting from "@/assets/imgs/knowledge/icon_zhishi_datawashing_setting.png";
-import quote from "@/assets/imgs/knowledge/icon_zhishi_datawashing_index.png";
-import preview from "@/assets/imgs/knowledge/icon_zhishi_datawashing_preview.png";
-import check from "@/assets/imgs/knowledge/icon_dialog_check.png";
-import order from "@/assets/imgs/knowledge/icon_zhishi_order.png";
-import text from "@/assets/imgs/knowledge/icon_zhishi_text.png";
-import arrowLeft from "@/assets/imgs/knowledge/icon_zhishi_arrow-left.png";
-import arrowRight from "@/assets/imgs/knowledge/icon_zhishi_datawashing_rightarow.png";
-import arrowDown from "@/assets/imgs/knowledge/icon_zhishi_datawashing_downarow.png";
+import jiexiAnimation from '@/constants/lottie-react/jiexi.json';
+import setting from '@/assets/imgs/knowledge/icon_zhishi_datawashing_setting.png';
+import quote from '@/assets/imgs/knowledge/icon_zhishi_datawashing_index.png';
+import preview from '@/assets/imgs/knowledge/icon_zhishi_datawashing_preview.png';
+import check from '@/assets/imgs/knowledge/icon_dialog_check.png';
+import order from '@/assets/imgs/knowledge/icon_zhishi_order.png';
+import text from '@/assets/imgs/knowledge/icon_zhishi_text.png';
+import arrowLeft from '@/assets/imgs/knowledge/icon_zhishi_arrow-left.png';
+import arrowRight from '@/assets/imgs/knowledge/icon_zhishi_datawashing_rightarow.png';
+import arrowDown from '@/assets/imgs/knowledge/icon_zhishi_datawashing_downarow.png';
 
-import download from "@/assets/imgs/knowledge/icon_zhishi_download.png";
-import dataCleanWait from "@/assets/imgs/knowledge/data-clean-wait.svg";
-import { Chunk, FileInfoV2, FileSummaryResponse } from "@/types/resource";
-import { useDataClean } from "./hooks/use-data-clean";
+import download from '@/assets/imgs/knowledge/icon_zhishi_download.png';
+import dataCleanWait from '@/assets/imgs/knowledge/data-clean-wait.svg';
+import { Chunk, FileInfoV2, FileSummaryResponse } from '@/types/resource';
+import { useDataClean } from './hooks/use-data-clean';
 
 const DataClean: FC<{
   tag: string;
@@ -80,7 +80,7 @@ const DataClean: FC<{
             alt=""
           />
           <h2 className="ml-3 text-2xl font-semibold text-second">
-            {t("knowledge.dataSettings")}
+            {t('knowledge.dataSettings')}
           </h2>
           <span
             className="ml-4 flex items-center bg-[#F9FAFB] px-3.5 py-2.5 w-[400px]"
@@ -88,14 +88,14 @@ const DataClean: FC<{
           >
             <img
               src={typeList.get(
-                generateType(fileInfo?.type?.toLowerCase()) || "",
+                generateType(fileInfo?.type?.toLowerCase()) || ''
               )}
               className="w-[22px] h-[22px] flex-shrink-0"
               alt=""
             />
             <p className="flex-1 ml-2 text-overflow">{fileInfo?.name}</p>
             {failedList.length > 0 && (
-              <span className="ml-2 text-desc">{t("knowledge.parseFail")}</span>
+              <span className="ml-2 text-desc">{t('knowledge.parseFail')}</span>
             )}
           </span>
         </div>
@@ -107,7 +107,7 @@ const DataClean: FC<{
             className="h-10 px-6 ml-3"
             onClick={() => setStep(2)}
           >
-            {t("knowledge.nextStep")}
+            {t('knowledge.nextStep')}
           </Button>
           <Button
             type="primary"
@@ -116,7 +116,7 @@ const DataClean: FC<{
             loading={saveLoading}
             onClick={handleSave}
           >
-            {t("common.save")}
+            {t('common.save')}
           </Button>
         </div>
       </div>
@@ -199,25 +199,25 @@ export const SegmentationSettings: FC<{
             <img src={setting} className="w-5 h-5" alt="" />
           </div>
           <span className="ml-3 text-lg font-semibold text-second">
-            {t("knowledge.segmentSettings")}
+            {t('knowledge.segmentSettings')}
           </span>
         </div>
         <div
           className={`mt-3 border border-${
-            sliceType === "default" ? "[#009dff]" : "[#e7ecff]"
+            sliceType === 'default' ? '[#009dff]' : '[#e7ecff]'
           } rounded-lg px-6 py-4 cursor-pointer flex justify-between items-center`}
           onClick={selectDefault}
         >
           <div>
             <h2 className="text-xl font-medium text-second">
-              {t("knowledge.autoSegmentAndClean")}
+              {t('knowledge.autoSegmentAndClean')}
             </h2>
             <p className="mt-2 text-desc">
-              {t("knowledge.autoSegmentationAndCleaningDesc")}
+              {t('knowledge.autoSegmentationAndCleaningDesc')}
             </p>
           </div>
           <div className="w-5 h-5 bg-[#275EFF] rounded-full flex justify-center items-center">
-            {sliceType === "default" ? (
+            {sliceType === 'default' ? (
               <img src={check} className="w-4 h-4" alt="" />
             ) : (
               <span className="border border-[#d3d3d3] w-5 h-5 rounded-full bg-[#EFF1F9]"></span>
@@ -226,7 +226,7 @@ export const SegmentationSettings: FC<{
         </div>
         <div
           className={`mt-3 border border-${
-            sliceType === "custom" ? "[#009dff]" : "[#e7ecff]"
+            sliceType === 'custom' ? '[#009dff]' : '[#e7ecff]'
           } rounded-lg px-6 py-4 cursor-pointer`}
           onClick={() => {
             selectCustom();
@@ -235,33 +235,33 @@ export const SegmentationSettings: FC<{
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-xl font-medium text-second">
-                {t("knowledge.custom")}
+                {t('knowledge.custom')}
               </h2>
               <p className="mt-2 text-desc">
-                {t("knowledge.customDescription")}
+                {t('knowledge.customDescription')}
               </p>
             </div>
             <div className="w-5 h-5 bg-[#275EFF] rounded-full flex justify-center items-center">
-              {sliceType === "custom" ? (
+              {sliceType === 'custom' ? (
                 <img src={check} className="w-4 h-4" alt="" />
               ) : (
                 <span className="border border-[#d3d3d3] w-5 h-5 rounded-full bg-[#EFF1F9]"></span>
               )}
             </div>
           </div>
-          {sliceType === "custom" && (
+          {sliceType === 'custom' && (
             <div className="mt-5">
               <div className="text-sm font-medium text-second">
-                {t("knowledge.segmentIdentifier")}
+                {t('knowledge.segmentIdentifier')}
               </div>
               <div ref={knowledgeSelectRef} className="relative mt-1.5">
                 <Input
                   value={configDetail.seperator}
-                  onChange={(event) => {
+                  onChange={event => {
                     configDetail.seperator = event.target.value;
                     setConfigDetail({ ...configDetail });
                   }}
-                  placeholder={t("knowledge.pleaseEnter")}
+                  placeholder={t('knowledge.pleaseEnter')}
                   className="absolute top-0 left-0 z-10 global-input"
                   onFocus={() => setOpen(true)}
                   // onBlur={() => setOpen(false)}
@@ -269,21 +269,21 @@ export const SegmentationSettings: FC<{
                 <Select
                   open={open}
                   className="w-full global-select knowledge-select"
-                  placeholder={t("knowledge.enterOrSelect")}
+                  placeholder={t('knowledge.enterOrSelect')}
                   value={configDetail.seperator}
-                  onSelect={(value) => {
+                  onSelect={value => {
                     configDetail.seperator = value;
                     setConfigDetail({ ...configDetail });
                     setOpen(false);
                   }}
                   options={seperatorsOptions}
-                  fieldNames={{ label: "name", value: "symbol" }}
+                  fieldNames={{ label: 'name', value: 'symbol' }}
                 />
               </div>
               <div className="mt-6 text-sm font-medium text-second">
-                {t("knowledge.segmentLength")}{" "}
+                {t('knowledge.segmentLength')}{' '}
                 <span className="text-xs text-desc">
-                  {t("knowledge.supportSegmentLength", {
+                  {t('knowledge.supportSegmentLength', {
                     min: lengthRange[0],
                     max: lengthRange[1],
                   })}
@@ -295,13 +295,13 @@ export const SegmentationSettings: FC<{
                   max={lengthRange[1] || 0}
                   controls={false}
                   value={configDetail.min}
-                  onChange={(value) => {
+                  onChange={value => {
                     if (value) {
                       configDetail.min = value;
                       setConfigDetail({ ...configDetail });
                     }
                   }}
-                  placeholder={t("knowledge.pleaseEnter")}
+                  placeholder={t('knowledge.pleaseEnter')}
                   className="global-input w-[141px] py-1"
                 />
                 <span className="w-5 h-[1px] bg-[#d3d3d3] mx-2"></span>
@@ -309,14 +309,14 @@ export const SegmentationSettings: FC<{
                   min={lengthRange[0] || 0}
                   max={lengthRange[1] || 0}
                   value={configDetail.max}
-                  onChange={(value) => {
+                  onChange={value => {
                     if (value) {
                       configDetail.max = value;
                       setConfigDetail({ ...configDetail });
                     }
                   }}
                   controls={false}
-                  placeholder={t("knowledge.pleaseEnter")}
+                  placeholder={t('knowledge.pleaseEnter')}
                   className="global-input w-[141px] py-1"
                 />
               </div>
@@ -326,14 +326,14 @@ export const SegmentationSettings: FC<{
                   className="primary-btn w-[90px] h-10"
                   onClick={() => sliceFile()}
                 >
-                  {t("knowledge.preview")}
+                  {t('knowledge.preview')}
                 </Button>
                 <Button
                   type="text"
                   className="second-btn w-[90px] h-10"
                   onClick={() => initConfig()}
                 >
-                  {t("knowledge.reset")}
+                  {t('knowledge.reset')}
                 </Button>
               </div>
             </div>
@@ -344,7 +344,7 @@ export const SegmentationSettings: FC<{
             <img src={quote} className="w-5 h-5" alt="" />
           </div>
           <span className="ml-3 text-lg font-semibold text-second">
-            {t("knowledge.indexingMethod")}
+            {t('knowledge.indexingMethod')}
           </span>
         </div>
         {/* <div className='mt-3 text-desc'>
@@ -353,10 +353,10 @@ export const SegmentationSettings: FC<{
         <div className="mt-3 border border-[#009dff] rounded-lg px-6 py-4 flex items-center justify-between">
           <div>
             <h2 className="text-xl font-medium text-second">
-              {t("knowledge.highQuality")}
+              {t('knowledge.highQuality')}
             </h2>
             <p className="mt-2 text-desc">
-              {t("knowledge.highQualityDescription")}
+              {t('knowledge.highQualityDescription')}
             </p>
             {/* <p className='mt-2 text-desc'>
           执行嵌入预估消耗 <span className='text-[#1F2A37]' style={{ fontFamily: 'SF Pro Text, SF Pro Text-500' }}>8,665 tokens(<span className='text-[#13A10E]'>$0.0008665</span>)</span>
@@ -404,26 +404,26 @@ export const SegmentPreview: FC<{
             <img src={preview} className="w-5 h-5" alt="" />
           </div>
           <span className="ml-3 text-lg font-semibold text-second">
-            {t("knowledge.segmentPreview")}
+            {t('knowledge.segmentPreview')}
           </span>
           {sliceType && (
             <span className="ml-3 h-[20px] px-2 leading-[20px] text-[10px] text-[#FFFFFF] rounded-[4px] bg-[#3DC253]">
-              {sliceType === "default"
-                ? t("knowledge.automatic")
-                : t("knowledge.customized")}
+              {sliceType === 'default'
+                ? t('knowledge.automatic')
+                : t('knowledge.customized')}
             </span>
           )}
           {!slicing ? (
             <>
               {/* <img src={info} className='w-[18px] h-[18px] ml-1' alt="" /> */}
               <span className="text-desc text-sm mt-1.5 ml-2">
-                ({t("knowledge.violationCount", { count: violationTotal })}/
-                {t("knowledge.totalCount", { count: total })})
+                ({t('knowledge.violationCount', { count: violationTotal })}/
+                {t('knowledge.totalCount', { count: total })})
               </span>
             </>
           ) : (
             <span className="text-desc text-[12px] ml-2">
-              {t("knowledge.saveTip")}
+              {t('knowledge.saveTip')}
             </span>
           )}
         </div>
@@ -433,7 +433,7 @@ export const SegmentPreview: FC<{
             onClick={() => downloadExcel([fileId], 0, fileInfo?.name)}
           >
             <img src={download} className="w-4 h-4" alt="" />
-            <span>{t("knowledge.downloadViolationDetails")}</span>
+            <span>{t('knowledge.downloadViolationDetails')}</span>
           </div>
         )}
       </div>
@@ -446,17 +446,17 @@ export const SegmentPreview: FC<{
             <div key={index} className="rounded-xl bg-[#F6F6FD] p-4">
               <div className="flex items-center">
                 <div className="flex items-center flex-1 overflow-hidden">
-                  {["block", "review"].includes(item.auditSuggest || "") && (
+                  {['block', 'review'].includes(item.auditSuggest || '') && (
                     <div className="rounded border border-[#FFA19B] bg-[#fff5f4] px-2 py-1 text-[#E92215] text-xs mr-2.5">
-                      {t("knowledge.violation")}
+                      {t('knowledge.violation')}
                     </div>
                   )}
                   <img src={order} className="w-3 h-3" alt="" />
                   <span
                     className="text-xs text-[#F6B728]"
                     style={{
-                      fontFamily: "SF Pro Text, SF Pro Text-600",
-                      fontStyle: "italic",
+                      fontFamily: 'SF Pro Text, SF Pro Text-600',
+                      fontStyle: 'italic',
                     }}
                   >
                     00{index + 1}
@@ -466,8 +466,8 @@ export const SegmentPreview: FC<{
                       generateType(
                         (item.fileInfoV2 &&
                           item.fileInfoV2.type?.toLowerCase()) ||
-                          "",
-                      ) || "",
+                          ''
+                      ) || ''
                     )}
                     className="w-4 h-4 ml-1"
                     alt=""
@@ -488,7 +488,7 @@ export const SegmentPreview: FC<{
                 content={item.markdownContent}
                 isSending={false}
               />
-              {["block", "review"].includes(item.auditSuggest || "") && (
+              {['block', 'review'].includes(item.auditSuggest || '') && (
                 <div className="w-full flex mt-2 border-t border-[#E2E8FF] py-2 text-[#000] text-sm font-semibold gap-1 overflow-hidden">
                   <img
                     src={
@@ -496,11 +496,11 @@ export const SegmentPreview: FC<{
                     }
                     className="w-4 h-4 cursor-pointer mt-0.5"
                     alt=""
-                    onClick={(e) => {
+                    onClick={e => {
                       e.stopPropagation();
                       if (violationIds.includes(item.id)) {
                         const newViolationIds = violationIds.filter(
-                          (v) => v != item.id,
+                          v => v != item.id
                         );
                         setViolationIds([...newViolationIds]);
                       } else {
@@ -514,12 +514,12 @@ export const SegmentPreview: FC<{
                       className="max-w-[400px] text-overflow"
                       title={item.auditDetail}
                     >
-                      {t("knowledge.violationReason") + item.auditDetail}
+                      {t('knowledge.violationReason') + item.auditDetail}
                     </span>
                   )}
                   {violationIds.includes(item.id) && (
                     <span className="max-w-[400px]">
-                      {t("knowledge.violationReason") + item.auditDetail}
+                      {t('knowledge.violationReason') + item.auditDetail}
                     </span>
                   )}
                 </div>
@@ -535,12 +535,12 @@ export const SegmentPreview: FC<{
               animationData={jiexiAnimation}
               loop={true}
               autoplay={true}
-              style={{ width: "100%", height: "auto" }}
+              style={{ width: '100%', height: 'auto' }}
             />
             <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[210px] h-[94px] bg-[#fff] rounded-2xl flex flex-col items-center justify-center gap-3">
               <img src={dataCleanWait} className="w-[18px] h-[18px]" alt="" />
               <p className="text-[#8FACFF] text-sm font-medium">
-                {t("knowledge.slicing")}
+                {t('knowledge.slicing')}
               </p>
             </div>
           </div>
@@ -549,12 +549,12 @@ export const SegmentPreview: FC<{
               animationData={jiexiAnimation}
               loop={true}
               autoplay={true}
-              style={{ width: "100%", height: "auto" }}
+              style={{ width: '100%', height: 'auto' }}
             />
             <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[210px] h-[94px] bg-[#fff] rounded-2xl flex flex-col items-center justify-center gap-3">
               <img src={dataCleanWait} className="w-[18px] h-[18px]" alt="" />
               <p className="text-[#8FACFF] text-sm font-medium">
-                {t("knowledge.slicing")}
+                {t('knowledge.slicing')}
               </p>
             </div>
           </div>

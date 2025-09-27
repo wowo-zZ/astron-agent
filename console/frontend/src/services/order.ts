@@ -1,5 +1,5 @@
-import http from "../utils/http";
-import qs from "qs";
+import http from '../utils/http';
+import qs from 'qs';
 
 /** ## 获取用户权益 -- NOTE: 提供给免费用户权益*/
 export const getUserAuth = (): Promise<any> => {
@@ -31,12 +31,12 @@ export const getModelResourceUsage = (): Promise<any> => {
 
 // 获取用户当前使用的权益
 export const getUserMeta = (): Promise<any> => {
-  return http.get("/userAuth/getOrderMeta");
+  return http.get('/userAuth/getOrderMeta');
 };
 
 /** ## 获取用户当前团队的权益/套餐 */
 export const getTeamMeta = (): Promise<any> => {
-  return http.get("/userAuth/getTeamOrderMeta");
+  return http.get('/userAuth/getTeamOrderMeta');
 };
 
 type ModelUsageParams = {
@@ -52,7 +52,7 @@ export const getModelUsage = ({
   appId,
 }: ModelUsageParams): Promise<any> => {
   return http.get(
-    `/userAuth/getModelDetailByUid?page=${page}&pageSize=${pageSize}&appId=${appId}`,
+    `/userAuth/getModelDetailByUid?page=${page}&pageSize=${pageSize}&appId=${appId}`
   );
 };
 
@@ -63,21 +63,21 @@ export const getTeamModelUsage = ({
   appId,
 }: ModelUsageParams): Promise<any> => {
   return http.get(
-    `/userAuth/getModelDetailByEnterpriseId?page=${page}&pageSize=${pageSize}&appId=${appId}`,
+    `/userAuth/getModelDetailByEnterpriseId?page=${page}&pageSize=${pageSize}&appId=${appId}`
   );
 };
 
 /** ## 个人空间 获取知识库和成员用量 */
 export const getKnowledgeUsage = (): Promise<any> => {
-  return http.get("/userAuth/getDetailByUid");
+  return http.get('/userAuth/getDetailByUid');
 };
 
 /** ## 团队空间 获取知识库和成员用量 */
 export const getTeamKnowledgeUsage = (): Promise<any> => {
-  return http.get("/userAuth/getDetailByEnterpriseId");
+  return http.get('/userAuth/getDetailByEnterpriseId');
 };
 
 /** ## 获取是否为特定用户 get /user/profile/specialUser */
 export const getSpecialUser = (): Promise<any> => {
-  return http.get("/user/profile/specialUser");
+  return http.get('/user/profile/specialUser');
 };

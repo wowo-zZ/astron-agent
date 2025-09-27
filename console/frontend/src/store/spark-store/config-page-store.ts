@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
 /** 模型对比显示模式 - 枚举类型 */
 export enum ModelPkDisplayMode {
@@ -26,13 +26,13 @@ export interface ModelPkStore {
 }
 
 /** 创建提示对比状态存储 */
-export const useTipPkStore = create<TipPkStore>((set) => ({
+export const useTipPkStore = create<TipPkStore>(set => ({
   showTipPk: false,
   setShowTipPk: (showTipPk: boolean): void => set({ showTipPk }),
 }));
 
 /** 创建模型对比状态存储 */
-export const useModelPkStore = create<ModelPkStore>((set) => ({
+export const useModelPkStore = create<ModelPkStore>(set => ({
   showModelPk: ModelPkDisplayMode.NONE,
   setShowModelPk: (showModelPk: ModelPkDisplayMode): void =>
     set({ showModelPk }),

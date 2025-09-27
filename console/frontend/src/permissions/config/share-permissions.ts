@@ -4,7 +4,7 @@ import {
   ModuleType,
   OperationType,
   RolePermissionConfig,
-} from "../permission-type";
+} from '../permission-type';
 
 export const SHARE_PERMISSIONS: RolePermissionConfig[] = [
   // 共享空间 - 所有者

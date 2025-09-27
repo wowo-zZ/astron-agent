@@ -1,11 +1,11 @@
-import React, { useCallback, useState } from "react";
-import { Table, Tooltip } from "antd";
-import { useTranslation } from "react-i18next";
-import { DebugInput } from "@/types/plugin-store";
-import { TableProps } from "antd/es/table";
+import React, { useCallback, useState } from 'react';
+import { Table, Tooltip } from 'antd';
+import { useTranslation } from 'react-i18next';
+import { DebugInput } from '@/types/plugin-store';
+import { TableProps } from 'antd/es/table';
 
-import expand from "@/assets/imgs/tool-square/icon-fold.png";
-import shrink from "@/assets/imgs/tool-square/icon-shrink.png";
+import expand from '@/assets/imgs/tool-square/icon-fold.png';
+import shrink from '@/assets/imgs/tool-square/icon-shrink.png';
 
 function ToolInputParameters({
   inputParamsData,
@@ -16,12 +16,12 @@ function ToolInputParameters({
   const [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]);
 
   const handleExpand = useCallback((record: DebugInput) => {
-    setExpandedRowKeys((expandedRowKeys) => [...expandedRowKeys, record.id]);
+    setExpandedRowKeys(expandedRowKeys => [...expandedRowKeys, record.id]);
   }, []);
 
   const handleCollapse = useCallback((record: DebugInput) => {
-    setExpandedRowKeys((expandedRowKeys) =>
-      expandedRowKeys.filter((id) => id !== record.id),
+    setExpandedRowKeys(expandedRowKeys =>
+      expandedRowKeys.filter(id => id !== record.id)
     );
   }, []);
 
@@ -34,7 +34,7 @@ function ToolInputParameters({
       expanded: boolean;
       onExpand: (
         record: DebugInput,
-        e: React.MouseEvent<HTMLImageElement>,
+        e: React.MouseEvent<HTMLImageElement>
       ) => void;
       record: DebugInput;
     }) => {
@@ -43,7 +43,7 @@ function ToolInputParameters({
           <img
             src={shrink}
             className="w-4 h-4 inline-block mb-1 mr-1"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               handleCollapse(record);
             }}
@@ -52,7 +52,7 @@ function ToolInputParameters({
           <img
             src={expand}
             className="w-4 h-4 inline-block mb-1 mr-1"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               handleExpand(record);
             }}
@@ -62,30 +62,30 @@ function ToolInputParameters({
         return null;
       }
     },
-    [],
+    []
   );
 
-  const columns: TableProps<DebugInput>["columns"] = [
+  const columns: TableProps<DebugInput>['columns'] = [
     {
-      title: t("workflow.nodes.common.parameterName"),
-      dataIndex: "name",
-      key: "name",
-      width: "20%",
+      title: t('workflow.nodes.common.parameterName'),
+      dataIndex: 'name',
+      key: 'name',
+      width: '20%',
     },
     {
-      title: t("workflow.nodes.common.description"),
-      dataIndex: "description",
-      key: "description",
-      width: "25%",
+      title: t('workflow.nodes.common.description'),
+      dataIndex: 'description',
+      key: 'description',
+      width: '25%',
       render: (description: string) => (
         <Tooltip title={description}>
           <div
             className=""
             style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              maxWidth: "90%",
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              maxWidth: '90%',
             }}
           >
             {description}
@@ -94,41 +94,41 @@ function ToolInputParameters({
       ),
     },
     {
-      title: t("workflow.nodes.common.variableType"),
-      dataIndex: "type",
-      key: "type",
-      width: "10%",
+      title: t('workflow.nodes.common.variableType'),
+      dataIndex: 'type',
+      key: 'type',
+      width: '10%',
     },
     {
-      title: t("workflow.nodes.toolNode.requestMethod"),
-      dataIndex: "location",
-      key: "location",
-      width: "10%",
+      title: t('workflow.nodes.toolNode.requestMethod'),
+      dataIndex: 'location',
+      key: 'location',
+      width: '10%',
     },
     {
-      title: t("workflow.nodes.toolNode.isRequired"),
-      dataIndex: "required",
-      key: "required",
-      width: "7%",
+      title: t('workflow.nodes.toolNode.isRequired'),
+      dataIndex: 'required',
+      key: 'required',
+      width: '7%',
       render: (required: boolean) => (
         <div
           className="inline-block px-4 py-0 rounded-md font-medium"
           style={{
             // background: required ? '#d0eeda' : '#FF6262',
-            color: required ? "#275EFF" : "#F74E43",
+            color: required ? '#275EFF' : '#F74E43',
           }}
         >
           {required
-            ? t("workflow.nodes.toolNode.yes")
-            : t("workflow.nodes.toolNode.no")}
+            ? t('workflow.nodes.toolNode.yes')
+            : t('workflow.nodes.toolNode.no')}
         </div>
       ),
     },
     {
-      title: t("workflow.nodes.questionAnswerNode.defaultValue"),
-      dataIndex: "default",
-      key: "default",
-      width: "10%",
+      title: t('workflow.nodes.questionAnswerNode.defaultValue'),
+      dataIndex: 'default',
+      key: 'default',
+      width: '10%',
     },
   ];
 
@@ -145,9 +145,9 @@ function ToolInputParameters({
       rowKey={(record: DebugInput) => record?.id}
       locale={{
         emptyText: (
-          <div style={{ padding: "20px" }}>
+          <div style={{ padding: '20px' }}>
             <p className="text-[#333333]">
-              {t("workflow.nodes.toolNode.noData")}
+              {t('workflow.nodes.toolNode.noData')}
             </p>
           </div>
         ),

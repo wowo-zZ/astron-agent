@@ -1,14 +1,14 @@
-import { Base64 } from "js-base64";
+import { Base64 } from 'js-base64';
 
 let reqParams = {
   // websocket参数
   header: {
-    app_id: "3e2c8419",
+    app_id: '3e2c8419',
     status: 2,
   },
   parameter: {
     tts: {
-      vcn: "x4_lingxiaoxuan",
+      vcn: 'x4_lingxiaoxuan',
       speed: 50,
       volume: 50,
       pitch: 50,
@@ -18,34 +18,34 @@ let reqParams = {
       rhy: 0,
       scn: 0,
       audio: {
-        encoding: "lame",
+        encoding: 'lame',
         sample_rate: 16000,
         channels: 1,
         bit_depth: 16,
         // frame_size: 0
       },
       pybuf: {
-        encoding: "utf8",
-        compress: "raw",
-        format: "plain",
+        encoding: 'utf8',
+        compress: 'raw',
+        format: 'plain',
       },
     },
   },
   payload: {
     text: {
-      encoding: "utf8",
-      compress: "raw",
-      format: "plain",
+      encoding: 'utf8',
+      compress: 'raw',
+      format: 'plain',
       status: 2,
       seq: 0,
-      text: "",
+      text: '',
     },
   },
 };
 
 export default class WebscoketConnect {
   // ws需要连接的Url
-  wsUrl = "";
+  wsUrl = '';
   // 已建立的websocket 连接，用于主动控制它的消息发送，关闭等动作
   websocket = null;
   mediaSource;
@@ -53,7 +53,7 @@ export default class WebscoketConnect {
   base64Quene = [];
   lock = false;
   audioElement;
-  totalText = ""; // 传入的需要合成的整段的文本
+  totalText = ''; // 传入的需要合成的整段的文本
   params; // 需要传给引擎的参数
   eachTextCount = 25000; // 一次传300个字符
   // 构造器
@@ -70,32 +70,32 @@ export default class WebscoketConnect {
     if (!inner) {
       this.mediaSource = new MediaSource();
       this.audioElement.src = URL.createObjectURL(this.mediaSource);
-      this.mediaSource.addEventListener("sourceopen", () => {
+      this.mediaSource.addEventListener('sourceopen', () => {
         URL.revokeObjectURL(this.audioElement.src);
-        this.sourceBuffer = this.mediaSource.addSourceBuffer("audio/mpeg");
-        this.sourceBuffer.addEventListener("updateend", this.addBuffer);
+        this.sourceBuffer = this.mediaSource.addSourceBuffer('audio/mpeg');
+        this.sourceBuffer.addEventListener('updateend', this.addBuffer);
         this.audioElement.play();
       });
     }
 
     if (this.websocket) {
-      this.websocket.onopen = (event) => {
+      this.websocket.onopen = event => {
         this.params.payload.text.text = Base64.encode(
-          this.totalText.slice(0, this.eachTextCount),
+          this.totalText.slice(0, this.eachTextCount)
         );
         this.totalText = this.totalText.slice(this.eachTextCount);
         this.websocket.send(JSON.stringify(this.params));
       };
 
-      this.websocket.onmessage = (msg) => {
+      this.websocket.onmessage = msg => {
         this.add(msg);
       };
 
-      this.websocket.onclose = (event) => {
+      this.websocket.onclose = event => {
         this.end();
       };
 
-      this.websocket.onerror = (event) => {
+      this.websocket.onerror = event => {
         // 关闭连接
         this.closeWebsocketConnect();
       };
@@ -113,7 +113,7 @@ export default class WebscoketConnect {
     // if (!this.base64Quene.length) return;
     if (this.sourceBuffer.updating) return;
     this.lock = true;
-    let content = "";
+    let content = '';
     while (this.base64Quene.length > 0) {
       content = this.base64Quene.shift();
       if (content) {
@@ -129,9 +129,9 @@ export default class WebscoketConnect {
   }
 
   add(msg) {
-    msg = msg.data.replace(" ", "");
-    if (typeof msg != "object") {
-      msg = msg.replace(/\ufeff/g, ""); //重点
+    msg = msg.data.replace(' ', '');
+    if (typeof msg != 'object') {
+      msg = msg.replace(/\ufeff/g, ''); //重点
       var jj = JSON.parse(msg);
       msg = jj;
     }
@@ -156,7 +156,7 @@ export default class WebscoketConnect {
         // 上个结束之后，保证base64Quene清空的情况下，继续建立连接往里面放东西
         this.establishConnect(this.params, this.totalText, true);
       } else {
-        if (this.mediaSource.readyState === "open") {
+        if (this.mediaSource.readyState === 'open') {
           this.mediaSource.endOfStream();
         }
       }
@@ -164,7 +164,7 @@ export default class WebscoketConnect {
     }, 0);
   }
 
-  Base64toArrayBuffer = async (base64Data) => {
+  Base64toArrayBuffer = async base64Data => {
     const rawData = Base64.atob(base64Data);
     const outputArray = new Uint8Array(rawData.length);
 

@@ -5,14 +5,14 @@ import {
   memo,
   useContext,
   useCallback,
-} from "react";
-import { useLocation } from "react-router-dom";
-import { message } from "antd";
-import localforage from "localforage";
-import { fetchEventSource } from "@microsoft/fetch-event-source";
-import { Base64 } from "js-base64";
-import { useSparkCommonStore } from "@/store/spark-store/spark-common";
-import { useLocaleStore } from "@/store/spark-store/locale-store";
+} from 'react';
+import { useLocation } from 'react-router-dom';
+import { message } from 'antd';
+import localforage from 'localforage';
+import { fetchEventSource } from '@microsoft/fetch-event-source';
+import { Base64 } from 'js-base64';
+import { useSparkCommonStore } from '@/store/spark-store/spark-common';
+import { useLocaleStore } from '@/store/spark-store/locale-store';
 import {
   // jumpTologin,
   transformMultiModal,
@@ -20,31 +20,31 @@ import {
   getBase64DecodeStr,
   transformMathThinkData,
   transformDeepthinkData,
-} from "@/utils/spark-utils";
-import { handleOtherProps } from "@/utils/chat";
-import eventBus from "@/utils/event-bus";
-import { getLanguageCode } from "@/utils/http";
+} from '@/utils/spark-utils';
+import { handleOtherProps } from '@/utils/chat';
+import eventBus from '@/utils/event-bus';
+import { getLanguageCode } from '@/utils/http';
 // import CodeWin from '@/components/code-win';
-import { installPlugin } from "@/services/plugin";
-import { DeleteIcon } from "@/components/svg-icons";
-import { PluginContext } from "@/components/plugin/PluginContext";
-import { localeConfig } from "@/locales/localeConfig";
+import { installPlugin } from '@/services/plugin';
+import { DeleteIcon } from '@/components/svg-icons';
+import { PluginContext } from '@/components/plugin/PluginContext';
+import { localeConfig } from '@/locales/localeConfig';
 // import MultiModeModal from '../muti-modal-components/multiModeModal';
 // import MultiModeCpn from '../muti-modal-components/multi_mode_cpn';
 // import $ from 'jquery'; // TODO: 之后放开
 // import ViewBigimg from 'view-bigimg'; // TODO: unadapted
 // import MathThinkProgress from '../MathThinkProgress';
 // import DeepThinkProgress from '../DeepThinkProgress';
-import { useGetState } from "ahooks";
-import { useTranslation } from "react-i18next";
+import { useGetState } from 'ahooks';
+import { useTranslation } from 'react-i18next';
 
-import userImg from "@/assets/svgs/user-logo.svg";
-import errorIcon from "@/assets/imgs/sparkImg/errorIcon.svg";
+import userImg from '@/assets/svgs/user-logo.svg';
+import errorIcon from '@/assets/imgs/sparkImg/errorIcon.svg';
 
-import styles from "./index.module.scss";
+import styles from './index.module.scss';
 
 // const viewer = new ViewBigimg();
-const bug = getQueryString("bug");
+const bug = getQueryString('bug');
 
 const PromptTry = ({
   newModel,
@@ -78,42 +78,42 @@ const PromptTry = ({
   choosedAlltool?: any;
 }) => {
   const { t } = useTranslation();
-  const [askValue, setAskValue] = useState("");
+  const [askValue, setAskValue] = useState('');
   const [deepThinkPeriod, setDeepThinkPeriod, getDeepThinkPeriod] =
     useGetState<any>([]);
 
   const [openCurrentMath, setOpenCurrentMath] = useState(false); // 是否打开当前解题（生成中的）
   const [processVisible, setProcessVisible] = useState(false); // 解题过程显示
   const [currentMathThink, setCurrentMathThink] = useState<any>({
-    current_title: "",
-    text: "",
+    current_title: '',
+    text: '',
     thinking_cost: 0,
   }); // sse实时返回时，数学解题思路的内容
   const [promptTextNow, setPromptTextNow] = useState(promptText);
 
-  const userAvatar = useSparkCommonStore((state) => state.avatar);
-  const botMode = useSparkCommonStore((state) => state.isBotMode); // 是否智能体模式
-  const answerLoading = useSparkCommonStore((state) => state.answerLoad);
-  const setAnswerLoading = useSparkCommonStore((state) => state.setAnswerLoad);
-  const answerCompleted = useSparkCommonStore((state) => state.answerCompleted);
+  const userAvatar = useSparkCommonStore(state => state.avatar);
+  const botMode = useSparkCommonStore(state => state.isBotMode); // 是否智能体模式
+  const answerLoading = useSparkCommonStore(state => state.answerLoad);
+  const setAnswerLoading = useSparkCommonStore(state => state.setAnswerLoad);
+  const answerCompleted = useSparkCommonStore(state => state.answerCompleted);
   const setAnswerCompleted = useSparkCommonStore(
-    (state) => state.setAnswerCompleted,
+    state => state.setAnswerCompleted
   );
   const { locale: localeNow } = useLocaleStore();
 
   const location = useLocation();
-  const isPlugin = location?.pathname?.startsWith("/plugin");
+  const isPlugin = location?.pathname?.startsWith('/plugin');
 
   /* state */
-  const [answer, setAnswer]: any = useState("");
-  const [error, setError]: any = useState("");
+  const [answer, setAnswer]: any = useState('');
+  const [error, setError]: any = useState('');
   const [mergedList, setMergedList]: any = useState([]); // 对话列表
   const {
     data: { infoId, flag, status },
   } = useContext(PluginContext);
   const [multiModeModalInfo, setMultiModeModalInfo] = useState<any>({
     open: false,
-    info: { type: "vm-live-modal", modalInfo: {} },
+    info: { type: 'vm-live-modal', modalInfo: {} },
   }); // 多模态弹窗信息
 
   /* ref */
@@ -125,23 +125,23 @@ const PromptTry = ({
   const $ask: any = useRef(null);
   const $inputConfirmFlag: any = useRef(true); // 是否完成输入
   const $godownFlag: any = useRef(false); // 持续下拉flag
-  const $temRandom: any = useRef(""); // 时间戳随机数
+  const $temRandom: any = useRef(''); // 时间戳随机数
 
   const removeAll = () => {
     setMergedList([]);
     setProcessVisible(false);
     setCurrentMathThink({
-      current_title: "",
-      text: "",
+      current_title: '',
+      text: '',
       thinking_cost: 0,
     });
     setDeepThinkPeriod([]);
-    setError("");
+    setError('');
   };
 
-  const enterFn = (e) => {
+  const enterFn = e => {
     // ctrl+enter执行换行
-    if (e.ctrlKey && e.code === "Enter") {
+    if (e.ctrlKey && e.code === 'Enter') {
       e.cancelBubble = true; //ie阻止冒泡行为
       e.stopPropagation(); //Firefox阻止冒泡行为
       e.preventDefault(); //取消事件的默认动作*换行
@@ -151,7 +151,7 @@ const PromptTry = ({
     if (
       !e.shiftKey &&
       !e.ctrlKey &&
-      e.code === "Enter" &&
+      e.code === 'Enter' &&
       $inputConfirmFlag.current
     ) {
       e.cancelBubble = true; //ie阻止冒泡行为
@@ -163,25 +163,25 @@ const PromptTry = ({
   };
 
   useEffect(() => {
-    eventBus.on("handleSendBtn", handleSendBtnClick);
+    eventBus.on('handleSendBtn', handleSendBtnClick);
 
     return () => {
-      eventBus.off("handleSendBtn", handleSendBtnClick);
+      eventBus.off('handleSendBtn', handleSendBtnClick);
     };
   }, []);
 
   useEffect(() => {
-    eventBus.on("eventRemoveAll", removeAll);
+    eventBus.on('eventRemoveAll', removeAll);
 
     return () => {
-      eventBus.off("eventRemoveAll", removeAll);
+      eventBus.off('eventRemoveAll', removeAll);
     };
   }, []);
 
   useEffect(() => {
-    eventBus.on("evenEnterFn", (e) => enterFn(e));
+    eventBus.on('evenEnterFn', e => enterFn(e));
     return () => {
-      eventBus.off("eventEnterFn", enterFn);
+      eventBus.off('eventEnterFn', enterFn);
     };
   }, []);
 
@@ -192,12 +192,12 @@ const PromptTry = ({
   }, [questionTip]);
 
   useEffect(() => {
-    const d = document.querySelector("#watermark-wrapper");
+    const d = document.querySelector('#watermark-wrapper');
     if (d) {
       const child: any = d.firstChild;
       if (child) {
-        child.style.width = "100%";
-        child.style.height = "100%";
+        child.style.width = '100%';
+        child.style.height = '100%';
       }
     }
   }, []);
@@ -217,15 +217,15 @@ const PromptTry = ({
   // plugin: 用户获取插件的访问令牌
   const installPluginFn = async () => {
     try {
-      await localforage.setItem("infoId", String(infoId));
-      const _url = await installPlugin(infoId as number, "/plugin/create");
+      await localforage.setItem('infoId', String(infoId));
+      const _url = await installPlugin(infoId as number, '/plugin/create');
       if (_url) {
         message.warning(
-          t("configBase.promptTry.pluginNeedUserAuthorizationInfo"),
+          t('configBase.promptTry.pluginNeedUserAuthorizationInfo'),
           0.5,
           () => {
             window.location.href = _url;
-          },
+          }
         );
       }
     } catch (e) {
@@ -236,8 +236,8 @@ const PromptTry = ({
   // 当一页回答太长，从无滚动条到有滚动条时，滚动一次到最底端
   const onAnswerLoadingGoDown = () => {
     if (!$godownFlag.current) return;
-    const outWrap = document.getElementById("out-wrap");
-    const d = document.getElementById("chat-content-wrapper");
+    const outWrap = document.getElementById('out-wrap');
+    const d = document.getElementById('chat-content-wrapper');
     if (
       d &&
       outWrap &&
@@ -251,34 +251,34 @@ const PromptTry = ({
 
   const scrollDialogToBottom = () => {
     setTimeout(() => {
-      $bottomRef && $bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+      $bottomRef && $bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
     });
   };
 
   // 点击发送按钮
   const handleSendBtnClick = () => {
     setCurrentMathThink({
-      current_title: "",
-      text: "",
+      current_title: '',
+      text: '',
       thinking_cost: 0,
     });
 
     if (!answerCompleted) {
-      message.warning(t("configBase.promptTry.answerPleaseTryAgainLater"));
+      message.warning(t('configBase.promptTry.answerPleaseTryAgainLater'));
       return;
     }
 
     const question: string = $ask.current?.value;
     if (!questionTip) {
-      if (!question || question.trim() === "") {
-        message.info(t("configBase.promptTry.pleaseEnterQuestion"));
+      if (!question || question.trim() === '') {
+        message.info(t('configBase.promptTry.pleaseEnterQuestion'));
         return;
       }
-      $ask.current.value = "";
+      $ask.current.value = '';
     }
 
     newQuestion(questionTip ? questionTip : question, mergedList);
-    setAskValue("");
+    setAskValue('');
   };
 
   // mergedList中新增一个问题, 并且调接口获取答案
@@ -286,7 +286,7 @@ const PromptTry = ({
     const list = [...originMergedList];
     list.unshift({
       message: str,
-      origin: "req",
+      origin: 'req',
       id: `${tempSid.current}`,
     });
     tempSid.current += 1;
@@ -304,13 +304,13 @@ const PromptTry = ({
     multiModalData?: any,
     type?: any,
     otherProps?: any, // 接下来往newResp内传参，请向otherProps内扩展
-    content?: any,
+    content?: any
   ) => {
     const { reasoning, reasoningElapsedSecs } = otherProps ?? {};
     const list = [...originMergedList];
     const tempItem: any = {
       message: str,
-      origin: "resp",
+      origin: 'resp',
       sid,
       reasoning,
       reasoningElapsedSecs,
@@ -319,16 +319,16 @@ const PromptTry = ({
     };
     // 此处插入实时获取的多媒体数据
     switch (multiModalData?.type) {
-      case "multi_video": // 直播的虚拟人视频
+      case 'multi_video': // 直播的虚拟人视频
         tempItem.url = multiModalData.data;
-        tempItem.type = "multi_video";
+        tempItem.type = 'multi_video';
         tempItem.message = `\`\`\`multi_video\n${JSON.stringify(
-          multiModalData.data,
+          multiModalData.data
         )}\n\`\`\``;
         break;
-      case "multi_image_url":
+      case 'multi_image_url':
         tempItem.url = multiModalData.data;
-        tempItem.type = "multi_image_url";
+        tempItem.type = 'multi_image_url';
         break;
       default:
         break;
@@ -336,8 +336,8 @@ const PromptTry = ({
     list.unshift(tempItem);
     setMergedList(list);
     scrollDialogToBottom();
-    if (type === "o1") {
-      setOpenCurrentMath((val) => {
+    if (type === 'o1') {
+      setOpenCurrentMath(val => {
         tempItem.mathProcessOpen = val;
         return val;
       });
@@ -351,50 +351,50 @@ const PromptTry = ({
   // 获取答案
   const getAnswer = (originMergedList: any, question: any, newchatId?: any) => {
     const esURL = isPlugin
-      ? "/xingchen-api/u/chat_message/plugin-debug"
-      : "/xingchen-api/u/chat_message/bot-debug";
+      ? '/xingchen-api/u/chat_message/plugin-debug'
+      : '/xingchen-api/u/chat_message/bot-debug';
     const form = new FormData();
     if (model) {
-      form.append("model", newModel ? newModel : model);
+      form.append('model', newModel ? newModel : model);
     } else {
-      form.append("model", newModel ? newModel : "spark");
+      form.append('model', newModel ? newModel : 'spark');
     }
 
-    form.append("text", question);
+    form.append('text', question);
     if (!isPlugin) {
       const datasetList: string[] = [];
       (selectSource || []).forEach((item: any) => {
         datasetList.push(item.id);
       });
-      if (datasetList.join(",") !== "") {
-        if (selectSource[0]?.tag == "SparkDesk-RAG") {
-          form.append("datasetList", JSON.stringify(datasetList.join(",")));
+      if (datasetList.join(',') !== '') {
+        if (selectSource[0]?.tag == 'SparkDesk-RAG') {
+          form.append('datasetList', JSON.stringify(datasetList.join(',')));
         } else {
-          form.append("maasDatasetList", JSON.stringify(datasetList.join(",")));
+          form.append('maasDatasetList', JSON.stringify(datasetList.join(',')));
         }
       }
     }
     if (isPlugin && infoId) {
-      form.append("infoId", String(infoId));
+      form.append('infoId', String(infoId));
     } else {
       const time = String(+new Date());
       const fd = time.substring(time.length - 6);
       $temRandom.current = fd;
-      form.append("need", `${supportContext}`);
+      form.append('need', `${supportContext}`);
       const arr = mergedList?.reverse()?.map((item: any) => item.message);
-      if (supportContext === 1) form.append("arr", arr ?? []);
+      if (supportContext === 1) form.append('arr', arr ?? []);
     }
     if (choosedAlltool) {
       form.append(
-        "openedTool",
+        'openedTool',
         Object.keys(choosedAlltool)
           .filter((key: any) => choosedAlltool[key])
-          .join(","),
+          .join(',')
       );
     }
     setAnswerLoading(true);
     setAnswerCompleted(false);
-    fetchEs(esURL, form, originMergedList, "");
+    fetchEs(esURL, form, originMergedList, '');
   };
 
   // 调用sse接口
@@ -403,20 +403,20 @@ const PromptTry = ({
     url: string,
     form: any,
     originMergedList: any[],
-    token: string, // 删除 validateResult?: any
+    token: string // 删除 validateResult?: any
   ) => {
     setAnswerLoading(true);
     setAnswerCompleted(false);
     $godownFlag.current = true;
-    let ans = "";
+    let ans = '';
     setAnswer(ans);
-    setError("");
+    setError('');
     let otherProps: any = {};
     let ansType: any = null;
     let ansContent: any = null;
-    let err = "";
+    let err = '';
     let answerAllGet = false;
-    let sid = "";
+    let sid = '';
     // 删除gee变量
     // let gee = '';
     let multiModalData: any = null;
@@ -426,20 +426,20 @@ const PromptTry = ({
     // 删除极验相关的头部配置
     const headerConfig: any = {};
     if (!isPlugin) {
-      headerConfig.clientType = "11";
+      headerConfig.clientType = '11';
     }
 
     // 删除GtToken添加
     // form.append('GtToken', token);
-    form.append("prompt", newPrompt ? newPrompt : prompt);
+    form.append('prompt', newPrompt ? newPrompt : prompt);
 
     scrollDialogToBottom();
     fetchEventSource(url, {
-      method: "POST",
+      method: 'POST',
       body: form,
       headers: {
         ...headerConfig,
-        "Lang-Code": getLanguageCode(),
+        'Lang-Code': getLanguageCode(),
       },
       openWhenHidden: true,
       signal: controller.signal,
@@ -455,27 +455,27 @@ const PromptTry = ({
         const deCodedData = getBase64DecodeStr(event.data);
         onAnswerLoadingGoDown();
         // 未出错，正常结束
-        if (event.data === "<end>" && !err) {
+        if (event.data === '<end>' && !err) {
           setAnswerCompleted(true);
           $godownFlag.current = false;
-          $answerRef.current = "";
+          $answerRef.current = '';
           answerAllGet = true;
           return;
         }
         // 出错了、禁用对话
-        else if (event.data === "<end>" && err) {
-          const errData = JSON.parse(err.replace(/^\[.*?\]/, ""));
+        else if (event.data === '<end>' && err) {
+          const errData = JSON.parse(err.replace(/^\[.*?\]/, ''));
           setError(errData?.descr);
           setAnswerCompleted(true);
           $godownFlag.current = false;
-          $answerRef.current = "";
+          $answerRef.current = '';
           newResp(errData?.descr, `${tempSid.current}`, originMergedList);
-          setError("");
+          setError('');
           tempSid.current += 1;
           if (errData?.key === 20002) {
             window.onbeforeunload = null;
           }
-          controller.abort(t("configBase.promptTry.end"));
+          controller.abort(t('configBase.promptTry.end'));
           return;
         }
         // 删除极验错误处理
@@ -501,36 +501,36 @@ const PromptTry = ({
         //   return;
         // }
 
-        if (event.data === "[belongerr]") {
+        if (event.data === '[belongerr]') {
           // chatid 不属于 当前账号, 这次chat接口只会返回这个头
           window.location.reload();
         }
         // 识别到就封
-        if (event.data === "<kx>") {
-          console.log("触发了快修");
+        if (event.data === '<kx>') {
+          console.log('触发了快修');
           return;
         }
-        if (event.data.startsWith("[needAuthError]")) {
+        if (event.data.startsWith('[needAuthError]')) {
           installPluginFn();
           err += event.data;
-          console.log("插件没权限");
+          console.log('插件没权限');
           return;
         }
         // 模型返回溯源结果
         if (
-          !event.data?.endsWith("<sid>") &&
-          deCodedData?.startsWith("```searchSource")
+          !event.data?.endsWith('<sid>') &&
+          deCodedData?.startsWith('```searchSource')
         ) {
           return;
         }
         if (
-          !event.data?.endsWith("<sid>") &&
-          (deCodedData?.startsWith("<math_thinking") ||
-            deCodedData?.startsWith("<thinking"))
+          !event.data?.endsWith('<sid>') &&
+          (deCodedData?.startsWith('<math_thinking') ||
+            deCodedData?.startsWith('<thinking'))
         ) {
           ansContent = transformMathThinkData(deCodedData, ansContent);
-          ansType = "o1";
-          setProcessVisible((visible) => {
+          ansType = 'o1';
+          setProcessVisible(visible => {
             setOpenCurrentMath(visible);
             return visible;
           });
@@ -538,24 +538,24 @@ const PromptTry = ({
           return;
         }
         if (
-          !event.data?.endsWith("<sid>") &&
-          deCodedData?.startsWith("<deep_x1>")
+          !event.data?.endsWith('<sid>') &&
+          deCodedData?.startsWith('<deep_x1>')
         ) {
           setDeepThinkPeriod(
             transformDeepthinkData(
               { setV2Trace: () => null },
               deCodedData,
-              deepThinkPeriod,
-            ),
+              deepThinkPeriod
+            )
           );
           return;
         }
-        if (event.data.startsWith("[pluginError]")) {
+        if (event.data.startsWith('[pluginError]')) {
           err += event.data;
           return;
         }
         // 多媒体流程
-        if (Base64.decode(event.data)?.startsWith("```multi")) {
+        if (Base64.decode(event.data)?.startsWith('```multi')) {
           if (!multiModalData)
             multiModalData = transformMultiModal(event.data) || null;
           return;
@@ -564,7 +564,7 @@ const PromptTry = ({
         if (!err) {
           // 删除 && !gee
           if (answerAllGet) {
-            sid = event.data.split("<sid>")[0];
+            sid = event.data.split('<sid>')[0];
             otherProps = handleOtherProps(otherProps, ansContent, ansType);
             newResp(
               ans,
@@ -573,9 +573,9 @@ const PromptTry = ({
               multiModalData,
               ansType,
               otherProps,
-              ansContent,
+              ansContent
             );
-            controller.abort(t("configBase.promptTry.end"));
+            controller.abort(t('configBase.promptTry.end'));
             return;
           }
           ans = `${ans}${Base64.decode(event.data)}`;
@@ -590,13 +590,13 @@ const PromptTry = ({
         }
       },
       onerror(err) {
-        console.warn("esError", err);
+        console.warn('esError', err);
         setAnswerLoading(false);
         setAnswerCompleted(true);
         $godownFlag.current = false;
-        setAnswer("");
+        setAnswer('');
         console.error(err);
-        setError(t("configBase.promptTry.networkError"));
+        setError(t('configBase.promptTry.networkError'));
         throw err;
       },
     }).catch(() => {});
@@ -608,11 +608,11 @@ const PromptTry = ({
     setAnswerCompleted(true);
     setAnswerLoading(false);
     $godownFlag.current = false;
-    $answerRef.current = "";
+    $answerRef.current = '';
     const list = [...mergedList];
     list.unshift({
       message: answer,
-      origin: "resp",
+      origin: 'resp',
       sid: `${tempSid.current}`,
       reasoning: currentMathThink.text,
       reasoningElapsedSecs: currentMathThink.thinking_cost,
@@ -629,15 +629,15 @@ const PromptTry = ({
   };
 
   const handleCodeWinClick = useCallback((event: any) => {
-    const srcValue = event.target.getAttribute("src");
+    const srcValue = event.target.getAttribute('src');
     const tagName = event.target.nodeName.toLowerCase();
-    if (tagName === "img" && srcValue && bug === "s") {
+    if (tagName === 'img' && srcValue && bug === 's') {
       // viewer.show(srcValue);
     }
     const _className = event.target.className;
     if (
-      ["pr-icon", "pr-name", "pr-contro-icon", "pr-contro-icon open"].includes(
-        _className,
+      ['pr-icon', 'pr-name', 'pr-contro-icon', 'pr-contro-icon open'].includes(
+        _className
       )
     ) {
       // const wrapperDom = $(event?.target).closest('.wrapper');
@@ -674,19 +674,19 @@ const PromptTry = ({
             <div className={styles.pr_title}>
               {status !== 0
                 ? t(
-                    "configBase.promptTry.youHaveNotUploadedDescriptionFileOrInterfaceDocument",
+                    'configBase.promptTry.youHaveNotUploadedDescriptionFileOrInterfaceDocument'
                   )
                 : t(
-                    "configBase.promptTry.youUploadedInterfaceDocumentButItHasNotBeenVerified",
+                    'configBase.promptTry.youUploadedInterfaceDocumentButItHasNotBeenVerified'
                   )}
             </div>
             <div className={styles.pr_subtle}>
               {status !== 0
                 ? t(
-                    "configBase.promptTry.pleaseUploadDescriptionFileAndInterfaceDocumentAndVerify",
+                    'configBase.promptTry.pleaseUploadDescriptionFileAndInterfaceDocumentAndVerify'
                   )
                 : t(
-                    "configBase.promptTry.pleaseUploadInterfaceDocumentAndVerify",
+                    'configBase.promptTry.pleaseUploadInterfaceDocumentAndVerify'
                   )}
             </div>
           </div>
@@ -696,7 +696,7 @@ const PromptTry = ({
           {!answerCompleted && !answerLoading && !error && (
             <div className={styles.stopBtn}>
               <div className={styles.stopSpan} onClick={stopAnswer}>
-                <div>{t("configBase.promptTry.stopOutput")}</div>
+                <div>{t('configBase.promptTry.stopOutput')}</div>
               </div>
             </div>
           )}
@@ -710,17 +710,17 @@ const PromptTry = ({
               <div
                 className={styles.content_gpt}
                 style={{
-                  padding: answerLoading ? "8px 30px 8px 16px" : "",
-                  minWidth: answerLoading ? "0" : "260px",
+                  padding: answerLoading ? '8px 30px 8px 16px' : '',
+                  minWidth: answerLoading ? '0' : '260px',
                 }}
               >
                 {answerLoading ||
-                (model == "xdeepseekr1" ? !currentMathThink.text : false) ? (
+                (model == 'xdeepseekr1' ? !currentMathThink.text : false) ? (
                   <span className={styles.ans_text_tip}>
                     <div className={styles.loading}>
                       <div className={styles.loading_inner} />
                     </div>
-                    {t("configBase.promptTry.answerInProgress")}
+                    {t('configBase.promptTry.answerInProgress')}
                   </span>
                 ) : (
                   <>
@@ -776,16 +776,16 @@ const PromptTry = ({
               return (
                 <div
                   className={styles.chat_content}
-                  key={`${item?.sid || "si"}-${item?.id || "i"}${item?.uuid} `}
+                  key={`${item?.sid || 'si'}-${item?.id || 'i'}${item?.uuid} `}
                 >
                   <img
                     className={
-                      item?.origin === "req" && userAvatar
+                      item?.origin === 'req' && userAvatar
                         ? styles.avatorImage
                         : styles.user_image
                     }
                     src={
-                      item?.origin === "req"
+                      item?.origin === 'req'
                         ? userAvatar || userImg
                         : coverUrl
                           ? coverUrl
@@ -793,17 +793,17 @@ const PromptTry = ({
                     }
                     alt=""
                   />
-                  {item?.origin === "req" ? (
+                  {item?.origin === 'req' ? (
                     <div className={styles.content_user}>{item?.message}</div>
                   ) : (
                     <div className={styles.content_gpt}>
                       {/* <DeepThinkProgress answerItem={item} />
                       <MathThinkProgress answerItem={item} /> */}
                       {![
-                        "video",
-                        "multi_video",
-                        "multi_image_url",
-                        "multi_video_edited",
+                        'video',
+                        'multi_video',
+                        'multi_image_url',
+                        'multi_video_edited',
                       ].includes(item.type) && (
                         <>
                           {/* <CodeWin
@@ -843,12 +843,12 @@ const PromptTry = ({
                   <div className={styles.nameBox}>
                     <h2 className={styles.name}>
                       {baseinfo?.botName ||
-                        t("configBase.promptTry.hereIsTheAgentName")}
+                        t('configBase.promptTry.hereIsTheAgentName')}
                     </h2>
                   </div>
                   <div className={styles.desc}>
                     {baseinfo?.botDesc ||
-                      t("configBase.promptTry.hereIsTheAgentIntroduction")}
+                      t('configBase.promptTry.hereIsTheAgentIntroduction')}
                   </div>
                 </div>
               </div>
@@ -866,7 +866,7 @@ const PromptTry = ({
                             handleSendBtnClick();
                           }}
                         >
-                          {ex.length > 15 ? ex.slice(0, 15) + "..." : ex}
+                          {ex.length > 15 ? ex.slice(0, 15) + '...' : ex}
                         </div>
                       ) : null;
                     })}
@@ -887,9 +887,9 @@ const PromptTry = ({
               }}
             >
               <DeleteIcon
-                style={{ pointerEvents: "none", marginRight: "6px" }}
+                style={{ pointerEvents: 'none', marginRight: '6px' }}
               />
-              {t("configBase.promptTry.clearHistory")}
+              {t('configBase.promptTry.clearHistory')}
             </div>
           )}
           <textarea
@@ -898,7 +898,7 @@ const PromptTry = ({
             onKeyDown={(e: any) => {
               enterFn(e);
             }}
-            onChange={(e) => {
+            onChange={e => {
               setAskValue(e.target.value);
             }}
             onCompositionStart={() => {
@@ -911,14 +911,14 @@ const PromptTry = ({
           <div
             className={styles.send}
             style={{
-              background: askValue ? "#257eff" : "#8aa5e6",
+              background: askValue ? '#257eff' : '#8aa5e6',
               opacity: $ask.current?.value ? 1 : 0.7,
             }}
             onClick={() => {
               handleSendBtnClick();
             }}
           >
-            {t("configBase.promptTry.send")}
+            {t('configBase.promptTry.send')}
           </div>
         </div>
       )}

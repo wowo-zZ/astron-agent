@@ -1,25 +1,25 @@
-import { useState, useEffect, JSX } from "react";
-import { useTranslation } from "react-i18next";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect, JSX } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const tabs = [
   {
-    key: "plugin",
-    path: "/resource/plugin",
-    iconClass: "plugin-icon",
-    title: "common.header.plugin",
+    key: 'plugin',
+    path: '/resource/plugin',
+    iconClass: 'plugin-icon',
+    title: 'common.header.plugin',
   },
   {
-    key: "knowledge",
-    path: "/resource/knowledge",
-    iconClass: "knowledge-icon",
-    title: "common.header.knowledge",
+    key: 'knowledge',
+    path: '/resource/knowledge',
+    iconClass: 'knowledge-icon',
+    title: 'common.header.knowledge',
   },
   {
-    key: "database",
-    path: "/resource/database",
-    iconClass: "database-icon",
-    title: "common.header.database",
+    key: 'database',
+    path: '/resource/database',
+    iconClass: 'database-icon',
+    title: 'common.header.database',
   },
 ];
 
@@ -27,29 +27,29 @@ function index(): JSX.Element {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const [currentTab, setCurrentTab] = useState<string>("");
+  const [currentTab, setCurrentTab] = useState<string>('');
 
   useEffect(() => {
-    setCurrentTab(location?.pathname?.split("/")?.pop() as string);
+    setCurrentTab(location?.pathname?.split('/')?.pop() as string);
   }, [location]);
 
   return (
     <div
       className="mx-auto max-w-[1425px]"
       style={{
-        width: "85%",
+        width: '85%',
       }}
     >
       <div
         className="flex items-center gap-[40px] relative"
         style={{
-          padding: "24px 0px 16px 0px",
+          padding: '24px 0px 16px 0px',
         }}
       >
         {tabs.map((item, index) => (
           <div
             key={index}
-            className={`flex relative items-center gap-2 font-medium cursor-pointer  ${currentTab === item?.key ? "header-tabs-active" : "header-tabs-normal"}`}
+            className={`flex relative items-center gap-2 font-medium cursor-pointer  ${currentTab === item?.key ? 'header-tabs-active' : 'header-tabs-normal'}`}
             onClick={() => {
               navigate(item?.path);
             }}

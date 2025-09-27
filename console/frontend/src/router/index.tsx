@@ -1,34 +1,34 @@
-import Loading from "@/components/loading";
-import { lazy, Suspense } from "react";
-import { createBrowserRouter, Navigate } from "react-router-dom";
-import Layout from "@/layouts/index";
-import ConfigPage from "@/pages/config-page";
+import Loading from '@/components/loading';
+import { lazy, Suspense } from 'react';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
+import Layout from '@/layouts/index';
+import ConfigPage from '@/pages/config-page';
 
-const CallbackPage = lazy(() => import("@/pages/callback"));
-const HomePage = lazy(() => import("@/pages/home-page"));
-const StorePlugin = lazy(() => import("@/pages/plugin-store"));
-const ToolSquareDetail = lazy(() => import("@/pages/plugin-store/detail"));
+const CallbackPage = lazy(() => import('@/pages/callback'));
+const HomePage = lazy(() => import('@/pages/home-page'));
+const StorePlugin = lazy(() => import('@/pages/plugin-store'));
+const ToolSquareDetail = lazy(() => import('@/pages/plugin-store/detail'));
 const OfficialModel = lazy(
-  () => import("@/pages/model-management/official-model/official-model-home"),
+  () => import('@/pages/model-management/official-model/official-model-home')
 );
 const PersonalModel = lazy(
-  () => import("@/pages/model-management/personal-model/personal-model-home"),
+  () => import('@/pages/model-management/personal-model/personal-model-home')
 );
-const ModelDetail = lazy(() => import("@/pages/model-management/model-detail"));
-const ResourceManagement = lazy(() => import("@/pages/resource-management"));
-const WorkFlow = lazy(() => import("@/pages/workflow"));
+const ModelDetail = lazy(() => import('@/pages/model-management/model-detail'));
+const ResourceManagement = lazy(() => import('@/pages/resource-management'));
+const WorkFlow = lazy(() => import('@/pages/workflow'));
 
-const ChatPage = lazy(() => import("@/pages/chat-page"));
-const PersonalSpace = lazy(() => import("@/pages/space/personal"));
-const SpaceDetail = lazy(() => import("@/pages/space/space-detail"));
-const EnterpriseSpace = lazy(() => import("@/pages/space/enterprise"));
-const SpacePage = lazy(() => import("@/pages/space-page"));
-const TeamCreate = lazy(() => import("@/pages/space/team-create"));
+const ChatPage = lazy(() => import('@/pages/chat-page'));
+const PersonalSpace = lazy(() => import('@/pages/space/personal'));
+const SpaceDetail = lazy(() => import('@/pages/space/space-detail'));
+const EnterpriseSpace = lazy(() => import('@/pages/space/enterprise'));
+const SpacePage = lazy(() => import('@/pages/space-page'));
+const TeamCreate = lazy(() => import('@/pages/space/team-create'));
 // const SmartRedirect = lazy(() => import('@/pages/smart-redirect'));
 
 const routes = [
   {
-    path: "/",
+    path: '/',
     element: (
       <Suspense fallback={<Loading />}>
         <Layout />
@@ -40,7 +40,7 @@ const routes = [
         element: <Navigate to="/home" />,
       },
       {
-        path: "/home",
+        path: '/home',
         element: (
           <Suspense fallback={<Loading />}>
             <HomePage />
@@ -48,7 +48,7 @@ const routes = [
         ),
       },
       {
-        path: "/management/model",
+        path: '/management/model',
         element: (
           <Suspense fallback={<Loading />}>
             <PersonalModel />
@@ -56,7 +56,7 @@ const routes = [
         ),
       },
       {
-        path: "/management/model/personalModel",
+        path: '/management/model/personalModel',
         element: (
           <Suspense fallback={<Loading />}>
             <PersonalModel />
@@ -64,7 +64,7 @@ const routes = [
         ),
       },
       {
-        path: "/management/model/detail/:id",
+        path: '/management/model/detail/:id',
         element: (
           <Suspense fallback={<Loading />}>
             <ModelDetail />
@@ -72,7 +72,7 @@ const routes = [
         ),
       },
       {
-        path: "/resource/*",
+        path: '/resource/*',
         element: (
           <Suspense fallback={<Loading />}>
             <ResourceManagement />
@@ -81,7 +81,7 @@ const routes = [
       },
       // 个人空间管理路由
       {
-        path: "/space",
+        path: '/space',
         element: (
           <Suspense fallback={<Loading />}>
             <PersonalSpace />
@@ -89,7 +89,7 @@ const routes = [
         ),
       },
       {
-        path: "/space/space-detail/:spaceId",
+        path: '/space/space-detail/:spaceId',
         element: (
           <Suspense fallback={<Loading />}>
             <SpaceDetail />
@@ -98,7 +98,7 @@ const routes = [
       },
       // 企业空间管理路由
       {
-        path: "/enterprise/:enterpriseId/*",
+        path: '/enterprise/:enterpriseId/*',
         element: (
           <Suspense fallback={<Loading />}>
             <EnterpriseSpace />
@@ -108,7 +108,7 @@ const routes = [
     ],
   },
   {
-    path: "/space",
+    path: '/space',
     element: (
       <Suspense fallback={<Loading />}>
         <Layout showHeader={false} />
@@ -116,7 +116,7 @@ const routes = [
     ),
     children: [
       {
-        path: "/space/*",
+        path: '/space/*',
         element: (
           <Suspense fallback={<Loading />}>
             <SpacePage />
@@ -126,7 +126,7 @@ const routes = [
     ],
   },
   {
-    path: "/callback",
+    path: '/callback',
     element: (
       <Suspense fallback={<Loading />}>
         <CallbackPage />
@@ -134,7 +134,7 @@ const routes = [
     ),
   },
   {
-    path: "/team/create/:type",
+    path: '/team/create/:type',
     element: (
       <Suspense fallback={<Loading />}>
         <TeamCreate />
@@ -142,7 +142,7 @@ const routes = [
     ),
   },
   {
-    path: "/store",
+    path: '/store',
     element: (
       <Suspense fallback={<Loading />}>
         <Layout showHeader={false} />
@@ -150,7 +150,7 @@ const routes = [
     ),
     children: [
       {
-        path: "/store/plugin",
+        path: '/store/plugin',
         element: (
           <Suspense fallback={<Loading />}>
             <StorePlugin />
@@ -158,7 +158,7 @@ const routes = [
         ),
       },
       {
-        path: "/store/plugin/:id",
+        path: '/store/plugin/:id',
         element: (
           <Suspense fallback={<Loading />}>
             <ToolSquareDetail />
@@ -168,7 +168,7 @@ const routes = [
     ],
   },
   {
-    path: "/chat/:botId/:version?",
+    path: '/chat/:botId/:version?',
     element: (
       <Suspense fallback={<Loading />}>
         <ChatPage />
@@ -184,16 +184,16 @@ const routes = [
   //   ),
   // },
   {
-    path: "/space",
+    path: '/space',
     children: [
       {
-        path: "/space/config/*",
+        path: '/space/config/*',
         element: <ConfigPage />,
       },
     ],
   },
   {
-    path: "/work_flow/:id/arrange",
+    path: '/work_flow/:id/arrange',
     element: (
       <Suspense fallback={<Loading />}>
         <WorkFlow />

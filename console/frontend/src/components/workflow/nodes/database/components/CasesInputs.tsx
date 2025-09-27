@@ -6,57 +6,57 @@ import React, {
   useRef,
   useEffect,
   createContext,
-} from "react";
-import { cloneDeep } from "lodash";
-import { v4 as uuid } from "uuid";
-import { useTranslation } from "react-i18next";
-import JsonMonacoEditor from "@/components/monaco-editor/JsonMonacoEditor";
+} from 'react';
+import { cloneDeep } from 'lodash';
+import { v4 as uuid } from 'uuid';
+import { useTranslation } from 'react-i18next';
+import JsonMonacoEditor from '@/components/monaco-editor/JsonMonacoEditor';
 import {
   FlowNodeInput,
   FlowSelect,
   FlowCascader,
   FLowCollapse,
-} from "@/components/workflow/ui";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
+} from '@/components/workflow/ui';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
 
-import inputAddIcon from "@/assets/imgs/workflow/input-add-icon.png";
-import remove from "@/assets/imgs/workflow/input-remove-icon.png";
+import inputAddIcon from '@/assets/imgs/workflow/input-add-icon.png';
+import remove from '@/assets/imgs/workflow/input-remove-icon.png';
 
-import { Input, Modal } from "antd";
-import arrowDownIcon from "@/assets/imgs/workflow/arrow-down-icon.png";
-import { conditions } from "@/constants";
+import { Input, Modal } from 'antd';
+import arrowDownIcon from '@/assets/imgs/workflow/arrow-down-icon.png';
+import { conditions } from '@/constants';
 
 const ModalContext = createContext<string | null>(null);
 function index({ id, data, allFields = [], children }): React.ReactElement {
   const { t } = useTranslation();
-  const getCurrentStore = useFlowsManager((state) => state.getCurrentStore);
+  const getCurrentStore = useFlowsManager(state => state.getCurrentStore);
   const currentStore = getCurrentStore();
-  const canPublishSetNot = useFlowsManager((state) => state.canPublishSetNot);
-  const canvasesDisabled = useFlowsManager((state) => state.canvasesDisabled);
+  const canPublishSetNot = useFlowsManager(state => state.canPublishSetNot);
+  const canvasesDisabled = useFlowsManager(state => state.canvasesDisabled);
   const autoSaveCurrentFlow = useFlowsManager(
-    (state) => state.autoSaveCurrentFlow,
+    state => state.autoSaveCurrentFlow
   );
-  const setNode = currentStore((state) => state.setNode);
-  const checkNode = currentStore((state) => state.checkNode);
-  const delayCheckNode = currentStore((state) => state.delayCheckNode);
-  const takeSnapshot = currentStore((state) => state.takeSnapshot);
+  const setNode = currentStore(state => state.setNode);
+  const checkNode = currentStore(state => state.checkNode);
+  const delayCheckNode = currentStore(state => state.delayCheckNode);
+  const takeSnapshot = currentStore(state => state.takeSnapshot);
   const [showParams, setShowParams] = useState(true);
-  const historyVersion = useFlowsManager((state) => state.historyVersion);
+  const historyVersion = useFlowsManager(state => state.historyVersion);
 
   const operatorRef = useRef<HTMLDivElement | null>(null);
-  const [operatorId, setOperatorId] = useState("");
+  const [operatorId, setOperatorId] = useState('');
   //   CASES ADD
 
   const handleRemoveLine = useCallback(
     (currentCondition): void => {
       takeSnapshot();
-      setNode(id, (old) => {
+      setNode(id, old => {
         old.data.inputs = old.data.inputs?.filter(
-          (input) => input.id !== currentCondition.varIndex,
+          input => input.id !== currentCondition.varIndex
         );
         const currentCase = old?.data?.nodeParam?.cases[0];
         currentCase.conditions = currentCase.conditions.filter(
-          (condition) => condition.varIndex !== currentCondition.varIndex,
+          condition => condition.varIndex !== currentCondition.varIndex
         );
         return {
           ...cloneDeep(old),
@@ -64,26 +64,26 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
       });
       canPublishSetNot();
     },
-    [takeSnapshot],
+    [takeSnapshot]
   );
 
   const handleAddLine = useCallback(() => {
     takeSnapshot();
-    setNode(id, (old) => {
+    setNode(id, old => {
       const uid = uuid();
       old.data.inputs = [
         ...old.data.inputs,
         {
           id: uid,
-          type: "range",
+          type: 'range',
           name: uid,
           schema: {
-            type: "string",
+            type: 'string',
             value: {
-              type: "ref",
+              type: 'ref',
               content: {
-                nodeId: "",
-                name: "",
+                nodeId: '',
+                name: '',
               },
             },
           },
@@ -107,7 +107,7 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
 
   const handleOperatorChange = useCallback(
     (caseId, value): void => {
-      setNode(id, (old) => {
+      setNode(id, old => {
         // const currentCase = old.data.nodeParam.casles.find(item => item.id === caseId)
         const currentCase = old.data.nodeParam.cases[0];
         currentCase.logicalOperator = value;
@@ -117,13 +117,13 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
       });
       autoSaveCurrentFlow();
     },
-    [setNode, autoSaveCurrentFlow],
+    [setNode, autoSaveCurrentFlow]
   );
 
   const handleChangeParam = useCallback(
     (inputId, fn, value): void => {
-      setNode(id, (old) => {
-        const currentInput = old.data.inputs.find((i) => i.id === inputId);
+      setNode(id, old => {
+        const currentInput = old.data.inputs.find(i => i.id === inputId);
         fn(currentInput, value);
         return {
           ...cloneDeep(old),
@@ -132,23 +132,23 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
       autoSaveCurrentFlow();
       canPublishSetNot();
     },
-    [setNode, canPublishSetNot, autoSaveCurrentFlow],
+    [setNode, canPublishSetNot, autoSaveCurrentFlow]
   );
 
   const handleConditionChange = useCallback(
     (value, currentCondition): void => {
-      setNode(id, (old) => {
+      setNode(id, old => {
         currentCondition.selectCondition = value;
         const currentInput = old.data.inputs.find(
-          (input) => input.id === currentCondition.varIndex,
+          input => input.id === currentCondition.varIndex
         );
-        if (["not null", "null"].includes(value)) {
-          currentInput.schema.value.type = "literal";
-          currentInput.schema.value.content = "";
+        if (['not null', 'null'].includes(value)) {
+          currentInput.schema.value.type = 'literal';
+          currentInput.schema.value.content = '';
         }
-        if (["not in", "in"].includes(value)) {
-          if (currentInput.schema.value.type === "literal") {
-            currentInput.schema.value.content = "";
+        if (['not in', 'in'].includes(value)) {
+          if (currentInput.schema.value.type === 'literal') {
+            currentInput.schema.value.content = '';
           }
         }
         return {
@@ -158,7 +158,7 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
       autoSaveCurrentFlow();
       canPublishSetNot();
     },
-    [setNode, canPublishSetNot, autoSaveCurrentFlow],
+    [setNode, canPublishSetNot, autoSaveCurrentFlow]
   );
 
   const fieldOptions = useMemo(() => {
@@ -173,17 +173,17 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
 
   const handleFieldChange = useCallback(
     (value, currentCondition): void => {
-      setNode(id, (old) => {
+      setNode(id, old => {
         const currentInput = old.data.inputs.find(
-          (input) => input.id === currentCondition.varIndex,
+          input => input.id === currentCondition.varIndex
         );
-        const item = fieldOptions.find((item) => item.name === value);
+        const item = fieldOptions.find(item => item.name === value);
         currentInput.schema.type = item.type.toLowerCase();
         currentCondition.fieldType = item.type;
         currentCondition.fieldName = value;
-        if (["in", "not in"].includes(currentCondition.selectCondition)) {
-          if (currentInput.schema.value.type === "literal") {
-            currentInput.schema.value.content = "";
+        if (['in', 'not in'].includes(currentCondition.selectCondition)) {
+          if (currentInput.schema.value.type === 'literal') {
+            currentInput.schema.value.content = '';
           }
         }
         return {
@@ -191,7 +191,7 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
         };
       });
     },
-    [setNode, canPublishSetNot, autoSaveCurrentFlow, fieldOptions],
+    [setNode, canPublishSetNot, autoSaveCurrentFlow, fieldOptions]
   );
 
   const mode = useMemo(() => {
@@ -210,7 +210,7 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
       const initCase = [
         {
           id: uuid(),
-          logicalOperator: "and",
+          logicalOperator: 'and',
           conditions: [
             {
               id: uuid(),
@@ -226,20 +226,20 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
         {
           id: uid,
           name: uid,
-          type: "range",
+          type: 'range',
           schema: {
-            type: "string",
+            type: 'string',
             value: {
-              type: "ref",
+              type: 'ref',
               content: {
-                nodeId: "",
-                name: "",
+                nodeId: '',
+                name: '',
               },
             },
           },
         },
       ];
-      setNode(id, (old) => {
+      setNode(id, old => {
         old.data.nodeParam.cases = initCase;
         old.data.inputs = initInput;
         return {
@@ -262,20 +262,20 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
   useEffect((): void | (() => void) => {
     function clickOutside(event: MouseEvent): void {
       if (operatorRef.current && !operatorRef.current.contains(event.target)) {
-        setOperatorId("");
+        setOperatorId('');
       }
     }
-    document.body.addEventListener("click", clickOutside);
+    document.body.addEventListener('click', clickOutside);
     return (): void => {
-      document.body.removeEventListener("click", clickOutside);
+      document.body.removeEventListener('click', clickOutside);
     };
   }, []);
 
   const checkArrayElementsType = (arr, type): boolean => {
     if (!arr || arr.length === 0) return true;
     const validators = {
-      string: (v): boolean => typeof v === "string",
-      number: (v): boolean => typeof v === "number" && !Number.isNaN(v),
+      string: (v): boolean => typeof v === 'string',
+      number: (v): boolean => typeof v === 'number' && !Number.isNaN(v),
       integer: (v): boolean => Number.isInteger(v),
     };
     if (!Object.hasOwn(validators, type)) {
@@ -287,26 +287,26 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
   };
 
   const [modal, contextHolder] = Modal.useModal();
-  const [validateMsg, setValidateMsg] = useState("");
+  const [validateMsg, setValidateMsg] = useState('');
   const handleNotInClick = async (activeCondition): Promise<void> => {
-    setValidateMsg("");
+    setValidateMsg('');
     const { fieldType } = activeCondition;
     let inputValue = inputs?.find(
-      (input) => input.id === activeCondition.varIndex,
+      input => input.id === activeCondition.varIndex
     )?.schema?.value?.content;
     if (!inputValue) {
       inputValue = [];
     }
     const handleInputChange = (value): void => {
-      setValidateMsg("");
+      setValidateMsg('');
       inputValue = value;
     };
 
     const handleDocumentPaste = (e: KeyboardEvent): void => {
       const isPasteShortcut =
         (e.ctrlKey || e.metaKey) &&
-        (e.key === "v" || e.key === "V" || e.keyCode === 86);
-      const modalNode = document.querySelector(".modal-confirm-input");
+        (e.key === 'v' || e.key === 'V' || e.keyCode === 86);
+      const modalNode = document.querySelector('.modal-confirm-input');
       const activeElement = document.activeElement;
       if (modalNode && modalNode.contains(activeElement)) {
         if (isPasteShortcut) {
@@ -318,26 +318,26 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
       e.preventDefault();
     };
 
-    window.addEventListener("keydown", handleDocumentPaste, true);
+    window.addEventListener('keydown', handleDocumentPaste, true);
 
     await modal.confirm({
-      title: t("workflow.nodes.databaseNode.pleaseEnter"),
+      title: t('workflow.nodes.databaseNode.pleaseEnter'),
       icon: null,
-      wrapClassName: "modal-confirm-input",
-      className: "modal-confirm-input-content",
+      wrapClassName: 'modal-confirm-input',
+      className: 'modal-confirm-input-content',
       content: (
         <>
           <ModalContext.Consumer>
-            {(errMsg) => (
+            {errMsg => (
               <div>
                 <JsonMonacoEditor
                   defaultValue={JSON.stringify(inputValue, null, 2)}
                   onChange={handleInputChange}
-                  onValidate={(markers) => {
-                    markers.forEach((m) => {
+                  onValidate={markers => {
+                    markers.forEach(m => {
                       if (m.message) {
                         setValidateMsg(
-                          t("workflow.nodes.databaseNode.syntaxError"),
+                          t('workflow.nodes.databaseNode.syntaxError')
                         );
                       }
                     });
@@ -353,14 +353,14 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
       onOk(): void {
         try {
           const parsed =
-            typeof inputValue === "string"
+            typeof inputValue === 'string'
               ? JSON.parse(inputValue)
               : inputValue;
           if (Array.isArray(parsed) && parsed.length > 0) {
             if (fieldType) {
               const validateType = checkArrayElementsType(
                 parsed,
-                fieldType.toLowerCase(),
+                fieldType.toLowerCase()
               );
               if (!validateType) {
                 throw new Error();
@@ -372,36 +372,34 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
                 data.schema.value.content = value;
                 data.schema.type = fieldType
                   ? `array-${fieldType.toLowerCase()}`
-                  : "array";
+                  : 'array';
               },
-              parsed,
+              parsed
             );
             delayCheckNode(id);
             return Promise.resolve();
           }
           throw new Error();
         } catch {
-          setValidateMsg(t("workflow.nodes.databaseNode.pleaseCheckType"));
+          setValidateMsg(t('workflow.nodes.databaseNode.pleaseCheckType'));
           return Promise.reject();
         }
       },
     });
-    window.removeEventListener("keydown", handleDocumentPaste, true);
+    window.removeEventListener('keydown', handleDocumentPaste, true);
   };
 
   const getConditionOptions = (type): unknown => {
-    if (type === "time" || type === "boolean") {
-      return conditions.filter(
-        (item) => !["in", "not in"].includes(item.value),
-      );
+    if (type === 'time' || type === 'boolean') {
+      return conditions.filter(item => !['in', 'not in'].includes(item.value));
     }
     return conditions;
   };
 
   const getFieldOptions = (selectCondition): unknown => {
-    if (["in", "not in"].includes(selectCondition)) {
+    if (['in', 'not in'].includes(selectCondition)) {
       return fieldOptions.filter(
-        (item) => item.type !== "time" && item.type !== "boolean",
+        item => item.type !== 'time' && item.type !== 'boolean'
       );
     }
     return fieldOptions;
@@ -409,17 +407,16 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
 
   const curentInput = useCallback(
     (activeCondition): unknown => {
-      return inputs?.find((input) => input.id === activeCondition.varIndex);
+      return inputs?.find(input => input.id === activeCondition.varIndex);
     },
-    [inputs],
+    [inputs]
   );
 
   const getTextArray = (activeCondition): unknown => {
-    const content = inputs?.find(
-      (input) => input.id === activeCondition.varIndex,
-    )?.schema?.value?.content;
+    const content = inputs?.find(input => input.id === activeCondition.varIndex)
+      ?.schema?.value?.content;
     if (!Array.isArray(content) || !content.length) {
-      return "";
+      return '';
     }
     return JSON.stringify(content);
   };
@@ -446,16 +443,16 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
                     )}
                     <div className="flex-1 flex items-center text-desc gap-2.5">
                       <h4 className="w-1/4">
-                        {t("workflow.nodes.databaseNode.tableField")}
+                        {t('workflow.nodes.databaseNode.tableField')}
                       </h4>
                       <h4 className="flex-1">
-                        {t("workflow.nodes.databaseNode.selectCondition")}
+                        {t('workflow.nodes.databaseNode.selectCondition')}
                       </h4>
                       <h4 className="flex-1">
-                        {t("workflow.nodes.databaseNode.compareType")}
+                        {t('workflow.nodes.databaseNode.compareType')}
                       </h4>
                       <h4 className="w-1/4">
-                        {t("workflow.nodes.databaseNode.compareValue")}
+                        {t('workflow.nodes.databaseNode.compareValue')}
                       </h4>
                       {(item?.conditions?.length > 1 || mode === 3) && (
                         <span className="w-4"></span>
@@ -478,9 +475,9 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
                             ref={operatorRef}
                           >
                             <span>
-                              {item.logicalOperator === "and"
-                                ? t("workflow.nodes.databaseNode.and")
-                                : t("workflow.nodes.databaseNode.or")}
+                              {item.logicalOperator === 'and'
+                                ? t('workflow.nodes.databaseNode.and')
+                                : t('workflow.nodes.databaseNode.or')}
                             </span>
                             <img
                               src={arrowDownIcon}
@@ -498,33 +495,33 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
                                   className="w-full py-1 text-desc font-medium hover:bg-[#E6F4FF] cursor-pointer flex items-center justify-center rounded-sm"
                                   onClick={(e): void => {
                                     e.stopPropagation();
-                                    setOperatorId("");
-                                    handleOperatorChange(item.id, "and");
+                                    setOperatorId('');
+                                    handleOperatorChange(item.id, 'and');
                                   }}
                                   style={{
                                     display:
-                                      item.logicalOperator === "and"
-                                        ? "none"
-                                        : "flex",
+                                      item.logicalOperator === 'and'
+                                        ? 'none'
+                                        : 'flex',
                                   }}
                                 >
-                                  {t("workflow.nodes.databaseNode.and")}
+                                  {t('workflow.nodes.databaseNode.and')}
                                 </div>
                                 <div
                                   className="w-full py-1 text-desc font-medium hover:bg-[#E6F4FF] cursor-pointer flex items-center justify-center rounded-sm"
-                                  onClick={(e) => {
+                                  onClick={e => {
                                     e.stopPropagation();
-                                    setOperatorId("");
-                                    handleOperatorChange(item.id, "or");
+                                    setOperatorId('');
+                                    handleOperatorChange(item.id, 'or');
                                   }}
                                   style={{
                                     display:
-                                      item.logicalOperator === "or"
-                                        ? "none"
-                                        : "flex",
+                                      item.logicalOperator === 'or'
+                                        ? 'none'
+                                        : 'flex',
                                   }}
                                 >
-                                  {t("workflow.nodes.databaseNode.or")}
+                                  {t('workflow.nodes.databaseNode.or')}
                                 </div>
                               </div>
                             )}
@@ -536,19 +533,19 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
                       </div>
                     )}
                     <div className="flex-1 overflow-hidden">
-                      {item?.conditions?.map((condition) => (
+                      {item?.conditions?.map(condition => (
                         <div key={condition.id}>
                           <div className="flex flex-col mt-2.5 overflow-hidden">
                             <div className="flex-1 flex items-center text-desc gap-2.5">
                               <div className="w-1/4">
                                 <FlowSelect
                                   value={condition.fieldName}
-                                  onChange={(value) =>
+                                  onChange={value =>
                                     handleFieldChange(value, condition)
                                   }
                                   // key={condition.selectCondition}
                                   options={getFieldOptions(
-                                    condition.selectCondition,
+                                    condition.selectCondition
                                   )}
                                   onBlur={() => checkNode(id)}
                                 />
@@ -557,11 +554,11 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
                                 <FlowSelect
                                   value={condition.selectCondition}
                                   // key={condition.fieldName}
-                                  onChange={(value) =>
+                                  onChange={value =>
                                     handleConditionChange(value, condition)
                                   }
                                   options={getConditionOptions(
-                                    condition.fieldType,
+                                    condition.fieldType
                                   )}
                                   onBlur={() => {
                                     checkNode(id);
@@ -571,8 +568,8 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
                               </div>
                               <div className="flex-1">
                                 <FlowSelect
-                                  disabled={["not null", "null"].includes(
-                                    condition.selectCondition,
+                                  disabled={['not null', 'null'].includes(
+                                    condition.selectCondition
                                   )}
                                   value={
                                     curentInput(condition)?.schema?.value?.type
@@ -580,38 +577,38 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
                                   options={[
                                     {
                                       label: t(
-                                        "workflow.nodes.databaseNode.literal",
+                                        'workflow.nodes.databaseNode.literal'
                                       ),
-                                      value: "literal",
+                                      value: 'literal',
                                     },
                                     {
                                       label: t(
-                                        "workflow.nodes.databaseNode.reference",
+                                        'workflow.nodes.databaseNode.reference'
                                       ),
-                                      value: "ref",
+                                      value: 'ref',
                                     },
                                   ]}
-                                  onChange={(value) =>
+                                  onChange={value =>
                                     handleChangeParam(
                                       condition.varIndex,
                                       (data, value) => {
                                         data.schema.value.type = value;
-                                        if (value === "literal") {
-                                          data.schema.value.content = "";
+                                        if (value === 'literal') {
+                                          data.schema.value.content = '';
                                         } else {
                                           data.schema.value.content = {};
                                         }
                                       },
-                                      value,
+                                      value
                                     )
                                   }
                                 />
                               </div>
                               <div className="w-1/4">
                                 {curentInput(condition)?.schema?.value?.type ===
-                                "literal" ? (
-                                  ["in", "not in"].includes(
-                                    condition.selectCondition,
+                                'literal' ? (
+                                  ['in', 'not in'].includes(
+                                    condition.selectCondition
                                   ) ? (
                                     <label
                                       onClick={() =>
@@ -621,9 +618,9 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
                                     >
                                       <Input
                                         value={getTextArray(condition)}
-                                        style={{ pointerEvents: "none" }}
+                                        style={{ pointerEvents: 'none' }}
                                         placeholder={t(
-                                          "workflow.nodes.databaseNode.pleaseEnter",
+                                          'workflow.nodes.databaseNode.pleaseEnter'
                                         )}
                                         className="!border-[#e4eaff] h-[30px] !bg-[#fff]"
                                         disabled
@@ -633,20 +630,20 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
                                     <FlowNodeInput
                                       nodeId={id}
                                       key={condition.selectCondition}
-                                      disabled={["not null", "null"].includes(
-                                        condition.selectCondition,
+                                      disabled={['not null', 'null'].includes(
+                                        condition.selectCondition
                                       )}
                                       value={
                                         curentInput(condition)?.schema?.value
                                           ?.content
                                       }
-                                      onChange={(value) =>
+                                      onChange={value =>
                                         handleChangeParam(
                                           condition.varIndex,
                                           (data, value) => {
                                             data.schema.value.content = value;
                                           },
-                                          value,
+                                          value
                                         )
                                       }
                                     />
@@ -665,7 +662,7 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
                                         : []
                                     }
                                     options={references}
-                                    handleTreeSelect={(node) => {
+                                    handleTreeSelect={node => {
                                       handleChangeParam(
                                         condition.varIndex,
                                         (data, value) => {
@@ -680,7 +677,7 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
                                             name: node.value,
                                           },
                                           type: node.type,
-                                        },
+                                        }
                                       );
                                     }}
                                     onBlur={() => checkNode(id)}
@@ -728,7 +725,7 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
                 onClick={handleAddLine}
               >
                 <img src={inputAddIcon} className="w-3 h-3" alt="" />
-                <span>{t("workflow.nodes.databaseNode.add")}</span>
+                <span>{t('workflow.nodes.databaseNode.add')}</span>
               </div>
             )}
             {contextHolder}
