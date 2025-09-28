@@ -41,7 +41,7 @@ public class TenantServiceImpl implements TenantService {
         requestBody.put("app_name", appName);
         requestBody.put("app_desc", appDesc);
         requestBody.put("dev_id", 1);
-        requestBody.put("cloud_id", 0);
+        requestBody.put("cloud_id", "0");
 
         RequestBody body = RequestBody.create(MediaType.parse("application/json"), requestBody.toJSONString());
         Request request = new Request.Builder()
@@ -51,12 +51,12 @@ public class TenantServiceImpl implements TenantService {
         log.info("TenantServiceImpl createApp: body: {}", requestBody);
         JSONObject reqJson = new JSONObject();
         try (Response response = HTTP_CLIENT.newCall(request).execute()) {
-            if (!response.isSuccessful() || response.body() == null) {
+            if ((!response.isSuccessful()) || (response.body() == null)) {
                 log.error("tenant-service-create-app error request:  {}, response: {}", requestBody, reqJson);
                 return null;
             }
             reqJson = JSONObject.parseObject(response.body().string());
-            if (reqJson.getInteger("code") == 0) {
+            if (reqJson.getInteger("code") == 0 && reqJson.containsKey("data") && reqJson.getJSONObject("data").containsKey("app_id")) {
                 return reqJson.getJSONObject("data").getString("app_id");
             } else {
                 log.error("tenant-service-create-app is not successful request : {}, response: {}", requestBody, reqJson);
@@ -76,7 +76,7 @@ public class TenantServiceImpl implements TenantService {
         log.info("TenantServiceImpl getAppDetail: requestUrl: {}", request.url());
         JSONObject reqJson = new JSONObject();
         try (Response response = HTTP_CLIENT.newCall(request).execute()) {
-            if (!response.isSuccessful() || response.body() == null) {
+            if ((!response.isSuccessful()) || (response.body() == null)) {
                 log.error("tenant-service-get-app-detail  error requestUrl: {}, response: {}", requestUrl, reqJson);
                 return null;
             }
