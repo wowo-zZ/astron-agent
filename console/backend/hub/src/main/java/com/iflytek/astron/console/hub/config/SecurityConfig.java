@@ -45,8 +45,6 @@ public class SecurityConfig {
                         .authenticationEntryPoint(restfulAuthenticationEntryPoint)
                         .accessDeniedHandler(restfulAccessDeniedHandler))
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                // Disable CSRF - JWT-based frontend-backend separation projects don't need CSRF protection
-                .csrf(AbstractHttpConfigurer::disable)
                 // Configure stateless session
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(AbstractHttpConfigurer::disable)
