@@ -10,6 +10,7 @@ import okhttp3.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -36,7 +37,7 @@ public class TenantServiceImpl implements TenantService {
     @Override
     public String createApp(String uid, String appName, String appDesc) {
         JSONObject requestBody = new JSONObject();
-        requestBody.put("request_id", uid);
+        requestBody.put("request_id", uid + UUID.randomUUID());
         requestBody.put("app_name", appName);
         requestBody.put("app_desc", appDesc);
         requestBody.put("dev_id", 1);
