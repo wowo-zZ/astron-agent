@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @author yun-zhi-ztl
@@ -30,16 +31,21 @@ public class AppMstServiceImpl implements AppMstService {
 
     @Override
     public void insert(String uid, String appId, String appName, String appDescribe, String apiKey, String apiSecret) {
-        AppMst appMst = new AppMst();
-        appMst.setUid(uid);
-        appMst.setAppName(appName);
-        appMst.setAppDescribe(appDescribe);
-        appMst.setAppId(appId);
-        appMst.setAppKey(apiKey);
-        appMst.setAppSecret(apiSecret);
-        appMst.setIsDelete(0);
-        appMst.setCreateTime(LocalDateTime.now());
-        appMst.setUpdateTime(LocalDateTime.now());
+        AppMst appMst = AppMst.builder()
+                .uid(uid).appId(appId).appName(appName)
+                .appDescribe(appDescribe).appKey(apiKey)
+                .appSecret(apiSecret).isDelete(0)
+                .createTime(LocalDateTime.now())
+                .updateTime(LocalDateTime.now())
+                .build();
         appMstMapper.insert(appMst);
+    }
+
+    @Override
+    public List<AppMst> getAppListByUid(String uid) {
+        return appMstMapper.selectList(Wrappers.lambdaQuery(AppMst.class)
+                .eq(AppMst::getUid, uid)
+                .eq(AppMst::getIsDelete, 0)
+                .orderByDesc(AppMst::getCreateTime));
     }
 }

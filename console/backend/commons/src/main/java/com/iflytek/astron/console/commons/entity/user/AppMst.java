@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
  * @author yun-zhi-ztl
  */
 @Data
+@Builder
 @TableName("app_mst")
 @Schema(name = "AppMst", description = "User app info table")
 public class AppMst {

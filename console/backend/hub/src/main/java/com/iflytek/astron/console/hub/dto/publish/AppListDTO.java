@@ -24,7 +24,4 @@ public class AppListDTO {
 
     @Schema(description = "App Describe")
     private String appDescribe;
-
-    @Schema(description = "User Id")
-    private String uid;
 }

@@ -39,7 +39,7 @@ public class PublishApiController {
     @RateLimit(limit = 30, window = 60, dimension = "USER")
     @GetMapping("/app-list")
     public ApiResult<List<AppListDTO>> getAppList() {
-        return ApiResult.success(null);
+        return ApiResult.success(publishApiService.getAppList());
     }
 
     @Operation(summary = "Create Bot Api", description = "create bot api with user app")
