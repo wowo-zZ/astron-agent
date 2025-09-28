@@ -476,12 +476,12 @@ class TestKnowledgePluginFactory:
         # Test with invalid types - should raise validation error
         with pytest.raises(ValueError):
             KnowledgePluginFactory(
-                query=123,  # type: ignore  # Should be string
-                top_k="invalid",  # type: ignore  # Should be int
-                repo_ids="not_a_list",  # type: ignore  # Should be list
-                doc_ids="not_a_list",  # type: ignore  # Should be list
-                score_threshold="invalid",  # type: ignore  # Should be float
-                rag_type=123,  # type: ignore  # Should be string
+                query=123,  # Should be string
+                top_k="invalid",  # Should be int
+                repo_ids="not_a_list",  # Should be list
+                doc_ids="not_a_list",  # Should be list
+                score_threshold="invalid",  # Should be float
+                rag_type=123,  # Should be string
             )
 
     @pytest.mark.unit

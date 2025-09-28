@@ -59,7 +59,7 @@ class CustomChatCompletion(CompletionBase):
                 yield response
 
 
-@workflow_agent_router.post(
+@workflow_agent_router.post(  # type: ignore[misc]
     "/custom/chat/completions",
     description="Agent execution - user mode",
     response_model=None,

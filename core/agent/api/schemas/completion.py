@@ -10,37 +10,37 @@ from pydantic import Field
 
 
 class ReasonChoiceMessageToolCallFunction(Function):
-    arguments: Optional[str] = None  # type: ignore[assignment]
-    name: Optional[str] = None  # type: ignore[assignment]
+    arguments: Optional[str] = None
+    name: Optional[str] = None
     response: Optional[str] = None
 
 
 class ReasonChoiceMessageToolCall(ChatCompletionMessageToolCall):
     id: str = Field(default="")
     reason: str = Field(default="")
-    function: Optional[ReasonChoiceMessageToolCallFunction] = None  # type: ignore
-    type: Optional[Literal["workflow", "tool", "knowledge"]] = None  # type: ignore
+    function: Optional[ReasonChoiceMessageToolCallFunction] = None
+    type: Optional[Literal["workflow", "tool", "knowledge"]] = None
 
 
 class ReasonChoiceMessage(ChatCompletionMessage):
     reasoning_content: Optional[str] = Field(default="")
     content: Optional[str] = Field(default="")
-    tool_calls: Optional[List[ReasonChoiceMessageToolCall]] = Field(  # type: ignore
+    tool_calls: Optional[List[ReasonChoiceMessageToolCall]] = Field(
         default_factory=list
     )
-    role: Optional[Literal["assistant"]] = Field(default="assistant")  # type: ignore
+    role: Optional[Literal["assistant"]] = Field(default="assistant")
 
 
 class ReasonChoice(Choice):
-    index: Optional[int] = Field(default=0)  # type: ignore[assignment]
+    index: Optional[int] = Field(default=0)
     message: ReasonChoiceMessage  # pyright: ignore[reportIncompatibleVariableOverride]
     finish_reason: Optional[
         Literal["stop", "length", "tool_calls", "content_filter", "function_call"]
-    ] = None  # type: ignore[assignment]
+    ] = None
 
 
 class ReasonChatCompletion(ChatCompletion):
-    choices: List[ReasonChoice] = Field(default_factory=list)  # type: ignore
+    choices: List[ReasonChoice] = Field(default_factory=list)
     code: int = Field(default=0)
     message: str = Field(default="success")
     logs: list[str] = Field(default_factory=list)

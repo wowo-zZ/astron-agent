@@ -37,4 +37,6 @@ dependencies = [
     "pydantic-settings>=2.10.1",
     "httpx>=0.28.1",
     "sqlmodel>=0.0.25",
+    "redis==3.5.3",
+    "redis-py-cluster==2.1.3",
 ]

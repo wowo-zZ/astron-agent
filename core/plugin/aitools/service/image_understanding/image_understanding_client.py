@@ -16,8 +16,7 @@ from wsgiref.handlers import format_date_time
 
 import requests
 import websocket
-
-from const.err_code.code import CodeEnum  # 引入错误码枚举类
+from plugin.aitools.const.err_code.code import CodeEnum
 
 
 class ImageUnderstandingClient:
@@ -31,8 +30,10 @@ class ImageUnderstandingClient:
     def create_url(self):
         now = datetime.now()
         date = format_date_time(mktime(now.timetuple()))
-        signature_origin = f"host: {urlparse(self.imageunderstanding_url).netloc}\n"\
-        f"date: {date}\nGET {urlparse(self.imageunderstanding_url).path} HTTP/1.1"
+        signature_origin = (
+            f"host: {urlparse(self.imageunderstanding_url).netloc}\n"
+            f"date: {date}\nGET {urlparse(self.imageunderstanding_url).path} HTTP/1.1"
+        )
         signature_sha = hmac.new(
             self.api_secret.encode("utf-8"),
             signature_origin.encode("utf-8"),

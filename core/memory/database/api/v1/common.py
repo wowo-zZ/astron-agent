@@ -8,7 +8,10 @@ from typing import Any, List, Optional, Tuple
 import sqlalchemy
 import sqlalchemy.exc
 from memory.database.domain.entity.database_meta import (
-    get_id_by_did, get_id_by_did_uid, get_uid_by_did_space_id)
+    get_id_by_did,
+    get_id_by_did_uid,
+    get_uid_by_did_space_id,
+)
 from memory.database.domain.entity.schema_meta import get_schema_name_by_did
 from memory.database.domain.entity.views.http_resp import format_response
 from memory.database.exceptions.error_code import CodeEnum

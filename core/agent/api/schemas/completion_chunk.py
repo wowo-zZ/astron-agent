@@ -18,17 +18,13 @@ class ReasonChoiceDeltaToolCallFunction(ChoiceDeltaToolCallFunction):
 class ReasonChoiceDeltaToolCall(ChoiceDeltaToolCall):
     reason: str = Field(default="")
     function: Optional[ReasonChoiceDeltaToolCallFunction] = None
-    type: Optional[Literal["workflow", "tool", "knowledge"]] = (
-        None  # type: ignore[assignment]
-    )
+    type: Optional[Literal["workflow", "tool", "knowledge"]] = None
 
 
 class ReasonChoiceDelta(ChoiceDelta):
     reasoning_content: Optional[str] = None
 
-    tool_calls: Optional[List[ReasonChoiceDeltaToolCall]] = (
-        None  # type: ignore[assignment]
-    )
+    tool_calls: Optional[List[ReasonChoiceDeltaToolCall]] = None
     role: Optional[Literal["assistant"]] = Field(default="assistant")
 
 
@@ -37,10 +33,10 @@ class ReasonChoice(Choice):
 
 
 class ReasonChatCompletionChunk(ChatCompletionChunk):
-    choices: List[ReasonChoice]  # type: ignore[assignment]
+    choices: List[ReasonChoice]
     code: int = Field(default=0)
     message: str = Field(default="success")
-    object: Literal[  # type: ignore[assignment]
+    object: Literal[
         "chat.completion.chunk",
         "chat.completion.log",
         "chat.completion.knowledge_metadata",

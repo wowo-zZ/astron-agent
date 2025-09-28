@@ -24,12 +24,14 @@ from plugin.aitools.api.schema.types import (
     ISEInput,
     SmartTTSInput,
     SuccessDataResponse,
+    TranslationInput,
 )
 from plugin.aitools.common.logger import log
 from plugin.aitools.const.const import IMAGE_GENERATE_MAX_PROMPT_LEN
 from plugin.aitools.const.err_code.code import CodeEnum
 from plugin.aitools.const.err_code.code_convert import CodeConvert
 from plugin.aitools.service.ase_sdk.common.entities.req_data import Credentials
+from plugin.aitools.service.ase_sdk.exception.CustomException import CustomException
 from plugin.aitools.service.ocr_llm.client_multithreading import (
     OcrLLMClientMultithreading,
 )
@@ -38,7 +40,6 @@ from plugin.aitools.service.ocr_llm.entities.req_data_multithreading import (
     OcrLLMReqSourceDataMultithreading,
     PayloadM,
 )
-from plugin.aitools.service.ase_sdk.exception.CustomException import CustomException
 
 from common.otlp.log_trace.node_trace_log import NodeTraceLog, Status
 from common.otlp.metrics.meter import Meter
@@ -311,5 +312,27 @@ async def ise_evaluate(params: ISEInput, request: Request):
         language=params.language,
         category=params.category,
         group=params.group,
+        _request=request,
+    )
+
+
+# Text Translation API
+@app.post("/translation")
+async def translation_api(params: TranslationInput, request: Request):
+    """
+    Text translation service endpoint
+
+    Supports bidirectional translation between Chinese and other languages:
+    - Chinese ↔ English (cn ↔ en)
+    - Chinese ↔ Japanese (cn ↔ ja)
+    - Chinese ↔ Korean (cn ↔ ko)
+    - Chinese ↔ Russian (cn ↔ ru)
+    """
+    from plugin.aitools.service.route_service import translation_main
+
+    return translation_main(
+        text=params.text,
+        target_language=params.target_language,
+        source_language=params.source_language,
         request=request,
     )

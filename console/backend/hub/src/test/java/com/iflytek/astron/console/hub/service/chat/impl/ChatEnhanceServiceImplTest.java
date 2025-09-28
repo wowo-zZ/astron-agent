@@ -251,7 +251,7 @@ class ChatEnhanceServiceImplTest {
             when(chatDataService.createChatFileUser(any(ChatFileUser.class))).thenReturn(createdFileUser);
             when(chatDataService.getFileUserCount(uid)).thenReturn(0);
             when(chatDataService.findAllBotChatFileParamByChatIdAndNameAndIsDelete(anyLong(), anyString(), anyInt()))
-                .thenReturn(new ArrayList<>());
+                    .thenReturn(new ArrayList<>());
 
             // When
             Map<String, String> result = chatEnhanceService.saveFile(uid, saveFileVo);
@@ -401,7 +401,7 @@ class ChatEnhanceServiceImplTest {
             existingParam.setFileUrls(new ArrayList<>(Arrays.asList("http://existing.com")));
 
             when(chatDataService.findAllBotChatFileParamByChatIdAndNameAndIsDelete(anyLong(), anyString(), anyInt()))
-                .thenReturn(Arrays.asList(existingParam));
+                    .thenReturn(Arrays.asList(existingParam));
 
             // When
             Map<String, String> result = chatEnhanceService.saveFile(uid, saveFileVo);
@@ -463,11 +463,11 @@ class ChatEnhanceServiceImplTest {
             when(chatDataService.createChatFileUser(any(ChatFileUser.class))).thenReturn(createdFileUser);
             when(chatDataService.getFileUserCount(uid)).thenReturn(0);
             when(chatDataService.findAllBotChatFileParamByChatIdAndNameAndIsDelete(anyLong(), anyString(), anyInt()))
-                .thenReturn(new ArrayList<>());
+                    .thenReturn(new ArrayList<>());
 
             // When
             Map<String, String> result = invokeDocumentHandler(null, uid, chatId, "http://test.com/file.pdf",
-                "test.pdf", 1024L, limitEnum, "key123", 1, "param1");
+                    "test.pdf", 1024L, limitEnum, "key123", 1, "param1");
 
             // Then
             assertNotNull(result);
@@ -491,11 +491,11 @@ class ChatEnhanceServiceImplTest {
 
             when(redissonClient.getBucket(anyString())).thenReturn(rBucket);
             when(chatDataService.findAllBotChatFileParamByChatIdAndNameAndIsDelete(anyLong(), anyString(), anyInt()))
-                .thenReturn(new ArrayList<>());
+                    .thenReturn(new ArrayList<>());
 
             // When
             Map<String, String> result = invokeDocumentHandler(existingFileUserId, uid, chatId,
-                "http://test.com/file.pdf", "test.pdf", 1024L, limitEnum, "key123", 1, "param1");
+                    "http://test.com/file.pdf", "test.pdf", 1024L, limitEnum, "key123", 1, "param1");
 
             // Then
             assertNotNull(result);
@@ -512,13 +512,13 @@ class ChatEnhanceServiceImplTest {
             String fileBusinessKey, Integer documentType, String paramName) {
         try {
             var method = ChatEnhanceServiceImpl.class.getDeclaredMethod("documentHandler",
-                Long.class, String.class, Long.class, String.class, String.class, Long.class,
-                ChatFileLimitEnum.class, String.class, Integer.class, String.class);
+                    Long.class, String.class, Long.class, String.class, String.class, Long.class,
+                    ChatFileLimitEnum.class, String.class, Integer.class, String.class);
             method.setAccessible(true);
             @SuppressWarnings("unchecked")
             Map<String, String> result = (Map<String, String>) method.invoke(chatEnhanceService,
-                chatFileUserId, uid, chatId, fileUrl, fileName, fileSize, limitEnum,
-                fileBusinessKey, documentType, paramName);
+                    chatFileUserId, uid, chatId, fileUrl, fileName, fileSize, limitEnum,
+                    fileBusinessKey, documentType, paramName);
             return result;
         } catch (Exception e) {
             throw new RuntimeException(e);

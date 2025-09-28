@@ -180,7 +180,7 @@ class TestAgentResponse:
         try:
             # empty type test
             AgentResponse(
-                typ="", content="test", model="test"  # type: ignore[arg-type]
+                typ="", content="test", model="test"
             )
         except (ValidationError, ValueError):
             pass
@@ -188,21 +188,21 @@ class TestAgentResponse:
         try:
             # None content test
             AgentResponse(
-                typ="content", content=None, model="test"  # type: ignore[arg-type]
+                typ="content", content=None, model="test"
             )
         except (ValidationError, TypeError, ValueError):
             pass
 
         try:
             # missing type test
-            AgentResponse(content="test", model="test")  # type: ignore[call-arg]
+            AgentResponse(content="test", model="test")
         except (ValidationError, TypeError):
             pass
 
         try:
             # invalid type test
             AgentResponse(
-                typ="invalid_type", content="test", model=""  # type: ignore[arg-type]
+                typ="invalid_type", content="test", model=""
             )
         except (ValidationError, ValueError):
             pass

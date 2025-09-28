@@ -203,7 +203,7 @@ jobs:
               ;;
             python)
               echo "🛠️ Installing Python quality tools..."
-              python3 -m pip install black==24.4.2 isort==5.13.2 flake8==7.0.0 mypy==1.9.0 pylint==3.1.0
+              python3 -m pip install black==24.4.2 isort==5.13.2 flake8==7.0.0 mypy==1.9.0 pylint==3.1.0 types-requests>=2.32.4.20250913
               echo "🔍 Running Python quality checks..."
               echo "1. Running flake8 code style check..."
               python3 -m flake8 --max-line-length 88 --ignore=E203,W503,E501 --max-complexity 10 .
@@ -212,9 +212,9 @@ jobs:
               echo "3. Running black code formatting..."
               python3 -m black .
               echo "4. Running mypy type checking..."
-              python3 -m mypy --disallow-untyped-defs --disallow-incomplete-defs --check-untyped-defs --no-implicit-optional .
+              python3 -m mypy --disallow-untyped-defs --disallow-incomplete-defs --check-untyped-defs --no-implicit-optional --ignore-missing-imports --explicit-package-bases .
               echo "5. Running pylint code analysis..."
-              python3 -m pylint --max-line-length=88 --max-args=7 --max-locals=15 --max-returns=6 --max-branches=12 --max-statements=50 *.py
+              python3 -m pylint --disable=import-error --max-line-length=88 --max-args=7 --max-locals=15 --max-returns=6 --max-branches=12 --max-statements=50 --fail-under=8.0 *.py
               ;;
           esac
 

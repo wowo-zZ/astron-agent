@@ -24,13 +24,13 @@ class TestOpenAPIRunner:
         """test方法初始化."""
         # create Mock object, specify spec as appropriate type but allow free attribute setting
         self.mock_chat_runner = Mock()  # pylint: disable=attribute-defined-outside-init
-        self.mock_chat_runner.__class__ = ChatRunner  # type: ignore
+        self.mock_chat_runner.__class__ = ChatRunner
         self.mock_chat_runner.question = (
             "test question"  # avoid JSON serialization errors
         )
 
         self.mock_cot_runner = Mock()  # pylint: disable=attribute-defined-outside-init
-        self.mock_cot_runner.__class__ = CotRunner  # type: ignore
+        self.mock_cot_runner.__class__ = CotRunner
 
         self.plugins = [
             Mock(spec=BasePlugin),

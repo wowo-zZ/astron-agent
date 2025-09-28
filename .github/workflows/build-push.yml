@@ -3,10 +3,12 @@ name: Build and Push astron Agent Images
 on:
   push:
     branches:
+      - main
       - master
       - feature/**
   pull_request:
     branches:
+      - main
       - master
       - feature/**
   workflow_dispatch:
@@ -53,9 +55,11 @@ jobs:
           # Version is always latest
           VERSION="latest"
 
-          # Determine if should push (master, feature branches, PR, or manual dispatch)
+          # Determine if should push (main, master, feature branches, PR, or manual dispatch)
           SHOULD_PUSH="false"
-          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/master" ]]; then
+          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]]; then
+            SHOULD_PUSH="true"
+          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/master" ]]; then
             SHOULD_PUSH="true"
           elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == refs/heads/feature/* ]]; then
             SHOULD_PUSH="true"
@@ -106,7 +110,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/astron-agent-core-tenant
+            ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/core-tenant
           tags: |
             type=raw,value=latest
 
@@ -153,7 +157,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/astron-agent-core-memory
+            ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/core-memory
           tags: |
             type=raw,value=latest
 
@@ -200,7 +204,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/astron-agent-core-rpa
+            ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/core-rpa
           tags: |
             type=raw,value=latest
 
@@ -247,7 +251,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/astron-agent-core-link
+            ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/core-link
           tags: |
             type=raw,value=latest
 
@@ -294,7 +298,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/astron-agent-core-aitools
+            ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/core-aitools
           tags: |
             type=raw,value=latest
 
@@ -341,7 +345,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/astron-agent-core-agent
+            ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/core-agent
           tags: |
             type=raw,value=latest
 
@@ -388,7 +392,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/astron-agent-core-knowledge
+            ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/core-knowledge
           tags: |
             type=raw,value=latest
 
@@ -435,7 +439,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/astron-agent-core-workflow
+            ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/core-workflow
           tags: |
             type=raw,value=latest
 
@@ -482,7 +486,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/astron-agent-console-frontend
+            ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/console-frontend
           tags: |
             type=raw,value=latest
 
@@ -529,7 +533,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/astron-agent-console-hub
+            ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/console-hub
           tags: |
             type=raw,value=latest
 
@@ -613,16 +617,16 @@ jobs:
           if [[ "${{ needs.detect-and-prepare.outputs.should-push }}" == "true" ]]; then
             echo ""
             echo "🎯 Published Images:"
-            [[ "${{ needs.build-core-tenant.result }}" == "success" ]] && echo "  🏢 ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/astron-agent-core-tenant:${{ needs.detect-and-prepare.outputs.version }}"
-            [[ "${{ needs.build-core-memory.result }}" == "success" ]] && echo "  🧠 ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/astron-agent-core-memory:${{ needs.detect-and-prepare.outputs.version }}"
-            [[ "${{ needs.build-core-rpa.result }}" == "success" ]] && echo "  🤖 ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/astron-agent-core-rpa:${{ needs.detect-and-prepare.outputs.version }}"
-            [[ "${{ needs.build-core-link.result }}" == "success" ]] && echo "  🔗 ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/astron-agent-core-link:${{ needs.detect-and-prepare.outputs.version }}"
-            [[ "${{ needs.build-core-aitools.result }}" == "success" ]] && echo "  🛠️ ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/astron-agent-core-aitools:${{ needs.detect-and-prepare.outputs.version }}"
-            [[ "${{ needs.build-core-agent.result }}" == "success" ]] && echo "  🤖 ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/astron-agent-core-agent:${{ needs.detect-and-prepare.outputs.version }}"
-            [[ "${{ needs.build-core-knowledge.result }}" == "success" ]] && echo "  📚 ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/astron-agent-core-knowledge:${{ needs.detect-and-prepare.outputs.version }}"
-            [[ "${{ needs.build-core-workflow.result }}" == "success" ]] && echo "  ⚡ ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/astron-agent-core-workflow:${{ needs.detect-and-prepare.outputs.version }}"
-            [[ "${{ needs.build-console-frontend.result }}" == "success" ]] && echo "  🌐 ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/astron-agent-console-frontend:${{ needs.detect-and-prepare.outputs.version }}"
-            [[ "${{ needs.build-console-hub.result }}" == "success" ]] && echo "  🎯 ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/astron-agent-console-hub:${{ needs.detect-and-prepare.outputs.version }}"
+            [[ "${{ needs.build-core-tenant.result }}" == "success" ]] && echo "  🏢 ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/core-tenant:${{ needs.detect-and-prepare.outputs.version }}"
+            [[ "${{ needs.build-core-memory.result }}" == "success" ]] && echo "  🧠 ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/core-memory:${{ needs.detect-and-prepare.outputs.version }}"
+            [[ "${{ needs.build-core-rpa.result }}" == "success" ]] && echo "  🤖 ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/core-rpa:${{ needs.detect-and-prepare.outputs.version }}"
+            [[ "${{ needs.build-core-link.result }}" == "success" ]] && echo "  🔗 ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/core-link:${{ needs.detect-and-prepare.outputs.version }}"
+            [[ "${{ needs.build-core-aitools.result }}" == "success" ]] && echo "  🛠️ ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/core-aitools:${{ needs.detect-and-prepare.outputs.version }}"
+            [[ "${{ needs.build-core-agent.result }}" == "success" ]] && echo "  🤖 ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/core-agent:${{ needs.detect-and-prepare.outputs.version }}"
+            [[ "${{ needs.build-core-knowledge.result }}" == "success" ]] && echo "  📚 ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/core-knowledge:${{ needs.detect-and-prepare.outputs.version }}"
+            [[ "${{ needs.build-core-workflow.result }}" == "success" ]] && echo "  ⚡ ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/core-workflow:${{ needs.detect-and-prepare.outputs.version }}"
+            [[ "${{ needs.build-console-frontend.result }}" == "success" ]] && echo "  🌐 ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/console-frontend:${{ needs.detect-and-prepare.outputs.version }}"
+            [[ "${{ needs.build-console-hub.result }}" == "success" ]] && echo "  🎯 ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/console-hub:${{ needs.detect-and-prepare.outputs.version }}"
           fi
 
           if [[ "$SUCCESS_COUNT" == "$TOTAL_COUNT" ]]; then

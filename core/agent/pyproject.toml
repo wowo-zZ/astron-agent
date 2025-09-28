@@ -80,6 +80,11 @@ pretty = true
 ignore_missing_imports = true
 exclude = ["build/", "dist/", ".eggs/", "../common/"]
 
+# Per-module options for pytest
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_decorators = false
+
 # Pylint static analysis configuration
 [tool.pylint.main]
 jobs = 0

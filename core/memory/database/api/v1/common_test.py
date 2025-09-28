@@ -5,9 +5,11 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 import sqlalchemy.exc
-from memory.database.api.v1.common import (check_database_exists_by_did,
-                                           check_database_exists_by_did_uid,
-                                           check_space_id_and_get_uid)
+from memory.database.api.v1.common import (
+    check_database_exists_by_did,
+    check_database_exists_by_did_uid,
+    check_space_id_and_get_uid,
+)
 from memory.database.exceptions.error_code import CodeEnum
 from sqlmodel.ext.asyncio.session import AsyncSession
 

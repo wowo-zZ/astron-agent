@@ -2,7 +2,7 @@
 
 import csv
 import io
-from typing import Any, Generator, Union
+from typing import Generator, Union
 
 from common.otlp.metrics.meter import Meter
 from common.otlp.trace.span import Span

@@ -65,9 +65,16 @@ public class EnterpriseServiceImpl extends ServiceImpl<EnterpriseMapper, Enterpr
     @Override
     public Integer checkNeedCreateTeam() {
         UserInfo userInfo = RequestContextUtil.getUserInfo();
-        if (userInfo == null || userInfo.getEnterpriseServiceType() == null) {
+        Enterprise enterprise = getEnterpriseByUid(userInfo.getUid());
+        if (enterprise != null) {
+            // Already joined an enterprise team, no need to create a team
             return 0;
         }
+        if (userInfo == null || userInfo.getEnterpriseServiceType() == null) {
+            // No enterprise service, need to create a personal team
+            return 0;
+        }
+        // Has enterprise service, need to create an enterprise team
         return userInfo.getEnterpriseServiceType().getCode();
     }
 

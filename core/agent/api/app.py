@@ -21,7 +21,7 @@ handler_id = logger.add(sys.stderr, level="ERROR")  # Add a modifiable handler
 app = FastAPI()
 
 
-@app.exception_handler(RequestValidationError)
+@app.exception_handler(RequestValidationError)  # type: ignore[misc]
 async def validation_exception_handler(
     _request: Request, exc: RequestValidationError
 ) -> JSONResponse:

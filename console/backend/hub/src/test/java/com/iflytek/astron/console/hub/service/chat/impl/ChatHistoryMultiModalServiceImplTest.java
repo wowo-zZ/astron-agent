@@ -185,17 +185,17 @@ class ChatHistoryMultiModalServiceImplTest {
 
         try (MockedStatic<JSON> mockedJSON = mockStatic(JSON.class)) {
             mockedJSON.when(() -> JSON.parseObject(anyString(), any(Class.class)))
-                .thenAnswer(invocation -> {
-                    String jsonString = invocation.getArgument(0);
-                    Class<?> clazz = invocation.getArgument(1);
+                    .thenAnswer(invocation -> {
+                        String jsonString = invocation.getArgument(0);
+                        Class<?> clazz = invocation.getArgument(1);
 
-                    if (clazz == WorkflowEventData.EventValue.class) {
-                        return eventValue;
-                    } else if (clazz == WorkflowEventData.EventValue.ValueOption.class) {
-                        return selectedOption;
-                    }
-                    return null;
-                });
+                        if (clazz == WorkflowEventData.EventValue.class) {
+                            return eventValue;
+                        } else if (clazz == WorkflowEventData.EventValue.ValueOption.class) {
+                            return selectedOption;
+                        }
+                        return null;
+                    });
 
             // When
             List<Object> result = chatHistoryMultiModalService.mergeChatHistory(reqList, respList, botId);
@@ -322,7 +322,7 @@ class ChatHistoryMultiModalServiceImplTest {
 
         try (MockedStatic<JSON> mockedJSON = mockStatic(JSON.class)) {
             mockedJSON.when(() -> JSON.parseObject(anyString(), any(Class.class)))
-                .thenReturn(null); // Simulate parsing failure
+                    .thenReturn(null); // Simulate parsing failure
 
             // When
             List<Object> result = chatHistoryMultiModalService.mergeChatHistory(reqList, respList, botId);
@@ -351,7 +351,7 @@ class ChatHistoryMultiModalServiceImplTest {
 
         try (MockedStatic<JSON> mockedJSON = mockStatic(JSON.class)) {
             mockedJSON.when(() -> JSON.parseObject(anyString(), eq(WorkflowEventData.EventValue.class)))
-                .thenReturn(eventValue);
+                    .thenReturn(eventValue);
 
             // When
             List<Object> result = chatHistoryMultiModalService.mergeChatHistory(singleReqList, singleRespList, botId);

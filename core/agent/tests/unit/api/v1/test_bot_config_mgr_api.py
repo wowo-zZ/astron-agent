@@ -35,7 +35,7 @@ class TestBotConfigMgrAPI:
                 response = self.client.get(endpoint)
                 responses.append((endpoint, response.status_code))
             except (ConnectionError, ValueError, TypeError) as e:
-                responses.append((endpoint, f"Error: {e}"))  # type: ignore[arg-type]
+                responses.append((endpoint, f"Error: {e}"))
 
         # Verify that at least one endpoint responds
         valid_responses = [r for r in responses if isinstance(r[1], int)]

@@ -151,7 +151,7 @@ class BotConfigClient(BaseModel):
 
                 return bot_config
 
-    async def pull(self, raw: bool = False) -> BotConfig | dict:
+    async def pull(self, raw: bool = False) -> BotConfig | dict[Any, Any]:
         with self.span.start("Pull") as sp:
             bot_config = await self.pull_from_redis(sp) or await self.pull_from_mysql(
                 sp
@@ -170,7 +170,7 @@ class BotConfigClient(BaseModel):
                 )
 
             if raw:
-                return bot_config.model_dump(by_alias=True)
+                return bot_config.model_dump(by_alias=True)  # type: ignore[no-any-return]
 
             return bot_config
 
@@ -282,16 +282,16 @@ class BotConfigClient(BaseModel):
                         "regular_config",
                         bot_config.regular_config.model_dump_json(),
                     )
-                    record.tool_ids = json.dumps(  # type: ignore
+                    record.tool_ids = json.dumps(
                         bot_config.tool_ids, ensure_ascii=False
                     )
-                    record.mcp_server_ids = json.dumps(  # type: ignore
+                    record.mcp_server_ids = json.dumps(
                         bot_config.mcp_server_ids, ensure_ascii=False
                     )
-                    record.mcp_server_urls = json.dumps(  # type: ignore
+                    record.mcp_server_urls = json.dumps(
                         bot_config.mcp_server_urls, ensure_ascii=False
                     )
-                    record.flow_ids = json.dumps(  # type: ignore
+                    record.flow_ids = json.dumps(
                         bot_config.flow_ids, ensure_ascii=False
                     )
 

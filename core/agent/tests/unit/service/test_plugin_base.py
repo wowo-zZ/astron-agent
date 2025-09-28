@@ -380,7 +380,7 @@ class TestBasePlugin:
         """Test BasePlugin validation of required fields."""
         # Test missing name
         with pytest.raises(ValueError):
-            BasePlugin(  # type: ignore[call-arg]
+            BasePlugin(
                 description="Test description",
                 schema_template="test_schema",
                 typ="test",
@@ -389,7 +389,7 @@ class TestBasePlugin:
 
         # Test missing description
         with pytest.raises(ValueError):
-            BasePlugin(  # type: ignore[call-arg]
+            BasePlugin(
                 name="test_plugin",
                 schema_template="test_schema",
                 typ="test",
@@ -398,7 +398,7 @@ class TestBasePlugin:
 
         # Test missing typ
         with pytest.raises(ValueError):
-            BasePlugin(  # type: ignore[call-arg]
+            BasePlugin(
                 name="test_plugin",
                 description="Test description",
                 schema_template="test_schema",
@@ -407,7 +407,7 @@ class TestBasePlugin:
 
         # Test missing run
         with pytest.raises(ValueError):
-            BasePlugin(  # type: ignore[call-arg]
+            BasePlugin(
                 name="test_plugin",
                 description="Test description",
                 schema_template="test_schema",

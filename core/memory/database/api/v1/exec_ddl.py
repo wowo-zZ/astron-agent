@@ -10,8 +10,10 @@ from common.otlp.trace.span import Span
 from common.service import get_otlp_metric_service, get_otlp_span_service
 from fastapi import APIRouter, Depends
 from memory.database.api.schemas.exec_ddl_types import ExecDDLInput
-from memory.database.api.v1.common import (check_database_exists_by_did_uid,
-                                           check_space_id_and_get_uid)
+from memory.database.api.v1.common import (
+    check_database_exists_by_did_uid,
+    check_space_id_and_get_uid,
+)
 from memory.database.domain.entity.general import exec_sql_statement
 from memory.database.domain.entity.schema import set_search_path_by_schema
 from memory.database.domain.entity.views.http_resp import format_response

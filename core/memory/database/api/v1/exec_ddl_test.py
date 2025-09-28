@@ -5,8 +5,12 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from memory.database.api.schemas.exec_ddl_types import ExecDDLInput
-from memory.database.api.v1.exec_ddl import (_ddl_split, _reset_uid, exec_ddl,
-                                             is_ddl_allowed)
+from memory.database.api.v1.exec_ddl import (
+    _ddl_split,
+    _reset_uid,
+    exec_ddl,
+    is_ddl_allowed,
+)
 from memory.database.exceptions.error_code import CodeEnum
 from sqlmodel.ext.asyncio.session import AsyncSession
 

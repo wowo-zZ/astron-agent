@@ -5,8 +5,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from fastapi.responses import StreamingResponse
 from memory.database.api.schemas.export_data_types import ExportDataInput
-from memory.database.api.v1.export_data import (_set_search_path_and_exec,
-                                                export_data)
+from memory.database.api.v1.export_data import _set_search_path_and_exec, export_data
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 

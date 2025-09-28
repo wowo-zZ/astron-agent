@@ -40,5 +40,5 @@ class TbBotConfig(Base):  # type: ignore[valid-type,misc]
             )
 
             if record:
-                record.is_deleted = True  # type: ignore[assignment]
+                record.is_deleted = True
                 session.commit()

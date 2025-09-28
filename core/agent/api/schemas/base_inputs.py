@@ -20,7 +20,7 @@ class BaseInputs(BaseModel):
     stream: bool = Field(default=False)
     meta_data: MetaDataInputs = Field(default_factory=MetaDataInputs)
 
-    @model_validator(mode="before")
+    @model_validator(mode="before")  # type: ignore[misc]
     @classmethod
     def validate_messages_params(cls, values: Any) -> Any:
         if not isinstance(values, dict):

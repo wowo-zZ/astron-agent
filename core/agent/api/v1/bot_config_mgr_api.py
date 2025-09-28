@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from typing import Any, AsyncIterator, Callable, Dict, Optional
 
 from fastapi import APIRouter, Query
+from fastapi.routing import APIRoute
 
 from api.schemas.bot_config import BotConfig
 from api.schemas.bot_config_mgr_response import GeneralResponse
@@ -130,7 +131,7 @@ async def handle_bot_config_operation(
         )
 
 
-@bot_config_mgr_router.post("/bot-config")
+@bot_config_mgr_router.post("/bot-config")  # type: ignore[misc]
 async def create_bot_config(bot_config: BotConfig) -> GeneralResponse:
     """Create new bot config"""
 
@@ -148,7 +149,7 @@ async def create_bot_config(bot_config: BotConfig) -> GeneralResponse:
     )
 
 
-@bot_config_mgr_router.delete("/bot-config")
+@bot_config_mgr_router.delete("/bot-config")  # type: ignore[misc]
 async def delete_bot_config(
     app_id: str = Query(min_length=1, max_length=64),
     bot_id: str = Query(min_length=1, max_length=64),
@@ -167,7 +168,7 @@ async def delete_bot_config(
     )
 
 
-@bot_config_mgr_router.put("/bot-config")
+@bot_config_mgr_router.put("/bot-config")  # type: ignore[misc]
 async def update_bot_config(bot_config: BotConfig) -> GeneralResponse:
     """Update bot config"""
 
@@ -185,14 +186,14 @@ async def update_bot_config(bot_config: BotConfig) -> GeneralResponse:
     )
 
 
-@bot_config_mgr_router.get("/bot-config")
+@bot_config_mgr_router.get("/bot-config")  # type: ignore[misc]
 async def get_bot_config(
     app_id: str = Query(min_length=1, max_length=64),
     bot_id: str = Query(min_length=1, max_length=64),
 ) -> GeneralResponse:
     """Query bot config"""
 
-    async def _get_operation(sp: Span) -> Dict[str, Any]:
+    async def _get_operation(sp: Span) -> dict[str, Any]:
         bot_config_result = await BotConfigClient(
             app_id=app_id, bot_id=bot_id, span=sp
         ).pull(raw=True)
@@ -200,7 +201,7 @@ async def get_bot_config(
         # Ensure returning dict type
         if isinstance(bot_config_result, dict):
             return bot_config_result
-        return bot_config_result.model_dump()
+        return bot_config_result.model_dump()  # type: ignore[no-any-return]
 
     return await handle_bot_config_operation(
         operation_func=_get_operation,

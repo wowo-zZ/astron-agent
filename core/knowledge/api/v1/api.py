@@ -52,21 +52,6 @@ def get_span_and_metric(
     return span, metric
 
 
-def set_safe_attribute(span_context: Span, key: str, value: Any) -> None:
-    """Safely set attributes, handling complex types"""
-    if isinstance(value, (dict, list)):
-        # Convert complex types to JSON string
-        span_context.set_attribute(
-            key, json.dumps(value, ensure_ascii=False, default=str)
-        )
-    elif isinstance(value, (str, int, float, bool, bytes)) or value is None:
-        # Basic types, set directly
-        span_context.set_attribute(key, value)
-    else:
-        # Other types (like custom objects), try to stringify
-        span_context.set_attribute(key, str(value))
-
-
 # --- Helper Functions ---
 async def handle_rag_operation(
     *,
@@ -95,10 +80,26 @@ async def handle_rag_operation(
         result_data = await operation_callable(**operation_kwargs, span=span_context)
 
         # Record successful output and metrics
-        set_safe_attribute(span_context, "usr_output", result_data)
+        # set_safe_attribute(span_context, result_data)
+        """Safely set attributes, handling complex types"""
+        if isinstance(result_data, (dict, list)):
+            # Convert complex types to JSON string
+            span_context.add_info_events(
+                {"usr_output": json.dumps(result_data, ensure_ascii=False, default=str)}
+            )
+        elif (
+            isinstance(result_data, (str, int, float, bool, bytes))
+            or result_data is None
+        ):
+            # Basic types, set directly
+            span_context.add_info_events({"usr_output": result_data})
+        else:
+            # Other types (like custom objects), try to stringify
+            span_context.add_info_events({"usr_output": str(result_data)})
+
         metric.in_success_count()
 
-        return SuccessDataResponse(data=result_data)
+        return SuccessDataResponse(data=result_data, sid=span_context.sid)
 
     except ProtocolParamException as e:
         error_msg = f"{operation_callable.__name__} ProtocolParamException, reason {e}"

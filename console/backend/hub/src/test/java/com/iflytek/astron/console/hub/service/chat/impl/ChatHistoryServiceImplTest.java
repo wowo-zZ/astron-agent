@@ -1,6 +1,5 @@
 package com.iflytek.astron.console.hub.service.chat.impl;
 
-import com.alibaba.fastjson2.JSONObject;
 import com.iflytek.astron.console.commons.dto.llm.SparkChatRequest;
 import com.iflytek.astron.console.commons.entity.chat.*;
 import com.iflytek.astron.console.commons.service.data.ChatDataService;
@@ -262,7 +261,8 @@ class ChatHistoryServiceImplTest {
         assertFalse(result.getMessages().isEmpty());
 
         // Should contain multimodal content
-        boolean hasMultimodalResponse = result.getMessages().stream()
+        boolean hasMultimodalResponse = result.getMessages()
+                .stream()
                 .anyMatch(msg -> "assistant".equals(msg.getRole()));
         assertTrue(hasMultimodalResponse);
     }
@@ -460,9 +460,10 @@ class ChatHistoryServiceImplTest {
         assertFalse(result.getMessages().isEmpty());
 
         // Should contain textual assistant response
-        boolean hasTextualResponse = result.getMessages().stream()
+        boolean hasTextualResponse = result.getMessages()
+                .stream()
                 .anyMatch(msg -> "assistant".equals(msg.getRole()) &&
-                         "Text response".equals(msg.getContent()));
+                        "Text response".equals(msg.getContent()));
         assertTrue(hasTextualResponse);
     }
 

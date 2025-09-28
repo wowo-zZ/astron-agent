@@ -11,7 +11,7 @@ def orjson_dumps(
     *,
     default: Optional[Callable[[Any], Any]] = None,
     sort_keys: bool = False,
-    indent_2: bool = True
+    indent_2: bool = True,
 ) -> str:
     """Serialize Python object to JSON string using orjson.
 

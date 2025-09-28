@@ -6,8 +6,11 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from memory.database.api.schemas.upload_data_types import UploadDataInput
-from memory.database.api.v1.upload_data import (insert_in_batches,
-                                                parse_upload_file, upload_data)
+from memory.database.api.v1.upload_data import (
+    insert_in_batches,
+    parse_upload_file,
+    upload_data,
+)
 from memory.database.exceptions.error_code import CodeEnum
 from sqlmodel.ext.asyncio.session import AsyncSession
 from starlette.responses import JSONResponse

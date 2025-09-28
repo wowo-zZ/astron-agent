@@ -218,7 +218,7 @@ class TestMysqlClient:
                     raise RuntimeError("Database error")
 
             # Assert
-            assert "Database error" in str(exc_info.value)
+            assert "Database error" in str(exc_info.value)  # type: ignore[unreachable]
             mock_session.rollback.assert_called_once()
             mock_session.close.assert_called_once()
             # commit should not be called when exception occurs

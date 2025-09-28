@@ -57,8 +57,8 @@ public class BotDatasetServiceImpl implements BotDatasetService {
                 List<DatasetInfo> ownedDatasets = datasetInfoMapper.selectList(
                         Wrappers.lambdaQuery(DatasetInfo.class)
                                 .in(DatasetInfo::getId, datasetList)
-                                .eq(DatasetInfo::getStatus, 2)  // Processed status
-                                .eq(DatasetInfo::getUid, uid)   // Owner user
+                                .eq(DatasetInfo::getStatus, 2) // Processed status
+                                .eq(DatasetInfo::getUid, uid) // Owner user
                 );
 
                 if (ownedDatasets.size() != datasetList.size()) {

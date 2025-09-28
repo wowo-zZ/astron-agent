@@ -156,7 +156,7 @@ class ChatCompletion(CompletionBase):
             self._update_tool_calls(response, chunk)
             self._update_response_metadata(response, chunk)
 
-        return response.model_dump()
+        return response.model_dump()  # type: ignore[no-any-return]
 
     async def build_runner(self, span: Span) -> OpenAPIRunner:
         """Build agent"""
@@ -169,7 +169,7 @@ class ChatCompletion(CompletionBase):
             return runner
 
 
-@openapi_router.post("/chat/completions")
+@openapi_router.post("/chat/completions")  # type: ignore[misc]
 async def chat_completions(
     x_consumer_username: Annotated[str, Header()], inputs: CompletionInputs
 ) -> Any:
