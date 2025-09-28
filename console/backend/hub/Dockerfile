@@ -6,6 +6,8 @@ COPY console/backend/commons/pom.xml commons/pom.xml
 COPY console/backend/hub/pom.xml hub/pom.xml
 COPY console/backend/toolkit/pom.xml toolkit/pom.xml
 
+RUN mvn -pl hub -am dependency:go-offline
+
 COPY console/backend/ .
 RUN mvn -DskipTests package -pl hub -am
 
