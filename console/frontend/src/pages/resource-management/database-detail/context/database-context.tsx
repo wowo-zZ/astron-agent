@@ -6,8 +6,8 @@ import React, {
   useRef,
   ReactNode,
   RefObject,
-} from "react";
-import { DatabaseItem } from "@/types/database";
+} from 'react';
+import { DatabaseItem } from '@/types/database';
 
 // 定义状态类型
 interface DatabaseState {
@@ -38,27 +38,27 @@ interface DatabaseState {
 
 // 定义Action类型
 type DatabaseAction =
-  | { type: "SET_DB_DETAIL"; payload: DatabaseItem }
+  | { type: 'SET_DB_DETAIL'; payload: DatabaseItem }
   | {
-      type: "SET_TABLES";
+      type: 'SET_TABLES';
       payload: { tables: DatabaseItem[]; loading: boolean };
     }
-  | { type: "SET_CURRENT_SHEET"; payload: DatabaseItem | null }
+  | { type: 'SET_CURRENT_SHEET'; payload: DatabaseItem | null }
   | {
-      type: "SET_TEST_DATA";
+      type: 'SET_TEST_DATA';
       payload: { data: Record<string, unknown>[]; loading: boolean };
     }
   | {
-      type: "SET_PAGINATION";
+      type: 'SET_PAGINATION';
       payload: { pageNum: number; pageSize: number; total: number };
     }
-  | { type: "SET_DATA_TYPE"; payload: number }
-  | { type: "SET_EXPORT_LOADING"; payload: boolean }
+  | { type: 'SET_DATA_TYPE'; payload: number }
+  | { type: 'SET_EXPORT_LOADING'; payload: boolean }
   | {
-      type: "SET_MODAL_STATE";
-      payload: { modal: "import" | "createDatabase" | "addRow"; open: boolean };
+      type: 'SET_MODAL_STATE';
+      payload: { modal: 'import' | 'createDatabase' | 'addRow'; open: boolean };
     }
-  | { type: "RESET_STATE" };
+  | { type: 'RESET_STATE' };
 
 // 初始状态
 const initialState: DatabaseState = {
@@ -83,52 +83,52 @@ const initialState: DatabaseState = {
 // Reducer函数
 function databaseReducer(
   state: DatabaseState,
-  action: DatabaseAction,
+  action: DatabaseAction
 ): DatabaseState {
   switch (action.type) {
-    case "SET_DB_DETAIL":
+    case 'SET_DB_DETAIL':
       return { ...state, dbDetailData: action.payload };
 
-    case "SET_TABLES":
+    case 'SET_TABLES':
       return {
         ...state,
         tables: action.payload.tables,
         tablesLoad: action.payload.loading,
       };
 
-    case "SET_CURRENT_SHEET":
+    case 'SET_CURRENT_SHEET':
       return { ...state, currentSheet: action.payload };
 
-    case "SET_TEST_DATA":
+    case 'SET_TEST_DATA':
       return {
         ...state,
         testDataSource: action.payload.data,
         testTableLoading: action.payload.loading,
       };
 
-    case "SET_PAGINATION":
+    case 'SET_PAGINATION':
       return { ...state, pagination: action.payload };
 
-    case "SET_DATA_TYPE":
+    case 'SET_DATA_TYPE':
       return { ...state, dataType: action.payload };
 
-    case "SET_EXPORT_LOADING":
+    case 'SET_EXPORT_LOADING':
       return { ...state, exportLoading: action.payload };
 
-    case "SET_MODAL_STATE": {
+    case 'SET_MODAL_STATE': {
       const { modal, open } = action.payload;
 
       // 修正键名映射
       let key: string;
       switch (modal) {
-        case "createDatabase":
-          key = "createDatabaseOpen";
+        case 'createDatabase':
+          key = 'createDatabaseOpen';
           break;
-        case "import":
-          key = "importModalOpen";
+        case 'import':
+          key = 'importModalOpen';
           break;
-        case "addRow":
-          key = "addRowModalOpen";
+        case 'addRow':
+          key = 'addRowModalOpen';
           break;
         default:
           key = `${modal}ModalOpen`;
@@ -140,7 +140,7 @@ function databaseReducer(
       };
     }
 
-    case "RESET_STATE":
+    case 'RESET_STATE':
       return initialState;
 
     default:
@@ -172,8 +172,8 @@ interface DatabaseContextType {
     setDataType: (type: number) => void;
     setExportLoading: (loading: boolean) => void;
     setModalState: (
-      modal: "import" | "createDatabase" | "addRow",
-      open: boolean,
+      modal: 'import' | 'createDatabase' | 'addRow',
+      open: boolean
     ) => void;
     resetState: () => void;
   };
@@ -218,19 +218,19 @@ export const DatabaseProvider: React.FC<DatabaseProviderProps> = ({
   const actions = useMemo(
     () => ({
       setDbDetail: (data: DatabaseItem): void => {
-        dispatch({ type: "SET_DB_DETAIL", payload: data });
+        dispatch({ type: 'SET_DB_DETAIL', payload: data });
       },
 
       setTables: (tables: DatabaseItem[], loading = false): void => {
-        dispatch({ type: "SET_TABLES", payload: { tables, loading } });
+        dispatch({ type: 'SET_TABLES', payload: { tables, loading } });
       },
 
       setCurrentSheet: (sheet: DatabaseItem | null): void => {
-        dispatch({ type: "SET_CURRENT_SHEET", payload: sheet });
+        dispatch({ type: 'SET_CURRENT_SHEET', payload: sheet });
       },
 
       setTestData: (data: Record<string, unknown>[], loading = false): void => {
-        dispatch({ type: "SET_TEST_DATA", payload: { data, loading } });
+        dispatch({ type: 'SET_TEST_DATA', payload: { data, loading } });
       },
 
       setPagination: (pagination: {
@@ -238,29 +238,29 @@ export const DatabaseProvider: React.FC<DatabaseProviderProps> = ({
         pageSize: number;
         total: number;
       }): void => {
-        dispatch({ type: "SET_PAGINATION", payload: pagination });
+        dispatch({ type: 'SET_PAGINATION', payload: pagination });
       },
 
       setDataType: (type: number): void => {
-        dispatch({ type: "SET_DATA_TYPE", payload: type });
+        dispatch({ type: 'SET_DATA_TYPE', payload: type });
       },
 
       setExportLoading: (loading: boolean): void => {
-        dispatch({ type: "SET_EXPORT_LOADING", payload: loading });
+        dispatch({ type: 'SET_EXPORT_LOADING', payload: loading });
       },
 
       setModalState: (
-        modal: "import" | "createDatabase" | "addRow",
-        open: boolean,
+        modal: 'import' | 'createDatabase' | 'addRow',
+        open: boolean
       ): void => {
-        dispatch({ type: "SET_MODAL_STATE", payload: { modal, open } });
+        dispatch({ type: 'SET_MODAL_STATE', payload: { modal, open } });
       },
 
       resetState: (): void => {
-        dispatch({ type: "RESET_STATE" });
+        dispatch({ type: 'RESET_STATE' });
       },
     }),
-    [dispatch],
+    [dispatch]
   );
 
   const value: DatabaseContextType = useMemo(
@@ -270,7 +270,7 @@ export const DatabaseProvider: React.FC<DatabaseProviderProps> = ({
       testTableRef,
       actions,
     }),
-    [state, dispatch, testTableRef, actions],
+    [state, dispatch, testTableRef, actions]
   );
 
   return (
@@ -285,7 +285,7 @@ export const useDatabaseContext = (): DatabaseContextType => {
   const context = useContext(DatabaseContext);
   if (!context) {
     throw new Error(
-      "useDatabaseContext must be used within a DatabaseProvider",
+      'useDatabaseContext must be used within a DatabaseProvider'
     );
   }
   return context;
@@ -297,7 +297,7 @@ export const useDatabaseState = (): DatabaseState => {
   return state;
 };
 
-export const useDatabaseActions = (): DatabaseContextType["actions"] => {
+export const useDatabaseActions = (): DatabaseContextType['actions'] => {
   const { actions } = useDatabaseContext();
   return actions;
 };

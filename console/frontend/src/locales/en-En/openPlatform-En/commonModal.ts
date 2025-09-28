@@ -5,8 +5,8 @@
  */
 const transition = {
   agentDelete: {
-    success: "Delete Success",
-    failed: "Delete Failed",
+    success: 'Delete Success',
+    failed: 'Delete Failed',
   },
 };
 

@@ -4,32 +4,32 @@ import React, {
   useCallback,
   useMemo,
   useRef,
-} from "react";
-import { Select, message } from "antd";
-import { useParams, useNavigate } from "react-router-dom";
-import { useDebounceFn } from "ahooks";
+} from 'react';
+import { Select, message } from 'antd';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useDebounceFn } from 'ahooks';
 
-import SpaceTab from "@/components/space/space-tab";
-import SpaceSearch from "@/components/space/space-search";
-import DetailHeader from "./components/detail-header";
-import MemberManagement from "./components/member-management";
-import ApplyManagement from "./components/apply-management";
+import SpaceTab from '@/components/space/space-tab';
+import SpaceSearch from '@/components/space/space-search';
+import DetailHeader from './components/detail-header';
+import MemberManagement from './components/member-management';
+import ApplyManagement from './components/apply-management';
 import InvitationManagement, {
   InvitationManagementRef,
-} from "./components/invitation-management";
-import SpaceSettings from "./components/space-settings";
-import AddMemberModal from "@/components/space/add-member-modal";
-import SpaceModal from "@/components/space/space-modal";
-import { useSpaceI18n } from "@/pages/space/hooks/use-space-i18n";
-import useUserStore from "@/store/user-store";
-import useSpaceStore from "@/store/space-store";
-import { SpaceType, RoleType } from "@/permissions/permission-type";
-import { roleToRoleType } from "@/pages/space/config";
-import { useSpaceType } from "@/hooks/use-space-type";
-import { useEnterprise } from "@/hooks/use-enterprise";
-import styles from "./index.module.scss";
-import { TAB_KEYS, DEBOUNCE_DELAY, DEFAULT_VALUES } from "@/pages/space/config";
-import { getSpaceDetail, spaceInvite, visitSpace } from "@/services/space";
+} from './components/invitation-management';
+import SpaceSettings from './components/space-settings';
+import AddMemberModal from '@/components/space/add-member-modal';
+import SpaceModal from '@/components/space/space-modal';
+import { useSpaceI18n } from '@/pages/space/hooks/use-space-i18n';
+import useUserStore from '@/store/user-store';
+import useSpaceStore from '@/store/space-store';
+import { SpaceType, RoleType } from '@/types/permission';
+import { roleToRoleType } from '@/pages/space/config';
+import { useSpaceType } from '@/hooks/use-space-type';
+import { useEnterprise } from '@/hooks/use-enterprise';
+import styles from './index.module.scss';
+import { TAB_KEYS, DEBOUNCE_DELAY, DEFAULT_VALUES } from '@/pages/space/config';
+import { getSpaceDetail, spaceInvite, visitSpace } from '@/services/space';
 
 const { Option } = Select;
 
@@ -38,7 +38,7 @@ interface SpaceInfo {
   name: string;
   description: string;
   avatarUrl?: string;
-  role: "owner" | "admin" | "member";
+  role: 'owner' | 'admin' | 'member';
   memberCount: number;
   totalMembers: number;
   ownerName: string;
@@ -147,37 +147,37 @@ const useFilterStates = (): FilterStatesReturn => {
 
 // 防抖搜索Hook
 const useDebounceSearch = (
-  params: DebounceSearchParams,
+  params: DebounceSearchParams
 ): DebounceSearchReturn => {
   const { setMemberFilter, setApplyFilter, setInvitationFilter } = params;
   const { run: debouncedMemberSearch } = useDebounceFn(
     (value: string) => {
-      setMemberFilter((prev) => ({
+      setMemberFilter(prev => ({
         ...prev,
         searchValue: value,
       }));
     },
-    { wait: DEBOUNCE_DELAY },
+    { wait: DEBOUNCE_DELAY }
   );
 
   const { run: debouncedApplySearch } = useDebounceFn(
     (value: string) => {
-      setApplyFilter((prev) => ({
+      setApplyFilter(prev => ({
         ...prev,
         searchValue: value,
       }));
     },
-    { wait: DEBOUNCE_DELAY },
+    { wait: DEBOUNCE_DELAY }
   );
 
   const { run: debouncedInvitationSearch } = useDebounceFn(
     (value: string) => {
-      setInvitationFilter((prev) => ({
+      setInvitationFilter(prev => ({
         ...prev,
         searchValue: value,
       }));
     },
-    { wait: DEBOUNCE_DELAY },
+    { wait: DEBOUNCE_DELAY }
   );
 
   return {
@@ -200,67 +200,67 @@ const useSearchHandlers = (params: SearchHandlersParams): SearchHandlers => {
   const handleMemberSearch = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value;
-      setMemberFilter((prev) => ({
+      setMemberFilter(prev => ({
         ...prev,
         inputValue: value,
       }));
       debouncedMemberSearch(value);
     },
-    [debouncedMemberSearch, setMemberFilter],
+    [debouncedMemberSearch, setMemberFilter]
   );
 
   const handleApplySearch = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value;
-      setApplyFilter((prev) => ({
+      setApplyFilter(prev => ({
         ...prev,
         inputValue: value,
       }));
       debouncedApplySearch(value);
     },
-    [debouncedApplySearch, setApplyFilter],
+    [debouncedApplySearch, setApplyFilter]
   );
 
   const handleInvitationSearch = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value;
-      setInvitationFilter((prev) => ({
+      setInvitationFilter(prev => ({
         ...prev,
         inputValue: value,
       }));
       debouncedInvitationSearch(value);
     },
-    [debouncedInvitationSearch, setInvitationFilter],
+    [debouncedInvitationSearch, setInvitationFilter]
   );
 
   const handleMemberRoleFilterChange = useCallback(
     (value: string) => {
-      setMemberFilter((prev) => ({
+      setMemberFilter(prev => ({
         ...prev,
         filterValue: value,
       }));
     },
-    [setMemberFilter],
+    [setMemberFilter]
   );
 
   const handleApplyStatusFilterChange = useCallback(
     (value: string) => {
-      setApplyFilter((prev) => ({
+      setApplyFilter(prev => ({
         ...prev,
         filterValue: value,
       }));
     },
-    [setApplyFilter],
+    [setApplyFilter]
   );
 
   const handleInvitationStatusFilterChange = useCallback(
     (value: string) => {
-      setInvitationFilter((prev) => ({
+      setInvitationFilter(prev => ({
         ...prev,
         filterValue: value,
       }));
     },
-    [setInvitationFilter],
+    [setInvitationFilter]
   );
 
   return {
@@ -325,14 +325,14 @@ const useSpaceInfo = (spaceId: string | undefined): UseSpaceInfoReturn => {
         await visitSpace(spaceId);
         setSpaceStore({
           enterpriseId: detailEnterpriseId,
-          spaceType: detailEnterpriseId ? "team" : "personal",
+          spaceType: detailEnterpriseId ? 'team' : 'personal',
         });
         setTimeout(() => {
           getLastVisitSpace();
         });
       }
     },
-    [spaceId, isTeamSpace, setSpaceStore, getLastVisitSpace],
+    [spaceId, isTeamSpace, setSpaceStore, getLastVisitSpace]
   );
 
   const loadSpaceInfo = useCallback(async (): Promise<void> => {
@@ -351,7 +351,7 @@ const useSpaceInfo = (spaceId: string | undefined): UseSpaceInfoReturn => {
       setSpaceInfo(spaceInfo);
       setUserRole(
         spaceType as SpaceType,
-        roleToRoleType(spaceInfo?.userRole, isTeamSpace()) as RoleType,
+        roleToRoleType(spaceInfo?.userRole, isTeamSpace()) as RoleType
       );
     } catch (err: unknown) {
       const error = err as { msg?: string; desc?: string };
@@ -489,7 +489,7 @@ const useTabContent = (params: TabContentParams): React.ReactNode => {
 const renderMembersTabAction = (
   memberFilter: FilterState,
   roleOptions: OptionData[],
-  searchHandlers: SearchHandlers,
+  searchHandlers: SearchHandlers
 ): React.JSX.Element => (
   <div key={TAB_KEYS.MEMBERS} className={styles.tabActions}>
     <Select
@@ -498,14 +498,14 @@ const renderMembersTabAction = (
       className={styles.filterSelect}
       placeholder="选择角色"
     >
-      {roleOptions.map((option) => (
+      {roleOptions.map(option => (
         <Option key={option.value} value={option.value}>
           {option.label}
         </Option>
       ))}
     </Select>
     <SpaceSearch
-      style={{ borderColor: "#E4EAFF" }}
+      style={{ borderColor: '#E4EAFF' }}
       value={memberFilter.inputValue}
       onChange={searchHandlers.handleMemberSearch}
       placeholder="请输入用户名"
@@ -517,7 +517,7 @@ const renderMembersTabAction = (
 const renderApplyTabAction = (
   applyFilter: FilterState,
   statusOptionsApply: OptionData[],
-  searchHandlers: SearchHandlers,
+  searchHandlers: SearchHandlers
 ): React.JSX.Element => (
   <div key={TAB_KEYS.APPLY} className={styles.tabActions}>
     <Select
@@ -526,14 +526,14 @@ const renderApplyTabAction = (
       className={styles.filterSelect}
       placeholder="选择状态"
     >
-      {statusOptionsApply.map((option) => (
+      {statusOptionsApply.map(option => (
         <Option key={option.value} value={option.value}>
           {option.label}
         </Option>
       ))}
     </Select>
     <SpaceSearch
-      style={{ borderColor: "#E4EAFF" }}
+      style={{ borderColor: '#E4EAFF' }}
       value={applyFilter.inputValue}
       onChange={searchHandlers.handleApplySearch}
       placeholder="请输入用户名"
@@ -545,7 +545,7 @@ const renderApplyTabAction = (
 const renderInvitationTabAction = (
   invitationFilter: FilterState,
   statusOptions: OptionData[],
-  searchHandlers: SearchHandlers,
+  searchHandlers: SearchHandlers
 ): React.JSX.Element => (
   <div key={TAB_KEYS.INVITATIONS} className={styles.tabActions}>
     <Select
@@ -554,14 +554,14 @@ const renderInvitationTabAction = (
       className={styles.filterSelect}
       placeholder="选择状态"
     >
-      {statusOptions.map((option) => (
+      {statusOptions.map(option => (
         <Option key={option.value} value={option.value}>
           {option.label}
         </Option>
       ))}
     </Select>
     <SpaceSearch
-      style={{ borderColor: "#E4EAFF" }}
+      style={{ borderColor: '#E4EAFF' }}
       value={invitationFilter.inputValue}
       onChange={searchHandlers.handleInvitationSearch}
       placeholder="请输入用户名"
@@ -588,19 +588,19 @@ const useTabActions = (params: TabActionsParams): React.ReactNode => {
         return renderMembersTabAction(
           memberFilter,
           roleOptions,
-          searchHandlers,
+          searchHandlers
         );
       case TAB_KEYS.APPLY:
         return renderApplyTabAction(
           applyFilter,
           statusOptionsApply,
-          searchHandlers,
+          searchHandlers
         );
       case TAB_KEYS.INVITATIONS:
         return renderInvitationTabAction(
           invitationFilter,
           statusOptions,
-          searchHandlers,
+          searchHandlers
         );
       default:
         return null;
@@ -702,12 +702,12 @@ const SpaceDetail: React.FC = () => {
   const handleAddMemberModalSubmit = useCallback(
     async (values: Array<{ uid: string; role: string }>) => {
       try {
-        const members = (values || []).map((item) => ({
+        const members = (values || []).map(item => ({
           uid: item.uid,
           role: item.role,
         }));
         await spaceInvite(members);
-        message.success("邀请成功");
+        message.success('邀请成功');
         handleAddMemberModalClose();
         invitationManagementRef.current?.reload();
       } catch (error: unknown) {
@@ -715,7 +715,7 @@ const SpaceDetail: React.FC = () => {
         message.error(err?.msg || messages.ERROR.MEMBER_ADD);
       }
     },
-    [messages, handleAddMemberModalClose],
+    [messages, handleAddMemberModalClose]
   );
 
   // 加载状态渲染

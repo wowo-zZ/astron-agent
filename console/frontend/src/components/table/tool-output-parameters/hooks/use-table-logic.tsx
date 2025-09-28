@@ -1,10 +1,10 @@
-import { InputParamsData } from "@/types/resource";
-import { useEffect, useState, useCallback } from "react";
-import { v4 as uuid } from "uuid";
-import { cloneDeep } from "lodash";
-import expand from "@/assets/imgs/plugin/icon_fold.png";
-import shrink from "@/assets/imgs/plugin/icon_shrink.png";
-import React from "react";
+import { InputParamsData } from '@/types/resource';
+import { useEffect, useState, useCallback } from 'react';
+import { v4 as uuid } from 'uuid';
+import { cloneDeep } from 'lodash';
+import expand from '@/assets/imgs/plugin/icon_fold.png';
+import shrink from '@/assets/imgs/plugin/icon_shrink.png';
+import React from 'react';
 
 export const useTableLogic = ({
   outputParamsData,
@@ -19,12 +19,12 @@ export const useTableLogic = ({
   handleInputParamsChange: (
     id: string,
     key: string,
-    value: string | number | boolean,
+    value: string | number | boolean
   ) => void;
   handleAddItem: (record: InputParamsData) => void;
   deleteNodeFromTree: (
     tree: InputParamsData[],
-    id: string,
+    id: string
   ) => InputParamsData[];
   handleExpand: (record: InputParamsData) => void;
   handleCollapse: (record: InputParamsData) => void;
@@ -40,7 +40,7 @@ export const useTableLogic = ({
 
   useEffect(() => {
     const allKeys: string[] = [];
-    outputParamsData.forEach((item) => {
+    outputParamsData.forEach(item => {
       if (item.children) {
         allKeys.push(item.id);
       }
@@ -51,17 +51,17 @@ export const useTableLogic = ({
   const handleAddData = useCallback(() => {
     const newData = {
       id: uuid(),
-      name: "",
-      description: "",
-      type: "string",
+      name: '',
+      description: '',
+      type: 'string',
       open: true,
     } as unknown as InputParamsData;
-    setOutputParamsData((outputParamsData) => [...outputParamsData, newData]);
+    setOutputParamsData(outputParamsData => [...outputParamsData, newData]);
   }, []);
 
   const findNodeById = (
     tree: InputParamsData[],
-    id: string,
+    id: string
   ): InputParamsData | null => {
     for (const node of tree) {
       if (node.id === id) {
@@ -84,38 +84,38 @@ export const useTableLogic = ({
       const currentNode =
         findNodeById(outputParamsData, id) || ({} as InputParamsData);
       currentNode[key] = value;
-      if (key === "type" && ["array", "object"].includes(value as string)) {
+      if (key === 'type' && ['array', 'object'].includes(value as string)) {
         const newData = {
           id: uuid(),
-          name: "",
-          description: "",
-          type: "string",
+          name: '',
+          description: '',
+          type: 'string',
           open: true,
         } as unknown as InputParamsData;
         newData.fatherType = value;
-        if (currentNode.type === "array") {
-          newData.name = "[Array Item]";
+        if (currentNode.type === 'array') {
+          newData.name = '[Array Item]';
         }
-        if (currentNode?.type === "array" || currentNode?.arraySon) {
+        if (currentNode?.type === 'array' || currentNode?.arraySon) {
           newData.arraySon = true;
         }
         currentNode.children = [newData];
-        setExpandedRowKeys((expandedRowKeys) => [...expandedRowKeys, id]);
-      } else if (key === "type") {
+        setExpandedRowKeys(expandedRowKeys => [...expandedRowKeys, id]);
+      } else if (key === 'type') {
         delete currentNode.children;
       }
       setOutputParamsData(cloneDeep(outputParamsData));
     },
-    [outputParamsData, setOutputParamsData, setExpandedRowKeys],
+    [outputParamsData, setOutputParamsData, setExpandedRowKeys]
   );
 
   const handleAddItem = useCallback(
     (record: InputParamsData) => {
       const newData = {
         id: uuid(),
-        name: "",
-        description: "",
-        type: "string",
+        name: '',
+        description: '',
+        type: 'string',
         open: true,
       } as unknown as InputParamsData;
       newData.fatherType = record.type;
@@ -124,18 +124,10 @@ export const useTableLogic = ({
       currentNode?.children?.push(newData);
       setOutputParamsData(cloneDeep(outputParamsData));
       if (!expandedRowKeys?.includes(record?.id)) {
-        setExpandedRowKeys((expandedRowKeys) => [
-          ...expandedRowKeys,
-          record?.id,
-        ]);
+        setExpandedRowKeys(expandedRowKeys => [...expandedRowKeys, record?.id]);
       }
     },
-    [
-      expandedRowKeys,
-      setExpandedRowKeys,
-      outputParamsData,
-      setOutputParamsData,
-    ],
+    [expandedRowKeys, setExpandedRowKeys, outputParamsData, setOutputParamsData]
   );
 
   const deleteNodeFromTree = useCallback(
@@ -153,16 +145,16 @@ export const useTableLogic = ({
         return acc;
       }, []);
     },
-    [],
+    []
   );
 
   const handleExpand = useCallback((record: InputParamsData) => {
-    setExpandedRowKeys((expandedRowKeys) => [...expandedRowKeys, record.id]);
+    setExpandedRowKeys(expandedRowKeys => [...expandedRowKeys, record.id]);
   }, []);
 
   const handleCollapse = useCallback((record: InputParamsData) => {
-    setExpandedRowKeys((expandedRowKeys) =>
-      expandedRowKeys.filter((id) => id !== record.id),
+    setExpandedRowKeys(expandedRowKeys =>
+      expandedRowKeys.filter(id => id !== record.id)
     );
   }, []);
 
@@ -173,7 +165,7 @@ export const useTableLogic = ({
           <img
             src={shrink}
             className="inline-block w-4 h-4 mb-1 mr-1"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               handleCollapse(record);
             }}
@@ -182,7 +174,7 @@ export const useTableLogic = ({
           <img
             src={expand}
             className="inline-block w-4 h-4 mb-1 mr-1"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               handleExpand(record);
             }}
@@ -191,7 +183,7 @@ export const useTableLogic = ({
       }
       return null;
     },
-    [],
+    []
   );
 
   const handleCheckInput = useCallback(
@@ -199,7 +191,7 @@ export const useTableLogic = ({
       checkParmas(outputParamsData, record?.id, key);
       setOutputParamsData(cloneDeep(outputParamsData));
     },
-    [outputParamsData, setOutputParamsData],
+    [outputParamsData, setOutputParamsData]
   );
   return {
     handleAddItem,

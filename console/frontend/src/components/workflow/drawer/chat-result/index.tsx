@@ -1,13 +1,13 @@
-import React, { useMemo, useCallback, memo } from "react";
-import { Drawer, message } from "antd";
-import { useTranslation } from "react-i18next";
-import useFlowStore from "@/components/workflow/store/useFlowStore";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import copy from "copy-to-clipboard";
-import JSONPretty from "react-json-view";
-import MarkdownRender from "@/components/markdown-render";
-import { ResultNodeData, FlowResultType } from "@/components/workflow/types";
-import { Icons } from "@/components/workflow/icons";
+import React, { useMemo, useCallback, memo } from 'react';
+import { Drawer, message } from 'antd';
+import { useTranslation } from 'react-i18next';
+import useFlowStore from '@/components/workflow/store/useFlowStore';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import copy from 'copy-to-clipboard';
+import JSONPretty from 'react-json-view';
+import MarkdownRender from '@/components/markdown-render';
+import { ResultNodeData, FlowResultType } from '@/components/workflow/types';
+import { Icons } from '@/components/workflow/icons';
 
 const icons = Icons.chatResult;
 
@@ -21,7 +21,7 @@ const BlockHeader = ({
 }): React.ReactElement => (
   <div
     className="flex items-center justify-between bg-[#EAEDF2] px-4 py-1.5"
-    style={{ borderRadius: "8px 8px 0 0" }}
+    style={{ borderRadius: '8px 8px 0 0' }}
   >
     <span className="font-medium">{title}</span>
     <img
@@ -97,27 +97,25 @@ const AnswerBlock = ({
 
 function FlowChatResult(): React.ReactElement {
   const { t } = useTranslation();
-  const nodes = useFlowStore((state) => state.nodes);
-  const flowChatResultOpen = useFlowsManager(
-    (state) => state.flowChatResultOpen,
-  );
+  const nodes = useFlowStore(state => state.nodes);
+  const flowChatResultOpen = useFlowsManager(state => state.flowChatResultOpen);
   const setFlowChatResultOpen = useFlowsManager(
-    (state) => state.setFlowChatResultOpen,
+    state => state.setFlowChatResultOpen
   );
   const flowResult = useFlowsManager(
-    (state) => state.flowResult,
+    state => state.flowResult
   ) as FlowResultType;
 
   const resultNodes = useMemo<ResultNodeData[]>((): ResultNodeData[] => {
     return (
       nodes
         ?.filter(
-          (node) =>
+          node =>
             !node?.data?.parentId &&
-            (node?.id?.startsWith("node-start") ||
-              node?.id?.startsWith("node-end")),
+            (node?.id?.startsWith('node-start') ||
+              node?.id?.startsWith('node-end'))
         )
-        ?.map((node) => ({
+        ?.map(node => ({
           name: node?.type,
           input: node?.data?.debuggerResult?.input,
           rawOutput: node?.data?.debuggerResult?.rawOutput,
@@ -132,9 +130,9 @@ function FlowChatResult(): React.ReactElement {
   const copyData = useCallback(
     (data: string): void => {
       copy(data);
-      message.success(t("workflow.nodes.flowChatResult.copySuccess"));
+      message.success(t('workflow.nodes.flowChatResult.copySuccess'));
     },
-    [t],
+    [t]
   );
 
   return (
@@ -147,14 +145,14 @@ function FlowChatResult(): React.ReactElement {
       <div className="p-5 pr-0 w-full h-full flex flex-col">
         <div className="flex items-center justify-between pr-5">
           <span className="font-semibold text-lg">
-            {t("workflow.nodes.flowChatResult.runResult")}
+            {t('workflow.nodes.flowChatResult.runResult')}
           </span>
           <div
             className="flex items-center gap-2.5 cursor-pointer"
             onClick={() => setFlowChatResultOpen(false)}
           >
             <span className="cursor-pointer text-base text-[#B1B1B1]">
-              {t("workflow.nodes.flowChatResult.collapse")}
+              {t('workflow.nodes.flowChatResult.collapse')}
             </span>
             <img
               src={icons.chatResultOpen}
@@ -191,7 +189,7 @@ function FlowChatResult(): React.ReactElement {
                   {node?.answerMode === 1 && node?.answerContent && (
                     <AnswerBlock
                       content={node.answerContent}
-                      onCopy={() => copyData(node.answerContent ?? "")}
+                      onCopy={() => copyData(node.answerContent ?? '')}
                     />
                   )}
                   {node?.failedReason && (
@@ -209,7 +207,7 @@ function FlowChatResult(): React.ReactElement {
               alt=""
             />
             <p className="text-sm text-[#7D839F]">
-              {t("workflow.nodes.flowChatResult.noRunResult")}
+              {t('workflow.nodes.flowChatResult.noRunResult')}
             </p>
           </div>
         )}

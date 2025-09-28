@@ -1,7 +1,7 @@
-import React, { memo } from "react";
-import { Tree } from "antd";
+import React, { memo } from 'react';
+import { Tree } from 'antd';
 
-import flowArrowDown from "@/assets/imgs/workflow/flow-arrow-down.png";
+import flowArrowDown from '@/assets/imgs/workflow/flow-arrow-down.png';
 
 function FLowTree({
   treeData = [],
@@ -17,8 +17,8 @@ function FLowTree({
           src={flowArrowDown}
           className="w-[8px] h-[7px]"
           style={{
-            transform: expanded ? "rotate(0deg)" : "rotate(-90deg)",
-            transition: "transform 0.3s ease",
+            transform: expanded ? 'rotate(0deg)' : 'rotate(-90deg)',
+            transition: 'transform 0.3s ease',
           }}
         />
       )}

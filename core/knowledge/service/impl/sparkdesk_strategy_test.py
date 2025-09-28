@@ -202,7 +202,7 @@ class TestSparkDeskRAGStrategy:
             # For query method, mock the external dependency
             if method_name == "query":
                 with patch(
-                    "service.impl.sparkdesk_strategy.sparkdesk_query_async"
+                    "knowledge.service.impl.sparkdesk_strategy.sparkdesk_query_async"
                 ) as mock_query:
                     mock_query.return_value = {}
                     result = await method(**kwargs)

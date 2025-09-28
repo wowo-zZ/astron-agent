@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
-import { RouterProvider } from "react-router-dom";
-import router from "@/router";
-import LoginModal from "@/components/login-modal";
-import useUserStore, { UserState } from "@/store/user-store";
-import { useEnterprise } from "./hooks/use-enterprise";
-import { useSpaceType } from "./hooks/use-space-type";
+import { useCallback, useEffect, useState } from 'react';
+import { RouterProvider } from 'react-router-dom';
+import router from '@/router';
+import LoginModal from '@/components/login-modal';
+import useUserStore, { UserState } from '@/store/user-store';
+import { useEnterprise } from './hooks/use-enterprise';
+import { useSpaceType } from './hooks/use-space-type';
 
 export default function App() {
   const getUserInfo = useUserStore((state: UserState) => state.getUserInfo);
@@ -16,15 +16,15 @@ export default function App() {
 
   const initSpaceInfo = useCallback(async () => {
     try {
-      const pathname = window.location.pathname.replace(/\/+$/, "");
-      if (pathname === "/space" && isTeamSpace()) {
+      const pathname = window.location.pathname.replace(/\/+$/, '');
+      if (pathname === '/space' && isTeamSpace()) {
         switchToPersonal({ isJump: false });
         return;
       }
 
-      if (!sessionStorage.getItem("lastVisitSpaceDone")) {
+      if (!sessionStorage.getItem('lastVisitSpaceDone')) {
         await getLastVisitSpace();
-        sessionStorage.setItem("lastVisitSpaceDone", "true");
+        sessionStorage.setItem('lastVisitSpaceDone', 'true');
       }
     } finally {
       setInitDone(true);

@@ -1,16 +1,16 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Button, message, Modal } from "antd";
-import styles from "./index.module.scss";
-import TeamSetCardBgImg from "@/assets/imgs/space/TeamSettingCardBg.png";
-import { uploadBotImg } from "@/services/spark-common";
-import Cropper from "react-easy-crop";
-import { compressImage } from "@/utils";
-import { updateLogo } from "@/services/enterprise-auth-api";
-import useEnterpriseStore from "@/store/enterprise-store";
+import React, { useEffect, useRef, useState } from 'react';
+import { Button, message, Modal } from 'antd';
+import styles from './index.module.scss';
+import TeamSetCardBgImg from '@/assets/imgs/space/TeamSettingCardBg.png';
+import { uploadBotImg } from '@/services/spark-common';
+import Cropper from 'react-easy-crop';
+import { compressImage } from '@/utils';
+import { updateLogo } from '@/services/enterprise-auth-api';
+import useEnterpriseStore from '@/store/enterprise-store';
 // 定义认证状态枚举
 export enum CertificationStatus {
-  NOT_CERTIFIED = "not_certified", // 未认证
-  CERTIFIED = "certified", // 已认证
+  NOT_CERTIFIED = 'not_certified', // 未认证
+  CERTIFIED = 'certified', // 已认证
 }
 
 interface UploadImageProps {
@@ -29,24 +29,24 @@ const UploadImage: React.FC<UploadImageProps> = ({
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [visible, setVisible] = useState(false);
-  const [uploadedSrc, setUploadedSrc] = useState(""); // 这是本地选择的图像
+  const [uploadedSrc, setUploadedSrc] = useState(''); // 这是本地选择的图像
   const [formData, setFormData] = useState<FormData>(); // blob 二进制文件流
 
   // 触发上传
   const triggerFileSelectPopup = () => {
-    inputRef.current.value = "";
+    inputRef.current.value = '';
     inputRef && inputRef?.current?.click();
   };
   useEffect(() => {
     if (onAction) {
-      console.log("onAction", onAction);
+      console.log('onAction', onAction);
       onAction(triggerFileSelectPopup);
     }
   }, [onAction]);
 
   const onCancel = () => {
     setVisible(false);
-    setUploadedSrc("");
+    setUploadedSrc('');
     onClose();
     setZoom(1);
   };
@@ -55,32 +55,32 @@ const UploadImage: React.FC<UploadImageProps> = ({
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
       if (!file) return;
-      if (file.type.startsWith("image/")) {
+      if (file.type.startsWith('image/')) {
         if (file.size > 5 * 1024 * 1024) {
-          message.error("文件大小不能超过5MB");
+          message.error('文件大小不能超过5MB');
           return;
         }
         const newFile: any = await compressImage(file, 0.2, 1000000);
         const reader = new FileReader();
-        reader.addEventListener("load", () => {
+        reader.addEventListener('load', () => {
           setUploadedSrc(reader.result as string);
           setVisible(true);
         });
         reader.readAsDataURL(newFile);
       } else {
-        message.error("只能上传图片");
+        message.error('只能上传图片');
       }
     }
   };
   const onCropComplete = (_croppedArea: any, croppedAreaPixels: any) => {
     const image = new window.Image();
-    image.src = uploadedSrc || "";
+    image.src = uploadedSrc || '';
     image.onload = () => {
       // 确保图像已经加载
-      const canvas = document.createElement("canvas");
+      const canvas = document.createElement('canvas');
       canvas.width = croppedAreaPixels.width;
       canvas.height = croppedAreaPixels.height;
-      const ctx = canvas.getContext("2d");
+      const ctx = canvas.getContext('2d');
       ctx &&
         ctx.drawImage(
           image,
@@ -91,16 +91,16 @@ const UploadImage: React.FC<UploadImageProps> = ({
           0,
           0,
           croppedAreaPixels.width,
-          croppedAreaPixels.height,
+          croppedAreaPixels.height
         );
       canvas.toBlob(
-        (blob) => {
+        blob => {
           const res = new FormData();
-          blob && res.append("file", blob, "cropped-image.jpeg");
+          blob && res.append('file', blob, 'cropped-image.jpeg');
           setFormData(res);
         },
-        "image/jpeg",
-        1,
+        'image/jpeg',
+        1
       );
     };
   };
@@ -112,7 +112,7 @@ const UploadImage: React.FC<UploadImageProps> = ({
         accept="image/*"
         ref={inputRef}
         onChange={onFileChange}
-        style={{ display: "none" }}
+        style={{ display: 'none' }}
       />
 
       <Modal
@@ -120,11 +120,11 @@ const UploadImage: React.FC<UploadImageProps> = ({
         centered
         onCancel={onCancel}
         closable={false}
-        style={{ height: "600px" }}
+        style={{ height: '600px' }}
         width={600}
         maskClosable={false}
         onOk={() => {
-          uploadBotImg(formData as FormData).then((res) => {
+          uploadBotImg(formData as FormData).then(res => {
             onSuccess(res);
             setVisible(false);
           });
@@ -133,9 +133,9 @@ const UploadImage: React.FC<UploadImageProps> = ({
         {uploadedSrc && (
           <div
             style={{
-              height: "500px",
-              overflow: "hidden",
-              position: "relative",
+              height: '500px',
+              overflow: 'hidden',
+              position: 'relative',
             }}
           >
             <Cropper

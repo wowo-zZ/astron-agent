@@ -224,9 +224,9 @@ public class LLMService {
                 .eq(Model::getEnable, 1)
                 .eq(Model::getIsDeleted, 0);
         Long spaceId = SpaceInfoUtil.getSpaceId();
-        if(spaceId != null){
-            lambdaQueryWrapper.eq(Model::getSpaceId,spaceId);
-        }else{
+        if (spaceId != null) {
+            lambdaQueryWrapper.eq(Model::getSpaceId, spaceId);
+        } else {
             lambdaQueryWrapper.eq(Model::getUid, userId);
         }
         List<Model> models = modelMapper.selectList(lambdaQueryWrapper);

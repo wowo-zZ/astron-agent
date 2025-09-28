@@ -1,10 +1,10 @@
-import React, { FC } from "react";
-import { RepoItem } from "../../../../types/resource";
-import RetractableInput from "@/components/ui/global/retract-table-input";
-import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
-import useUserStore from "@/store/user-store";
-import { jumpTologin } from "@/utils/http";
+import React, { FC } from 'react';
+import { RepoItem } from '../../../../types/resource';
+import RetractableInput from '@/components/ui/global/retract-table-input';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import useUserStore from '@/store/user-store';
+import { jumpTologin } from '@/utils/http';
 
 export const KnowledgeContent: FC<{
   knowledgeRef: React.RefObject<HTMLDivElement>;
@@ -29,13 +29,13 @@ export const KnowledgeContent: FC<{
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const user = useUserStore((state) => state.user);
+  const user = useUserStore(state => state.user);
   return (
     <div className="pt-8 h-full flex flex-col overflow-hidden gap-6">
       <div
         className="flex justify-between mx-auto max-w-[1425px]"
         style={{
-          width: "calc(0.85 * (100% - 8px))",
+          width: 'calc(0.85 * (100% - 8px))',
         }}
       >
         <div className="flex items-center gap-6"></div>
@@ -51,22 +51,22 @@ export const KnowledgeContent: FC<{
         <div
           className="w-full h-full mx-auto max-w-[1425px]"
           style={{
-            width: "85%",
+            width: '85%',
           }}
         >
           <div className="grid lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-3 gap-6">
             <div
               className={`common-card-add-container relative ${
                 isHovered === null
-                  ? ""
+                  ? ''
                   : isHovered
-                    ? "knowledge-no-hover"
-                    : " knowledge-hover"
+                    ? 'knowledge-no-hover'
+                    : ' knowledge-hover'
               }`}
-              onMouseLeave={(e) => {
+              onMouseLeave={e => {
                 setIsHovered(true);
               }}
-              onMouseEnter={(e) => {
+              onMouseEnter={e => {
                 setIsHovered(false);
               }}
               onClick={() => {
@@ -86,11 +86,11 @@ export const KnowledgeContent: FC<{
                   className="mt-4 font-semibold add-name"
                   style={{ fontSize: 22 }}
                 >
-                  {t("knowledge.createNewKnowledge")}
+                  {t('knowledge.createNewKnowledge')}
                 </div>
               </div>
             </div>
-            {knowledges.map((k) => (
+            {knowledges.map(k => (
               <div
                 className="common-card-item group flex flex-col"
                 key={k.id}
@@ -101,7 +101,7 @@ export const KnowledgeContent: FC<{
                       state: {
                         parentId: -1,
                       },
-                    },
+                    }
                   );
                 }}
               >
@@ -132,7 +132,7 @@ export const KnowledgeContent: FC<{
                     <div className="flex items-center justify-between px-3 bg-[#F2F5FE] rounded-xl mt-3 text-sm h-[38px]">
                       <div className="flex items-center gap-1 text-center justify-center">
                         <div className="text-[#333]">
-                          {t("knowledge.documentCount")}
+                          {t('knowledge.documentCount')}
                         </div>
                         <div className="text-[#275EFF] text-xl DINPROMedium">
                           {k.fileCount}
@@ -141,7 +141,7 @@ export const KnowledgeContent: FC<{
                       <div className="w-[1px] h-[20px] my-[9px] bg-[#E1E8FF]"></div>
                       <div className="flex items-center gap-1 text-center justify-center">
                         <div className="text-[#333]">
-                          {t("knowledge.totalCharacters")}
+                          {t('knowledge.totalCharacters')}
                         </div>
                         <div className="text-[#275EFF] text-xl DINPROMedium">
                           {Math.round(k.charCount / 1000)}
@@ -150,7 +150,7 @@ export const KnowledgeContent: FC<{
                       <div className="w-[1px] h-[20px] my-[9px] bg-[#E1E8FF]"></div>
                       <div className="flex items-center gap-1 text-center justify-center">
                         <div className="text-[#333]">
-                          {t("knowledge.relatedAgents")}
+                          {t('knowledge.relatedAgents')}
                         </div>
                         <div className="text-[#275EFF] text-xl DINPROMedium">
                           {k?.bots?.length}
@@ -161,15 +161,15 @@ export const KnowledgeContent: FC<{
                   <div
                     className="mt-3 flex justify-between items-center overflow-hidden overflow-x-auto overflow-y-hidden"
                     style={{
-                      padding: "12px 24px 0 24px",
-                      borderTop: "1px dashed #e2e8ff",
-                      scrollbarWidth: "none", // Hide scrollbar
-                      msOverflowStyle: "none", // Hide scrollbar for IE/Edge
+                      padding: '12px 24px 0 24px',
+                      borderTop: '1px dashed #e2e8ff',
+                      scrollbarWidth: 'none', // Hide scrollbar
+                      msOverflowStyle: 'none', // Hide scrollbar for IE/Edge
                     }}
                   >
                     <span className="text-[#7F7F7F] text-xs go-setting flex items-center">
                       <span className="whitespace-nowrap">
-                        {t("common.edit")}
+                        {t('common.edit')}
                       </span>
                       <span className="setting-icon setting-act"></span>
                     </span>
@@ -177,7 +177,7 @@ export const KnowledgeContent: FC<{
                       <div className="flex items-center text-desc gap-5">
                         <div
                           className="card-delete cursor-pointer flex items-center"
-                          onClick={(e) => {
+                          onClick={e => {
                             e.stopPropagation();
                             setCurrentKnowledge(k);
                             setDeleteModal(true);
@@ -185,7 +185,7 @@ export const KnowledgeContent: FC<{
                         >
                           <span className="delete-icon"></span>
                           <span className="ml-1 whitespace-nowrap">
-                            {t("common.delete")}
+                            {t('common.delete')}
                           </span>
                         </div>
                       </div>

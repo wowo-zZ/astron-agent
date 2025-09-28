@@ -1,5 +1,5 @@
-import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 /** 订单管理相关状态的Zustand Store */
 
@@ -68,35 +68,35 @@ const useOrderStore = create<OrderStore>()(
     (set, get) => ({
       // 初始状态
       userOrderList: [],
-      userOrderType: "free",
+      userOrderType: 'free',
       userOrderNow: {},
       traceColumn: [],
       userOrderMeta: [
         {
-          menu: "FREE_EDITION",
-          startTime: "--",
-          endTime: "--",
+          menu: 'FREE_EDITION',
+          startTime: '--',
+          endTime: '--',
           isExpired: false,
         },
       ],
-      spaceTypeAtom: "personal",
+      spaceTypeAtom: 'personal',
       isSpecialUser: false,
 
       // 初始派生信息
       orderDerivedInfo: {
         orderMeta: [
           {
-            menu: "FREE_EDITION",
-            startTime: "--",
-            endTime: "--",
+            menu: 'FREE_EDITION',
+            startTime: '--',
+            endTime: '--',
             isExpired: false,
           },
         ],
         orderShowArr: [0, 0],
         useOrder: {
-          menu: "FREE_EDITION",
-          startTime: "--",
-          endTime: "--",
+          menu: 'FREE_EDITION',
+          startTime: '--',
+          endTime: '--',
           isExpired: false,
         },
         orderTraceAndIcon: 0,
@@ -132,27 +132,27 @@ const useOrderStore = create<OrderStore>()(
         const spaceType = state.spaceTypeAtom;
         const orderShowArr = [0, 0]; // 使用的套餐显示数据 -- 当有第三项时, 表明第二项团队的套餐过期了
         let useOrder: OrderMetaType = orderMeta[0] || {
-          menu: "FREE_EDITION",
-          startTime: "--",
-          endTime: "--",
+          menu: 'FREE_EDITION',
+          startTime: '--',
+          endTime: '--',
           isExpired: false,
         }; // 订单管理页显示当前套餐
         let orderTraceAndIcon = 0; // trace页/ 左下角Icon显示当前套餐
 
-        orderMeta.forEach((item) => {
+        orderMeta.forEach(item => {
           // spaceType可能为空, 就是普通的用户, 总共的值: personal, team, 或空
-          if (spaceType === "personal" || !spaceType) {
-            if (item.menu === "FREE_EDITION") {
+          if (spaceType === 'personal' || !spaceType) {
+            if (item.menu === 'FREE_EDITION') {
               orderShowArr[0] = 0;
               useOrder = item;
               orderTraceAndIcon = 0;
-            } else if (item.menu === "PERSONAL_EDITION") {
+            } else if (item.menu === 'PERSONAL_EDITION') {
               orderShowArr[0] = 1;
               useOrder = item;
               orderTraceAndIcon = 1;
             }
           } else {
-            if (item.menu === "TEAM_EDITION") {
+            if (item.menu === 'TEAM_EDITION') {
               // item.status为false时，同时设置2，3项为 2,0，第一项不动
               if (item.isExpired) {
                 orderShowArr[1] = 2;
@@ -162,7 +162,7 @@ const useOrderStore = create<OrderStore>()(
               }
               useOrder = item;
               orderTraceAndIcon = 2;
-            } else if (item.menu === "ENTERPRISE_EDITION") {
+            } else if (item.menu === 'ENTERPRISE_EDITION') {
               if (item.isExpired) {
                 orderShowArr[1] = 3;
                 orderShowArr[2] = 0;
@@ -176,9 +176,9 @@ const useOrderStore = create<OrderStore>()(
               orderShowArr[1] = 0;
               orderTraceAndIcon = 0;
               useOrder = orderMeta[0] || {
-                menu: "FREE_EDITION",
-                startTime: "--",
-                endTime: "--",
+                menu: 'FREE_EDITION',
+                startTime: '--',
+                endTime: '--',
                 isExpired: false,
               };
             }
@@ -194,15 +194,15 @@ const useOrderStore = create<OrderStore>()(
       },
     }),
     {
-      name: "order-storage",
+      name: 'order-storage',
       storage: createJSONStorage(() => sessionStorage),
-      partialize: (state) => ({
+      partialize: state => ({
         userOrderType: state.userOrderType,
         userOrderMeta: state.userOrderMeta,
         spaceTypeAtom: state.spaceTypeAtom,
       }),
-    },
-  ),
+    }
+  )
 );
 
 export default useOrderStore;

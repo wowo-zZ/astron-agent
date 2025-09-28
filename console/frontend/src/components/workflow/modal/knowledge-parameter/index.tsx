@@ -1,30 +1,30 @@
-import React, { useState, useEffect } from "react";
-import { createPortal } from "react-dom";
-import { Slider, InputNumber, Button } from "antd";
-import { useTranslation } from "react-i18next";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import { useMemoizedFn } from "ahooks";
-import { cloneDeep } from "lodash";
-import { RepoConfig } from "@/components/workflow/types";
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { Slider, InputNumber, Button } from 'antd';
+import { useTranslation } from 'react-i18next';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import { useMemoizedFn } from 'ahooks';
+import { cloneDeep } from 'lodash';
+import { RepoConfig } from '@/components/workflow/types';
 
 const KnowledgeParameter = (): React.ReactElement => {
   const { t } = useTranslation();
   const [repoConfig, setRepoConfig] = useState<RepoConfig>({});
   const knowledgeParameterModalInfo = useFlowsManager(
-    (state) => state.knowledgeParameterModalInfo,
+    state => state.knowledgeParameterModalInfo
   );
   const setKnowledgeParameterModalInfo = useFlowsManager(
-    (state) => state.setKnowledgeParameterModalInfo,
+    state => state.setKnowledgeParameterModalInfo
   );
-  const currentStore = useFlowsManager((state) => state.getCurrentStore());
+  const currentStore = useFlowsManager(state => state.getCurrentStore());
   const autoSaveCurrentFlow = useFlowsManager(
-    (state) => state.autoSaveCurrentFlow,
+    state => state.autoSaveCurrentFlow
   );
-  const canPublishSetNot = useFlowsManager((state) => state.canPublishSetNot);
-  const nodes = currentStore((state) => state.nodes);
-  const setNode = currentStore((state) => state.setNode);
+  const canPublishSetNot = useFlowsManager(state => state.canPublishSetNot);
+  const nodes = currentStore(state => state.nodes);
+  const setNode = currentStore(state => state.setNode);
   const currentNode = nodes.find(
-    (node) => node.id === knowledgeParameterModalInfo.nodeId,
+    node => node.id === knowledgeParameterModalInfo.nodeId
   );
 
   useEffect(() => {
@@ -36,7 +36,7 @@ const KnowledgeParameter = (): React.ReactElement => {
 
   const handleParameterChange = useMemoizedFn((fn: (old: unknown) => void) => {
     autoSaveCurrentFlow();
-    setNode(currentNode?.id, (old) => {
+    setNode(currentNode?.id, old => {
       fn(old);
       return {
         ...cloneDeep(old),
@@ -46,13 +46,13 @@ const KnowledgeParameter = (): React.ReactElement => {
   });
 
   const handleOk = useMemoizedFn((): void => {
-    handleParameterChange((old) => {
+    handleParameterChange(old => {
       old.data.nodeParam.topN = repoConfig?.topN;
       old.data.nodeParam.score = repoConfig?.score || 0.2;
     });
     setKnowledgeParameterModalInfo({
       open: false,
-      nodeId: "",
+      nodeId: '',
     });
   });
 
@@ -63,10 +63,10 @@ const KnowledgeParameter = (): React.ReactElement => {
             <div className="mask">
               <div className="modalContent">
                 <p className="text-second font-medium">
-                  {t("workflow.nodes.parameterModal.topK")}
+                  {t('workflow.nodes.parameterModal.topK')}
                 </p>
                 <p className="text-desc mt-1.5">
-                  {t("workflow.nodes.parameterModal.topKDescription")}
+                  {t('workflow.nodes.parameterModal.topKDescription')}
                 </p>
                 <div className="flex flex-1">
                   <Slider
@@ -74,7 +74,7 @@ const KnowledgeParameter = (): React.ReactElement => {
                     max={5}
                     value={repoConfig.topN}
                     className="flex-1 config-slider"
-                    onChange={(value) =>
+                    onChange={value =>
                       setRepoConfig({
                         ...repoConfig,
                         topN: value,
@@ -87,7 +87,7 @@ const KnowledgeParameter = (): React.ReactElement => {
                     onChange={(value: unknown) => {
                       setRepoConfig({
                         ...repoConfig,
-                        topN: typeof value === "number" ? value : 3,
+                        topN: typeof value === 'number' ? value : 3,
                       });
                     }}
                     min={1}
@@ -96,10 +96,10 @@ const KnowledgeParameter = (): React.ReactElement => {
                   />
                 </div>
                 <p className="text-second font-medium mt-2.5">
-                  {t("workflow.promptDebugger.scoreThresholdLabel")}
+                  {t('workflow.promptDebugger.scoreThresholdLabel')}
                 </p>
                 <p className="text-desc mt-1.5">
-                  {t("workflow.promptDebugger.scoreThresholdDescription")}
+                  {t('workflow.promptDebugger.scoreThresholdDescription')}
                 </p>
                 <div className="flex flex-1">
                   <Slider
@@ -108,7 +108,7 @@ const KnowledgeParameter = (): React.ReactElement => {
                     step={0.01}
                     value={repoConfig.score}
                     className="flex-1 config-slider"
-                    onChange={(value) =>
+                    onChange={value =>
                       setRepoConfig({
                         ...repoConfig,
                         score: value,
@@ -136,7 +136,7 @@ const KnowledgeParameter = (): React.ReactElement => {
                     className="px-[48px]"
                     onClick={handleOk}
                   >
-                    {t("common.save")}
+                    {t('common.save')}
                   </Button>
                   <Button
                     type="text"
@@ -144,16 +144,16 @@ const KnowledgeParameter = (): React.ReactElement => {
                     onClick={() =>
                       setKnowledgeParameterModalInfo({
                         open: false,
-                        nodeId: "",
+                        nodeId: '',
                       })
                     }
                   >
-                    {t("common.cancel")}
+                    {t('common.cancel')}
                   </Button>
                 </div>
               </div>
             </div>,
-            document.body,
+            document.body
           )
         : null}
     </>

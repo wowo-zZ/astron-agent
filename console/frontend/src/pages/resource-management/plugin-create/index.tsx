@@ -1,13 +1,13 @@
-import { useState, memo, useEffect, FC } from "react";
-import { useTranslation } from "react-i18next";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { CreateTool } from "@/components/modal/plugin";
-import { getToolDetail } from "@/services/plugin";
+import { useState, memo, useEffect, FC } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { CreateTool } from '@/components/modal/plugin';
+import { getToolDetail } from '@/services/plugin';
 
-import arrowLeft from "@/assets/imgs/common/arrow_back.png";
-import dottedLine from "@/assets/imgs/plugin/dotted_line.svg";
-import dottedLineActive from "@/assets/imgs/plugin/dotted_line_active.svg";
-import { AvatarType, ToolItem } from "@/types/resource";
+import arrowLeft from '@/assets/imgs/common/arrow_back.png';
+import dottedLine from '@/assets/imgs/plugin/dotted_line.svg';
+import dottedLineActive from '@/assets/imgs/plugin/dotted_line_active.svg';
+import { AvatarType, ToolItem } from '@/types/resource';
 
 const PluginCreate: FC = () => {
   const { t } = useTranslation();
@@ -15,10 +15,10 @@ const PluginCreate: FC = () => {
   const [step, setStep] = useState(1);
   // const [users, setUsers] = useState([]);
   const [botIcon, setBotIcon] = useState<AvatarType>({});
-  const [botColor, setBotColor] = useState("");
+  const [botColor, setBotColor] = useState('');
 
   const [searchParams] = useSearchParams();
-  const toolId = searchParams?.get("id");
+  const toolId = searchParams?.get('id');
   const [toolInfo, setToolInfo] = useState<ToolItem>({} as ToolItem);
 
   useEffect(() => {
@@ -26,7 +26,7 @@ const PluginCreate: FC = () => {
       getToolDetail({
         id: toolId,
         temporary: true,
-      }).then((data) => {
+      }).then(data => {
         setToolInfo(data);
       });
     }
@@ -36,35 +36,35 @@ const PluginCreate: FC = () => {
       <div
         className="w-full mx-auto flex items-center max-w-[1425px]"
         style={{
-          width: "85%",
+          width: '85%',
           minWidth: 1000,
-          padding: "30px 0px 0px 0px",
+          padding: '30px 0px 0px 0px',
         }}
       >
         <div
           className="w-[200px] flex items-center gap-2 cursor-pointer"
-          onClick={() => navigate("/resource/plugin")}
+          onClick={() => navigate('/resource/plugin')}
         >
           <img src={arrowLeft} className="w-[18px] h-[18px]" alt="" />
-          <span className="font-medium">{t("plugin.back")}</span>
+          <span className="font-medium">{t('plugin.back')}</span>
         </div>
         <div className="flex items-center gap-5 flex-1 justify-center">
           <div className="flex items-center gap-2">
             <div
               className="w-[28px] h-[28px] rounded-full text-center text-base leading-none"
               style={{
-                color: step >= 1 ? "#275EFF" : "#7F7F7F",
-                border: step >= 1 ? "2px solid #275EFF" : "2px solid #7F7F7F",
-                lineHeight: "24px",
+                color: step >= 1 ? '#275EFF' : '#7F7F7F',
+                border: step >= 1 ? '2px solid #275EFF' : '2px solid #7F7F7F',
+                lineHeight: '24px',
               }}
             >
               1
             </div>
             <div
               className="font-medium text-base"
-              style={{ color: step >= 1 ? "#275EFF" : "#7F7F7F" }}
+              style={{ color: step >= 1 ? '#275EFF' : '#7F7F7F' }}
             >
-              {t("plugin.fillBasicInfo")}
+              {t('plugin.fillBasicInfo')}
             </div>
           </div>
           <img
@@ -76,18 +76,18 @@ const PluginCreate: FC = () => {
             <div
               className="w-[28px] h-[28px] rounded-full text-center text-base leading-none"
               style={{
-                color: step >= 2 ? "#275EFF" : "#7F7F7F",
-                border: step >= 2 ? "2px solid #275EFF" : "2px solid #7F7F7F",
-                lineHeight: "24px",
+                color: step >= 2 ? '#275EFF' : '#7F7F7F',
+                border: step >= 2 ? '2px solid #275EFF' : '2px solid #7F7F7F',
+                lineHeight: '24px',
               }}
             >
               2
             </div>
             <div
               className="font-medium text-base"
-              style={{ color: step >= 2 ? "#275EFF" : "#7F7F7F" }}
+              style={{ color: step >= 2 ? '#275EFF' : '#7F7F7F' }}
             >
-              {t("plugin.addPlugin")}
+              {t('plugin.addPlugin')}
             </div>
           </div>
           <img
@@ -99,18 +99,18 @@ const PluginCreate: FC = () => {
             <div
               className="w-[28px] h-[28px] rounded-full text-center text-base leading-none"
               style={{
-                color: step === 3 ? "#275EFF" : "#7F7F7F",
-                border: step === 3 ? "2px solid #275EFF" : "2px solid #7F7F7F",
-                lineHeight: "24px",
+                color: step === 3 ? '#275EFF' : '#7F7F7F',
+                border: step === 3 ? '2px solid #275EFF' : '2px solid #7F7F7F',
+                lineHeight: '24px',
               }}
             >
               3
             </div>
             <div
               className="font-medium"
-              style={{ color: step === 3 ? "#275EFF" : "#7F7F7F" }}
+              style={{ color: step === 3 ? '#275EFF' : '#7F7F7F' }}
             >
-              {t("plugin.debugAndValidate")}
+              {t('plugin.debugAndValidate')}
             </div>
           </div>
         </div>
@@ -119,7 +119,7 @@ const PluginCreate: FC = () => {
       <CreateTool
         showHeader={false}
         currentToolInfo={toolInfo}
-        handleCreateToolDone={() => navigate("/resource/plugin")}
+        handleCreateToolDone={() => navigate('/resource/plugin')}
         step={step}
         setStep={setStep}
         botIcon={botIcon}

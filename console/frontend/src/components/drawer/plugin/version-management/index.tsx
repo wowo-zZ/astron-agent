@@ -1,19 +1,19 @@
-import React, { useState, useEffect, FC } from "react";
-import { Drawer, Timeline, Card, Tabs } from "antd";
-import close from "@/assets/imgs/workflow/modal-close.png";
-import { getToolVersionList } from "@/services/plugin";
-import { useTranslation } from "react-i18next";
+import React, { useState, useEffect, FC } from 'react';
+import { Drawer, Timeline, Card, Tabs } from 'antd';
+import close from '@/assets/imgs/workflow/modal-close.png';
+import { getToolVersionList } from '@/services/plugin';
+import { useTranslation } from 'react-i18next';
 
-import pointIcon from "@/assets/imgs/workflow/dot-icon.png";
-import selectedPointIcon from "@/assets/imgs/workflow/select-dot-icon.png";
+import pointIcon from '@/assets/imgs/workflow/dot-icon.png';
+import selectedPointIcon from '@/assets/imgs/workflow/select-dot-icon.png';
 
-import "./index.css";
-import dayjs from "dayjs";
-import { ToolItem } from "@/types/resource";
+import './index.css';
+import dayjs from 'dayjs';
+import { ToolItem } from '@/types/resource';
 
 const TAB_TYPE = {
-  version: "1",
-  feedback: "2",
+  version: '1',
+  feedback: '2',
 };
 
 interface VersionItem {
@@ -44,11 +44,11 @@ const VersionManagement: FC<{
     zIndex: 998,
   });
   const [versionList, setVersionList] = useState<VersionItem[]>([]);
-  const [activeKey, setActiveKey] = useState(TAB_TYPE["version"]);
+  const [activeKey, setActiveKey] = useState(TAB_TYPE['version']);
 
   useEffect(() => {
     currentDebuggerPluginInfo?.toolId &&
-      getToolVersionList(currentDebuggerPluginInfo?.toolId).then((res) => {
+      getToolVersionList(currentDebuggerPluginInfo?.toolId).then(res => {
         setVersionList(res);
       });
   }, [currentDebuggerPluginInfo?.toolId]);
@@ -62,14 +62,14 @@ const VersionManagement: FC<{
         open={open}
         mask={false}
         onClose={() => {
-          setActiveKey(TAB_TYPE["version"]);
+          setActiveKey(TAB_TYPE['version']);
         }}
       >
         <div className="flex flex-col w-full h-full p-5 overflow-hidden">
           {/* 1.title */}
           <div className="flex items-center justify-between mb-[12px]">
             <div className="text-lg font-semibold">
-              {t("plugin.versionAndIssueTracking")}
+              {t('plugin.versionAndIssueTracking')}
             </div>
             <img
               src={close}
@@ -82,11 +82,11 @@ const VersionManagement: FC<{
             activeKey={activeKey}
             size="small"
             className="flex flex-col flex-1 h-0 overflow-hidden version-feedback-tabs"
-            tabBarStyle={{ margin: "0 0 24px 0" }}
+            tabBarStyle={{ margin: '0 0 24px 0' }}
             tabBarGutter={40}
-            onChange={(key) => setActiveKey(key)}
+            onChange={key => setActiveKey(key)}
           >
-            <Tabs.TabPane tab={t("plugin.versionRecord")} key="1">
+            <Tabs.TabPane tab={t('plugin.versionRecord')} key="1">
               {/* 2.list */}
               <div className="flex flex-1 overflow-auto version-list">
                 <Timeline mode="left">
@@ -94,7 +94,7 @@ const VersionManagement: FC<{
                     dot={
                       <img
                         src={
-                          selectedCard?.id === "" ||
+                          selectedCard?.id === '' ||
                           selectedCard?.id === undefined
                             ? selectedPointIcon
                             : pointIcon
@@ -105,18 +105,18 @@ const VersionManagement: FC<{
                     }
                   >
                     <Card
-                      title={t("plugin.draftVersion")}
+                      title={t('plugin.draftVersion')}
                       bordered={true}
                       style={{
                         borderColor:
-                          selectedCard?.id === "" ||
+                          selectedCard?.id === '' ||
                           selectedCard?.id === undefined
-                            ? "#275EFF"
-                            : "#e8e8e8",
+                            ? '#275EFF'
+                            : '#e8e8e8',
                       }}
                       onClick={() =>
                         handleCardClick({
-                          id: "",
+                          id: '',
                         } as ToolItem)
                       }
                       hoverable
@@ -138,16 +138,16 @@ const VersionManagement: FC<{
                       }
                     >
                       <Card
-                        title={`${t("plugin.version")}${
-                          item.version || "V1.0"
+                        title={`${t('plugin.version')}${
+                          item.version || 'V1.0'
                         }`}
                         bordered={true}
                         style={{
                           borderColor:
                             selectedCard?.id === item.id
-                              ? "#275EFF"
-                              : "#e8e8e8",
-                          cursor: "pointer",
+                              ? '#275EFF'
+                              : '#e8e8e8',
+                          cursor: 'pointer',
                         }}
                         onClick={() => handleCardClick(item as ToolItem)}
                         hoverable
@@ -155,9 +155,9 @@ const VersionManagement: FC<{
                         <div className="px-3 pb-[6px]">
                           {/* <p>版本ID：{item.versionNum}</p> */}
                           <p>
-                            {t("plugin.publishTime")}
+                            {t('plugin.publishTime')}
                             {dayjs(item.createTime)?.format(
-                              "YYYY-MM-DD HH:mm:ss",
+                              'YYYY-MM-DD HH:mm:ss'
                             )}
                           </p>
                         </div>

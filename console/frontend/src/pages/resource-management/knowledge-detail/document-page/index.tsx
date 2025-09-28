@@ -83,7 +83,6 @@ const DocumentPage: FC<{
     statusMap,
     setDeleteModal,
   });
-
   return (
     <div
       className="w-full h-full flex flex-col p-6 pb-2 bg-[#fff] border border-[#E2E8FF] overflow-hidden"
@@ -156,7 +155,7 @@ const DocumentPage: FC<{
               className="primary-btn w-[151px] h-10 flex items-center justify-center mt-6"
               onClick={() => {
                 navigate(
-                  `/resource/knowledge/upload?parentId=${parentId}&repoId=${repoId}&tag=${tag}`,
+                  `/resource/knowledge/upload?parentId=${parentId}&repoId=${repoId}&tag=${tag}`
                 );
               }}
             >
@@ -292,7 +291,7 @@ export const DocumentPageContent: FC<{
             className="primary-btn w-[151px] h-10 flex items-center justify-center ml-2"
             onClick={() => {
               navigate(
-                `/resource/knowledge/upload?parentId=${parentId}&repoId=${repoId}&tag=${tag}`,
+                `/resource/knowledge/upload?parentId=${parentId}&repoId=${repoId}&tag=${tag}`
               );
             }}
           >

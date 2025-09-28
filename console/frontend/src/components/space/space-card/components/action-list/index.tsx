@@ -1,19 +1,19 @@
-import React from "react";
-import { Button } from "antd";
+import React from 'react';
+import { Button } from 'antd';
 import {
   UserOutlined,
   ClockCircleOutlined,
   LockOutlined,
-} from "@ant-design/icons";
-import styles from "./index.module.scss";
-import { SpaceType } from "@/permissions/permission-type";
-import { useUserStoreHook } from "@/hooks/use-user-store";
+} from '@ant-design/icons';
+import styles from './index.module.scss';
+import { SpaceType } from '@/types/permission';
+import { useUserStoreHook } from '@/hooks/use-user-store';
 
 // 按钮配置接口
 interface ButtonConfig {
   key: string;
   text: string;
-  type?: "primary" | "default" | "dashed" | "link" | "text";
+  type?: 'primary' | 'default' | 'dashed' | 'link' | 'text';
   icon?: React.ReactNode;
   disabled?: boolean;
   loading?: boolean;
@@ -44,36 +44,36 @@ const ActionList: React.FC<ActionListProps> = ({
   // 默认按钮配置列表
   const defaultButtonConfigs: ButtonConfig[] = [
     {
-      key: "enter",
-      text: "进入管理",
-      statusList: ["joined"],
-      spaceTypeList: ["personal"],
+      key: 'enter',
+      text: '进入管理',
+      statusList: ['joined'],
+      spaceTypeList: ['personal'],
     },
     {
-      key: "enter",
-      text: "进入空间",
-      statusList: ["joined"],
-      spaceTypeList: ["team"],
+      key: 'enter',
+      text: '进入空间',
+      statusList: ['joined'],
+      spaceTypeList: ['team'],
     },
     {
-      key: "join",
-      text: "申请空间",
-      statusList: ["notJoined"],
-      spaceTypeList: ["team"], // 只有团队空间支持申请加入
+      key: 'join',
+      text: '申请空间',
+      statusList: ['notJoined'],
+      spaceTypeList: ['team'], // 只有团队空间支持申请加入
     },
     {
-      key: "pending",
-      text: "申请中",
-      statusList: ["pending"],
-      spaceTypeList: ["team"], // 只有团队空间支持申请加入
+      key: 'pending',
+      text: '申请中',
+      statusList: ['pending'],
+      spaceTypeList: ['team'], // 只有团队空间支持申请加入
       disabled: true,
     },
     {
-      key: "noPermission",
-      text: "暂无权限",
+      key: 'noPermission',
+      text: '暂无权限',
       icon: <LockOutlined />,
-      statusList: ["noPermission"],
-      spaceTypeList: ["personal", "team"],
+      statusList: ['noPermission'],
+      spaceTypeList: ['personal', 'team'],
       disabled: true,
     },
   ];
@@ -82,7 +82,7 @@ const ActionList: React.FC<ActionListProps> = ({
   const getVisibleButtons = (
     configs: ButtonConfig[],
     currentSpaceType: string,
-    currentStatus: string,
+    currentStatus: string
   ) => {
     // 企业空间管理员只展示进入空间按钮(需求变更)
     // if (currentSpaceType === SpaceType.ENTERPRISE && isSuperAdmin) {
@@ -95,7 +95,7 @@ const ActionList: React.FC<ActionListProps> = ({
 
     // 其他情况根据状态和空间类型过滤按钮
     return configs
-      .filter((config) => {
+      .filter(config => {
         // 状态匹配
         const statusMatch = config.statusList.includes(currentStatus);
         // 空间类型匹配：如果没有指定spaceTypeList则认为对所有类型可见
@@ -104,7 +104,7 @@ const ActionList: React.FC<ActionListProps> = ({
           config.spaceTypeList.includes(currentSpaceType);
         return statusMatch && spaceTypeMatch;
       })
-      .map((config) => ({
+      .map(config => ({
         ...config,
         onClick: () => onButtonClick(config.key, space),
       }));
@@ -115,11 +115,11 @@ const ActionList: React.FC<ActionListProps> = ({
 
   return (
     <div className={styles.actionList}>
-      {visibleButtons.map((button) => (
+      {visibleButtons.map(button => (
         <Button
           key={button.key}
           loading={button.loading}
-          type={button.type || "default"}
+          type={button.type || 'default'}
           className={styles.actionBtn}
           disabled={button.disabled}
           icon={button.icon}

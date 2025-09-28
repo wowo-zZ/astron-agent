@@ -1,9 +1,9 @@
 /* eslint-disable no-undef */
-import Ws from "./ws";
-import "./recorder-core";
-import "./pcm";
-import "./wav";
-import { message } from "antd";
+import Ws from './ws';
+import './recorder-core';
+import './pcm';
+import './wav';
+import { message } from 'antd';
 
 var testSampleRate = 16000;
 var testBitRate = 16;
@@ -54,7 +54,7 @@ function Media({ resetText }) {
     rec: null,
     status: 0,
     ws: null,
-    text: "-",
+    text: '-',
 
     //=====实时处理核心函数==========
     RealTimeSendTry: function (buffers, bufferSampleRate, isClose) {
@@ -77,7 +77,7 @@ function Media({ resetText }) {
           buffers,
           bufferSampleRate,
           testSampleRate,
-          this.realTimeSendTryChunk,
+          this.realTimeSendTryChunk
         );
 
         //清理已处理完的缓冲数据，释放内存以支持长时间录音，最后完成录音时不能调用stop，因为数据已经被清掉了
@@ -98,11 +98,11 @@ function Media({ resetText }) {
         if (pcmSampleRate != testSampleRate)
           //除非是onProcess给的bufferSampleRate低于testSampleRate
           throw new Error(
-            "不应该出现pcm采样率" +
+            '不应该出现pcm采样率' +
               pcmSampleRate +
-              "和需要的采样率" +
+              '和需要的采样率' +
               testSampleRate +
-              "不一致",
+              '不一致'
           );
       }
 
@@ -153,7 +153,7 @@ function Media({ resetText }) {
       var number = ++this.realTimeSendTryNumber;
       var encStartTime = Date.now();
       var recMock = Recorder({
-        type: "pcm",
+        type: 'pcm',
         sampleRate: testSampleRate, //需要转换成的采样率
         bitRate: testBitRate, //需要转换成的比特率
       });
@@ -170,8 +170,8 @@ function Media({ resetText }) {
         },
         function (msg) {
           //转码错误？没想到什么时候会产生错误！
-          console.log("不应该出现的错误:" + msg, 1);
-        },
+          console.log('不应该出现的错误:' + msg, 1);
+        }
       );
     },
 
@@ -179,7 +179,7 @@ function Media({ resetText }) {
     TransferUpload: function (number, blobOrNull, duration, blobRec, isClose) {
       this.transferUploadNumberMax = Math.max(
         this.transferUploadNumberMax,
-        number,
+        number
       );
       if (blobOrNull) {
         var blob = blobOrNull;
@@ -209,10 +209,10 @@ function Media({ resetText }) {
         var numberFail =
           number < this.transferUploadNumberMax
             ? '<span style="color:red">顺序错乱的数据，如果要求不高可以直接丢弃</span>'
-            : "";
+            : '';
         var logMsg =
-          "No." +
-          (number < 100 ? ("000" + number).substr(-3) : number) +
+          'No.' +
+          (number < 100 ? ('000' + number).substr(-3) : number) +
           numberFail;
 
         // console.logAudio(
@@ -230,39 +230,39 @@ function Media({ resetText }) {
 
       if (isClose) {
         console.log(
-          "No." +
-            (number < 100 ? ("000" + number).substr(-3) : number) +
-            ":已停止传输",
+          'No.' +
+            (number < 100 ? ('000' + number).substr(-3) : number) +
+            ':已停止传输'
         );
       }
     },
 
     handlemessage: function (data) {
-      console.log("response=> first time", this.text);
-      if (data.action === "result") {
+      console.log('response=> first time', this.text);
+      if (data.action === 'result') {
         const result = JSON.parse(data.data);
-        localStorage.setItem("recorderSid", data.sid);
-        let str = "";
+        localStorage.setItem('recorderSid', data.sid);
+        let str = '';
         const arr = [];
-        result.cn.st.rt.forEach((j) => {
-          j.ws.forEach((k) => {
-            k.cw.forEach((l) => {
-              if (l.wp !== "s") {
+        result.cn.st.rt.forEach(j => {
+          j.ws.forEach(k => {
+            k.cw.forEach(l => {
+              if (l.wp !== 's') {
                 arr.push(l.w);
                 str += l.w;
               }
             });
           });
         });
-        if (result?.cn?.st?.type === "0") {
+        if (result?.cn?.st?.type === '0') {
           if (this.text === undefined) {
-            this.text = arr.join("");
+            this.text = arr.join('');
           } else {
-            this.text = (this.text || "") + "" + arr.join("");
+            this.text = (this.text || '') + '' + arr.join('');
           }
           resetText(this.text);
         } else {
-          resetText((this.text || "") + arr.join(""));
+          resetText((this.text || '') + arr.join(''));
         }
       }
     },
@@ -287,15 +287,15 @@ function Media({ resetText }) {
         }
 
         _this.ws = new Ws({ handlemessage: _this.handlemessage, tokenParam });
-        _this.text = "";
+        _this.text = '';
         _this.ws.createWs();
         _this.rec = Recorder({
-          type: "unknown",
+          type: 'unknown',
           onProcess: (
             buffers,
             powerLevel,
             bufferDuration,
-            bufferSampleRate,
+            bufferSampleRate
           ) => {
             //   Runtime.Process.apply(null, arguments);
 
@@ -306,8 +306,8 @@ function Media({ resetText }) {
 
         var t = setTimeout(function () {
           console.log(
-            "无法录音：权限请求被忽略（超时假装手动点击了确认对话框）",
-            1,
+            '无法录音：权限请求被忽略（超时假装手动点击了确认对话框）',
+            1
           );
         }, 8000);
 
@@ -318,18 +318,18 @@ function Media({ resetText }) {
             _this.rec.start(); //开始录音
 
             _this.RealTimeSendTryReset(); //重置环境，开始录音时必须调用一次
-            resolve("success");
+            resolve('success');
           },
           function (msg, isUserNotAllow) {
             clearTimeout(t);
             message.info(msg);
             console.error(
-              (isUserNotAllow ? "UserNotAllow，" : "") + "无法录音:" + msg,
-              1,
+              (isUserNotAllow ? 'UserNotAllow，' : '') + '无法录音:' + msg,
+              1
             );
             reject(msg);
             throw new Error(msg);
-          },
+          }
         );
       });
     },

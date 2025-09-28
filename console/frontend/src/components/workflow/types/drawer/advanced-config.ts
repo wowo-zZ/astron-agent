@@ -51,6 +51,15 @@ export interface UploadResponse {
   };
 }
 
+export interface UploadProps {
+  name: string;
+  action: string;
+  showUploadList: boolean;
+  accept: string;
+  beforeUpload: (file: unknown) => boolean;
+  onChange: (info: unknown) => void;
+}
+
 // 抽屉样式类型定义
 export interface DrawerStyleType {
   height: number;
@@ -72,3 +81,18 @@ export type DeepPartial<T> = {
 
 // 配置更新类型
 export type AdvancedConfigUpdate = DeepPartial<AdvancedConfigType>;
+
+export interface useAdvancedConfigurationProps {
+  advancedConfig: AdvancedConfigType;
+  handleAdvancedConfigChange: (callback: () => void) => void;
+  updateAdvancedConfigParams: (updateParams: AdvancedConfigUpdate) => void;
+  updateAdvancedConfigParamsDebounce: (
+    updateParams: AdvancedConfigUpdate
+  ) => void;
+  handlePresetQuestionChange: (index: number, value: string) => void;
+  openingRemarksModal: boolean;
+  setOpeningRemarksModal: (value: boolean) => void;
+  chatBackgroundInfo: ChatBackgroundInfo | null;
+  setChatBackgroundInfo: (value: ChatBackgroundInfo | null) => void;
+  uploadProps: UploadProps;
+}

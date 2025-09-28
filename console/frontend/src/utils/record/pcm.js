@@ -7,12 +7,12 @@ https://github.com/xiangyuecn/Recorder
 编码的代码和wav.js区别不大，pcm加上一个44字节wav头即成wav文件；所以要播放pcm就很简单了，直接转成wav文件来播放，已提供转换函数 Recorder.pcm2wav
 */
 (function () {
-  "use strict";
+  'use strict';
 
   Recorder.prototype.enc_pcm = {
     stable: true,
     testmsg:
-      "pcm为未封装的原始音频数据，pcm数据文件无法直接播放；支持位数8位、16位（填在比特率里面），采样率取值无限制",
+      'pcm为未封装的原始音频数据，pcm数据文件无法直接播放；支持位数8位、16位（填在比特率里面），采样率取值无限制',
   };
   Recorder.prototype.pcm = function (res, True, False) {
     var This = this,
@@ -36,7 +36,7 @@ https://github.com/xiangyuecn/Recorder
       }
     }
 
-    True(new Blob([data.buffer], { type: "audio/pcm" }));
+    True(new Blob([data.buffer], { type: 'audio/pcm' }));
   };
 
   Recorder.pcm2wav = function (data, True, False) {
@@ -47,10 +47,10 @@ https://github.com/xiangyuecn/Recorder
     var sampleRate = data.sampleRate || 16000,
       bitRate = data.bitRate || 16;
     if (!data.sampleRate || !data.bitRate) {
-      console.warn("pcm2wav必须提供sampleRate和bitRate");
+      console.warn('pcm2wav必须提供sampleRate和bitRate');
     }
     if (!Recorder.prototype.wav) {
-      False("pcm2wav必须先加载wav编码器wav.js");
+      False('pcm2wav必须先加载wav编码器wav.js');
       return;
     }
 
@@ -69,7 +69,7 @@ https://github.com/xiangyuecn/Recorder
       }
 
       Recorder({
-        type: "wav",
+        type: 'wav',
         sampleRate: sampleRate,
         bitRate: bitRate,
       })

@@ -1,12 +1,12 @@
-import { useTranslation } from "react-i18next";
-import ModelParamsTable from "../../components/model-params-table";
+import { useTranslation } from 'react-i18next';
+import ModelParamsTable from '../../components/model-params-table';
 import {
   ModelInfo,
   ModelConfigParam,
   LLMSource,
   ModelCreateType,
-} from "@/types/model";
-import React from "react";
+} from '@/types/model';
+import React from 'react';
 
 interface ModelConfigSectionProps {
   modelDetail: ModelInfo | null;
@@ -42,26 +42,30 @@ const ModelConfigSection: React.FC<ModelConfigSectionProps> = ({
                     {modelDetail?.domain}
                   </span>
                 </p>
-                <p>
-                  <span className="font-['PingFang_SC'] text-sm font-normal text-[#7F7F7F]">
-                    {t("model.interfaceAddress")}：
-                  </span>
-                  <span className="font-['PingFang_SC'] text-sm font-normal text-[#333333]">
-                    {modelDetail?.url}
-                  </span>
-                </p>
-                <p>
-                  <span className="font-['PingFang_SC'] text-sm font-normal text-[#7F7F7F]">
-                    {t("model.apiKey")}：
-                  </span>
-                  <span className="font-['PingFang_SC'] text-sm font-normal text-[#333333]">
-                    {maskKey(modelDetail?.apiKey || "")}
-                  </span>
-                </p>
+                {modelDetail.type === ModelCreateType.THIRD_PARTY && (
+                  <>
+                    <p>
+                      <span className="font-['PingFang_SC'] text-sm font-normal text-[#7F7F7F]">
+                        {t('model.interfaceAddress')}：
+                      </span>
+                      <span className="font-['PingFang_SC'] text-sm font-normal text-[#333333]">
+                        {modelDetail?.url}
+                      </span>
+                    </p>
+                    <p>
+                      <span className="font-['PingFang_SC'] text-sm font-normal text-[#7F7F7F]">
+                        {t('model.apiKey')}：
+                      </span>
+                      <span className="font-['PingFang_SC'] text-sm font-normal text-[#333333]">
+                        {maskKey(modelDetail?.apiKey || '')}
+                      </span>
+                    </p>
+                  </>
+                )}
                 {modelDetail.type === ModelCreateType.LOCAL && (
                   <p>
                     <span className="font-['PingFang_SC'] text-sm font-normal text-[#7F7F7F]">
-                      {t("model.acceleratorCount")}：
+                      {t('model.acceleratorCount')}：
                     </span>
                     <span className="font-['PingFang_SC'] text-sm font-normal text-[#333333]">
                       {modelDetail?.acceleratorCount}
@@ -77,7 +81,7 @@ const ModelConfigSection: React.FC<ModelConfigSectionProps> = ({
       {modelDetail?.llmSource === LLMSource.CUSTOM && (
         <div className="flex flex-col gap-2 mt-5">
           <div className="w-full flex items-center justify-between">
-            <div className="font-bold">{t("model.modelParameters")}：</div>
+            <div className="font-bold">{t('model.modelParameters')}：</div>
           </div>
           <div>
             <ModelParamsTable

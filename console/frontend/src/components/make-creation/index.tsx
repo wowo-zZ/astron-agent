@@ -1,20 +1,20 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import { Modal, Form, message, Spin, Dropdown, Tooltip } from "antd";
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Modal, Form, message, Spin, Dropdown, Tooltip } from 'antd';
 import {
   submitBotBaseInfo,
   createFromTemplate,
   getStarTemplate,
   getStarTemplateGroup,
-} from "@/services/spark-common";
-import { useTranslation } from "react-i18next";
-import { useSpaceType } from "@/hooks/use-space-type";
-import WorkflowImportModal from "./components/WorkflowImportModal";
-import { PlusOutlined } from "@ant-design/icons";
-import ai_kefu from "@/assets/imgs/create-bot-v2/ai_kefu.png";
-import workflowImportIcon from "@/assets/imgs/workflow/workflow-import-icon.svg";
+} from '@/services/spark-common';
+import { useTranslation } from 'react-i18next';
+import { useSpaceType } from '@/hooks/use-space-type';
+import WorkflowImportModal from './components/WorkflowImportModal';
+import { PlusOutlined } from '@ant-design/icons';
+import ai_kefu from '@/assets/imgs/create-bot-v2/ai_kefu.png';
+import workflowImportIcon from '@/assets/imgs/workflow/workflow-import-icon.svg';
 
-import styles from "./index.module.scss";
+import styles from './index.module.scss';
 
 interface MakeCreateModalProps {
   visible: boolean;
@@ -26,7 +26,7 @@ const MakeCreateModal: React.FC<MakeCreateModalProps> = ({
   onCancel,
 }) => {
   const { t, i18n } = useTranslation();
-  const isEnglish = i18n.language === "en";
+  const isEnglish = i18n.language === 'en';
   const navigate = useNavigate();
   const [starTemplatePageInfo, setStarTemplatePageInfo] = useState<{
     pageIndex: number;
@@ -41,31 +41,31 @@ const MakeCreateModal: React.FC<MakeCreateModalProps> = ({
   const addAgentTemplate = async (flag: boolean, item?: any) => {
     setAddAgentTemplateLoading(true);
     const req: any = {
-      name: t("createAgent1.commonCustom") + Date.now(),
+      name: t('createAgent1.commonCustom') + Date.now(),
       botType: 0,
       avatar:
-        "https://oss-beijing-m8.openstorage.cn/SparkBotProd/icon/common/emojiitem_00_10@2x.png",
-      botDesc: "",
+        'https://oss-beijing-m8.openstorage.cn/SparkBotProd/icon/common/emojiitem_00_10@2x.png',
+      botDesc: '',
       botId: null,
-      inputExample: ["", "", ""],
+      inputExample: ['', '', ''],
     };
     if (flag) {
-      req["massId"] = item.mass_id;
-      req["name"] = item.title + Date.now();
+      req['massId'] = item.mass_id;
+      req['name'] = item.title + Date.now();
       await createFromTemplate(req)
         .then((res: any) => {
           navigate(`/work_flow/${res.maasId}/arrange`);
         })
-        .catch((e) => {
-          message.error(e?.msg || "创建失败");
+        .catch(e => {
+          message.error(e?.msg || '创建失败');
         });
     } else {
       await submitBotBaseInfo(req)
         .then((res: any) => {
           navigate(`/work_flow/${res.maasId}/arrange`);
         })
-        .catch((e) => {
-          message.error(e?.msg || "创建失败");
+        .catch(e => {
+          message.error(e?.msg || '创建失败');
         });
     }
     setAddAgentTemplateLoading(false);
@@ -84,7 +84,7 @@ const MakeCreateModal: React.FC<MakeCreateModalProps> = ({
       return starModelList;
     }
 
-    return starModelList.filter((item) => item.bot_id !== AI_RECORD_BOT_ID);
+    return starModelList.filter(item => item.bot_id !== AI_RECORD_BOT_ID);
   }, [isDefaultPersonalSpace, starModelList]);
 
   // 获取星辰模板
@@ -101,7 +101,7 @@ const MakeCreateModal: React.FC<MakeCreateModalProps> = ({
   //获取模板分类列表
   const getTemplateTypeList = async () => {
     const res = await getStarTemplateGroup();
-    res.unshift({ id: null, groupName: t("createAgent1.allTemplates") }); // 添加“所有模板”选项
+    res.unshift({ id: null, groupName: t('createAgent1.allTemplates') }); // 添加“所有模板”选项
     setModalList(res);
   };
   // 根据分类进行查询
@@ -130,7 +130,7 @@ const MakeCreateModal: React.FC<MakeCreateModalProps> = ({
       <Modal
         open={visible}
         getContainer={false}
-        width={"auto"}
+        width={'auto'}
         footer={false}
         centered
         onCancel={onCancel}
@@ -138,23 +138,23 @@ const MakeCreateModal: React.FC<MakeCreateModalProps> = ({
           setActiveTab(0);
         }}
       >
-        <Spin style={{ maxHeight: "654px" }} spinning={addAgentTemplateLoading}>
+        <Spin style={{ maxHeight: '654px' }} spinning={addAgentTemplateLoading}>
           <div className={styles.create_modal_wrap}>
             <div className={styles.wrapper_title}>
               <div className={styles.title_left}>
                 <span style={{ fontWeight: 600 }}>
-                  {t("createAgent1.workflowCreationTitle")}
+                  {t('createAgent1.workflowCreationTitle')}
                 </span>
               </div>
             </div>
             {/* 工作流模板tabs */}
             <div className="w-full flex items-center justify-between mb-[14px]">
               <div className={styles.agent_Template_Tab}>
-                {modalList.slice(0, isEnglish ? 5 : 8).map((item) => (
+                {modalList.slice(0, isEnglish ? 5 : 8).map(item => (
                   <div
                     key={item.id}
                     className={`${styles.agent_Template_Tab_item} cursor-pointer 
-                    ${activeTab == item.id ? styles.agent_Template_Tab_item_active : ""} 
+                    ${activeTab == item.id ? styles.agent_Template_Tab_item_active : ''} 
                     transition duration-75`}
                     onClick={() => handleTabChange(item.id)}
                   >
@@ -171,10 +171,10 @@ const MakeCreateModal: React.FC<MakeCreateModalProps> = ({
                   <Dropdown
                     dropdownRender={() => (
                       <div className="bg-[#F6F9FF] text-[#7F7F7F]">
-                        {modalList.slice(isEnglish ? 5 : 8).map((item) => (
+                        {modalList.slice(isEnglish ? 5 : 8).map(item => (
                           <div
                             key={item.id}
-                            className={`cursor-pointer font-medium text-[14px] leading-4 transition duration-75 font-[苹方-简] px-4 py-2 ${activeTab == item.id ? "text-[#275EFF] bg-[#fff]" : ""}`}
+                            className={`cursor-pointer font-medium text-[14px] leading-4 transition duration-75 font-[苹方-简] px-4 py-2 ${activeTab == item.id ? 'text-[#275EFF] bg-[#fff]' : ''}`}
                             onClick={() => {
                               handleTabChange(item.id);
                             }}
@@ -186,8 +186,8 @@ const MakeCreateModal: React.FC<MakeCreateModalProps> = ({
                         ))}
                       </div>
                     )}
-                    trigger={["click"]}
-                    onOpenChange={(open) => {
+                    trigger={['click']}
+                    onOpenChange={open => {
                       // 控制高亮状态
                       setMoreDropdownOpen(open);
                     }}
@@ -200,13 +200,13 @@ const MakeCreateModal: React.FC<MakeCreateModalProps> = ({
                         ${
                           // 只有在关闭且有选中才高亮，打开时不高亮
                           !moreDropdownOpen &&
-                          modalList.slice(8).some((i) => i.id === activeTab)
+                          modalList.slice(8).some(i => i.id === activeTab)
                             ? styles.agent_Template_Tab_item_active
-                            : ""
+                            : ''
                         }
                       `}
                     >
-                      {t("createAgent1.moreCategories")}
+                      {t('createAgent1.moreCategories')}
                     </div>
                   </Dropdown>
                 )}
@@ -221,7 +221,7 @@ const MakeCreateModal: React.FC<MakeCreateModalProps> = ({
                   alt=""
                 />
                 <span className="text-sm text-[#275EFF]">
-                  {t("createAgent1.importWorkflow")}
+                  {t('createAgent1.importWorkflow')}
                 </span>
               </div>
             </div>
@@ -236,33 +236,33 @@ const MakeCreateModal: React.FC<MakeCreateModalProps> = ({
                       <div
                         className={styles.iconBox}
                         style={{
-                          width: "48px",
-                          height: "48px",
-                          backgroundColor: "#275EFF",
-                          borderRadius: "50%",
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          marginBottom: "21px",
+                          width: '48px',
+                          height: '48px',
+                          backgroundColor: '#275EFF',
+                          borderRadius: '50%',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          marginBottom: '21px',
                         }}
                       >
                         <PlusOutlined
                           style={{
-                            fontSize: "20px",
-                            color: "white",
+                            fontSize: '20px',
+                            color: 'white',
                           }}
                         />
                       </div>
                       <div
                         className={styles.iconTitle}
                         style={{
-                          fontSize: "16px",
-                          fontWeight: "normal",
-                          lineHeight: "24px",
-                          color: "#000000",
+                          fontSize: '16px',
+                          fontWeight: 'normal',
+                          lineHeight: '24px',
+                          color: '#000000',
                         }}
                       >
-                        {t("createAgent1.customCreation")}
+                        {t('createAgent1.customCreation')}
                       </div>
                     </div>
 
@@ -272,7 +272,7 @@ const MakeCreateModal: React.FC<MakeCreateModalProps> = ({
                         <div
                           key={item.mass_id + item._id?.timestamp}
                           className={styles.agentType_Type_content}
-                          ref={(ref) => (mouseNowPageRef.current[index] = ref)}
+                          ref={ref => (mouseNowPageRef.current[index] = ref)}
                           onMouseLeave={() => {
                             setCreateButton(-1);
                           }}
@@ -281,11 +281,11 @@ const MakeCreateModal: React.FC<MakeCreateModalProps> = ({
                           }}
                         >
                           <div
-                            ref={(ref) => (firstPageRef.current[index] = ref)}
+                            ref={ref => (firstPageRef.current[index] = ref)}
                             className={styles.wrapper_agentType_Type}
                             style={{
-                              display: "flex",
-                              justifyContent: "space-between",
+                              display: 'flex',
+                              justifyContent: 'space-between',
                             }}
                           >
                             <div className={styles.agent_img}>
@@ -310,20 +310,20 @@ const MakeCreateModal: React.FC<MakeCreateModalProps> = ({
                                   onClick={() => addAgentTemplate(true, item)}
                                   className={styles.my_btn}
                                 >
-                                  <span>{t("createAgent1.buildSame")}</span>
+                                  <span>{t('createAgent1.buildSame')}</span>
                                 </button>
                               )}
                               {createButton !== index && (
                                 <div
                                   className={styles.ell}
                                   style={{
-                                    fontSize: "14px",
-                                    fontWeight: "normal",
-                                    color: "#7f7f7f",
-                                    lineHeight: "18px",
-                                    paddingTop: "2px",
+                                    fontSize: '14px',
+                                    fontWeight: 'normal',
+                                    color: '#7f7f7f',
+                                    lineHeight: '18px',
+                                    paddingTop: '2px',
                                     // height: '60px',
-                                    width: "100%",
+                                    width: '100%',
                                   }}
                                 >
                                   {item.core_abilities.description}

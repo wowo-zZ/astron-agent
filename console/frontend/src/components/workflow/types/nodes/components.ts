@@ -1,5 +1,5 @@
-import { RefInput } from "@/components/workflow/types/drawer";
-import { ReactFlowNode } from "@/components/workflow/types/drawer";
+import { RefInput } from '@/components/workflow/types/drawer';
+import { ReactFlowNode } from '@/components/workflow/types/drawer';
 
 export interface UseNodeDebuggerReturn {
   open: boolean;
@@ -9,9 +9,9 @@ export interface UseNodeDebuggerReturn {
   handleNodeDebug: () => void;
   nodeDebugExect: (
     currentNode: ReactFlowNode,
-    debuggerNode: ReactFlowNode,
+    debuggerNode: ReactFlowNode
   ) => void;
-  remarkStatus: "show" | "hide" | null;
+  remarkStatus: 'show' | 'hide' | null;
   remarkClick: () => void;
   labelInputId: string;
 }

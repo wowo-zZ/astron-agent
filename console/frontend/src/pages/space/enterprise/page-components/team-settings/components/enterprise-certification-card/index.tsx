@@ -1,18 +1,18 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Button, message, Modal } from "antd";
-import styles from "./index.module.scss";
-import TeamSetCardBgImg from "@/assets/imgs/space/teamSettingCardBg.png";
-import { uploadBotImg } from "@/services/spark-common";
-import Cropper from "react-easy-crop";
-import { compressImage } from "@/utils";
-import { updateLogo } from "@/services/enterprise-auth-api";
-import useEnterpriseStore from "@/store/enterprise-store";
-import UploadImage from "../upload-image";
+import React, { useEffect, useRef, useState } from 'react';
+import { Button, message, Modal } from 'antd';
+import styles from './index.module.scss';
+import TeamSetCardBgImg from '@/assets/imgs/space/teamSettingCardBg.png';
+import { uploadBotImg } from '@/services/spark-common';
+import Cropper from 'react-easy-crop';
+import { compressImage } from '@/utils';
+import { updateLogo } from '@/services/enterprise-auth-api';
+import useEnterpriseStore from '@/store/enterprise-store';
+import UploadImage from '../upload-image';
 
 // 定义认证状态枚举
 export enum CertificationStatus {
-  NOT_CERTIFIED = "not_certified", // 未认证
-  CERTIFIED = "certified", // 已认证
+  NOT_CERTIFIED = 'not_certified', // 未认证
+  CERTIFIED = 'certified', // 已认证
 }
 
 interface EnterpriseCertificationCardProps {
@@ -35,25 +35,25 @@ const EnterpriseCertificationCard: React.FC<
     switch (status) {
       case CertificationStatus.NOT_CERTIFIED:
         return {
-          title: "升级为企业认证",
+          title: '升级为企业认证',
           description: [
             {
-              text: "导入Logo徽章为企业LOGO",
+              text: '导入Logo徽章为企业LOGO',
             },
             {
-              text: "开通为企业认证, 团队内所有成员都享受企业认证",
+              text: '开通为企业认证, 团队内所有成员都享受企业认证',
             },
           ],
           showButton: true,
-          buttonText: "去升级",
+          buttonText: '去升级',
         };
       case CertificationStatus.CERTIFIED:
         return {
-          title: "已升级为企业认证",
+          title: '已升级为企业认证',
           description: [
             {
-              text: "导入Logo徽章为企业LOGO",
-              buttonText: "替换",
+              text: '导入Logo徽章为企业LOGO',
+              buttonText: '替换',
               onClick: () => {
                 // todo
                 // triggerFileSelectPopup()
@@ -61,7 +61,7 @@ const EnterpriseCertificationCard: React.FC<
               },
             },
             {
-              text: "开通为企业认证, 团队内所有成员都享受企业认证",
+              text: '开通为企业认证, 团队内所有成员都享受企业认证',
             },
           ],
         };
@@ -73,12 +73,12 @@ const EnterpriseCertificationCard: React.FC<
   const config = getCardConfig();
 
   const handleUpgradeClick = (buttonText: string) => {
-    if (buttonText === "去升级") {
+    if (buttonText === '去升级') {
       // onUpgrade?.();
-      window.open("https://console.xfyun.cn/user/authentication/company");
+      window.open('https://console.xfyun.cn/user/authentication/company');
       return;
     }
-    if (buttonText === "替换") {
+    if (buttonText === '替换') {
       //
     }
   };
@@ -100,9 +100,9 @@ const EnterpriseCertificationCard: React.FC<
               size="small"
               type="link"
               className={styles.upgradeBtn}
-              onClick={() => handleUpgradeClick(config.buttonText || "")}
+              onClick={() => handleUpgradeClick(config.buttonText || '')}
             >
-              {config.buttonText || ""}
+              {config.buttonText || ''}
             </Button>
           )}
         </h3>
@@ -110,8 +110,8 @@ const EnterpriseCertificationCard: React.FC<
           {config.description?.map((item, index) => (
             <p key={index}>
               <span className={styles.dot}>•</span>
-              {item?.text}{" "}
-              {"buttonText" in item && item.buttonText && (
+              {item?.text}{' '}
+              {'buttonText' in item && item.buttonText && (
                 <span
                   className={styles.renewTag}
                   onClick={() => item?.onClick?.()}
@@ -124,15 +124,15 @@ const EnterpriseCertificationCard: React.FC<
         </div>
       </div>
       <UploadImage
-        onSuccess={(res) => {
+        onSuccess={res => {
           setTriggerChild(false);
           updateLogo(res)
-            .then((_) => {
-              message.success("logo已上传!");
+            .then(_ => {
+              message.success('logo已上传!');
               setEnterpriseInfo({ logoUrl: res });
             })
-            .catch((e) => {
-              message.error(e?.msg || "上传失败或套餐已过期");
+            .catch(e => {
+              message.error(e?.msg || '上传失败或套餐已过期');
             });
         }}
         onClose={() => {

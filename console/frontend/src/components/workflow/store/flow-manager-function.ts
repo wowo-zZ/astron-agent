@@ -1,7 +1,7 @@
-import { cloneDeep } from "lodash";
-import { Node } from "reactflow";
-import i18next from "i18next";
-import { ErrNodeType } from "@/components/workflow/types";
+import { cloneDeep } from 'lodash';
+import { Node } from 'reactflow';
+import i18next from 'i18next';
+import { ErrNodeType } from '@/components/workflow/types';
 import {
   getFlowDetailAPI,
   saveFlowAPI,
@@ -13,12 +13,12 @@ import {
   getKnowledgeProStrategyAPI,
   getFlowModelList,
   canPublishSetNotAPI,
-} from "@/services/flow";
-import { getModelConfigDetail } from "@/services/common";
-import useFlowStore from "./useFlowStore";
-import useIteratorFlowStore from "./useIteratorFlowStore";
-import { FlowStoreType } from "../types/zustand/flow";
-import { UseBoundStore, StoreApi } from "zustand";
+} from '@/services/flow';
+import { getModelConfigDetail } from '@/services/common';
+import useFlowStore from './useFlowStore';
+import useIteratorFlowStore from './useIteratorFlowStore';
+import { FlowStoreType } from '../types/zustand/flow';
+import { UseBoundStore, StoreApi } from 'zustand';
 
 export const initialStatus = {
   willAddNode: null,
@@ -28,7 +28,7 @@ export const initialStatus = {
   autonomousMode: false,
   showAiuiTips: false,
   nodeList: [],
-  currentFlowId: "",
+  currentFlowId: '',
   historys: [],
   sparkLlmModels: [],
   decisionMakingModels: [],
@@ -38,9 +38,9 @@ export const initialStatus = {
   questionAnswerModels: [],
   flows: [],
   flowResult: {
-    status: "",
-    timeCost: "",
-    totalTokens: "",
+    status: '',
+    timeCost: '',
+    totalTokens: '',
   },
   errNodes: [],
   currentFlow: undefined,
@@ -52,39 +52,39 @@ export const initialStatus = {
   showIterativeModal: false,
   selectPromptModalInfo: {
     open: false,
-    nodeId: "",
+    nodeId: '',
   },
   selectAgentPromptModalInfo: {
     open: false,
-    nodeId: "",
+    nodeId: '',
   },
   defaultValueModalInfo: {
     open: false,
-    nodeId: "",
-    paramsId: "",
+    nodeId: '',
+    paramsId: '',
     data: {},
   },
   promptOptimizeModalInfo: {
     open: false,
-    nodeId: "",
-    key: "template",
+    nodeId: '',
+    key: 'template',
   },
   clearFlowCanvasModalInfo: {
     open: false,
   },
   nodeInfoEditDrawerlInfo: {
     open: false,
-    nodeId: "",
+    nodeId: '',
   },
   codeIDEADrawerlInfo: {
     open: false,
-    nodeId: "",
+    nodeId: '',
   },
-  iteratorId: "",
-  chatId: "",
+  iteratorId: '',
+  chatId: '',
   currentStore: undefined,
   flowChatResultOpen: false,
-  edgeType: "curve",
+  edgeType: 'curve',
   loadingNodesData: false,
   loadingModels: false,
   loadingNodesLayout: false,
@@ -99,12 +99,12 @@ export const initialStatus = {
   openOperationResult: false,
   knowledgeModalInfo: {
     open: false,
-    nodeId: "",
+    nodeId: '',
   },
   knowledgeDetailModalInfo: {
     open: false,
-    nodeId: "",
-    repoId: "",
+    nodeId: '',
+    repoId: '',
   },
   toolModalInfo: {
     open: false,
@@ -112,20 +112,23 @@ export const initialStatus = {
   flowModalInfo: {
     open: false,
   },
+  rpaModalInfo: {
+    open: false,
+  },
   knowledgeParameterModalInfo: {
     open: false,
-    nodeId: "",
+    nodeId: '',
   },
   knowledgeProParameterModalInfo: {
     open: false,
-    nodeId: "",
+    nodeId: '',
   },
   chatDebuggerResult: false,
   advancedConfiguration: false,
   versionManagement: false,
   historyVersion: false,
   historyVersionData: {},
-  controlMode: "mouse",
+  controlMode: 'mouse',
 };
 
 export interface ModelConfig {
@@ -168,40 +171,40 @@ interface CustomNode extends Node {
   idType?: string;
 }
 
-const intentOrderList = i18next.t("workflow.nodes.flow.intentNumbers", {
+const intentOrderList = i18next.t('workflow.nodes.flow.intentNumbers', {
   returnObjects: true,
 }) as string[];
 
 // Helper function to get translated error messages
 export const getFlowErrorMsg = (
   key: string,
-  params?: Record<string, unknown>,
+  params?: Record<string, unknown>
 ): string => {
   return i18next.t(`workflow.nodes.flow.${key}`, params);
 };
 
 export const addModelParamsToNode = (currentModel, get): void => {
   getModelConfigDetail(currentModel.llmId, currentModel.llmSource).then(
-    (modelDetail) => {
+    modelDetail => {
       const configs =
         modelDetail?.config?.serviceBlock?.[currentModel.serviceId]?.[0]
           ?.fields || [];
       const modelParams = {};
-      configs.forEach((item) => {
-        if (item.key === "max_tokens") {
-          item.key = "maxTokens";
+      configs.forEach(item => {
+        if (item.key === 'max_tokens') {
+          item.key = 'maxTokens';
         }
-        if (item.key === "top_k") {
-          item.key = "topK";
+        if (item.key === 'top_k') {
+          item.key = 'topK';
         }
         modelParams[item.key] = item.default;
       });
-      get().setNodeList((nodeList) => {
-        nodeList.forEach((nodeCatagory) => {
+      get().setNodeList(nodeList => {
+        nodeList.forEach(nodeCatagory => {
           nodeCatagory.nodes.forEach((node: CustomNode) => {
             if (
-              ["spark-llm", "decision-making", "extractor-parameter"].includes(
-                node.idType || "",
+              ['spark-llm', 'decision-making', 'extractor-parameter'].includes(
+                node.idType || ''
               )
             ) {
               node.data.nodeParam.configs = configs;
@@ -218,13 +221,13 @@ export const addModelParamsToNode = (currentModel, get): void => {
         });
         return cloneDeep(nodeList);
       });
-    },
+    }
   );
 };
 
 export const addTextNodeConfig = async (
   params: unknown,
-  get,
+  get
 ): Promise<void> => {
   const res = await textNodeConfigSaveAPI(params);
   const textNodeConfigList = await textNodeConfigListAPI();
@@ -237,12 +240,12 @@ export const setModels = (appId: string, set): void => {
     loadingModels: true,
   });
   Promise.all([
-    getFlowModelList(appId, "spark-llm"),
-    getFlowModelList(appId, "decision-making"),
-    getFlowModelList(appId, "extractor-parameter"),
-    getFlowModelList(appId, "agent"),
-    getFlowModelList(appId, "knowledge-pro-base"),
-    getFlowModelList(appId, "question-answer"),
+    getFlowModelList(appId, 'spark-llm'),
+    getFlowModelList(appId, 'decision-making'),
+    getFlowModelList(appId, 'extractor-parameter'),
+    getFlowModelList(appId, 'agent'),
+    getFlowModelList(appId, 'knowledge-pro-base'),
+    getFlowModelList(appId, 'question-answer'),
   ])
     .then(
       ([
@@ -256,12 +259,12 @@ export const setModels = (appId: string, set): void => {
         const sparkLlmModels = sparkLlmModelsData?.workflow.flatMap(
           function (item) {
             return item.modelList;
-          },
+          }
         );
         const decisionMakingModels = decisionMakingModelsData?.workflow.flatMap(
           function (item) {
             return item.modelList;
-          },
+          }
         );
         const extractorParameterModels =
           extractorParameterModelsData?.workflow.flatMap(function (item) {
@@ -273,12 +276,12 @@ export const setModels = (appId: string, set): void => {
         const knowledgeProModels = knowledgeProData?.workflow.flatMap(
           function (item) {
             return item.modelList;
-          },
+          }
         );
         const questionAnswerModels = questionAnswerData?.workflow.flatMap(
           function (item) {
             return item.modelList;
-          },
+          }
         );
         set({
           sparkLlmModels,
@@ -289,14 +292,14 @@ export const setModels = (appId: string, set): void => {
           questionAnswerModels,
           currentStore: useFlowStore,
         });
-      },
+      }
     )
     .finally(() => set({ loadingModels: false }));
 };
 
 export const removeTextNodeConfig = async (
   id: string,
-  get,
+  get
 ): Promise<unknown> => {
   await textNodeConfigClearAPI(id);
   const textNodeConfigList = await textNodeConfigListAPI();
@@ -306,8 +309,8 @@ export const removeTextNodeConfig = async (
 
 export const getFlowDetail = (get): void => {
   get().setIsLoading(true);
-  getFlowDetailAPI(get().currentFlow?.id || "")
-    .then((data) => {
+  getFlowDetailAPI(get().currentFlow?.id || '')
+    .then(data => {
       get().setCurrentFlow({
         ...data,
         originData: data?.data,
@@ -347,7 +350,7 @@ export const initFlowData = async (id: string, set): Promise<void> => {
     textNodeConfigList,
     agentStrategy,
     knowledgeProStrategy,
-    controlMode: window.localStorage.getItem("controlMode") || "mouse",
+    controlMode: window.localStorage.getItem('controlMode') || 'mouse',
   });
 };
 
@@ -381,12 +384,12 @@ export const autoSaveCurrentFlow = (get): void => {
       };
       get().setIsLoading(true);
       saveFlowAPI(params)
-        .then((data) =>
+        .then(data =>
           get().setCurrentFlow({
             ...currentFlow,
             updateTime: data.updateTime,
             originData: data.data,
-          }),
+          })
         )
         .finally(() => get().setIsLoading(false));
     }
@@ -408,12 +411,12 @@ export const canPublishSetNot = (get): void => {
 
 export const setCurrentStore = (type: string, set): void => {
   set({
-    currentStore: type === "iterator" ? useIteratorFlowStore : useFlowStore,
+    currentStore: type === 'iterator' ? useIteratorFlowStore : useFlowStore,
   });
 };
 
 export const getCurrentStore = (
-  get,
+  get
 ): UseBoundStore<StoreApi<FlowStoreType>> => {
   const store = get().currentStore;
   if (!store) {
@@ -436,7 +439,7 @@ export const setFlowResult = (flowResult, set): void => {
 
 export const setTextNodeConfigList = (change, get, set): void => {
   const textNodeConfigList =
-    typeof change === "function" ? change(get().textNodeConfigList) : change;
+    typeof change === 'function' ? change(get().textNodeConfigList) : change;
   set({
     textNodeConfigList,
   });
@@ -444,7 +447,7 @@ export const setTextNodeConfigList = (change, get, set): void => {
 
 export const setAgentStrategy = (change, get, set): void => {
   const agentStrategy =
-    typeof change === "function" ? change(get().agentStrategy) : change;
+    typeof change === 'function' ? change(get().agentStrategy) : change;
   set({
     agentStrategy,
   });
@@ -452,7 +455,7 @@ export const setAgentStrategy = (change, get, set): void => {
 
 export const setKnowledgeProStrategy = (change, get, set): void => {
   const knowledgeProStrategy =
-    typeof change === "function" ? change(get().knowledgeProStrategy) : change;
+    typeof change === 'function' ? change(get().knowledgeProStrategy) : change;
   set({
     knowledgeProStrategy,
   });
@@ -460,7 +463,7 @@ export const setKnowledgeProStrategy = (change, get, set): void => {
 
 export const setHistorys = (change, get, set): void => {
   const newChange =
-    typeof change === "function" ? change(get().historys) : change;
+    typeof change === 'function' ? change(get().historys) : change;
   set({
     historys: newChange,
   });
@@ -468,7 +471,7 @@ export const setHistorys = (change, get, set): void => {
 
 // ===== 公共工具函数 =====
 function addErrNode({ errNodes, currentNode, msg }): void {
-  const isExist = errNodes?.find((node) => node?.id === currentNode?.id);
+  const isExist = errNodes?.find(node => node?.id === currentNode?.id);
   if (isExist) return;
   const errNode = {
     id: currentNode?.id,
@@ -490,19 +493,19 @@ function validateNodeBase({
   if (
     !checkNode(
       currentCheckNode.id,
-      variableNodes.filter((node) => node.id !== currentCheckNode.id),
+      variableNodes.filter(node => node.id !== currentCheckNode.id)
     )
   ) {
     addErrNode({
       errNodes,
       currentNode: currentCheckNode,
-      msg: getFlowErrorMsg("nodeValidationFailed"),
+      msg: getFlowErrorMsg('nodeValidationFailed'),
     });
     useFlowStore
       .getState()
       .setNode(currentCheckNode.id, cloneDeep(currentCheckNode));
   }
-  if (currentCheckNode.id.includes("node-variable")) {
+  if (currentCheckNode.id.includes('node-variable')) {
     variableNodes.push(currentCheckNode);
   }
 }
@@ -514,17 +517,17 @@ function validateDecisionMakingNode({
 }): void {
   const intentChains = currentCheckNode?.data?.nodeParam?.intentChains;
   let flag = true;
-  let errorNodeMsg = "";
+  let errorNodeMsg = '';
   intentChains.forEach((intentChain, index) => {
     const hasIntentChainEdge = outgoingEdges.some(
-      (edge) => edge.sourceHandle === intentChain.id,
+      edge => edge.sourceHandle === intentChain.id
     );
     if (!hasIntentChainEdge) {
       flag = false;
       errorNodeMsg =
         index === intentChains?.length - 1
-          ? getFlowErrorMsg("defaultIntentNotConnected")
-          : getFlowErrorMsg("intentNotConnected", {
+          ? getFlowErrorMsg('defaultIntentNotConnected')
+          : getFlowErrorMsg('intentNotConnected', {
               intentNumber: intentOrderList[index],
             });
     }
@@ -540,20 +543,20 @@ function validateIfElseNode({
 }): void {
   const cases = currentCheckNode?.data?.nodeParam?.cases;
   let flag = true;
-  let errorNodeMsg = "";
+  let errorNodeMsg = '';
   cases.forEach((intentCase, index) => {
     const hasCaseEdge = outgoingEdges.some(
-      (edge) => edge.sourceHandle === intentCase.id,
+      edge => edge.sourceHandle === intentCase.id
     );
     if (!hasCaseEdge) {
       flag = false;
       const title =
         index === 0
-          ? getFlowErrorMsg("if")
+          ? getFlowErrorMsg('if')
           : index !== cases.length - 1
-            ? getFlowErrorMsg("elseIf", { priority: intentCase.level })
-            : getFlowErrorMsg("else");
-      errorNodeMsg = `${title}${getFlowErrorMsg("edgeNotConnected")}`;
+            ? getFlowErrorMsg('elseIf', { priority: intentCase.level })
+            : getFlowErrorMsg('else');
+      errorNodeMsg = `${title}${getFlowErrorMsg('edgeNotConnected')}`;
     }
   });
   if (!flag)
@@ -567,18 +570,18 @@ function validateQuestionAnswerNode({
 }): void {
   const optionAnswer = currentCheckNode.data.nodeParam.optionAnswer;
   let flag = true;
-  let errorNodeMsg = "";
-  optionAnswer.forEach((option) => {
+  let errorNodeMsg = '';
+  optionAnswer.forEach(option => {
     const hasCaseEdge = outgoingEdges.some(
-      (edge) => edge.sourceHandle === option.id,
+      edge => edge.sourceHandle === option.id
     );
     if (!hasCaseEdge) {
       flag = false;
       const title =
         option?.type === 2
-          ? getFlowErrorMsg("option", { optionName: option?.name })
-          : getFlowErrorMsg("otherOption");
-      errorNodeMsg = `${title}${getFlowErrorMsg("edgeNotConnected")}`;
+          ? getFlowErrorMsg('option', { optionName: option?.name })
+          : getFlowErrorMsg('otherOption');
+      errorNodeMsg = `${title}${getFlowErrorMsg('edgeNotConnected')}`;
     }
   });
   if (!flag)
@@ -597,19 +600,19 @@ function validateRetryConfigNode({
     const exceptionHandlingEdge =
       currentCheckNode?.data?.nodeParam?.exceptionHandlingEdge;
     const hasExceptionHandlingEdge = outgoingEdges.some(
-      (edge) => edge.sourceHandle === exceptionHandlingEdge,
+      edge => edge.sourceHandle === exceptionHandlingEdge
     );
     if (!hasExceptionHandlingEdge)
       addErrNode({
         errNodes,
         currentNode: currentCheckNode,
-        msg: "异常处理节点存在未连接的边",
+        msg: '异常处理节点存在未连接的边',
       });
     if (outgoingEdges?.length === 1)
       addErrNode({
         errNodes,
         currentNode: currentCheckNode,
-        msg: "该节点存在未连接的边",
+        msg: '该节点存在未连接的边',
       });
   }
 }
@@ -628,13 +631,13 @@ function validateOutgoingEdges({
     addErrNode({
       errNodes,
       currentNode: currentCheckNode,
-      msg: getFlowErrorMsg("nodeNotConnected"),
+      msg: getFlowErrorMsg('nodeNotConnected'),
     });
     return;
   }
 
   for (const edge of outgoingEdges) {
-    const targetNode = nodes.find((node) => node.id === edge.target);
+    const targetNode = nodes.find(node => node.id === edge.target);
     if (!targetNode) return false;
     if (!targetNode.data.label.trim()) return false;
 
@@ -643,7 +646,7 @@ function validateOutgoingEdges({
       addErrNode({
         errNodes,
         currentNode: targetNode,
-        msg: getFlowErrorMsg("cycleDependency"),
+        msg: getFlowErrorMsg('cycleDependency'),
       });
       return;
     }
@@ -659,15 +662,14 @@ function checkIteratorNode({ iteratorId, outerErrNodes, get }): void {
     edges: allEdges,
     checkNode,
   } = useFlowStore.getState();
-  const nodes = allNodes?.filter((node) => node?.data?.parentId === iteratorId);
-  const nodeIds = nodes?.map((node) => node?.id);
+  const nodes = allNodes?.filter(node => node?.data?.parentId === iteratorId);
+  const nodeIds = nodes?.map(node => node?.id);
   const edges = allEdges?.filter(
-    (edge) =>
-      nodeIds?.includes(edge?.source) || nodeIds?.includes(edge?.target),
+    edge => nodeIds?.includes(edge?.source) || nodeIds?.includes(edge?.target)
   );
 
-  const startNode = nodes.find((node) => node.nodeType === "node-start");
-  const endNode = nodes.find((node) => node.nodeType === "node-end");
+  const startNode = nodes.find(node => node.nodeType === 'node-start');
+  const endNode = nodes.find(node => node.nodeType === 'node-end');
 
   const visitedNodes = new Set();
   const errNodes: unknown = [];
@@ -678,7 +680,7 @@ function checkIteratorNode({ iteratorId, outerErrNodes, get }): void {
 
   function dfs(): void {
     const { nodeId } = stack.pop();
-    const currentCheckNode = nodes.find((node) => node.id === nodeId);
+    const currentCheckNode = nodes.find(node => node.id === nodeId);
 
     if (!visitedNodes.has(nodeId)) {
       visitedNodes.add(nodeId);
@@ -692,21 +694,21 @@ function checkIteratorNode({ iteratorId, outerErrNodes, get }): void {
       return;
     }
 
-    const outgoingEdges = edges.filter((edge) => edge.source === nodeId);
+    const outgoingEdges = edges.filter(edge => edge.source === nodeId);
 
     switch (currentCheckNode.nodeType) {
-      case "decision-making":
+      case 'decision-making':
         validateDecisionMakingNode({
           currentCheckNode,
           outgoingEdges,
           errNodes,
         });
         break;
-      case "if-else":
+      case 'if-else':
         validateIfElseNode({ currentCheckNode, outgoingEdges, errNodes });
         break;
-      case "question-answer":
-        if (currentCheckNode.data.nodeParam?.answerType === "option")
+      case 'question-answer':
+        if (currentCheckNode.data.nodeParam?.answerType === 'option')
           validateQuestionAnswerNode({
             currentCheckNode,
             outgoingEdges,
@@ -734,31 +736,31 @@ function checkIteratorNode({ iteratorId, outerErrNodes, get }): void {
 
   dfs();
 
-  nodes.forEach((node) => {
+  nodes.forEach(node => {
     if (!visitedNodes.has(node.id))
       addErrNode({
         errNodes,
         currentNode: node,
-        msg: getFlowErrorMsg("nodeNotConnected"),
+        msg: getFlowErrorMsg('nodeNotConnected'),
       });
   });
 
-  get().setCycleEdges((old) => [...old, ...cycleEdges]);
+  get().setCycleEdges(old => [...old, ...cycleEdges]);
 
   if (errNodes.length > 0) {
     const currentIteratorNode = outerErrNodes?.find(
-      (node) => node?.id === iteratorId,
+      node => node?.id === iteratorId
     );
     const iteratorNodeInfo = useFlowStore
       .getState()
-      .nodes.find((node) => node?.id === iteratorId);
+      .nodes.find(node => node?.id === iteratorId);
     if (currentIteratorNode) currentIteratorNode.childErrList = errNodes;
     else {
       iteratorNodeInfo.childErrList = errNodes;
       addErrNode({
         errNodes: outerErrNodes,
         currentNode: iteratorNodeInfo,
-        msg: getFlowErrorMsg("subNodeNotSatisfied"),
+        msg: getFlowErrorMsg('subNodeNotSatisfied'),
       });
     }
   }
@@ -771,8 +773,8 @@ export function checkFlow(get): boolean {
   const errNodes: unknown[] = [];
   const cycleEdges: unknown[] = [];
 
-  const startNode = nodes.find((node) => node.nodeType === "node-start");
-  const endNode = nodes.find((node) => node.nodeType === "node-end");
+  const startNode = nodes.find(node => node.nodeType === 'node-start');
+  const endNode = nodes.find(node => node.nodeType === 'node-end');
   const visitedNodes = new Set();
   const recStack = new Set();
   const stack: unknown[] = [{ nodeId: startNode.id }];
@@ -780,7 +782,7 @@ export function checkFlow(get): boolean {
 
   function dfs(): void {
     const { nodeId } = stack.pop();
-    const currentCheckNode = nodes.find((node) => node.id === nodeId);
+    const currentCheckNode = nodes.find(node => node.id === nodeId);
 
     if (!visitedNodes.has(nodeId)) {
       visitedNodes.add(nodeId);
@@ -789,13 +791,13 @@ export function checkFlow(get): boolean {
 
     validateNodeBase({ currentCheckNode, variableNodes, checkNode, errNodes });
 
-    if (currentCheckNode?.nodeType === "iteration") {
+    if (currentCheckNode?.nodeType === 'iteration') {
       checkIteratorNode(
         {
           iteratorId: currentCheckNode.id,
           outerErrNodes: errNodes,
         },
-        get,
+        get
       );
     }
 
@@ -804,21 +806,21 @@ export function checkFlow(get): boolean {
       return;
     }
 
-    const outgoingEdges = edges.filter((edge) => edge.source === nodeId);
+    const outgoingEdges = edges.filter(edge => edge.source === nodeId);
 
     switch (currentCheckNode.nodeType) {
-      case "decision-making":
+      case 'decision-making':
         validateDecisionMakingNode({
           currentCheckNode,
           outgoingEdges,
           errNodes,
         });
         break;
-      case "if-else":
+      case 'if-else':
         validateIfElseNode({ currentCheckNode, outgoingEdges, errNodes });
         break;
-      case "question-answer":
-        if (currentCheckNode.data.nodeParam?.answerType === "option")
+      case 'question-answer':
+        if (currentCheckNode.data.nodeParam?.answerType === 'option')
           validateQuestionAnswerNode({
             currentCheckNode,
             outgoingEdges,
@@ -846,16 +848,16 @@ export function checkFlow(get): boolean {
 
   dfs();
 
-  nodes.forEach((node) => {
+  nodes.forEach(node => {
     if (!visitedNodes.has(node.id) && !node?.data?.parentId)
       addErrNode({
         errNodes,
         currentNode: node,
-        msg: getFlowErrorMsg("nodeNotConnected"),
+        msg: getFlowErrorMsg('nodeNotConnected'),
       });
   });
 
   get().setErrNodes(errNodes);
-  get().setCycleEdges((old) => [...old, ...cycleEdges]);
+  get().setCycleEdges(old => [...old, ...cycleEdges]);
   return errNodes?.length === 0;
 }

@@ -1,4 +1,4 @@
-import { FileInfoV2 } from "../resource";
+import { FileInfoV2 } from '../resource';
 
 export type fileType = {
   id: string;

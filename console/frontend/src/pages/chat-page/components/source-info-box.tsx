@@ -1,12 +1,12 @@
-import { memo, useState, useEffect, FC } from "react";
-import { getTraceList } from "@/utils";
-import { SourceInfoItem } from "@/types/chat";
-import { getLanguageCode } from "@/utils/http";
+import { memo, useState, useEffect, FC } from 'react';
+import { getTraceList } from '@/utils';
+import { SourceInfoItem } from '@/types/chat';
+import { getLanguageCode } from '@/utils/http';
 
 const SourceInfoBox: FC<{ traceSource?: string }> = ({ traceSource }) => {
   const [open, setOpen] = useState<boolean>(false);
   const [renderTraceSource, setRenderTraceSource] = useState<SourceInfoItem[]>(
-    [],
+    []
   );
   const languageCode = getLanguageCode();
 
@@ -34,7 +34,7 @@ const SourceInfoBox: FC<{ traceSource?: string }> = ({ traceSource }) => {
   return (
     <div
       className={`w-[calc(100%-55px)] transition-all duration-300 rounded-md ml-[55px] mb-[15px] overflow-hidden ${
-        open ? "max-h-[230px]" : "max-h-[38px]"
+        open ? 'max-h-[230px]' : 'max-h-[38px]'
       }`}
     >
       {/* 标题栏 */}
@@ -43,7 +43,7 @@ const SourceInfoBox: FC<{ traceSource?: string }> = ({ traceSource }) => {
         onClick={handleTitleClick}
       >
         <span>
-          {languageCode === "zh"
+          {languageCode === 'zh'
             ? `来源：获取到${renderTraceSource.length}篇资料作为参考`
             : `Source: ${renderTraceSource.length} articles were obtained as references.`}
         </span>
@@ -51,10 +51,10 @@ const SourceInfoBox: FC<{ traceSource?: string }> = ({ traceSource }) => {
           src="https://openres.xfyun.cn/xfyundoc/2024-04-11/22f3b4aa-daab-4b0c-a4d7-c42a7aff03d6/1712803618079/aaaaaa.png"
           alt="展开/收起"
           className={`w-[10px] h-[6px] ml-[30px] transition-transform duration-300 ${
-            !open ? "rotate-x-180" : ""
+            !open ? 'rotate-x-180' : ''
           }`}
           style={{
-            transform: !open ? "rotateX(180deg)" : "rotateX(0deg)",
+            transform: !open ? 'rotateX(180deg)' : 'rotateX(0deg)',
           }}
         />
       </div>

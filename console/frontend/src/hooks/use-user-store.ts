@@ -1,6 +1,6 @@
-import { useCallback, useMemo } from "react";
-import useUserStore from "@/store/user-store";
-import { RoleType } from "@/permissions/permission-type";
+import { useCallback, useMemo } from 'react';
+import useUserStore from '@/store/user-store';
+import { RoleType } from '@/types/permission';
 
 export const useUserStoreHook = () => {
   const { user } = useUserStore();
@@ -42,7 +42,7 @@ export const useUserStoreHook = () => {
       permissionParams,
       isExpires,
     }),
-    [isSuperAdmin, isAdmin, isMember, isOwner, permissionParams, isExpires],
+    [isSuperAdmin, isAdmin, isMember, isOwner, permissionParams, isExpires]
   );
 
   return returnValues;

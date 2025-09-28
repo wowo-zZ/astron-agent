@@ -2,15 +2,15 @@
  * 工作流节点选项组件
  * 处理节点问答功能的选项渲染和交互
  */
-import React, { useMemo } from "react";
-import type { MessageListType, Option } from "@/types/chat";
-import { useTranslation } from "react-i18next";
-import clsx from "clsx";
-import useChat from "@/hooks/use-chat";
-import chatIgnoreNormal from "@/assets/imgs/chat/chat-ignore-normal.svg";
-import chatIgnoreActive from "@/assets/imgs/chat/chat-ignore-active.svg";
-import chatEndRoundNormal from "@/assets/imgs/chat/chat-end-round-normal.svg";
-import chatEndRoundActive from "@/assets/imgs/chat/chat-end-round-active.svg";
+import React, { useMemo } from 'react';
+import type { MessageListType, Option } from '@/types/chat';
+import { useTranslation } from 'react-i18next';
+import clsx from 'clsx';
+import useChat from '@/hooks/use-chat';
+import chatIgnoreNormal from '@/assets/imgs/chat/chat-ignore-normal.svg';
+import chatIgnoreActive from '@/assets/imgs/chat/chat-ignore-active.svg';
+import chatEndRoundNormal from '@/assets/imgs/chat/chat-end-round-normal.svg';
+import chatEndRoundActive from '@/assets/imgs/chat/chat-end-round-active.svg';
 
 interface WorkflowNodeOptionsProps {
   /** 消息数据 */
@@ -42,7 +42,7 @@ const WorkflowNodeOptions: React.FC<WorkflowNodeOptionsProps> = ({
   const options = useMemo(() => {
     return (
       message?.workflowEventData?.option?.filter(
-        (option: Option) => option?.text,
+        (option: Option) => option?.text
       ) || []
     );
   }, [message?.workflowEventData?.option]);
@@ -74,18 +74,18 @@ const WorkflowNodeOptions: React.FC<WorkflowNodeOptionsProps> = ({
               key={option?.id}
               className={clsx(
                 // 基础样式
-                "max-w-sm w-full min-w-48 h-auto rounded-lg border",
-                "leading-10 px-3 font-sans text-sm text-gray-800 font-normal",
-                "overflow-hidden text-ellipsis whitespace-nowrap mb-2",
-                "transition-all duration-200 ease-in-out",
+                'max-w-sm w-full min-w-48 h-auto rounded-lg border',
+                'leading-10 px-3 font-sans text-sm text-gray-800 font-normal',
+                'overflow-hidden text-ellipsis whitespace-nowrap mb-2',
+                'transition-all duration-200 ease-in-out',
                 {
-                  "border-blue-200 bg-blue-50": isSelected,
-                  "border-blue-100": !isSelected,
+                  'border-blue-200 bg-blue-50': isSelected,
+                  'border-blue-100': !isSelected,
                 },
                 {
-                  "cursor-pointer hover:bg-blue-50": isOptionClickable,
-                  "cursor-not-allowed": !isOptionClickable,
-                },
+                  'cursor-pointer hover:bg-blue-50': isOptionClickable,
+                  'cursor-not-allowed': !isOptionClickable,
+                }
               )}
               title={option?.text}
               onClick={() => {
@@ -95,7 +95,7 @@ const WorkflowNodeOptions: React.FC<WorkflowNodeOptionsProps> = ({
               }}
             >
               <span className="mr-1.5 text-gray-600">{option?.id}</span>
-              {option?.contentType === "image" ? (
+              {option?.contentType === 'image' ? (
                 <img
                   src={option?.text}
                   alt=""
@@ -113,18 +113,18 @@ const WorkflowNodeOptions: React.FC<WorkflowNodeOptionsProps> = ({
       {isLastMessage && workflowOperation.length > 0 && (
         <div className="w-full flex items-center ml-14 text-xs mt-4 md:ml-0">
           {/* 忽略按钮 */}
-          {workflowOperation.includes("ignore") && (
+          {workflowOperation.includes('ignore') && (
             <div
               className={clsx(
                 // 基础按钮样式
-                "group flex items-center cursor-pointer h-7 pr-3 rounded-lg",
-                "transition-all duration-200 ease-in-out mr-2",
-                "text-gray-500",
+                'group flex items-center cursor-pointer h-7 pr-3 rounded-lg',
+                'transition-all duration-200 ease-in-out mr-2',
+                'text-gray-500'
               )}
               onClick={() => {
                 onSendMsg({
-                  msg: t("workflow.nodes.chatDebugger.ignoreThisQuestion"),
-                  workflowOperation: "ignore",
+                  msg: t('workflow.nodes.chatDebugger.ignoreThisQuestion'),
+                  workflowOperation: 'ignore',
                 });
               }}
             >
@@ -138,27 +138,27 @@ const WorkflowNodeOptions: React.FC<WorkflowNodeOptionsProps> = ({
                 alt=""
                 className="w-4 h-4 hidden group-hover:block"
               />
-              <span>{t("workflow.nodes.chatDebugger.ignoreThisQuestion")}</span>
+              <span>{t('workflow.nodes.chatDebugger.ignoreThisQuestion')}</span>
             </div>
           )}
 
           {/* 结束按钮 */}
-          {workflowOperation.includes("abort") && (
+          {workflowOperation.includes('abort') && (
             <div
               className={clsx(
                 // 基础按钮样式
-                "group flex items-center cursor-pointer h-7 pr-3 rounded-lg",
-                "transition-all duration-200 ease-in-out",
-                "bg-cover bg-no-repeat",
+                'group flex items-center cursor-pointer h-7 pr-3 rounded-lg',
+                'transition-all duration-200 ease-in-out',
+                'bg-cover bg-no-repeat',
                 // 背景图标和文字颜色
-                "text-gray-500",
+                'text-gray-500'
               )}
               onClick={() => {
                 onSendMsg({
                   msg: t(
-                    "workflow.nodes.chatDebugger.endThisRoundConversation",
+                    'workflow.nodes.chatDebugger.endThisRoundConversation'
                   ),
-                  workflowOperation: "abort",
+                  workflowOperation: 'abort',
                 });
               }}
             >
@@ -174,7 +174,7 @@ const WorkflowNodeOptions: React.FC<WorkflowNodeOptionsProps> = ({
                 className="w-4 h-4 hidden group-hover:block"
               />
               <span>
-                {t("workflow.nodes.chatDebugger.endThisRoundConversation")}
+                {t('workflow.nodes.chatDebugger.endThisRoundConversation')}
               </span>
             </div>
           )}

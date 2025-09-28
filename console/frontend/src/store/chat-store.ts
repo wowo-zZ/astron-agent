@@ -1,64 +1,79 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 import type {
   MessageListType,
   ChatState,
   ChatActions,
   Option,
-} from "@/types/chat";
-const useChatStore = create<ChatState & ChatActions>((set) => ({
+  UploadFileInfo,
+} from '@/types/chat';
+const useChatStore = create<ChatState & ChatActions>(set => ({
   // 状态
   messageList: [],
+  chatFileListNoReq: [],
   streamingMessage: null,
-  streamId: "",
+  streamId: '',
   answerPercent: 0,
   controllerRef: new AbortController(),
   isLoading: false,
-  currentToolName: "",
-  traceSource: "",
-  deepThinkText: "",
+  currentToolName: '',
+  traceSource: '',
+  deepThinkText: '',
   currentChatId: 0,
   workflowOperation: [],
   isWorkflowOption: false,
   workflowOption: {
     option: [] as Option[],
-    content: "",
+    content: '',
   },
   // 操作
   initChatStore: (): void => {
     set({
       messageList: [],
-      streamId: "",
+      chatFileListNoReq: [],
+      streamId: '',
       streamingMessage: null,
       answerPercent: 0,
       controllerRef: new AbortController(),
       isLoading: false,
-      currentToolName: "",
-      traceSource: "",
-      deepThinkText: "",
+      currentToolName: '',
+      traceSource: '',
+      deepThinkText: '',
       workflowOperation: [],
       isWorkflowOption: false,
       workflowOption: {
         option: [] as Option[],
-        content: "",
+        content: '',
       },
     });
   },
 
   setMessageList: (messageList: MessageListType[]): void =>
     set({ messageList }),
+  setChatFileListNoReq: (
+    updater: UploadFileInfo[] | ((prev: UploadFileInfo[]) => UploadFileInfo[])
+  ): void => {
+    set(state => ({
+      chatFileListNoReq:
+        typeof updater === 'function'
+          ? updater(state.chatFileListNoReq)
+          : updater,
+    }));
+  },
   addMessage: (message: MessageListType): void =>
-    set((state) => ({ messageList: [...state.messageList, message] })),
+    set(state => {
+      return { messageList: [...state.messageList, message] };
+    }),
 
   // 流式消息管理 - 性能优化版：直接在messageList中操作
   startStreamingMessage: (message: MessageListType): void =>
-    set((state) => ({
+    set(state => ({
       messageList: [...state.messageList, message],
       streamingMessage: null, // 清除单独的streamingMessage
       isLoading: true,
     })),
 
   updateStreamingMessage: (content: string): void =>
-    set((state) => {
+    set(state => {
       if (state.messageList.length === 0) return state;
 
       const updatedMessageList = [...state.messageList];
@@ -82,7 +97,7 @@ const useChatStore = create<ChatState & ChatActions>((set) => ({
     }),
 
   finishStreamingMessage: (sid?: string, id?: number): void =>
-    set((state) => {
+    set(state => {
       if (state.messageList.length === 0) return state;
 
       const updatedMessageList = [...state.messageList];
@@ -92,7 +107,7 @@ const useChatStore = create<ChatState & ChatActions>((set) => ({
       if (lastMessage && !lastMessage.sid) {
         updatedMessageList[updatedMessageList.length - 1] = {
           ...lastMessage,
-          message: lastMessage.message || "", // 确保message字段存在
+          message: lastMessage.message || '', // 确保message字段存在
           sid,
           id: id || lastMessage.id,
           workflowEventData: {
@@ -106,35 +121,27 @@ const useChatStore = create<ChatState & ChatActions>((set) => ({
           messageList: updatedMessageList,
           isLoading: false,
           answerPercent: 0,
-          traceSource: "",
-          sourceType: "",
-          deepThinkText: "",
-          currentToolName: "",
-          streamId: "",
+          traceSource: '',
+          sourceType: '',
+          deepThinkText: '',
+          currentToolName: '',
+          streamId: '',
         };
       }
 
       return {
         isLoading: false,
         answerPercent: 0,
-        traceSource: "",
-        deepThinkText: "",
-        currentToolName: "",
-        streamId: "",
+        traceSource: '',
+        deepThinkText: '',
+        currentToolName: '',
+        streamId: '',
       };
     }),
 
   clearStreamingMessage: (): void =>
-    set((state) => {
+    set(state => {
       const updatedMessageList = [...state.messageList];
-
-      // 移除最后一条未完成的流式消息（没有sid的消息）
-      if (
-        updatedMessageList.length > 0 &&
-        !updatedMessageList[updatedMessageList.length - 1]?.sid
-      ) {
-        updatedMessageList.pop();
-      }
 
       return {
         messageList: updatedMessageList,
@@ -145,7 +152,7 @@ const useChatStore = create<ChatState & ChatActions>((set) => ({
         isWorkflowOption: false,
         workflowOption: {
           option: [] as Option[],
-          content: "",
+          content: '',
         },
       };
     }),
@@ -158,7 +165,7 @@ const useChatStore = create<ChatState & ChatActions>((set) => ({
     set({ currentToolName }),
   setTraceSource: (traceSource: string): void => set({ traceSource }),
   setDeepThinkText: (deepThinkText: string): void =>
-    set((state) => ({ deepThinkText: state.deepThinkText + deepThinkText })),
+    set(state => ({ deepThinkText: state.deepThinkText + deepThinkText })),
   setCurrentChatId: (currentChatId: number): void => set({ currentChatId }),
   setWorkflowOperation: (workflowOperation: string[]): void =>
     set({ workflowOperation }),

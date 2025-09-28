@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
-import { createContext, useReducer, FC, ReactNode } from "react";
+import { createContext, useReducer, FC, ReactNode } from 'react';
 
 interface IState {
   status: number;
@@ -30,32 +29,32 @@ const PluginContext = createContext<{
 
 const pluginReducer = (state: IState, action: Action): IState => {
   switch (action.type) {
-    case "setFlag": {
+    case 'setFlag': {
       return {
         ...state,
         flag: action?.flag,
       };
     }
-    case "setSideBarShow": {
+    case 'setSideBarShow': {
       return {
         ...state,
         sideBarShow: action?.sideBarShow,
       };
     }
-    case "setStatus": {
+    case 'setStatus': {
       return {
         ...state,
         status: action?.status,
       };
     }
-    case "setInfoId": {
+    case 'setInfoId': {
       return {
         ...state,
         infoId: action?.infoId,
       };
     }
     default: {
-      throw Error("Unknown action: " + action.type);
+      throw Error('Unknown action: ' + action.type);
     }
   }
 };

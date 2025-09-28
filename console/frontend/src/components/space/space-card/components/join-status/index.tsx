@@ -1,8 +1,8 @@
-import React, { useMemo } from "react";
-import { Tag } from "antd";
-import styles from "./index.module.scss";
+import React, { useMemo } from 'react';
+import { Tag } from 'antd';
+import styles from './index.module.scss';
 
-import joinedIcon from "@/assets/imgs/space/spaceJoined.png";
+import joinedIcon from '@/assets/imgs/space/spaceJoined.png';
 
 // 状态配置接口
 interface StatusConfig {
@@ -13,7 +13,7 @@ interface StatusConfig {
   icon?: React.ReactNode;
   disabled?: boolean;
   // 支持的空间类型列表
-  spaceTypeList?: ("personal" | "team")[];
+  spaceTypeList?: ('personal' | 'team')[];
 }
 
 interface JoinStatusProps {
@@ -31,23 +31,23 @@ const JoinStatus: React.FC<JoinStatusProps> = ({
   // 默认状态配置列表
   const defaultStatusConfigs: StatusConfig[] = [
     {
-      key: "pending",
-      label: "申请中",
-      color: "#FF9602",
-      bgColor: "#FFF4E5",
+      key: 'pending',
+      label: '申请中',
+      color: '#FF9602',
+      bgColor: '#FFF4E5',
     },
     {
-      key: "joined",
-      label: "已加入",
-      color: "#477D62",
-      bgColor: "#CFF4E1",
+      key: 'joined',
+      label: '已加入',
+      color: '#477D62',
+      bgColor: '#CFF4E1',
       icon: <img src={joinedIcon} alt="joined" />,
     },
     {
-      key: "notJoined",
-      label: "未加入",
-      color: "#666666",
-      bgColor: "#E6E6E8",
+      key: 'notJoined',
+      label: '未加入',
+      color: '#666666',
+      bgColor: '#E6E6E8',
     },
   ];
 
@@ -55,15 +55,15 @@ const JoinStatus: React.FC<JoinStatusProps> = ({
   const getCurrentStatusConfig = (
     configs: StatusConfig[],
     currentStatus: string,
-    currentSpaceType: string,
+    currentSpaceType: string
   ): StatusConfig | null => {
     return (
-      configs.find((config) => {
+      configs.find(config => {
         const statusMatch = config.key === currentStatus;
         const spaceTypeMatch =
           !config.spaceTypeList ||
           config.spaceTypeList.includes(
-            currentSpaceType as "personal" | "team",
+            currentSpaceType as 'personal' | 'team'
           );
         return statusMatch && spaceTypeMatch;
       }) || null
@@ -74,7 +74,7 @@ const JoinStatus: React.FC<JoinStatusProps> = ({
   const currentStatusConfig = getCurrentStatusConfig(
     configs,
     status,
-    spaceType,
+    spaceType
   );
 
   // 如果找不到匹配的状态配置，不渲染任何内容

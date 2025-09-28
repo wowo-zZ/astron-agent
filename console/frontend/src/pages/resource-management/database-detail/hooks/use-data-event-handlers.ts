@@ -1,6 +1,6 @@
-import { useCallback } from "react";
-import { useDatabaseContext } from "../context/database-context";
-import { DatabaseItem } from "@/types/database";
+import { useCallback } from 'react';
+import { useDatabaseContext } from '../context/database-context';
+import { DatabaseItem } from '@/types/database';
 
 /**
  * 数据事件处理Hook
@@ -11,8 +11,8 @@ export const useDataEventHandlers = (
     type: number,
     page?: number,
     size?: number,
-    isRefresh?: boolean,
-  ) => Promise<void>,
+    isRefresh?: boolean
+  ) => Promise<void>
 ): {
   refreshCurrentTableData: () => void;
   handleDataTypeChange: (type: number) => void;
@@ -27,7 +27,7 @@ export const useDataEventHandlers = (
         state.currentSheet,
         state.dataType,
         state.pagination.pageNum,
-        state.pagination.pageSize,
+        state.pagination.pageSize
       );
     }
   }, [
@@ -45,7 +45,7 @@ export const useDataEventHandlers = (
         getTableData(state.currentSheet, type);
       }
     },
-    [actions.setDataType, state.currentSheet, getTableData],
+    [actions.setDataType, state.currentSheet, getTableData]
   );
 
   const handlePageChange = useCallback(
@@ -54,7 +54,7 @@ export const useDataEventHandlers = (
         getTableData(state.currentSheet, state.dataType, page, pageSize);
       }
     },
-    [state.currentSheet, state.dataType, getTableData],
+    [state.currentSheet, state.dataType, getTableData]
   );
 
   const handleRefreshData = useCallback(() => {

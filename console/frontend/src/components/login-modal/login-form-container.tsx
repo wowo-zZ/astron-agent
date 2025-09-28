@@ -1,6 +1,6 @@
-import { ReactElement } from "react";
-import { Form, Button, Checkbox, FormInstance, Alert, Spin } from "antd";
-import AccountLoginForm from "./account-login-form";
+import { ReactElement } from 'react';
+import { Form, Button, Checkbox, FormInstance, Alert, Spin } from 'antd';
+import AccountLoginForm from './account-login-form';
 interface LoginRequest {
   username: string;
   password: string;
@@ -70,7 +70,7 @@ const LoginFormContainer = ({
                 validator: (_, value) =>
                   value
                     ? Promise.resolve()
-                    : Promise.reject(new Error("请同意服务协议")),
+                    : Promise.reject(new Error('请同意服务协议')),
               },
             ]}
             className="mb-6"
@@ -98,7 +98,7 @@ const LoginFormContainer = ({
               disabled={loading}
               className="h-12 bg-gradient-to-r from-[#275EFF] to-[#C927FF] border-none rounded-lg font-medium text-base hover:opacity-90 transition-opacity"
             >
-              {loading ? "登录中..." : "登录"}
+              {loading ? '登录中...' : '登录'}
             </Button>
           </Form.Item>
         </Form>

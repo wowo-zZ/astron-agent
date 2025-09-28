@@ -6,6 +6,7 @@ import knowledge from "./knowledge";
 import effectEvaluation from "./effectEvaluation";
 import database from "./database";
 import openPlatformEnModule from "./openPlatformEnModule";
+import rpa from "./rpa";
 
 export default {
   ...openPlatformEnModule,
@@ -16,4 +17,5 @@ export default {
   knowledge,
   effectEvaluation,
   database,
+  rpa,
 };

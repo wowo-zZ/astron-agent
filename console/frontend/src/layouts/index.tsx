@@ -5,7 +5,7 @@ import CrashErrorComponent from "@/components/crash-error-component";
 import Sidebar from "@/components/sidebar";
 import Header from "@/components/header";
 
-const hasHeaderList = ["knowledge", "plugin", "database"];
+const hasHeaderList = ["knowledge", "plugin", "database", "rpa"];
 
 interface BasicLayoutProps {
   showHeader?: boolean;

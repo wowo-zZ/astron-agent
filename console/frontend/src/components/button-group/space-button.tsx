@@ -1,14 +1,14 @@
-import React from "react";
-import { Button, Tooltip } from "antd";
-import classNames from "classnames";
+import React from 'react';
+import { Button, Tooltip } from 'antd';
+import classNames from 'classnames';
 import {
   hasModulePermission,
   checkResourceRestrictions,
-} from "@/permissions/utils";
-import type { ButtonConfig, UserRole } from "./types";
-import { ModuleType, OperationType, PermissionFailureBehavior } from "./types";
-import styles from "./space-button.module.scss";
-import { useUserStoreHook } from "@/hooks/use-user-store";
+} from '@/permissions/utils';
+import type { ButtonConfig, UserRole } from './types';
+import { ModuleType, OperationType, PermissionFailureBehavior } from './types';
+import styles from './space-button.module.scss';
+import { useUserStoreHook } from '@/hooks/use-user-store';
 
 // SpaceButton 组件属性接口
 export interface SpaceButtonProps {
@@ -23,7 +23,7 @@ export interface SpaceButtonProps {
   style?: React.CSSProperties;
 
   // 大小
-  size?: "large" | "middle" | "small";
+  size?: 'large' | 'middle' | 'small';
 
   // 点击事件处理
   onClick?: (key: string, event: React.MouseEvent) => void;
@@ -57,7 +57,7 @@ const SpaceButton: React.FC<SpaceButtonProps> = ({
     key,
     text,
     icon,
-    type = "default",
+    type = 'default',
     size: configSize,
     disabled = false,
     tooltip,
@@ -82,7 +82,7 @@ const SpaceButton: React.FC<SpaceButtonProps> = ({
       const hasPermission = hasModulePermission(
         effectiveUserRole,
         permission.module,
-        permission.operation,
+        permission.operation
       );
 
       if (!hasPermission) {
@@ -95,7 +95,7 @@ const SpaceButton: React.FC<SpaceButtonProps> = ({
           effectiveUserRole,
           permission.module,
           permission.resourceOwnerId,
-          permission.currentUserId,
+          permission.currentUserId
         );
       }
     }
@@ -109,11 +109,11 @@ const SpaceButton: React.FC<SpaceButtonProps> = ({
       return true; // 默认可见
     }
 
-    if (typeof visible === "boolean") {
+    if (typeof visible === 'boolean') {
       return visible;
     }
 
-    if (typeof visible === "function" && effectiveUserRole) {
+    if (typeof visible === 'function' && effectiveUserRole) {
       return visible(effectiveUserRole);
     }
 
@@ -171,9 +171,9 @@ const SpaceButton: React.FC<SpaceButtonProps> = ({
     loading && styles.loading,
     danger && styles.danger,
     type && styles[`ant-btn-${type}`],
-    styles[`size-${configSize || size || "middle"}`],
-    type === "primary" && styles.addMemberBtn,
-    className,
+    styles[`size-${configSize || size || 'middle'}`],
+    type === 'primary' && styles.addMemberBtn,
+    className
   );
 
   // 创建按钮元素

@@ -1,33 +1,33 @@
-import React, { useMemo, useCallback, memo } from "react";
-import { useTranslation } from "react-i18next";
-import { cloneDeep } from "lodash";
-import { FLowCollapse } from "@/components/workflow/ui";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import ExceptionHandling from "@/components/workflow/nodes/components/exception-handling";
-import SingleInput from "../components/single-input";
-import FixedOutputs from "../components/fixed-outputs";
+import React, { useMemo, useCallback, memo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { cloneDeep } from 'lodash';
+import { FLowCollapse } from '@/components/workflow/ui';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import ExceptionHandling from '@/components/workflow/nodes/components/exception-handling';
+import SingleInput from '../components/single-input';
+import FixedOutputs from '../components/fixed-outputs';
 
-import inputAddIcon from "@/assets/imgs/workflow/input-add-icon.png";
-import parameterSettingsIcon from "@/assets/imgs/workflow/parameter-settings-icon.png";
-import knowledgeListDelete from "@/assets/imgs/workflow/knowledge-list-delete.svg";
-import knowledgeListLook from "@/assets/imgs/workflow/knowledge-list-look.svg";
+import inputAddIcon from '@/assets/imgs/workflow/input-add-icon.png';
+import parameterSettingsIcon from '@/assets/imgs/workflow/parameter-settings-icon.png';
+import knowledgeListDelete from '@/assets/imgs/workflow/knowledge-list-delete.svg';
+import knowledgeListLook from '@/assets/imgs/workflow/knowledge-list-look.svg';
 
 const KnowledgeCollapseHeader = ({ id }): React.ReactElement => {
   const setKnowledgeModalInfo = useFlowsManager(
-    (state) => state.setKnowledgeModalInfo,
+    state => state.setKnowledgeModalInfo
   );
   const setKnowledgeParameterModalInfo = useFlowsManager(
-    (state) => state.setKnowledgeParameterModalInfo,
+    state => state.setKnowledgeParameterModalInfo
   );
   const { t } = useTranslation();
-  const canvasesDisabled = useFlowsManager((state) => state.canvasesDisabled);
+  const canvasesDisabled = useFlowsManager(state => state.canvasesDisabled);
   return (
     <div className="w-full flex items-center justify-between">
-      <h4>{t("workflow.nodes.knowledgeNode.knowledgeBase")}</h4>
+      <h4>{t('workflow.nodes.knowledgeNode.knowledgeBase')}</h4>
       {!canvasesDisabled && (
         <div
           className="flex items-center gap-4 text-xs font-medium"
-          onClick={(e) => e.stopPropagation()}
+          onClick={e => e.stopPropagation()}
         >
           <div
             className="flex items-center cursor-pointer gap-1"
@@ -44,12 +44,12 @@ const KnowledgeCollapseHeader = ({ id }): React.ReactElement => {
               alt=""
             />
             <span className="text-[#275EFF] cursor-pointer">
-              {t("workflow.nodes.knowledgeNode.parameterSetting")}
+              {t('workflow.nodes.knowledgeNode.parameterSetting')}
             </span>
           </div>
           <div
             className="flex items-center cursor-pointer gap-1"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               setKnowledgeModalInfo({
                 open: true,
@@ -59,7 +59,7 @@ const KnowledgeCollapseHeader = ({ id }): React.ReactElement => {
           >
             <img src={inputAddIcon} className="w-2.5 h-2.5 mt-0.5" alt="" />
             <span className="text-[#275EFF] cursor-pointer">
-              {t("workflow.nodes.knowledgeNode.addKnowledgeBase")}
+              {t('workflow.nodes.knowledgeNode.addKnowledgeBase')}
             </span>
           </div>
         </div>
@@ -74,9 +74,9 @@ export const KnowledgeRepoList = ({
   handleKnowledgesChange,
 }): React.ReactElement => {
   const { t } = useTranslation();
-  const canvasesDisabled = useFlowsManager((state) => state.canvasesDisabled);
+  const canvasesDisabled = useFlowsManager(state => state.canvasesDisabled);
   const setKnowledgeDetailModalInfo = useFlowsManager(
-    (state) => state.setKnowledgeDetailModalInfo,
+    state => state.setKnowledgeDetailModalInfo
   );
 
   const repoList = useMemo(() => {
@@ -86,11 +86,11 @@ export const KnowledgeRepoList = ({
     <div className="p-3 rounded-md min-h-[78px] relative">
       {repoList.length > 0 ? (
         <div className="p-1.5 bg-[#f7f7f7] flex flex-col gap-1.5">
-          {repoList.map((knowledge) => (
+          {repoList.map(knowledge => (
             <div
               key={knowledge.id}
               className="py-2 px-2.5 bg-[#fff] flex items-center gap-2.5 rounded-md"
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation();
               }}
             >
@@ -105,7 +105,7 @@ export const KnowledgeRepoList = ({
               </div>
               <div
                 className="w-[18px] h-[18px] rounded-full bg-[#F7F7F7] flex items-center justify-center cursor-pointer"
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation();
                   setKnowledgeDetailModalInfo({
                     ...knowledge,
@@ -120,7 +120,7 @@ export const KnowledgeRepoList = ({
               {!canvasesDisabled && (
                 <div
                   className="w-[18px] h-[18px] rounded-full bg-[#F7F7F7] flex items-center justify-center cursor-pointer"
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation();
                     handleKnowledgesChange(knowledge);
                   }}
@@ -134,7 +134,7 @@ export const KnowledgeRepoList = ({
       ) : (
         <>
           <p className="text-desc text-center py-[30px] bg-[#f7f7f7] text-[#CBCBCD]">
-            {t("workflow.nodes.knowledgeNode.pleaseAddKnowledgeBase")}
+            {t('workflow.nodes.knowledgeNode.pleaseAddKnowledgeBase')}
           </p>
         </>
       )}
@@ -145,26 +145,26 @@ export const KnowledgeRepoList = ({
   );
 };
 
-export const KnowledgeDetail = memo((props) => {
+export const KnowledgeDetail = memo(props => {
   const { id, data } = props;
-  const currentStore = useFlowsManager((state) => state.getCurrentStore());
+  const currentStore = useFlowsManager(state => state.getCurrentStore());
   const autoSaveCurrentFlow = useFlowsManager(
-    (state) => state.autoSaveCurrentFlow,
+    state => state.autoSaveCurrentFlow
   );
-  const setNode = currentStore((state) => state.setNode);
-  const checkNode = currentStore((state) => state.checkNode);
-  const canPublishSetNot = useFlowsManager((state) => state.canPublishSetNot);
+  const setNode = currentStore(state => state.setNode);
+  const checkNode = currentStore(state => state.checkNode);
+  const canPublishSetNot = useFlowsManager(state => state.canPublishSetNot);
 
   const handleKnowledgesChange = useCallback(
-    (knowledge) => {
+    knowledge => {
       autoSaveCurrentFlow();
-      setNode(id, (old) => {
+      setNode(id, old => {
         const findKnowledgeIndex = old.data.nodeParam.repoList?.findIndex(
-          (item) => item.id === knowledge.id,
+          item => item.id === knowledge.id
         );
         if (findKnowledgeIndex === -1) {
           old.data.nodeParam.repoId.push(
-            knowledge.coreRepoId || knowledge.outerRepoId,
+            knowledge.coreRepoId || knowledge.outerRepoId
           );
           old.data.nodeParam.repoList.push(knowledge);
         } else {
@@ -178,7 +178,7 @@ export const KnowledgeDetail = memo((props) => {
       checkNode(id);
       canPublishSetNot();
     },
-    [setNode, checkNode, canPublishSetNot, autoSaveCurrentFlow],
+    [setNode, checkNode, canPublishSetNot, autoSaveCurrentFlow]
   );
 
   return (
@@ -208,7 +208,7 @@ export const Knowledge = memo(({ data, repoList }) => {
       <span className="text-[#333] text-right">知识库</span>
       <span className="flex items-center gap-1 flex-wrap">
         {repoList?.length > 0 ? (
-          repoList?.map((item) => (
+          repoList?.map(item => (
             <span key={item.id} className="flex items-center gap-1">
               <img src={data?.icon} className="w-[12px] h-[12px]" alt="" />
               <span>{item.name}</span>

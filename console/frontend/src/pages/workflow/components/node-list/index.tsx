@@ -59,6 +59,7 @@ const NodeList: React.FC<NodeListProps> = ({
   const filterNodeList = useMemo<NodeCategory[]>(() => {
     return nodeList?.filter((node) => node?.name !== "固定节点") || [];
   }, [nodeList]);
+  console.log(filterNodeList, "nodeList");
 
   return (
     <>
@@ -152,8 +153,8 @@ const NodeList: React.FC<NodeListProps> = ({
                                         handleAddNode(
                                           item,
                                           generateRandomPosition(
-                                            reactFlowInstance?.getViewport(),
-                                          ),
+                                            reactFlowInstance?.getViewport()
+                                          )
                                         );
                                       }}
                                     >
@@ -166,7 +167,7 @@ const NodeList: React.FC<NodeListProps> = ({
                                   </div>
                                 </div>
                               </Tooltip>
-                            ) : null,
+                            ) : null
                           )}
                         </div>
                       </div>

@@ -1,5 +1,5 @@
-import { zh } from "./zh";
-import { en } from "./en";
+import { zh } from './zh';
+import { en } from './en';
 
 export const localeConfig = {
   zh: zh,

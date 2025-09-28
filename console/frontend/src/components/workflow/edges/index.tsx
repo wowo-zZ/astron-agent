@@ -1,15 +1,15 @@
-import React, { useCallback, memo } from "react";
-import { BaseEdge, EdgeLabelRenderer, getBezierPath, Edge } from "reactflow";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
+import React, { useCallback, memo } from 'react';
+import { BaseEdge, EdgeLabelRenderer, getBezierPath, Edge } from 'reactflow';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
 
 // 类型导入
-import { CustomEdgeProps } from "@/components/workflow/types";
+import { CustomEdgeProps } from '@/components/workflow/types';
 
 // 使用 reactflow 的 Edge 类型
 type ReactFlowEdge = Edge;
 
 // 从统一的图标管理中导入
-import { Icons } from "@/components/workflow/icons";
+import { Icons } from '@/components/workflow/icons';
 
 // 获取 Edge 模块的图标
 const icons = Icons.edge;
@@ -23,16 +23,16 @@ const CustomEdge = ({
   targetY,
   sourcePosition,
   targetPosition,
-  style = { strokeWidth: 2, stroke: "#275EFF" },
+  style = { strokeWidth: 2, stroke: '#275EFF' },
   markerEnd,
 }: CustomEdgeProps): React.ReactElement => {
-  const getCurrentStore = useFlowsManager((state) => state.getCurrentStore);
+  const getCurrentStore = useFlowsManager(state => state.getCurrentStore);
   const currentStore = getCurrentStore();
-  const canvasesDisabled = useFlowsManager((state) => state.canvasesDisabled);
-  const edges = currentStore((state) => state.edges);
-  const setEdges = currentStore((state) => state.setEdges);
-  const removeNodeRef = currentStore((state) => state.removeNodeRef);
-  const takeSnapshot = currentStore((state) => state.takeSnapshot);
+  const canvasesDisabled = useFlowsManager(state => state.canvasesDisabled);
+  const edges = currentStore(state => state.edges);
+  const setEdges = currentStore(state => state.setEdges);
+  const removeNodeRef = currentStore(state => state.removeNodeRef);
+  const takeSnapshot = currentStore(state => state.takeSnapshot);
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
     sourceY,
@@ -42,7 +42,7 @@ const CustomEdge = ({
     targetPosition,
   });
   const path: string =
-    data?.edgeType === "polyline"
+    data?.edgeType === 'polyline'
       ? `M ${sourceX},${sourceY} H ${
           (sourceX + targetX) / 2
         } V ${targetY} H ${targetX}`
@@ -55,13 +55,13 @@ const CustomEdge = ({
       edge &&
       edges?.filter(
         (item: ReactFlowEdge) =>
-          item?.source === edge?.source && item?.target === edge?.target,
+          item?.source === edge?.source && item?.target === edge?.target
       )?.length === 1
     ) {
       removeNodeRef(edge.source, edge.target);
     }
     setEdges((edges: ReactFlowEdge[]) =>
-      edges.filter((edge: ReactFlowEdge) => edge.id !== id),
+      edges.filter((edge: ReactFlowEdge) => edge.id !== id)
     );
   }, [edges, setEdges, takeSnapshot, id, removeNodeRef]);
 
@@ -72,10 +72,10 @@ const CustomEdge = ({
         <EdgeLabelRenderer>
           <div
             style={{
-              position: "absolute",
+              position: 'absolute',
               transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
               fontSize: 12,
-              pointerEvents: "all",
+              pointerEvents: 'all',
             }}
             className="nodrag nopan"
           >

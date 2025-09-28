@@ -1,30 +1,30 @@
-import React, { useState, useCallback, useMemo, useRef } from "react";
-import { Select, message } from "antd";
-import { useDebounceFn } from "ahooks";
-import SpaceTab, { TabOption } from "@/components/space/space-tab";
-import SpaceSearch from "@/components/space/space-search";
+import React, { useState, useCallback, useMemo, useRef } from 'react';
+import { Select, message } from 'antd';
+import { useDebounceFn } from 'ahooks';
+import SpaceTab, { TabOption } from '@/components/space/space-tab';
+import SpaceSearch from '@/components/space/space-search';
 import SpaceButton, {
   SpaceButtonProps,
-} from "@/components/button-group/space-button";
-import MemberList from "./components/member-list";
+} from '@/components/button-group/space-button';
+import MemberList from './components/member-list';
 import InvitationList, {
   InvitationListRef,
-} from "./components/invitation-list";
-import AddMemberModal from "@/components/space/add-member-modal";
-import BatchImport from "./components/batch-import";
-import { useSpaceI18n } from "@/pages/space/hooks/use-space-i18n";
+} from './components/invitation-list';
+import AddMemberModal from '@/components/space/add-member-modal';
+import BatchImport from './components/batch-import';
+import { useSpaceI18n } from '@/pages/space/hooks/use-space-i18n';
 
-import styles from "./index.module.scss";
-import { ModuleType, OperationType } from "@/permissions/permission-type";
-import { enterpriseInvite } from "@/services/enterprise";
-import { DEFAULT_VALUES } from "@/pages/space/config";
+import styles from './index.module.scss';
+import { ModuleType, OperationType } from '@/types/permission';
+import { enterpriseInvite } from '@/services/enterprise';
+import { DEFAULT_VALUES } from '@/pages/space/config';
 
 const { Option } = Select;
 
 // 常量定义
 const TAB_KEYS = {
-  MEMBERS: "members",
-  INVITATIONS: "invitations",
+  MEMBERS: 'members',
+  INVITATIONS: 'invitations',
 } as const;
 
 const DEBOUNCE_DELAY = 300;
@@ -42,14 +42,14 @@ const MemberManage: React.FC = () => {
 
   // 为每个tab维护独立的筛选状态
   const [memberFilter, setMemberFilter] = useState<FilterState>({
-    inputValue: "",
-    searchValue: "",
+    inputValue: '',
+    searchValue: '',
     filterValue: DEFAULT_VALUES.ROLE_FILTER,
   });
 
   const [invitationFilter, setInvitationFilter] = useState<FilterState>({
-    inputValue: "",
-    searchValue: "",
+    inputValue: '',
+    searchValue: '',
     filterValue: DEFAULT_VALUES.STATUS_FILTER,
   });
 
@@ -63,11 +63,11 @@ const MemberManage: React.FC = () => {
   const tabOptions: TabOption[] = [
     {
       key: TAB_KEYS.MEMBERS,
-      label: "成员列表",
+      label: '成员列表',
     },
     {
       key: TAB_KEYS.INVITATIONS,
-      label: "邀请管理",
+      label: '邀请管理',
       permission: {
         module: ModuleType.SPACE,
         operation: OperationType.INVITATION_MANAGE,
@@ -78,23 +78,23 @@ const MemberManage: React.FC = () => {
   // 成员搜索防抖
   const { run: debouncedMemberSearch } = useDebounceFn(
     (value: string) => {
-      setMemberFilter((prev) => ({
+      setMemberFilter(prev => ({
         ...prev,
         searchValue: value,
       }));
     },
-    { wait: DEBOUNCE_DELAY },
+    { wait: DEBOUNCE_DELAY }
   );
 
   // 邀请搜索防抖
   const { run: debouncedInvitationSearch } = useDebounceFn(
     (value: string) => {
-      setInvitationFilter((prev) => ({
+      setInvitationFilter(prev => ({
         ...prev,
         searchValue: value,
       }));
     },
-    { wait: DEBOUNCE_DELAY },
+    { wait: DEBOUNCE_DELAY }
   );
 
   // 处理选项卡切换
@@ -106,31 +106,31 @@ const MemberManage: React.FC = () => {
   const handleMemberSearch = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value;
-      setMemberFilter((prev) => ({
+      setMemberFilter(prev => ({
         ...prev,
         inputValue: value,
       }));
       debouncedMemberSearch(value);
     },
-    [debouncedMemberSearch],
+    [debouncedMemberSearch]
   );
 
   // 邀请搜索处理
   const handleInvitationSearch = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value;
-      setInvitationFilter((prev) => ({
+      setInvitationFilter(prev => ({
         ...prev,
         inputValue: value,
       }));
       debouncedInvitationSearch(value);
     },
-    [debouncedInvitationSearch],
+    [debouncedInvitationSearch]
   );
 
   // 成员角色筛选处理
   const handleMemberRoleFilterChange = useCallback((value: string) => {
-    setMemberFilter((prev) => ({
+    setMemberFilter(prev => ({
       ...prev,
       filterValue: value,
     }));
@@ -140,9 +140,9 @@ const MemberManage: React.FC = () => {
   const handleInvitationStatusFilterChange = useCallback((value: string) => {
     console.log(
       value,
-      "============= handleInvitationStatusFilterChange ===========",
+      '============= handleInvitationStatusFilterChange ==========='
     );
-    setInvitationFilter((prev) => ({
+    setInvitationFilter(prev => ({
       ...prev,
       filterValue: value,
     }));
@@ -169,7 +169,7 @@ const MemberManage: React.FC = () => {
         const res = await enterpriseInvite(members);
         console.log(
           res,
-          "============= handleAddMemberModalSubmit ===========",
+          '============= handleAddMemberModalSubmit ==========='
         );
 
         setShowAddMemberModal(false);
@@ -182,12 +182,12 @@ const MemberManage: React.FC = () => {
         return false;
       }
     },
-    [messages],
+    [messages]
   );
 
   // 批量导入成功处理函数
   const handleBatchImportSuccess = useCallback((data: any) => {
-    console.log("批量导入成功:", data);
+    console.log('批量导入成功:', data);
     message.success(`批量导入成功：${data.successCount || 0}个成员`);
     // 刷新邀请列表
     invitationListRef.current?.reload();
@@ -196,17 +196,17 @@ const MemberManage: React.FC = () => {
   // 添加成员按钮配置
   const addMemberButtonConfig = useMemo(
     () => ({
-      key: "add-member",
-      text: "添加成员",
-      type: "primary" as const,
-      size: "small" as const,
+      key: 'add-member',
+      text: '添加成员',
+      type: 'primary' as const,
+      size: 'small' as const,
       permission: {
         module: ModuleType.SPACE,
         operation: OperationType.ADD_MEMBERS,
       },
       onClick: (key: string, event: React.MouseEvent) => handleAddMember(),
     }),
-    [handleAddMember],
+    [handleAddMember]
   );
 
   // 渲染tab操作区域的通用函数
@@ -231,21 +231,21 @@ const MemberManage: React.FC = () => {
       } = config;
 
       return (
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <Select
             value={filterValue}
             onChange={onFilterChange}
             style={{ width: 120 }}
             placeholder={filterPlaceholder}
           >
-            {filterOptions.map((option) => (
+            {filterOptions.map(option => (
               <Option key={option.value} value={option.value}>
                 {option.label}
               </Option>
             ))}
           </Select>
           <SpaceSearch
-            style={{ borderColor: "#E4EAFF", width: 200 }}
+            style={{ borderColor: '#E4EAFF', width: 200 }}
             value={inputValue}
             onChange={onInputChange}
             placeholder={inputPlaceholder}
@@ -255,7 +255,7 @@ const MemberManage: React.FC = () => {
         </div>
       );
     },
-    [handleAddMemberModalSubmit, addMemberButtonConfig],
+    [handleAddMemberModalSubmit, addMemberButtonConfig]
   );
 
   // 缓存tab内容渲染
@@ -295,10 +295,10 @@ const MemberManage: React.FC = () => {
           filterValue: memberFilter.filterValue,
           onFilterChange: handleMemberRoleFilterChange,
           filterOptions: enterpriseRoleOptions,
-          filterPlaceholder: "选择角色",
+          filterPlaceholder: '选择角色',
           inputValue: memberFilter.inputValue,
           onInputChange: handleMemberSearch,
-          inputPlaceholder: "请输入用户名",
+          inputPlaceholder: '请输入用户名',
         });
 
       case TAB_KEYS.INVITATIONS:
@@ -306,10 +306,10 @@ const MemberManage: React.FC = () => {
           filterValue: invitationFilter.filterValue,
           onFilterChange: handleInvitationStatusFilterChange,
           filterOptions: statusOptions,
-          filterPlaceholder: "选择状态",
+          filterPlaceholder: '选择状态',
           inputValue: invitationFilter.inputValue,
           onInputChange: handleInvitationSearch,
-          inputPlaceholder: "请输入用户名",
+          inputPlaceholder: '请输入用户名',
         });
 
       default:

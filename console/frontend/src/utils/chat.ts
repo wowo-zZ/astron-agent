@@ -1,13 +1,13 @@
 /** 判断输入是否命中推广 */
 export const judgePromoteType = (question: string) => {
-  if (!question) return "";
+  if (!question) return '';
   switch (true) {
     case /\b(PPT|PPT生成|年终总结|年终汇报|年终|总结|述职|ppt)\b/.test(
-      question,
+      question
     ):
-      return "ppt";
+      return 'ppt';
     default:
-      return "";
+      return '';
   }
 };
 
@@ -15,10 +15,10 @@ export const judgePromoteType = (question: string) => {
 export const handleOtherProps = (
   otherProps: any,
   ansContent: any,
-  ansType: string,
+  ansType: string
 ) => {
   const tempProps = { ...otherProps };
-  if (ansType === "o1") {
+  if (ansType === 'o1') {
     return {
       ...tempProps,
       reasoning: ansContent?.text,

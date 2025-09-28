@@ -1,7 +1,7 @@
-import { useMemoizedFn } from "ahooks";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import { message } from "antd";
-import useUserStore from "@/store/user-store";
+import { useMemoizedFn } from 'ahooks';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import { message } from 'antd';
+import useUserStore from '@/store/user-store';
 import {
   generateKnowledgeOutput,
   getNodeId,
@@ -11,12 +11,11 @@ import {
   findFromTwoItems,
   transformTree,
   generateRandomPosition,
-} from "@/components/workflow/utils/reactflowUtils";
-import { isJSON } from "@/utils";
-import { getCookie } from "@/utils/sparkutils";
-import useSpaceStore from "@/store/space-store";
-import { v4 as uuid } from "uuid";
-import { cloneDeep } from "lodash";
+} from '@/components/workflow/utils/reactflowUtils';
+import { isJSON } from '@/utils';
+import useSpaceStore from '@/store/space-store';
+import { v4 as uuid } from 'uuid';
+import { cloneDeep } from 'lodash';
 
 // 类型导入
 import {
@@ -25,98 +24,100 @@ import {
   FlowType,
   PositionType,
   NewNodeType,
-} from "@/components/workflow/types/hooks";
+} from '@/components/workflow/types/hooks';
 
-import { UseFlowCommonReturn } from "@/components/workflow/types/hooks";
+import { UseFlowCommonReturn } from '@/components/workflow/types/hooks';
+import { RpaNodeParam } from '@/types/rpa';
+import { Edge } from 'reactflow';
+import { transRpaParameters } from '@/utils/rpa';
 
 // 全局类型声明 - 移除重复声明
-// IFlyCollector已在全局声明
-
 export const useFlowCommon = (): UseFlowCommonReturn => {
   const { spaceId } = useSpaceStore();
-  const user = useUserStore((state) => state.user);
-  const setShowToolModal = useFlowsManager((state) => state.setToolModalInfo);
-  const setFlowModal = useFlowsManager((state) => state.setFlowModalInfo);
-  const currentStore = useFlowsManager((state) => state.getCurrentStore());
+  const user = useUserStore(state => state.user);
+  const setShowToolModal = useFlowsManager(state => state.setToolModalInfo);
+  const setFlowModal = useFlowsManager(state => state.setFlowModalInfo);
+  const setRpaModal = useFlowsManager(state => state.setRpaModalInfo);
+  const currentStore = useFlowsManager(state => state.getCurrentStore());
   const setOpenOperationResult = useFlowsManager(
-    (state) => state.setOpenOperationResult,
+    state => state.setOpenOperationResult
   );
   const setVersionManagement = useFlowsManager(
-    (state) => state.setVersionManagement,
+    state => state.setVersionManagement
   );
-  const willAddNode = useFlowsManager((state) => state.willAddNode);
-  const beforeNode = useFlowsManager((state) => state.beforeNode);
-  const setBeforeNode = useFlowsManager((state) => state.setBeforeNode);
-  const nodes = currentStore((state) => state.nodes);
-  const setNodes = currentStore((state) => state.setNodes);
-  const currentFlow = useFlowsManager((state) => state.currentFlow);
-  const canPublishSetNot = useFlowsManager((state) => state.canPublishSetNot);
-  const setWillAddNode = useFlowsManager((state) => state.setWillAddNode);
+  const willAddNode = useFlowsManager(state => state.willAddNode);
+  const beforeNode = useFlowsManager(state => state.beforeNode);
+  const setBeforeNode = useFlowsManager(state => state.setBeforeNode);
+  const nodes = currentStore(state => state.nodes);
+  const setNodes = currentStore(state => state.setNodes);
+  const currentFlow = useFlowsManager(state => state.currentFlow);
+  const canPublishSetNot = useFlowsManager(state => state.canPublishSetNot);
+  const setWillAddNode = useFlowsManager(state => state.setWillAddNode);
   const setNodeInfoEditDrawerlInfo = useFlowsManager(
-    (state) => state.setNodeInfoEditDrawerlInfo,
+    state => state.setNodeInfoEditDrawerlInfo
   );
-  const checkFlow = useFlowsManager((state) => state.checkFlow);
-  const reactFlowInstance = currentStore((state) => state.reactFlowInstance);
-  const takeSnapshot = currentStore((state) => state.takeSnapshot);
-  const setEdges = currentStore((state) => state.setEdges);
-  const edgeType = useFlowsManager((state) => state.edgeType);
+  const checkFlow = useFlowsManager(state => state.checkFlow);
+  const reactFlowInstance = currentStore(state => state.reactFlowInstance);
+  const takeSnapshot = currentStore(state => state.takeSnapshot);
+  const setEdges = currentStore(state => state.setEdges);
+  const edgeType = useFlowsManager(state => state.edgeType);
 
   const addEdge = useMemoizedFn(
     (
       sourceHandle: string | null,
       currentNode: NewNodeType,
-      nextNode: NewNodeType,
+      nextNode: NewNodeType
     ): void => {
       const edge = {
         source: currentNode?.id,
         sourceHandle: sourceHandle,
         target: nextNode?.id,
         targetHandle: null,
-        type: "customEdge",
+        type: 'customEdge',
         markerEnd: {
-          type: "arrow",
-          color: "#275EFF",
+          type: 'arrow',
+          color: '#275EFF',
         },
         data: {
           edgeType: edgeType,
         },
-        id: `reactflow__edge-${currentNode?.id}${sourceHandle ?? ""}-${
+        id: `reactflow__edge-${currentNode?.id}${sourceHandle ?? ''}-${
           nextNode?.id
         }`,
       };
       setEdges((edges: unknown[]) => {
-        const newEdges = [...edges, edge];
+        const newEdges = [...edges, edge] as Edge[];
         return newEdges;
       });
-    },
+    }
   );
 
   const handleAddToolNode = useMemoizedFn((tool: ToolType): void => {
     takeSnapshot();
     const currentTypeList = nodes.filter(
-      (node) => node?.data?.nodeParam?.pluginId === tool.toolId,
+      node => node?.data?.nodeParam?.pluginId === tool.toolId
     );
     willAddNode.data.nodeParam.pluginId = tool.toolId;
     willAddNode.data.nodeParam.operationId = tool.operationId;
     willAddNode.data.nodeParam.toolDescription = tool.description;
-    willAddNode.data.nodeParam.version = tool.version || "V1.0";
-    willAddNode.data.nodeParam.appId = currentFlow?.appId || "";
-    willAddNode.data.nodeParam.uid = user?.uid?.toString() || "";
+    willAddNode.data.nodeParam.version = tool.version || 'V1.0';
+    willAddNode.data.nodeParam.appId = currentFlow?.appId || '';
+    willAddNode.data.nodeParam.uid = user?.uid?.toString() || '';
     const toolRequestInput =
-      (isJSON(tool?.webSchema || "") &&
-        JSON.parse(tool.webSchema || "")?.toolRequestInput) ||
+      (isJSON(tool?.webSchema || '') &&
+        JSON.parse(tool.webSchema || '')?.toolRequestInput) ||
       [];
     willAddNode.data.inputs = handleModifyToolUrlParams(toolRequestInput);
     willAddNode.data.nodeParam.businessInput =
       findFromTwoItems(toolRequestInput);
     willAddNode.data.outputs = transformTree(
-      (isJSON(tool?.webSchema || "") &&
-        JSON.parse(tool.webSchema || "")?.toolRequestOutput) ||
-        [],
+      (isJSON(tool?.webSchema || '') &&
+        JSON.parse(tool.webSchema || '')?.toolRequestOutput) ||
+        []
     );
     const newToolNode = {
       id: getNodeId(willAddNode.idType),
-      type: "custom",
+      type: 'custom',
       nodeType: willAddNode?.idType,
       position: generateRandomPosition(reactFlowInstance?.getViewport()),
       selected: true,
@@ -127,8 +128,8 @@ export const useFlowCommon = (): UseFlowCommonReturn => {
         labelEdit: false,
       },
     };
-    setNodes((nodes) => [
-      ...nodes.map((node) => ({ ...node, selected: false })),
+    setNodes(nodes => [
+      ...nodes.map(node => ({ ...node, selected: false })),
       newToolNode,
     ]);
     canPublishSetNot();
@@ -141,18 +142,18 @@ export const useFlowCommon = (): UseFlowCommonReturn => {
   const handleAddFlowNode = useMemoizedFn((flow: FlowType): void => {
     takeSnapshot();
     const currentTypeList = nodes.filter(
-      (node) => node?.data?.nodeParam?.flowId === flow.flowId,
+      node => node?.data?.nodeParam?.flowId === flow.flowId
     );
     willAddNode.data.nodeParam.toolDescription = flow.description;
     willAddNode.data.nodeParam.appId = flow?.appId;
     willAddNode.data.nodeParam.flowId = flow?.flowId;
-    willAddNode.data.nodeParam.uid = user?.uid?.toString() || "";
-    willAddNode.data.nodeParam.version = (flow as unknown)?.version || "";
+    willAddNode.data.nodeParam.uid = user?.uid?.toString() || '';
+    willAddNode.data.nodeParam.version = (flow as unknown)?.version || '';
     willAddNode.data.inputs = (flow as unknown)?.ioInversion?.inputs || [];
     willAddNode.data.outputs = (flow as unknown)?.ioInversion?.outputs || [];
     const newFlowNode = {
       id: getNodeId(willAddNode.idType),
-      type: "custom",
+      type: 'custom',
       nodeType: willAddNode?.idType,
       position: generateRandomPosition(reactFlowInstance?.getViewport()),
       selected: true,
@@ -163,8 +164,8 @@ export const useFlowCommon = (): UseFlowCommonReturn => {
         labelEdit: false,
       },
     };
-    setNodes((nodes) => [
-      ...nodes.map((node) => ({ ...node, selected: false })),
+    setNodes(nodes => [
+      ...nodes.map(node => ({ ...node, selected: false })),
       newFlowNode,
     ]);
     canPublishSetNot();
@@ -174,47 +175,90 @@ export const useFlowCommon = (): UseFlowCommonReturn => {
     }
   });
 
+  const handleAddRpaNode = useMemoizedFn((rpaParam: RpaNodeParam): void => {
+    takeSnapshot();
+    const currentTypeList = nodes.filter(
+      node => node?.data?.nodeParam?.projectId === rpaParam.project_id
+    );
+    willAddNode.data.nodeParam.projectId = rpaParam.project_id;
+    willAddNode.data.nodeParam.source = rpaParam.platform;
+    willAddNode.data.nodeParam.header = rpaParam.fields;
+    willAddNode.data.inputs = transRpaParameters(
+      rpaParam.parameters?.filter(item => item.varDirection === 0) || []
+    );
+    willAddNode.data.outputs = transRpaParameters(
+      rpaParam.parameters?.filter(item => item.varDirection === 1) || []
+    );
+    const newRpaNode = {
+      id: getNodeId(willAddNode.idType),
+      type: 'custom',
+      nodeType: willAddNode?.idType,
+      position: generateRandomPosition(reactFlowInstance?.getViewport()),
+      selected: true,
+      data: {
+        icon: willAddNode.icon,
+        ...copyNodeData(willAddNode.data),
+        label: getNextName(currentTypeList, rpaParam.name),
+        labelEdit: false,
+      },
+    };
+    setNodes(nodes => [
+      ...nodes.map(node => ({ ...node, selected: false })),
+      newRpaNode,
+    ]);
+    canPublishSetNot();
+    message.success(`${rpaParam?.name} 已添加`);
+    if (beforeNode) {
+      addEdge(beforeNode.sourceHandle, beforeNode, newRpaNode);
+    }
+  });
+
   const handleAddNode = useMemoizedFn(
     (addNode: AddNodeType, position: PositionType): NewNodeType[] | null => {
       setWillAddNode(addNode);
       const nodeType = addNode?.idType;
-      if (nodeType === "plugin") {
+      if (nodeType === 'plugin') {
         setWillAddNode(addNode);
         setShowToolModal({
           open: true,
         });
         return null;
-      } else if (nodeType === "flow") {
+      } else if (nodeType === 'flow') {
         setFlowModal({
+          open: true,
+        });
+        return null;
+      } else if (nodeType === 'rpa') {
+        setRpaModal({
           open: true,
         });
         return null;
       } else {
         const currentTypeList = nodes.filter(
-          (node) => node.type === addNode?.data?.nodeMeta?.aliasName,
+          node => node.type === addNode?.data?.nodeMeta?.aliasName
         );
         addNode.data.nodeParam.appId = currentFlow?.appId;
         addNode.data.nodeParam.uid = user?.uid?.toString();
-        if (nodeType === "knowledge-base") {
+        if (nodeType === 'knowledge-base') {
           addNode.data.nodeParam.flowId = currentFlow?.flowId;
-          addNode.data.nodeParam.ragType = "CBG-RAG";
-          addNode.data.outputs = generateKnowledgeOutput("CBG-RAG");
+          addNode.data.nodeParam.ragType = 'CBG-RAG';
+          addNode.data.outputs = generateKnowledgeOutput('CBG-RAG');
         }
-        if (nodeType === "node-variable") {
+        if (nodeType === 'node-variable') {
           addNode.data.nodeParam.flowId = currentFlow?.flowId;
         }
-        if (nodeType === "database" && spaceId) {
+        if (nodeType === 'database' && spaceId) {
           addNode.data.nodeParam.spaceId = spaceId?.toString();
         }
         let addNodes: NewNodeType[] = [];
-        if (nodeType === "iteration") {
+        if (nodeType === 'iteration') {
           const nodeId = getNodeId(addNode.idType);
-          const startNodeId = getNodeId("iteration-node-start");
+          const startNodeId = getNodeId('iteration-node-start');
           addNode.data.nodeParam.IterationStartNodeId = startNodeId;
           addNodes = [
             {
               id: nodeId,
-              type: "custom",
+              type: 'custom',
               nodeType,
               selected: true,
               position: { x: position?.x, y: position?.y },
@@ -228,34 +272,34 @@ export const useFlowCommon = (): UseFlowCommonReturn => {
             {
               id: startNodeId,
               parentId: nodeId,
-              extent: "parent",
+              extent: 'parent',
               zIndex: 1,
               draggable: false,
-              type: "custom",
-              nodeType: "node-start",
+              type: 'custom',
+              nodeType: 'node-start',
               selected: false,
               position: { x: 100, y: 150 },
               data: {
-                label: "开始",
+                label: '开始',
                 originPosition: {
                   x: 100,
                   y: 300,
                 },
                 parentId: nodeId,
                 description:
-                  "工作流的开启节点，用于定义流程调用所需的业务变量信息。",
+                  '工作流的开启节点，用于定义流程调用所需的业务变量信息。',
                 nodeMeta: {
-                  nodeType: "基础节点",
-                  aliasName: "开始节点",
+                  nodeType: '基础节点',
+                  aliasName: '开始节点',
                 },
                 inputs: [],
                 outputs: [
                   {
                     id: uuid(),
-                    name: "input",
+                    name: 'input',
                     schema: {
-                      type: "",
-                      default: "",
+                      type: '',
+                      default: '',
                     },
                   },
                 ],
@@ -263,13 +307,13 @@ export const useFlowCommon = (): UseFlowCommonReturn => {
               },
             },
             {
-              id: getNodeId("iteration-node-end"),
+              id: getNodeId('iteration-node-end'),
               parentId: nodeId,
-              extent: "parent",
+              extent: 'parent',
               draggable: false,
               zIndex: 1,
-              type: "custom",
-              nodeType: "node-end",
+              type: 'custom',
+              nodeType: 'node-end',
               selected: false,
               position: { x: 250, y: 150 },
               data: {
@@ -278,21 +322,21 @@ export const useFlowCommon = (): UseFlowCommonReturn => {
                   x: 1000,
                   y: 300,
                 },
-                label: "结束",
+                label: '结束',
                 description:
-                  "工作流的结束节点，用于输出工作流运行后的最终结果。",
+                  '工作流的结束节点，用于输出工作流运行后的最终结果。',
                 nodeMeta: {
-                  nodeType: "基础节点",
-                  aliasName: "结束节点",
+                  nodeType: '基础节点',
+                  aliasName: '结束节点',
                 },
                 inputs: [
                   {
                     id: uuid(),
-                    name: "output",
+                    name: 'output',
                     schema: {
-                      type: "",
+                      type: '',
                       value: {
-                        type: "ref",
+                        type: 'ref',
                         content: {},
                       },
                     },
@@ -301,7 +345,7 @@ export const useFlowCommon = (): UseFlowCommonReturn => {
                 outputs: [],
                 nodeParam: {
                   outputMode: 0,
-                  template: "",
+                  template: '',
                 },
               },
             },
@@ -310,7 +354,7 @@ export const useFlowCommon = (): UseFlowCommonReturn => {
           addNodes = [
             {
               id: getNodeId(addNode.idType),
-              type: "custom",
+              type: 'custom',
               nodeType,
               selected: true,
               position: { x: position?.x, y: position?.y },
@@ -325,17 +369,17 @@ export const useFlowCommon = (): UseFlowCommonReturn => {
           ];
         }
         takeSnapshot();
-        setNodes((nodes) =>
+        setNodes(nodes =>
           cloneDeep([
-            ...nodes.map((node) => ({ ...node, selected: false })),
+            ...nodes.map(node => ({ ...node, selected: false })),
             ...addNodes,
-          ]),
+          ])
         );
         canPublishSetNot();
         setWillAddNode(null);
         return addNodes;
       }
-    },
+    }
   );
 
   const handleEdgeAddNode = useMemoizedFn(
@@ -343,7 +387,7 @@ export const useFlowCommon = (): UseFlowCommonReturn => {
       addNode: AddNodeType,
       position: PositionType,
       sourceHandle: string | null,
-      currentNode: NewNodeType,
+      currentNode: NewNodeType
     ): void => {
       const addNodes = handleAddNode(addNode, position);
       addNodes && addEdge(sourceHandle, currentNode, addNodes[0]);
@@ -351,23 +395,15 @@ export const useFlowCommon = (): UseFlowCommonReturn => {
         ...currentNode,
         sourceHandle,
       });
-    },
+    }
   );
 
   const handleDebugger = useMemoizedFn((): void => {
-    IFlyCollector?.onEvent(
-      "testing_agents",
-      {
-        uid: `${getCookie("account_id")}`,
-        botid: `${currentFlow?.id}`,
-      },
-      "new25_agent_center",
-    );
-    setOpenOperationResult((openOperationResult) => !openOperationResult);
+    setOpenOperationResult(openOperationResult => !openOperationResult);
     setVersionManagement(false);
     setNodeInfoEditDrawerlInfo({
       open: false,
-      nodeId: "",
+      nodeId: '',
     });
     checkFlow();
   });
@@ -381,6 +417,7 @@ export const useFlowCommon = (): UseFlowCommonReturn => {
     handleAddNode,
     handleAddToolNode,
     handleAddFlowNode,
+    handleAddRpaNode,
     handleEdgeAddNode,
     handleDebugger,
     resetBeforeAndWillNode,

@@ -1,8 +1,8 @@
-import React, { FC } from "react";
-import { DetailModal } from "./components/modal-components";
-import { useTranslation } from "react-i18next";
-import { useHitPage } from "./hooks/use-hit-page";
-import { HistoryContent } from "./components/history-content";
+import React, { FC } from 'react';
+import { DetailModal } from './components/modal-components';
+import { useTranslation } from 'react-i18next';
+import { useHitPage } from './hooks/use-hit-page';
+import { HistoryContent } from './components/history-content';
 
 const HitPage: FC<{ repoId: string }> = ({ repoId }) => {
   const { t } = useTranslation();
@@ -36,10 +36,10 @@ const HitPage: FC<{ repoId: string }> = ({ repoId }) => {
       )}
       <div className="w-full flex pb-5 border-b border-[#E2E8FF] ">
         <h2 className="text-2xl font-semibold text-second">
-          {t("knowledge.hitTest")}
+          {t('knowledge.hitTest')}
         </h2>
         <p className="ml-2 desc-color font-medium mt-2">
-          {t("knowledge.hitTestDescription")}
+          {t('knowledge.hitTestDescription')}
         </p>
       </div>
       <HistoryContent

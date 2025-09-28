@@ -1,23 +1,199 @@
-import { FC, useState } from "react";
-import { Input, message, Modal } from "antd";
-import styles from "./index.module.scss";
-// import UploadAvatar from '@/components/upload-avatar';
-import useUserStore from "@/store/user-store";
-import user from "@/assets/imgs/personal-center/user.svg";
-import copy from "@/assets/imgs/personal-center/copy.svg";
-import edit from "@/assets/imgs/personal-center/edit.svg";
-import yes from "@/assets/imgs/personal-center/yes.svg";
-import no from "@/assets/imgs/personal-center/no.svg";
-import act from "@/assets/imgs/personal-center/act.png";
-import fire from "@/assets/imgs/personal-center/fire.png";
-import { copyText } from "@/utils/spark-utils";
-import { uploadUserProfile } from "@/services/spark-common";
-import UploadAvatar from "@/components/upload-avatar";
+import React from 'react';
+import { FC, useState, useCallback, useMemo } from 'react';
+import { Input, message, Modal } from 'antd';
+import styles from './index.module.scss';
+import useUserStore from '@/store/user-store';
+import user from '@/assets/imgs/personal-center/user.svg';
+import copy from '@/assets/imgs/personal-center/copy.svg';
+import edit from '@/assets/imgs/personal-center/edit.svg';
+import yes from '@/assets/imgs/personal-center/yes.svg';
+import no from '@/assets/imgs/personal-center/no.svg';
+import act from '@/assets/imgs/personal-center/act.png';
+import fire from '@/assets/imgs/personal-center/fire.png';
+import empty from '@/assets/imgs/common/empty-gray.png';
+import { copyText } from '@/utils/spark-utils';
+import { uploadUserProfile } from '@/services/spark-common';
+import UploadAvatar from '@/components/upload-avatar';
+import { PostChatItem, FavoriteEntry } from '@/types/chat';
 
 interface PersonalCenterProps {
   open: boolean;
   onCancel: () => void;
+  mixedChatList: PostChatItem[];
+  favoriteBotList: FavoriteEntry[];
+  onRefreshData: () => void;
+  onRefreshRecentData: () => void;
+  onRefreshFavoriteData: () => void;
 }
+
+// 类型定义
+interface TabItem {
+  tab: string;
+}
+
+// 常量定义
+const tabs: TabItem[] = [{ tab: '最近使用' }, { tab: '我的收藏' }];
+
+// 内部组件定义
+
+// 空状态组件
+const EmptyState: FC = React.memo(() => (
+  <div className={styles.emptyBox}>
+    <img src={empty} alt="" />
+  </div>
+));
+
+// Tab 头部组件
+const TabsHeader: FC<{
+  tabs: TabItem[];
+  activeIndex: number;
+  onTabChange: (index: number) => void;
+}> = React.memo(({ tabs, activeIndex, onTabChange }) => {
+  const handleTabClick = useCallback(
+    (index: number) => {
+      onTabChange(index);
+    },
+    [onTabChange]
+  );
+
+  return (
+    <div className={styles.tabs}>
+      {tabs.map((item, index) => (
+        <div
+          key={index}
+          onClick={() => handleTabClick(index)}
+          className={activeIndex === index ? styles.tabActive : styles.tab}
+        >
+          {item.tab}
+        </div>
+      ))}
+    </div>
+  );
+});
+
+// 最近使用列表组件
+const RecentUsedList: FC<{
+  recentList: PostChatItem[];
+  onItemClick: (item: PostChatItem) => void;
+  onDeleteClick: (item: PostChatItem, e: any, isRecentTab: boolean) => void;
+}> = React.memo(({ recentList, onItemClick, onDeleteClick }) => {
+  const memoizedList = useMemo(() => recentList, [recentList]);
+
+  const handleItemClick = useCallback(
+    (item: PostChatItem) => {
+      onItemClick(item);
+    },
+    [onItemClick]
+  );
+
+  const handleDeleteClick = useCallback(
+    (item: PostChatItem, e: React.MouseEvent) => {
+      onDeleteClick(item, e, true);
+    },
+    [onDeleteClick]
+  );
+
+  if (memoizedList?.length === 0) {
+    return <EmptyState />;
+  }
+
+  return (
+    <>
+      {memoizedList?.length > 0 &&
+        memoizedList.map((item, index) => (
+          <div
+            key={`recent-${index}`}
+            onClick={() => handleItemClick(item)}
+            className={styles.itemBox}
+          >
+            <div className={styles.itemHead}>
+              <img className={styles.headImg} src={item.botAvatar} alt="" />
+              <div title={item.botName} className={styles.headTitle}>
+                {item.botName}
+              </div>
+            </div>
+            <div title={item.botDesc} className={styles.headDesc}>
+              {item.botDesc}
+            </div>
+            <div className={styles.itemInfo}>
+              <img className={styles.actImg} src={act} alt="" />
+              <div className={styles.actText}>
+                {item.creatorName || '@讯飞星火'}
+              </div>
+              <img className={styles.fireImg} src={fire} alt="" />
+              <div className={styles.fireText}>{item.hotNum || 0}</div>
+            </div>
+            <div
+              onClick={e => handleDeleteClick(item, e)}
+              className={styles.delete}
+            />
+          </div>
+        ))}
+    </>
+  );
+});
+
+// 我的收藏列表组件
+const FavoritesList: FC<{
+  collectList: FavoriteEntry[];
+  onItemClick: (item: any) => void;
+  onDeleteClick: (item: FavoriteEntry, e: any, isRecentTab: boolean) => void;
+}> = React.memo(({ collectList, onItemClick, onDeleteClick }) => {
+  const memoizedList = useMemo(() => collectList, [collectList]);
+
+  const handleItemClick = useCallback(
+    (item: FavoriteEntry) => {
+      onItemClick(item.bot);
+    },
+    [onItemClick]
+  );
+
+  const handleDeleteClick = useCallback(
+    (item: FavoriteEntry, e: React.MouseEvent) => {
+      onDeleteClick(item, e, false);
+    },
+    [onDeleteClick]
+  );
+
+  if (memoizedList?.length === 0) {
+    return <EmptyState />;
+  }
+
+  return (
+    <>
+      {memoizedList?.length > 0 &&
+        memoizedList.map((item, index) => (
+          <div
+            key={`favorite-${index}`}
+            onClick={() => handleItemClick(item)}
+            className={styles.itemBox}
+          >
+            <div className={styles.itemHead}>
+              <img className={styles.headImg} src={item.bot.avatar} alt="" />
+              <div title={item.bot.botName} className={styles.headTitle}>
+                {item.bot.botName}
+              </div>
+            </div>
+            <div title={item.bot.botDesc} className={styles.headDesc}>
+              {item.bot.botDesc}
+            </div>
+            <div className={styles.itemInfo}>
+              <img className={styles.actImg} src={act} alt="" />
+              <div className={styles.actText}>
+                {item.bot.creatorName || '@讯飞星火'}
+              </div>
+              <img className={styles.fireImg} src={fire} alt="" />
+              <div className={styles.fireText}>{item.bot.hotNum || 0}</div>
+            </div>
+            <div
+              onClick={e => handleDeleteClick(item, e)}
+              className={styles.delete}
+            />
+          </div>
+        ))}
+    </>
+  );
+});
 
 const PersonalCenterHeader: FC<{
   showInput: boolean;
@@ -39,7 +215,7 @@ const PersonalCenterHeader: FC<{
                 placeholder="请输入昵称"
                 showCount
                 maxLength={20}
-                onChange={(e) => {
+                onChange={e => {
                   setInfoName(e.target.value);
                 }}
               />
@@ -54,14 +230,14 @@ const PersonalCenterHeader: FC<{
               <img
                 onClick={() => {
                   const formData = new FormData();
-                  formData.append("nickname", infoName);
+                  formData.append('nickname', infoName);
                   uploadUserProfile(formData)
                     // uploadUserProfile({
                     //   nickname: infoName,
                     //   avatar: userInfo.avatar,
                     // })
-                    .then((res) => {
-                      message.success("修改成功");
+                    .then(res => {
+                      message.success('修改成功');
                       // 更新用户信息
                       useUserStore.setState({
                         user: {
@@ -71,7 +247,7 @@ const PersonalCenterHeader: FC<{
                       });
                       setShowInput(false);
                     })
-                    .catch((err) => {
+                    .catch(err => {
                       message.error(err.msg);
                     });
                 }}
@@ -107,7 +283,7 @@ const PersonalCenterHeader: FC<{
             onClick={() => {
               copyText({
                 text: `${userInfo?.uid}`,
-                successText: "复制成功",
+                successText: '复制成功',
               });
             }}
             className={styles.copy}
@@ -120,8 +296,57 @@ const PersonalCenterHeader: FC<{
   );
 };
 
-const PersonalCenter: FC<PersonalCenterProps> = ({ open, onCancel }) => {
+const PersonalCenter: FC<PersonalCenterProps> = ({
+  open,
+  onCancel,
+  mixedChatList,
+  favoriteBotList,
+  onRefreshData,
+  onRefreshRecentData,
+  onRefreshFavoriteData,
+}) => {
   const [showInput, setShowInput] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+
+  // 事件处理函数
+  const handleToChat = useCallback((item: any) => {
+    // TODO: 实现跳转到聊天的逻辑
+    console.log('Navigate to chat with:', item);
+  }, []);
+
+  const handleDeleteChat = useCallback(
+    (item: any, e: React.MouseEvent, isRecentTab: boolean) => {
+      e.stopPropagation();
+      setDeleteOpen(true);
+      // TODO: 实现删除逻辑
+      console.log('Delete item:', item, 'isRecentTab:', isRecentTab);
+    },
+    []
+  );
+
+  const handleDeleteChatConfirm = useCallback(() => {
+    // TODO: 实现确认删除的逻辑
+    console.log('Confirm delete');
+    setDeleteOpen(false);
+    // Refresh data after deletion
+    onRefreshData();
+  }, [onRefreshData]);
+
+  const handleTabChange = useCallback(
+    (index: number) => {
+      setActiveIndex(index);
+      // Refresh specific data based on the active tab
+      if (index === 0) {
+        // Recent Used tab - refresh recent chat data
+        onRefreshRecentData();
+      } else if (index === 1) {
+        // My Favorites tab - refresh favorite data
+        onRefreshFavoriteData();
+      }
+    },
+    [onRefreshRecentData, onRefreshFavoriteData]
+  );
 
   return (
     <Modal
@@ -139,24 +364,12 @@ const PersonalCenter: FC<PersonalCenterProps> = ({ open, onCancel }) => {
           showInput={showInput}
           setShowInput={setShowInput}
         />
-        {/* <div className={styles.content}>
-          <div className={styles.tabs}>
-            {tabs.map((item, index) => {
-              return (
-                <div
-                  key={index}
-                  onClick={() => {
-                    setActiveIndex(index);
-                  }}
-                  className={
-                    activeIndex === index ? styles.tabActive : styles.tab
-                  }
-                >
-                  {item.tab}
-                </div>
-              );
-            })}
-          </div>
+        <div className={styles.content}>
+          <TabsHeader
+            tabs={tabs}
+            activeIndex={activeIndex}
+            onTabChange={handleTabChange}
+          />
           <div className={styles.contentBox}>
             <Modal
               open={deleteOpen}
@@ -180,105 +393,22 @@ const PersonalCenter: FC<PersonalCenterProps> = ({ open, onCancel }) => {
                 </span>
               </div>
             </Modal>
-            {activeIndex === 0 && recentList?.length === 0 && (
-              <div className={styles.emptyBox}>
-                <img src={empty} alt="" />
-              </div>
+            {activeIndex === 0 && (
+              <RecentUsedList
+                recentList={mixedChatList}
+                onItemClick={handleToChat}
+                onDeleteClick={handleDeleteChat}
+              />
             )}
-            {activeIndex === 0 &&
-              recentList?.length > 0 &&
-              recentList.map((item, index) => {
-                return (
-                  <div
-                    onClick={() => {
-                      handleToChat(item);
-                    }}
-                    key={index}
-                    className={styles.itemBox}
-                  >
-                    <div className={styles.itemHead}>
-                      <img
-                        className={styles.headImg}
-                        src={item.botAvatar}
-                        alt=""
-                      />
-                      <div title={item.botTitle} className={styles.headTitle}>
-                        {item.botTitle}
-                      </div>
-                    </div>
-                    <div title={item.botDesc} className={styles.headDesc}>
-                      {item.botDesc}
-                    </div>
-                    <div className={styles.itemInfo}>
-                      <img className={styles.actImg} src={act} alt="" />
-                      <div className={styles.actText}>
-                        {item.creatorName || '@讯飞星火'}
-                      </div>
-                      <img className={styles.fireImg} src={fire} alt="" />
-                      <div className={styles.fireText}>{item.hotNum || 0}</div>
-                    </div>
-                    <div
-                      onClick={e => {
-                        handleDeleteChat(item, e, true);
-                      }}
-                      className={styles.delete}
-                    />
-                  </div>
-                );
-              })}
-            {activeIndex === 1 &&
-              collectList?.length > 0 &&
-              collectList.map((item, index) => {
-                return (
-                  <div
-                    onClick={() => {
-                      handleToChat(item.bot);
-                    }}
-                    key={index}
-                    className={styles.itemBox}
-                  >
-                    <div className={styles.itemHead}>
-                      <img
-                        className={styles.headImg}
-                        src={item.bot.avatar}
-                        alt=""
-                      />
-                      <div
-                        title={item.bot.botTitle}
-                        className={styles.headTitle}
-                      >
-                        {item.bot.botName}
-                      </div>
-                    </div>
-                    <div title={item.bot.botDesc} className={styles.headDesc}>
-                      {item.bot.botDesc}
-                    </div>
-                    <div className={styles.itemInfo}>
-                      <img className={styles.actImg} src={act} alt="" />
-                      <div className={styles.actText}>
-                        {item.bot.creatorName || '@讯飞星火'}
-                      </div>
-                      <img className={styles.fireImg} src={fire} alt="" />
-                      <div className={styles.fireText}>
-                        {item.bot.hotNum || 0}
-                      </div>
-                    </div>
-                    <div
-                      onClick={e => {
-                        handleDeleteChat(item, e, false);
-                      }}
-                      className={styles.delete}
-                    />
-                  </div>
-                );
-              })}
-            {activeIndex === 1 && collectList?.length === 0 && (
-              <div className={styles.emptyBox}>
-                <img src={empty} alt="" />
-              </div>
+            {activeIndex === 1 && (
+              <FavoritesList
+                collectList={favoriteBotList}
+                onItemClick={handleToChat}
+                onDeleteClick={handleDeleteChat}
+              />
             )}
           </div>
-        </div> */}
+        </div>
       </div>
     </Modal>
   );

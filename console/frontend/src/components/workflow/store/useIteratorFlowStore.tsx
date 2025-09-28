@@ -1,6 +1,6 @@
-import { Edge, EdgeChange, Node, NodeChange, Connection } from "reactflow";
-import { create } from "zustand";
-import { FlowStoreType } from "../types/zustand/flow";
+import { Edge, EdgeChange, Node, NodeChange, Connection } from 'reactflow';
+import { create } from 'zustand';
+import { FlowStoreType } from '../types/zustand/flow';
 import {
   initialStatus,
   undo,
@@ -29,7 +29,7 @@ import {
   addIntentId,
   onConnect,
   loadHistory,
-} from "./flow-function";
+} from './flow-function';
 
 // this is our useStore hook that we can use in our components to get parts of the store and call actions
 const useFlowStore = create<FlowStoreType>((set, get) => ({
@@ -57,18 +57,17 @@ const useFlowStore = create<FlowStoreType>((set, get) => ({
   deleteNode: (nodeId: string): void => deleteNode(nodeId, get),
   updateNodeNameStatus: (
     nodeId: string,
-    labelInputId: string | undefined,
+    labelInputId: string | undefined
   ): void => updateNodeNameStatus(nodeId, labelInputId, get),
   reNameNode: (nodeId: string, value: string): void =>
     reNameNode(nodeId, value, get),
-  paste: (selection: { nodes: Node[]; edges: Edge[] }): void =>
-    paste(selection, get),
+  paste: (): Promise<void> => paste(get),
   updateNodeRef: (id: string): void => updateNodeRef(id, get),
   delayUpdateNodeRef: (id: string): void => delayUpdateNodeRef(id, get),
   removeNodeRef: (
     souceId: string,
     targetId: string,
-    inputEdges?: Edge[],
+    inputEdges?: Edge[]
   ): void => removeNodeRef(souceId, targetId, inputEdges, get),
   deleteNodeRef: (id: string, outputId: string): void =>
     deleteNodeRef(id, outputId, get),

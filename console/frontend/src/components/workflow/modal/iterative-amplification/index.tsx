@@ -1,12 +1,6 @@
-import React, {
-  useCallback,
-  useState,
-  useRef,
-  useEffect,
-  useMemo,
-} from "react";
-import { createPortal } from "react-dom";
-import { cloneDeep } from "lodash";
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
+import { cloneDeep } from 'lodash';
 import ReactFlow, {
   Background,
   Connection,
@@ -17,23 +11,27 @@ import ReactFlow, {
   Panel,
   OnMove,
   Node,
-} from "reactflow";
+  XYPosition,
+} from 'reactflow';
 import {
   ConnectionLineProps,
   FlowContainerProps,
-} from "@/components/workflow/types";
-import NodeList from "@/pages/workflow/components/node-list";
-import useIteratorFlowStore from "@/components/workflow/store/useIteratorFlowStore";
-import useFlowStore from "@/components/workflow/store/useFlowStore";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import FlowPanel from "@/components/workflow/panel";
-import { ReactFlowProvider } from "reactflow";
-import { useFlowCommon } from "@/components/workflow/hooks/useFlowCommon";
+  useIterativeAmplificationProps,
+} from '@/components/workflow/types';
+import { message } from 'antd';
+import NodeList from '@/pages/workflow/components/node-list';
+import useIteratorFlowStore from '@/components/workflow/store/useIteratorFlowStore';
+import useFlowStore from '@/components/workflow/store/useFlowStore';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import FlowPanel from '@/components/workflow/panel';
+import { ReactFlowProvider } from 'reactflow';
+import { useFlowCommon } from '@/components/workflow/hooks/useFlowCommon';
 
-import CustomNode from "@/components/workflow/nodes";
-import CustomEdge from "@/components/workflow/edges";
+import CustomNode from '@/components/workflow/nodes';
+import CustomEdge from '@/components/workflow/edges';
 
-import smallScreenIcon from "@/assets/imgs/workflow/small-screen-icon.png";
+import smallScreenIcon from '@/assets/imgs/workflow/small-screen-icon.png';
+import { useMemoizedFn } from 'ahooks';
 
 const nodeTypes = {
   custom: CustomNode,
@@ -48,7 +46,7 @@ const ConnectionLineComponent = ({
   fromY,
   toX,
   toY,
-  connectionLineStyle = { strokeWidth: 2, stroke: "#275EFF" }, // provide a default value for connectionLineStyle
+  connectionLineStyle = { strokeWidth: 2, stroke: '#275EFF' }, // provide a default value for connectionLineStyle
 }: ConnectionLineProps): React.ReactElement => {
   return (
     <g>
@@ -72,142 +70,76 @@ const ConnectionLineComponent = ({
   );
 };
 
-function FlowContainer({
-  zoom,
-  setZoom,
-  setShowIterativeModal,
-}: FlowContainerProps): React.ReactElement {
-  const { handleAddNode } = useFlowCommon();
-  //迭代画布修改前的节点数组
-  const beforeNodes = useRef<Node[]>([]);
-  const canPublishSetNot = useFlowsManager((state) => state.canPublishSetNot);
-  const dropZoneRef = useRef<HTMLDivElement | null>(null);
-  const reactFlowInstance = useIteratorFlowStore(
-    (state) => state.reactFlowInstance,
-  );
-  const nodes = useIteratorFlowStore((state) => state.nodes);
-  const edges = useIteratorFlowStore((state) => state.edges);
-  const setReactFlowInstance = useIteratorFlowStore(
-    (state) => state.setReactFlowInstance,
-  );
-  const onNodesChange = useIteratorFlowStore((state) => state.onNodesChange);
-  const onEdgesChange = useIteratorFlowStore((state) => state.onEdgesChange);
-  const setNodes = useIteratorFlowStore((state) => state.setNodes);
-  const setEdges = useIteratorFlowStore((state) => state.setEdges);
-  const onConnect = useIteratorFlowStore((state) => state.onConnect);
-  const flowNodes = useFlowStore((state) => state.nodes);
-  const flowEdges = useFlowStore((state) => state.edges);
-  const setFlowNodes = useFlowStore((state) => state.setNodes);
-  const setFlowEdges = useFlowStore((state) => state.setEdges);
-  const switchNodeRef = useIteratorFlowStore((state) => state.switchNodeRef);
-  const deleteNode = useIteratorFlowStore((state) => state.deleteNode);
-  const removeNodeRef = useIteratorFlowStore((state) => state.removeNodeRef);
-  const takeSnapshot = useIteratorFlowStore((state) => state.takeSnapshot);
-  const edgeType = useFlowsManager((state) => state.edgeType);
-  const autoSaveCurrentFlow = useFlowsManager(
-    (state) => state.autoSaveCurrentFlow,
-  );
-  const willAddNode = useFlowsManager((state) => state.willAddNode);
-  const undo = useIteratorFlowStore((state) => state.undo);
-  const historys = useIteratorFlowStore((state) => state.historys);
-  const setHistorys = useIteratorFlowStore((state) => state.setHistorys);
-  const lastCopiedSelection = useIteratorFlowStore(
-    (state) => state.lastCopiedSelection,
-  );
-  const paste = useIteratorFlowStore((state) => state.paste);
-  const setCurrentStore = useFlowsManager((state) => state.setCurrentStore);
-  const iteratorId = useFlowsManager((state) => state.iteratorId);
-  const canvasesDisabled = useFlowsManager((state) => state.canvasesDisabled);
-  const knowledgeModalInfoOpen = useFlowsManager(
-    (state) => state.knowledgeModalInfo?.open,
-  );
-  const controlMode = useFlowsManager((state) => state.controlMode);
-  const showToolModal = useFlowsManager((state) => state.toolModalInfo?.open);
-  const [lastSelection, setLastSelection] =
-    useState<OnSelectionChangeParams | null>(null);
+const useKeyboardHandlers = ({ lastSelection }): void => {
   const position = useRef({ x: 0, y: 0 });
-
-  useEffect(() => {
-    if (iteratorId) {
-      const nodes = flowNodes
-        .filter((node) => node?.data?.parentId === iteratorId)
-        .map((node) => ({
-          ...node,
-          draggable: !canvasesDisabled,
-          position: node?.data?.originPosition,
-          data: {
-            ...node?.data,
-            parentId: "",
-          },
-          parentId: "",
-          extent: undefined,
-          zIndex: 0,
-        }));
-      const nodeIds = nodes.map((node) => node?.id);
-      const edges = flowEdges.filter(
-        (edge) =>
-          nodeIds?.includes(edge?.target) || nodeIds?.includes(edge?.source),
-      );
-      beforeNodes.current = nodes;
-      setNodes(cloneDeep(nodes));
-      setEdges(cloneDeep(edges.map((edge) => ({ ...edge, zIndex: 0 }))));
-      setHistorys([]);
-    }
-  }, [iteratorId, flowNodes, flowEdges, canvasesDisabled]);
-
-  const handleDelete = useCallback((): void => {
-    if (!lastSelection) return;
-
+  const takeSnapshot = useIteratorFlowStore(state => state.takeSnapshot);
+  const currentStore = useFlowsManager(state => state.getCurrentStore());
+  const edges = currentStore(state => state.edges);
+  const removeNodeRef = currentStore(state => state.removeNodeRef);
+  const deleteNode = currentStore(state => state.deleteNode);
+  const setEdges = currentStore(state => state.setEdges);
+  const undo = currentStore(state => state.undo);
+  const paste = currentStore(state => state.paste);
+  const canPublishSetNot = useFlowsManager(state => state.canPublishSetNot);
+  const showToolModal = useFlowsManager(state => state.toolModalInfo)?.open;
+  const knowledgeModalInfoOpen = useFlowsManager(
+    state => state.knowledgeModalInfo
+  )?.open;
+  const handleDelete = useMemoizedFn((): void => {
     takeSnapshot();
     lastSelection.nodes = lastSelection?.nodes?.filter(
-      (node: unknown) =>
-        node.nodeType !== "node-start" && node.nodeType !== "node-end",
+      node => node.type !== '开始节点' && node.type !== '结束节点'
     );
-    const edgeIds = lastSelection?.edges?.map((edge) => edge?.id);
-    const leftEdges = edges.filter((edge) => !edgeIds?.includes(edge?.id));
-    lastSelection?.edges?.forEach((edge) => {
+    const edgeIds = lastSelection?.edges?.map(edge => edge?.id);
+    const leftEdges = edges.filter(edge => !edgeIds?.includes(edge?.id));
+    lastSelection?.edges?.forEach(edge => {
       if (
         leftEdges?.filter(
-          (item) =>
-            item?.source === edge?.source && item?.target === edge?.target,
+          item => item?.source === edge?.source && item?.target === edge?.target
         )?.length === 0
       ) {
         removeNodeRef(edge.source, edge.target);
       }
     });
-    lastSelection?.nodes?.map((node) => deleteNode(node?.id));
-    setEdges((edges) => edges.filter((edge) => !edgeIds?.includes(edge?.id)));
+    lastSelection?.nodes?.map(node => deleteNode(node?.id));
+    setEdges(edges => edges.filter(edge => !edgeIds?.includes(edge?.id)));
     canPublishSetNot();
-  }, [lastSelection, edges]);
+  });
 
   useEffect((): void | (() => void) => {
-    const handleKeyDown = (event: KeyboardEvent): void => {
+    const handleKeyDown = async (event: KeyboardEvent): void => {
       event.stopPropagation();
-      if ((event.ctrlKey || event.metaKey) && event.key === "z") {
+      if ((event.ctrlKey || event.metaKey) && event.key === 'z') {
         undo();
       } else if (
         (event.ctrlKey || event.metaKey) &&
-        event.key === "c" &&
+        event.key === 'c' &&
         lastSelection
       ) {
         const cloneLastSelection = cloneDeep(lastSelection);
-        cloneLastSelection.nodes = cloneLastSelection.nodes?.filter(
-          (node) =>
-            node.nodeType !== "node-start" &&
-            node.nodeType !== "node-end" &&
-            (node?.nodeType !== "decision-making" ||
-              (node?.nodeType === "decision-making" &&
-                node.data.nodeParam.reasonMode === 1)),
-        );
+        cloneLastSelection.nodes = cloneLastSelection.nodes?.filter(node => {
+          if (node?.data?.parentId) {
+            return true;
+          }
+          return node.type !== '开始节点' && node.type !== '结束节点';
+        });
+        try {
+          await navigator.clipboard.writeText(
+            JSON.stringify(cloneLastSelection)
+          );
+          message.success('复制成功');
+        } catch (err) {
+          console.error('[Clipboard] 复制失败', err);
+        }
       } else if (
         (event.ctrlKey || event.metaKey) &&
-        event.key === "v" &&
-        lastCopiedSelection
+        event.key === 'v' &&
+        lastSelection
       ) {
         event.preventDefault();
         paste();
       } else if (
-        ["Backspace", "Delete"]?.includes(event.key) &&
+        ['Backspace', 'Delete']?.includes(event.key) &&
         lastSelection
       ) {
         handleDelete();
@@ -220,21 +152,51 @@ function FlowContainer({
 
     !showToolModal &&
       !knowledgeModalInfoOpen &&
-      window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('mousemove', handleMouseMove);
 
     return (): void => {
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('mousemove', handleMouseMove);
     };
   }, [
     lastSelection,
-    lastCopiedSelection,
+    lastSelection,
     showToolModal,
     knowledgeModalInfoOpen,
     edges,
   ]);
+};
 
+const useIterativeAmplification = ({
+  lastSelection,
+  setLastSelection,
+}): useIterativeAmplificationProps => {
+  const { handleAddNode } = useFlowCommon();
+  const dropZoneRef = useRef<HTMLDivElement | null>(null);
+  const setFlowNodes = useFlowStore(state => state.setNodes);
+  const setFlowEdges = useFlowStore(state => state.setEdges);
+  const switchNodeRef = useIteratorFlowStore(state => state.switchNodeRef);
+  const takeSnapshot = useIteratorFlowStore(state => state.takeSnapshot);
+  const edgeType = useFlowsManager(state => state.edgeType);
+  const autoSaveCurrentFlow = useFlowsManager(
+    state => state.autoSaveCurrentFlow
+  );
+  const willAddNode = useFlowsManager(state => state.willAddNode);
+  const setCurrentStore = useFlowsManager(state => state.setCurrentStore);
+  const iteratorId = useFlowsManager(state => state.iteratorId);
+  const setShowIterativeModal = useFlowsManager(
+    state => state.setShowIterativeModal
+  );
+  const reactFlowInstance = useIteratorFlowStore(
+    state => state.reactFlowInstance
+  );
+  const beforeNodes = useRef<Node[]>([]);
+  const currentStore = useFlowsManager(state => state.getCurrentStore());
+  const nodes = currentStore(state => state.nodes);
+  const edges = currentStore(state => state.edges);
+  const setEdges = currentStore(state => state.setEdges);
+  const setZoom = currentStore(state => state.setZoom);
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>): void => {
     event.preventDefault();
   };
@@ -261,63 +223,39 @@ function FlowContainer({
     });
   };
 
-  const edgeUpdateSuccessful = useRef(true);
-
-  const onEdgeUpdate = useCallback(
+  const onEdgeUpdate = useMemoizedFn(
     (oldEdge: Edge, newConnection: Connection) => {
       const isExistEdge = edges?.some(
-        (item) =>
+        item =>
           item.target === newConnection.target &&
-          item.source === newConnection.source,
+          item.source === newConnection.source
       );
       if (!isExistEdge) {
         switchNodeRef({ ...newConnection }, { ...oldEdge });
-        setEdges((els) => updateEdge(oldEdge, newConnection, els));
+        setEdges(els => updateEdge(oldEdge, newConnection, els));
       }
-    },
-    [setEdges, edges],
+    }
   );
 
-  const onEdgeUpdateStart = useCallback((): void => {
-    edgeUpdateSuccessful.current = false;
-  }, []);
-
-  const onEdgeUpdateEnd = useCallback((): void => {
-    edgeUpdateSuccessful.current = true;
-  }, []);
-
-  const onSelectionChange = useCallback(
+  const onSelectionChange = useMemoizedFn(
     (flow: OnSelectionChangeParams): void => {
       setLastSelection(flow);
-    },
-    [],
+    }
   );
 
-  const onNodeDragStart: NodeDragHandler = useCallback(() => {
+  const onNodeDragStart: NodeDragHandler = useMemoizedFn(() => {
     takeSnapshot(false);
-  }, []);
+  });
 
-  const onNodeDragStop = useCallback((): void => {
-    // autoSaveCurrentFlow();
-  }, []);
-
-  const onMoveEnd: OnMove = useCallback((event, viewport): void => {
+  const onMoveEnd: OnMove = useMemoizedFn((event, viewport): void => {
     const zoom = viewport?.zoom || 0.8;
     setZoom(Math.round(zoom * 100));
-  }, []);
-
-  useEffect(() => {
-    const zoom = reactFlowInstance?.getViewport?.()?.zoom
-      ? Math.round(reactFlowInstance?.getViewport?.()?.zoom * 100)
-      : 80;
-    setZoom(zoom);
-  }, [reactFlowInstance]);
-
-  const generateIteratorPosition = useCallback(
+  });
+  const generateIteratorPosition = useMemoizedFn(
     (
       basePosition: { x: number; y: number },
       position: { x: number; y: number },
-      offsetY: number,
+      offsetY: number
     ) => {
       const currentPositionX = (position?.x - basePosition?.x) / 4 + 30;
       const currentPositionY =
@@ -326,51 +264,52 @@ function FlowContainer({
         x: currentPositionX ? currentPositionX : 20,
         y: currentPositionY ? currentPositionY : 20,
       };
-    },
-    [],
+    }
   );
 
-  const getDimensions = useCallback((positions: Node[]): Node | null => {
-    if (!positions.length) return null;
-    let minXPosition = positions[0];
+  const getDimensions = useMemoizedFn(
+    (positions: Node[]): XYPosition | undefined => {
+      if (!positions.length) return null;
+      let minXPosition = positions[0];
 
-    positions.forEach((item) => {
-      if (item.position.x < minXPosition.position.x) {
-        minXPosition = item;
-      }
-    });
-    return minXPosition?.position;
-  }, []);
+      positions.forEach(item => {
+        if (item.position.x < minXPosition.position.x) {
+          minXPosition = item;
+        }
+      });
+      return minXPosition?.position;
+    }
+  );
 
-  const getOffsetY = useCallback((y: number, positions: Node[]): number => {
+  const getOffsetY = useMemoizedFn((y: number, positions: Node[]): number => {
     let offsetY = 0;
-    positions.forEach((item) => {
+    positions.forEach(item => {
       if (y - item.position.y > offsetY) {
         offsetY = y - item.position.y;
       }
     });
     return offsetY;
-  }, []);
+  });
 
-  const addNodeToFlow = useCallback((): void => {
-    const nodeIds = beforeNodes?.current?.map((node) => node?.id);
+  const addNodeToFlow = useMemoizedFn((): void => {
+    const nodeIds = beforeNodes?.current?.map(node => node?.id);
     const basePosition = getDimensions(nodes);
     const offsetY = getOffsetY(basePosition?.y || 0, nodes);
     setShowIterativeModal(false);
-    setCurrentStore("flow");
-    setFlowNodes((flowNodes) =>
+    setCurrentStore('flow');
+    setFlowNodes(flowNodes =>
       cloneDeep([
-        ...flowNodes.filter((node) => node?.data?.parentId !== iteratorId),
-        ...nodes.map((node) => ({
+        ...flowNodes.filter(node => node?.data?.parentId !== iteratorId),
+        ...nodes.map(node => ({
           ...node,
           parentId: iteratorId,
-          extent: "parent",
+          extent: 'parent',
           zIndex: 1,
           draggable: false,
           position: generateIteratorPosition(
             basePosition || { x: 0, y: 0 },
             node?.position,
-            offsetY,
+            offsetY
           ),
           data: {
             ...node.data,
@@ -378,39 +317,127 @@ function FlowContainer({
             parentId: iteratorId,
           },
         })),
-      ]),
+      ])
     );
-    setFlowEdges((flowEdges) =>
+    setFlowEdges(flowEdges =>
       cloneDeep([
         ...flowEdges
           .filter(
-            (edge) =>
+            edge =>
               !nodeIds?.includes(edge?.target) &&
-              !nodeIds?.includes(edge?.source),
+              !nodeIds?.includes(edge?.source)
           )
-          .map((edge) => ({
+          .map(edge => ({
             ...edge,
             data: {
               edgeType: edgeType,
             },
           })),
-        ...edges.map((edge) => ({
+        ...edges.map(edge => ({
           ...edge,
           zIndex: 100,
           data: {
             edgeType: edgeType,
           },
         })),
-      ]),
+      ])
     );
     autoSaveCurrentFlow();
-  }, [
-    setShowIterativeModal,
-    setCurrentStore,
-    nodes,
-    edges,
-    autoSaveCurrentFlow,
-  ]);
+  });
+
+  return {
+    beforeNodes,
+    dropZoneRef,
+    lastSelection,
+    addNodeToFlow,
+    onEdgeUpdate,
+    onSelectionChange,
+    onNodeDragStart,
+    onMoveEnd,
+    handleDragOver,
+    handleDropAllowed,
+  };
+};
+
+function FlowContainer({
+  zoom,
+  setZoom,
+}: FlowContainerProps): React.ReactElement {
+  //迭代画布修改前的节点数组
+  const reactFlowInstance = useIteratorFlowStore(
+    state => state.reactFlowInstance
+  );
+  const nodes = useIteratorFlowStore(state => state.nodes);
+  const edges = useIteratorFlowStore(state => state.edges);
+  const setReactFlowInstance = useIteratorFlowStore(
+    state => state.setReactFlowInstance
+  );
+  const onNodesChange = useIteratorFlowStore(state => state.onNodesChange);
+  const onEdgesChange = useIteratorFlowStore(state => state.onEdgesChange);
+  const setNodes = useIteratorFlowStore(state => state.setNodes);
+  const setEdges = useIteratorFlowStore(state => state.setEdges);
+  const onConnect = useIteratorFlowStore(state => state.onConnect);
+  const flowNodes = useFlowStore(state => state.nodes);
+  const flowEdges = useFlowStore(state => state.edges);
+  const historys = useIteratorFlowStore(state => state.historys);
+  const setHistorys = useIteratorFlowStore(state => state.setHistorys);
+  const iteratorId = useFlowsManager(state => state.iteratorId);
+  const canvasesDisabled = useFlowsManager(state => state.canvasesDisabled);
+  const controlMode = useFlowsManager(state => state.controlMode);
+  const [lastSelection, setLastSelection] =
+    useState<OnSelectionChangeParams | null>(null);
+  useKeyboardHandlers({
+    lastSelection,
+  });
+  const {
+    beforeNodes,
+    dropZoneRef,
+    handleDragOver,
+    handleDropAllowed,
+    onEdgeUpdate,
+    onNodeDragStart,
+    onSelectionChange,
+    onMoveEnd,
+    addNodeToFlow,
+  } = useIterativeAmplification({
+    lastSelection,
+    setLastSelection,
+  });
+
+  useEffect(() => {
+    if (iteratorId) {
+      const nodes = flowNodes
+        .filter(node => node?.data?.parentId === iteratorId)
+        .map(node => ({
+          ...node,
+          draggable: !canvasesDisabled,
+          position: node?.data?.originPosition,
+          data: {
+            ...node?.data,
+            parentId: '',
+          },
+          parentId: '',
+          extent: undefined,
+          zIndex: 0,
+        }));
+      const nodeIds = nodes.map(node => node?.id);
+      const edges = flowEdges.filter(
+        edge =>
+          nodeIds?.includes(edge?.target) || nodeIds?.includes(edge?.source)
+      );
+      beforeNodes.current = nodes;
+      setNodes(cloneDeep(nodes));
+      setEdges(cloneDeep(edges.map(edge => ({ ...edge, zIndex: 0 }))));
+      setHistorys([]);
+    }
+  }, [iteratorId, flowNodes, flowEdges, canvasesDisabled]);
+
+  useEffect(() => {
+    const zoom = reactFlowInstance?.getViewport?.()?.zoom
+      ? Math.round(reactFlowInstance?.getViewport?.()?.zoom * 100)
+      : 80;
+    setZoom(zoom);
+  }, [reactFlowInstance]);
 
   //在非对话和非多开的情况下才允许编辑画布
   const canUseCanvases = useMemo(() => {
@@ -435,15 +462,12 @@ function FlowContainer({
         edges={edges}
         onInit={setReactFlowInstance}
         onEdgeUpdate={onEdgeUpdate}
-        onEdgeUpdateStart={onEdgeUpdateStart}
-        onEdgeUpdateEnd={onEdgeUpdateEnd}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         connectionLineComponent={ConnectionLineComponent}
         nodeDragThreshold={3}
         onNodeDragStart={onNodeDragStart}
-        onNodeDragStop={onNodeDragStop}
         onSelectionChange={onSelectionChange}
         onMoveEnd={onMoveEnd}
         nodesDraggable={canUseCanvases}
@@ -451,9 +475,9 @@ function FlowContainer({
         nodesConnectable={canUseCanvases}
         deleteKeyCode={[]}
         multiSelectionKeyCode="Shift"
-        panOnDrag={controlMode === "mouse"}
-        selectionOnDrag={controlMode === "touch"}
-        panOnScroll={controlMode === "touch"}
+        panOnDrag={controlMode === 'mouse'}
+        selectionOnDrag={controlMode === 'touch'}
+        panOnScroll={controlMode === 'touch'}
       >
         <Background />
         <Panel position="top-right">
@@ -476,12 +500,12 @@ function FlowContainer({
 }
 
 function IterativeAmplificationModal(): React.ReactElement {
-  const zoom = useIteratorFlowStore((state) => state.zoom);
-  const setZoom = useIteratorFlowStore((state) => state.setZoom);
+  const zoom = useIteratorFlowStore(state => state.zoom);
+  const setZoom = useIteratorFlowStore(state => state.setZoom);
   const setShowIterativeModal = useFlowsManager(
-    (state) => state.setShowIterativeModal,
+    state => state.setShowIterativeModal
   );
-  const showNodeList = useFlowsManager((state) => state.showNodeList);
+  const showNodeList = useFlowsManager(state => state.showNodeList);
 
   return (
     <>
@@ -490,8 +514,8 @@ function IterativeAmplificationModal(): React.ReactElement {
           <div
             className="flex items-start modalContent"
             style={{
-              height: "87vh",
-              width: "90%",
+              height: '87vh',
+              width: '90%',
             }}
           >
             {showNodeList && <NodeList noIterator={true} />}
@@ -502,16 +526,14 @@ function IterativeAmplificationModal(): React.ReactElement {
             />
           </div>
         </div>,
-        document.body,
+        document.body
       )}
     </>
   );
 }
 
 function IterativeAmplificationModalReactFlowProvider(): React.ReactElement {
-  const showIterativeModal = useFlowsManager(
-    (state) => state.showIterativeModal,
-  );
+  const showIterativeModal = useFlowsManager(state => state.showIterativeModal);
 
   return (
     <>

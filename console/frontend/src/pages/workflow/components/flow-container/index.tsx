@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useRef, useMemo } from "react";
+import React, { useCallback, useState, useRef, useMemo } from 'react';
 import ReactFlow, {
   Background,
   Connection,
@@ -7,16 +7,16 @@ import ReactFlow, {
   OnSelectionChangeParams,
   ReactFlowInstance,
   updateEdge,
-} from "reactflow";
-import { useFlowCommon } from "@/components/workflow/hooks/useFlowCommon";
-import ConnectionLineComponent from "@/components/workflow/nodes/components/connection-line";
-import FlowPanel from "@/components/workflow/panel";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import useFlowStore from "@/components/workflow/store/useFlowStore";
-import SelectNode from "@/components/workflow/tips/select-node";
+} from 'reactflow';
+import { useFlowCommon } from '@/components/workflow/hooks/useFlowCommon';
+import ConnectionLineComponent from '@/components/workflow/nodes/components/connection-line';
+import FlowPanel from '@/components/workflow/panel';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowStore from '@/components/workflow/store/useFlowStore';
+import SelectNode from '@/components/workflow/tips/select-node';
 
-import CustomNode from "@/components/workflow/nodes";
-import CustomEdge from "@/components/workflow/edges";
+import CustomNode from '@/components/workflow/nodes';
+import CustomEdge from '@/components/workflow/edges';
 
 const nodeTypes = { custom: CustomNode };
 const edgeTypes = { customEdge: CustomEdge };
@@ -33,24 +33,24 @@ function Index({ zoom, setZoom }: IndexProps): React.ReactElement {
   const [lastSelection, setLastSelection] =
     useState<OnSelectionChangeParams | null>(null);
 
-  const nodes = useFlowStore((state) => state.nodes);
-  const edges = useFlowStore((state) => state.edges);
-  const reactFlowInstance = useFlowStore((state) => state.reactFlowInstance);
-  const onNodesChange = useFlowStore((state) => state.onNodesChange);
-  const onEdgesChange = useFlowStore((state) => state.onEdgesChange);
-  const setEdges = useFlowStore((state) => state.setEdges);
-  const onConnect = useFlowStore((state) => state.onConnect);
-  const takeSnapshot = useFlowStore((state) => state.takeSnapshot);
-  const switchNodeRef = useFlowStore((state) => state.switchNodeRef);
+  const nodes = useFlowStore(state => state.nodes);
+  const edges = useFlowStore(state => state.edges);
+  const reactFlowInstance = useFlowStore(state => state.reactFlowInstance);
+  const onNodesChange = useFlowStore(state => state.onNodesChange);
+  const onEdgesChange = useFlowStore(state => state.onEdgesChange);
+  const setEdges = useFlowStore(state => state.setEdges);
+  const onConnect = useFlowStore(state => state.onConnect);
+  const takeSnapshot = useFlowStore(state => state.takeSnapshot);
+  const switchNodeRef = useFlowStore(state => state.switchNodeRef);
   const setReactFlowInstance = useFlowStore(
-    (state) => state.setReactFlowInstance,
+    state => state.setReactFlowInstance
   );
   const autoSaveCurrentFlow = useFlowsManager(
-    (state) => state.autoSaveCurrentFlow,
+    state => state.autoSaveCurrentFlow
   );
-  const canvasesDisabled = useFlowsManager((state) => state.canvasesDisabled);
-  const controlMode = useFlowsManager((state) => state.controlMode);
-  const willAddNode = useFlowsManager((state) => state.willAddNode);
+  const canvasesDisabled = useFlowsManager(state => state.canvasesDisabled);
+  const controlMode = useFlowsManager(state => state.controlMode);
+  const willAddNode = useFlowsManager(state => state.willAddNode);
 
   // =========================
   // 拆分函数：初始化 ReactFlow
@@ -64,7 +64,7 @@ function Index({ zoom, setZoom }: IndexProps): React.ReactElement {
         : 80;
       setZoom(zoomLevel);
     },
-    [setReactFlowInstance, setZoom],
+    [setReactFlowInstance, setZoom]
   );
 
   // =========================
@@ -94,12 +94,12 @@ function Index({ zoom, setZoom }: IndexProps): React.ReactElement {
   // =========================
   const onNodeDragStart: NodeDragHandler = useCallback(
     () => takeSnapshot(false),
-    [takeSnapshot],
+    [takeSnapshot]
   );
 
   const onNodeDragStop = useCallback(
     () => autoSaveCurrentFlow(),
-    [autoSaveCurrentFlow],
+    [autoSaveCurrentFlow]
   );
 
   // =========================
@@ -109,7 +109,7 @@ function Index({ zoom, setZoom }: IndexProps): React.ReactElement {
     (flow: OnSelectionChangeParams): void => {
       setLastSelection(flow);
     },
-    [],
+    []
   );
 
   // =========================
@@ -118,16 +118,16 @@ function Index({ zoom, setZoom }: IndexProps): React.ReactElement {
   const onEdgeUpdate = useCallback(
     (oldEdge: Edge, newConnection: Connection): void => {
       const isExistEdge = edges?.some(
-        (item) =>
+        item =>
           item.target === newConnection.target &&
-          item.source === newConnection.source,
+          item.source === newConnection.source
       );
       if (!isExistEdge) {
         switchNodeRef({ ...newConnection }, { ...oldEdge });
-        setEdges((els) => updateEdge(oldEdge, newConnection, els));
+        setEdges(els => updateEdge(oldEdge, newConnection, els));
       }
     },
-    [edges, setEdges, switchNodeRef],
+    [edges, setEdges, switchNodeRef]
   );
 
   const canUseCanvases = useMemo(() => !canvasesDisabled, [canvasesDisabled]);
@@ -147,7 +147,7 @@ function Index({ zoom, setZoom }: IndexProps): React.ReactElement {
         <SelectNode lastSelection={lastSelection} />
       ) : null}
       <ReactFlow
-        nodes={nodes?.filter((node) => !node.hidden)}
+        nodes={nodes?.filter(node => !node.hidden)}
         edges={edges}
         onInit={handleFlowInit}
         onNodesChange={onNodesChange}
@@ -159,14 +159,14 @@ function Index({ zoom, setZoom }: IndexProps): React.ReactElement {
         onEdgeUpdate={onEdgeUpdate}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes as unknown}
-        panOnDrag={controlMode === "mouse"}
-        selectionOnDrag={controlMode === "touch"}
+        panOnDrag={controlMode === 'mouse'}
+        selectionOnDrag={controlMode === 'touch'}
         nodesDraggable={canUseCanvases}
         nodesConnectable={canUseCanvases}
         elementsSelectable={canUseCanvases}
         deleteKeyCode={[]}
         multiSelectionKeyCode="Shift"
-        panOnScroll={controlMode === "touch"}
+        panOnScroll={controlMode === 'touch'}
         connectionLineComponent={ConnectionLineComponent}
         onlyRenderVisibleElements
       >

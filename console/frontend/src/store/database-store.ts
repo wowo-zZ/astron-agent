@@ -1,5 +1,5 @@
-import { DatabaseItem } from "@/types/database";
-import { create } from "zustand";
+import { DatabaseItem } from '@/types/database';
+import { create } from 'zustand';
 const databaseStore = create<{
   database: DatabaseItem;
   setDatabase: (val: DatabaseItem) => void;

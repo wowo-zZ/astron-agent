@@ -52,7 +52,7 @@ interface BotType {
 
 interface SearchBotParam {
   search: string;
-  pageIndex: number;
+  page: number;
   pageSize: number;
   type: number;
 }

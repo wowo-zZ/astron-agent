@@ -1,14 +1,14 @@
-import React, { useState, useCallback, useEffect } from "react";
-import { Tooltip, Table, Input, Button, message } from "antd";
-import { v4 as uuid } from "uuid";
-import { cloneDeep } from "lodash";
-import { capitalizeFirstLetter } from "@/components/workflow/utils/reactflowUtils";
+import React, { useState, useCallback, useEffect } from 'react';
+import { Tooltip, Table, Input, Button, message } from 'antd';
+import { v4 as uuid } from 'uuid';
+import { cloneDeep } from 'lodash';
+import { capitalizeFirstLetter } from '@/components/workflow/utils/reactflowUtils';
 
-import close from "@/assets/imgs/workflow/modal-close.png";
-import addItemIcon from "@/assets/imgs/workflow/add-item-icon.png";
-import expand from "@/assets/imgs/plugin/icon_fold.png";
-import shrink from "@/assets/imgs/plugin/icon_shrink.png";
-import remove from "@/assets/imgs/workflow/input-remove-icon.png";
+import close from '@/assets/imgs/workflow/modal-close.png';
+import addItemIcon from '@/assets/imgs/workflow/add-item-icon.png';
+import expand from '@/assets/imgs/plugin/icon_fold.png';
+import shrink from '@/assets/imgs/plugin/icon_shrink.png';
+import remove from '@/assets/imgs/workflow/input-remove-icon.png';
 
 function ArrayDefault({
   setArrayDefaultModal,
@@ -23,7 +23,7 @@ function ArrayDefault({
     const newObj = { ...obj, id: uuid() };
 
     if (newObj.children && Array.isArray(newObj.children)) {
-      newObj.children = newObj.children.map((child) => updateIds(child));
+      newObj.children = newObj.children.map(child => updateIds(child));
     }
 
     return newObj;
@@ -36,22 +36,22 @@ function ArrayDefault({
       currentNode.children.push(newData);
       setDefaultParamsData(cloneDeep(defaultParamsData));
       if (!expandedRowKeys?.includes(newData?.id)) {
-        setExpandedRowKeys((expandedRowKeys) => [
+        setExpandedRowKeys(expandedRowKeys => [
           ...expandedRowKeys,
           newData?.id,
         ]);
       }
     },
-    [expandedRowKeys, defaultParamsData, setDefaultParamsData],
+    [expandedRowKeys, defaultParamsData, setDefaultParamsData]
   );
 
-  const handleExpand = useCallback((record) => {
-    setExpandedRowKeys((expandedRowKeys) => [...expandedRowKeys, record.id]);
+  const handleExpand = useCallback(record => {
+    setExpandedRowKeys(expandedRowKeys => [...expandedRowKeys, record.id]);
   }, []);
 
-  const handleCollapse = useCallback((record) => {
-    setExpandedRowKeys((expandedRowKeys) =>
-      expandedRowKeys.filter((id) => id !== record.id),
+  const handleCollapse = useCallback(record => {
+    setExpandedRowKeys(expandedRowKeys =>
+      expandedRowKeys.filter(id => id !== record.id)
     );
   }, []);
 
@@ -62,7 +62,7 @@ function ArrayDefault({
           <img
             src={shrink}
             className="inline-block w-4 h-4 mb-1 mr-1"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               handleCollapse(record);
             }}
@@ -71,7 +71,7 @@ function ArrayDefault({
           <img
             src={expand}
             className="inline-block w-4 h-4 mb-1 mr-1"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               handleExpand(record);
             }}
@@ -80,7 +80,7 @@ function ArrayDefault({
       }
       return null;
     },
-    [],
+    []
   );
 
   const findNodeById = (tree, id): unknown => {
@@ -106,7 +106,7 @@ function ArrayDefault({
       currentNode.default = value;
       setDefaultParamsData(cloneDeep(defaultParamsData));
     },
-    [defaultParamsData, setDefaultParamsData, setExpandedRowKeys],
+    [defaultParamsData, setDefaultParamsData, setExpandedRowKeys]
   );
 
   function addTestProperty(dataArray): void {
@@ -115,11 +115,11 @@ function ArrayDefault({
       obj.id = uuid();
 
       if (obj.children && Array.isArray(obj.children)) {
-        obj.children.forEach((child) => addTest(child));
+        obj.children.forEach(child => addTest(child));
       }
     }
 
-    dataArray.forEach((item) => addTest(item));
+    dataArray.forEach(item => addTest(item));
   }
 
   const transformInputDataToDefaultParamsData = useCallback((data): unknown => {
@@ -128,17 +128,17 @@ function ArrayDefault({
       // 为每个节点生成唯一的ID
       node.id = parentId ? `${parentId}-${uuid()}` : uuid();
       // 如果节点是对象类型，递归处理其子节点
-      if (node.type === "object") {
+      if (node.type === 'object') {
         // 对象类型只需要遍历子节点，给每个子节点分配ID
-        (node.children || []).forEach((child) => {
+        (node.children || []).forEach(child => {
           // 递归处理每个子节点，default值从父节点传递
           recurse(
             child,
             defaultVal ? defaultVal[child.name] : undefined,
-            node.id,
+            node.id
           );
         });
-      } else if (node.type === "array") {
+      } else if (node.type === 'array') {
         // 数组类型，递归处理数组中的每一项
         const arrayDefault = Array.isArray(defaultVal) ? defaultVal : [];
 
@@ -170,7 +170,7 @@ function ArrayDefault({
     }
 
     // 遍历所有根节点并开始递归处理
-    data.forEach((node) => {
+    data.forEach(node => {
       recurse(node, node.default, node.id); // 顶级节点会从自己的default中获取值
     });
 
@@ -182,7 +182,7 @@ function ArrayDefault({
 
     if (
       Array.isArray(defaultValue) &&
-      newChild.type === "array" &&
+      newChild.type === 'array' &&
       newChild.children
     ) {
       newChild.children = defaultValue.map((value, i) => {
@@ -191,7 +191,7 @@ function ArrayDefault({
           : {};
         return applyDefaults(childTemplate, value);
       });
-    } else if (typeof defaultValue !== "undefined") {
+    } else if (typeof defaultValue !== 'undefined') {
       newChild.default = defaultValue;
     }
 
@@ -207,7 +207,7 @@ function ArrayDefault({
         transformInputDataToDefaultParamsData(copyCurrentNode);
       setDefaultParamsData(defaultParamsData);
       const allKeys = [];
-      defaultParamsData[0]?.children?.forEach((item) => {
+      defaultParamsData[0]?.children?.forEach(item => {
         allKeys.push(item.id);
       });
       setExpandedRowKeys([defaultParamsData[0]?.id, ...allKeys]);
@@ -235,18 +235,18 @@ function ArrayDefault({
     const validate = (items): unknown => {
       const newItems = items.map((item, index) => {
         // 校验当前项的 name 字段是否为空
-        if (item?.type !== "object" && item?.type !== "array") {
+        if (item?.type !== 'object' && item?.type !== 'array') {
           if (item?.required && !item?.default?.toString()?.trim()) {
-            item.defaultErrMsg = "值不能为空";
+            item.defaultErrMsg = '值不能为空';
             flag = false;
           } else {
-            item.defaultErrMsg = "";
+            item.defaultErrMsg = '';
           }
         }
         return item;
       });
 
-      return newItems?.map((item) => {
+      return newItems?.map(item => {
         if (Array.isArray(item.children)) {
           item.children = validate(item.children);
         }
@@ -261,13 +261,13 @@ function ArrayDefault({
   const transformDefaultParamsDataToDefaultData = useCallback(
     (data): unknown => {
       function recurse(node): unknown {
-        if (node.type === "object") {
+        if (node.type === 'object') {
           const obj = {};
-          (node.children || []).forEach((child) => {
+          (node.children || []).forEach(child => {
             obj[child.name] = recurse(child);
           });
           return obj;
-        } else if (node.type === "array") {
+        } else if (node.type === 'array') {
           return node.children && node.children.length > 0
             ? node.children.map(recurse)
             : [recurse(node.subChild)];
@@ -278,7 +278,7 @@ function ArrayDefault({
 
       return data.map(recurse).flat();
     },
-    [],
+    []
   );
 
   const checkParmasTable = useCallback((): void => {
@@ -290,7 +290,7 @@ function ArrayDefault({
   const handleSaveData = useCallback((): void => {
     const flag = checkParmasTable();
     if (!flag) {
-      message.warning("存在未填写的必填参数，请检查后再试");
+      message.warning('存在未填写的必填参数，请检查后再试');
       return;
     }
     const currentNode = findNodeById(inputParamsData, currentArrayDefaultId);
@@ -310,13 +310,13 @@ function ArrayDefault({
 
   const checkParmas = useCallback((params, id, key): boolean => {
     let passFlag = true;
-    const errEsg = "请输入参数值";
+    const errEsg = '请输入参数值';
     const currentNode = findNodeById(params, id);
     if (currentNode?.required && !currentNode[key]) {
       currentNode[`${key}ErrMsg`] = errEsg;
       passFlag = false;
     } else {
-      currentNode[`${key}ErrMsg`] = "";
+      currentNode[`${key}ErrMsg`] = '';
     }
     return passFlag;
   }, []);
@@ -326,15 +326,15 @@ function ArrayDefault({
       checkParmas(defaultParamsData, record?.id, key);
       setDefaultParamsData(cloneDeep(defaultParamsData));
     },
-    [defaultParamsData, setDefaultParamsData],
+    [defaultParamsData, setDefaultParamsData]
   );
 
   const columns = [
     {
-      title: "参数名称",
-      dataIndex: "name",
-      key: "name",
-      width: "30%",
+      title: '参数名称',
+      dataIndex: 'name',
+      key: 'name',
+      width: '30%',
       render: (name: string, record): React.ReactElement => (
         <Tooltip
           title={record?.description}
@@ -353,22 +353,22 @@ function ArrayDefault({
       ),
     },
     {
-      title: "参数值",
-      dataIndex: "default",
-      key: "default",
-      width: "40%",
+      title: '参数值',
+      dataIndex: 'default',
+      key: 'default',
+      width: '40%',
       render: (_, record: unknown): React.ReactElement => (
         <div className="w-full">
-          {record?.type === "object" || record?.type === "array" ? null : (
+          {record?.type === 'object' || record?.type === 'array' ? null : (
             <Input
               placeholder="请输入参数值"
               className="global-input inline-input"
               value={record?.default}
-              onChange={(e) => {
+              onChange={e => {
                 handleInputParamsChange(record?.id, e.target.value);
-                handleCheckInput(record, "default");
+                handleCheckInput(record, 'default');
               }}
-              onBlur={() => handleCheckInput(record, "default")}
+              onBlur={() => handleCheckInput(record, 'default')}
             />
           )}
           <p className="text-[#F74E43] text-xs absolute bottom-0 left-0">
@@ -378,12 +378,12 @@ function ArrayDefault({
       ),
     },
     {
-      title: "操作",
-      key: "operation",
-      width: "5%",
+      title: '操作',
+      key: 'operation',
+      width: '5%',
       render: (_, record: unknown): React.ReactElement => (
         <div className="flex items-center gap-2 ">
-          {record?.type === "array" && (
+          {record?.type === 'array' && (
             <Tooltip
               title="添加子项"
               overlayClassName="black-tooltip config-secret"
@@ -395,14 +395,14 @@ function ArrayDefault({
               />
             </Tooltip>
           )}
-          {record?.fatherType === "array" && (
+          {record?.fatherType === 'array' && (
             <Tooltip title="" overlayClassName="black-tooltip config-secret">
               <img
                 className="w-4 h-4 cursor-pointer"
                 src={remove}
                 onClick={(): void => {
                   setDefaultParamsData(
-                    cloneDeep(deleteNodeFromTree(defaultParamsData, record.id)),
+                    cloneDeep(deleteNodeFromTree(defaultParamsData, record.id))
                   );
                 }}
                 alt=""
@@ -429,7 +429,7 @@ function ArrayDefault({
         <div
           className="flex-1 pr-6 overflow-auto"
           style={{
-            maxHeight: "50vh",
+            maxHeight: '50vh',
           }}
         >
           <Table
@@ -441,10 +441,10 @@ function ArrayDefault({
               expandIcon: customExpandIcon,
               expandedRowKeys,
             }}
-            rowKey={(record) => record?.id}
+            rowKey={record => record?.id}
             locale={{
               emptyText: (
-                <div style={{ padding: "20px" }}>
+                <div style={{ padding: '20px' }}>
                   <p className="text-[#333333]">暂无数据</p>
                 </div>
               ),

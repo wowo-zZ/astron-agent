@@ -85,10 +85,12 @@
         <where>
             and ni.node_id LIKE 'plugin%'
             AND ni.sub = 'workflow'
-            and JSON_UNQUOTE(JSON_EXTRACT(ni.config, '$.pluginId')) IN
-            <foreach collection="toolIds" item="toolId" open="(" separator="," close=")">
-                #{toolId}
-            </foreach>
+            <if test="toolIds != null and toolIds.size() > 0">
+                AND JSON_UNQUOTE(JSON_EXTRACT(ni.config, '$.pluginId')) IN
+                <foreach collection="toolIds" item="toolId" open="(" separator="," close=")">
+                    #{toolId}
+                </foreach>
+            </if>
         </where>
         GROUP BY
         JSON_UNQUOTE(JSON_EXTRACT(ni.config, '$.pluginId'));

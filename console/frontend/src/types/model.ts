@@ -1,15 +1,15 @@
 // 分类键枚举
 export enum CategoryKey {
-  MODEL_CATEGORY = "modelCategory",
-  LANGUAGE_SUPPORT = "languageSupport",
-  CONTEXT_LENGTH_TAG = "contextLengthTag",
-  MODEL_SCENARIO = "modelScenario",
+  MODEL_CATEGORY = 'modelCategory',
+  LANGUAGE_SUPPORT = 'languageSupport',
+  CONTEXT_LENGTH_TAG = 'contextLengthTag',
+  MODEL_SCENARIO = 'modelScenario',
 }
 
 // 分类来源枚举
 export enum CategorySource {
-  SYSTEM = "SYSTEM",
-  USER = "USER",
+  SYSTEM = 'SYSTEM',
+  USER = 'USER',
 }
 
 // 模型状态枚举
@@ -46,7 +46,6 @@ export enum LLMSource {
 
 // 模型类型枚举
 export enum ModelCreateType {
-  OFFICIAL = 0, // 官方模型
   THIRD_PARTY = 1, // 第三方模型
   LOCAL = 2, // 本地模型
 }
@@ -59,11 +58,11 @@ export enum LocalModelStatus {
 
 // 模型操作类型
 export type ModelOperation =
-  | "create"
-  | "edit"
-  | "delete"
-  | "toggleShelf"
-  | "view";
+  | 'create'
+  | 'edit'
+  | 'delete'
+  | 'toggleShelf'
+  | 'view';
 
 // 约束内容项
 export interface ConstraintContentItem {
@@ -76,13 +75,13 @@ export interface ConstraintContentItem {
 // 模型配置参数
 export interface ModelConfigParam {
   standard: boolean;
-  constraintType: "range" | "switch";
+  constraintType: 'range' | 'switch';
   default: number | boolean;
   constraintContent: ConstraintContentItem[];
   precision?: number;
   required: boolean;
   name: string;
-  fieldType: "int" | "float" | "boolean";
+  fieldType: 'int' | 'float' | 'boolean';
   initialValue: number | boolean;
   key: string;
   desc?: string;
@@ -314,8 +313,8 @@ export interface ModelDetailParams {
 
 // 模型启用/禁用操作类型
 export type ModelToggleOption =
-  | "on" // 启用
-  | "off" // 禁用
+  | 'on' // 启用
+  | 'off' // 禁用
   | string;
 
 // RSA 公钥响应 - 真实数据显示直接返回字符串
@@ -346,4 +345,5 @@ export interface LocalModelParams {
   modelCategoryReq?: ModelCategoryReq; // 模型分类请求参数
   acceleratorCount: number; // 加速器数量
   modelPath: string; // 模型路径
+  config?: ConfigObject[]; // 模型配置参数
 }

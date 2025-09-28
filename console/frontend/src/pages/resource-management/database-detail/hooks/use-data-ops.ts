@@ -1,14 +1,14 @@
-import { useCallback } from "react";
-import { message, Modal } from "antd";
-import { useTranslation } from "react-i18next";
-import { useDatabaseContext } from "../context/database-context";
-import { useDataEventHandlers } from "./use-data-event-handlers";
+import { useCallback } from 'react';
+import { message, Modal } from 'antd';
+import { useTranslation } from 'react-i18next';
+import { useDatabaseContext } from '../context/database-context';
+import { useDataEventHandlers } from './use-data-event-handlers';
 import {
   queryTableData,
   operateTableData,
   exportData,
-} from "@/services/database";
-import { DatabaseItem, OperateType } from "@/types/database";
+} from '@/services/database';
+import { DatabaseItem, OperateType } from '@/types/database';
 
 /**
  * 数据操作Hook
@@ -19,12 +19,12 @@ export const useDataOps = (): {
     type: number,
     page?: number,
     size?: number,
-    isRefresh?: boolean,
+    isRefresh?: boolean
   ) => Promise<void>;
   batchDeleteRows: (
     currentSheet: DatabaseItem | null,
     dataType: number,
-    rows: string[],
+    rows: string[]
   ) => Promise<void>;
   exportTableData: (
     currentSheet: DatabaseItem | null,
@@ -32,8 +32,8 @@ export const useDataOps = (): {
     rowKeys: string[],
     downloadHandler: (res: {
       data?: Blob;
-      headers?: { "content-disposition": string };
-    }) => void,
+      headers?: { 'content-disposition': string };
+    }) => void
   ) => Promise<void>;
   refreshCurrentTableData: () => void;
   handleDataTypeChange: (type: number) => void;
@@ -49,7 +49,7 @@ export const useDataOps = (): {
       type: number,
       page = 1,
       size = 10,
-      isRefresh = false,
+      isRefresh = false
     ) => {
       if (!currentSheet) return;
 
@@ -77,24 +77,24 @@ export const useDataOps = (): {
         });
 
         if (isRefresh) {
-          message.success(t("database.dataUpdated"));
+          message.success(t('database.dataUpdated'));
         }
       } catch (error) {
         actions.setTestData([], false);
         actions.setPagination({ pageNum: 1, pageSize: 10, total: 0 });
       }
     },
-    [actions.setTestData, actions.setPagination, t],
+    [actions.setTestData, actions.setPagination, t]
   );
 
   const batchDeleteRows = useCallback(
     async (
       currentSheet: DatabaseItem | null,
       dataType: number,
-      rows: string[],
+      rows: string[]
     ) => {
       if (!rows || !rows.length) {
-        message.warning(t("database.pleaseSelectDataToDelete"));
+        message.warning(t('database.pleaseSelectDataToDelete'));
         return;
       }
 
@@ -108,7 +108,7 @@ export const useDataOps = (): {
       };
 
       Modal.confirm({
-        title: t("database.confirmDeleteData"),
+        title: t('database.confirmDeleteData'),
         centered: true,
         onOk: async () => {
           try {
@@ -119,12 +119,12 @@ export const useDataOps = (): {
                 currentSheet,
                 dataType,
                 state.pagination.pageNum,
-                state.pagination.pageSize,
+                state.pagination.pageSize
               );
             }
-            message.success(t("database.deleteSuccess"));
+            message.success(t('database.deleteSuccess'));
           } catch (error) {
-            message.error(t("database.deleteFailed"));
+            message.error(t('database.deleteFailed'));
           }
         },
       });
@@ -135,7 +135,7 @@ export const useDataOps = (): {
       getTableData,
       state.pagination.pageNum,
       state.pagination.pageSize,
-    ],
+    ]
   );
 
   const exportTableData = useCallback(
@@ -145,8 +145,8 @@ export const useDataOps = (): {
       rowKeys: string[],
       downloadHandler: (res: {
         data?: Blob;
-        headers?: { "content-disposition": string };
-      }) => void,
+        headers?: { 'content-disposition': string };
+      }) => void
     ) => {
       try {
         if (!state.testDataSource.length) return;
@@ -160,15 +160,15 @@ export const useDataOps = (): {
 
         downloadHandler({
           data: new Blob([res.data]),
-          headers: res.headers as { "content-disposition": string },
+          headers: res.headers as { 'content-disposition': string },
         });
         actions.setExportLoading(false);
-        message.success(t("database.exportSuccess"));
+        message.success(t('database.exportSuccess'));
       } catch (error) {
         actions.setExportLoading(false);
       }
     },
-    [state.testDataSource.length, actions.setExportLoading, t],
+    [state.testDataSource.length, actions.setExportLoading, t]
   );
 
   // 使用事件处理hook

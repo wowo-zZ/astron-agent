@@ -1,6 +1,6 @@
-import Lottie from "lottie-react";
-import { ReactElement } from "react";
-import LoadingAnimate from "@/constants/lottie-react/chat-loading.json";
+import Lottie from 'lottie-react';
+import { ReactElement } from 'react';
+import LoadingAnimate from '@/constants/lottie-react/chat-loading.json';
 const UseToolsInfo = (props: {
   allToolsList: string[];
   loading: boolean;
@@ -18,12 +18,12 @@ const UseToolsInfo = (props: {
             loop={true}
             className="w-[30px] h-[30px] mr-1"
             rendererSettings={{
-              preserveAspectRatio: "xMidYMid slice",
+              preserveAspectRatio: 'xMidYMid slice',
             }}
           />
         </div>
       )}
-      <span>使用工具：{allToolsList.join(",")}</span>
+      <span>使用工具：{allToolsList.join(',')}</span>
     </div>
   );
 };

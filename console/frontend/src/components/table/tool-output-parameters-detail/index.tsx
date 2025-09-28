@@ -1,11 +1,11 @@
-import { useState, useCallback, FC } from "react";
-import { Table } from "antd";
+import { useState, useCallback, FC } from 'react';
+import { Table } from 'antd';
 
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 
-import expand from "@/assets/imgs/plugin/icon_fold.png";
-import shrink from "@/assets/imgs/plugin/icon_shrink.png";
-import { InputParamsData } from "@/types/resource";
+import expand from '@/assets/imgs/plugin/icon_fold.png';
+import shrink from '@/assets/imgs/plugin/icon_shrink.png';
+import { InputParamsData } from '@/types/resource';
 
 const ToolOutputParameters: FC<{ outputParamsData: InputParamsData[] }> = ({
   outputParamsData,
@@ -14,12 +14,12 @@ const ToolOutputParameters: FC<{ outputParamsData: InputParamsData[] }> = ({
   const [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]);
 
   const handleExpand = useCallback((record: InputParamsData) => {
-    setExpandedRowKeys((expandedRowKeys) => [...expandedRowKeys, record.id]);
+    setExpandedRowKeys(expandedRowKeys => [...expandedRowKeys, record.id]);
   }, []);
 
   const handleCollapse = useCallback((record: InputParamsData) => {
-    setExpandedRowKeys((expandedRowKeys) =>
-      expandedRowKeys.filter((id) => id !== record.id),
+    setExpandedRowKeys(expandedRowKeys =>
+      expandedRowKeys.filter(id => id !== record.id)
     );
   }, []);
 
@@ -30,7 +30,7 @@ const ToolOutputParameters: FC<{ outputParamsData: InputParamsData[] }> = ({
           <img
             src={shrink}
             className="w-4 h-4 inline-block mb-1 mr-1"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               handleCollapse(record);
             }}
@@ -39,7 +39,7 @@ const ToolOutputParameters: FC<{ outputParamsData: InputParamsData[] }> = ({
           <img
             src={expand}
             className="w-4 h-4 inline-block mb-1 mr-1"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               handleExpand(record);
             }}
@@ -48,27 +48,27 @@ const ToolOutputParameters: FC<{ outputParamsData: InputParamsData[] }> = ({
       }
       return null;
     },
-    [],
+    []
   );
 
   const columns = [
     {
-      title: t("workflow.nodes.common.parameterName"),
-      dataIndex: "name",
-      key: "name",
-      width: "20%",
+      title: t('workflow.nodes.common.parameterName'),
+      dataIndex: 'name',
+      key: 'name',
+      width: '20%',
     },
     {
-      title: t("workflow.nodes.common.description"),
-      dataIndex: "description",
-      key: "description",
-      width: "25%",
+      title: t('workflow.nodes.common.description'),
+      dataIndex: 'description',
+      key: 'description',
+      width: '25%',
     },
     {
-      title: t("workflow.nodes.common.variableType"),
-      dataIndex: "type",
-      key: "type",
-      width: "10%",
+      title: t('workflow.nodes.common.variableType'),
+      dataIndex: 'type',
+      key: 'type',
+      width: '10%',
     },
   ];
 
@@ -82,12 +82,12 @@ const ToolOutputParameters: FC<{ outputParamsData: InputParamsData[] }> = ({
         expandIcon: customExpandIcon,
         expandedRowKeys,
       }}
-      rowKey={(record) => record?.id}
+      rowKey={record => record?.id}
       locale={{
         emptyText: (
-          <div style={{ padding: "20px" }}>
+          <div style={{ padding: '20px' }}>
             <p className="text-[#333333]">
-              {t("workflow.nodes.toolNode.noData")}
+              {t('workflow.nodes.toolNode.noData')}
             </p>
           </div>
         ),

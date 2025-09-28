@@ -1,6 +1,6 @@
-import http from "@/utils/http";
-import type { AxiosResponse } from "axios";
-import type { User } from "@/store/user-store";
+import http from '@/utils/http';
+import type { AxiosResponse } from 'axios';
+import type { User } from '@/store/user-store';
 
 export interface CheckAccountParams {
   username: string;
@@ -12,7 +12,7 @@ export interface CheckAccountParams {
  * 插件验证
  */
 export async function plugValidate(): Promise<AxiosResponse> {
-  return http.get("/xingchen-api/plug/validate");
+  return http.get('/xingchen-api/plug/validate');
 }
 
 /**
@@ -21,9 +21,9 @@ export async function plugValidate(): Promise<AxiosResponse> {
  * @return {*}
  */
 export async function login(
-  params: CheckAccountParams,
+  params: CheckAccountParams
 ): Promise<AxiosResponse> {
-  return http.post("/xingchen-api/login/check-account", params);
+  return http.post('/xingchen-api/login/check-account', params);
 }
 
 /**
@@ -32,7 +32,7 @@ export async function login(
  */
 
 export async function logOutAPI(): Promise<AxiosResponse> {
-  const response = await http.get("/api/v1/auth/userLogout");
+  const response = await http.get('/api/v1/auth/userLogout');
   if (response?.data?.code !== 0) {
     throw new Error(response.data.message);
   }
@@ -44,11 +44,11 @@ export async function logOutAPI(): Promise<AxiosResponse> {
  * @return {*}
  */
 export async function queryCurrentUser(): Promise<User> {
-  const response: User = await http.get("/userInfo");
+  const response: User = await http.get('/userInfo');
   return response;
 }
 
 export async function getUserInfoMe(): Promise<User> {
-  const response: User = await http.get("/user-info/me");
+  const response: User = await http.get('/user-info/me');
   return response;
 }

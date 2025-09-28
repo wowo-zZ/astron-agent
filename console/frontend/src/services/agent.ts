@@ -1,6 +1,6 @@
-import api from "@/utils/http";
-import axios from "axios";
-import qs from "qs";
+import api from '@/utils/http';
+import axios from 'axios';
+import qs from 'qs';
 
 // Define interfaces for getAgentList
 export interface GetAgentListParams {
@@ -42,7 +42,7 @@ export interface GetAgentListResponse {
 }
 
 export async function enableBotFavorite(params: any) {
-  const response = await api.get("/sparkbot/favorite", { params });
+  const response = await api.get('/sparkbot/favorite', { params });
   return response;
 }
 
@@ -52,7 +52,7 @@ export async function applySpark(params: any) {
 }
 
 export async function getRobotsAPI(params: any) {
-  const response = await api.get("/sparkbot/listBots", { params });
+  const response = await api.get('/sparkbot/listBots', { params });
   return response;
 }
 
@@ -85,10 +85,10 @@ export async function getFloatRobotAPI() {
 
 export async function getFilterUser(params: any) {
   const response = await axios.get(
-    "/api/v1/auth/common/fuzzy-search-domain-account",
+    '/api/v1/auth/common/fuzzy-search-domain-account',
     {
       params: params,
-    },
+    }
   );
   return response.data.data;
 }
@@ -124,7 +124,7 @@ export async function getModelConfigDetail(id: any, llmSource: any) {
 }
 /** 获取智能体列表 */
 export const getAgentList = async (
-  params: GetAgentListParams,
+  params: GetAgentListParams
 ): Promise<GetAgentListResponse> => {
   const response = await api.post(`/my-bot/list`, {
     searchValue: params.searchValue,
@@ -139,9 +139,9 @@ export const getAgentList = async (
 
 /** 复制bot */
 export const copyBot = async (params: any) => {
-  const response = await api.post(`/u/bot/v2/copyBot`, qs.stringify(params), {
+  const response = await api.post(`/workflow/copy-bot`, qs.stringify(params), {
     headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
+      'Content-Type': 'application/x-www-form-urlencoded',
     },
   });
   return response;
@@ -151,7 +151,7 @@ export const copyBot = async (params: any) => {
 export const deleteAgent = async (params: any): Promise<any> => {
   const response = await api.post(`/my-bot/delete`, qs.stringify(params), {
     headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
+      'Content-Type': 'application/x-www-form-urlencoded',
     },
   });
   return response;

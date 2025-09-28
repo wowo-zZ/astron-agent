@@ -42,8 +42,7 @@ public enum VarType {
     }
 
     /**
-     * Lookup by varType string (case-sensitive).
-     * If not found, returns {@link #UNKNOWN}.
+     * Lookup by varType string (case-sensitive). If not found, returns {@link #UNKNOWN}.
      *
      * @param code varType string
      * @return VarType enum

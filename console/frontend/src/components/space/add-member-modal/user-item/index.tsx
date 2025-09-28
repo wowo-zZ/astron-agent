@@ -1,9 +1,9 @@
-import React, { useCallback, useMemo } from "react";
-import { Avatar } from "antd";
-import classNames from "classnames";
-import CusCheckBox from "../cus-check-box";
-import styles from "./index.module.scss";
-import defaultAvatar from "@/assets/imgs/space/creator.png";
+import React, { useCallback, useMemo } from 'react';
+import { Avatar } from 'antd';
+import classNames from 'classnames';
+import CusCheckBox from '../cus-check-box';
+import styles from './index.module.scss';
+import defaultAvatar from '@/assets/imgs/space/creator.png';
 interface User {
   uid: string;
   username: string;
@@ -29,33 +29,33 @@ const UserItem: React.FC<UserItemProps> = React.memo(
         classNames(
           styles.userItem,
           isUserSelected(user.uid) && styles.selected,
-          (isExisting || isInvited) && styles.existing,
+          (isExisting || isInvited) && styles.existing
         ),
-      [user.uid, isUserSelected, isExisting, isInvited],
+      [user.uid, isUserSelected, isExisting, isInvited]
     );
 
     const userStatus = useMemo(() => {
       if (isInvited) {
-        return "已邀请";
+        return '已邀请';
       }
       if (isExisting) {
-        return "已加入";
+        return '已加入';
       }
-      return "";
+      return '';
     }, [isInvited, isExisting]);
 
     const handleCheckboxChange = useCallback(
       (checked: boolean) => {
         handleSelectUser(user, checked);
       },
-      [user, handleSelectUser],
+      [user, handleSelectUser]
     );
 
     // 处理整个用户项的点击事件
     const handleUserItemClick = useCallback(
       (e: React.MouseEvent) => {
         // 如果点击的是复选框本身，不处理（避免重复触发）
-        if ((e.target as HTMLElement).closest("[data-checkbox]")) {
+        if ((e.target as HTMLElement).closest('[data-checkbox]')) {
           return;
         }
 
@@ -68,7 +68,7 @@ const UserItem: React.FC<UserItemProps> = React.memo(
         const currentSelected = isUserSelected(user.uid);
         handleSelectUser(user, !currentSelected);
       },
-      [user, handleSelectUser, checkboxDisabled, isExisting, isUserSelected],
+      [user, handleSelectUser, checkboxDisabled, isExisting, isUserSelected]
     );
 
     return (
@@ -88,9 +88,9 @@ const UserItem: React.FC<UserItemProps> = React.memo(
         <span className={styles.existingLabel}>{userStatus}</span>
       </div>
     );
-  },
+  }
 );
 
-UserItem.displayName = "UserItem";
+UserItem.displayName = 'UserItem';
 
 export default UserItem;

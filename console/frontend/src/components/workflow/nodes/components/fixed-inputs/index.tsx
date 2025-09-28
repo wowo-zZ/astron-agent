@@ -1,18 +1,18 @@
-import React from "react";
-import { useTranslation } from "react-i18next";
-import { Tooltip } from "antd";
-import { FLowCollapse } from "@/components/workflow/ui";
-import ChatHistory from "@/components/workflow/nodes/components/chat-history";
-import { useNodeCommon } from "@/components/workflow/hooks/useNodeCommon";
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { Tooltip } from 'antd';
+import { FLowCollapse } from '@/components/workflow/ui';
+import ChatHistory from '@/components/workflow/nodes/components/chat-history';
+import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
 import {
   TypeSelector,
   ValueField,
   ErrorMessages,
-} from "@/components/workflow/nodes/components/inputs";
-import { EnabledChatHistory } from "../single-input";
-import { capitalizeFirstLetter } from "@/components/workflow/utils/reactflowUtils";
+} from '@/components/workflow/nodes/components/inputs';
+import { EnabledChatHistory } from '../single-input';
+import { capitalizeFirstLetter } from '@/components/workflow/utils/reactflowUtils';
 
-import desciptionIcon from "@/assets/imgs/workflow/desciption-icon.png";
+import desciptionIcon from '@/assets/imgs/workflow/desciption-icon.png';
 
 function InputName({ item }: { item: unknown }): React.ReactElement {
   return (
@@ -50,7 +50,7 @@ function index({ id, data }): React.ReactElement {
     <FLowCollapse
       label={
         <div className="flex-1 flex items-center justify-between text-base font-medium">
-          <div>{t("common.input")}</div>
+          <div>{t('common.input')}</div>
           <EnabledChatHistory id={id} data={data} />
         </div>
       }

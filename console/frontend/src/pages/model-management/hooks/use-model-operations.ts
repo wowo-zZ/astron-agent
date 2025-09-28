@@ -1,20 +1,20 @@
-import { useCallback } from "react";
-import { message } from "antd";
-import { useModelContext } from "../context/model-context";
-import { getModelList } from "@/services/model";
+import { useCallback } from 'react';
+import { message } from 'antd';
+import { useModelContext } from '../context/model-context';
+import { getModelList } from '@/services/model';
 import {
   ModelFilterParams,
   ModelInfo,
   ModelType,
   ShelfStatus,
-} from "@/types/model";
+} from '@/types/model';
 
 /**
  * 模型操作Hook
  * 负责模型的增删改查等基本操作
  */
 export const useModelOperations = (
-  modelType: ModelType = 1,
+  modelType: ModelType = 1
 ): {
   refreshModels: () => Promise<void>;
   setModels: (models: ModelInfo[]) => void;
@@ -49,7 +49,7 @@ export const useModelOperations = (
 
       // 更新即将下架的模型
       const willBeRemoved = records.filter(
-        (m) => m.shelfStatus === ShelfStatus.WAIT_OFF_SHELF,
+        m => m.shelfStatus === ShelfStatus.WAIT_OFF_SHELF
       );
       actions.setShelfOffModels(willBeRemoved);
     } finally {
@@ -61,8 +61,8 @@ export const useModelOperations = (
   const handleQuickFilter = useCallback((): void => {
     actions.setShowShelfOnly(true);
     sessionStorage.setItem(
-      modelType === 1 ? "officialModelQueckFilter" : "personalModelQueckFilter",
-      "1",
+      modelType === 1 ? 'officialModelQueckFilter' : 'personalModelQueckFilter',
+      '1'
     );
   }, [modelType, actions]);
 
@@ -70,9 +70,9 @@ export const useModelOperations = (
   const handleCloseQuickFilter = useCallback((): void => {
     actions.setShowShelfOnly(false);
     if (modelType === 1) {
-      sessionStorage.removeItem("officialModelQueckFilter");
+      sessionStorage.removeItem('officialModelQueckFilter');
     } else {
-      sessionStorage.removeItem("personalModelQueckFilter");
+      sessionStorage.removeItem('personalModelQueckFilter');
     }
   }, [modelType, actions]);
 
@@ -85,25 +85,25 @@ export const useModelOperations = (
   // 打开编辑模型弹窗
   const handleEditModel = useCallback(
     (modelId: number): void => {
-      const model = state.models.find((m) => m.id === modelId);
+      const model = state.models.find(m => m.id === modelId);
       if (model) {
         actions.setCurrentEditModel(model);
         actions.setCreateModal(true);
       }
     },
-    [state.models, actions],
+    [state.models, actions]
   );
 
   // 打开删除模型弹窗
   const handleDeleteModel = useCallback(
     (modelId: number): void => {
-      const model = state.models.find((m) => m.id === modelId);
+      const model = state.models.find(m => m.id === modelId);
       if (model) {
         actions.setCurrentEditModel(model);
         actions.setDeleteModal(true);
       }
     },
-    [state.models, actions],
+    [state.models, actions]
   );
 
   // 关闭创建/编辑弹窗
@@ -135,7 +135,7 @@ export const useModelOperations = (
     (models: ModelInfo[]): void => {
       actions.setModels(models);
     },
-    [actions],
+    [actions]
   );
 
   return {

@@ -1,19 +1,19 @@
-import React, { useState, useCallback, useMemo, useEffect } from "react";
-import { Modal, Upload, Button, message, Spin, Space } from "antd";
-import { UploadOutlined, DownloadOutlined } from "@ant-design/icons";
-import SpaceButton from "@/components/button-group/space-button";
-import AddMemberModal from "@/components/space/add-member-modal";
-import { useTranslation } from "react-i18next";
-import type { UploadFile } from "antd";
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import { Modal, Upload, Button, message, Spin, Space } from 'antd';
+import { UploadOutlined, DownloadOutlined } from '@ant-design/icons';
+import SpaceButton from '@/components/button-group/space-button';
+import AddMemberModal from '@/components/space/add-member-modal';
+import { useTranslation } from 'react-i18next';
+import type { UploadFile } from 'antd';
 import {
   batchImportMembers,
   downloadMemberTemplate,
   type BatchImportResult,
   downloadResult,
   validExcel,
-} from "./utils";
-import { ImportStep, BatchImportProps, btnConfigs } from "./config";
-import styles from "./index.module.scss";
+} from './utils';
+import { ImportStep, BatchImportProps, btnConfigs } from './config';
+import styles from './index.module.scss';
 
 const { Dragger } = Upload;
 
@@ -27,11 +27,11 @@ const BatchImport: React.FC<BatchImportProps> = ({
   const [importModalVisible, setImportModalVisible] = useState(false);
   const [addMemberModalVisible, setAddMemberModalVisible] = useState(false);
   const [currentStep, setCurrentStep] = useState<ImportStep>(
-    ImportStep.BEFORE_IMPORT,
+    ImportStep.BEFORE_IMPORT
   );
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [importResult, setImportResult] = useState<BatchImportResult | null>(
-    null,
+    null
   );
   const [abortController, setAbortController] =
     useState<AbortController | null>(null);
@@ -55,7 +55,7 @@ const BatchImport: React.FC<BatchImportProps> = ({
       setAbortController(null);
     }
     setCurrentStep(ImportStep.BEFORE_IMPORT);
-    message.info("已取消上传");
+    message.info('已取消上传');
   }, [abortController]);
 
   // 关闭导入弹窗
@@ -72,7 +72,7 @@ const BatchImport: React.FC<BatchImportProps> = ({
   // 文件上传前验证
   const beforeUpload = useCallback((file: File) => {
     if (!validExcel(file)) {
-      message.error("模板格式不符");
+      message.error('模板格式不符');
       return false;
     }
 
@@ -89,7 +89,7 @@ const BatchImport: React.FC<BatchImportProps> = ({
     async (file?: File) => {
       const targetFile = file || fileList[0];
       if (!targetFile) {
-        message.error("请先选择要导入的文件");
+        message.error('请先选择要导入的文件');
         return;
       }
 
@@ -102,7 +102,7 @@ const BatchImport: React.FC<BatchImportProps> = ({
       try {
         // 创建FormData
         const formData = new FormData();
-        formData.append("file", targetFile as any);
+        formData.append('file', targetFile as any);
 
         // 调用批量导入API，传递 signal
         const result = await batchImportMembers(formData, controller.signal);
@@ -119,22 +119,22 @@ const BatchImport: React.FC<BatchImportProps> = ({
             setCurrentStep(ImportStep.IMPORT_RESULT);
           }
         } else {
-          message.error("上传失败，请稍后重试");
+          message.error('上传失败，请稍后重试');
           setCurrentStep(ImportStep.BEFORE_IMPORT);
         }
       } catch (error: any) {
         setAbortController(null); // 清除 AbortController
 
         // 区分是否为取消操作
-        if (error.name === "AbortError" || error.message === "上传已取消") {
+        if (error.name === 'AbortError' || error.message === '上传已取消') {
           return;
         }
 
-        message.error(error?.desc || error?.msg || "上传失败，请稍后重试");
+        message.error(error?.desc || error?.msg || '上传失败，请稍后重试');
         setCurrentStep(ImportStep.BEFORE_IMPORT);
       }
     },
-    [skipResultPreview],
+    [skipResultPreview]
   );
 
   // AddMemberModal关闭处理
@@ -154,7 +154,7 @@ const BatchImport: React.FC<BatchImportProps> = ({
   const handleAddMemberModalSubmit = useCallback(
     async (values: any) => {
       // 这里可以处理最终的成员添加逻辑
-      console.log("最终提交的成员数据:", values);
+      console.log('最终提交的成员数据:', values);
       try {
         const res = await onSubmit?.(values);
         if (res) {
@@ -162,10 +162,10 @@ const BatchImport: React.FC<BatchImportProps> = ({
           resetState();
         }
       } catch (err: any) {
-        message.error(err.message || "导入失败");
+        message.error(err.message || '导入失败');
       }
     },
-    [onSubmit, resetState],
+    [onSubmit, resetState]
   );
 
   // 渲染导入前步骤
@@ -250,7 +250,7 @@ const BatchImport: React.FC<BatchImportProps> = ({
 
   const handleExportResult = useCallback(() => {
     if (!importResult?.data?.resultUrl) {
-      message.error("暂无解析结果");
+      message.error('暂无解析结果');
       return;
     }
 

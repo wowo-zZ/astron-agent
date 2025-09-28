@@ -1,8 +1,8 @@
-import React from "react";
-import { Button } from "antd";
-import { useTranslation } from "react-i18next";
+import React from 'react';
+import { Button } from 'antd';
+import { useTranslation } from 'react-i18next';
 
-import dialogDel from "@/assets/imgs/main/icon_dialog_del.png";
+import dialogDel from '@/assets/imgs/main/icon_dialog_del.png';
 
 interface DeleteChatHistoryProps {
   setDeleteModal: (value: boolean) => void;
@@ -23,7 +23,7 @@ function DeleteChatHistory({
             <img src={dialogDel} className="w-7 h-7" alt="" />
           </div>
           <span className="ml-2.5">
-            {t("workflow.nodes.chatDebugger.confirmDeleteAllDialogue")}
+            {t('workflow.nodes.chatDebugger.confirmDeleteAllDialogue')}
           </span>
         </div>
         <div className="flex flex-row-reverse gap-3 mt-7">
@@ -32,14 +32,14 @@ function DeleteChatHistory({
             className="delete-btn px-6"
             onClick={() => deleteChat()}
           >
-            {t("common.continue")}
+            {t('common.continue')}
           </Button>
           <Button
             type="text"
             className="origin-btn px-6"
             onClick={() => setDeleteModal(false)}
           >
-            {t("common.cancel")}
+            {t('common.cancel')}
           </Button>
         </div>
       </div>

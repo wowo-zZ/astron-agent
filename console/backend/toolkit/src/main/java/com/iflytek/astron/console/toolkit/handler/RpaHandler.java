@@ -110,6 +110,7 @@ public class RpaHandler {
             throw new BusinessException(ResponseEnum.RESPONSE_FAILED, parseEx, "Failed to parse RPA response");
         }
     }
+
     private static void convertParameterTypes(JSONArray parameters) {
         if (parameters == null || parameters.isEmpty()) {
             return;

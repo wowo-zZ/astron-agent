@@ -1,9 +1,9 @@
-import React from "react";
-import { useTranslation } from "react-i18next";
-import { useModelContext } from "../context/model-context";
-import { useModelOperations } from "../hooks/use-model-operations";
-import { CreateModal, DeleteModal } from "./modal-component";
-import { ModelType } from "@/types/model";
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { useModelContext } from '../context/model-context';
+import { useModelOperations } from '../hooks/use-model-operations';
+import { CreateModal, DeleteModal } from './modal-component';
+import { ModelType } from '@/types/model';
 
 /**
  * 模型管理弹窗组件集合
@@ -38,7 +38,7 @@ const ModelModalComponents: React.FC<ModelModalComponentsProps> = ({
           currentModel={state.currentEditModel}
           setDeleteModal={operations.handleCloseDeleteModal}
           getModels={operations.refreshModels}
-          msg={t("model.deleteConfirmMessage")}
+          msg={t('model.deleteConfirmMessage')}
         />
       )}
     </>

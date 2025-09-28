@@ -13,7 +13,7 @@ TS_DIRS := $(shell \
 	if [ -n "$(LOCALCI_CONFIG)" ] && [ -f "$(LOCALCI_CONFIG)" ]; then \
 		makefiles/parse_localci.sh enabled typescript $(LOCALCI_CONFIG) | cut -d'|' -f2 | tr '\n' ' '; \
 	else \
-		echo "demo-apps/frontends/typescript"; \
+		echo "console/frontend"; \
 	fi)
 
 TS_PRIMARY_DIR := $(shell echo $(TS_DIRS) | cut -d' ' -f1)

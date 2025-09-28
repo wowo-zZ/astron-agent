@@ -1,14 +1,14 @@
-import React, { memo } from "react";
-import { useNavigate } from "react-router-dom";
-import { Spin, Popconfirm } from "antd";
-import { useTranslation } from "react-i18next";
-import dayjs from "dayjs";
-import classNames from "classnames";
-import databaseEditIcon from "@/assets/imgs/database/database-edit-icon.svg";
-import deleteIcon from "@/assets/imgs/database/delete.png";
-import { useDatabaseState } from "../context/database-context";
-import { useDatabaseActions } from "../hooks/use-database-actions";
-import { DatabaseItem } from "@/types/database";
+import React, { memo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Spin, Popconfirm } from 'antd';
+import { useTranslation } from 'react-i18next';
+import dayjs from 'dayjs';
+import classNames from 'classnames';
+import databaseEditIcon from '@/assets/imgs/database/database-edit-icon.svg';
+import deleteIcon from '@/assets/imgs/database/delete.png';
+import { useDatabaseState } from '../context/database-context';
+import { useDatabaseActions } from '../hooks/use-database-actions';
+import { DatabaseItem } from '@/types/database';
 
 /**
  * 数据库侧边栏组件
@@ -25,7 +25,7 @@ const DatabaseSidebar: React.FC = () => {
     openModal,
   } = useDatabaseActions();
 
-  const handleEditDatabase = (): void => openModal("createDatabase");
+  const handleEditDatabase = (): void => openModal('createDatabase');
 
   return (
     <div className="w-[28%] flex-none h-full p-6 bg-[#fff] rounded-2xl flex flex-col">
@@ -73,14 +73,14 @@ const DatabaseHeader: React.FC<DatabaseHeaderProps> = memo(
           onClick={onEditDatabase}
         >
           <img src={databaseEditIcon} className="w-[14px] h-[14px]" alt="" />
-          <span>{t("database.edit")}</span>
+          <span>{t('database.edit')}</span>
         </div>
       </div>
     );
-  },
+  }
 );
 
-DatabaseHeader.displayName = "DatabaseHeader";
+DatabaseHeader.displayName = 'DatabaseHeader';
 
 /**
  * 表格列表组件
@@ -124,11 +124,11 @@ const TableList: React.FC<TableListProps> = memo(
               <div
                 key={index}
                 className={classNames(
-                  "flex items-center min-w-max w-full gap-1.5 h-12 px-3 py-3.5 text-gray-500 border border-blue-100 rounded-lg bg-white cursor-pointer hover:border-blue-600",
+                  'flex items-center min-w-max w-full gap-1.5 h-12 px-3 py-3.5 text-gray-500 border border-blue-100 rounded-lg bg-white cursor-pointer hover:border-blue-600',
                   {
-                    "border-blue-600 bg-blue-50":
+                    'border-blue-600 bg-blue-50':
                       currentSheet && item.id === currentSheet.id,
-                  },
+                  }
                 )}
                 onClick={(): void => handleSelectSheet(item)}
               >
@@ -140,13 +140,13 @@ const TableList: React.FC<TableListProps> = memo(
                 </div>
                 <div className="flex-none flex items-center gap-[14px]">
                   <div className="text-[12px]">
-                    {dayjs(item.createTime).format("YYYY-MM-DD HH:mm")}
+                    {dayjs(item.createTime).format('YYYY-MM-DD HH:mm')}
                   </div>
                   <Popconfirm
-                    title={t("database.confirmDeleteTable")}
+                    title={t('database.confirmDeleteTable')}
                     onConfirm={(): void => onDeleteTable(item.id)}
-                    okText={t("database.confirm")}
-                    cancelText={t("database.cancel")}
+                    okText={t('database.confirm')}
+                    cancelText={t('database.cancel')}
                   >
                     <img
                       src={deleteIcon}
@@ -160,7 +160,7 @@ const TableList: React.FC<TableListProps> = memo(
           </div>
         ) : (
           <div className="flex-1 flex items-center justify-center text-[#B2B2B2] text-[14px]">
-            {t("database.noData")}
+            {t('database.noData')}
           </div>
         )}
         <div className="w-full pt-6">
@@ -170,14 +170,14 @@ const TableList: React.FC<TableListProps> = memo(
               navigate(`/resource/database/${dbDetailData?.id}/add`)
             }
           >
-            {t("database.addDataTable")}
+            {t('database.addDataTable')}
           </div>
         </div>
       </Spin>
     );
-  },
+  }
 );
 
-TableList.displayName = "TableList";
+TableList.displayName = 'TableList';
 
 export default memo(DatabaseSidebar);

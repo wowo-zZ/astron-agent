@@ -20,7 +20,7 @@ export enum ImportType {
   TEST_DATA = 3,
 }
 
-export type UploadFileStatus = "error" | "done" | "uploading" | "removed";
+export type UploadFileStatus = 'error' | 'done' | 'uploading' | 'removed';
 
 export interface ResponseData<T> {
   code: number;
@@ -118,7 +118,7 @@ export interface TableField {
   id: number;
   tbId?: number;
   name: string;
-  type: "String" | "Integer" | "Time" | "Number" | "Boolean";
+  type: 'String' | 'Integer' | 'Time' | 'Number' | 'Boolean';
   description?: string;
   defaultValue?: string;
   isRequired?: boolean;
@@ -249,7 +249,7 @@ export interface UploadFile {
   lastModified?: number;
   lastModifiedDate?: Date;
   url?: string;
-  status?: UploadFileStatus | "failed";
+  status?: UploadFileStatus | 'failed';
   percent?: number;
   thumbUrl?: string;
   type?: string;

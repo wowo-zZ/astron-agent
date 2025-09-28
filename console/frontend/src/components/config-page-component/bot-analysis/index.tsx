@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { Button, Input, Modal, Select, Space, Table } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
-import ReactECharts from "echarts-for-react";
+import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Button, Input, Modal, Select, Space, Table } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
+import ReactECharts from 'echarts-for-react';
 import {
   sessionOption,
   userOption,
@@ -11,15 +11,15 @@ import {
   mutiUserOption,
   mutiSessionOption,
   processChannelData,
-} from "./config";
-import { getErrorNodeList } from "@/services/flow";
-import { getAnalysisData } from "@/services/spark-common";
-import type { SortOrder } from "antd/es/table/interface";
+} from './config';
+import { getErrorNodeList } from '@/services/flow';
+import { getAnalysisData } from '@/services/spark-common';
+import type { SortOrder } from 'antd/es/table/interface';
 
-import indicator from "@/assets/imgs/bot-center/indicator.svg";
-import errorTime from "@/assets/imgs/create-bot-v2/errorTime.svg";
+import indicator from '@/assets/imgs/bot-center/indicator.svg';
+import errorTime from '@/assets/imgs/create-bot-v2/errorTime.svg';
 
-import styles from "./index.module.scss";
+import styles from './index.module.scss';
 
 interface NodeErrorInfo {
   info: {
@@ -60,21 +60,21 @@ const BotAnalysis = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   // //日期对应的value
   const selectDayOption = [
-    { label: t("common.botAndFlowAnalysis.past7Days"), value: 1 },
-    { label: t("common.botAndFlowAnalysis.past14Days"), value: 2 },
-    { label: t("common.botAndFlowAnalysis.past30Days"), value: 3 },
+    { label: t('common.botAndFlowAnalysis.past7Days'), value: 1 },
+    { label: t('common.botAndFlowAnalysis.past14Days'), value: 2 },
+    { label: t('common.botAndFlowAnalysis.past30Days'), value: 3 },
   ];
   const dayType: Record<number, { label: string; value: number }> = {
     1: {
-      label: t("common.botAndFlowAnalysis.past7Days"),
+      label: t('common.botAndFlowAnalysis.past7Days'),
       value: 7,
     },
     2: {
-      label: t("common.botAndFlowAnalysis.past14Days"),
+      label: t('common.botAndFlowAnalysis.past14Days'),
       value: 14,
     },
     3: {
-      label: t("common.botAndFlowAnalysis.past30Days"),
+      label: t('common.botAndFlowAnalysis.past30Days'),
       value: 30,
     },
   };
@@ -106,16 +106,16 @@ const BotAnalysis = ({
     }) => {
       const { setSelectedKeys, selectedKeys, confirm, clearFilters } = props;
       return (
-        <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
+        <div style={{ padding: 8 }} onKeyDown={e => e.stopPropagation()}>
           <Input
             ref={searchInput}
-            placeholder={`${t("common.botAndFlowAnalysis.search")} ${dataIndex}`}
+            placeholder={`${t('common.botAndFlowAnalysis.search')} ${dataIndex}`}
             value={selectedKeys[0]}
-            onChange={(e) =>
+            onChange={e =>
               setSelectedKeys(e.target.value ? [e.target.value] : [])
             }
             onPressEnter={() => confirm()}
-            style={{ marginBottom: 8, display: "block" }}
+            style={{ marginBottom: 8, display: 'block' }}
           />
           <Space>
             <Button
@@ -125,24 +125,24 @@ const BotAnalysis = ({
               size="small"
               style={{ width: 90 }}
             >
-              {t("common.botAndFlowAnalysis.search")}
+              {t('common.botAndFlowAnalysis.search')}
             </Button>
             <Button
               onClick={() => clearFilters && clearFilters()}
               size="small"
               style={{ width: 90 }}
             >
-              {t("common.botAndFlowAnalysis.reset")}
+              {t('common.botAndFlowAnalysis.reset')}
             </Button>
           </Space>
         </div>
       );
     },
     filterIcon: (filtered: boolean) => (
-      <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
+      <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
     ),
     onFilter: (value: boolean | React.Key, record: Record<string, any>) => {
-      if (typeof value === "string" || typeof value === "number") {
+      if (typeof value === 'string' || typeof value === 'number') {
         return record[dataIndex]
           ?.toString()
           .toLowerCase()
@@ -154,24 +154,24 @@ const BotAnalysis = ({
 
   const columnsSuggest = [
     {
-      title: t("common.botAndFlowAnalysis.feedbackUserUid"),
-      dataIndex: "uid",
-      key: "uid",
-      ...getColumnSearchProps("uid"),
+      title: t('common.botAndFlowAnalysis.feedbackUserUid'),
+      dataIndex: 'uid',
+      key: 'uid',
+      ...getColumnSearchProps('uid'),
     },
     {
-      title: t("common.botAndFlowAnalysis.errorCode"),
-      dataIndex: "errorCode",
-      key: "errorCode",
+      title: t('common.botAndFlowAnalysis.errorCode'),
+      dataIndex: 'errorCode',
+      key: 'errorCode',
       sorter: (a: any, b: any) => a.errorCode - b.errorCode,
-      sortDirections: ["descend", "ascend"] as SortOrder[],
+      sortDirections: ['descend', 'ascend'] as SortOrder[],
     },
     {
-      title: t("common.botAndFlowAnalysis.feedbackTime"),
-      dataIndex: "errorTime",
-      key: "errorTime",
+      title: t('common.botAndFlowAnalysis.feedbackTime'),
+      dataIndex: 'errorTime',
+      key: 'errorTime',
       sorter: (a: any, b: any) => a.errorTime - b.errorTime,
-      sortDirections: ["descend", "ascend"] as SortOrder[],
+      sortDirections: ['descend', 'ascend'] as SortOrder[],
     },
   ];
 
@@ -182,33 +182,33 @@ const BotAnalysis = ({
 
   const columns = [
     {
-      title: t("common.botAndFlowAnalysis.nodeName"),
-      dataIndex: "nodeName",
-      key: "nodeName",
-      ...getColumnSearchProps("nodeName"),
+      title: t('common.botAndFlowAnalysis.nodeName'),
+      dataIndex: 'nodeName',
+      key: 'nodeName',
+      ...getColumnSearchProps('nodeName'),
     },
     {
-      title: t("common.botAndFlowAnalysis.totalCalls"),
-      dataIndex: "callNum",
-      key: "callNum",
+      title: t('common.botAndFlowAnalysis.totalCalls'),
+      dataIndex: 'callNum',
+      key: 'callNum',
       sorter: (a: any, b: any) => a.callNum - b.callNum,
-      sortDirections: ["descend", "ascend"] as SortOrder[],
+      sortDirections: ['descend', 'ascend'] as SortOrder[],
     },
     {
-      title: t("common.botAndFlowAnalysis.errorCount"),
-      dataIndex: "errorNum",
-      key: "errorNum",
+      title: t('common.botAndFlowAnalysis.errorCount'),
+      dataIndex: 'errorNum',
+      key: 'errorNum',
       sorter: (a: any, b: any) => a.errorNum - b.errorNum,
-      sortDirections: ["descend", "ascend"] as SortOrder[],
+      sortDirections: ['descend', 'ascend'] as SortOrder[],
     },
     {
-      title: t("common.botAndFlowAnalysis.operation"),
-      key: "action",
+      title: t('common.botAndFlowAnalysis.operation'),
+      key: 'action',
       render: (rootdata: any) => (
         <Space size="middle">
           <a>
             <Space onClick={() => handleExpandable(rootdata)}>
-              {t("common.botAndFlowAnalysis.details")}
+              {t('common.botAndFlowAnalysis.details')}
             </Space>
           </a>
         </Space>
@@ -229,27 +229,27 @@ const BotAnalysis = ({
         },
         series: [
           {
-            name: "星火Desk",
+            name: '星火Desk',
             ...pre.series[0],
             data: processedData.channelData.desk,
           },
           {
-            name: "星火App",
+            name: '星火App',
             ...pre.series[1],
             data: processedData.channelData.app,
           },
           {
-            name: "星辰广场",
+            name: '星辰广场',
             ...pre.series[2],
             data: processedData.channelData.plaza,
           },
           {
-            name: "H5",
+            name: 'H5',
             ...pre.series[3],
             data: processedData.channelData.h5,
           },
           {
-            name: "小程序",
+            name: '小程序',
             ...pre.series[4],
             data: processedData.channelData.mini,
           },
@@ -271,27 +271,27 @@ const BotAnalysis = ({
         },
         series: [
           {
-            name: "星火Desk",
+            name: '星火Desk',
             ...pre.series[0],
             data: processedData.channelData.desk,
           },
           {
-            name: "星火App",
+            name: '星火App',
             ...pre.series[1],
             data: processedData.channelData.app,
           },
           {
-            name: "星辰广场",
+            name: '星辰广场',
             ...pre.series[2],
             data: processedData.channelData.plaza,
           },
           {
-            name: "H5",
+            name: 'H5',
             ...pre.series[3],
             data: processedData.channelData.h5,
           },
           {
-            name: "小程序",
+            name: '小程序',
             ...pre.series[4],
             data: processedData.channelData.mini,
           },
@@ -347,19 +347,19 @@ const BotAnalysis = ({
     }
     const dayChatNum = res?.chatMessages?.reduce(
       (acc: any, curr: any) => acc + curr.count,
-      0,
+      0
     ); //累加得到过去7天会话数据
     const dayUserNum = res?.activityUser?.reduce(
       (acc: any, curr: any) => acc + curr.count,
-      0,
+      0
     ); //累加得到过去7天活跃用户数据
     const dayAvgChatNum = res?.avgChatMessages?.reduce(
       (acc: any, curr: any) => acc + curr.count,
-      0,
+      0
     ); //累加得到过去7天平均会话互动数数据
     const dayTokenNum = res?.tokenUsed?.reduce(
       (acc: any, curr: any) => acc + curr.count,
-      0,
+      0
     ); //累加得到过去7天Token消耗量数据
     setBeforeData({
       dayChatNum,
@@ -444,33 +444,33 @@ const BotAnalysis = ({
       <div className={styles.web_app_contaienr}>
         <div className={styles.monitor_count_container}>
           <div className={styles.monitor_title}>
-            <span>{t("common.botAndFlowAnalysis.cumulativeIndicators")}</span>
+            <span>{t('common.botAndFlowAnalysis.cumulativeIndicators')}</span>
           </div>
           <div className={styles.monitor_count_box_container}>
             <div className={styles.monitor_count}>
               <div className={styles.title}>
-                {t("common.botAndFlowAnalysis.totalChats")}
+                {t('common.botAndFlowAnalysis.totalChats')}
               </div>
               <div className={styles.count}>{webData?.totalMessages || 0}</div>
               <img src={indicator} alt="" />
             </div>
             <div className={styles.monitor_count}>
               <div className={styles.title}>
-                {t("common.botAndFlowAnalysis.totalUsers")}
+                {t('common.botAndFlowAnalysis.totalUsers')}
               </div>
               <div className={styles.count}>{webData?.totalUsers || 0}</div>
               <img src={indicator} alt="" />
             </div>
             <div className={styles.monitor_count}>
               <div className={styles.title}>
-                {t("common.botAndFlowAnalysis.totalTokenConsumption")}
+                {t('common.botAndFlowAnalysis.totalTokenConsumption')}
               </div>
               <div className={styles.count}>{webData?.totalTokens || 0}</div>
               <img src={indicator} alt="" />
             </div>
             <div className={styles.monitor_count}>
               <div className={styles.title}>
-                {t("common.botAndFlowAnalysis.totalMessages")}
+                {t('common.botAndFlowAnalysis.totalMessages')}
               </div>
               <div className={styles.count}>{webData?.totalMessages || 0}</div>
               <img src={indicator} alt="" />
@@ -478,13 +478,13 @@ const BotAnalysis = ({
           </div>
           <div className={styles.monitor_count_tip}>
             {t(
-              "common.botAndFlowAnalysis.cumulativeIndicatorsNotAffectedByTimeFilter",
+              'common.botAndFlowAnalysis.cumulativeIndicatorsNotAffectedByTimeFilter'
             )}
           </div>
         </div>
         <div className={styles.chart_con}>
           <div className={styles.chart_title}>
-            <span>{t("common.botAndFlowAnalysis.analysisOverview")}</span>
+            <span>{t('common.botAndFlowAnalysis.analysisOverview')}</span>
             <Select
               options={selectDayOption}
               defaultValue={1}
@@ -495,7 +495,7 @@ const BotAnalysis = ({
           <div className={styles.chart_con_box_container}>
             <div className={styles.chart_con_box}>
               <div className={styles.chart_con_box_title}>
-                {t("common.botAndFlowAnalysis.totalChats")}
+                {t('common.botAndFlowAnalysis.totalChats')}
               </div>
               <div className={styles.chart_con_box_time}>
                 {dayType[overviewType]?.label}
@@ -506,12 +506,12 @@ const BotAnalysis = ({
               <ReactECharts
                 option={sessionOptions}
                 style={{ height: 280 }}
-                opts={{ locale: "FR" }}
+                opts={{ locale: 'FR' }}
               />
             </div>
             <div className={styles.chart_con_box}>
               <div className={styles.chart_con_box_title}>
-                {t("common.botAndFlowAnalysis.activeUsers")}
+                {t('common.botAndFlowAnalysis.activeUsers')}
               </div>
               <div className={styles.chart_con_box_time}>
                 {dayType[overviewType]?.label}
@@ -522,12 +522,12 @@ const BotAnalysis = ({
               <ReactECharts
                 option={userOptions}
                 style={{ height: 280 }}
-                opts={{ locale: "FR" }}
+                opts={{ locale: 'FR' }}
               />
             </div>
             <div className={styles.chart_con_box}>
               <div className={styles.chart_con_box_title}>
-                {t("common.botAndFlowAnalysis.averageSessionInteraction")}
+                {t('common.botAndFlowAnalysis.averageSessionInteraction')}
               </div>
               <div className={styles.chart_con_box_time}>
                 {dayType[overviewType]?.label}
@@ -538,12 +538,12 @@ const BotAnalysis = ({
               <ReactECharts
                 option={interactionOptions}
                 style={{ height: 280 }}
-                opts={{ locale: "FR" }}
+                opts={{ locale: 'FR' }}
               />
             </div>
             <div className={styles.chart_con_box}>
               <div className={styles.chart_con_box_title}>
-                {t("common.botAndFlowAnalysis.tokenConsumption")}
+                {t('common.botAndFlowAnalysis.tokenConsumption')}
               </div>
               <div className={styles.chart_con_box_time}>
                 {dayType[overviewType]?.label}
@@ -554,7 +554,7 @@ const BotAnalysis = ({
               <ReactECharts
                 option={TokenOptions}
                 style={{ height: 280 }}
-                opts={{ locale: "FR" }}
+                opts={{ locale: 'FR' }}
               />
             </div>
           </div>
@@ -562,7 +562,7 @@ const BotAnalysis = ({
           {detailInfo?.version > 1 && (
             <>
               <div className={styles.chart_title}>
-                {t("common.botAndFlowAnalysis.stabilityMonitoring")}
+                {t('common.botAndFlowAnalysis.stabilityMonitoring')}
                 <Select
                   options={selectDayOption}
                   defaultValue={1}
@@ -573,7 +573,7 @@ const BotAnalysis = ({
               <div className={styles.error_table_container}>
                 <div className={styles.error_table_item}>
                   <div className={styles.error_table_item_title}>
-                    <div>{t("common.botAndFlowAnalysis.nodeError")}</div>
+                    <div>{t('common.botAndFlowAnalysis.nodeError')}</div>
                     <div>{dayType[monitorType]?.label}</div>
                   </div>
                   <div>
@@ -589,7 +589,7 @@ const BotAnalysis = ({
                 <div className={styles.error_table_item}>
                   <div className={styles.error_table_item_title}>
                     <div>
-                      {t("common.botAndFlowAnalysis.userFeedbackError")}
+                      {t('common.botAndFlowAnalysis.userFeedbackError')}
                     </div>
                     <div>{dayType[monitorType]?.label}</div>
                   </div>
@@ -617,7 +617,7 @@ const BotAnalysis = ({
         title={
           <div>
             <span className={styles.fontWeight}>
-              {t("common.botAndFlowAnalysis.errorLog")}
+              {t('common.botAndFlowAnalysis.errorLog')}
             </span>
           </div>
         }
@@ -632,13 +632,13 @@ const BotAnalysis = ({
                 </div>
                 <div className={styles.errorCode}>
                   <span className={styles.errorLable}>
-                    {t("common.botAndFlowAnalysis.errorCode")}:
+                    {t('common.botAndFlowAnalysis.errorCode')}:
                   </span>
                   <span className={styles.errorSpan}>{item.errorCode}</span>
                 </div>
                 <div className={styles.errorMsg}>
                   <span className={styles.errorLable}>
-                    {t("common.botAndFlowAnalysis.errorReason")}:
+                    {t('common.botAndFlowAnalysis.errorReason')}:
                   </span>
                   <span className={styles.errorSpan}>{item.errorMsg}</span>
                 </div>

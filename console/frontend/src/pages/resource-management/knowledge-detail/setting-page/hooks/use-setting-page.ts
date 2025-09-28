@@ -1,7 +1,7 @@
-import { updateRepoAPI } from "@/services/knowledge";
-import globalStore from "@/store/global-store";
-import { AvatarType, RepoItem } from "@/types/resource";
-import React, { useState, useEffect } from "react";
+import { updateRepoAPI } from '@/services/knowledge';
+import globalStore from '@/store/global-store';
+import { AvatarType, RepoItem } from '@/types/resource';
+import React, { useState, useEffect } from 'react';
 
 export const useSettingPage = ({
   knowledgeInfo,
@@ -41,17 +41,17 @@ export const useSettingPage = ({
   setIdCopied: React.Dispatch<React.SetStateAction<boolean>>;
   handleSave: () => void;
 } => {
-  const getKnowledges = globalStore((state) => state.getKnowledges);
-  const avatarIcon = globalStore((state) => state.avatarIcon);
-  const avatarColor = globalStore((state) => state.avatarColor);
-  const getAvatarConfig = globalStore((state) => state.getAvatarConfig);
-  const [name, setName] = useState("");
+  const getKnowledges = globalStore(state => state.getKnowledges);
+  const avatarIcon = globalStore(state => state.avatarIcon);
+  const avatarColor = globalStore(state => state.avatarColor);
+  const getAvatarConfig = globalStore(state => state.getAvatarConfig);
+  const [name, setName] = useState('');
   const [tags, setTags] = useState<string[]>([]);
-  const [tagValue, setTagValue] = useState("");
-  const [desc, setDesc] = useState("");
+  const [tagValue, setTagValue] = useState('');
+  const [desc, setDesc] = useState('');
   const [loading, setLoading] = useState(false);
   const [botIcon, setBotIcon] = useState<{ name?: string; value?: string }>({});
-  const [botColor, setBotColor] = useState<string>("");
+  const [botColor, setBotColor] = useState<string>('');
   const [showModal, setShowModal] = useState(false);
   const [permission, setPermission] = useState(0);
   const [users] = useState([]);
@@ -68,11 +68,11 @@ export const useSettingPage = ({
     if (knowledgeInfo.tagDtoList && knowledgeInfo.tagDtoList.length) {
       const knowledgeTags = knowledgeInfo.tagDtoList;
       const currentTags = knowledgeTags
-        .filter((item) => item.type === 1)
-        .map((item) => item.tagName);
-      setTagValue(currentTags.join("，"));
+        .filter(item => item.type === 1)
+        .map(item => item.tagName);
+      setTagValue(currentTags.join('，'));
     }
-    setBotColor(knowledgeInfo.color || "");
+    setBotColor(knowledgeInfo.color || '');
     setBotIcon({
       name: knowledgeInfo.address,
       value: knowledgeInfo.icon,
@@ -81,7 +81,7 @@ export const useSettingPage = ({
 
   useEffect(() => {
     if (tagValue) {
-      const tagArr = tagValue.split(/[,，]/).filter((item) => item);
+      const tagArr = tagValue.split(/[,，]/).filter(item => item);
       setTags([...tagArr]);
     } else {
       setTags([]);
@@ -105,7 +105,7 @@ export const useSettingPage = ({
       desc,
       tags,
       avatarColor: botColor,
-      avatarIcon: botIcon.value || "",
+      avatarIcon: botIcon.value || '',
       visibility: permission,
     };
     if (permission === 1) {

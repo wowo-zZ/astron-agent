@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   Input,
   Tooltip,
@@ -8,39 +8,39 @@ import {
   message,
   Checkbox,
   Spin,
-} from "antd";
-import { typeList } from "@/constants";
+} from 'antd';
+import { typeList } from '@/constants';
 import {
   generateInputExample,
   listRepos,
   generatePrologue,
-} from "@/services/spark-common";
-import { placeholderText } from "@/components/bot-center/edit-bot/placeholder";
-import { localeConfig } from "@/locales/localeConfig";
-import { useSparkCommonStore } from "@/store/spark-store/spark-common";
-import { useLocaleStore } from "@/store/spark-store/locale-store";
-import SpeakerModal from "@/components/speaker-modal";
-import { vcnCnJson } from "@/components/speaker-modal/vcn";
-import UploadBackgroundModal from "@/components/upload-background";
-import { RightOutlined, QuestionCircleOutlined } from "@ant-design/icons";
+} from '@/services/spark-common';
+import { placeholderText } from '@/components/bot-center/edit-bot/placeholder';
+import { localeConfig } from '@/locales/localeConfig';
+import { useSparkCommonStore } from '@/store/spark-store/spark-common';
+import { useLocaleStore } from '@/store/spark-store/locale-store';
+import SpeakerModal from '@/components/speaker-modal';
+import { vcnCnJson } from '@/components/speaker-modal/vcn';
+import UploadBackgroundModal from '@/components/upload-background';
+import { RightOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 
-import settingFile from "@/assets/imgs/sparkImg/icon_bot_setting_file.png";
-import settingKaichangbai from "@/assets/imgs/sparkImg/icon_bot_setting_kaichangbai.png";
-import plugin from "@/assets/imgs/sparkImg/icon_bot_setting_plugin.png";
-import del from "@/assets/imgs/knowledge/icon_chat_dropdown_del.png";
-import arrowUp from "@/assets/imgs/sparkImg/arrowUp.png";
-import arrowDown from "@/assets/imgs/sparkImg/arrowDown.png";
-import aiGenerate from "@/assets/imgs/sparkImg/ai-generate.png";
-import fileImg from "@/assets/imgs/bot-center/file.svg";
-import closeImg from "@/assets/imgs/bot-center/close.svg";
-import autoInputExamplesLoadingIcon from "@/assets/imgs/bot-center/autoInputExamplesLoadingIcon.svg";
-import codeIcon from "@/assets/imgs/plugin/code.svg"; // 代码图标
-import netIcon from "@/assets/imgs/plugin/network.svg"; // 网络图标
-import genPicIcon from "@/assets/imgs/plugin/gen-pic.svg"; // 图片图标
-import { useTranslation } from "react-i18next";
+import settingFile from '@/assets/imgs/sparkImg/icon_bot_setting_file.png';
+import settingKaichangbai from '@/assets/imgs/sparkImg/icon_bot_setting_kaichangbai.png';
+import plugin from '@/assets/imgs/sparkImg/icon_bot_setting_plugin.png';
+import del from '@/assets/imgs/knowledge/icon_chat_dropdown_del.png';
+import arrowUp from '@/assets/imgs/sparkImg/arrowUp.png';
+import arrowDown from '@/assets/imgs/sparkImg/arrowDown.png';
+import aiGenerate from '@/assets/imgs/sparkImg/ai-generate.png';
+import fileImg from '@/assets/imgs/bot-center/file.svg';
+import closeImg from '@/assets/imgs/bot-center/close.svg';
+import autoInputExamplesLoadingIcon from '@/assets/imgs/bot-center/autoInputExamplesLoadingIcon.svg';
+import codeIcon from '@/assets/imgs/plugin/code.svg'; // 代码图标
+import netIcon from '@/assets/imgs/plugin/network.svg'; // 网络图标
+import genPicIcon from '@/assets/imgs/plugin/gen-pic.svg'; // 图片图标
+import { useTranslation } from 'react-i18next';
 
-import styles from "./CapabilityDevelopment.module.scss";
-import cls from "classnames";
+import styles from './CapabilityDevelopment.module.scss';
+import cls from 'classnames';
 
 const { TextArea } = Input;
 
@@ -149,10 +149,8 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
     vcnList,
   } = props;
 
-  const backgroundImg = useSparkCommonStore((state) => state.backgroundImg);
-  const backgroundImgApp = useSparkCommonStore(
-    (state) => state.backgroundImgApp,
-  );
+  const backgroundImg = useSparkCommonStore(state => state.backgroundImg);
+  const backgroundImgApp = useSparkCommonStore(state => state.backgroundImgApp);
   const { locale: localeNow } = useLocaleStore();
 
   const [uploadBackgroundModalVisible, setUploadBackgroundModalVisible] =
@@ -182,16 +180,16 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
     { promptKey: string; promptValue: string; id: number }[]
   >([]);
   const requestDescribe = t(
-    "configBase.CapabilityDevelopment.requireCreativeNovelty",
+    'configBase.CapabilityDevelopment.requireCreativeNovelty'
   );
   const targetTask = t(
-    "configBase.CapabilityDevelopment.pleaseWriteACreativeCommercialCopywriting",
+    'configBase.CapabilityDevelopment.pleaseWriteACreativeCommercialCopywriting'
   );
   const setRole = t(
-    "configBase.CapabilityDevelopment.youAreAComprehensiveCopywriter",
+    'configBase.CapabilityDevelopment.youAreAComprehensiveCopywriter'
   );
-  const botDesc = "wode";
-  const name = "123";
+  const botDesc = 'wode';
+  const name = '123';
 
   const [mySpeaker, setMySpeaker]: any = useState([]); //我的发音人数组
 
@@ -212,12 +210,12 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
    */
   const renderBotVcn = () => {
     let vcnObj = vcnCnJson.find(
-      (item: any) => item.vcn === botCreateActiveV.cn,
+      (item: any) => item.vcn === botCreateActiveV.cn
     );
     let isCustomVcn = false;
     if (!vcnObj) {
       vcnObj = mySpeaker.find(
-        (item: any) => item.vcnCode === botCreateActiveV.cn,
+        (item: any) => item.vcnCode === botCreateActiveV.cn
       );
       if (vcnObj) {
         isCustomVcn = true;
@@ -230,31 +228,31 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
           <>
             <img
               style={{
-                width: "16px",
-                height: "16px",
-                marginRight: "3px",
-                marginTop: "3px",
+                width: '16px',
+                height: '16px',
+                marginRight: '3px',
+                marginTop: '3px',
               }}
               className={styles.vcn_icon}
               src={
                 isCustomVcn
-                  ? "https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16906018510400728%2F%E7%BC%96%E7%BB%84%204%402x.png"
+                  ? 'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16906018510400728%2F%E7%BC%96%E7%BB%84%204%402x.png'
                   : vcnObj?.imgUrl
               }
               alt=""
             />
             <span title={vcnObj?.name}>
-              {localeNow === "en"
+              {localeNow === 'en'
                 ? vcnObj?.en_name
                   ? vcnObj?.en_name
                   : vcnObj?.name
                 : vcnObj?.name}
             </span>
             <div
-              style={{ marginLeft: "3px" }}
+              style={{ marginLeft: '3px' }}
               className={styles.right_outline_wrap}
             >
-              <RightOutlined style={{ color: "#A0A6AF", fontSize: 12 }} />
+              <RightOutlined style={{ color: '#A0A6AF', fontSize: 12 }} />
             </div>
           </>
         ) : (
@@ -262,11 +260,11 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
             <img
               className={styles.choose_icon}
               src={
-                "https://openres.xfyun.cn/xfyundoc/2024-05-13/6c7b581a-e2f1-43fc-a73f-f63307df8150/1715581373857/1123213.png"
+                'https://openres.xfyun.cn/xfyundoc/2024-05-13/6c7b581a-e2f1-43fc-a73f-f63307df8150/1715581373857/1123213.png'
               }
               alt=""
             />
-            {t("configBase.selectPronouncer")}
+            {t('configBase.selectPronouncer')}
           </>
         )}
       </>
@@ -279,8 +277,8 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
     if (!botDesc || !name || !setRole || !targetTask || !requestDescribe) {
       message.error(
         t(
-          "configBase.CapabilityDevelopment.pleaseFillInAgentNameFunctionDescriptionAndAgentInstruction",
-        ),
+          'configBase.CapabilityDevelopment.pleaseFillInAgentNameFunctionDescriptionAndAgentInstruction'
+        )
       );
       return;
     }
@@ -310,11 +308,11 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
         if (res && res.length === 3) setInputExample(res);
         else
           message.error(
-            t("configBase.CapabilityDevelopment.generateFailedPleaseTryAgain"),
+            t('configBase.CapabilityDevelopment.generateFailedPleaseTryAgain')
           );
         setInputExampleLoading(false);
       })
-      .catch((err) => {
+      .catch(err => {
         err?.msg && message.error(err.msg);
         setInputExampleLoading(false);
       });
@@ -405,14 +403,14 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
       className="flex-1  overflow-auto pr-6"
       ref={containerRef}
       style={{
-        padding: multiModelDebugging ? "" : "0 24px",
-        borderLeft: multiModelDebugging ? "" : "1px solid #E2E8FF",
+        padding: multiModelDebugging ? '' : '0 24px',
+        borderLeft: multiModelDebugging ? '' : '1px solid #E2E8FF',
         marginTop: multiModelDebugging ? 24 : 0,
       }}
     >
       <div className="flex items-center justify-between mt-6">
         <div className=" w-full">
-          <div className="flex items-center" style={{ marginBottom: "20px" }}>
+          <div className="flex items-center" style={{ marginBottom: '20px' }}>
             {multiModelDebugging && (
               <img
                 src={growOrShrinkConfig?.tools ? arrowDown : arrowUp}
@@ -428,27 +426,27 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
             )}
             <img src={plugin} className="w-6 h-6" alt="" />
             <span className="ml-2 text-[#D84516] font-medium">
-              {t("configBase.CapabilityDevelopment.capability")}
+              {t('configBase.CapabilityDevelopment.capability')}
             </span>
           </div>
           <div
             className="flex justify-between items-center border-b border-[#E9EFF6]"
             style={{
-              padding: "8px 20px 12px 20px",
+              padding: '8px 20px 12px 20px',
             }}
           >
             <div className="flex gap-2 items-center">
               <img src={netIcon} alt="" className="w-[16px] h-[16px]" />
               <span className="text-sm font-medium">
-                {t("configBase.CapabilityDevelopment.internetSearch")}
+                {t('configBase.CapabilityDevelopment.internetSearch')}
               </span>
             </div>
             <Switch
               className="list-switch config-switch"
               defaultChecked={
-                detailInfo.openedTool?.indexOf("ifly_search") !== -1
+                detailInfo.openedTool?.indexOf('ifly_search') !== -1
               }
-              onChange={(checked) => {
+              onChange={checked => {
                 choosedAlltool.ifly_search = checked;
                 setChoosedAlltool(choosedAlltool);
               }}
@@ -457,21 +455,21 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
           <div
             className="flex justify-between items-center border-b border-[#E9EFF6]"
             style={{
-              padding: "8px 20px 12px 20px",
+              padding: '8px 20px 12px 20px',
             }}
           >
             <div className="flex gap-2 items-center">
               <img src={genPicIcon} alt="" className="w-[16px] h-[16px]" />
               <span className="text-sm font-medium">
-                {t("configBase.CapabilityDevelopment.AIDraw")}
+                {t('configBase.CapabilityDevelopment.AIDraw')}
               </span>
             </div>
             <Switch
               className="list-switch config-switch"
               defaultChecked={
-                detailInfo.openedTool?.indexOf("text_to_image") !== -1
+                detailInfo.openedTool?.indexOf('text_to_image') !== -1
               }
-              onChange={(checked) => {
+              onChange={checked => {
                 choosedAlltool.text_to_image = checked;
                 setChoosedAlltool(choosedAlltool);
               }}
@@ -480,21 +478,21 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
           <div
             className="flex justify-between items-center border-b border-[#E9EFF6]"
             style={{
-              padding: "8px 20px 12px 20px",
+              padding: '8px 20px 12px 20px',
             }}
           >
             <div className="flex gap-2 items-center">
               <img src={codeIcon} alt="" className="w-[16px] h-[16px]" />
               <span className="text-sm font-medium">
-                {t("configBase.CapabilityDevelopment.codeGeneration")}
+                {t('configBase.CapabilityDevelopment.codeGeneration')}
               </span>
             </div>
             <Switch
               className="list-switch config-switch"
               defaultChecked={
-                detailInfo.openedTool?.indexOf("codeinterpreter") !== -1
+                detailInfo.openedTool?.indexOf('codeinterpreter') !== -1
               }
-              onChange={(checked) => {
+              onChange={checked => {
                 choosedAlltool.codeinterpreter = checked;
                 setChoosedAlltool(choosedAlltool);
               }}
@@ -512,8 +510,8 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
               <Tooltip
                 title={
                   item.isPublic
-                    ? t("configBase.CapabilityDevelopment.officialPlugin")
-                    : t("configBase.CapabilityDevelopment.personalPlugin")
+                    ? t('configBase.CapabilityDevelopment.officialPlugin')
+                    : t('configBase.CapabilityDevelopment.personalPlugin')
                 }
                 overlayClassName="black-tooltip config-secret"
               ></Tooltip>
@@ -543,7 +541,7 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
         <div className="w-full font-medium text-second">
           <div
             className="flex items-center"
-            style={{ marginBottom: "20px", justifyContent: "space-between" }}
+            style={{ marginBottom: '20px', justifyContent: 'space-between' }}
           >
             {multiModelDebugging && (
               <img
@@ -558,19 +556,19 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
                 }
               />
             )}
-            <div style={{ display: "flex" }}>
+            <div style={{ display: 'flex' }}>
               <img src={settingFile} className="w-6 h-6" alt="" />
               <span className="text-[#13A10E] font-medium ml-2">
-                {t("configBase.CapabilityDevelopment.knowledgeBase")}
+                {t('configBase.CapabilityDevelopment.knowledgeBase')}
               </span>
             </div>
             <div
               onClick={() => {
                 setVisible(true);
               }}
-              style={{ color: "#275EFF", cursor: "pointer" }}
+              style={{ color: '#275EFF', cursor: 'pointer' }}
             >
-              + {t("configBase.CapabilityDevelopment.addKnowledgeBase")}
+              + {t('configBase.CapabilityDevelopment.addKnowledgeBase')}
             </div>
           </div>
           <Modal
@@ -584,15 +582,15 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
             maskClosable={false}
           >
             <div
-              style={{ display: "flex", justifyContent: " space-between" }}
+              style={{ display: 'flex', justifyContent: ' space-between' }}
               className={styles.title}
             >
               <div>
                 {t(
-                  "configBase.CapabilityDevelopment.selectToAssociateTheDataset",
+                  'configBase.CapabilityDevelopment.selectToAssociateTheDataset'
                 )}
                 <span
-                  style={{ display: "inline-block" }}
+                  style={{ display: 'inline-block' }}
                   className={styles.refresh}
                   onClick={() => {
                     setIsFresh(true);
@@ -606,23 +604,23 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
                 >
                   <img
                     src={
-                      "https://aixfyun-cn-bj.xfyun.cn/bbs/88573.51517541305/%E5%88%B7%E6%96%B0.svg"
+                      'https://aixfyun-cn-bj.xfyun.cn/bbs/88573.51517541305/%E5%88%B7%E6%96%B0.svg'
                     }
                     style={
                       isFresh
                         ? {
-                            display: "inline-block",
-                            transform: "rotate(360deg)",
-                            transformOrigin: "center",
-                            transition: "all 0.5s linear",
+                            display: 'inline-block',
+                            transform: 'rotate(360deg)',
+                            transformOrigin: 'center',
+                            transition: 'all 0.5s linear',
                           }
                         : {
-                            display: "inline-block",
+                            display: 'inline-block',
                           }
                     }
                     alt=""
                   />
-                  {t("configBase.CapabilityDevelopment.refresh")}
+                  {t('configBase.CapabilityDevelopment.refresh')}
                 </span>
               </div>
               <img
@@ -633,7 +631,7 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
               />
             </div>
             <div
-              style={{ position: "relative" }}
+              style={{ position: 'relative' }}
               className={styles.data_content}
             >
               {dataSource?.length > 0 ? (
@@ -643,11 +641,11 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
                       style={{
                         cursor:
                           disList.length == 0 || disList[0]?.tag == item.tag
-                            ? "pointer"
-                            : "not-allowed",
+                            ? 'pointer'
+                            : 'not-allowed',
                       }}
                       key={item.id}
-                      className={`${item.checked ? styles.checked : ""} ${
+                      className={`${item.checked ? styles.checked : ''} ${
                         styles.cardlist
                       }`}
                       onClick={() => {
@@ -662,34 +660,34 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
                     >
                       <div
                         style={{
-                          position: "absolute",
+                          position: 'absolute',
                           right: 0,
                           top: 0,
                           background:
-                            item.tag == "SparkDesk-RAG"
-                              ? "#13A10e"
-                              : item.tag == "AIUI-RAG2"
-                                ? "linear-gradient(215deg, #6F8AF5 18%, #0458FF 82%)"
-                                : "linear-gradient(34deg, #6B23FF 19%, rgba(153, 98, 255, 0.9281) 83%)",
-                          width: "58px",
-                          height: "28px",
-                          fontFamily: "苹方",
-                          fontSize: "14px",
+                            item.tag == 'SparkDesk-RAG'
+                              ? '#13A10e'
+                              : item.tag == 'AIUI-RAG2'
+                                ? 'linear-gradient(215deg, #6F8AF5 18%, #0458FF 82%)'
+                                : 'linear-gradient(34deg, #6B23FF 19%, rgba(153, 98, 255, 0.9281) 83%)',
+                          width: '58px',
+                          height: '28px',
+                          fontFamily: '苹方',
+                          fontSize: '14px',
                           fontWeight: 500,
-                          lineHeight: "28px",
-                          letterSpacing: "normal",
-                          color: "#FFFFFF",
-                          textAlign: "center",
-                          borderRadius: "0px 17px 0px 8px",
+                          lineHeight: '28px',
+                          letterSpacing: 'normal',
+                          color: '#FFFFFF',
+                          textAlign: 'center',
+                          borderRadius: '0px 17px 0px 8px',
                         }}
                       >
-                        {item.tag == "SparkDesk-RAG"
+                        {item.tag == 'SparkDesk-RAG'
                           ? t(
-                              "configBase.CapabilityDevelopment.personalVersion",
+                              'configBase.CapabilityDevelopment.personalVersion'
                             )
-                          : item.tag == "AIUI-RAG2"
-                            ? t("configBase.CapabilityDevelopment.stardust")
-                            : t("configBase.CapabilityDevelopment.spark")}
+                          : item.tag == 'AIUI-RAG2'
+                            ? t('configBase.CapabilityDevelopment.stardust')
+                            : t('configBase.CapabilityDevelopment.spark')}
                       </div>
                       <div className={styles.img}>
                         <img src={fileImg} alt="" />
@@ -698,7 +696,7 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
                         <div className={styles.name}>{item.name}</div>
                         <div className={styles.detail}>
                           <span title={item.charCount}>
-                            {t("configBase.CapabilityDevelopment.character")}{" "}
+                            {t('configBase.CapabilityDevelopment.character')}{' '}
                             {item.charCount ? item.charCount : 0}
                           </span>
                         </div>
@@ -714,7 +712,7 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
                   />
                   <div className={styles.tips}>
                     {t(
-                      "configBase.CapabilityDevelopment.youHaveNotCreatedAnyDatasets",
+                      'configBase.CapabilityDevelopment.youHaveNotCreatedAnyDatasets'
                     )}
                   </div>
                 </div>
@@ -722,17 +720,17 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
             </div>
             {dataSource?.length > 0 && (
               <div
-                style={{ display: "flex" }}
+                style={{ display: 'flex' }}
                 className={styles.go_create}
-                onClick={() => window.open("/resource/knowledge")}
+                onClick={() => window.open('/resource/knowledge')}
               >
                 <img
                   src="https://aixfyun-cn-bj.xfyun.cn/bbs/27965.529211835106/%E6%96%B0%E5%A2%9E.svg"
-                  style={{ height: 12, marginRight: 2, marginTop: "3px" }}
+                  style={{ height: 12, marginRight: 2, marginTop: '3px' }}
                   alt=""
                 />
                 <div>
-                  {t("configBase.CapabilityDevelopment.createNewDataset")}
+                  {t('configBase.CapabilityDevelopment.createNewDataset')}
                 </div>
               </div>
             )}
@@ -749,7 +747,7 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
                   });
                 }}
               >
-                {t("configBase.CapabilityDevelopment.cancel")}
+                {t('configBase.CapabilityDevelopment.cancel')}
               </Button>
               <Button
                 type="primary"
@@ -757,15 +755,15 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
                   if (dataSource?.length > 0) {
                     setVisible(false);
                     const filterSource = (dataSource || []).filter(
-                      (item: any) => item.checked,
+                      (item: any) => item.checked
                     );
                     setSelectSource(filterSource);
-                  } else window.open("/resource/knowledge");
+                  } else window.open('/resource/knowledge');
                 }}
               >
                 {dataSource?.length > 0
-                  ? t("configBase.CapabilityDevelopment.confirm")
-                  : t("configBase.CapabilityDevelopment.goCreate")}
+                  ? t('configBase.CapabilityDevelopment.confirm')
+                  : t('configBase.CapabilityDevelopment.goCreate')}
               </Button>
             </div>
           </Modal>
@@ -781,7 +779,7 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
                       }}
                     >
                       <img src="https://openres.xfyun.cn/xfyundoc/2024-01-22/47883fae-7d3e-46e2-bde0-e46b4753351b/1705888336589/addDatasetIcon.svg" />
-                      {t("configBase.CapabilityDevelopment.addDataset")}
+                      {t('configBase.CapabilityDevelopment.addDataset')}
                     </div>
                     <div className={styles.datasetList}>
                       {(selectSource || []).map((item: any) => {
@@ -814,7 +812,7 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
                               />
                             </div>
                             <div className={styles.datasetInfo}>
-                              {t("configBase.CapabilityDevelopment.character")}{" "}
+                              {t('configBase.CapabilityDevelopment.character')}{' '}
                               {item.charCount ? item.charCount : 0}
                             </div>
                           </div>
@@ -866,7 +864,7 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
           )}
           <img src={settingKaichangbai} className="w-6 h-6" alt="" />
           <span className="text-[#6407FD] font-medium ml-2">
-            {t("configBase.CapabilityDevelopment.conversationEnhancement")}
+            {t('configBase.CapabilityDevelopment.conversationEnhancement')}
           </span>
         </div>
         {growOrShrinkConfig.chatStrong && (
@@ -874,19 +872,19 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
             <div
               className="border-b border-[#E9EFF6]"
               style={{
-                padding: "8px 20px 12px 20px",
+                padding: '8px 20px 12px 20px',
               }}
             >
               <div className="flex justify-between items-center">
                 <div className="flex flex-col gap-2">
                   <span className="text-sm font-medium">
-                    {t("configBase.CapabilityDevelopment.openingStatement")}
+                    {t('configBase.CapabilityDevelopment.openingStatement')}
                   </span>
                 </div>
                 <Switch
                   className="list-switch config-switch"
                   checked={conversation}
-                  onChange={(checked) => setConversation(checked)}
+                  onChange={checked => setConversation(checked)}
                 />
               </div>
               {conversation && (
@@ -902,36 +900,36 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
                           if (!baseinfo.botName && !baseinfo.botDesc) {
                             return message.warning(
                               t(
-                                "configBase.CapabilityDevelopment.pleaseFillInIntroductionAndName",
-                              ),
+                                'configBase.CapabilityDevelopment.pleaseFillInIntroductionAndName'
+                              )
                             );
                           }
                           setShiliLoading(true);
                           generatePrologue({
                             name: baseinfo.botName,
                             botDesc: baseinfo.botDesc,
-                          }).then((res) => {
+                          }).then(res => {
                             setPrologue(res);
                             setShiliLoading(false);
                           });
                           return;
                         }}
                       >
-                        {t("configBase.CapabilityDevelopment.aiGenerated")}
+                        {t('configBase.CapabilityDevelopment.aiGenerated')}
                       </span>
                     </div>
                     <Spin
                       spinning={shiliLoading}
-                      tip={t("configBase.CapabilityDevelopment.generating")}
+                      tip={t('configBase.CapabilityDevelopment.generating')}
                     >
                       <TextArea
                         className="mt-1.5 global-textarea pr-6"
                         placeholder={t(
-                          "configBase.CapabilityDevelopment.pleaseEnterOpeningStatement",
+                          'configBase.CapabilityDevelopment.pleaseEnterOpeningStatement'
                         )}
-                        style={{ height: 96, resize: "none" }}
+                        style={{ height: 96, resize: 'none' }}
                         value={prologue}
-                        onChange={(event) => setPrologue(event.target.value)}
+                        onChange={event => setPrologue(event.target.value)}
                       />
                     </Spin>
                   </div>
@@ -941,13 +939,13 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
             <div
               className="border-b border-[#E9EFF6]"
               style={{
-                padding: "8px 20px 12px 20px",
+                padding: '8px 20px 12px 20px',
               }}
             >
               <div className="flex justify-between items-center">
                 <div className="flex  gap-2">
                   <div className="flex text-sm font-medium">
-                    {t("configBase.CapabilityDevelopment.inputExample")}
+                    {t('configBase.CapabilityDevelopment.inputExample')}
                   </div>
                   {inputExampFlag && (
                     <div
@@ -956,16 +954,16 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
                       }
                       className={cls(
                         styles.autoInputExampleBtn,
-                        inputExampleLoading && styles.inputExampleLoading,
+                        inputExampleLoading && styles.inputExampleLoading
                       )}
-                      style={{ whiteSpace: "nowrap", overflow: "hidden" }}
+                      style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}
                     >
                       <img
                         src="https://aixfyun-cn-bj.xfyun.cn/bbs/28921.014458559814/%E7%A7%91%E6%8A%80.svg"
                         alt=""
                       />
                       <span>
-                        {t("configBase.CapabilityDevelopment.aiGenerated")}
+                        {t('configBase.CapabilityDevelopment.aiGenerated')}
                       </span>
                     </div>
                   )}
@@ -984,7 +982,7 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
                 <Switch
                   className="list-switch config-switch"
                   checked={inputExampFlag}
-                  onChange={(checked) => setInputExampFlag(checked)}
+                  onChange={checked => setInputExampFlag(checked)}
                 />
               </div>
               {inputExampFlag && (
@@ -996,12 +994,12 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
                       placeholder={
                         placeholderText[botTypeValue]?.example1 ||
                         t(
-                          "configBase.CapabilityDevelopment.femaleBabyWithSurnameZhang",
+                          'configBase.CapabilityDevelopment.femaleBabyWithSurnameZhang'
                         )
                       }
                       value={inputExample[0]}
                       onChange={(
-                        event: React.ChangeEvent<HTMLInputElement>,
+                        event: React.ChangeEvent<HTMLInputElement>
                       ) => {
                         inputExample[0] = event.target.value.trim();
                         setInputExample([...inputExample]);
@@ -1013,12 +1011,12 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
                       placeholder={
                         placeholderText[botTypeValue]?.example2 ||
                         t(
-                          "configBase.CapabilityDevelopment.nameWithSurnameSong",
+                          'configBase.CapabilityDevelopment.nameWithSurnameSong'
                         )
                       }
                       value={inputExample[1]}
                       onChange={(
-                        event: React.ChangeEvent<HTMLInputElement>,
+                        event: React.ChangeEvent<HTMLInputElement>
                       ) => {
                         inputExample[1] = event.target.value.trim();
                         setInputExample([...inputExample]);
@@ -1029,11 +1027,11 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
                       maxLength={50}
                       placeholder={
                         placeholderText[botTypeValue]?.example3 ||
-                        t("configBase.CapabilityDevelopment.liNameWithSurname")
+                        t('configBase.CapabilityDevelopment.liNameWithSurname')
                       }
                       value={inputExample[2]}
                       onChange={(
-                        event: React.ChangeEvent<HTMLInputElement>,
+                        event: React.ChangeEvent<HTMLInputElement>
                       ) => {
                         inputExample[2] = event.target.value.trim();
                         setInputExample([...inputExample]);
@@ -1046,24 +1044,24 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
             <div
               className="flex justify-between items-center border-b border-[#E9EFF6]"
               style={{
-                padding: "8px 20px 12px 20px",
+                padding: '8px 20px 12px 20px',
               }}
             >
               <div className="flex flex-col gap-2">
                 <span className="text-sm font-medium">
-                  {t("configBase.CapabilityDevelopment.roleSound")}
+                  {t('configBase.CapabilityDevelopment.roleSound')}
                 </span>
               </div>
               <div
                 style={{
-                  display: "flex",
-                  borderRadius: "22px",
-                  background: "#F2F5FE",
-                  width: "138px",
-                  height: "44px",
-                  justifyContent: "center",
-                  paddingTop: "10px",
-                  cursor: "pointer",
+                  display: 'flex',
+                  borderRadius: '22px',
+                  background: '#F2F5FE',
+                  width: '138px',
+                  height: '44px',
+                  justifyContent: 'center',
+                  paddingTop: '10px',
+                  cursor: 'pointer',
                 }}
                 className={`${styles.vcn_choose} ${styles.vcn_choose_banned}`}
                 onClick={() => {
@@ -1076,20 +1074,20 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
             <div
               className="flex justify-between items-center border-b border-[#E9EFF6]"
               style={{
-                padding: "8px 20px 12px 20px",
+                padding: '8px 20px 12px 20px',
               }}
             >
               <div className="flex flex-col gap-2">
                 <span className="text-sm font-medium">
                   {t(
-                    "configBase.CapabilityDevelopment.supportMultiRoundConversation",
+                    'configBase.CapabilityDevelopment.supportMultiRoundConversation'
                   )}
                 </span>
               </div>
               <Switch
                 className="list-switch config-switch"
                 checked={supportContextFlag}
-                onChange={(checked) => setSupportContextFlag(checked)}
+                onChange={checked => setSupportContextFlag(checked)}
               />
             </div>
 
@@ -1097,7 +1095,7 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
               <div
                 className="flex justify-between items-center"
                 style={{
-                  padding: "8px 20px 12px 20px",
+                  padding: '8px 20px 12px 20px',
                 }}
               >
                 <div className="flex">
@@ -1107,7 +1105,7 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
                     overlayClassName="black-tooltip config-secret"
                   >
                     <QuestionCircleOutlined
-                      style={{ marginLeft: "5px", cursor: "pointer" }}
+                      style={{ marginLeft: '5px', cursor: 'pointer' }}
                     />
                   </Tooltip>
                 </div>
@@ -1116,7 +1114,7 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
                   type="primary"
                   onClick={() => setUploadBackgroundModalVisible(true)}
                 >
-                  {backgroundImg ? "修改" : "上传"}
+                  {backgroundImg ? '修改' : '上传'}
                 </Button>
               </div>
               {backgroundImg && (
@@ -1174,19 +1172,19 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
           </div>
         )}
         <Checkbox
-          style={{ marginTop: "20px" }}
+          style={{ marginTop: '20px' }}
           onChange={onChecked}
           checked={xieyi}
           className={styles.customCheckbox}
         >
-          {t("configBase.CapabilityDevelopment.iHaveAgreed")}
+          {t('configBase.CapabilityDevelopment.iHaveAgreed')}
           <a
             href="https://www.xfyun.cn/doc/policy/agreement.html"
             rel="noreferrer"
             target="_blank"
           >
             {t(
-              "configBase.CapabilityDevelopment.xunfeiOpenPlatformServiceAgreement",
+              'configBase.CapabilityDevelopment.xunfeiOpenPlatformServiceAgreement'
             )}
           </a>
           与
@@ -1195,7 +1193,7 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
             rel="noreferrer"
             target="_blank"
           >
-            {t("configBase.CapabilityDevelopment.privacyAgreement")}
+            {t('configBase.CapabilityDevelopment.privacyAgreement')}
           </a>
         </Checkbox>
       </div>

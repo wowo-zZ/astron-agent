@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { Popover } from "antd";
-import { getCommonConfig } from "@/services/common";
+import React, { useEffect, useState } from 'react';
+import { Popover } from 'antd';
+import { getCommonConfig } from '@/services/common';
 
-import communityQRCodeContainer from "@/assets/imgs/workflow/community-qRCode-container.png";
+import communityQRCodeContainer from '@/assets/imgs/workflow/community-qRCode-container.png';
 
 function index(): React.ReactElement {
-  const [wechatqRCode, setWechatQRCode] = useState("");
-  const [feishuQRCode, setFeishuQRCode] = useState("");
+  const [wechatqRCode, setWechatQRCode] = useState('');
+  const [feishuQRCode, setFeishuQRCode] = useState('');
 
   useEffect(() => {
     Promise.all([
       getCommonConfig({
-        category: "SPARK_PRO_QR_CODE",
-        code: "qr",
+        category: 'SPARK_PRO_QR_CODE',
+        code: 'qr',
       }),
-      getCommonConfig({ category: "SPARK_PRO_QR_CODE", code: "qr_feishu" }),
+      getCommonConfig({ category: 'SPARK_PRO_QR_CODE', code: 'qr_feishu' }),
     ]).then(([wechatQRCode, feishuQRCode]) => {
       setWechatQRCode(wechatQRCode?.value);
       setFeishuQRCode(feishuQRCode?.value);

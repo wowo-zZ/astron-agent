@@ -4,22 +4,29 @@ import {
   useRef,
   MutableRefObject,
   useState,
-} from "react";
-import type { MessageListType, BotInfoType, Option } from "@/types/chat";
-import recommendIcon from "@/assets/imgs/chat/recommend.svg";
-import rightArrowIcon from "@/assets/imgs/chat/right-arrow.svg";
-import LoadingAnimate from "@/constants/lottie-react/chat-loading.json";
-import { Progress, Skeleton } from "antd";
-import useUserStore from "@/store/user-store";
-import useChatStore from "@/store/chat-store";
-import { getLanguageCode } from "@/utils/http";
-import Lottie from "lottie-react";
-import DeepThinkProgress from "./deep-think-progress";
-import MarkdownRender from "@/components/markdown-render";
-import useBindEvents from "@/hooks/search-event-bind";
-import SourceInfoBox from "./source-info-box";
-import UseToolsInfo from "./use-tools-info";
-import WorkflowNodeOptions from "./workflow-node-options";
+} from 'react';
+import type {
+  MessageListType,
+  BotInfoType,
+  Option,
+  UploadFileInfo,
+} from '@/types/chat';
+import recommendIcon from '@/assets/imgs/chat/recommend.svg';
+import rightArrowIcon from '@/assets/imgs/chat/right-arrow.svg';
+import LoadingAnimate from '@/constants/lottie-react/chat-loading.json';
+import { Progress, Skeleton } from 'antd';
+import useUserStore from '@/store/user-store';
+import useChatStore from '@/store/chat-store';
+import { getLanguageCode } from '@/utils/http';
+import Lottie from 'lottie-react';
+import DeepThinkProgress from './deep-think-progress';
+import MarkdownRender from '@/components/markdown-render';
+import useBindEvents from '@/hooks/search-event-bind';
+import SourceInfoBox from './source-info-box';
+import UseToolsInfo from './use-tools-info';
+import WorkflowNodeOptions from './workflow-node-options';
+import { formatFileSize, getFileIcon } from '@/utils';
+import FilePreview from './file-preview';
 
 //渲染全新开始
 const renderRestart = (): ReactElement => {
@@ -37,7 +44,11 @@ const MessageList = (props: {
   botInfo: BotInfoType;
   isDataLoading: boolean;
   botNameColor: string;
-  handleSendMessage: (item: string, callback?: () => void) => void;
+  handleSendMessage: (params: {
+    item: string;
+    fileUrl?: string;
+    callback?: () => void;
+  }) => void;
 }): ReactElement => {
   const {
     messageList,
@@ -49,13 +60,14 @@ const MessageList = (props: {
   const languageCode = getLanguageCode();
   const scrollAnchorRef = useRef<HTMLDivElement>(null);
   const answerPercent = useChatStore((state: any) => state.answerPercent); //回答进度条
-  const isLoading = useChatStore((state) => state.isLoading); //是否正在加载
-  const streamId = useChatStore((state) => state.streamId); //流式回复id
-  const workflowOperation = useChatStore((state) => state.workflowOperation); //工作流操作
+  const isLoading = useChatStore(state => state.isLoading); //是否正在加载
+  const streamId = useChatStore(state => state.streamId); //流式回复id
+  const workflowOperation = useChatStore(state => state.workflowOperation); //工作流操作
   const { user } = useUserStore();
   const lastClickedQA: MutableRefObject<MessageListType | null> =
     useRef<MessageListType | null>(null);
   const { bindTagClickEvent } = useBindEvents(lastClickedQA);
+  const [previewFile, setPreviewFile] = useState<UploadFileInfo>(); //预览文件
 
   // 选中的选项状态
   const [selectedOptionId, setSelectedOptionId] = useState<{
@@ -66,7 +78,9 @@ const MessageList = (props: {
   // 处理节点选项点击
   const handleNodeClick = (option: Option, messageId: number) => {
     setSelectedOptionId({ id: messageId, option });
-    handleSendMessage(JSON.stringify(option));
+    handleSendMessage({
+      item: JSON.stringify(option),
+    });
   };
 
   useEffect((): void => {
@@ -93,7 +107,11 @@ const MessageList = (props: {
               <div
                 className="h-12 flex items-center mb-2 bg-white border border-[#e4eaff] rounded-xl px-4 cursor-pointer text-sm font-normal transition-all duration-200 ease-in-out hover:border-[#275eff]"
                 key={index}
-                onClick={() => handleSendMessage(item)}
+                onClick={() =>
+                  handleSendMessage({
+                    item: item,
+                  })
+                }
               >
                 <img src={recommendIcon} alt="" className="w-[18px] h-[18px]" />
                 <span className="flex-1 mx-3 truncate">{item}</span>
@@ -141,37 +159,47 @@ const MessageList = (props: {
     return (
       <div
         key={item.id}
-        className="max-w-[90%] text-white py-2.5 flex flex-row-reverse rounded-tr rounded-tl rounded-br-[2px] leading-[1.4] ml-auto h-auto"
+        className="max-w-[90%] text-white py-2.5 flex flex-row-reverse leading-[1.4] ml-auto h-auto"
       >
         <img src={user?.avatar} alt="" className="h-9 w-9 rounded-full ml-4" />
         <div className="bg-[#275eff] rounded-[12px_0px_12px_12px] p-[14px_19px] relative max-w-full">
           <div className="text-base font-normal text-white leading-[25px] whitespace-pre-wrap w-auto break-words">
             {item.message}
           </div>
-          {/* {item?.chatFileList?.length > 0 && (
-            <div className={styles.req_content_url}>
+          {item?.chatFileList && item?.chatFileList?.length > 0 && (
+            <div className={'w-48 h-auto mt-2.5 rounded-xl'}>
               {item?.chatFileList?.map((file: any, index: number) => (
                 <div
                   key={index}
-                  className={styles.pdf_wrap}
+                  className={
+                    'flex items-center justify-between p-2.5 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer'
+                  }
                   onClick={() => {
-                    handleFileClick(file);
+                    setPreviewFile(file);
                   }}
                 >
-                  <img src={getFileIcon(file)} alt="" />
-                  <div className={styles.pdf_right}>
-                    <div title={file?.fileName} className={styles.title}>
+                  <img src={getFileIcon(file)} alt="" className="w-6 h-8" />
+                  <div className={'flex-1 ml-2 min-w-0'}>
+                    <div
+                      title={file?.fileName}
+                      className={
+                        'text-xs text-[#939393] truncate block max-w-[120px]'
+                      }
+                    >
                       {file?.fileName}
                     </div>
-                    <div className={styles.pdf_size}>
-                      <span>{file?.fileName?.split('.')?.pop()}</span>
-                      <span>{file?.fileSize}</span>
+                    <div
+                      className={
+                        'text-xs text-[#939393] truncate block max-w-full'
+                      }
+                    >
+                      <span>{formatFileSize(file.fileSize)}</span>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
-          )} */}
+          )}
         </div>
       </div>
     );
@@ -180,7 +208,7 @@ const MessageList = (props: {
   //渲染回复
   const renderResp = (
     item: MessageListType,
-    messageIndex: number,
+    messageIndex: number
   ): ReactElement => {
     const showLoading = !item.sid && (isLoading || !!answerPercent);
     const workflowContent = item?.workflowEventData?.content;
@@ -194,7 +222,7 @@ const MessageList = (props: {
           <img
             src={botInfo.avatar}
             alt="avatar"
-            className="w-9 h-9 rounded-full mr-4"
+            className="w-9 h-9 rounded-full mr-4 object-cover"
           />
           <div className="bg-white rounded-[0px_12px_12px_12px] p-[14px_19px] w-auto text-[#333333] max-w-full min-w-[10%]">
             {showLoading && (
@@ -204,11 +232,11 @@ const MessageList = (props: {
                   loop={true}
                   className="w-[30px] h-[30px] mr-1"
                   rendererSettings={{
-                    preserveAspectRatio: "xMidYMid slice",
+                    preserveAspectRatio: 'xMidYMid slice',
                   }}
                 />
                 <span className="text-sm text-gray-500">
-                  {languageCode === "zh" ? "正在回答中..." : "Processing..."}
+                  {languageCode === 'zh' ? '正在回答中...' : 'Processing...'}
                 </span>
                 {!!answerPercent && (
                   <Progress
@@ -253,7 +281,7 @@ const MessageList = (props: {
         <div className="w-full flex flex-col-reverse items-center max-w-[960px] min-h-min scrollbar-hide">
           <div ref={scrollAnchorRef} />
 
-          {/* 直接渲染消息列表 - 性能优化版：合并已在store中完成 */}
+          {/* 直接渲染消息列表 */}
           {messageList
             .slice()
             .reverse()
@@ -261,9 +289,9 @@ const MessageList = (props: {
               const actualIndex = messageList.length - 1 - index; // 计算真实的消息索引
               return (
                 <div className="w-[inherit]" key={actualIndex}>
-                  {item?.reqId === "USER" && renderReq(item)}
-                  {item?.reqId === "BOT" && renderResp(item, actualIndex)}
-                  {item?.reqId === "START" && renderRestart()}
+                  {item?.reqId === 'USER' && renderReq(item)}
+                  {item?.reqId === 'BOT' && renderResp(item, actualIndex)}
+                  {item?.reqId === 'START' && renderRestart()}
                 </div>
               );
             })}
@@ -271,6 +299,10 @@ const MessageList = (props: {
           {renderHeaderAndRecommend()}
         </div>
       </div>
+      <FilePreview
+        file={previewFile || ({} as UploadFileInfo)}
+        onClose={() => setPreviewFile({} as UploadFileInfo)}
+      />
     </div>
   );
 };

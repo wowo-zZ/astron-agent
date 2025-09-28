@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import { Button } from "antd";
-import { deleteTool } from "@/services/plugin";
-import dialogDel from "@/assets/imgs/main/icon_dialog_del.png";
+import React, { useState } from 'react';
+import { Button, message } from 'antd';
+import { deleteTool } from '@/services/plugin';
+import dialogDel from '@/assets/imgs/main/icon_dialog_del.png';
 
 function DeleteModal({
   setDeleteModal,
@@ -13,9 +13,13 @@ function DeleteModal({
   function handleDelete(): void {
     setLoading(true);
     deleteTool(currentTool.id)
-      .then((data) => {
+      .then(data => {
+        console.log(data);
         setDeleteModal(false);
         getPersonTools();
+      })
+      .catch(error => {
+        message.error(error.message);
       })
       .finally(() => {
         setLoading(false);

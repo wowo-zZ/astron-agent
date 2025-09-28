@@ -1,9 +1,9 @@
-import React from "react";
-import classNames from "classnames";
-import styles from "./index.module.scss";
+import React from 'react';
+import classNames from 'classnames';
+import styles from './index.module.scss';
 
-export type TagTheme = "default" | "success" | "warning" | "danger";
-export type TagSize = "middle" | "small";
+export type TagTheme = 'default' | 'success' | 'warning' | 'danger';
+export type TagSize = 'middle' | 'small';
 
 export interface SpaceTagProps {
   /** 标签文本 */
@@ -26,8 +26,8 @@ const SpaceTag: React.FC<SpaceTagProps> = ({
   children,
   icon,
   showBorder = false,
-  theme = "default",
-  size = "middle",
+  theme = 'default',
+  size = 'middle',
   style,
   className,
 }) => {
@@ -38,7 +38,7 @@ const SpaceTag: React.FC<SpaceTagProps> = ({
         styles[theme],
         styles[size],
         showBorder && styles.hasBorder,
-        className,
+        className
       )}
       style={style}
     >

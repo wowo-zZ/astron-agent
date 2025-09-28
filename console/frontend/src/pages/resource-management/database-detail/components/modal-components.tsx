@@ -1,8 +1,8 @@
-import React, { memo } from "react";
-import CreateDatabase from "../../database/components/create-database";
-import AddTableRowModal from "./add-tablerow-modal";
-import { useDatabaseState } from "../context/database-context";
-import { useDatabaseActions } from "../hooks/use-database-actions";
+import React, { memo } from 'react';
+import CreateDatabase from '../../database/components/create-database';
+import AddTableRowModal from './add-tablerow-modal';
+import { useDatabaseState } from '../context/database-context';
+import { useDatabaseActions } from '../hooks/use-database-actions';
 
 /**
  * 弹框组件集合
@@ -27,8 +27,8 @@ const ModalComponents: React.FC = () => {
       {createDatabaseOpen && (
         <CreateDatabase
           open={createDatabaseOpen}
-          type={"edit"}
-          handleCancel={(): void => closeModal("createDatabase")}
+          type={'edit'}
+          handleCancel={(): void => closeModal('createDatabase')}
           handleOk={updateDatabase}
           info={dbDetailData}
         />
@@ -40,7 +40,7 @@ const ModalComponents: React.FC = () => {
           dataType={dataType}
           info={currentSheet}
           open={addRowModalOpen}
-          setOpen={(): void => closeModal("addRow")}
+          setOpen={(): void => closeModal('addRow')}
           handleUpdateTable={refreshCurrentTableData}
         />
       )}

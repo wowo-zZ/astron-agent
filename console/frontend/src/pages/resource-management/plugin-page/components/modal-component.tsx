@@ -1,9 +1,9 @@
-import { FC, useState } from "react";
-import { Button } from "antd";
-import { deleteTool } from "@/services/plugin";
+import { FC, useState } from 'react';
+import { Button, message } from 'antd';
+import { deleteTool } from '@/services/plugin';
 
-import dialogDel from "@/assets/imgs/main/icon_dialog_del.png";
-import { ToolItem } from "../../../../types/resource";
+import dialogDel from '@/assets/imgs/main/icon_dialog_del.png';
+import { ToolItem } from '../../../../types/resource';
 
 export const DeleteModal: FC<{
   setDeleteModal: (value: boolean) => void;
@@ -15,9 +15,12 @@ export const DeleteModal: FC<{
   function handleDelete(): void {
     setLoading(true);
     deleteTool(currentTool.id)
-      .then((data) => {
+      .then(data => {
         setDeleteModal(false);
         getTools();
+      })
+      .catch(error => {
+        message.error(error.message);
       })
       .finally(() => {
         setLoading(false);

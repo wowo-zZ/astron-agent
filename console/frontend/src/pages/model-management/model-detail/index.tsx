@@ -1,27 +1,27 @@
-import React, { memo, useEffect, useState, useMemo } from "react";
-import { useParams, useSearchParams, useLocation } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { message } from "antd";
-import { getModelDetail } from "@/services/model";
-import dayjs from "dayjs";
-import ModelDetailHeader from "./components/model-detail-header";
-import ModelInfoDisplay from "./components/model-info-display";
-import ModelConfigSection from "./components/model-config-section";
+import React, { memo, useEffect, useState, useMemo } from 'react';
+import { useParams, useSearchParams, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { message } from 'antd';
+import { getModelDetail } from '@/services/model';
+import dayjs from 'dayjs';
+import ModelDetailHeader from './components/model-detail-header';
+import ModelInfoDisplay from './components/model-info-display';
+import ModelConfigSection from './components/model-config-section';
 import {
   ModelInfo,
   CategoryNode,
   ModelConfigParam,
   LLMSource,
-} from "@/types/model";
+} from '@/types/model';
 
-import { v4 as uuid } from "uuid";
-import { ResponseBusinessError } from "@/types/global";
+import { v4 as uuid } from 'uuid';
+import { ResponseBusinessError } from '@/types/global';
 
 // 辅助函数
 function collectNames(nodes: CategoryNode[] = []): string[] {
   const res: string[] = [];
   function dfs(list: CategoryNode[]): void {
-    list.forEach((item) => {
+    list.forEach(item => {
       res.push(item.name);
       if (item.children?.length) {
         dfs(item.children);
@@ -34,8 +34,8 @@ function collectNames(nodes: CategoryNode[] = []): string[] {
 
 const formatDate = (d: Date): string => {
   const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
   return `${y}-${m}-${day}`;
 };
 
@@ -44,9 +44,9 @@ const checkNameConventions = (string: string): boolean => {
   return regex.test(string);
 };
 
-const maskKey = (key = ""): string =>
+const maskKey = (key = ''): string =>
   key.length <= 8
-    ? key.replace(/./g, "*") // 太短直接全打码
+    ? key.replace(/./g, '*') // 太短直接全打码
     : `${key.slice(0, 4)}******${key.slice(-4)}`;
 
 function index(): React.JSX.Element {
@@ -54,8 +54,8 @@ function index(): React.JSX.Element {
   const { state } = useLocation();
   const { id } = useParams();
   const [searchParams] = useSearchParams();
-  const llmSource = searchParams.get("llmSource");
-  const modelIcon = searchParams.get("modelIcon");
+  const llmSource = searchParams.get('llmSource');
+  const modelIcon = searchParams.get('modelIcon');
   const [modelDetail, setModelDetail] = useState<ModelInfo | null>(null);
 
   /* 控制提示框是否已手动关闭 */
@@ -74,13 +74,13 @@ function index(): React.JSX.Element {
     };
 
     getModelDetail(params)
-      .then((data) => {
+      .then(data => {
         if (data) {
           setModelDetail({
             ...data,
             updateTime: data?.updateTime
-              ? dayjs(data.updateTime).format("YYYY-MM-DD HH:mm:ss")
-              : "",
+              ? dayjs(data.updateTime).format('YYYY-MM-DD HH:mm:ss')
+              : '',
           });
 
           if (data?.llmSource === LLMSource.CUSTOM) {
@@ -90,7 +90,7 @@ function index(): React.JSX.Element {
                 id: uuid(),
                 min: item?.constraintContent?.[0]?.name,
                 max: item?.constraintContent?.[1]?.name,
-              })),
+              }))
             );
           }
         }
@@ -102,7 +102,7 @@ function index(): React.JSX.Element {
 
   const modelCategoryTags = useMemo(() => {
     const tags: string[] = [];
-    ["modelCategory"].forEach((key) => {
+    ['modelCategory'].forEach(key => {
       let categoryTree: CategoryNode[] = [];
       if (model && model.categoryTree) {
         categoryTree = model.categoryTree;
@@ -119,7 +119,7 @@ function index(): React.JSX.Element {
 
   const modelScenarioTags = useMemo(() => {
     const tags: string[] = [];
-    ["modelScenario"].forEach((key) => {
+    ['modelScenario'].forEach(key => {
       let categoryTree: CategoryNode[] = [];
       if (model && model.categoryTree) {
         categoryTree = model.categoryTree;
@@ -146,7 +146,7 @@ function index(): React.JSX.Element {
         <div
           className="w-full h-full mx-auto bg-[#FFFFFF] rounded-2xl p-6"
           style={{
-            width: "85%",
+            width: '85%',
           }}
         >
           <ModelInfoDisplay

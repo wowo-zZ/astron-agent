@@ -1,10 +1,10 @@
-import React, { useState, memo } from "react";
-import { Cascader } from "antd";
-import { cn } from "@/utils";
+import React, { useState, memo } from 'react';
+import { Cascader } from 'antd';
+import { cn } from '@/utils';
 
-import formSelect from "@/assets/imgs/main/icon_nav_dropdown.svg";
+import formSelect from '@/assets/imgs/main/icon_nav_dropdown.svg';
 
-function FlowTypeCascader({ className = "", ...reset }): React.ReactElement {
+function FlowTypeCascader({ className = '', ...reset }): React.ReactElement {
   const [open, setOpen] = useState(false);
 
   return (
@@ -15,20 +15,20 @@ function FlowTypeCascader({ className = "", ...reset }): React.ReactElement {
         allowClear={false}
         suffixIcon={<img src={formSelect} className="w-4 h-4" />}
         placeholder="请选择"
-        className={cn("flow-select nodrag w-full", className)}
+        className={cn('flow-select nodrag w-full', className)}
         dropdownAlign={{ offset: [0, 0] }}
         popupClassName="custom-cascader-popup"
         {...reset}
-        dropdownRender={(menu) => (
+        dropdownRender={menu => (
           <div
-            onWheel={(e) => {
+            onWheel={e => {
               e.stopPropagation();
             }}
           >
             {menu}
           </div>
         )}
-        displayRender={(labels) => labels[labels.length - 1]}
+        displayRender={labels => labels[labels.length - 1]}
       />
     </div>
   );

@@ -1,15 +1,15 @@
-import React, { useCallback, memo } from "react";
-import { useTranslation } from "react-i18next";
-import { cloneDeep } from "lodash";
-import { FLowCollapse, FlowTextArea } from "@/components/workflow/ui";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import ExceptionHandling from "@/components/workflow/nodes/components/exception-handling";
-import SingleInput from "../components/single-input";
-import { KnowledgeRepoList } from "../knowledge";
-import FixedOutputs from "../components/fixed-outputs";
+import React, { useCallback, memo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { cloneDeep } from 'lodash';
+import { FLowCollapse, FlowTextArea } from '@/components/workflow/ui';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import ExceptionHandling from '@/components/workflow/nodes/components/exception-handling';
+import SingleInput from '../components/single-input';
+import { KnowledgeRepoList } from '../knowledge';
+import FixedOutputs from '../components/fixed-outputs';
 
-import inputAddIcon from "@/assets/imgs/workflow/input-add-icon.png";
-import parameterSettingsIcon from "@/assets/imgs/workflow/parameter-settings-icon.png";
+import inputAddIcon from '@/assets/imgs/workflow/input-add-icon.png';
+import parameterSettingsIcon from '@/assets/imgs/workflow/parameter-settings-icon.png';
 
 const KnowledgeProStrategy = ({
   handleParameterChange,
@@ -17,32 +17,32 @@ const KnowledgeProStrategy = ({
 }): React.ReactElement => {
   const { t } = useTranslation();
   const knowledgeProStrategy = useFlowsManager(
-    (state) => state.knowledgeProStrategy,
+    state => state.knowledgeProStrategy
   );
 
   return (
     <FLowCollapse
       label={
         <div className="text-base font-medium">
-          {t("workflow.nodes.knowledgeProNode.strategySelection")}
+          {t('workflow.nodes.knowledgeProNode.strategySelection')}
         </div>
       }
       content={
         <div className="flex flex-col gap-2 px-[18px] pb-3">
-          {knowledgeProStrategy?.map((item) => (
+          {knowledgeProStrategy?.map(item => (
             <div
               key={item?.code}
               className="bg-[#fff] rounded-lg px-3 py-2 flex flex-col gap-1.5 cursor-pointer"
               style={{
                 border:
                   data?.nodeParam?.ragType === item?.code
-                    ? "1px solid #275EFF"
-                    : "1px solid #E4EAFF",
+                    ? '1px solid #275EFF'
+                    : '1px solid #E4EAFF',
                 color:
-                  data?.nodeParam?.ragType === item?.code ? "#275EFF" : "#333",
+                  data?.nodeParam?.ragType === item?.code ? '#275EFF' : '#333',
               }}
               onClick={() =>
-                handleParameterChange((old) => {
+                handleParameterChange(old => {
                   old.data.nodeParam.ragType = item?.code;
                 })
               }
@@ -64,7 +64,7 @@ const AnswerRole = ({ handleParameterChange, data }): React.ReactElement => {
       label={
         <div className="flex items-center justify-between">
           <h4 className="text-base font-medium">
-            {t("workflow.nodes.knowledgeProNode.answerRule")}
+            {t('workflow.nodes.knowledgeProNode.answerRule')}
           </h4>
         </div>
       }
@@ -76,11 +76,11 @@ const AnswerRole = ({ handleParameterChange, data }): React.ReactElement => {
             }}
             adaptiveHeight={true}
             placeholder={t(
-              "workflow.nodes.knowledgeProNode.outputRequirementPlaceholder",
+              'workflow.nodes.knowledgeProNode.outputRequirementPlaceholder'
             )}
             value={data?.nodeParam?.answerRole}
-            onChange={(e) =>
-              handleParameterChange((old) => {
+            onChange={e =>
+              handleParameterChange(old => {
                 old.data.nodeParam.answerRole = e?.target?.value;
               })
             }
@@ -94,42 +94,42 @@ const AnswerRole = ({ handleParameterChange, data }): React.ReactElement => {
   );
 };
 
-export const KnowledgeProDetail = memo((props) => {
+export const KnowledgeProDetail = memo(props => {
   const { id, data } = props;
   const { t } = useTranslation();
-  const getCurrentStore = useFlowsManager((state) => state.getCurrentStore);
+  const getCurrentStore = useFlowsManager(state => state.getCurrentStore);
   const currentStore = getCurrentStore();
-  const canvasesDisabled = useFlowsManager((state) => state.canvasesDisabled);
+  const canvasesDisabled = useFlowsManager(state => state.canvasesDisabled);
   const setKnowledgeModalInfo = useFlowsManager(
-    (state) => state.setKnowledgeModalInfo,
+    state => state.setKnowledgeModalInfo
   );
-  const setNode = currentStore((state) => state.setNode);
-  const checkNode = currentStore((state) => state.checkNode);
-  const canPublishSetNot = useFlowsManager((state) => state.canPublishSetNot);
+  const setNode = currentStore(state => state.setNode);
+  const checkNode = currentStore(state => state.checkNode);
+  const canPublishSetNot = useFlowsManager(state => state.canPublishSetNot);
   const autoSaveCurrentFlow = useFlowsManager(
-    (state) => state.autoSaveCurrentFlow,
+    state => state.autoSaveCurrentFlow
   );
   const setKnowledgeProParameterModalInfo = useFlowsManager(
-    (state) => state.setKnowledgeProParameterModalInfo,
+    state => state.setKnowledgeProParameterModalInfo
   );
 
   const handleKnowledgesChange = useCallback(
-    (knowledge) => {
+    knowledge => {
       autoSaveCurrentFlow();
-      setNode(id, (old) => {
+      setNode(id, old => {
         const findKnowledgeIndex = old.data.nodeParam.repoList?.findIndex(
-          (item) => item.id === knowledge.id,
+          item => item.id === knowledge.id
         );
         if (findKnowledgeIndex === -1) {
           old.data.nodeParam.repoIds.push(
-            knowledge.coreRepoId || knowledge.outerRepoId,
+            knowledge.coreRepoId || knowledge.outerRepoId
           );
           old.data.nodeParam.repoList.push(knowledge);
         } else {
           old.data.nodeParam.repoIds.splice(findKnowledgeIndex, 1);
           old.data.nodeParam.repoList.splice(findKnowledgeIndex, 1);
         }
-        if (knowledge?.tag === "SparkDesk-RAG") {
+        if (knowledge?.tag === 'SparkDesk-RAG') {
           old.data.nodeParam.repoType = 3;
         } else {
           old.data.nodeParam.repoType = 2;
@@ -141,13 +141,13 @@ export const KnowledgeProDetail = memo((props) => {
       checkNode(id);
       canPublishSetNot();
     },
-    [setNode, checkNode, canPublishSetNot, autoSaveCurrentFlow],
+    [setNode, checkNode, canPublishSetNot, autoSaveCurrentFlow]
   );
 
   const handleParameterChange = useCallback(
-    (fn) => {
+    fn => {
       autoSaveCurrentFlow();
-      setNode(id, (old) => {
+      setNode(id, old => {
         fn(old);
         return {
           ...cloneDeep(old),
@@ -155,7 +155,7 @@ export const KnowledgeProDetail = memo((props) => {
       });
       canPublishSetNot();
     },
-    [setNode, canPublishSetNot, autoSaveCurrentFlow],
+    [setNode, canPublishSetNot, autoSaveCurrentFlow]
   );
 
   return (
@@ -169,11 +169,11 @@ export const KnowledgeProDetail = memo((props) => {
         <FLowCollapse
           label={
             <div className="w-full flex items-center justify-between">
-              <h4>{t("workflow.nodes.knowledgeProNode.knowledgeBase")}</h4>
+              <h4>{t('workflow.nodes.knowledgeProNode.knowledgeBase')}</h4>
               {!canvasesDisabled && (
                 <div
                   className="flex items-center gap-4 text-xs font-medium"
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={e => e.stopPropagation()}
                 >
                   <div
                     className="flex items-center cursor-pointer gap-1"
@@ -190,12 +190,12 @@ export const KnowledgeProDetail = memo((props) => {
                       alt=""
                     />
                     <span className="text-[#275EFF] cursor-pointer">
-                      {t("workflow.nodes.knowledgeProNode.parameterSetting")}
+                      {t('workflow.nodes.knowledgeProNode.parameterSetting')}
                     </span>
                   </div>
                   <div
                     className="flex items-center cursor-pointer gap-1"
-                    onClick={(e) => {
+                    onClick={e => {
                       e.stopPropagation();
                       setKnowledgeModalInfo({
                         open: true,
@@ -209,7 +209,7 @@ export const KnowledgeProDetail = memo((props) => {
                       alt=""
                     />
                     <span className="text-[#275EFF] cursor-pointer">
-                      {t("workflow.nodes.knowledgeProNode.addKnowledgeBase")}
+                      {t('workflow.nodes.knowledgeProNode.addKnowledgeBase')}
                     </span>
                   </div>
                 </div>

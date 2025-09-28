@@ -1,7 +1,7 @@
-import { listRepos } from "@/services/knowledge";
-import { RepoItem } from "@/types/resource";
-import { debounce } from "lodash";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { listRepos } from '@/services/knowledge';
+import { RepoItem } from '@/types/resource';
+import { debounce } from 'lodash';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 export const useKnowledgePage = (): {
   loading: React.RefObject<boolean>;
@@ -31,25 +31,25 @@ export const useKnowledgePage = (): {
   const [deleteModal, setDeleteModal] = useState(false);
   const [createModal, setCreateModal] = useState(false);
   const [currentKnowledge, setCurrentKnowledge] = useState<RepoItem>(
-    {} as RepoItem,
+    {} as RepoItem
   );
   const [isHovered, setIsHovered] = useState<boolean | null>(null);
   const [knowledges, setKnowledges] = useState<RepoItem[]>([]);
   const [pageNo, setPageNo] = useState(1);
   const [hasMore, setHasMore] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState('');
 
   useEffect(() => {
     getKnowledges();
   }, []);
 
   const getRobotsDebounce = useCallback(
-    debounce((e) => {
+    debounce(e => {
       const value = e.target.value;
       setSearchValue(value);
       getKnowledges(value);
     }, 500),
-    [searchValue],
+    [searchValue]
   );
 
   function getKnowledges(value?: string): void {
@@ -63,8 +63,8 @@ export const useKnowledgePage = (): {
       content: value !== undefined ? value?.trim() : searchValue,
     };
     listRepos(params)
-      .then((data) => {
-        const newKnowledges = data.pageData?.map((item) => ({
+      .then(data => {
+        const newKnowledges = data.pageData?.map(item => ({
           ...item,
           tagDtoList: item.tagDtoList,
         }));
@@ -82,12 +82,12 @@ export const useKnowledgePage = (): {
   useEffect(() => {
     const element = knowledgeRef.current;
     if (element) {
-      element.addEventListener("scroll", handleScroll);
+      element.addEventListener('scroll', handleScroll);
     }
 
     return (): void => {
       if (element) {
-        element.removeEventListener("scroll", handleScroll);
+        element.removeEventListener('scroll', handleScroll);
       }
     };
   }, [pageNo, hasMore, searchValue]);
@@ -114,13 +114,13 @@ export const useKnowledgePage = (): {
       pageSize: 20,
       content: searchValue,
     };
-    listRepos(params).then((data) => {
-      const newKnowledges = data.pageData?.map((item) => ({
+    listRepos(params).then(data => {
+      const newKnowledges = data.pageData?.map(item => ({
         ...item,
         tagDtoList: item.tagDtoList,
       }));
       setKnowledges([...knowledges, ...(newKnowledges || [])]);
-      setPageNo((pageNo) => pageNo + 1);
+      setPageNo(pageNo => pageNo + 1);
       if (knowledges.length + 20 < data.totalCount) {
         setHasMore(true);
       } else {

@@ -1,56 +1,56 @@
-import { useCallback } from "react";
-import { cloneDeep } from "lodash";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import { isRefKnowledgeBase } from "@/components/workflow/utils/reactflowUtils";
-import { UseVariableMemoryHandlersReturn } from "../types/hooks";
+import { useCallback } from 'react';
+import { cloneDeep } from 'lodash';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import { isRefKnowledgeBase } from '@/components/workflow/utils/reactflowUtils';
+import { UseVariableMemoryHandlersReturn } from '../types/hooks';
 
 export function useVariableMemoryHandlers({
   id,
   currentNodes,
 }): UseVariableMemoryHandlersReturn {
-  const getCurrentStore = useFlowsManager((state) => state.getCurrentStore);
+  const getCurrentStore = useFlowsManager(state => state.getCurrentStore);
   const currentStore = getCurrentStore();
 
-  const setNode = currentStore((state) => state.setNode);
-  const setNodes = currentStore((state) => state.setNodes);
-  const takeSnapshot = currentStore((state) => state.takeSnapshot);
-  const updateNodeRef = currentStore((state) => state.updateNodeRef);
-  const deleteNodeRef = currentStore((state) => state.deleteNodeRef);
+  const setNode = currentStore(state => state.setNode);
+  const setNodes = currentStore(state => state.setNodes);
+  const takeSnapshot = currentStore(state => state.takeSnapshot);
+  const updateNodeRef = currentStore(state => state.updateNodeRef);
+  const deleteNodeRef = currentStore(state => state.deleteNodeRef);
 
-  const canPublishSetNot = useFlowsManager((state) => state.canPublishSetNot);
+  const canPublishSetNot = useFlowsManager(state => state.canPublishSetNot);
   const autoSaveCurrentFlow = useFlowsManager(
-    (state) => state.autoSaveCurrentFlow,
+    state => state.autoSaveCurrentFlow
   );
 
   /** 更新 variable-memory 节点的 ref */
   const updateVariableMemoryNodeRef = useCallback(() => {
     const variableMemoryNode = currentNodes.filter(
-      (node) =>
-        node.nodeType === "node-variable" &&
-        node.data.nodeParam.method === "get",
+      node =>
+        node.nodeType === 'node-variable' &&
+        node.data.nodeParam.method === 'get'
     );
-    variableMemoryNode.forEach((node) => updateNodeRef(node?.id));
+    variableMemoryNode.forEach(node => updateNodeRef(node?.id));
   }, [currentNodes, updateNodeRef]);
 
   /** 移除 variable-memory 节点的 ref */
   const removeVariableMemoryNodeRef = useCallback(
-    (outputId) => {
+    outputId => {
       const variableMemoryNodeIds = currentNodes
         ?.filter(
-          (node) =>
-            node.nodeType === "node-variable" &&
-            node.data.nodeParam.method === "get",
+          node =>
+            node.nodeType === 'node-variable' &&
+            node.data.nodeParam.method === 'get'
         )
-        ?.map((node) => node?.id);
+        ?.map(node => node?.id);
 
-      setNodes((old) => {
-        old.forEach((node) => {
+      setNodes(old => {
+        old.forEach(node => {
           if (variableMemoryNodeIds?.includes(node?.id)) {
-            node?.data?.outputs?.forEach((output) => {
+            node?.data?.outputs?.forEach(output => {
               if (output?.refId === outputId) {
-                output.refId = "";
-                output.name = "";
-                output.schema.type = "";
+                output.refId = '';
+                output.name = '';
+                output.schema.type = '';
                 setTimeout(() => {
                   deleteNodeRef(node?.id, output?.id);
                 }, 0);
@@ -61,23 +61,23 @@ export function useVariableMemoryHandlers({
         return cloneDeep(old);
       });
     },
-    [currentNodes, setNodes, deleteNodeRef],
+    [currentNodes, setNodes, deleteNodeRef]
   );
 
   // 判断 currentInput 是否有效
-  const isValidInput = (input) => {
+  const isValidInput = (input): boolean | string | {} => {
     if (!input?.name) return false;
     const { type, content } = input?.schema?.value || {};
-    if (type === "literal") return !!content;
-    if (type === "ref") return !!content?.name;
+    if (type === 'literal') return !!content;
+    if (type === 'ref') return !!content?.name;
     return false;
   };
 
   // 更新 output
-  const updateOutputFromInput = (output, currentInput) => {
+  const updateOutputFromInput = (output, currentInput): void => {
     if (!isValidInput(currentInput)) {
-      output.name = "";
-      output.schema.type = "";
+      output.name = '';
+      output.schema.type = '';
       return;
     }
 
@@ -91,9 +91,9 @@ export function useVariableMemoryHandlers({
   const handleChangeParam = useCallback(
     (outputId, fn, value) => {
       // 更新当前节点输入
-      setNode(id, (old) => {
+      setNode(id, old => {
         const currentInput = old.data?.inputs.find(
-          (item) => item?.id === outputId,
+          item => item?.id === outputId
         );
         fn(currentInput, value);
         return { ...cloneDeep(old) };
@@ -104,14 +104,16 @@ export function useVariableMemoryHandlers({
 
       // 延迟更新 variable-memory 节点
       setTimeout(() => {
-        setNodes((nodes) => {
-          nodes.forEach((node) => {
+        setNodes(nodes => {
+          nodes.forEach(node => {
             if (
-              node.nodeType === "node-variable" &&
-              node.data.nodeParam.method === "get"
+              node.nodeType === 'node-variable' &&
+              node.data.nodeParam.method === 'get'
             ) {
-              node?.data?.outputs?.forEach((output) => {
-                const currentInput = findCurrentInput(nodes, id, output);
+              node?.data?.outputs?.forEach(output => {
+                const currentInput = nodes
+                  ?.find(node => node?.id === id)
+                  ?.data?.inputs.find(item => item?.id === output?.refId);
                 if (currentInput) {
                   updateOutputFromInput(output, currentInput);
                 }
@@ -122,22 +124,22 @@ export function useVariableMemoryHandlers({
         });
       }, 0);
     },
-    [id, setNode, setNodes, canPublishSetNot, autoSaveCurrentFlow],
+    [id, setNode, setNodes, canPublishSetNot, autoSaveCurrentFlow]
   );
 
   /** 删除输入行 */
   const handleRemoveInputLine = useCallback(
-    (inputId) => {
+    inputId => {
       takeSnapshot();
-      setNode(id, (old) => {
-        const index = old.data.inputs?.findIndex((item) => item.id === inputId);
+      setNode(id, old => {
+        const index = old.data.inputs?.findIndex(item => item.id === inputId);
         old.data.inputs.splice(index, 1);
         return { ...cloneDeep(old) };
       });
       canPublishSetNot();
       removeVariableMemoryNodeRef(inputId);
     },
-    [id, takeSnapshot, setNode, canPublishSetNot, removeVariableMemoryNodeRef],
+    [id, takeSnapshot, setNode, canPublishSetNot, removeVariableMemoryNodeRef]
   );
 
   return {

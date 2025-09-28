@@ -5,31 +5,31 @@ import React, {
   useMemo,
   useEffect,
   memo,
-} from "react";
-import { cloneDeep, debounce } from "lodash";
-import { v4 as uuid } from "uuid";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import FlowTree from "./FlowTree";
+} from 'react';
+import { cloneDeep, debounce } from 'lodash';
+import { v4 as uuid } from 'uuid';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import FlowTree from './FlowTree';
 
 const FlowTemplateEditor = (props: unknown): React.ReactElement => {
   const {
     data,
     value,
-    placeholder = "",
+    placeholder = '',
     onBlur = (): void => {},
     onChange = (value): void => {},
-    minHeight = "100px",
+    minHeight = '100px',
   } = props;
 
   const updateNodeInputData = useFlowsManager(
-    (state) => state.updateNodeInputData,
+    state => state.updateNodeInputData
   );
-  const getCurrentStore = useFlowsManager((state) => state.getCurrentStore);
+  const getCurrentStore = useFlowsManager(state => state.getCurrentStore);
   const currentStore = getCurrentStore();
   const isComposingRef = useRef(false);
   const beforeUpdateNodeInputData = useRef(false);
   const replaceSpanRef = useRef(false);
-  const zoom = currentStore((state) => state.zoom);
+  const zoom = currentStore(state => state.zoom);
   const editorRef = useRef<null | HTMLDivElement>(null);
   const parentRef = useRef(null);
   const currentSelection = useRef(null);
@@ -46,10 +46,10 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
   const [treeData, setTreeData] = useState([]);
   const [isEmpty, setIsEmpty] = useState(true);
   const [matchingInformation, setMatchingInformation] = useState({
-    keyWord: "",
-    matchingKeyWord: "",
+    keyWord: '',
+    matchingKeyWord: '',
   });
-  const [templateValue, setTemplateValue] = useState("");
+  const [templateValue, setTemplateValue] = useState('');
   const isPastingRef = useRef(false);
 
   // 键盘事件的状态管理
@@ -79,7 +79,7 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
   useEffect(() => {
     if (beforeUpdateNodeInputData.current !== updateNodeInputData) {
       setTemplateValue(value);
-      setEditorContent(value || "");
+      setEditorContent(value || '');
       beforeUpdateNodeInputData.current = updateNodeInputData;
     }
   }, [updateNodeInputData, value]);
@@ -88,27 +88,27 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
     setTemplateValue(value);
   }, []);
 
-  const setEditorContent = useCallback((content) => {
+  const setEditorContent = useCallback(content => {
     if (editorRef.current) {
       // 清空现有内容
-      editorRef.current.innerHTML = "";
+      editorRef.current.innerHTML = '';
 
       // 将字符串按行分割
-      const lines = content.split("\n");
+      const lines = content.split('\n');
 
       // 处理每一行的内容，将 {{xxx}} 包裹上 <span>
       lines.forEach((line, index) => {
-        const lineContainer = document.createElement("div");
+        const lineContainer = document.createElement('div');
 
         // 使用正则表达式查找并分割 {{xxx}} 包裹的内容
         const parts = line.split(/(\{\{.*?\}\})/g);
 
-        parts.forEach((part) => {
-          if (part.startsWith("{{") && part.endsWith("}}")) {
+        parts.forEach(part => {
+          if (part.startsWith('{{') && part.endsWith('}}')) {
             // 如果是 {{xxx}} 的部分，用 <span> 包裹
-            const span = document.createElement("span");
+            const span = document.createElement('span');
             span.textContent = part;
-            span.style.color = "blue"; // 可根据需求设置样式
+            span.style.color = 'blue'; // 可根据需求设置样式
             lineContainer.appendChild(span);
           } else {
             // 其他文本直接添加为文本节点
@@ -120,7 +120,7 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
         // 检查 lineContainer 是否为空
         if (!lineContainer.textContent.trim()) {
           // 如果为空，添加 <br /> 标签
-          const br = document.createElement("br");
+          const br = document.createElement('br');
           lineContainer.appendChild(br);
         }
 
@@ -133,7 +133,7 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
   useEffect(() => {
     const editor = editorRef.current;
     if (editor) {
-      setEditorContent(value || "");
+      setEditorContent(value || '');
     }
   }, []);
 
@@ -144,17 +144,17 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
   useEffect(() => {
     if (editorRef?.current) {
       const handleKeyDown = (event): void => {
-        if (event.ctrlKey && (event.key === "c" || event.key === "v")) {
+        if (event.ctrlKey && (event.key === 'c' || event.key === 'v')) {
           event.stopPropagation();
-          if (event.key === "v") {
+          if (event.key === 'v') {
             isPastingRef.current = true;
           }
         }
       };
 
-      editorRef.current.addEventListener("keydown", handleKeyDown);
+      editorRef.current.addEventListener('keydown', handleKeyDown);
       return (): void => {
-        editorRef?.current?.removeEventListener("keydown", handleKeyDown);
+        editorRef?.current?.removeEventListener('keydown', handleKeyDown);
       };
     }
   }, []);
@@ -165,10 +165,10 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
         e.stopPropagation();
       };
 
-      editorRef?.current.addEventListener("wheel", handleWheel);
+      editorRef?.current.addEventListener('wheel', handleWheel);
 
       return (): void => {
-        editorRef?.current?.removeEventListener("wheel", handleWheel);
+        editorRef?.current?.removeEventListener('wheel', handleWheel);
       };
     }
   }, []);
@@ -214,9 +214,9 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
       setShowDropdown(false);
     };
 
-    window.addEventListener("click", handleClickOutside);
+    window.addEventListener('click', handleClickOutside);
 
-    return (): void => window.removeEventListener("click", handleClickOutside);
+    return (): void => window.removeEventListener('click', handleClickOutside);
   }, []);
 
   const inputs = useMemo(() => {
@@ -230,13 +230,13 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
   const inputsOption = useMemo(() => {
     return (
       inputs
-        ?.map((input) => {
+        ?.map(input => {
           const contentValue = input?.schema?.value?.content?.name;
           const treeContent = findNodeByValue(
             contentValue,
-            cloneDeep(references),
+            cloneDeep(references)
           );
-          if (input?.schema?.value?.type === "literal" || !treeContent) {
+          if (input?.schema?.value?.type === 'literal' || !treeContent) {
             return {
               id: treeContent?.id || input?.id,
               label: input?.name,
@@ -248,7 +248,7 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
             };
           }
         })
-        ?.filter((input) => input) || []
+        ?.filter(input => input) || []
     );
   }, [inputs, references]);
 
@@ -269,11 +269,11 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
       if (startContainer.nodeType === Node.TEXT_NODE) {
         const textBefore = startContainer.textContent.slice(
           0,
-          offset - willInertInfo?.current?.offset?.offsetLeft,
+          offset - willInertInfo?.current?.offset?.offsetLeft
         );
 
         const textAfter = startContainer.textContent.slice(
-          offset + willInertInfo?.current?.offset?.offsetRight,
+          offset + willInertInfo?.current?.offset?.offsetRight
         );
         // 只保留一个文本节点
         startContainer.textContent = textBefore + content + textAfter;
@@ -327,26 +327,22 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
 
   const filterArr = useCallback(
     (arr, value, offset, content) => {
-      const splitArr = value?.split(".");
-      const filterSplitArr = splitArr?.map((str) =>
-        str.replace(/\[\d+\]$/, ""),
-      );
+      const splitArr = value?.split('.');
+      const filterSplitArr = splitArr?.map(str => str.replace(/\[\d+\]$/, ''));
       willInertInfo.current.offset = offset;
       if (splitArr?.length === 1) {
         setMatchingInformation({
-          keyWord: content?.split(".")[0],
+          keyWord: content?.split('.')[0],
           matchingKeyWord: value,
         });
-        return arr.filter((item) => item?.label?.startsWith(value));
+        return arr.filter(item => item?.label?.startsWith(value));
       } else {
-        const topValue = inputs?.find(
-          (item) => item.name === filterSplitArr[0],
-        );
+        const topValue = inputs?.find(item => item.name === filterSplitArr[0]);
         const endValue = splitArr.at(-1);
-        const leftIndex = value?.replace(`${endValue}`, "")?.length;
+        const leftIndex = value?.replace(`${endValue}`, '')?.length;
         const contentValue =
           topValue?.schema?.value?.content?.name +
-          value?.replace(splitArr[0], "")?.replace(`.${endValue}`, "");
+          value?.replace(splitArr[0], '')?.replace(`.${endValue}`, '');
         const treeContent =
           findNodeByValue(contentValue, cloneDeep(references))?.children || [];
         setMatchingInformation({
@@ -356,7 +352,7 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
         return treeContent;
       }
     },
-    [references, inputs],
+    [references, inputs]
   );
 
   const getCurrentLineContent = useCallback(() => {
@@ -374,10 +370,10 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
 
     if (currentLine) {
       const nodes = Array.from(currentLine.childNodes);
-      let nearbyContent = "";
+      let nearbyContent = '';
 
-      nodes.forEach((node) => {
-        const nodeText = node.textContent || "";
+      nodes.forEach(node => {
+        const nodeText = node.textContent || '';
         const isCursorInNode =
           range.startContainer === node || node.contains(range.startContainer);
 
@@ -392,8 +388,8 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
   }, []);
 
   const handleKeyDown = useCallback(
-    (e) => {
-      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+    e => {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
         // 如果在 {{ 内，激活下拉菜单的键盘导航
         if (showDropdown && isInsideTemplateTag()) {
           e.preventDefault();
@@ -406,21 +402,13 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
           return;
         }
       }
-      if (e.key !== "Backspace" && e.key !== "Delete") {
+      if (e.key !== 'Backspace' && e.key !== 'Delete') {
         replaceSpanRef.current = false;
       } else {
         replaceSpanRef.current = true;
       }
     },
-    [
-      inputsOption,
-      zoom,
-      references,
-      inputs,
-      showDropdown,
-      focusedKey,
-      treeData,
-    ],
+    [inputsOption, zoom, references, inputs, showDropdown, focusedKey, treeData]
   );
   // 辅助函数：判断光标是否在 {{}} 内
   const isInsideTemplateTag = useCallback(() => {
@@ -435,7 +423,7 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
     const textBeforeCursor = currentLineContent.slice(0, cursorPosition);
     const textAfterCursor = currentLineContent.slice(cursorPosition);
 
-    return textBeforeCursor.includes("{{") && textAfterCursor.includes("}}");
+    return textBeforeCursor.includes('{{') && textAfterCursor.includes('}}');
   }, []);
 
   const handleClick = useCallback(() => {
@@ -461,14 +449,14 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
               offsetLeft: matchBefore?.[1]?.length || 0,
               offsetRight: matchAfter?.[1]?.length || 0,
             },
-            matchBefore[1] + matchAfter?.[1],
+            matchBefore[1] + matchAfter?.[1]
           );
           if (newOptions?.length) {
             willInertInfo.current.cursorPosition = cursorPosition;
             currentSelection.current = range;
             setShowDropdown(true);
             setTreeData(newOptions);
-          } else if (matchText?.endsWith(".")) {
+          } else if (matchText?.endsWith('.')) {
             setShowDropdown(true);
             setTreeData(newOptions);
           } else {
@@ -486,14 +474,14 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
             offsetRight: matchAfter?.[1]?.length || 0,
           };
           setMatchingInformation({
-            keyWord: "",
-            matchingKeyWord: "",
+            keyWord: '',
+            matchingKeyWord: '',
           });
         }
       } else {
         setMatchingInformation({
-          keyWord: "",
-          matchingKeyWord: "",
+          keyWord: '',
+          matchingKeyWord: '',
         });
         setShowDropdown(false); // 否则隐藏下拉菜单
       }
@@ -508,7 +496,7 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
   }, [inputsOption, zoom, references, inputs]);
 
   const onKeyUp = useCallback(
-    (e) => {
+    e => {
       e.stopPropagation();
 
       const selection = window.getSelection();
@@ -534,14 +522,14 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
                 offsetLeft: matchBefore?.[1]?.length || 0,
                 offsetRight: matchAfter?.[1]?.length || 0,
               },
-              matchBefore[1] + matchAfter?.[1],
+              matchBefore[1] + matchAfter?.[1]
             );
             if (newOptions?.length) {
               willInertInfo.current.cursorPosition = cursorPosition;
               currentSelection.current = range;
               setShowDropdown(true);
               setTreeData(newOptions);
-            } else if (matchText?.endsWith(".")) {
+            } else if (matchText?.endsWith('.')) {
               setShowDropdown(true);
               setTreeData(newOptions);
             } else {
@@ -559,14 +547,14 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
               offsetRight: matchAfter?.[1]?.length || 0,
             };
             setMatchingInformation({
-              keyWord: "",
-              matchingKeyWord: "",
+              keyWord: '',
+              matchingKeyWord: '',
             });
           }
         } else {
           setMatchingInformation({
-            keyWord: "",
-            matchingKeyWord: "",
+            keyWord: '',
+            matchingKeyWord: '',
           });
           setShowDropdown(false); // 否则隐藏下拉菜单
         }
@@ -579,13 +567,13 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
       setKeyboardNavigationActive(false);
       setIsFirstOpen(false);
     },
-    [inputsOption, zoom, references, inputs],
+    [inputsOption, zoom, references, inputs]
   );
 
   const findPathToNode = useCallback((tree, key, path = []) => {
     for (const node of tree) {
       const label =
-        node?.type === "array-object" ? node?.label + "[0]" : node?.label;
+        node?.type === 'array-object' ? node?.label + '[0]' : node?.label;
       const newPath = [...path, label];
       if (node.id === key) {
         return newPath;
@@ -616,22 +604,22 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
   }, []);
 
   const handleTreeSelect = useCallback(
-    (selectedKeys) => {
+    selectedKeys => {
       if (selectedKeys.length > 0) {
         const selectedKey = selectedKeys[0];
         const pathTitles = findPathToNode(treeData, selectedKey);
-        const pathString = pathTitles ? pathTitles.join(".") : "";
+        const pathString = pathTitles ? pathTitles.join('.') : '';
         const selectedNode = findNodeByKey(treeData, selectedKey);
         const isLeaf = selectedNode && !selectedNode.children;
         insertOption(pathString, isLeaf);
         handleInput();
       }
     },
-    [treeData],
+    [treeData]
   );
 
   const handleReplaceInput = useCallback(
-    (e) => {
+    e => {
       const selection = window.getSelection();
       const range = selection.getRangeAt(0);
       const currentLineContent = getCurrentLineContent();
@@ -639,14 +627,14 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
       const textBeforeCursor = currentLineContent?.slice(0, cursorPosition);
 
       // 检查是否输入了 "{"
-      if (textBeforeCursor?.endsWith("{") && !replaceSpanRef.current) {
+      if (textBeforeCursor?.endsWith('{') && !replaceSpanRef.current) {
         replaceSpanRef.current = true;
         e.preventDefault(); // 阻止默认输入事件
 
         // 创建包含 "{{}}" 的 <span> 元素
-        const span = document.createElement("span");
-        span.textContent = "{{}}";
-        span.style.color = "blue"; // 可根据需求自定义样式
+        const span = document.createElement('span');
+        span.textContent = '{{}}';
+        span.style.color = 'blue'; // 可根据需求自定义样式
 
         // 获取光标所在的文本节点和偏移量
         const startContainer = range.startContainer;
@@ -683,42 +671,42 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
         }, 100);
       }
     },
-    [], // 添加依赖项
+    [] // 添加依赖项
   );
 
   const handleChangeDebounce = useCallback(
-    debounce((text) => {
+    debounce(text => {
       onChange(text);
     }, 500),
-    [],
+    []
   );
 
   const handleInput = useCallback(
     (e?) => {
       const editor = editorRef.current;
-      let text = "";
-      if (text === "\n") text = "";
+      let text = '';
+      if (text === '\n') text = '';
       // 重置粘贴状态
       if (isPastingRef.current) {
         isPastingRef.current = false;
         text = editor?.innerText;
-        setEditorContent(text || "");
+        setEditorContent(text || '');
       } else {
-        text = editor?.innerText?.replaceAll("\n\n", "\n");
+        text = editor?.innerText?.replaceAll('\n\n', '\n');
       }
-      handleChangeDebounce(text || "");
-      setTemplateValue(text || "");
+      handleChangeDebounce(text || '');
+      setTemplateValue(text || '');
       if (!replaceSpanRef.current) {
         handleReplaceInput(e);
         handleReplaceSpan();
       }
     },
-    [onChange, setIsEmpty],
+    [onChange, setIsEmpty]
   );
 
   const noProperties = useMemo(() => {
     return treeData?.every(
-      (item) => !item?.children || item?.children?.length === 0,
+      item => !item?.children || item?.children?.length === 0
     );
   }, [treeData]);
 
@@ -727,30 +715,30 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
   }, [treeData]);
 
   const titleRender = useCallback(
-    (value) => {
+    value => {
       const isFocused = value.id === focusedKey && keyboardNavigationActive;
-      const content = value?.label || "";
+      const content = value?.label || '';
       const { keyWord, matchingKeyWord } = matchingInformation;
       // 先匹配 keyWord，将其包裹为蓝色
       const escapedKeyWord = keyWord.replace(
         /[-[\]{}()*+?.,\\^$|#\s]/g,
-        "\\$&",
+        '\\$&'
       );
       const blueWrappedContent = content
-        .split(new RegExp(`(${escapedKeyWord})`, "g"))
+        .split(new RegExp(`(${escapedKeyWord})`, 'g'))
         .map((part, index) => {
           if (part === keyWord) {
             // 在匹配到 keyWord 的部分，进一步处理 matchingKeyWord 的嵌套包裹
             return (
-              <span key={`blue-${index}`} style={{ color: "#4d53e8" }}>
+              <span key={`blue-${index}`} style={{ color: '#4d53e8' }}>
                 {part
-                  .split(new RegExp(`(${matchingKeyWord})`, "g"))
+                  .split(new RegExp(`(${matchingKeyWord})`, 'g'))
                   .map((subPart, subIndex) => {
                     if (subPart === matchingKeyWord) {
                       return (
                         <span
                           key={`yellow-${index}-${subIndex}`}
-                          style={{ color: "#ff9600" }}
+                          style={{ color: '#ff9600' }}
                         >
                           {subPart}
                         </span>
@@ -766,7 +754,7 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
 
       return (
         <div
-          className={isFocused ? "bg-gray-100 rounded px-1" : ""}
+          className={isFocused ? 'bg-gray-100 rounded px-1' : ''}
           onClick={() => {
             // handleTreeSelect([focusedKey]);
           }}
@@ -775,7 +763,7 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
         </div>
       );
     },
-    [matchingInformation, focusedKey, keyboardNavigationActive],
+    [matchingInformation, focusedKey, keyboardNavigationActive]
   );
 
   const handleReplaceSpan = useCallback(() => {
@@ -788,7 +776,7 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
     const parentNode = range.startContainer.parentNode;
 
     // 判断是否在 `{{input}}` 的 `span` 标签之后
-    if (parentNode.tagName === "SPAN" && parentNode.style.color === "blue") {
+    if (parentNode.tagName === 'SPAN' && parentNode.style.color === 'blue') {
       // 确保光标位置在 `</span>` 后
       const span = parentNode;
       if (range.startOffset === span.textContent.length) {
@@ -799,7 +787,7 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
         const index = match?.index + 2;
         if (match) {
           const newTextNode = document.createTextNode(
-            range.startContainer.nodeValue.slice(index),
+            range.startContainer.nodeValue.slice(index)
           );
           span.textContent = span.textContent?.slice(0, index);
           span.parentNode.insertBefore(newTextNode, span.nextSibling);
@@ -817,7 +805,7 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
         // 在 span 开始位置插入文本节点
         const index = 1;
         const newTextNode = document.createTextNode(
-          range.startContainer.nodeValue.slice(0, index),
+          range.startContainer.nodeValue.slice(0, index)
         );
         span.textContent = span.textContent?.slice(index);
         span.parentNode.insertBefore(newTextNode, span);
@@ -833,18 +821,18 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
 
   // 处理下拉菜单内的键盘事件
   const handleDropdownKeyDown = useCallback(
-    (e) => {
+    e => {
       if (!treeData.length) return;
 
       const key = e.key;
-      const isArrowKey = key === "ArrowUp" || key === "ArrowDown";
-      const isEnterKey = key === "Enter";
+      const isArrowKey = key === 'ArrowUp' || key === 'ArrowDown';
+      const isEnterKey = key === 'Enter';
 
       if (isArrowKey) {
         e.preventDefault();
         setKeyboardNavigationActive(true);
 
-        let currentIndex = treeData.findIndex((node) => node.id === focusedKey);
+        let currentIndex = treeData.findIndex(node => node.id === focusedKey);
         if (focusedKey === null) {
           currentIndex = -1;
         }
@@ -856,7 +844,7 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
           return;
         }
 
-        const direction = key === "ArrowUp" ? -1 : 1;
+        const direction = key === 'ArrowUp' ? -1 : 1;
         const newIndex =
           (currentIndex + direction + treeData.length) % treeData.length;
 
@@ -869,16 +857,16 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
         handleTreeSelect([focusedKey]);
       }
     },
-    [treeData, focusedKey, handleTreeSelect],
+    [treeData, focusedKey, handleTreeSelect]
   );
 
   // 确保选中节点可见（处理滚动）
-  const ensureNodeVisible = useCallback((nodeId) => {
+  const ensureNodeVisible = useCallback(nodeId => {
     const nodeElement = dropdownRef.current?.querySelector(
-      `[data-key="${nodeId}"]`,
+      `[data-key="${nodeId}"]`
     );
     if (nodeElement) {
-      nodeElement.scrollIntoView({ block: "nearest" });
+      nodeElement.scrollIntoView({ block: 'nearest' });
     }
   }, []);
 
@@ -902,49 +890,49 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
   // 键盘事件监听
   useEffect((): void | (() => void) => {
     const handleKeyDown = (e: KeyboardEvent): void => {
-      if (e.key === "ArrowDown") {
+      if (e.key === 'ArrowDown') {
         setIsArrowDownPressed(true);
       }
     };
 
     const handleKeyUp = (e: KeyboardEvent): void => {
-      if (e.key === "ArrowDown") {
+      if (e.key === 'ArrowDown') {
         setIsArrowDownPressed(false);
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keyup", handleKeyUp);
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
 
     return (): void => {
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("keyup", handleKeyUp);
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
     };
   }, []);
 
   return (
     <div
       ref={parentRef}
-      style={{ position: "relative" }}
+      style={{ position: 'relative' }}
       className="nodrag"
-      onKeyDown={(e) => e.stopPropagation()}
+      onKeyDown={e => e.stopPropagation()}
     >
       <div
         ref={editorRef}
         contentEditable
         onKeyDown={handleKeyDown}
         onKeyUp={onKeyUp}
-        onClick={(e) => {
+        onClick={e => {
           e.stopPropagation();
           handleClick();
         }}
         className="flow-template-editor nodrag"
         style={{
-          padding: "10px",
+          padding: '10px',
           minHeight,
         }}
         onBlur={onBlur}
-        onInput={(e) => handleInput(e)}
+        onInput={e => handleInput(e)}
         onCompositionStart={() => (isComposingRef.current = true)}
         onCompositionEnd={() => {
           isComposingRef.current = false;
@@ -956,25 +944,25 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
           ref={dropdownRef}
           className="nodrag px-2 py-1 min-w-[150px]"
           style={{
-            position: "absolute",
+            position: 'absolute',
             top: dropdownPosition.top,
             left: dropdownPosition.left,
-            borderRadius: "6px",
-            backgroundColor: "#fff",
+            borderRadius: '6px',
+            backgroundColor: '#fff',
             zIndex: 1000,
-            boxShadow: "0 0 1px 0 rgba(0,0,0,.3),0 4px 14px 0 rgba(0,0,0,.1)",
-            outline: "none",
+            boxShadow: '0 0 1px 0 rgba(0,0,0,.3),0 4px 14px 0 rgba(0,0,0,.1)',
+            outline: 'none',
           }}
-          onClick={(e) => e.stopPropagation()}
+          onClick={e => e.stopPropagation()}
           onKeyDown={handleDropdownKeyDown} // 添加键盘事件监听
           tabIndex={0} // 使其可以获取焦点
         >
           {hasData ? (
             <FlowTree
-              className={noProperties ? "no-ant-tree-switcher" : ""}
+              className={noProperties ? 'no-ant-tree-switcher' : ''}
               fieldNames={{
-                title: "label",
-                key: "id",
+                title: 'label',
+                key: 'id',
               }}
               titleRender={titleRender}
               showLine={false}
@@ -991,10 +979,10 @@ const FlowTemplateEditor = (props: unknown): React.ReactElement => {
         <div
           className="px-2.5 py-1 text-[#9ca3af] break-all"
           style={{
-            position: "absolute",
-            top: "0px",
-            left: "0px",
-            pointerEvents: "none",
+            position: 'absolute',
+            top: '0px',
+            left: '0px',
+            pointerEvents: 'none',
           }}
         >
           {placeholder}

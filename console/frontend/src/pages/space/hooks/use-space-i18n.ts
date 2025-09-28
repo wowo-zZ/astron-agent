@@ -1,5 +1,5 @@
-import { useMemo } from "react";
-import { useLocaleStore } from "@/store/spark-store/locale-store";
+import { useMemo } from 'react';
+import { useLocaleStore } from '@/store/spark-store/locale-store';
 import {
   getTabOptions,
   getRoleOptions,
@@ -9,47 +9,47 @@ import {
   getApplyStatusTextMap,
   getInvitationStatusTextMap,
   getMemberRoleOptions,
-} from "../config";
+} from '../config';
 
 export const useSpaceI18n = () => {
   const currentLocale = useLocaleStore.getState().locale;
 
   const tabOptions = useMemo(
     () => getTabOptions(currentLocale),
-    [currentLocale],
+    [currentLocale]
   );
   const roleOptions = useMemo(
     () => getRoleOptions(currentLocale),
-    [currentLocale],
+    [currentLocale]
   );
   const enterpriseRoleOptions = useMemo(
     () => getRoleOptions(currentLocale, true),
-    [currentLocale],
+    [currentLocale]
   );
   const statusOptions = useMemo(
     () => getStatusOptions(currentLocale),
-    [currentLocale],
+    [currentLocale]
   );
   const statusOptionsApply = useMemo(
     () => getStatusOptions(currentLocale, true),
-    [currentLocale],
+    [currentLocale]
   );
   const applyStatusTextMap = useMemo(
     () => getApplyStatusTextMap(currentLocale),
-    [currentLocale],
+    [currentLocale]
   );
   const invitationStatusTextMap = useMemo(
     () => getInvitationStatusTextMap(currentLocale),
-    [currentLocale],
+    [currentLocale]
   );
   const messages = useMemo(() => getMessages(currentLocale), [currentLocale]);
   const roleTextMap = useMemo(
     () => getRoleTextMap(currentLocale),
-    [currentLocale],
+    [currentLocale]
   );
   const memberRoleOptions = useMemo(
     () => getMemberRoleOptions(currentLocale),
-    [currentLocale],
+    [currentLocale]
   );
 
   return {

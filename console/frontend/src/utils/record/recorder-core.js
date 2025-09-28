@@ -2,27 +2,27 @@
 (function (factory) {
   factory(window);
   //umd returnExports.js
-  if (typeof define == "function" && define.amd) {
+  if (typeof define == 'function' && define.amd) {
     define(function () {
       return Recorder;
     });
   }
-  if (typeof module == "object" && module.exports) {
+  if (typeof module == 'object' && module.exports) {
     module.exports = Recorder;
   }
 })(function (window) {
-  "use strict";
+  'use strict';
 
   var NOOP = function () {};
 
   var Recorder = function (set) {
     return new initFn(set);
   };
-  Recorder.LM = "2022-08-06 20:51";
-  var RecTxt = "Recorder";
-  var getUserMediaTxt = "getUserMedia";
-  var srcSampleRateTxt = "srcSampleRate";
-  var sampleRateTxt = "sampleRate";
+  Recorder.LM = '2022-08-06 20:51';
+  var RecTxt = 'Recorder';
+  var getUserMediaTxt = 'getUserMedia';
+  var srcSampleRateTxt = 'srcSampleRate';
+  var sampleRateTxt = 'sampleRate';
 
   //是否已经打开了全局的麦克风录音，所有工作都已经准备好了，就等接收音频数据了
   Recorder.IsOpen = function () {
@@ -33,7 +33,7 @@
       var track = tracks[0];
       if (track) {
         var state = track.readyState;
-        return state == "live" || state == track.LIVE;
+        return state == 'live' || state == track.LIVE;
       }
     }
     return false;
@@ -46,7 +46,7 @@
   Recorder.BufferSize = 4096;
   //销毁已持有的所有全局资源，当要彻底移除Recorder时需要显式的调用此方法
   Recorder.Destroy = function () {
-    CLog(RecTxt + " Destroy");
+    CLog(RecTxt + ' Destroy');
     Disconnect(); //断开可能存在的全局Stream、资源
 
     for (var k in DestroyList) {
@@ -81,11 +81,11 @@
     }
 
     Recorder.Scope = scope;
-    if (!Recorder.Ctx || Recorder.Ctx.state == "closed") {
+    if (!Recorder.Ctx || Recorder.Ctx.state == 'closed') {
       //不能反复构造，低版本number of hardware contexts reached maximum (6)
       Recorder.Ctx = new AC();
 
-      Recorder.BindDestroy("Ctx", function () {
+      Recorder.BindDestroy('Ctx', function () {
         var ctx = Recorder.Ctx;
         if (ctx && ctx.close) {
           //能关掉就关掉，关不掉就保留着
@@ -98,11 +98,11 @@
   };
 
   /*是否启用MediaRecorder.WebM.PCM来进行音频采集连接（如果浏览器支持的话），默认启用，禁用或者不支持时将使用AudioWorklet或ScriptProcessor来连接；MediaRecorder采集到的音频数据比其他方式更好，几乎不存在丢帧现象，所以音质明显会好很多，建议保持开启*/
-  var ConnectEnableWebM = "ConnectEnableWebM";
+  var ConnectEnableWebM = 'ConnectEnableWebM';
   Recorder[ConnectEnableWebM] = true;
 
   /*是否启用AudioWorklet特性来进行音频采集连接（如果浏览器支持的话），默认禁用，禁用或不支持时将使用过时的ScriptProcessor来连接（如果方法还在的话），当前AudioWorklet的实现在移动端没有ScriptProcessor稳健；ConnectEnableWebM如果启用并且有效时，本参数将不起作用*/
-  var ConnectEnableWorklet = "ConnectEnableWorklet";
+  var ConnectEnableWorklet = 'ConnectEnableWorklet';
   Recorder[ConnectEnableWorklet] = false;
 
   /*初始化H5音频采集连接。如果自行提供了sourceStream将只进行一次简单的连接处理。如果是普通麦克风录音，此时的Stream是全局的，Safari上断开后就无法再次进行连接使用，表现为静音，因此使用全部使用全局处理避免调用到disconnect；全局处理也有利于屏蔽底层细节，start时无需再调用底层接口，提升兼容、可靠性。*/
@@ -114,7 +114,7 @@
     var mediaConn = function (node) {
       var media = (stream._m = ctx.createMediaStreamSource(stream));
       var ctxDest = ctx.destination,
-        cmsdTxt = "createMediaStreamDestination";
+        cmsdTxt = 'createMediaStreamDestination';
       if (ctx[cmsdTxt]) {
         ctxDest = ctx[cmsdTxt]();
       }
@@ -124,7 +124,7 @@
     var isWebM,
       isWorklet,
       badInt,
-      webMTips = "";
+      webMTips = '';
     var calls = stream._call;
 
     //浏览器回传的音频数据处理
@@ -151,47 +151,47 @@
       }
     };
 
-    var scriptProcessor = "ScriptProcessor"; //一堆字符串名字，有利于压缩js
-    var audioWorklet = "audioWorklet";
-    var recAudioWorklet = RecTxt + " " + audioWorklet;
-    var RecProc = "RecProc";
-    var MediaRecorderTxt = "MediaRecorder";
-    var MRWebMPCM = MediaRecorderTxt + ".WebM.PCM";
+    var scriptProcessor = 'ScriptProcessor'; //一堆字符串名字，有利于压缩js
+    var audioWorklet = 'audioWorklet';
+    var recAudioWorklet = RecTxt + ' ' + audioWorklet;
+    var RecProc = 'RecProc';
+    var MediaRecorderTxt = 'MediaRecorder';
+    var MRWebMPCM = MediaRecorderTxt + '.WebM.PCM';
 
     //===================连接方式三=========================
     //古董级别的 ScriptProcessor 处理，目前所有浏览器均兼容，虽然是过时的方法，但更稳健，移动端性能比AudioWorklet强
     var oldFn = ctx.createScriptProcessor || ctx.createJavaScriptNode;
     var oldIsBest =
-      "。由于" +
+      '。由于' +
       audioWorklet +
-      "内部1秒375次回调，在移动端可能会有性能问题导致回调丢失录音变短，PC端无影响，暂不建议开启" +
+      '内部1秒375次回调，在移动端可能会有性能问题导致回调丢失录音变短，PC端无影响，暂不建议开启' +
       audioWorklet +
-      "。";
+      '。';
     var oldScript = function () {
       isWorklet = stream.isWorklet = false;
       _Disconn_n(stream);
       CLog(
-        "Connect采用老的" +
+        'Connect采用老的' +
           scriptProcessor +
-          "，" +
-          (Recorder[ConnectEnableWorklet] ? "但已" : "可") +
-          "设置" +
+          '，' +
+          (Recorder[ConnectEnableWorklet] ? '但已' : '可') +
+          '设置' +
           RecTxt +
-          "." +
+          '.' +
           ConnectEnableWorklet +
-          "=true尝试启用" +
+          '=true尝试启用' +
           audioWorklet +
           webMTips +
           oldIsBest,
-        3,
+        3
       );
 
       var process = (stream._p = oldFn.call(ctx, bufferSize, 1, 1)); //单声道，省的数据处理复杂
       mediaConn(process);
 
-      var _DsetTxt = "_D220626",
+      var _DsetTxt = '_D220626',
         _Dset = Recorder[_DsetTxt];
-      if (_Dset) CLog("Use " + RecTxt + "." + _DsetTxt, 3);
+      if (_Dset) CLog('Use ' + RecTxt + '.' + _DsetTxt, 3);
       process.onaudioprocess = function (e) {
         var arr = e.inputBuffer.getChannelData(0);
         if (_Dset) {
@@ -222,12 +222,12 @@
         var xf = function (f) {
           return f
             .toString()
-            .replace(/^function|DEL_/g, "")
+            .replace(/^function|DEL_/g, '')
             .replace(/\$RA/g, recAudioWorklet);
         };
-        var clazz = "class " + RecProc + " extends AudioWorkletProcessor{";
+        var clazz = 'class ' + RecProc + ' extends AudioWorkletProcessor{';
         clazz +=
-          "constructor " +
+          'constructor ' +
           xf(function (option) {
             DEL_super(option);
             var This = this,
@@ -238,15 +238,15 @@
             This.port.onmessage = function (e) {
               if (e.data.kill) {
                 This.kill = true;
-                console.log("$RA kill call");
+                console.log('$RA kill call');
               }
             };
-            console.log("$RA .ctor call", option);
+            console.log('$RA .ctor call', option);
           });
 
         //https://developer.mozilla.org/en-US/docs/Web/API/AudioWorkletProcessor/process 每次回调128个采样数据，1秒375次回调，高频导致移动端性能问题，结果就是回调次数缺斤少两，进而导致丢失数据，PC端似乎没有性能问题
         clazz +=
-          "process " +
+          'process ' +
           xf(function (input, b, c) {
             //需要等到ctx激活后才会有回调
             var This = this,
@@ -273,21 +273,21 @@
             return !This.kill;
           });
         clazz +=
-          "}" +
-          "try{" +
+          '}' +
+          'try{' +
           'registerProcessor("' +
           RecProc +
           '", ' +
           RecProc +
-          ")" +
-          "}catch(e){" +
+          ')' +
+          '}catch(e){' +
           'console.error("' +
           recAudioWorklet +
           '注册失败",e)' +
-          "}";
+          '}';
         //URL.createObjectURL 本地有些浏览器会报 Not allowed to load local resource，直接用dataurl
         return (
-          "data:text/javascript;base64," +
+          'data:text/javascript;base64,' +
           btoa(unescape(encodeURIComponent(clazz)))
         );
       };
@@ -298,15 +298,15 @@
       };
       var nodeAlive = (stream._na = function () {
         //start时会调用，只要没有收到数据就断定AudioWorklet有问题，恢复用老的
-        if (badInt !== "") {
+        if (badInt !== '') {
           //没有回调过数据
           clearTimeout(badInt);
           badInt = setTimeout(function () {
             badInt = 0;
             if (awNext()) {
               CLog(
-                audioWorklet + "未返回任何音频，恢复使用" + scriptProcessor,
-                3,
+                audioWorklet + '未返回任何音频，恢复使用' + scriptProcessor,
+                3
               );
               oldFn && oldScript(); //未来没有老的，可能是误判
             }
@@ -322,31 +322,31 @@
         node.port.onmessage = function (e) {
           if (badInt) {
             clearTimeout(badInt);
-            badInt = "";
+            badInt = '';
           }
           if (awNext()) {
             onReceive(e.data.val);
           } else if (!isWorklet) {
-            CLog(audioWorklet + "多余回调", 3);
+            CLog(audioWorklet + '多余回调', 3);
           }
         };
         CLog(
-          "Connect采用" +
+          'Connect采用' +
             audioWorklet +
-            "，设置" +
+            '，设置' +
             RecTxt +
-            "." +
+            '.' +
             ConnectEnableWorklet +
-            "=false可恢复老式" +
+            '=false可恢复老式' +
             scriptProcessor +
             webMTips +
             oldIsBest,
-          3,
+          3
         );
       };
 
       //如果start时的resume和下面的构造node同时进行，将会导致部分浏览器崩溃，源码assets中 ztest_chrome_bug_AudioWorkletNode.html 可测试。所以，将所有代码套到resume里面（不管catch），避免出现这个问题
-      ctx.resume()[calls && "finally"](function () {
+      ctx.resume()[calls && 'finally'](function () {
         //注释掉这行 观摩浏览器崩溃 STATUS_ACCESS_VIOLATION
         if (!awNext()) return;
         if (ctx[RecProc]) {
@@ -365,9 +365,9 @@
               nodeAlive();
             }
           })
-          [calls && "catch"](function (e) {
+          [calls && 'catch'](function (e) {
             //fix 关键字，保证catch压缩时保持字符串形式
-            CLog(audioWorklet + ".addModule失败", 1, e);
+            CLog(audioWorklet + '.addModule失败', 1, e);
             awNext() && oldScript();
           });
       });
@@ -377,13 +377,13 @@
     var connWebM = function () {
       //尝试开启MediaRecorder录制webm+pcm处理
       var MR = window[MediaRecorderTxt];
-      var onData = "ondataavailable";
-      var webmType = "audio/webm; codecs=pcm";
+      var onData = 'ondataavailable';
+      var webmType = 'audio/webm; codecs=pcm';
       isWebM = stream.isWebM = Recorder[ConnectEnableWebM];
 
       var supportMR =
         MR && onData in MR.prototype && MR.isTypeSupported(webmType);
-      webMTips = supportMR ? "" : "（此浏览器不支持" + MRWebMPCM + "）";
+      webMTips = supportMR ? '' : '（此浏览器不支持' + MRWebMPCM + '）';
       if (!isUserMedia || !isWebM || !supportMR) {
         connWorklet(); //非麦克风录音（MediaRecorder采样率不可控） 或 被禁用 或 不支持MediaRecorder 或 不支持webm+pcm
         return;
@@ -395,15 +395,15 @@
       };
       var mrAlive = (stream._ra = function () {
         //start时会调用，只要没有收到数据就断定MediaRecorder有问题，降级处理
-        if (badInt !== "") {
+        if (badInt !== '') {
           //没有回调过数据
           clearTimeout(badInt);
           badInt = setTimeout(function () {
             //badInt=0; 保留给nodeAlive继续判断
             if (mrNext()) {
               CLog(
-                MediaRecorderTxt + "未返回任何音频，降级使用" + audioWorklet,
-                3,
+                MediaRecorderTxt + '未返回任何音频，降级使用' + audioWorklet,
+                3
               );
               connWorklet();
             }
@@ -413,7 +413,7 @@
 
       var mrSet = Object.assign(
         { mimeType: webmType },
-        Recorder.ConnectWebMOptions,
+        Recorder.ConnectWebMOptions
       );
       var mr = (stream._r = new MR(stream, mrSet));
       var webmData = (stream._rd = { sampleRate: ctx[sampleRateTxt] });
@@ -432,27 +432,27 @@
 
             if (badInt) {
               clearTimeout(badInt);
-              badInt = "";
+              badInt = '';
             }
             onReceive(f32arr);
           } else if (!isWebM) {
-            CLog(MediaRecorderTxt + "多余回调", 3);
+            CLog(MediaRecorderTxt + '多余回调', 3);
           }
         };
         reader.readAsArrayBuffer(e.data);
       };
       mr.start(~~(bufferSize / 48)); //按48k时的回调间隔
       CLog(
-        "Connect采用" +
+        'Connect采用' +
           MRWebMPCM +
-          "，设置" +
+          '，设置' +
           RecTxt +
-          "." +
+          '.' +
           ConnectEnableWebM +
-          "=false可恢复使用" +
+          '=false可恢复使用' +
           audioWorklet +
-          "或老式" +
-          scriptProcessor,
+          '或老式' +
+          scriptProcessor
       );
     };
 
@@ -535,7 +535,7 @@ option:{ 可选，配置项
     pcmSampleRate,
     newSampleRate,
     prevChunkInfo,
-    option,
+    option
   ) {
     prevChunkInfo || (prevChunkInfo = {});
     var index = prevChunkInfo.index || 0;
@@ -545,12 +545,12 @@ option:{ 可选，配置项
     option || (option = {});
     var frameSize = option.frameSize || 1;
     if (option.frameType) {
-      frameSize = option.frameType == "mp3" ? 1152 : 1;
+      frameSize = option.frameType == 'mp3' ? 1152 : 1;
     }
 
     var nLen = pcmDatas.length;
     if (index > nLen + 1) {
-      CLog("SampleData似乎传入了未重置chunk " + index + ">" + nLen, 3);
+      CLog('SampleData似乎传入了未重置chunk ' + index + '>' + nLen, 3);
     }
     var size = 0;
     for (var i = index; i < nLen; i++) {
@@ -645,8 +645,8 @@ pcmLength: pcm长度
       level = Math.round(
         Math.min(
           100,
-          Math.max(0, (1 + Math.log(power / 10000) / Math.log(10)) * 100),
-        ),
+          Math.max(0, (1 + Math.log(power / 10000) / Math.log(10)) * 100)
+        )
       );
     }
     return level;
@@ -656,18 +656,18 @@ pcmLength: pcm长度
   var CLog = function (msg, err) {
     var now = new Date();
     var t =
-      ("0" + now.getMinutes()).substr(-2) +
-      ":" +
-      ("0" + now.getSeconds()).substr(-2) +
-      "." +
-      ("00" + now.getMilliseconds()).substr(-3);
+      ('0' + now.getMinutes()).substr(-2) +
+      ':' +
+      ('0' + now.getSeconds()).substr(-2) +
+      '.' +
+      ('00' + now.getMilliseconds()).substr(-3);
     var recID = this && this.envIn && this.envCheck && this.id;
-    var arr = ["[" + t + " " + RecTxt + (recID ? ":" + recID : "") + "]" + msg];
+    var arr = ['[' + t + ' ' + RecTxt + (recID ? ':' + recID : '') + ']' + msg];
     var a = arguments,
       console = window.console || {};
     var i = 2,
       fn = console.log;
-    if (typeof err == "number") {
+    if (typeof err == 'number') {
       fn = err == 1 ? console.error : err == 3 ? console.warn : fn;
     } else {
       i = 1;
@@ -677,7 +677,7 @@ pcmLength: pcm长度
     }
     if (IsLoser) {
       //古董浏览器，仅保证基本的可执行不代码异常
-      fn && fn("[IsLoser]" + arr[0], arr.length > 1 ? arr : "");
+      fn && fn('[IsLoser]' + arr[0], arr.length > 1 ? arr : '');
     } else {
       fn.apply(console, arr);
     }
@@ -696,7 +696,7 @@ pcmLength: pcm长度
     Traffic();
 
     var o = {
-      type: "mp3", //输出类型：mp3,wav，wav输出文件尺寸超大不推荐使用，但mp3编码支持会导致js文件超大，如果不需支持mp3可以使js文件大幅减小
+      type: 'mp3', //输出类型：mp3,wav，wav输出文件尺寸超大不推荐使用，但mp3编码支持会导致js文件超大，如果不需支持mp3可以使js文件大幅减小
       bitRate: 16, //比特率 wav:16或8位，MP3：8kbps 1k/s，8kbps 2k/s 录音文件很小
 
       sampleRate: 16000, //采样率，wav格式大小=sampleRate*时间；mp3此项对低比特率有影响，高比特率几乎无影响。
@@ -754,15 +754,15 @@ pcmLength: pcm长度
       var failCall = function (errMsg, isUserNotAllow) {
         isUserNotAllow = !!isUserNotAllow;
         This.CLog(
-          "录音open失败：" + errMsg + ",isUserNotAllow:" + isUserNotAllow,
-          1,
+          '录音open失败：' + errMsg + ',isUserNotAllow:' + isUserNotAllow,
+          1
         );
         False && False(errMsg, isUserNotAllow);
         throw new Error(errMsg);
       };
 
       var ok = function () {
-        This.CLog("open ok id:" + This.id);
+        This.CLog('open ok id:' + This.id);
         True();
 
         This._SO = 0; //解除stop对open中的start调用的阻止
@@ -777,12 +777,12 @@ pcmLength: pcm长度
       var lockFail = function () {
         //允许多次open，但不允许任何一次close，或者自身已经调用了关闭
         if (lockClose != Lock.C || !This._O) {
-          var err = "open被取消";
+          var err = 'open被取消';
           if (lockOpen == Lock.O) {
             //无新的open，已经调用了close进行取消，此处应让上次的close明确生效
             This.close();
           } else {
-            err = "open被中断";
+            err = 'open被中断';
           }
           failCall(err);
           return true;
@@ -790,16 +790,16 @@ pcmLength: pcm长度
       };
 
       //环境配置检查
-      var checkMsg = This.envCheck({ envName: "H5", canProcess: true });
+      var checkMsg = This.envCheck({ envName: 'H5', canProcess: true });
       if (checkMsg) {
-        failCall("不能录音：" + checkMsg);
+        failCall('不能录音：' + checkMsg);
         return;
       }
 
       //***********已直接提供了音频流************
       if (This.set.sourceStream) {
         if (!Recorder.Support()) {
-          failCall("不支持此浏览器从流中获取录音");
+          failCall('不支持此浏览器从流中获取录音');
           return;
         }
 
@@ -810,7 +810,7 @@ pcmLength: pcm长度
         try {
           Connect(streamStore);
         } catch (e) {
-          failCall("从流中打开录音失败：" + e.message);
+          failCall('从流中打开录音失败：' + e.message);
           return;
         }
         ok();
@@ -824,18 +824,18 @@ pcmLength: pcm长度
           window.top.a;
         } catch (e) {
           failCall(
-            '无权录音(跨域，请尝试给iframe添加麦克风访问策略，如allow="camera;microphone")',
+            '无权录音(跨域，请尝试给iframe添加麦克风访问策略，如allow="camera;microphone")'
           );
           return;
         }
 
         if (/Permission|Allow/i.test(code)) {
-          failCall("未授权浏览器录音权限", true);
+          failCall('未授权浏览器录音权限', true);
         } else if (window.isSecureContext === false) {
-          failCall("浏览器禁止不安全页面录音，可开启https解决");
+          failCall('浏览器禁止不安全页面录音，可开启https解决');
         } else if (/Found/i.test(code)) {
           //可能是非安全环境导致的没有设备
-          failCall(msg + "，无可用麦克风");
+          failCall(msg + '，无可用麦克风');
         } else {
           failCall(msg);
         }
@@ -847,7 +847,7 @@ pcmLength: pcm长度
         return;
       }
       if (!Recorder.Support()) {
-        codeFail("", "此浏览器不支持录音");
+        codeFail('', '此浏览器不支持录音');
         return;
       }
 
@@ -865,20 +865,20 @@ pcmLength: pcm长度
           if (lockFail()) return;
 
           if (Recorder.IsOpen()) {
-            if (oldStream) This.CLog("发现同时多次调用open", 1);
+            if (oldStream) This.CLog('发现同时多次调用open', 1);
 
             Connect(streamStore, 1);
             ok();
           } else {
-            failCall("录音功能无效：无音频流");
+            failCall('录音功能无效：无音频流');
           }
         }, 100);
       };
       var f2 = function (e) {
-        var code = e.name || e.message || e.code + ":" + e;
-        This.CLog("请求录音权限错误", 1, e);
+        var code = e.name || e.message || e.code + ':' + e;
+        This.CLog('请求录音权限错误', 1, e);
 
-        codeFail(code, "无法录音：" + code);
+        codeFail(code, '无法录音：' + code);
         throw new Error(code);
       };
 
@@ -898,7 +898,7 @@ pcmLength: pcm长度
         pro = Recorder.Scope[getUserMediaTxt]({ audio: true }, f1, f2);
       }
       if (pro && pro.then) {
-        pro.then(f1)[True && "catch"](f2); //fix 关键字，保证catch压缩时保持字符串形式
+        pro.then(f1)[True && 'catch'](f2); //fix 关键字，保证catch压缩时保持字符串形式
       }
     },
     //关闭释放录音资源
@@ -914,8 +914,8 @@ pcmLength: pcm长度
       if (This._O_ != Lock.O) {
         //唯一资源Stream的控制权已交给新对象，这里不能关闭。此处在每次都弹权限的浏览器内可能存在泄漏，新对象被拒绝权限可能不会调用close，忽略这种不处理
         This.CLog(
-          "close被忽略（因为同时open了多个rec，只有最后一个会真正close）",
-          3,
+          'close被忽略（因为同时open了多个rec，只有最后一个会真正close）',
+          3
         );
         call();
         return;
@@ -924,7 +924,7 @@ pcmLength: pcm长度
 
       Disconnect(streamStore);
 
-      This.CLog("close");
+      This.CLog('close');
       call();
     },
 
@@ -948,7 +948,7 @@ pcmLength: pcm长度
         set = This.set;
 
       //检测CPU的数字字节序，TypedArray字节序是个迷，直接拒绝罕见的大端模式，因为找不到这种CPU进行测试
-      var tag = "CPU_BE";
+      var tag = 'CPU_BE';
       if (
         !errMsg &&
         !Recorder[tag] &&
@@ -956,28 +956,28 @@ pcmLength: pcm长度
         !new Int8Array(new Int32Array([1]).buffer)[0]
       ) {
         Traffic(tag); //如果开启了流量统计，这里将发送一个图片请求
-        errMsg = "不支持" + tag + "架构";
+        errMsg = '不支持' + tag + '架构';
       }
 
       //编码器检查环境下配置是否可用
       if (!errMsg) {
         var type = set.type;
-        if (This[type + "_envCheck"]) {
+        if (This[type + '_envCheck']) {
           //编码器已实现环境检查
-          errMsg = This[type + "_envCheck"](envInfo, set);
+          errMsg = This[type + '_envCheck'](envInfo, set);
         } else {
           //未实现检查的手动检查配置是否有效
           if (set.takeoffEncodeChunk) {
             errMsg =
               type +
-              "类型" +
-              (This[type] ? "" : "(未加载编码器)") +
-              "不支持设置takeoffEncodeChunk";
+              '类型' +
+              (This[type] ? '' : '(未加载编码器)') +
+              '不支持设置takeoffEncodeChunk';
           }
         }
       }
 
-      return errMsg || "";
+      return errMsg || '';
     },
     envStart: function (mockEnvInfo, sampleRate) {
       //平台环境相关的start调用
@@ -1003,20 +1003,20 @@ pcmLength: pcm长度
       This[srcSampleRateTxt] = sampleRate;
       This.CLog(
         srcSampleRateTxt +
-          ": " +
+          ': ' +
           sampleRate +
-          " set." +
+          ' set.' +
           sampleRateTxt +
-          ": " +
+          ': ' +
           set[sampleRateTxt] +
-          (setSr ? " 忽略" + setSr : ""),
-        setSr ? 3 : 0,
+          (setSr ? ' 忽略' + setSr : ''),
+        setSr ? 3 : 0
       );
 
       This.engineCtx = 0;
       //此类型有边录边转码(Worker)支持
-      if (This[set.type + "_start"]) {
-        var engineCtx = (This.engineCtx = This[set.type + "_start"](set));
+      if (This[set.type + '_start']) {
+        var engineCtx = (This.engineCtx = This[set.type + '_start'](set));
         if (engineCtx) {
           engineCtx.pcmDatas = [];
           engineCtx.pcmSize = 0;
@@ -1081,8 +1081,8 @@ pcmLength: pcm长度
           //丢失超过本帧的1/5
           var fixOpen = !set.disableEnvInFix;
           This.CLog(
-            "[" + now + "]" + (fixOpen ? "" : "未") + "补偿" + addTime + "ms",
-            3,
+            '[' + now + ']' + (fixOpen ? '' : '未') + '补偿' + addTime + 'ms',
+            3
           );
           This.envInFix += addTime;
 
@@ -1107,7 +1107,7 @@ pcmLength: pcm长度
           buffers,
           bufferSampleRate,
           set[sampleRateTxt],
-          engineCtx.chunkInfo,
+          engineCtx.chunkInfo
         );
         engineCtx.chunkInfo = chunkInfo;
 
@@ -1141,7 +1141,7 @@ pcmLength: pcm长度
 
             //推入后台边录边转码
             if (engineCtx && buffer.length) {
-              This[set.type + "_encode"](engineCtx, buffer);
+              This[set.type + '_encode'](engineCtx, buffer);
             }
           }
         }
@@ -1171,7 +1171,7 @@ pcmLength: pcm长度
       };
       //实时回调处理数据，允许修改或替换上次回调以来新增的数据 ，但是不允许修改已处理过的，不允许增删第一维数组 ，允许将第二维数组任意修改替换成空数组也可以
       var asyncBegin = 0,
-        procTxt = "rec.set.onProcess";
+        procTxt = 'rec.set.onProcess';
       try {
         asyncBegin = set.onProcess(
           buffers,
@@ -1179,17 +1179,17 @@ pcmLength: pcm长度
           duration,
           bufferSampleRate,
           bufferFirstIdx,
-          asyncEnd,
+          asyncEnd
         );
       } catch (e) {
         //此错误显示不要用CLog，这样控制台内相同内容不会重复打印
-        console.error(procTxt + "回调出错是不允许的，需保证不会抛异常", e);
+        console.error(procTxt + '回调出错是不允许的，需保证不会抛异常', e);
       }
 
       var slowT = Date.now() - now;
       if (slowT > 10 && This.envInFirst - now > 1000) {
         //1秒后开始onProcess性能监测
-        This.CLog(procTxt + "低性能，耗时" + slowT + "ms", 3);
+        This.CLog(procTxt + '低性能，耗时' + slowT + 'ms', 3);
       }
 
       if (asyncBegin === true) {
@@ -1205,7 +1205,7 @@ pcmLength: pcm长度
         }
 
         if (hasClear) {
-          This.CLog("未进入异步前不能清除buffers", 3);
+          This.CLog('未进入异步前不能清除buffers', 3);
         } else {
           //还原size，异步结束后再统计仅修改后的size，如果发生clear要原样加回来
           if (engineCtx) {
@@ -1235,10 +1235,10 @@ pcmLength: pcm长度
         isOpen = 0;
       }
       if (!isOpen) {
-        This.CLog("未open", 1);
+        This.CLog('未open', 1);
         return;
       }
-      This.CLog("开始录音");
+      This.CLog('开始录音');
 
       This._stop();
       This.state = 3; //0未录音 1录音中 2暂停 3等待ctx激活
@@ -1248,7 +1248,7 @@ pcmLength: pcm长度
       if (This._SO && This._SO + 1 != This._S) {
         //上面调用过一次 _stop
         //open未完成就调用了stop，此种情况终止start。也应尽量避免出现此情况
-        This.CLog("start被中断", 3);
+        This.CLog('start被中断', 3);
         return;
       }
       This._SO = 0;
@@ -1259,10 +1259,10 @@ pcmLength: pcm长度
           This.resume();
         }
       };
-      if (ctx.state == "suspended") {
-        This.CLog("wait ctx resume...");
+      if (ctx.state == 'suspended') {
+        This.CLog('wait ctx resume...');
         ctx.resume().then(function () {
-          This.CLog("ctx resume");
+          This.CLog('ctx resume');
           end();
         });
       } else {
@@ -1274,7 +1274,7 @@ pcmLength: pcm长度
       var This = this;
       if (This.state) {
         This.state = 2;
-        This.CLog("pause");
+        This.CLog('pause');
         delete This._streamStore().Stream._call[This.id];
       }
     },
@@ -1283,7 +1283,7 @@ pcmLength: pcm长度
       var This = this;
       if (This.state) {
         This.state = 1;
-        This.CLog("resume");
+        This.CLog('resume');
         This.envResume();
 
         var stream = This._streamStore().Stream;
@@ -1306,8 +1306,8 @@ pcmLength: pcm长度
         This.pause();
         This.state = 0;
       }
-      if (!keepEngine && This[set.type + "_stop"]) {
-        This[set.type + "_stop"](This.engineCtx);
+      if (!keepEngine && This[set.type + '_stop']) {
+        This[set.type + '_stop'](This.engineCtx);
         This.engineCtx = 0;
       }
     },
@@ -1325,17 +1325,17 @@ pcmLength: pcm长度
       var envInMS = This.envInLast - This.envInFirst,
         envInLen = envInMS && This.buffers.length; //可能未start
       This.CLog(
-        "stop 和start时差" +
+        'stop 和start时差' +
           (envInMS
             ? envInMS +
-              "ms 补偿" +
+              'ms 补偿' +
               This.envInFix +
-              "ms" +
-              " envIn:" +
+              'ms' +
+              ' envIn:' +
               envInLen +
-              " fps:" +
+              ' fps:' +
               ((envInLen / envInMS) * 1000).toFixed(1)
-            : "-"),
+            : '-')
       );
 
       var end = function () {
@@ -1345,29 +1345,29 @@ pcmLength: pcm长度
         }
       };
       var err = function (msg) {
-        This.CLog("结束录音失败：" + msg, 1);
+        This.CLog('结束录音失败：' + msg, 1);
         False && False(msg);
         end();
       };
       var ok = function (blob, duration, originBUffers, originSampleRate) {
         This.CLog(
-          "结束录音 编码花" +
+          '结束录音 编码花' +
             (Date.now() - t1) +
-            "ms 音频时长" +
+            'ms 音频时长' +
             duration +
-            "ms 文件大小" +
+            'ms 文件大小' +
             blob.size +
-            "b",
+            'b'
         );
         if (set.takeoffEncodeChunk) {
           //接管了输出，此时blob长度为0
           This.CLog(
-            "启用takeoffEncodeChunk后stop返回的blob长度为0不提供音频数据",
-            3,
+            '启用takeoffEncodeChunk后stop返回的blob长度为0不提供音频数据',
+            3
           );
         } else if (blob.size < Math.max(100, duration / 2)) {
           //1秒小于0.5k？
-          err("生成的" + set.type + "无效");
+          err('生成的' + set.type + '无效');
           return;
         }
         True &&
@@ -1378,8 +1378,8 @@ pcmLength: pcm长度
         var isCtxWait = This.state == 3;
         if (!This.state || isCtxWait) {
           err(
-            "未开始录音" +
-              (isCtxWait ? "，开始录音前无用户交互导致AudioContext未运行" : ""),
+            '未开始录音' +
+              (isCtxWait ? '，开始录音前无用户交互导致AudioContext未运行' : '')
           );
           return;
         }
@@ -1387,43 +1387,43 @@ pcmLength: pcm长度
       }
       var size = This.recSize;
       if (!size) {
-        err("未采集到录音");
+        err('未采集到录音');
         return;
       }
       if (!This.buffers[0]) {
-        err("音频buffers被释放");
+        err('音频buffers被释放');
         return;
       }
       if (!This[set.type]) {
-        err("未加载" + set.type + "编码器");
+        err('未加载' + set.type + '编码器');
         return;
       }
 
       //环境配置检查，此处仅针对mock调用，因为open已经检查过了
       if (This.isMock) {
         var checkMsg = This.envCheck(
-          This.mockEnvInfo || { envName: "mock", canProcess: false },
+          This.mockEnvInfo || { envName: 'mock', canProcess: false }
         ); //没有提供环境信息的mock时没有onProcess回调
         if (checkMsg) {
-          err("录音错误：" + checkMsg);
+          err('录音错误：' + checkMsg);
           return;
         }
       }
 
       //此类型有边录边转码(Worker)支持
       var engineCtx = This.engineCtx;
-      if (This[set.type + "_complete"] && engineCtx) {
+      if (This[set.type + '_complete'] && engineCtx) {
         var duration = Math.round(
-          (engineCtx.pcmSize / set[sampleRateTxt]) * 1000,
+          (engineCtx.pcmSize / set[sampleRateTxt]) * 1000
         ); //采用后的数据长度和buffers的长度可能微小的不一致，是采样率连续转换的精度问题
 
         t1 = Date.now();
-        This[set.type + "_complete"](
+        This[set.type + '_complete'](
           engineCtx,
           function (blob) {
             ok(blob, duration);
           },
-          err,
+          err
         );
         return;
       }
@@ -1433,14 +1433,14 @@ pcmLength: pcm长度
       var chunk = Recorder.SampleData(
         This.buffers,
         This[srcSampleRateTxt],
-        set[sampleRateTxt],
+        set[sampleRateTxt]
       );
 
       set[sampleRateTxt] = chunk[sampleRateTxt];
       var res = chunk.data;
       var duration = Math.round((res.length / set[sampleRateTxt]) * 1000);
       This.CLog(
-        "采样" + size + "->" + res.length + " 花:" + (Date.now() - t1) + "ms",
+        '采样' + size + '->' + res.length + ' 花:' + (Date.now() - t1) + 'ms'
       );
 
       setTimeout(function () {
@@ -1452,14 +1452,14 @@ pcmLength: pcm长度
           },
           function (msg) {
             err(msg);
-          },
+          }
         );
       });
     },
   };
 
   if (window[RecTxt]) {
-    CLog("重复引入" + RecTxt, 3);
+    CLog('重复引入' + RecTxt, 3);
     window[RecTxt].Destroy();
   }
   window[RecTxt] = Recorder;
@@ -1520,15 +1520,15 @@ pcmLength: pcm长度
                 } else if (BytesEq(eid2, [0x83])) {
                   //Track Type
                   var val = BytesInt(bytes2);
-                  if (val == 1) track.type = "video";
+                  if (val == 1) track.type = 'video';
                   else if (val == 2) {
-                    track.type = "audio";
+                    track.type = 'audio';
                     if (!audioIdx) scope.track0 = track;
                     track.idx = audioIdx++;
-                  } else track.type = "Type-" + val;
+                  } else track.type = 'Type-' + val;
                 } else if (BytesEq(eid2, [0x86])) {
                   //Track Codec
-                  var str = "";
+                  var str = '';
                   for (var i = 0; i < bytes2.length; i++) {
                     str += String.fromCharCode(bytes2[i]);
                   }
@@ -1545,7 +1545,7 @@ pcmLength: pcm长度
                       if (bytes3.length == 4) val = new Float32Array(arr)[0];
                       else if (bytes3.length == 8)
                         val = new Float64Array(arr)[0];
-                      else CLog("WebM Track !Float", 1, bytes3);
+                      else CLog('WebM Track !Float', 1, bytes3);
                       track[sampleRateTxt] = Math.round(val);
                     } else if (BytesEq(eid3, [0x62, 0x64]))
                       track.bitDepth = BytesInt(bytes3);
@@ -1557,7 +1557,7 @@ pcmLength: pcm长度
             }
           }
           scope._ht = 1;
-          CLog("WebM Tracks", tracks);
+          CLog('WebM Tracks', tracks);
           endPos();
           break;
         }
@@ -1569,7 +1569,7 @@ pcmLength: pcm长度
     if (!track0) return;
     if (track0.bitDepth == 16 && /FLOAT/i.test(track0.codec)) {
       track0.bitDepth = 32; //chrome v66 实际为浮点数
-      CLog("WebM 16改32位", 3);
+      CLog('WebM 16改32位', 3);
     }
     if (
       track0[sampleRateTxt] != scope[sampleRateTxt] ||
@@ -1578,7 +1578,7 @@ pcmLength: pcm长度
       !/(\b|_)PCM\b/i.test(track0.codec)
     ) {
       scope.bytes = []; //格式非预期 无法处理，清空缓冲数据
-      if (!scope.bad) CLog("WebM Track非预期", 3, scope);
+      if (!scope.bad) CLog('WebM Track非预期', 3, scope);
       scope.bad = 1;
       return -1;
     }
@@ -1642,10 +1642,10 @@ pcmLength: pcm长度
   };
   //字节数组BE转成int数字
   var BytesInt = function (bytes) {
-    var s = ""; //0-8字节，js位运算只支持4字节
+    var s = ''; //0-8字节，js位运算只支持4字节
     for (var i = 0; i < bytes.length; i++) {
       var n = bytes[i];
-      s += (n < 16 ? "0" : "") + n.toString(16);
+      s += (n < 16 ? '0' : '') + n.toString(16);
     }
     return parseInt(s, 16) || 0;
   };
@@ -1654,7 +1654,7 @@ pcmLength: pcm长度
     var i = pos[0];
     if (i >= arr.length) return;
     var b0 = arr[i],
-      b2 = ("0000000" + b0.toString(2)).substr(-8);
+      b2 = ('0000000' + b0.toString(2)).substr(-8);
     var m = /^(0*1)(\d*)$/.exec(b2);
     if (!m) return;
     var len = m[1].length,
@@ -1664,7 +1664,7 @@ pcmLength: pcm长度
       val[i2] = arr[i];
       i++;
     }
-    if (trim) val[0] = parseInt(m[2] || "0", 2);
+    if (trim) val[0] = parseInt(m[2] || '0', 2);
     pos[0] = i;
     return val;
   };
@@ -1689,26 +1689,26 @@ pcmLength: pcm长度
   //=====End WebM读取=====
 
   //流量统计用1像素图片地址，设置为空将不参与统计
-  Recorder.TrafficImgUrl = "//ia.51.la/go1?id=20469973&pvFlag=1";
+  Recorder.TrafficImgUrl = '//ia.51.la/go1?id=20469973&pvFlag=1';
   var Traffic = (Recorder.Traffic = function (report) {
-    report = report ? "/" + RecTxt + "/Report/" + report : "";
+    report = report ? '/' + RecTxt + '/Report/' + report : '';
     var imgUrl = Recorder.TrafficImgUrl;
     if (imgUrl) {
       var data = Recorder.Traffic;
       var m = /^(https?:..[^\/#]*\/?)[^#]*/i.exec(location.href) || [];
-      var host = m[1] || "http://file/";
+      var host = m[1] || 'http://file/';
       var idf = (m[0] || host) + report;
 
-      if (imgUrl.indexOf("//") == 0) {
+      if (imgUrl.indexOf('//') == 0) {
         //给url加上http前缀，如果是file协议下，不加前缀没法用
         if (/^https:/i.test(idf)) {
-          imgUrl = "https:" + imgUrl;
+          imgUrl = 'https:' + imgUrl;
         } else {
-          imgUrl = "http:" + imgUrl;
+          imgUrl = 'http:' + imgUrl;
         }
       }
       if (report) {
-        imgUrl = imgUrl + "&cu=" + encodeURIComponent(host + report);
+        imgUrl = imgUrl + '&cu=' + encodeURIComponent(host + report);
       }
 
       if (!data[idf]) {
@@ -1717,8 +1717,8 @@ pcmLength: pcm长度
         var img = new Image();
         img.src = imgUrl;
         CLog(
-          "Traffic Analysis Image: " +
-            (report || RecTxt + ".TrafficImgUrl=" + Recorder.TrafficImgUrl),
+          'Traffic Analysis Image: ' +
+            (report || RecTxt + '.TrafficImgUrl=' + Recorder.TrafficImgUrl)
         );
       }
     }

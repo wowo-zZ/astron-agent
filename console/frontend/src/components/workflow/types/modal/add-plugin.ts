@@ -1,3 +1,4 @@
+import React from 'react';
 // Add Plugin Modal 相关类型定义
 
 // 分页接口
@@ -36,10 +37,10 @@ export interface BotIcon {
 }
 
 // 标签类型
-export type PluginTabType = "offical" | "person" | "";
+export type PluginTabType = 'offical' | 'person' | '';
 
 // 工具操作类型
-export type ToolOperateType = "" | "create" | "edit" | "test" | "detail";
+export type ToolOperateType = '' | 'create' | 'edit' | 'test' | 'detail';
 
 // 当前工具信息接口
 export interface CurrentToolInfo {
@@ -78,4 +79,35 @@ export interface ToolNode {
 // Modal 组件的 Props 接口（如果需要的话）
 export interface AddPluginModalProps {
   // 可以为空，因为组件目前没有 props
+}
+
+export interface useAddPluginType {
+  loader: null | HTMLDivElement;
+  loadingRef: boolean;
+  toolRef: HTMLDivElement | null;
+  currentTab: string;
+  setCurrentTab: (currentTab: string) => void;
+  toolOperate: ToolOperateType;
+  setToolOperate: (toolOperate: ToolOperateType) => void;
+  orderFlag: number;
+  setOrderFlag: (orderFlag: number) => void;
+  handleAddToolNodeThrottle: (tool: ToolListItem) => void;
+  loading: boolean;
+  setLoading: (loading: boolean) => void;
+  hasMore: boolean;
+  pagination: Pagination;
+  setPagination: (pagination: Pagination) => void;
+  searchValue: string;
+  setSearchValue: (searchValue: string) => void;
+  dataSource: ToolListItem[];
+  setDataSource: (dataSource: ToolListItem[]) => void;
+  handleInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  operateId: string;
+  setOperateId: (operateId: string) => void;
+  getPersonTools: () => void;
+  getOfficalTools: () => void;
+  handleClearData: () => void;
+  handleChangeTab: (tab: PluginTabType) => void;
+  currentToolInfo: ToolListItem;
+  setCurrentToolInfo: (currentToolInfo: ToolListItem) => void;
 }

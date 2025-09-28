@@ -1,14 +1,14 @@
-import React, { ReactNode, useState, useEffect } from "react";
-import { Modal, Tooltip } from "antd";
-import { COMBOCONFIG, COMBOCONFIG_EN } from "./combo-config";
-import ComboContrastModal from "./combo-contrast-modal";
-import useOrderData from "@/hooks/use-order-data";
-import { useEnterprise } from "@/hooks/use-enterprise";
+import React, { ReactNode, useState, useEffect } from 'react';
+import { Modal, Tooltip } from 'antd';
+import { COMBOCONFIG, COMBOCONFIG_EN } from './combo-config';
+import ComboContrastModal from './combo-contrast-modal';
+import useOrderData from '@/hooks/use-order-data';
+import { useEnterprise } from '@/hooks/use-enterprise';
 
-import rightGray from "@/assets/imgs/trace/right-gray.svg";
-import BackIcon from "@/assets/imgs/sparkImg/back.svg";
-import styles from "./combo-modal.module.scss";
-import { useTranslation } from "react-i18next";
+import rightGray from '@/assets/imgs/trace/right-gray.svg';
+import BackIcon from '@/assets/imgs/sparkImg/back.svg';
+import styles from './combo-modal.module.scss';
+import { useTranslation } from 'react-i18next';
 
 interface ComboModalProps {
   visible: boolean;
@@ -31,15 +31,15 @@ export default function ComboModal({
   const { checkNeedCreateTeamFn } = useEnterprise();
 
   const { t, i18n } = useTranslation();
-  const isEnglish = i18n.language === "en";
+  const isEnglish = i18n.language === 'en';
   const jumpPicePage = (url: string | null) => {
     if (url) {
-      window.open(url, "_blank");
+      window.open(url, '_blank');
     }
   };
 
   const handleVisibilityChange = () => {
-    if (document.visibilityState === "visible") {
+    if (document.visibilityState === 'visible') {
       checkNeedCreateTeamFn();
     }
   };
@@ -48,12 +48,12 @@ export default function ComboModal({
     if (visible) {
       // 弹窗打开时，获取用户套餐并添加监听
       fetchUserMeta();
-      document.addEventListener("visibilitychange", handleVisibilityChange);
+      document.addEventListener('visibilitychange', handleVisibilityChange);
     }
 
     // 弹窗关闭或组件卸载时，移除监听
     return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [visible]);
 
@@ -63,9 +63,9 @@ export default function ComboModal({
       setShowQrCode(false);
     };
 
-    document.addEventListener("click", handleClickOutside);
+    document.addEventListener('click', handleClickOutside);
     return () => {
-      document.removeEventListener("click", handleClickOutside);
+      document.removeEventListener('click', handleClickOutside);
     };
   }, []);
 
@@ -75,18 +75,18 @@ export default function ComboModal({
       open={visible}
       onCancel={onCancel}
       footer={null}
-      width={fullScreen ? "100%" : width}
+      width={fullScreen ? '100%' : width}
       mask={false}
       closable={false}
       style={{
         top: fullScreen ? 0 : undefined,
-        maxWidth: fullScreen ? "100%" : undefined,
-        height: fullScreen ? "100vh" : undefined,
+        maxWidth: fullScreen ? '100%' : undefined,
+        height: fullScreen ? '100vh' : undefined,
       }}
       styles={{
         body: {
-          height: fullScreen ? "100vh" : undefined,
-          overflow: fullScreen ? "auto" : undefined,
+          height: fullScreen ? '100vh' : undefined,
+          overflow: fullScreen ? 'auto' : undefined,
         },
       }}
     >
@@ -102,11 +102,11 @@ export default function ComboModal({
       </div>
       <div className={styles.ComboModalWrap}>
         <h1 className={styles.title}>
-          {t("comboContrastModal.comboModal.freeUse")}
+          {t('comboContrastModal.comboModal.freeUse')}
           <span className={styles.titleGradient}>
-            {t("comboContrastModal.comboModal.useAgent")}
+            {t('comboContrastModal.comboModal.useAgent')}
           </span>
-          {t("comboContrastModal.comboModal.orUpgrade")}
+          {t('comboContrastModal.comboModal.orUpgrade')}
         </h1>
 
         <div className={styles.ComboList}>
@@ -116,7 +116,7 @@ export default function ComboModal({
                 <h2
                   className={styles.ComboTitle}
                   style={{
-                    color: item.themeColor ? `${item.themeColor}` : "#000",
+                    color: item.themeColor ? `${item.themeColor}` : '#000',
                   }}
                 >
                   <Tooltip title={item.titleName} placement="top">
@@ -135,15 +135,15 @@ export default function ComboModal({
                 </div>
                 <div
                   className={`${styles.ComboBtn} ${
-                    item.hasQrcode && showQrCode ? styles.QRactive : ""
+                    item.hasQrcode && showQrCode ? styles.QRactive : ''
                   }`}
                   style={{
                     backgroundColor: item.themeColor
                       ? `${item.themeColor}`
-                      : "#fff",
-                    color: item.themeColor ? "#fff" : "#000",
+                      : '#fff',
+                    color: item.themeColor ? '#fff' : '#000',
                   }}
-                  onClick={(e) => {
+                  onClick={e => {
                     if (item?.hasQrcode) {
                       e.stopPropagation();
                       setShowQrCode(!showQrCode);
@@ -161,7 +161,7 @@ export default function ComboModal({
                   <div key={it + ind} className={styles.ComboItemIntroBox}>
                     <img
                       src={rightGray}
-                      alt={t("comboContrastModal.comboModal.comboList")}
+                      alt={t('comboContrastModal.comboModal.comboList')}
                     />
                     <span>{it}</span>
                   </div>

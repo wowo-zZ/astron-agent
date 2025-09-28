@@ -2,10 +2,10 @@ import {
   embeddingFiles,
   getFileSummary,
   getStatusAPI,
-} from "@/services/knowledge";
-import { FileSummaryResponse } from "@/types/resource";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+} from '@/services/knowledge';
+import { FileSummaryResponse } from '@/types/resource';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export const useProcessingCompletion = ({
   repoId,
@@ -23,9 +23,9 @@ export const useProcessingCompletion = ({
   embedding: () => void;
 } => {
   const navigate = useNavigate();
-  const [embed, setEmbed] = useState("loading");
+  const [embed, setEmbed] = useState('loading');
   const [parameters, setParameters] = useState<FileSummaryResponse>(
-    {} as FileSummaryResponse,
+    {} as FileSummaryResponse
   );
 
   useEffect(() => {
@@ -40,12 +40,12 @@ export const useProcessingCompletion = ({
       fileIds: [fileId],
     };
     embeddingFiles(params);
-    setEmbed("loading");
+    setEmbed('loading');
   }
 
   useEffect(() => {
     let timer: number;
-    if (embed === "loading") {
+    if (embed === 'loading') {
       timer = window.setInterval(() => {
         getFileStatus(timer);
       }, 1000);
@@ -60,17 +60,17 @@ export const useProcessingCompletion = ({
       tag,
       fileIds: [fileId],
     };
-    getStatusAPI(params).then((data) => {
+    getStatusAPI(params).then(data => {
       const fileStatus = data[0]?.status;
       if ([4, 5].includes(fileStatus || 0)) {
         window.clearInterval(timer);
         if (fileStatus === 5) {
-          setEmbed("success");
+          setEmbed('success');
           navigate(
-            `/resource/knowledge/detail/${repoId}/file?parentId=${pid}&fileId=${fileId}&tag=${tag}`,
+            `/resource/knowledge/detail/${repoId}/file?parentId=${pid}&fileId=${fileId}&tag=${tag}`
           );
         } else if (fileStatus === 4) {
-          setEmbed("failed");
+          setEmbed('failed');
         }
         getParameters();
       }
@@ -83,7 +83,7 @@ export const useProcessingCompletion = ({
       repoId,
       fileIds: [fileId],
     };
-    getFileSummary(params).then((data) => {
+    getFileSummary(params).then(data => {
       setParameters(data);
     });
   }

@@ -1,4 +1,4 @@
-import { UploadFileStatus } from "antd/es/upload/interface";
+import { UploadFileStatus } from 'antd/es/upload/interface';
 
 // 通用响应结构
 export interface ApiResponse<T> {
@@ -662,7 +662,7 @@ export type ImportDataParams = FormData;
 // 导出数据参数
 export interface ExportDataParams {
   tbId?: number;
-  format?: "CSV" | "EXCEL";
+  format?: 'CSV' | 'EXCEL';
   execDev?: number;
   dataIds?: string[];
 }
@@ -697,7 +697,7 @@ export interface UploadFile {
   lastModified?: number;
   lastModifiedDate?: Date;
   url?: string;
-  status?: UploadFileStatus | "failed";
+  status?: UploadFileStatus | 'failed';
   percent?: number;
   thumbUrl?: string;
   type?: string;

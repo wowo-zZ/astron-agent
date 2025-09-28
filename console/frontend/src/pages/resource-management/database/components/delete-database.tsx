@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import { Button } from "antd";
-import { deleteDb } from "@/services/database";
-import { useTranslation } from "react-i18next";
-import dialogDel from "@/assets/imgs/common/delete-red.png";
-import { DatabaseItem } from "@/types/database";
+import React, { useState } from 'react';
+import { Button, message } from 'antd';
+import { deleteDb } from '@/services/database';
+import { useTranslation } from 'react-i18next';
+import dialogDel from '@/assets/imgs/common/delete-red.png';
+import { DatabaseItem } from '@/types/database';
 
 export default function DeleteModal({
   setDeleteModal,
@@ -24,6 +24,9 @@ export default function DeleteModal({
         setDeleteModal(false);
         getDataBase();
       })
+      .catch(error => {
+        message.error(error.message);
+      })
       .finally(() => {
         setLoading(false);
       });
@@ -36,7 +39,7 @@ export default function DeleteModal({
           <div className="bg-[#fff5f4] w-10 h-10 flex justify-center items-center rounded-lg">
             <img src={dialogDel} className="w-7 h-7" alt="" />
           </div>
-          <p className="ml-2.5">{t("database.confirmDeleteDatabase")}</p>
+          <p className="ml-2.5">{t('database.confirmDeleteDatabase')}</p>
         </div>
         <div
           className="w-full h-10 bg-[#F9FAFB] text-center mt-7 py-2 px-5 text-overflow"
@@ -45,7 +48,7 @@ export default function DeleteModal({
           {currentData.name}
         </div>
         <p className="mt-6 text-desc max-w-[310px]">
-          {t("database.deleteDatabaseIrreversible")}
+          {t('database.deleteDatabaseIrreversible')}
         </p>
         <div className="flex flex-row-reverse gap-3 mt-7">
           <Button
@@ -54,14 +57,14 @@ export default function DeleteModal({
             className="delete-btn px-6"
             onClick={handleDelete}
           >
-            {t("database.delete")}
+            {t('database.delete')}
           </Button>
           <Button
             type="text"
             className="origin-btn px-6"
             onClick={(): void => setDeleteModal(false)}
           >
-            {t("database.cancel")}
+            {t('database.cancel')}
           </Button>
         </div>
       </div>

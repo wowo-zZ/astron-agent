@@ -1,9 +1,9 @@
-import { CloseOutlined } from "@ant-design/icons";
-import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
-import arrowLeft from "@/assets/imgs/common/back.png";
-import { ModelInfo, ShelfStatus } from "@/types/model";
-import React from "react";
+import { CloseOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import arrowLeft from '@/assets/imgs/common/back.png';
+import { ModelInfo, ShelfStatus } from '@/types/model';
+import React from 'react';
 
 interface ModelDetailHeaderProps {
   modelDetail: ModelInfo | null;
@@ -29,7 +29,7 @@ const ModelDetailHeader: React.FC<ModelDetailHeaderProps> = ({
         onClick={() => navigate(-1)}
       >
         <img src={arrowLeft} className="w-[18px] h-[18px]" alt="" />
-        <span className="font-medium">{t("model.back")}</span>
+        <span className="font-medium">{t('model.back')}</span>
       </div>
 
       {/* 警告栏 */}
@@ -38,11 +38,11 @@ const ModelDetailHeader: React.FC<ModelDetailHeaderProps> = ({
         !closed && (
           <div className="flex items-center h-[20px] justify-between gap-3 px-3 py-1.5 rounded-[10px] bg-[#FEEDEC] text-[#F74E43] text-sm flex-1">
             <span className="flex-1 text-center">
-              {t("model.modelWillStopOn")}
+              {t('model.modelWillStopOn')}
               {modelDetail.shelfOffTime
                 ? formatDate(new Date(modelDetail.shelfOffTime))
-                : ""}
-              {t("model.stopServicePleaseSwitch")}
+                : ''}
+              {t('model.stopServicePleaseSwitch')}
             </span>
             <CloseOutlined
               className="cursor-pointer shrink-0"

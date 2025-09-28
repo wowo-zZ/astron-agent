@@ -1,6 +1,6 @@
-import { visit } from "unist-util-visit";
-import type { Plugin } from "unified";
-import type { Root, Text, Element, Parent } from "hast";
+import { visit } from 'unist-util-visit';
+import type { Plugin } from 'unified';
+import type { Root, Text, Element, Parent } from 'hast';
 
 /**
  * 自定义脚注的 Rehype 插件 (适用于 react-markdown)
@@ -9,8 +9,8 @@ import type { Root, Text, Element, Parent } from "hast";
  */
 
 interface FootnoteElement extends Element {
-  type: "element";
-  tagName: "span";
+  type: 'element';
+  tagName: 'span';
   properties: {
     className: string[];
     dataIndex: string;
@@ -23,15 +23,15 @@ interface FootnoteElement extends Element {
  */
 function createFootnoteElement(number: string): FootnoteElement {
   return {
-    type: "element",
-    tagName: "span",
+    type: 'element',
+    tagName: 'span',
     properties: {
-      className: ["custom-footnote"],
+      className: ['custom-footnote'],
       dataIndex: number,
     },
     children: [
       {
-        type: "text",
+        type: 'text',
         value: number,
       },
     ],
@@ -45,9 +45,9 @@ const customFootnotePlugin: Plugin<[], Root> = () => {
   return (tree: Root) => {
     visit(
       tree,
-      "text",
+      'text',
       (node: Text, index: number | undefined, parent: Parent | undefined) => {
-        if (!parent || typeof index === "undefined") return;
+        if (!parent || typeof index === 'undefined') return;
 
         const text = node.value;
         const footnoteRegex = /\[\^(\d{1,2})\^\]/g;
@@ -73,7 +73,7 @@ const customFootnotePlugin: Plugin<[], Root> = () => {
             const beforeText = text.slice(lastIndex, matchStart);
             if (beforeText) {
               newChildren.push({
-                type: "text",
+                type: 'text',
                 value: beforeText,
               });
             }
@@ -92,7 +92,7 @@ const customFootnotePlugin: Plugin<[], Root> = () => {
           const remainingText = text.slice(lastIndex);
           if (remainingText) {
             newChildren.push({
-              type: "text",
+              type: 'text',
               value: remainingText,
             });
           }
@@ -102,7 +102,7 @@ const customFootnotePlugin: Plugin<[], Root> = () => {
         if (newChildren.length > 0) {
           parent.children.splice(index, 1, ...newChildren);
         }
-      },
+      }
     );
   };
 };

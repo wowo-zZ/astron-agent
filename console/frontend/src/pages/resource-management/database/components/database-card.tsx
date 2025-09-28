@@ -1,8 +1,8 @@
-import { memo, useCallback, JSX } from "react";
-import type React from "react";
-import { useTranslation } from "react-i18next";
-import { DatabaseItem } from "@/types/database";
-import databaseIcon from "@/assets/imgs/database/database-page-icon.svg";
+import { memo, useCallback, JSX } from 'react';
+import type React from 'react';
+import { useTranslation } from 'react-i18next';
+import { DatabaseItem } from '@/types/database';
+import databaseIcon from '@/assets/imgs/database/database-page-icon.svg';
 
 interface DatabaseCardProps {
   database: DatabaseItem;
@@ -25,7 +25,7 @@ const DatabaseCard = ({
     (e: React.MouseEvent) => {
       onDeleteClick(database, e);
     },
-    [database, onDeleteClick],
+    [database, onDeleteClick]
   );
 
   return (
@@ -50,12 +50,12 @@ const DatabaseCard = ({
       <div
         className="flex items-center justify-between mt-3 overflow-hidden overflow-x-auto overflow-y-hidden py-4 px-6 border-t border-dashed border-[#e2e8ff]"
         style={{
-          scrollbarWidth: "none", // Hide scrollbar
-          msOverflowStyle: "none", // IE/Edge hide scrollbar
+          scrollbarWidth: 'none', // Hide scrollbar
+          msOverflowStyle: 'none', // IE/Edge hide scrollbar
         }}
       >
         <span className="text-[#7F7F7F] text-xs go-setting flex items-center">
-          <span className="whitespace-nowrap">{t("database.goToEdit")}</span>
+          <span className="whitespace-nowrap">{t('database.goToEdit')}</span>
           <span className="setting-icon setting-act"></span>
         </span>
         <div className="flex items-center">
@@ -66,7 +66,7 @@ const DatabaseCard = ({
             >
               <span className="delete-icon"></span>
               <span className="ml-1 whitespace-nowrap">
-                {t("database.delete")}
+                {t('database.delete')}
               </span>
             </div>
           </div>

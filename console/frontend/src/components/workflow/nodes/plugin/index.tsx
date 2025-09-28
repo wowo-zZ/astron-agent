@@ -1,7 +1,7 @@
-import React, { memo } from "react";
-import ExceptionHandling from "@/components/workflow/nodes/components/exception-handling";
-import FixedInputs from "@/components/workflow/nodes/components/fixed-inputs";
-import FixedOutputs from "@/components/workflow/nodes/components/fixed-outputs";
+import React, { memo } from 'react';
+import ExceptionHandling from '@/components/workflow/nodes/components/exception-handling';
+import FixedInputs from '@/components/workflow/nodes/components/fixed-inputs';
+import FixedOutputs from '@/components/workflow/nodes/components/fixed-outputs';
 
 export const ToolDetail = memo((props: unknown): React.ReactElement => {
   const { id, data } = props;

@@ -1,12 +1,12 @@
-import React from "react";
-import { useMemoizedFn } from "ahooks";
-import { Table, Input, Select, InputNumber } from "antd";
-import { cloneDeep } from "lodash";
-import { useTranslation } from "react-i18next";
-import inputErrorMsg from "@/assets/svgs/input-error.svg";
-import formSelect from "@/assets/imgs/common/arrow-down.png";
-import remove from "@/assets/imgs/common/input-remove.png";
-import { ModelConfigParam } from "@/types/model";
+import React from 'react';
+import { useMemoizedFn } from 'ahooks';
+import { Table, Input, Select, InputNumber } from 'antd';
+import { cloneDeep } from 'lodash';
+import { useTranslation } from 'react-i18next';
+import inputErrorMsg from '@/assets/svgs/input-error.svg';
+import formSelect from '@/assets/imgs/common/arrow-down.png';
+import remove from '@/assets/imgs/common/input-remove.png';
+import { ModelConfigParam } from '@/types/model';
 
 // 参数名称列组件
 const ParamNameColumn = ({
@@ -19,7 +19,7 @@ const ParamNameColumn = ({
   handleInputParamsChange: (
     id: string,
     key: string,
-    value: string | number | boolean,
+    value: string | number | boolean
   ) => void;
   handleCheckInput: (record: ModelConfigParam, key: string) => void;
   detail: boolean;
@@ -28,19 +28,19 @@ const ParamNameColumn = ({
   return (
     <div className="w-full flex flex-col gap-1">
       <Input
-        placeholder={t("model.pleaseEnterParameterName")}
+        placeholder={t('model.pleaseEnterParameterName')}
         className="global-input params-input inline-input"
         value={record.key}
         disabled={detail}
-        onChange={(e) => {
+        onChange={e => {
           handleInputParamsChange(
-            String(record?.id || ""),
-            "key",
-            e.target.value,
+            String(record?.id || ''),
+            'key',
+            e.target.value
           );
-          handleCheckInput(record, "name");
+          handleCheckInput(record, 'name');
         }}
-        onBlur={() => handleCheckInput(record, "key")}
+        onBlur={() => handleCheckInput(record, 'key')}
       />
       {record?.keyErrMsg && (
         <div className="flex items-start gap-1">
@@ -67,7 +67,7 @@ const ParamDescColumn = ({
   handleInputParamsChange: (
     id: string,
     key: string,
-    value: string | number | boolean,
+    value: string | number | boolean
   ) => void;
   handleCheckInput: (record: ModelConfigParam, key: string) => void;
   detail: boolean;
@@ -77,19 +77,19 @@ const ParamDescColumn = ({
     <div className="w-full flex flex-col gap-1">
       <Input
         title={detail ? record.name : undefined}
-        placeholder={t("model.pleaseEnterParameterDescription")}
+        placeholder={t('model.pleaseEnterParameterDescription')}
         className="global-input params-input inline-input"
         value={record.name}
         disabled={detail}
-        onChange={(e) => {
+        onChange={e => {
           handleInputParamsChange(
-            String(record?.id || ""),
-            "name",
-            e.target.value,
+            String(record?.id || ''),
+            'name',
+            e.target.value
           );
-          handleCheckInput(record, "name");
+          handleCheckInput(record, 'name');
         }}
-        onBlur={() => handleCheckInput(record, "name")}
+        onBlur={() => handleCheckInput(record, 'name')}
       />
       {record?.nameErrMsg && (
         <div className="flex items-center gap-1">
@@ -111,7 +111,7 @@ const ParamTypeColumn = ({
   handleInputParamsChange: (
     id: string,
     key: string,
-    value: string | number | boolean,
+    value: string | number | boolean
   ) => void;
   detail: boolean;
 }): React.JSX.Element => (
@@ -121,15 +121,15 @@ const ParamTypeColumn = ({
       suffixIcon={<img src={formSelect} className="w-4 h-4 " />}
       value={record.fieldType}
       disabled={detail}
-      onChange={(value) =>
-        handleInputParamsChange(String(record?.id || ""), "fieldType", value)
+      onChange={value =>
+        handleInputParamsChange(String(record?.id || ''), 'fieldType', value)
       }
       options={[
-        { label: "int", value: "int" },
-        { label: "float", value: "float" },
-        { label: "boolean", value: "boolean" },
+        { label: 'int', value: 'int' },
+        { label: 'float', value: 'float' },
+        { label: 'boolean', value: 'boolean' },
       ]}
-      style={{ lineHeight: "40px", height: "40px" }}
+      style={{ lineHeight: '40px', height: '40px' }}
     />
   </div>
 );
@@ -145,7 +145,7 @@ const PrecisionColumn = ({
   handleInputParamsChange: (
     id: string,
     key: string,
-    value: string | number | boolean,
+    value: string | number | boolean
   ) => void;
   handleCheckInput: (record: ModelConfigParam, key: string) => void;
   detail: boolean;
@@ -153,23 +153,23 @@ const PrecisionColumn = ({
   const { t } = useTranslation();
   return (
     <div className="w-full flex flex-col gap-1">
-      {record?.fieldType === "float" ? (
+      {record?.fieldType === 'float' ? (
         <InputNumber
           step={1}
           precision={0}
           controls={false}
-          style={{ lineHeight: "40px", height: "40px" }}
+          style={{ lineHeight: '40px', height: '40px' }}
           disabled={detail}
-          placeholder={t("model.pleaseEnter")}
+          placeholder={t('model.pleaseEnter')}
           className="global-input params-input inline-input w-full"
           value={detail && record.precision === 0.1 ? 1.0 : record.precision}
-          onChange={(value) => {
+          onChange={value => {
             handleInputParamsChange(
-              String(record?.id || ""),
-              "precision",
-              value ?? 0,
+              String(record?.id || ''),
+              'precision',
+              value ?? 0
             );
-            handleCheckInput(record, "precision");
+            handleCheckInput(record, 'precision');
           }}
         />
       ) : (
@@ -190,13 +190,13 @@ const ParamRangeColumn = ({
   handleInputParamsChange: (
     id: string,
     key: string,
-    value: string | number | boolean,
+    value: string | number | boolean
   ) => void;
   exchangeMinMax: (id: string, min: number, max: number) => void;
   detail: boolean;
 }): React.JSX.Element => {
   const { t } = useTranslation();
-  return record?.fieldType === "boolean" ? (
+  return record?.fieldType === 'boolean' ? (
     <div className="w-full flex items-center h-[40px]">--</div>
   ) : (
     <div className="w-full flex items-center gap-1">
@@ -206,27 +206,27 @@ const ParamRangeColumn = ({
           detail && record?.precision === 0.1 ? 1.0 : record?.precision
         }
         controls={false}
-        style={{ lineHeight: "40px", height: "40px" }}
+        style={{ lineHeight: '40px', height: '40px' }}
         disabled={detail}
-        placeholder={t("model.pleaseEnter")}
+        placeholder={t('model.pleaseEnter')}
         className="global-input params-input inline-input w-full"
         value={record?.min}
-        onChange={(value) =>
-          handleInputParamsChange(String(record?.id || ""), "min", value ?? 0)
+        onChange={value =>
+          handleInputParamsChange(String(record?.id || ''), 'min', value ?? 0)
         }
         onBlur={() => {
           if (record?.min === null) {
             handleInputParamsChange(
-              String(record?.id || ""),
-              "min",
-              record?.min,
+              String(record?.id || ''),
+              'min',
+              record?.min
             );
           }
           if ((record?.min || 0) > (record?.max || 0)) {
             exchangeMinMax(
-              String(record?.id || ""),
+              String(record?.id || ''),
               record?.min || 0,
-              record?.max || 0,
+              record?.max || 0
             );
           }
         }}
@@ -238,27 +238,27 @@ const ParamRangeColumn = ({
           detail && record?.precision === 0.1 ? 1.0 : record?.precision
         }
         controls={false}
-        style={{ lineHeight: "40px", height: "40px" }}
-        placeholder={t("model.pleaseEnter")}
+        style={{ lineHeight: '40px', height: '40px' }}
+        placeholder={t('model.pleaseEnter')}
         className="global-input params-input inline-input w-full"
         value={record?.max}
-        onChange={(value) =>
-          handleInputParamsChange(String(record?.id || ""), "max", value ?? 0)
+        onChange={value =>
+          handleInputParamsChange(String(record?.id || ''), 'max', value ?? 0)
         }
         disabled={detail}
         onBlur={() => {
           if (record?.max === null) {
             handleInputParamsChange(
-              String(record?.id || ""),
-              "max",
-              record?.max,
+              String(record?.id || ''),
+              'max',
+              record?.max
             );
           }
           if ((record?.min || 0) > (record?.max || 0)) {
             exchangeMinMax(
-              String(record?.id || ""),
+              String(record?.id || ''),
               record?.min || 0,
-              record?.max || 0,
+              record?.max || 0
             );
           }
         }}
@@ -278,7 +278,7 @@ const DefaultValueColumn = ({
   handleInputParamsChange: (
     id: string,
     key: string,
-    value: string | number | boolean,
+    value: string | number | boolean
   ) => void;
   handleCheckInput: (record: ModelConfigParam, key: string) => void;
   detail: boolean;
@@ -286,29 +286,29 @@ const DefaultValueColumn = ({
   const { t } = useTranslation();
   return (
     <div className="w-full flex flex-col gap-1">
-      {record?.fieldType === "float" || record?.fieldType === "int" ? (
+      {record?.fieldType === 'float' || record?.fieldType === 'int' ? (
         <InputNumber
           step={1}
           precision={
             detail && record?.precision === 0.1 ? 1.0 : record?.precision
           }
           controls={false}
-          style={{ lineHeight: "40px", height: "40px" }}
-          placeholder={t("model.pleaseEnter")}
+          style={{ lineHeight: '40px', height: '40px' }}
+          placeholder={t('model.pleaseEnter')}
           className="global-input params-input inline-input w-full"
           value={record?.default as number}
-          onChange={(value) => {
+          onChange={value => {
             handleInputParamsChange(
-              String(record?.id || ""),
-              "default",
-              value ?? 0,
+              String(record?.id || ''),
+              'default',
+              value ?? 0
             );
-            handleCheckInput(record, "default");
+            handleCheckInput(record, 'default');
           }}
           disabled={detail}
           onBlur={() => {
             if (record?.default === null) {
-              handleInputParamsChange(String(record?.id || ""), "default", 0);
+              handleInputParamsChange(String(record?.id || ''), 'default', 0);
             }
           }}
         />
@@ -316,14 +316,14 @@ const DefaultValueColumn = ({
         <Select
           suffixIcon={<img src={formSelect} className="w-4 h-4 " />}
           options={[
-            { label: "true", value: true },
-            { label: "false", value: false },
+            { label: 'true', value: true },
+            { label: 'false', value: false },
           ]}
-          style={{ lineHeight: "40px", height: "40px" }}
+          style={{ lineHeight: '40px', height: '40px' }}
           disabled={detail}
           value={record?.default}
-          onChange={(value) =>
-            handleInputParamsChange(String(record?.id || ""), "default", value)
+          onChange={value =>
+            handleInputParamsChange(String(record?.id || ''), 'default', value)
           }
         />
       )}
@@ -335,12 +335,12 @@ const DefaultValueColumn = ({
 const useModelParamsLogic = (
   modelParams: ModelConfigParam[],
   setModelParams: (params: ModelConfigParam[]) => void,
-  checkNameConventions: (name: string) => boolean,
+  checkNameConventions: (name: string) => boolean
 ): {
   handleInputParamsChange: (
     id: string,
     key: string,
-    value: string | number | boolean,
+    value: string | number | boolean
   ) => void;
   handleCheckInput: (record: ModelConfigParam, key: string) => void;
   exchangeMinMax: (id: string, min: number, max: number) => void;
@@ -350,70 +350,70 @@ const useModelParamsLogic = (
   const handleInputParamsChange = useMemoizedFn(
     (id: string, key: string, value: string | number | boolean): void => {
       const currentNode = modelParams.find(
-        (item) => String(item.id) === id,
+        item => String(item.id) === id
       ) as ModelConfigParam;
       (currentNode as unknown as Record<string, unknown>)[key] = value;
-      if (key === "fieldType") {
+      if (key === 'fieldType') {
         currentNode.precision = 0;
-        if (value === "int") {
+        if (value === 'int') {
           currentNode.min = 0;
           currentNode.max = 10;
         }
-        if (value === "boolean") {
+        if (value === 'boolean') {
           currentNode.default = false;
         }
-        if (value === "float" || value === "int") {
+        if (value === 'float' || value === 'int') {
           currentNode.default = 0;
         }
       }
       setModelParams(cloneDeep(modelParams));
-    },
+    }
   );
 
   const checkParams = useMemoizedFn((id: string, key: string): boolean => {
     let passFlag = true;
     const errEsg =
-      key === "key"
-        ? t("model.pleaseEnterParameterName")
-        : t("model.pleaseEnterParameterDescription");
+      key === 'key'
+        ? t('model.pleaseEnterParameterName')
+        : t('model.pleaseEnterParameterDescription');
     const currentNode = modelParams.find(
-      (item) => String(item.id) === id,
+      item => String(item.id) === id
     ) as ModelConfigParam;
     if (!(currentNode as unknown as Record<string, unknown>)[key]) {
       (currentNode as unknown as Record<string, unknown>)[`${key}ErrMsg`] =
         errEsg;
       passFlag = false;
     } else if (
-      key === "key" &&
+      key === 'key' &&
       !checkNameConventions(
-        (currentNode as unknown as Record<string, unknown>)[key] as string,
+        (currentNode as unknown as Record<string, unknown>)[key] as string
       )
     ) {
       (currentNode as unknown as Record<string, unknown>).keyErrMsg = t(
-        "model.onlyLettersNumbersDashUnderscore",
+        'model.onlyLettersNumbersDashUnderscore'
       );
     } else {
-      (currentNode as unknown as Record<string, unknown>)[`${key}ErrMsg`] = "";
+      (currentNode as unknown as Record<string, unknown>)[`${key}ErrMsg`] = '';
     }
     return passFlag;
   });
 
   const handleCheckInput = useMemoizedFn(
     (record: ModelConfigParam, key: string): void => {
-      checkParams(String(record?.id || ""), key);
+      checkParams(String(record?.id || ''), key);
       setModelParams(cloneDeep(modelParams));
-    },
+    }
   );
 
   const exchangeMinMax = useMemoizedFn(
     (id: string, min: number, max: number): void => {
       const currentNode = modelParams.find(
-        (item) => String(item.id) === id,
+        item => String(item.id) === id
       ) as ModelConfigParam;
       currentNode.min = max;
       currentNode.max = min;
       setModelParams(cloneDeep(modelParams));
-    },
+    }
   );
 
   return { handleInputParamsChange, handleCheckInput, exchangeMinMax };
@@ -440,11 +440,11 @@ function ModelParamsTable({
       title: (
         <span>
           <span className="text-[#F74E43] text-sm">* </span>
-          {t("model.parameterName")}
+          {t('model.parameterName')}
         </span>
       ),
-      dataIndex: "key",
-      key: "key",
+      dataIndex: 'key',
+      key: 'key',
       render: (_: string, record: ModelConfigParam): React.JSX.Element => (
         <ParamNameColumn
           record={record}
@@ -459,11 +459,11 @@ function ModelParamsTable({
       title: (
         <span>
           <span className="text-[#F74E43] text-sm">* </span>
-          {t("model.parameterDescription")}
+          {t('model.parameterDescription')}
         </span>
       ),
-      dataIndex: "name",
-      key: "name",
+      dataIndex: 'name',
+      key: 'name',
       render: (_: string, record: ModelConfigParam): React.JSX.Element => (
         <ParamDescColumn
           record={record}
@@ -478,11 +478,11 @@ function ModelParamsTable({
       title: (
         <span>
           <span className="text-[#F74E43] text-sm">* </span>
-          {t("model.parameterType")}
+          {t('model.parameterType')}
         </span>
       ),
-      dataIndex: "fieldType",
-      key: "fieldType",
+      dataIndex: 'fieldType',
+      key: 'fieldType',
       render: (_: string, record: ModelConfigParam): React.JSX.Element => (
         <ParamTypeColumn
           record={record}
@@ -496,11 +496,11 @@ function ModelParamsTable({
       title: (
         <span>
           <span className="text-[#F74E43] text-sm">* </span>
-          {t("model.decimalPlaces")}
+          {t('model.decimalPlaces')}
         </span>
       ),
-      dataIndex: "precision",
-      key: "precision",
+      dataIndex: 'precision',
+      key: 'precision',
       render: (_: number, record: ModelConfigParam): React.JSX.Element => (
         <PrecisionColumn
           record={record}
@@ -511,15 +511,15 @@ function ModelParamsTable({
       ),
     },
     {
-      width: "15%",
+      width: '15%',
       title: (
         <span>
           <span className="text-[#F74E43] text-sm">* </span>
-          {t("model.parameterRange")}
+          {t('model.parameterRange')}
         </span>
       ),
-      dataIndex: "range",
-      key: "range",
+      dataIndex: 'range',
+      key: 'range',
       render: (_: unknown, record: ModelConfigParam): React.JSX.Element => (
         <ParamRangeColumn
           record={record}
@@ -530,15 +530,15 @@ function ModelParamsTable({
       ),
     },
     {
-      width: "10%",
+      width: '10%',
       title: (
         <span>
           <span className="text-[#F74E43] text-sm">* </span>
-          {t("model.defaultValue")}
+          {t('model.defaultValue')}
         </span>
       ),
-      dataIndex: "default",
-      key: "default",
+      dataIndex: 'default',
+      key: 'default',
       render: (_: unknown, record: ModelConfigParam): React.JSX.Element => (
         <DefaultValueColumn
           record={record}
@@ -552,13 +552,13 @@ function ModelParamsTable({
       ? []
       : [
           {
-            fixed: "right" as const,
-            title: t("model.operation"),
-            key: "operation",
-            width: "5%",
+            fixed: 'right' as const,
+            title: t('model.operation'),
+            key: 'operation',
+            width: '5%',
             render: (
               _: unknown,
-              record: ModelConfigParam,
+              record: ModelConfigParam
             ): React.JSX.Element => (
               <div className="flex items-center gap-1 h-[40px]">
                 <img
@@ -567,8 +567,8 @@ function ModelParamsTable({
                   onClick={() => {
                     setModelParams(
                       cloneDeep(
-                        modelParams.filter((item) => item.id !== record.id),
-                      ),
+                        modelParams.filter(item => item.id !== record.id)
+                      )
                     );
                   }}
                   alt=""
@@ -585,8 +585,8 @@ function ModelParamsTable({
       columns={columns}
       className="tool-params-table mt-4"
       pagination={false}
-      rowKey={(record) => String(record.id || "")}
-      scroll={{ x: "max-content" }}
+      rowKey={record => String(record.id || '')}
+      scroll={{ x: 'max-content' }}
     />
   );
 }

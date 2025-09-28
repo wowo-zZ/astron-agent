@@ -13,51 +13,51 @@ const getSevenDay = () => {
 //不同平台用户数
 export const mutiUserOption = {
   tooltip: {
-    trigger: "axis",
+    trigger: 'axis',
   },
   legend: {
-    left: "center",
-    bottom: "5%",
-    icon: "rect",
+    left: 'center',
+    bottom: '5%',
+    icon: 'rect',
     itemWidth: 20, // 调整图标宽度
     itemHeight: 4, // 调整图标高度为细线效果
     data: [
       {
-        name: "星火Desk",
+        name: '星火Desk',
         textStyle: {
-          color: "#7F7F7F",
+          color: '#7F7F7F',
           fontWeight: 500,
           fontSize: 14,
         },
       },
       {
-        name: "星火App",
+        name: '星火App',
         textStyle: {
-          color: "#7F7F7F",
+          color: '#7F7F7F',
           fontWeight: 500,
           fontSize: 14,
         },
       },
       {
-        name: "星辰广场",
+        name: '星辰广场',
         textStyle: {
-          color: "#7F7F7F",
+          color: '#7F7F7F',
           fontWeight: 500,
           fontSize: 14,
         },
       },
       {
-        name: "H5",
+        name: 'H5',
         textStyle: {
-          color: "#F57977",
+          color: '#F57977',
           fontWeight: 500,
           fontSize: 14,
         },
       },
       {
-        name: "小程序",
+        name: '小程序',
         textStyle: {
-          color: "#77B4FF",
+          color: '#77B4FF',
           fontWeight: 500,
           fontSize: 14,
         },
@@ -65,100 +65,100 @@ export const mutiUserOption = {
     ],
   },
   grid: {
-    left: "3%",
-    right: "4%",
-    bottom: "20%",
+    left: '3%',
+    right: '4%',
+    bottom: '20%',
     containLabel: true,
   },
   xAxis: {
-    boundaryGap: ["20%", "20%"],
-    type: "category",
+    boundaryGap: ['20%', '20%'],
+    type: 'category',
     data: getSevenDay(),
     axisLine: {
       show: true, // 显示x轴线
       lineStyle: {
-        color: "#BFBFBF",
+        color: '#BFBFBF',
         width: 1,
-        type: "solid", // 设置x轴线为实线
+        type: 'solid', // 设置x轴线为实线
       },
     },
     axisTick: {
       show: true, // 显示刻度线
       alignWithLabel: true,
       lineStyle: {
-        color: "#BFBFBF", // 刻度线颜色
+        color: '#BFBFBF', // 刻度线颜色
         width: 1,
       },
     },
   },
 
   yAxis: {
-    type: "value",
+    type: 'value',
     splitLine: {
       show: true,
       lineStyle: {
-        type: "dashed",
-        color: "#e8e8e8",
+        type: 'dashed',
+        color: '#e8e8e8',
       },
     },
   },
 
   series: [
     {
-      name: "星火Desk",
-      type: "line",
-      stack: "总量",
+      name: '星火Desk',
+      type: 'line',
+      stack: '总量',
       showSymbol: false,
       lineStyle: {
-        color: "#275EFF", // 设置线的颜色
+        color: '#275EFF', // 设置线的颜色
         width: 2, // 可选：设置线宽
       },
       areaStyle: null,
       data: [0, 0, 0, 0, 0, 0, 0],
     },
     {
-      name: "星火App",
-      type: "line",
-      stack: "总量",
+      name: '星火App',
+      type: 'line',
+      stack: '总量',
       showSymbol: false,
       lineStyle: {
-        color: "#A074FF", // 设置线的颜色
+        color: '#A074FF', // 设置线的颜色
         width: 2, // 可选：设置线宽
       },
       areaStyle: null,
       data: [0, 0, 0, 0, 0, 0, 0],
     },
     {
-      name: "星辰广场",
-      type: "line",
-      stack: "总量",
+      name: '星辰广场',
+      type: 'line',
+      stack: '总量',
       showSymbol: false,
       lineStyle: {
-        color: "#FDA775", // 设置线的颜色
+        color: '#FDA775', // 设置线的颜色
         width: 2, // 可选：设置线宽
       },
       areaStyle: null,
       data: [0, 0, 0, 0, 0, 0, 0],
     },
     {
-      name: "H5",
-      type: "line",
-      stack: "总量",
+      name: 'H5',
+      type: 'line',
+      stack: '总量',
       showSymbol: false,
       lineStyle: {
-        color: "#F57977", // 设置线的颜色
+        color: '#F57977', // 设置线的颜色
         width: 2, // 可选：设置线宽
       },
       areaStyle: null,
       data: [0, 0, 0, 0, 0, 0, 0],
     },
     {
-      name: "小程序",
-      type: "line",
-      stack: "总量",
+      name: '小程序',
+      type: 'line',
+      stack: '总量',
       showSymbol: false,
       lineStyle: {
-        color: "#77B4FF", // 设置线的颜色
+        color: '#77B4FF', // 设置线的颜色
         width: 2, // 可选：设置线宽
       },
       areaStyle: null,
@@ -169,51 +169,51 @@ export const mutiUserOption = {
 //不同平台会话数
 export const mutiSessionOption = {
   tooltip: {
-    trigger: "axis",
+    trigger: 'axis',
   },
   legend: {
-    left: "center",
-    bottom: "5%",
-    icon: "rect",
+    left: 'center',
+    bottom: '5%',
+    icon: 'rect',
     itemWidth: 20, // 调整图标宽度
     itemHeight: 4, // 调整图标高度为细线效果
     data: [
       {
-        name: "星火Desk",
+        name: '星火Desk',
         textStyle: {
-          color: "#7F7F7F",
+          color: '#7F7F7F',
           fontWeight: 500,
           fontSize: 14,
         },
       },
       {
-        name: "星火App",
+        name: '星火App',
         textStyle: {
-          color: "#7F7F7F",
+          color: '#7F7F7F',
           fontWeight: 500,
           fontSize: 14,
         },
       },
       {
-        name: "星辰广场",
+        name: '星辰广场',
         textStyle: {
-          color: "#7F7F7F",
+          color: '#7F7F7F',
           fontWeight: 500,
           fontSize: 14,
         },
       },
       {
-        name: "H5",
+        name: 'H5',
         textStyle: {
-          color: "#F57977",
+          color: '#F57977',
           fontWeight: 500,
           fontSize: 14,
         },
       },
       {
-        name: "小程序",
+        name: '小程序',
         textStyle: {
-          color: "#77B4FF",
+          color: '#77B4FF',
           fontWeight: 500,
           fontSize: 14,
         },
@@ -221,100 +221,100 @@ export const mutiSessionOption = {
     ],
   },
   grid: {
-    left: "3%",
-    right: "4%",
-    bottom: "20%",
+    left: '3%',
+    right: '4%',
+    bottom: '20%',
     containLabel: true,
   },
   xAxis: {
-    boundaryGap: ["20%", "20%"],
-    type: "category",
+    boundaryGap: ['20%', '20%'],
+    type: 'category',
     data: getSevenDay(),
     axisLine: {
       show: true, // 显示x轴线
       lineStyle: {
-        color: "#BFBFBF",
+        color: '#BFBFBF',
         width: 1,
-        type: "solid", // 设置x轴线为实线
+        type: 'solid', // 设置x轴线为实线
       },
     },
     axisTick: {
       show: true, // 显示刻度线
       alignWithLabel: true,
       lineStyle: {
-        color: "#BFBFBF", // 刻度线颜色
+        color: '#BFBFBF', // 刻度线颜色
         width: 1,
       },
     },
   },
 
   yAxis: {
-    type: "value",
+    type: 'value',
     splitLine: {
       show: true,
       lineStyle: {
-        type: "dashed",
-        color: "#e8e8e8",
+        type: 'dashed',
+        color: '#e8e8e8',
       },
     },
   },
 
   series: [
     {
-      name: "星火Desk",
-      type: "line",
-      stack: "总量",
+      name: '星火Desk',
+      type: 'line',
+      stack: '总量',
       showSymbol: false,
       lineStyle: {
-        color: "#275EFF", // 设置线的颜色
+        color: '#275EFF', // 设置线的颜色
         width: 2, // 可选：设置线宽
       },
       areaStyle: null,
       data: [0, 0, 0, 0, 0, 0, 0],
     },
     {
-      name: "星火App",
-      type: "line",
-      stack: "总量",
+      name: '星火App',
+      type: 'line',
+      stack: '总量',
       showSymbol: false,
       lineStyle: {
-        color: "#A074FF", // 设置线的颜色
+        color: '#A074FF', // 设置线的颜色
         width: 2, // 可选：设置线宽
       },
       areaStyle: null,
       data: [0, 0, 0, 0, 0, 0, 0],
     },
     {
-      name: "星辰广场",
-      type: "line",
-      stack: "总量",
+      name: '星辰广场',
+      type: 'line',
+      stack: '总量',
       showSymbol: false,
       lineStyle: {
-        color: "#FDA775", // 设置线的颜色
+        color: '#FDA775', // 设置线的颜色
         width: 2, // 可选：设置线宽
       },
       areaStyle: null,
       data: [0, 0, 0, 0, 0, 0, 0],
     },
     {
-      name: "H5",
-      type: "line",
-      stack: "总量",
+      name: 'H5',
+      type: 'line',
+      stack: '总量',
       showSymbol: false,
       lineStyle: {
-        color: "#F57977", // 设置线的颜色
+        color: '#F57977', // 设置线的颜色
         width: 2, // 可选：设置线宽
       },
       areaStyle: null,
       data: [0, 0, 0, 0, 0, 0, 0],
     },
     {
-      name: "小程序",
-      type: "line",
-      stack: "总量",
+      name: '小程序',
+      type: 'line',
+      stack: '总量',
       showSymbol: false,
       lineStyle: {
-        color: "#77B4FF", // 设置线的颜色
+        color: '#77B4FF', // 设置线的颜色
         width: 2, // 可选：设置线宽
       },
       areaStyle: null,
@@ -334,15 +334,15 @@ export const sessionOption = {
     right: 40,
   },
   xAxis: {
-    boundaryGap: ["20%", "20%"],
+    boundaryGap: ['20%', '20%'],
     data: getSevenDay(),
-    type: "category",
+    type: 'category',
     axisLine: {
       show: true, // 显示x轴线
       lineStyle: {
-        color: "#BFBFBF",
+        color: '#BFBFBF',
         width: 1,
-        type: "solid", // 设置x轴线为实线
+        type: 'solid', // 设置x轴线为实线
       },
     },
 
@@ -350,35 +350,35 @@ export const sessionOption = {
       show: true, // 显示刻度线
       alignWithLabel: true,
       lineStyle: {
-        color: "#BFBFBF", // 刻度线颜色
+        color: '#BFBFBF', // 刻度线颜色
         width: 1,
       },
     },
   },
   yAxis: {
-    type: "value",
+    type: 'value',
     splitLine: {
       show: true,
       lineStyle: {
-        type: "dashed",
-        color: "#e8e8e8",
+        type: 'dashed',
+        color: '#e8e8e8',
       },
     },
   },
   series: [
     {
-      type: "line",
+      type: 'line',
       smooth: true,
       data: [0, 0, 0, 0, 0, 0, 0],
       lineStyle: {
-        color: "#405DF9",
+        color: '#405DF9',
       },
       areaStyle: {
-        color: "#405DF9",
+        color: '#405DF9',
         opacity: 0.25,
       },
       itemStyle: {
-        color: "#405DF9",
+        color: '#405DF9',
       },
     },
   ],
@@ -395,15 +395,15 @@ export const userOption = {
     right: 40,
   },
   xAxis: {
-    boundaryGap: ["20%", "20%"],
+    boundaryGap: ['20%', '20%'],
     data: getSevenDay(),
-    type: "category",
+    type: 'category',
     axisLine: {
       show: true, // 显示x轴线
       lineStyle: {
-        color: "#BFBFBF",
+        color: '#BFBFBF',
         width: 1,
-        type: "solid", // 设置x轴线为实线
+        type: 'solid', // 设置x轴线为实线
       },
     },
 
@@ -411,35 +411,35 @@ export const userOption = {
       show: true, // 显示刻度线
       alignWithLabel: true,
       lineStyle: {
-        color: "#BFBFBF", // 刻度线颜色
+        color: '#BFBFBF', // 刻度线颜色
         width: 1,
       },
     },
   },
   yAxis: {
-    type: "value",
+    type: 'value',
     splitLine: {
       show: true,
       lineStyle: {
-        type: "dashed",
-        color: "#e8e8e8",
+        type: 'dashed',
+        color: '#e8e8e8',
       },
     },
   },
   series: [
     {
-      type: "line",
+      type: 'line',
       smooth: true,
       data: [0, 0, 0, 0, 0, 0, 0],
       lineStyle: {
-        color: "#FF9A2E",
+        color: '#FF9A2E',
       },
       areaStyle: {
-        color: "#FF9A2E",
+        color: '#FF9A2E',
         opacity: 0.25,
       },
       itemStyle: {
-        color: "#FF9A2E",
+        color: '#FF9A2E',
       },
     },
   ],
@@ -456,15 +456,15 @@ export const interactionOption = {
     right: 40,
   },
   xAxis: {
-    boundaryGap: ["20%", "20%"],
+    boundaryGap: ['20%', '20%'],
     data: getSevenDay(),
-    type: "category",
+    type: 'category',
     axisLine: {
       show: true, // 显示x轴线
       lineStyle: {
-        color: "#BFBFBF",
+        color: '#BFBFBF',
         width: 1,
-        type: "solid", // 设置x轴线为实线
+        type: 'solid', // 设置x轴线为实线
       },
     },
 
@@ -472,35 +472,35 @@ export const interactionOption = {
       show: true, // 显示刻度线
       alignWithLabel: true,
       lineStyle: {
-        color: "#BFBFBF", // 刻度线颜色
+        color: '#BFBFBF', // 刻度线颜色
         width: 1,
       },
     },
   },
   yAxis: {
-    type: "value",
+    type: 'value',
     splitLine: {
       show: true,
       lineStyle: {
-        type: "dashed",
-        color: "#e8e8e8",
+        type: 'dashed',
+        color: '#e8e8e8',
       },
     },
   },
   series: [
     {
-      type: "line",
+      type: 'line',
       smooth: true,
       data: [0, 0, 0, 0, 0, 0, 0],
       lineStyle: {
-        color: "#405DF9",
+        color: '#405DF9',
       },
       areaStyle: {
-        color: "#405DF9",
+        color: '#405DF9',
         opacity: 0.25,
       },
       itemStyle: {
-        color: "#405DF9",
+        color: '#405DF9',
       },
     },
   ],
@@ -517,15 +517,15 @@ export const TokenOption = {
     right: 40,
   },
   xAxis: {
-    boundaryGap: ["20%", "20%"],
+    boundaryGap: ['20%', '20%'],
     data: getSevenDay(),
-    type: "category",
+    type: 'category',
     axisLine: {
       show: true, // 显示x轴线
       lineStyle: {
-        color: "#BFBFBF",
+        color: '#BFBFBF',
         width: 1,
-        type: "solid", // 设置x轴线为实线
+        type: 'solid', // 设置x轴线为实线
       },
     },
 
@@ -533,35 +533,35 @@ export const TokenOption = {
       show: true, // 显示刻度线
       alignWithLabel: true,
       lineStyle: {
-        color: "#BFBFBF", // 刻度线颜色
+        color: '#BFBFBF', // 刻度线颜色
         width: 1,
       },
     },
   },
   yAxis: {
-    type: "value",
+    type: 'value',
     splitLine: {
       show: true,
       lineStyle: {
-        type: "dashed",
-        color: "#e8e8e8",
+        type: 'dashed',
+        color: '#e8e8e8',
       },
     },
   },
   series: [
     {
-      type: "line",
+      type: 'line',
       smooth: true,
       data: [0, 0, 0, 0, 0, 0, 0],
       lineStyle: {
-        color: "#405DF9",
+        color: '#405DF9',
       },
       areaStyle: {
-        color: "#405DF9",
+        color: '#405DF9',
         opacity: 0.25,
       },
       itemStyle: {
-        color: "#405DF9",
+        color: '#405DF9',
       },
     },
   ],
@@ -571,7 +571,7 @@ export const TokenOption = {
 export const processChannelData = (data: any) => {
   // 1. 提取唯一日期
   const uniqueDates = Array.from(
-    new Set(data.map((item: any) => item.date)),
+    new Set(data.map((item: any) => item.date))
   ).sort();
 
   // 2. 初始化各渠道数据对象

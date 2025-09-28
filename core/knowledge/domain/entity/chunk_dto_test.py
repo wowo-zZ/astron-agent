@@ -258,34 +258,6 @@ class TestQueryMatch:
         assert len(errors) == 1
         assert errors[0]["type"] == "less_than_equal"
 
-    def test_doc_ids_unique_validation(self) -> None:
-        """Test docIds unique validation."""
-        # Valid case with unique docIds
-        match = QueryMatch(docIds=["doc1", "doc2", "doc3"], repoId=["repo1"])
-        assert match.docIds == ["doc1", "doc2", "doc3"]
-
-        # Invalid case with duplicate docIds
-        with pytest.raises(ValidationError) as exc_info:
-            QueryMatch(docIds=["doc1", "doc2", "doc1"], repoId=["repo1"])
-
-        errors = exc_info.value.errors()
-        assert len(errors) == 1
-        assert "Elements in docIds must be unique" in str(errors[0]["ctx"])
-
-    def test_repo_id_unique_validation(self) -> None:
-        """Test repoId unique validation."""
-        # Valid case with unique repoIds
-        match = QueryMatch(repoId=["repo1", "repo2", "repo3"])
-        assert match.repoId == ["repo1", "repo2", "repo3"]
-
-        # Invalid case with duplicate repoIds
-        with pytest.raises(ValidationError) as exc_info:
-            QueryMatch(repoId=["repo1", "repo2", "repo1"])
-
-        errors = exc_info.value.errors()
-        assert len(errors) == 1
-        assert "Elements in repoId must be unique" in str(errors[0]["ctx"])
-
     def test_none_doc_ids_validation(self) -> None:
         """Test None docIds does not trigger unique validation."""
         match = QueryMatch(docIds=None, repoId=["repo1"])

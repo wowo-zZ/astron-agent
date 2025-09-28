@@ -1,5 +1,5 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 // 定义收藏项类型
 interface CollectItem {
@@ -123,10 +123,10 @@ interface SparkCommonState {
   setAvatar: (avatar: string | null) => void;
   setAnswerCompleted: (completed: boolean) => void;
   setAnswerLoad: (loading: boolean) => void;
-  setActiveVcn: (vcn: SparkCommonState["activeVcn"]) => void;
+  setActiveVcn: (vcn: SparkCommonState['activeVcn']) => void;
   setVcnBgm: (bgm: string) => void;
   setIsBotMode: (mode: boolean) => void;
-  setFileViewer: (viewer: SparkCommonState["fileViewer"]) => void;
+  setFileViewer: (viewer: SparkCommonState['fileViewer']) => void;
   setMyMessage: (message: string) => void;
   setNoticeModalVisible: (visible: boolean) => void;
 }
@@ -134,8 +134,8 @@ interface SparkCommonState {
 // 创建基础store
 const createBaseStore = (): Partial<SparkCommonState> => ({
   // 背景图
-  backgroundImg: "",
-  backgroundImgApp: "",
+  backgroundImg: '',
+  backgroundImgApp: '',
 
   // 收藏和最近使用
   collectList: null,
@@ -152,8 +152,8 @@ const createBaseStore = (): Partial<SparkCommonState> => ({
   isCollapsed: false,
 
   // 示例相关
-  inputExampleTip: "",
-  inputExampleModel: "",
+  inputExampleTip: '',
+  inputExampleModel: '',
 
   // 用户信息
   userInfo: null,
@@ -165,30 +165,30 @@ const createBaseStore = (): Partial<SparkCommonState> => ({
 
   // 发音人配置
   activeVcn: {
-    cn: "x4_lingxiaoqi",
+    cn: 'x4_lingxiaoqi',
     cnImg:
-      "https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16824985943709826%2Flxq.png",
-    en: "x4_EnUs_Luna",
+      'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16824985943709826%2Flxq.png',
+    en: 'x4_EnUs_Luna',
     enImg:
-      "https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16824985943695009%2Fluna.png",
+      'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16824985943695009%2Fluna.png',
     speed: 50,
   },
   vcnBgm:
-    "https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16828512103618230%2Fqrshmusic5.mp3",
+    'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16828512103618230%2Fqrshmusic5.mp3',
 
   // 助手模式
   isBotMode: false,
 
   // 文档预览
   fileViewer: {
-    fileUrl: "",
-    fileName: "",
+    fileUrl: '',
+    fileName: '',
     visible: false,
-    fileType: "",
+    fileType: '',
   },
 
   // 弹窗状态
-  myMessage: "",
+  myMessage: '',
   noticeModalVisible: false,
 });
 
@@ -197,39 +197,39 @@ export const useSparkCommonStore = create<SparkCommonState>()(
   persist(
     (set, get) => ({
       ...{
-        backgroundImg: "",
-        backgroundImgApp: "",
+        backgroundImg: '',
+        backgroundImgApp: '',
         collectList: null,
         recentList: null,
         configPageData: null,
         promptNode: null,
         promptPublishVersion: null,
         isCollapsed: false,
-        inputExampleTip: "",
-        inputExampleModel: "",
+        inputExampleTip: '',
+        inputExampleModel: '',
         userInfo: null,
         avatar: null,
         answerCompleted: true,
         answerLoad: false,
         activeVcn: {
-          cn: "x4_lingxiaoqi",
+          cn: 'x4_lingxiaoqi',
           cnImg:
-            "https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16824985943709826%2Flxq.png",
-          en: "x4_EnUs_Luna",
+            'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16824985943709826%2Flxq.png',
+          en: 'x4_EnUs_Luna',
           enImg:
-            "https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16824985943695009%2Fluna.png",
+            'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16824985943695009%2Fluna.png',
           speed: 50,
         },
         vcnBgm:
-          "https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16828512103618230%2Fqrshmusic5.mp3",
+          'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16828512103618230%2Fqrshmusic5.mp3',
         isBotMode: false,
         fileViewer: {
-          fileUrl: "",
-          fileName: "",
+          fileUrl: '',
+          fileName: '',
           visible: false,
-          fileType: "",
+          fileType: '',
         },
-        myMessage: "",
+        myMessage: '',
         noticeModalVisible: false,
       },
       ...createBaseStore(),
@@ -258,23 +258,23 @@ export const useSparkCommonStore = create<SparkCommonState>()(
       setAnswerCompleted: (completed: boolean): void =>
         set({ answerCompleted: completed }),
       setAnswerLoad: (loading: boolean): void => set({ answerLoad: loading }),
-      setActiveVcn: (vcn: SparkCommonState["activeVcn"]): void =>
+      setActiveVcn: (vcn: SparkCommonState['activeVcn']): void =>
         set({ activeVcn: vcn }),
       setVcnBgm: (bgm: string): void => set({ vcnBgm: bgm }),
       setIsBotMode: (mode: boolean): void => set({ isBotMode: mode }),
-      setFileViewer: (viewer: SparkCommonState["fileViewer"]): void =>
+      setFileViewer: (viewer: SparkCommonState['fileViewer']): void =>
         set({ fileViewer: viewer }),
       setMyMessage: (message: string): void => set({ myMessage: message }),
       setNoticeModalVisible: (visible: boolean): void =>
         set({ noticeModalVisible: visible }),
     }),
     {
-      name: "spark-common-storage", // 本地存储的键名
+      name: 'spark-common-storage', // 本地存储的键名
       // 只持久化需要的状态
       partialize: (state: SparkCommonState) => ({
         activeVcn: state.activeVcn,
         vcnBgm: state.vcnBgm,
       }),
-    },
-  ),
+    }
+  )
 );

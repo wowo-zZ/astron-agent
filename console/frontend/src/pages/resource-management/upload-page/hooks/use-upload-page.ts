@@ -1,18 +1,18 @@
-import React, { useCallback, useEffect, useMemo } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import React, { useCallback, useEffect, useMemo } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   getConfigs,
   embeddingFiles,
   getKnowledgeDetail,
   embeddingBack,
-} from "@/services/knowledge";
+} from '@/services/knowledge';
 import {
   EmbeddingFilesParams,
   FileStatusResponse,
   FlexibleType,
   RepoItem,
   UploadFile,
-} from "@/types/resource";
+} from '@/types/resource';
 
 export const useUploadPage = ({
   failedList,
@@ -57,58 +57,61 @@ export const useUploadPage = ({
   embedding: () => void;
 } => {
   const [searchParams] = useSearchParams();
-  const tag = searchParams.get("tag") || "CBG-RAG";
-  const parentId = searchParams.get("parentId");
-  const repoId = searchParams.get("repoId");
+  const tag = searchParams.get('tag') || 'CBG-RAG';
+  const parentId = searchParams.get('parentId');
+  const repoId = searchParams.get('repoId');
   const navigate = useNavigate();
 
   const sliceConfig = useMemo(() => {
-    if (tag === "CBG-RAG") {
+    if (tag === 'CBG-RAG') {
       return [
-        "DEFAULT_SLICE_RULES_CBG",
-        "CUSTOM_SLICE_RULES_CBG",
-        "CUSTOM_SLICE_SEPERATORS_CBG",
+        'DEFAULT_SLICE_RULES_CBG',
+        'CUSTOM_SLICE_RULES_CBG',
+        'CUSTOM_SLICE_SEPERATORS_CBG',
       ];
-    } else if (tag === "AIUI-RAG2") {
+    } else if (tag === 'AIUI-RAG2') {
       return [
-        "DEFAULT_SLICE_RULES_AIUI",
-        "CUSTOM_SLICE_RULES_AIUI",
-        "CUSTOM_SLICE_SEPERATORS_AIUI",
+        'DEFAULT_SLICE_RULES_AIUI',
+        'CUSTOM_SLICE_RULES_AIUI',
+        'CUSTOM_SLICE_SEPERATORS_AIUI',
       ];
     } else {
       return [
-        "DEFAULT_SLICE_RULES_SPARK",
-        "CUSTOM_SLICE_RULES_SPARK",
-        "CUSTOM_SLICE_SEPERATORS_SPARK",
+        'DEFAULT_SLICE_RULES_SPARK',
+        'CUSTOM_SLICE_RULES_SPARK',
+        'CUSTOM_SLICE_SEPERATORS_SPARK',
       ];
     }
   }, [tag]);
 
   useEffect(() => {
-    getConfigs(sliceConfig[0]).then((data) => {
-      const config = JSON.parse(data[0]?.value || "{}");
+    getConfigs(sliceConfig[0]).then(data => {
+      const config = JSON.parse(data[0]?.value || '{}');
       setDefaultConfig(config);
     });
 
-    getConfigs(sliceConfig[1]).then((data) => {
-      const config = JSON.parse(data[0]?.value || "{}");
+    getConfigs(sliceConfig[1]).then(data => {
+      const config = JSON.parse(data[0]?.value || '{}');
       setLengthRange(config.lengthRange);
       setCustomConfig(config);
     });
 
-    getConfigs(sliceConfig[2]).then((data) => {
-      setSeperatorsOptions(JSON.parse(data[0]?.value || "{}"));
+    getConfigs(sliceConfig[2]).then(data => {
+      setSeperatorsOptions(JSON.parse(data[0]?.value || '{}'));
     });
 
-    getKnowledgeDetail(repoId || "", tag).then((data) => {
+    getKnowledgeDetail(repoId || '', tag).then(data => {
       setKnowledge(data);
     });
   }, [sliceConfig]);
 
   useEffect(() => {
-    if (importType === "web" && uploadList.length > 0) {
+    if (importType === 'web' && uploadList.length > 0) {
       setSaveDisabled(false);
-    } else if (failedList.length === fileIds.length) {
+    } else if (
+      failedList.length === fileIds.length ||
+      uploadList.length !== fileIds.length
+    ) {
       setSaveDisabled(true);
     } else {
       setSaveDisabled(false);
@@ -116,20 +119,20 @@ export const useUploadPage = ({
   }, [failedList, fileIds, importType]);
 
   function embedding(): void {
-    const failedIds = failedList.map((item) => item.id);
-    const newFileIds = fileIds.filter((item) => !failedIds.includes(item));
+    const failedIds = failedList.map(item => item.id);
+    const newFileIds = fileIds.filter(item => !failedIds.includes(item));
     setFileIds([...newFileIds]);
-    const newUploadList = uploadList.filter((item) =>
-      fileIds.includes(item.fileId || ""),
+    const newUploadList = uploadList.filter(item =>
+      fileIds.includes(item.fileId || '')
     );
     setUploadList([...newUploadList]);
     const params: EmbeddingFilesParams = {
-      repoId: repoId || "",
+      repoId: repoId || '',
       tag,
       configs: {},
       fileIds: newFileIds,
     };
-    if (tag === "SparkDesk-RAG") {
+    if (tag === 'SparkDesk-RAG') {
       params.sparkFiles = sparkFiles;
     }
     embeddingFiles(params);
@@ -137,15 +140,15 @@ export const useUploadPage = ({
 
   const embeddingBackCb = useCallback(() => {
     setSaveLoading(true);
-    const failedIds = failedList.map((item) => item.id);
-    const newFileIds = fileIds.filter((item) => !failedIds.includes(item));
+    const failedIds = failedList.map(item => item.id);
+    const newFileIds = fileIds.filter(item => !failedIds.includes(item));
     const params: EmbeddingFilesParams = {
-      repoId: repoId || "",
+      repoId: repoId || '',
       tag,
       configs: {},
       fileIds: newFileIds,
     };
-    if (tag === "SparkDesk-RAG") {
+    if (tag === 'SparkDesk-RAG') {
       params.sparkFiles = sparkFiles;
     }
     embeddingBack(params)
@@ -163,15 +166,15 @@ export const useUploadPage = ({
 
   useEffect(() => {
     const fileIds = uploadList
-      .filter((item) => item.status === "done")
-      .map((item) => item.fileId) as number[];
+      .filter(item => item.status === 'done')
+      .map(item => item.fileId) as number[];
     setFileIds(fileIds);
   }, [uploadList]);
 
   useEffect(() => {
     const sparkFiles = uploadList
-      .filter((item) => item.status === "done")
-      .map((item) => ({
+      .filter(item => item.status === 'done')
+      .map(item => ({
         fileId: item.fileId,
         fileName: item.fileName,
         charCount: item.charCount,

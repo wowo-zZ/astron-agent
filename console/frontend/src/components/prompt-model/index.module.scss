@@ -117,12 +117,12 @@
             align-items: center;
             justify-content: center;
             padding-left: 10px;
-            background: url("~assets/imgs/svg/stop-icon.svg") 0 center / 14px auto no-repeat;
+            background: url("~assets/imgs/svgs/stop-icon.svg") 0 center / 14px auto no-repeat;
           }
           &:hover {
             color: #6b89ff;
             > div {
-              background: url("~assets/imgs/stop-icon-active.svg") 0 center / 14px auto no-repeat;
+              background: url("~assets/imgs/svgs/stop-icon-active.svg") 0 center / 14px auto no-repeat;
             }
           }
         }

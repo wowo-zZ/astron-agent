@@ -7,16 +7,16 @@ import React, {
   useRef,
   JSX,
   ReactNode,
-} from "react";
-import { Table, Tooltip, Popconfirm, TableColumnType, message } from "antd";
-import { fieldList, operateTableData } from "@/services/database";
-import { useSize } from "ahooks";
-import dayjs from "dayjs";
-import questionIcon from "@/assets/imgs/database/question-icon.svg";
-import deleteIcon from "@/assets/imgs/database/delete-circle.png";
-import { DatabaseItem, TableField, OperateType } from "@/types/database";
-import i18next from "i18next";
-import { ResponseBusinessError } from "@/types/global";
+} from 'react';
+import { Table, Tooltip, Popconfirm, TableColumnType, message } from 'antd';
+import { fieldList, operateTableData } from '@/services/database';
+import { useSize } from 'ahooks';
+import dayjs from 'dayjs';
+import questionIcon from '@/assets/imgs/database/question-icon.svg';
+import deleteIcon from '@/assets/imgs/database/delete-circle.png';
+import { DatabaseItem, TableField, OperateType } from '@/types/database';
+import i18next from 'i18next';
+import { ResponseBusinessError } from '@/types/global';
 
 const isDateString = (str: string): boolean => {
   const date = dayjs(str);
@@ -24,9 +24,9 @@ const isDateString = (str: string): boolean => {
     return false;
   }
   if (
-    str.includes("-") &&
-    (str.includes("T") || str.includes(" ")) &&
-    str.includes(":")
+    str.includes('-') &&
+    (str.includes('T') || str.includes(' ')) &&
+    str.includes(':')
   ) {
     return true;
   }
@@ -42,7 +42,7 @@ const createTableColumns = (
     pageSize: number;
     total: number;
   },
-  deleteRecord: (row: Record<string, unknown>) => void,
+  deleteRecord: (row: Record<string, unknown>) => void
 ): TableColumnType<Record<string, unknown>>[] => {
   if (!fieldLists.length) return [];
 
@@ -67,14 +67,14 @@ const createTableColumns = (
       </div>
     ),
     dataIndex: item.name,
-    key: item.id?.toString() || "",
+    key: item.id?.toString() || '',
     render: (text: string | boolean | number): ReactNode => {
       let value = text;
-      if (typeof text === "boolean" || typeof text === "number") {
+      if (typeof text === 'boolean' || typeof text === 'number') {
         value = text.toString();
       } else {
         if (text && isDateString(text)) {
-          value = dayjs(text).format("YYYY-MM-DD HH:mm:ss");
+          value = dayjs(text).format('YYYY-MM-DD HH:mm:ss');
         }
       }
       return (
@@ -90,22 +90,22 @@ const createTableColumns = (
 
   return [
     {
-      title: i18next.t("database.serialNumber"),
-      key: "index",
+      title: i18next.t('database.serialNumber'),
+      key: 'index',
       width: 42,
       render: (_: unknown, __: Record<string, unknown>, index: number) =>
         (pagination.pageNum - 1) * pagination.pageSize + index + 1,
     },
     ...fetchColumns,
     {
-      title: i18next.t("database.action"),
+      title: i18next.t('database.action'),
       width: 62,
-      fixed: "right" as const,
-      key: "action" as const,
+      fixed: 'right' as const,
+      key: 'action' as const,
       render: (_: unknown, record: Record<string, unknown>) => (
         <div className="flex items-center pl-[5px] bg-[#fff] mr-[-1px]">
           <Popconfirm
-            title={i18next.t("database.confirmDeleteData")}
+            title={i18next.t('database.confirmDeleteData')}
             onConfirm={() => deleteRecord(record)}
           >
             <img
@@ -143,10 +143,10 @@ const TestTable = forwardRef<
   TestTableProps
 >(function TestTable(
   { dataSource, pagination, info, loading, type, updateTestData },
-  ref,
+  ref
 ): JSX.Element {
   const [selectedRows, setSelectedRows] = useState<Record<string, unknown>[]>(
-    [],
+    []
   );
   const [fieldLists, setFieldLists] = useState<TableField[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -187,7 +187,7 @@ const TestTable = forwardRef<
     await operateTableData(params)
       .then(() => {
         updateTestData();
-        updateSelectRows([String(row.id || "")]);
+        updateSelectRows([String(row.id || '')]);
       })
       .catch((error: ResponseBusinessError) => {
         message.error(error.message);
@@ -200,14 +200,14 @@ const TestTable = forwardRef<
 
   const onSelectChange = (
     _newSelectedRowKeys: React.Key[],
-    selectedRows: Record<string, unknown>[],
+    selectedRows: Record<string, unknown>[]
   ): void => {
     setSelectedRows(selectedRows);
   };
 
   const rowSelection = {
     selectedRowKeys: selectedRows.map((item: Record<string, unknown>) =>
-      String(item.id || ""),
+      String(item.id || '')
     ),
     onChange: onSelectChange,
     preserveSelectedRowKeys: true,
@@ -215,10 +215,9 @@ const TestTable = forwardRef<
   };
 
   const updateSelectRows = (rows: string[]): void => {
-    setSelectedRows((prev) => {
+    setSelectedRows(prev => {
       return prev.filter(
-        (item: Record<string, unknown>) =>
-          !rows.includes(String(item.id || "")),
+        (item: Record<string, unknown>) => !rows.includes(String(item.id || ''))
       );
     });
   };
@@ -228,17 +227,17 @@ const TestTable = forwardRef<
     () => ({
       getSelectRowKeys(): string[] {
         return selectedRows.map((item: Record<string, unknown>) =>
-          String(item.id || ""),
+          String(item.id || '')
         );
       },
       getSelectRows(): string[] {
         return selectedRows.map((item: Record<string, unknown>) =>
-          String(item.id || ""),
+          String(item.id || '')
         );
       },
       updateSelectRows,
     }),
-    [selectedRows],
+    [selectedRows]
   );
 
   return (
@@ -248,10 +247,10 @@ const TestTable = forwardRef<
         pagination={false}
         columns={mergeColumns}
         dataSource={dataSource}
-        rowKey={(record) => String(record?.id || "")}
+        rowKey={record => String(record?.id || '')}
         rowSelection={rowSelection}
         loading={loading}
-        scroll={{ x: "max-content", y: tableHeight }}
+        scroll={{ x: 'max-content', y: tableHeight }}
       />
     </div>
   );

@@ -1,21 +1,21 @@
-import React, { FC, useEffect, useState } from "react";
-import { Switch, Tag, Form, Input, Button, Image, FormInstance } from "antd";
+import React, { FC, useEffect, useState } from 'react';
+import { Switch, Tag, Form, Input, Button, Image, FormInstance } from 'antd';
 import {
   createKnowledge,
   updateKnowledgeAPI,
   deleteChunkAPI,
-} from "@/services/knowledge";
-import { typeList, tagTypeClass } from "@/constants";
-import GlobalMarkDown from "@/components/global-markdown";
-import { useTranslation } from "react-i18next";
+} from '@/services/knowledge';
+import { typeList, tagTypeClass } from '@/constants';
+import GlobalMarkDown from '@/components/global-markdown';
+import { useTranslation } from 'react-i18next';
 
-import target from "@/assets/imgs/knowledge/icon_zhishi_target_act_1.png";
-import text from "@/assets/imgs/knowledge/icon_zhishi_text.png";
-import edit from "@/assets/imgs/knowledge/icon_zhishi_dialog_edit.png";
-import del from "@/assets/imgs/main/icon_bot_del_act.png";
-import order from "@/assets/imgs/knowledge/icon_zhishi_order.png";
-import dialogDel from "@/assets/imgs/main/icon_dialog_del.png";
-import { Chunk, FileInfoV2, TagDto } from "@/types/resource";
+import target from '@/assets/imgs/knowledge/icon_zhishi_target_act_1.png';
+import text from '@/assets/imgs/knowledge/icon_zhishi_text.png';
+import edit from '@/assets/imgs/knowledge/icon_zhishi_dialog_edit.png';
+import del from '@/assets/imgs/main/icon_bot_del_act.png';
+import order from '@/assets/imgs/knowledge/icon_zhishi_order.png';
+import dialogDel from '@/assets/imgs/main/icon_dialog_del.png';
+import { Chunk, FileInfoV2, TagDto } from '@/types/resource';
 
 const { TextArea } = Input;
 
@@ -40,9 +40,9 @@ export const EditChunk: FC<{
   const [form] = Form.useForm();
   const [folderTags, setFolderTags] = useState<string[]>([]);
   const [othersTag, setOtherTags] = useState<TagDto[]>([]);
-  const [tagValue, setTagValue] = useState("");
+  const [tagValue, setTagValue] = useState('');
   const [isEdit, setIsEdit] = useState(false);
-  const [textValue, setTextValue] = useState("");
+  const [textValue, setTextValue] = useState('');
   const [loading, setLoading] = useState(false);
   const [checked, setChecked] = useState(false);
   const [moreTags, setMoreTags] = useState(false);
@@ -52,21 +52,19 @@ export const EditChunk: FC<{
     form.setFieldsValue({
       text: currentChunk.content,
     });
-    setTextValue(currentChunk.content || "");
+    setTextValue(currentChunk.content || '');
     const currentTags = currentChunk.tagDtoList
-      .filter((item) => item.type === 4)
-      .map((item) => item.tagName);
-    const remainTags = currentChunk.tagDtoList.filter(
-      (item) => item.type !== 4,
-    );
-    setTagValue(currentTags.join("，"));
+      .filter(item => item.type === 4)
+      .map(item => item.tagName);
+    const remainTags = currentChunk.tagDtoList.filter(item => item.type !== 4);
+    setTagValue(currentTags.join('，'));
     setOtherTags(remainTags);
     setChecked(currentChunk.enabled ? true : false);
   }, []);
 
   useEffect(() => {
     if (tagValue) {
-      const tagArr = tagValue.split(/[,，]/).filter((item) => item);
+      const tagArr = tagValue.split(/[,，]/).filter(item => item);
       setFolderTags([...tagArr]);
 
       if (tagArr.length + othersTag.length > 5) {
@@ -109,8 +107,8 @@ export const EditChunk: FC<{
             <span
               className="ml-1 text-xs text-[#F6B728]"
               style={{
-                fontFamily: "SF Pro Text, SF Pro Text-600",
-                fontStyle: "italic",
+                fontFamily: 'SF Pro Text, SF Pro Text-600',
+                fontStyle: 'italic',
               }}
             >
               00{currentChunk.index}
@@ -139,24 +137,24 @@ export const EditChunk: FC<{
             <div className="flex items-center">
               <span
                 className={`w-[9px] h-[9px] ${
-                  checked ? "bg-[#13A10E]" : "bg-[#757575]"
+                  checked ? 'bg-[#13A10E]' : 'bg-[#757575]'
                 } rounded-full`}
               ></span>
               <span
                 className={`${
-                  checked ? "text-[#13A10E]" : "text-[#757575]"
+                  checked ? 'text-[#13A10E]' : 'text-[#757575]'
                 } text-sm ml-2`}
               >
-                {checked ? t("knowledge.enabled") : t("knowledge.disabled")}
+                {checked ? t('knowledge.enabled') : t('knowledge.disabled')}
               </span>
             </div>
             <Switch
-              disabled={["block", "review"].includes(
-                currentChunk.auditSuggest || "",
+              disabled={['block', 'review'].includes(
+                currentChunk.auditSuggest || ''
               )}
               size="small"
               checked={checked}
-              onChange={(checked) => {
+              onChange={checked => {
                 setChecked(checked);
                 enableChunk(currentChunk, checked);
               }}
@@ -250,7 +248,7 @@ export const EditChunkContent: FC<{
                   return (
                     <Tag
                       key={index}
-                      className={tagTypeClass.get(item.type as number) || ""}
+                      className={tagTypeClass.get(item.type as number) || ''}
                     >
                       <span
                         className="max-w-[100px] text-overflow"
@@ -264,7 +262,7 @@ export const EditChunkContent: FC<{
                   return moreTags ? (
                     <Tag
                       key={index}
-                      className={tagTypeClass.get(item.type as number) || ""}
+                      className={tagTypeClass.get(item.type as number) || ''}
                     >
                       <span
                         className="max-w-[100px] text-overflow"
@@ -290,7 +288,7 @@ export const EditChunkContent: FC<{
                 className="rounded-md border border-[#D7DFE9] px-4 py-1 text-second text-sm cursor-pointer"
                 onClick={() => setEditModal(false)}
               >
-                {t("common.cancel")}
+                {t('common.cancel')}
               </div>
               <div
                 className="rounded-md border border-[#D7DFE9] p-2 cursor-pointer"
@@ -317,11 +315,11 @@ export const EditChunkContent: FC<{
         <div className="mt-1.5">
           <Form form={form} layout="vertical">
             <Form.Item
-              label={t("knowledge.knowledgeParagraph")}
+              label={t('knowledge.knowledgeParagraph')}
               rules={[
                 {
                   required: true,
-                  message: t("knowledge.knowledgeParagraphRequired"),
+                  message: t('knowledge.knowledgeParagraphRequired'),
                 },
               ]}
               name="text"
@@ -330,8 +328,8 @@ export const EditChunkContent: FC<{
                 className="global-textarea"
                 style={{ height: 104 }}
                 value={textValue}
-                onChange={(event) => setTextValue(event?.target.value)}
-                placeholder={t("common.inputPlaceholder")}
+                onChange={event => setTextValue(event?.target.value)}
+                placeholder={t('common.inputPlaceholder')}
                 autoSize={{ minRows: 2, maxRows: 10 }}
               />
             </Form.Item>
@@ -342,9 +340,9 @@ export const EditChunkContent: FC<{
               loading={loading}
               disabled={!textValue}
               onClick={handleOk}
-              style={{ height: 32, lineHeight: "32px" }}
+              style={{ height: 32, lineHeight: '32px' }}
             >
-              {t("common.save")}
+              {t('common.save')}
             </Button>
             <Button
               type="text"
@@ -353,9 +351,9 @@ export const EditChunkContent: FC<{
                 setIsEdit(false);
                 setMoreTags(false);
               }}
-              style={{ height: 32, lineHeight: "32px", borderRadius: 6 }}
+              style={{ height: 32, lineHeight: '32px', borderRadius: 6 }}
             >
-              {t("common.cancel")}
+              {t('common.cancel')}
             </Button>
           </div>
         </div>
@@ -371,14 +369,14 @@ export const CreateChunk: FC<{
 }> = ({ setAddModal, fileId, resetKnowledge }) => {
   const { t } = useTranslation();
   const [form] = Form.useForm();
-  const [textValue, setTextValue] = useState("");
+  const [textValue, setTextValue] = useState('');
   const [tags, setTags] = useState<string[]>([]);
-  const [tagValue] = useState("");
+  const [tagValue] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (tagValue) {
-      const tagArr = tagValue.split(/[,，]/).filter((item) => item);
+      const tagArr = tagValue.split(/[,，]/).filter(item => item);
       setTags([...tagArr]);
     } else {
       setTags([]);
@@ -404,16 +402,16 @@ export const CreateChunk: FC<{
     <div className="mask">
       <div className="p-6 absolute bg-[#fff] rounded-2xl top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 text-second font-medium text-md w-[600px]">
         <div className="text-second text-lg font-medium">
-          {t("knowledge.addKnowledgeParagraph")}
+          {t('knowledge.addKnowledgeParagraph')}
         </div>
         <div className="mt-6">
           <Form form={form} layout="vertical">
             <Form.Item
-              label={t("knowledge.knowledgeParagraph")}
+              label={t('knowledge.knowledgeParagraph')}
               rules={[
                 {
                   required: true,
-                  message: t("knowledge.knowledgeParagraphRequired"),
+                  message: t('knowledge.knowledgeParagraphRequired'),
                 },
               ]}
               name="text"
@@ -422,8 +420,8 @@ export const CreateChunk: FC<{
                 className="global-textarea"
                 style={{ height: 104 }}
                 value={textValue}
-                onChange={(event) => setTextValue(event.target.value)}
-                placeholder={t("common.inputPlaceholder")}
+                onChange={event => setTextValue(event.target.value)}
+                placeholder={t('common.inputPlaceholder')}
                 autoSize={{ minRows: 6, maxRows: 10 }}
               />
             </Form.Item>
@@ -437,14 +435,14 @@ export const CreateChunk: FC<{
             className="px-[48px]"
             onClick={handleOk}
           >
-            {t("common.save")}
+            {t('common.save')}
           </Button>
           <Button
             type="text"
             className="origin-btn px-[48px]"
             onClick={() => setAddModal(false)}
           >
-            {t("common.cancel")}
+            {t('common.cancel')}
           </Button>
         </div>
       </div>
@@ -481,10 +479,10 @@ export const DeleteChunk: FC<{
           <div className="bg-[#fff5f4] w-10 h-10 flex justify-center items-center rounded-lg">
             <img src={dialogDel} className="w-7 h-7" alt="" />
           </div>
-          <p className="ml-2.5">{t("knowledge.confirmDeleteParagraph")}</p>
+          <p className="ml-2.5">{t('knowledge.confirmDeleteParagraph')}</p>
         </div>
         <p className="mt-6 text-desc max-w-[310px]">
-          {t("knowledge.paragraphDeleteWarning")}
+          {t('knowledge.paragraphDeleteWarning')}
         </p>
         <div className="flex flex-row-reverse gap-3 mt-7">
           <Button
@@ -494,7 +492,7 @@ export const DeleteChunk: FC<{
             className="delete-btn"
             style={{ paddingLeft: 24, paddingRight: 24 }}
           >
-            {t("common.delete")}
+            {t('common.delete')}
           </Button>
           <Button
             type="text"
@@ -502,7 +500,7 @@ export const DeleteChunk: FC<{
             onClick={() => setDeleteModal(false)}
             style={{ paddingLeft: 24, paddingRight: 24 }}
           >
-            {t("common.cancel")}
+            {t('common.cancel')}
           </Button>
         </div>
       </div>

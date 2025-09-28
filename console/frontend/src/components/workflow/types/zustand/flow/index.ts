@@ -6,7 +6,7 @@ import {
   OnNodesChange,
   ReactFlowInstance,
   Viewport,
-} from "reactflow";
+} from 'reactflow';
 
 export type FlowState = {
   template?: string;
@@ -33,7 +33,7 @@ export type FlowStoreType = {
   setNodes: (update: Node[] | ((oldState: Node[]) => Node[])) => void;
   setEdges: (
     update: Edge[] | ((oldState: Edge[]) => Edge[]),
-    noNeedTakeSnapshot?: boolean,
+    noNeedTakeSnapshot?: boolean
   ) => void;
   setNode: (id: string, update: Node | ((oldState: Node) => Node)) => void;
   delayCheckNode: (id: string) => void;
@@ -46,7 +46,7 @@ export type FlowStoreType = {
   removeNodeRef: (
     souceId: string,
     targetId: string,
-    inputEdges?: Edge[],
+    inputEdges?: Edge[]
   ) => void;
   updateNodeRef: (id: string) => void;
   delayUpdateNodeRef: (id: string) => void;
@@ -58,7 +58,7 @@ export type FlowStoreType = {
   takeSnapshot: (flag?: boolean) => void;
   historys: History[];
   setHistorys: (
-    update: History[] | ((oldState: History[]) => History[]),
+    update: History[] | ((oldState: History[]) => History[])
   ) => void;
   undo: () => void;
 };

@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
 export interface EnterpriseInfo {
   id: string;
@@ -33,19 +33,19 @@ export interface EnterpriseStore {
 }
 
 const getDefaultEnterpriseInfo = () => ({
-  id: "",
-  logoUrl: "",
-  avatarUrl: "",
-  name: "",
+  id: '',
+  logoUrl: '',
+  avatarUrl: '',
+  name: '',
   role: 0,
-  roleTypeText: "",
-  officerName: "",
-  orgId: "",
+  roleTypeText: '',
+  officerName: '',
+  orgId: '',
   serviceType: 1,
-  uid: "",
-  createTime: "",
-  updateTime: "",
-  expireTime: "",
+  uid: '',
+  createTime: '',
+  updateTime: '',
+  expireTime: '',
 });
 
 const useEnterpriseStore = create<EnterpriseStore>((set, get) => ({

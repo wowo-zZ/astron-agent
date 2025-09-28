@@ -1,12 +1,12 @@
-import http from "@/utils/http";
-import { feedbackType } from "@/types/types-services";
-import { AvatarType } from "@/types/resource";
+import http from '@/utils/http';
+import { feedbackType } from '@/types/types-services';
+import { AvatarType } from '@/types/resource';
 
 export async function getCommonConfig(params: {
   category: string;
   code: string;
 }): Promise<unknown> {
-  return await http.get("/config-info/get-by-category-and-code", {
+  return await http.get('/config-info/get-by-category-and-code', {
     params,
   });
 }
@@ -17,17 +17,17 @@ export async function avatarImageGenerate(content: string): Promise<unknown> {
 
 export async function getConfigs(
   category: string,
-  code = "1",
+  code = '1'
 ): Promise<AvatarType[]> {
   return await http.get(
-    `/config-info/get-list-by-category?category=${category}&code=${code}`,
+    `/config-info/get-list-by-category?category=${category}&code=${code}`
   );
 }
 
 export async function getMessages(
-  params: Record<string, string | number | boolean>,
+  params: Record<string, string | number | boolean>
 ): Promise<unknown> {
-  return await http.get("/monitor/overview", { params });
+  return await http.get('/monitor/overview', { params });
 }
 
 //获取版本list
@@ -36,14 +36,14 @@ export async function getVersionList(params: {
   size: number;
   current: number;
 }): Promise<unknown> {
-  return await http.get("/workflow/version/list", { params });
+  return await http.get('/workflow/version/list', { params });
 }
 //还原版本
 export async function restoreVersion(params: {
   flowId: string;
   id: string;
 }): Promise<unknown> {
-  return await http.post("/workflow/version/restore", params);
+  return await http.post('/workflow/version/restore', params);
 }
 // 删除版本
 export async function delVersion(id: string): Promise<unknown> {
@@ -54,7 +54,7 @@ export async function getPublicResult(params: {
   flowId: string;
   name: string;
 }): Promise<unknown> {
-  return await http.get("/workflow/version/publishResult", {
+  return await http.get('/workflow/version/publishResult', {
     params,
   });
 }
@@ -62,23 +62,23 @@ export async function getPublicResult(params: {
 export async function nextQuestionAdvice(data: {
   question: string;
 }): Promise<unknown> {
-  return await http.post("/prompt/next-question-advice", data);
+  return await http.post('/prompt/next-question-advice', data);
 }
 
 export async function feedback(params: feedbackType): Promise<unknown> {
-  return await http.post("/common/feedback", params);
+  return await http.post('/common/feedback', params);
 }
 
 export async function getModelConfigDetail(
   id: string,
-  llmSource: string,
+  llmSource: string
 ): Promise<unknown> {
   return await http.get(`/llm/inter1?id=${id}&llmSource=${llmSource}`);
 }
 
 export async function getCustomModelConfigDetail(
   id: string,
-  llmSource: string,
+  llmSource: string
 ): Promise<unknown> {
   return await http.get(`/llm/selfModelConfig?id=${id}&llmSource=${llmSource}`);
 }
@@ -95,11 +95,11 @@ export async function createFeedback(data: {
   description: string | undefined;
   picUrl: string | undefined;
 }): Promise<unknown> {
-  return await http.post("/workflow/feedback", data);
+  return await http.post('/workflow/feedback', data);
 }
 // 获取反馈列表
 export async function getFeedbackList(params: {
   flowId: string;
 }): Promise<unknown> {
-  return await http.get("/workflow/feedback-list", { params });
+  return await http.get('/workflow/feedback-list', { params });
 }

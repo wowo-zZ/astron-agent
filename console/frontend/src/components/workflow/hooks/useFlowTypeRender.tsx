@@ -1,18 +1,18 @@
-import { ItemType } from "@/components/workflow/types/hooks";
-import React from "react";
+import { ItemType } from '@/components/workflow/types/hooks';
+import React from 'react';
 
 export const useFlowTypeRender = (
-  item: ItemType,
+  item: ItemType
 ): React.ReactElement | null => {
   const isFile = item?.fileType;
   const type = item?.type || item?.schema?.type;
   if (
-    item?.schema?.value?.type === "ref" &&
+    item?.schema?.value?.type === 'ref' &&
     !item?.schema?.value?.content?.name
   ) {
     return null;
   }
-  if (isFile && type?.includes("array")) {
+  if (isFile && type?.includes('array')) {
     return (
       <svg
         className="icon-icon icon-icon-coz_folder_bracket "
@@ -49,13 +49,13 @@ export const useFlowTypeRender = (
       </svg>
     );
   }
-  if (type === "string") {
-    return "str.";
+  if (type === 'string') {
+    return 'str.';
   }
-  if (type === "integer") {
-    return "int.";
+  if (type === 'integer') {
+    return 'int.';
   }
-  if (type === "number") {
+  if (type === 'number') {
     return (
       <svg
         className="icon-icon icon-icon-coz_number "
@@ -74,7 +74,7 @@ export const useFlowTypeRender = (
       </svg>
     );
   }
-  if (type === "object") {
+  if (type === 'object') {
     return (
       <svg
         className="icon-icon icon-icon-coz_brace "
@@ -88,7 +88,7 @@ export const useFlowTypeRender = (
       </svg>
     );
   }
-  if (type === "boolean") {
+  if (type === 'boolean') {
     return (
       <svg
         className="icon-icon icon-icon-coz_boolean "
@@ -113,7 +113,7 @@ export const useFlowTypeRender = (
       </svg>
     );
   }
-  if (type === "array-string") {
+  if (type === 'array-string') {
     return (
       <svg
         className="icon-icon icon-icon-coz_string_bracket "
@@ -128,7 +128,7 @@ export const useFlowTypeRender = (
       </svg>
     );
   }
-  if (type === "array-integer") {
+  if (type === 'array-integer') {
     return (
       <svg
         className="icon-icon icon-icon-coz_number_int_bracket "
@@ -143,7 +143,7 @@ export const useFlowTypeRender = (
       </svg>
     );
   }
-  if (type === "array-number") {
+  if (type === 'array-number') {
     return (
       <svg
         className="icon-icon icon-icon-coz_number_bracket "
@@ -164,7 +164,7 @@ export const useFlowTypeRender = (
       </svg>
     );
   }
-  if (type === "array-boolean") {
+  if (type === 'array-boolean') {
     return (
       <svg
         className="icon-icon icon-icon-coz_boolean_bracket "
@@ -183,7 +183,7 @@ export const useFlowTypeRender = (
       </svg>
     );
   }
-  if (type === "array-object") {
+  if (type === 'array-object') {
     return (
       <svg
         className="icon-icon icon-icon-coz_brace_bracket "

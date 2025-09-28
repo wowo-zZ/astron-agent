@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Modal, Button, Space } from "antd";
-import Editor from "@monaco-editor/react";
-import { useTranslation } from "react-i18next";
-import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
-import "./index.css";
+import React, { useState, useEffect, useRef } from 'react';
+import { Modal, Button, Space } from 'antd';
+import Editor from '@monaco-editor/react';
+import { useTranslation } from 'react-i18next';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+import './index.css';
 
-import close from "@/assets/imgs/workflow/modal-close.png";
-import { JsonObject } from "@/types/resource";
+import close from '@/assets/imgs/workflow/modal-close.png';
+import { JsonObject } from '@/types/resource';
 
 interface JsonEditorModalProps {
   visible: boolean;
@@ -21,15 +21,15 @@ interface JsonEditorModalProps {
 
 const JsonEditorModal: React.FC<JsonEditorModalProps> = ({
   visible,
-  initialValue = "",
+  initialValue = '',
   onConfirm,
   onCancel,
-  width = "50vw",
-  height = "50vh",
+  width = '50vw',
+  height = '50vh',
 }) => {
-  const [jsonValue, setJsonValue] = useState<string>("");
+  const [jsonValue, setJsonValue] = useState<string>('');
   const [isValid, setIsValid] = useState<boolean>(true);
-  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>('');
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const { t } = useTranslation();
 
@@ -40,15 +40,15 @@ const JsonEditorModal: React.FC<JsonEditorModalProps> = ({
     try {
       // 处理初始值（支持对象或字符串）
       const initialString =
-        typeof initialValue === "string"
+        typeof initialValue === 'string'
           ? initialValue
           : JSON.stringify(initialValue, null, 2);
-      setJsonValue(initialString || "{}");
-      validateJson(initialString || "{}");
+      setJsonValue(initialString || '{}');
+      validateJson(initialString || '{}');
     } catch (error) {
-      setJsonValue("{}");
+      setJsonValue('{}');
       setIsValid(false);
-      setErrorMessage(t("workflow.nodes.common.jsonError"));
+      setErrorMessage(t('workflow.nodes.common.jsonError'));
     }
 
     return (): void => {
@@ -59,32 +59,32 @@ const JsonEditorModal: React.FC<JsonEditorModalProps> = ({
   // 验证JSON格式
   const validateJson = (value: string): void => {
     try {
-      if (value.trim() === "" || value.trim() === "[]") {
+      if (value.trim() === '' || value.trim() === '[]') {
         setIsValid(false);
-        setErrorMessage(t("workflow.nodes.common.jsonError"));
+        setErrorMessage(t('workflow.nodes.common.jsonError'));
         return;
       }
       JSON.parse(value);
       setIsValid(true);
-      setErrorMessage("");
+      setErrorMessage('');
     } catch (error) {
       setIsValid(false);
       setErrorMessage(
         error instanceof Error
           ? error.message
-          : t("workflow.nodes.common.jsonError"),
+          : t('workflow.nodes.common.jsonError')
       );
     }
   };
 
   const handleEditorChange = (value: string | undefined): void => {
-    const newValue = value || "";
+    const newValue = value || '';
     setJsonValue(newValue);
     validateJson(newValue);
   };
 
   const handleEditorDidMount = (
-    editor: monaco.editor.IStandaloneCodeEditor,
+    editor: monaco.editor.IStandaloneCodeEditor
   ): void => {
     editorRef.current = editor;
   };
@@ -93,7 +93,7 @@ const JsonEditorModal: React.FC<JsonEditorModalProps> = ({
   const handleConfirm = (): void => {
     if (!isValid) {
       setIsValid(false);
-      setErrorMessage(t("workflow.nodes.common.jsonError"));
+      setErrorMessage(t('workflow.nodes.common.jsonError'));
       return;
     }
 
@@ -102,13 +102,13 @@ const JsonEditorModal: React.FC<JsonEditorModalProps> = ({
       onConfirm?.(jsonValue, jsonObj);
     } catch (error) {
       setIsValid(false);
-      setErrorMessage(t("workflow.nodes.common.jsonError"));
+      setErrorMessage(t('workflow.nodes.common.jsonError'));
     }
   };
 
   return (
     <Modal
-      title={t("workflow.nodes.common.jsonExtract")}
+      title={t('workflow.nodes.common.jsonExtract')}
       open={visible}
       onCancel={() => onCancel?.()}
       width={width}
@@ -116,10 +116,10 @@ const JsonEditorModal: React.FC<JsonEditorModalProps> = ({
       footer={
         <Space>
           <Button onClick={() => onCancel?.()}>
-            {t("workflow.nodes.common.cancel")}
+            {t('workflow.nodes.common.cancel')}
           </Button>
           <Button type="primary" onClick={handleConfirm} disabled={!isValid}>
-            {t("workflow.nodes.toolNode.save")}
+            {t('workflow.nodes.toolNode.save')}
           </Button>
         </Space>
       }
@@ -147,8 +147,8 @@ const JsonEditorModal: React.FC<JsonEditorModalProps> = ({
             overviewRulerBorder: false,
             automaticLayout: true,
             fontSize: 14,
-            placeholder: `{${t("workflow.nodes.common.inputPlaceholder")}}`,
-            lineNumbers: "off",
+            placeholder: `{${t('workflow.nodes.common.inputPlaceholder')}}`,
+            lineNumbers: 'off',
             folding: false,
             glyphMargin: false,
             formatOnType: true,
@@ -162,10 +162,10 @@ const JsonEditorModal: React.FC<JsonEditorModalProps> = ({
       {!isValid && (
         <div
           style={{
-            padding: "8px 16px",
-            backgroundColor: "#fff2f0",
-            borderTop: "1px solid #ffccc7",
-            color: "#ff4d4f",
+            padding: '8px 16px',
+            backgroundColor: '#fff2f0',
+            borderTop: '1px solid #ffccc7',
+            color: '#ff4d4f',
           }}
         >
           {errorMessage}

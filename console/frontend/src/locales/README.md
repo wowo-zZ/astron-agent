@@ -26,46 +26,46 @@ src/locales/
 ```typescript
 workflow.nodes.common = {
   // 基础UI元素
-  selectPlaceholder: "请选择",
-  inputPlaceholder: "请输入",
-  outputPlaceholder: "输出",
-  input: "输入",
-  output: "输出",
-  reference: "引用",
-  add: "添加",
+  selectPlaceholder: '请选择',
+  inputPlaceholder: '请输入',
+  outputPlaceholder: '输出',
+  input: '输入',
+  output: '输出',
+  reference: '引用',
+  add: '添加',
 
   // 参数相关
-  parameterName: "参数名",
-  parameterValue: "参数值",
-  variableName: "变量名",
-  variableType: "变量类型",
-  description: "描述",
-  required: "是否必要",
+  parameterName: '参数名',
+  parameterValue: '参数值',
+  variableName: '变量名',
+  variableType: '变量类型',
+  description: '描述',
+  required: '是否必要',
 
   // 操作相关
-  referenceVariable: "引用变量",
-  addBranch: "添加分支",
-  addOption: "添加选项",
-  addIntentKeyword: "添加意图关键字",
-  addSubItem: "添加子项",
-  addPlugin: "添加插件",
-  addAddress: "添加地址",
+  referenceVariable: '引用变量',
+  addBranch: '添加分支',
+  addOption: '添加选项',
+  addIntentKeyword: '添加意图关键字',
+  addSubItem: '添加子项',
+  addPlugin: '添加插件',
+  addAddress: '添加地址',
 
   // 提示和警告
-  inputTest: "输入测试",
-  outputResult: "输出结果",
-  maxAddWarning: "最多添加30个插件或者MCP!",
+  inputTest: '输入测试',
+  outputResult: '输出结果',
+  maxAddWarning: '最多添加30个插件或者MCP!',
   pluginLimitTip:
-    "支持在已发布列表里同时勾选并添加多个插件或 MCP，最多添加 30 个。",
-  mcpServerTip: "支持自定义添加MCP服务器地址，上限3个",
-  knowledgeTypeTip: "知识库节点仅支持添加同类型文件",
+    '支持在已发布列表里同时勾选并添加多个插件或 MCP，最多添加 30 个。',
+  mcpServerTip: '支持自定义添加MCP服务器地址，上限3个',
+  knowledgeTypeTip: '知识库节点仅支持添加同类型文件',
 
   // 占位符文本
-  variableDescriptionPlaceholder: "请输入变量的作用的描述语句",
-  contentPlaceholder: "请输入内容，可以使用{{变量名}}方式引用输入参数",
+  variableDescriptionPlaceholder: '请输入变量的作用的描述语句',
+  contentPlaceholder: '请输入内容，可以使用{{变量名}}方式引用输入参数',
 
   // 意图相关
-  intentDescription: "意图描述",
+  intentDescription: '意图描述',
 };
 ```
 
@@ -77,15 +77,15 @@ workflow.nodes.common = {
 
 ```typescript
 workflow.nodes.largeModelNode = {
-  type: "大模型",
-  prompt: "提示词",
-  promptLibrary: "提示词库",
-  systemPrompt: "系统提示词",
-  userPrompt: "用户提示词",
-  chatHistory: "对话历史", // 如果其他节点也用到，应该移到common
-  outputFormat: "输出格式：",
-  systemPromptPlaceholder: "大模型人设设置...",
-  userPromptPlaceholder: "大模型人设设置...",
+  type: '大模型',
+  prompt: '提示词',
+  promptLibrary: '提示词库',
+  systemPrompt: '系统提示词',
+  userPrompt: '用户提示词',
+  chatHistory: '对话历史', // 如果其他节点也用到，应该移到common
+  outputFormat: '输出格式：',
+  systemPromptPlaceholder: '大模型人设设置...',
+  userPromptPlaceholder: '大模型人设设置...',
 };
 ```
 

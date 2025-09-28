@@ -1,25 +1,25 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { createPortal } from "react-dom";
-import { useMemoizedFn } from "ahooks";
-import { cloneDeep } from "lodash";
-import { Button } from "antd";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import JsonMonacoEditor from "@/components/monaco-editor/JsonMonacoEditor";
-import Ajv from "ajv";
-import { generateValidationSchema } from "@/components/workflow/utils/reactflowUtils";
-import { Icons } from "@/components/workflow/icons";
+import React, { useState, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
+import { useMemoizedFn } from 'ahooks';
+import { cloneDeep } from 'lodash';
+import { Button } from 'antd';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import JsonMonacoEditor from '@/components/monaco-editor/JsonMonacoEditor';
+import Ajv from 'ajv';
+import { generateValidationSchema } from '@/components/workflow/utils/reactflowUtils';
+import { Icons } from '@/components/workflow/icons';
 
 function SetDefaultValue(): React.ReactElement {
   const defaultValueModalInfo = useFlowsManager(
-    (state) => state.defaultValueModalInfo,
+    state => state.defaultValueModalInfo
   );
   const setDefaultValueModalInfo = useFlowsManager(
-    (state) => state.setDefaultValueModalInfo,
+    state => state.setDefaultValueModalInfo
   );
-  const currentStore = useFlowsManager((state) => state.getCurrentStore());
-  const setNode = currentStore((state) => state.setNode);
-  const [value, setValue] = useState<string>("");
-  const [errorMsg, setErrorMsg] = useState<string>("");
+  const currentStore = useFlowsManager(state => state.getCurrentStore());
+  const setNode = currentStore(state => state.setNode);
+  const [value, setValue] = useState<string>('');
+  const [errorMsg, setErrorMsg] = useState<string>('');
 
   const validationSchema = useMemo(() => {
     if (defaultValueModalInfo?.nodeId) {
@@ -31,7 +31,7 @@ function SetDefaultValue(): React.ReactElement {
   useEffect(() => {
     if (defaultValueModalInfo?.open) {
       setValue(
-        JSON.stringify(defaultValueModalInfo?.data?.schema?.default, null, 2),
+        JSON.stringify(defaultValueModalInfo?.data?.schema?.default, null, 2)
       );
     }
   }, [defaultValueModalInfo]);
@@ -39,7 +39,7 @@ function SetDefaultValue(): React.ReactElement {
   const handleOk = useMemoizedFn(() => {
     setNode(defaultValueModalInfo?.nodeId, (old: unknown) => {
       const currentInput = old.data?.outputs.find(
-        (item: unknown) => item.id === defaultValueModalInfo?.paramsId,
+        (item: unknown) => item.id === defaultValueModalInfo?.paramsId
       );
       if (currentInput) {
         currentInput.schema.default = JSON.parse(value);
@@ -50,8 +50,8 @@ function SetDefaultValue(): React.ReactElement {
     });
     setDefaultValueModalInfo({
       open: false,
-      nodeId: "",
-      paramsId: "",
+      nodeId: '',
+      paramsId: '',
     });
   });
 
@@ -65,16 +65,16 @@ function SetDefaultValue(): React.ReactElement {
         if (!valid) {
           return (
             validate?.errors?.[0]?.instancePath?.slice(1) +
-              " " +
-              validate?.errors?.[0]?.message || ""
+              ' ' +
+              validate?.errors?.[0]?.message || ''
           );
         } else {
-          return "";
+          return '';
         }
       } catch {
-        return "Invalid JSON format";
+        return 'Invalid JSON format';
       }
-    },
+    }
   );
 
   const handleInputChange = useMemoizedFn((value: string) => {
@@ -85,8 +85,8 @@ function SetDefaultValue(): React.ReactElement {
   const handleCloseModal = useMemoizedFn(() => {
     setDefaultValueModalInfo({
       open: false,
-      nodeId: "",
-      paramsId: "",
+      nodeId: '',
+      paramsId: '',
     });
   });
 
@@ -131,7 +131,7 @@ function SetDefaultValue(): React.ReactElement {
                 </div>
               </div>
             </div>,
-            document.body,
+            document.body
           )
         : null}
     </>

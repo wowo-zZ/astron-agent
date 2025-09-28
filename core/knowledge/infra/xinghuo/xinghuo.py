@@ -520,7 +520,8 @@ async def _process_form_response(
         ThirdPartyException: Raised when response error occurs
     """
     response_text = await resp.text()
-    span_context.add_info_events({"RAG_OUTPUT": response_text})
+    if span_context:
+        span_context.add_info_events({"RAG_OUTPUT": response_text})
 
     if resp.status != 200:
         logger.error(f"{url} Failed to 【XINGHUO-RAG】; err code {resp.status}")
@@ -554,20 +555,23 @@ def _handle_form_request_error(e: Exception, url: str, span_context: Any) -> Non
     if isinstance(e, asyncio.TimeoutError):
         error_msg = f"Request to {url} timed out after 60 seconds"
         logger.error(error_msg)
-        span_context.record_exception(e)
+        if span_context:
+            span_context.record_exception(e)
         raise ThirdPartyException(
             e=CodeEnum.CBG_RAGError, msg=f"CBG Request error: {e}"
         ) from e
     if isinstance(e, aiohttp.ClientError):
         error_msg = f"Network error during request to {url}: {e}"
         logger.error(error_msg)
-        span_context.record_exception(e)
+        if span_context:
+            span_context.record_exception(e)
         raise ThirdPartyException(
             e=CodeEnum.CBG_RAGError, msg=f"CBG Network error: {e}"
         ) from e
     error_msg = f"Unexpected error during request to {url}: {e}"
     logger.error(error_msg)
-    span_context.record_exception(e)
+    if span_context:
+        span_context.record_exception(e)
     raise ThirdPartyException(e=CodeEnum.CBG_RAGError, msg=str(e)) from e
 
 

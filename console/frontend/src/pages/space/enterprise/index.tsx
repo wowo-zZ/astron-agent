@@ -1,30 +1,30 @@
-import { Suspense, useCallback, useEffect } from "react";
+import { Suspense, useCallback, useEffect } from 'react';
 import {
   Routes,
   Route,
   Navigate,
   useParams,
   useNavigate,
-} from "react-router-dom";
-import { Spin, message } from "antd";
-import classNames from "classnames";
-import styles from "./index.module.scss";
+} from 'react-router-dom';
+import { Spin, message } from 'antd';
+import classNames from 'classnames';
+import styles from './index.module.scss';
 
-import EnterpriseSpaceLayout from "./base-layout";
-import SpaceManage from "./page-components/space-manage";
-import MemberManage from "./page-components/member-manage";
-import TeamSettings from "./page-components/team-settings";
+import EnterpriseSpaceLayout from './base-layout';
+import SpaceManage from './page-components/space-manage';
+import MemberManage from './page-components/member-manage';
+import TeamSettings from './page-components/team-settings';
 
-import { getEnterpriseDetail } from "@/services/enterprise";
+import { getEnterpriseDetail } from '@/services/enterprise';
 
-import useUserStore from "@/store/user-store";
-import useSpaceStore from "@/store/space-store";
-import useEnterpriseStore from "@/store/enterprise-store";
-import { useSpaceType } from "@/hooks/use-space-type";
+import useUserStore from '@/store/user-store';
+import useSpaceStore from '@/store/space-store';
+import useEnterpriseStore from '@/store/enterprise-store';
+import { useSpaceType } from '@/hooks/use-space-type';
 
-import { defaultEnterpriseAvatar, roleToRoleType } from "@/pages/space/config";
-import { useSpaceI18n } from "@/pages/space/hooks/use-space-i18n";
-import { RoleType, SpaceType } from "@/permissions/permission-type";
+import { defaultEnterpriseAvatar, roleToRoleType } from '@/pages/space/config';
+import { useSpaceI18n } from '@/pages/space/hooks/use-space-i18n';
+import { RoleType, SpaceType } from '@/types/permission';
 
 export default function Index() {
   const navigate = useNavigate();
@@ -46,7 +46,7 @@ export default function Index() {
 
     if (!isTeamSpace()) {
       setSpaceStore({
-        spaceType: "team",
+        spaceType: 'team',
         enterpriseId,
       });
 
@@ -55,7 +55,7 @@ export default function Index() {
 
     try {
       const res: any = await getEnterpriseDetail();
-      console.log(res, "=========== getEnterpriseDetail ============");
+      console.log(res, '=========== getEnterpriseDetail ============');
 
       if (res?.detail?.flag === false) {
         message.error(res?.detail?.desc);
@@ -66,11 +66,11 @@ export default function Index() {
 
       setUserRole(
         SpaceType.ENTERPRISE,
-        roleToRoleType(res?.role, true) as RoleType,
+        roleToRoleType(res?.role, true) as RoleType
       );
       console.log(
         roleToRoleType(res?.role, true),
-        "=========== roleToRoleType ============",
+        '=========== roleToRoleType ============'
       );
 
       const enterpriseDetail = {
@@ -93,7 +93,7 @@ export default function Index() {
 
   return (
     <div
-      className={classNames("h-full overflow-hidden", styles.enterpriseSpace)}
+      className={classNames('h-full overflow-hidden', styles.enterpriseSpace)}
     >
       <Suspense
         fallback={

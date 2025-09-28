@@ -1,7 +1,7 @@
-import React from "react";
-import { useTranslation } from "react-i18next";
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 
-import toolArrowLeft from "@/assets/imgs/common/back.png";
+import toolArrowLeft from '@/assets/imgs/common/back.png';
 
 interface BackButtonProps {
   onBack: () => void;
@@ -19,10 +19,10 @@ export const BackButton: React.FC<BackButtonProps> = ({ onBack }) => {
       onClick={onBack}
     >
       <img src={toolArrowLeft} className="w-[18px] h-[18px]" alt="" />
-      <div className="mr-1 font-medium text-4">{t("database.back")}</div>
+      <div className="mr-1 font-medium text-4">{t('database.back')}</div>
       <div className="">
         <span className="text-[#7F7F7F] text-[14px]">
-          {t("database.database")}
+          {t('database.database')}
         </span>
       </div>
     </div>

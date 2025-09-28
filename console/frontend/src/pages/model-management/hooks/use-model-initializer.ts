@@ -1,6 +1,6 @@
-import { useEffect } from "react";
-import { useModelContext } from "../context/model-context";
-import { getModelList } from "@/services/model";
+import { useEffect } from 'react';
+import { useModelContext } from '../context/model-context';
+import { getModelList } from '@/services/model';
 import {
   ModelFilterParams,
   ModelInfo,
@@ -8,14 +8,14 @@ import {
   ShelfStatus,
   ModelType,
   CategorySource,
-} from "@/types/model";
+} from '@/types/model';
 
 /**
  * 模型初始化Hook
  * 专门负责页面初始化时的数据加载
  */
 export const useModelInitializer = (
-  modelType: ModelType = ModelType.OFFICIAL,
+  modelType: ModelType = ModelType.OFFICIAL
 ): void => {
   const { state, actions } = useModelContext();
 
@@ -32,11 +32,11 @@ export const useModelInitializer = (
       if (!item.categoryTree) continue;
       for (const node of item.categoryTree) {
         if (
-          node.key === "modelCategory" ||
-          node.key === "languageSupport" ||
-          node.key === "contextLengthTag" ||
-          node.key === "modelProvider" ||
-          node.key === "modelScenario"
+          node.key === 'modelCategory' ||
+          node.key === 'languageSupport' ||
+          node.key === 'contextLengthTag' ||
+          node.key === 'modelProvider' ||
+          node.key === 'modelScenario'
         ) {
           // 初始化一级节点
           if (!map.has(node.key)) {
@@ -45,7 +45,7 @@ export const useModelInitializer = (
                 id: node.id,
                 key: node.key,
                 name:
-                  node.key === "contextLengthTag" ? "上下文长度" : node.name,
+                  node.key === 'contextLengthTag' ? '上下文长度' : node.name,
                 sortOrder: node.sortOrder,
                 children: [],
                 source: CategorySource.SYSTEM,
@@ -73,7 +73,7 @@ export const useModelInitializer = (
     return Array.from(map.values())
       .map(({ root, childMap }) => {
         root.children = Array.from(childMap.values()).sort(
-          (a, b) => a.id - b.id,
+          (a, b) => a.id - b.id
         );
         return root;
       })
@@ -90,7 +90,7 @@ export const useModelInitializer = (
           type: modelType,
           page: 1,
           pageSize: 9999,
-          name: state.searchInput || "",
+          name: state.searchInput || '',
           filter: modelType === 2 ? state.filterType : 0,
         };
 
@@ -102,7 +102,7 @@ export const useModelInitializer = (
 
         // 设置即将下架的模型
         const willBeRemoved = records.filter(
-          (m) => m.shelfStatus === ShelfStatus.WAIT_OFF_SHELF,
+          m => m.shelfStatus === ShelfStatus.WAIT_OFF_SHELF
         );
         actions.setShelfOffModels(willBeRemoved);
 
@@ -131,7 +131,7 @@ export const useModelInitializer = (
 
     try {
       const cached = JSON.parse(
-        sessionStorage.getItem("officialModelFilter") || "{}",
+        sessionStorage.getItem('officialModelFilter') || '{}'
       );
 
       if (cached.checkedLeaves) {
@@ -149,7 +149,7 @@ export const useModelInitializer = (
 
     try {
       const showShelfOnly =
-        sessionStorage.getItem("officialModelQueckFilter") === "1";
+        sessionStorage.getItem('officialModelQueckFilter') === '1';
       actions.setShowShelfOnly(showShelfOnly);
     } catch {
       // 忽略解析错误
@@ -161,12 +161,12 @@ export const useModelInitializer = (
     if (modelType !== 1) return;
 
     sessionStorage.setItem(
-      "officialModelFilter",
+      'officialModelFilter',
       JSON.stringify({
         checkedLeaves: state.checkedLeaves,
         contextLength: state.contextLength,
         searchInput: state.searchInput,
-      }),
+      })
     );
   }, [modelType, state.checkedLeaves, state.contextLength, state.searchInput]);
 };

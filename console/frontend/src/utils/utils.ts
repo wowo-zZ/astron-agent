@@ -1,9 +1,9 @@
-import { message } from "antd";
-import { v4 as uuid } from "uuid";
-import clsx, { ClassValue } from "clsx";
-import { getFileInfoV2BySourceId } from "@/services/knowledge";
-import { downloadKnowledgeByViolation } from "@/services/knowledge";
-import http from "@/utils/http";
+import { message } from 'antd';
+import { v4 as uuid } from 'uuid';
+import clsx, { ClassValue } from 'clsx';
+import { getFileInfoV2BySourceId } from '@/services/knowledge';
+import { downloadKnowledgeByViolation } from '@/services/knowledge';
+import http from '@/utils/http';
 import {
   Chunk,
   DownloadViolationParams,
@@ -13,13 +13,13 @@ import {
   TagDto,
   JsonObject,
   JsonArray,
-} from "@/types/resource";
-import axios from "axios";
+} from '@/types/resource';
+import axios from 'axios';
 
 export function downloadExcel(
   fileIds: (string | number)[],
   source: number,
-  name: string,
+  name: string
 ): void {
   const params: DownloadViolationParams = {
     fileIds,
@@ -27,25 +27,25 @@ export function downloadExcel(
   };
   downloadKnowledgeByViolation(params).then((data: Blob) => {
     const excelBlob = new Blob([data], {
-      type: "application/vnd.ms-excel",
+      type: 'application/vnd.ms-excel',
     });
     const excelUrl = URL.createObjectURL(excelBlob);
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = excelUrl;
-    a.download = name + "的违规详情.xls"; // 设置文件名
+    a.download = name + '的违规详情.xls'; // 设置文件名
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(excelUrl);
-    message.success("下载成功");
+    message.success('下载成功');
   });
 }
 
 export const isJSON = (str: string): boolean | void => {
-  if (typeof str == "string") {
+  if (typeof str == 'string') {
     try {
       const obj = JSON.parse(str);
-      if (typeof obj == "object" && obj) {
+      if (typeof obj == 'object' && obj) {
         return true;
       } else {
         return false;
@@ -57,27 +57,27 @@ export const isJSON = (str: string): boolean | void => {
 };
 
 export const getRouteId = (): string => {
-  const arr = window.location.pathname.split("/");
-  return arr[arr.length - 2] || "";
+  const arr = window.location.pathname.split('/');
+  return arr[arr.length - 2] || '';
 };
 
 export const getActiveKey = (): string => {
-  let key = window.location.pathname.split("/").pop();
-  if (key === "file" || key === "segmentation") {
-    key = "document";
+  let key = window.location.pathname.split('/').pop();
+  if (key === 'file' || key === 'segmentation') {
+    key = 'document';
   }
-  return key || "";
+  return key || '';
 };
 
 export const fileType = (file: FileItem): string => {
-  return file.isFile ? file.fileInfoV2?.type : "folder";
+  return file.isFile ? file.fileInfoV2?.type : 'folder';
 };
 
 export const tagsModify = (tags: TagDto[]): TagDto[] => {
   const newTags: TagDto[] = [];
-  tags.map((item) => {
+  tags.map(item => {
     if (item.tags?.length) {
-      item.tags.map((tag) => {
+      item.tags.map(tag => {
         newTags.push({
           ...item,
           tagName: tag,
@@ -90,12 +90,12 @@ export const tagsModify = (tags: TagDto[]): TagDto[] => {
 
 export const generateMeta = async (data: TagDto[]): Promise<TagDto[]> => {
   const newArr: TagDto[] = [];
-  const newData = data.map(async (item) => {
-    const data = await getFileInfoV2BySourceId(item["source_id"] || "");
+  const newData = data.map(async item => {
+    const data = await getFileInfoV2BySourceId(item['source_id'] || '');
     newArr.push({
       ...item,
       name: data.name,
-      type: data.type || "",
+      type: data.type || '',
     });
   });
   await Promise.all(newData);
@@ -108,23 +108,23 @@ export function modifyChunks(chunks: KnowledgeItem[]): Chunk[] {
     markdownContent: modifyContent(item.content),
     content: item.content?.content || item.content?.knowledge,
     tagDtoList: tagsModify(item.tagDtoList || []),
-    auditSuggest: item.content?.auditSuggest || "",
+    auditSuggest: item.content?.auditSuggest || '',
     auditDetail:
       item.content?.auditDetail
-        ?.map((item) => item["category_description"])
-        ?.join(",") || "",
+        ?.map(item => item['category_description'])
+        ?.join(',') || '',
   }));
 }
 
-export function modifyContent(chunk: KnowledgeItem["content"]): string {
+export function modifyContent(chunk: KnowledgeItem['content']): string {
   const regex = /[{<]unused.+?[>}]/g;
-  let content = chunk?.content || chunk?.knowledge || "";
+  let content = chunk?.content || chunk?.knowledge || '';
   const matches = content?.match(regex);
   const references = chunk.references;
   if (matches && matches.length) {
-    matches.map((item) => {
+    matches.map(item => {
       const imageInfo = references?.[item.slice(1, -1)];
-      if (imageInfo && imageInfo.format === "image") {
+      if (imageInfo && imageInfo.format === 'image') {
         content = content.replace(item, `![image](${imageInfo.link})`);
       } else if (imageInfo && imageInfo?.content) {
         content = content.replace(item, imageInfo.content);
@@ -139,90 +139,90 @@ export function cn(...inputs: ClassValue[]): string {
 }
 
 export const generateTypeDefault = (
-  type: string,
+  type: string
 ): string | number | boolean | [] => {
-  if (type === "string") {
-    return "";
-  } else if (type === "integer") {
+  if (type === 'string') {
+    return '';
+  } else if (type === 'integer') {
     return 0;
-  } else if (type === "boolean") {
+  } else if (type === 'boolean') {
     return false;
-  } else if (type === "number") {
+  } else if (type === 'number') {
     return 0;
   } else {
     return [];
   }
 };
 export const generateType = (suffix: string): string | void => {
-  if (["pdf"]?.includes(suffix)) {
-    return "pdf";
-  } else if (["doc", "docx"]?.includes(suffix)) {
-    return "doc";
-  } else if (["jpg", "jpeg", "png", "bmp"]?.includes(suffix)) {
-    return "image";
-  } else if (["txt"]?.includes(suffix)) {
-    return "txt";
-  } else if (["md"]?.includes(suffix)) {
-    return "md";
-  } else if (["ppt", "pptx"]?.includes(suffix)) {
-    return "ppt";
-  } else if (["xlsx", "xls", "csv"]?.includes(suffix)) {
-    return "excel";
-  } else if (["html"]?.includes(suffix)) {
-    return "html";
+  if (['pdf']?.includes(suffix)) {
+    return 'pdf';
+  } else if (['doc', 'docx']?.includes(suffix)) {
+    return 'doc';
+  } else if (['jpg', 'jpeg', 'png', 'bmp']?.includes(suffix)) {
+    return 'image';
+  } else if (['txt']?.includes(suffix)) {
+    return 'txt';
+  } else if (['md']?.includes(suffix)) {
+    return 'md';
+  } else if (['ppt', 'pptx']?.includes(suffix)) {
+    return 'ppt';
+  } else if (['xlsx', 'xls', 'csv']?.includes(suffix)) {
+    return 'excel';
+  } else if (['html']?.includes(suffix)) {
+    return 'html';
   }
 };
 
 // 类型判断工具函数
 const getValueType = (value: FlexibleType): string => {
-  if (value === null) return "string";
-  if (Array.isArray(value)) return "array";
+  if (value === null) return 'string';
+  if (Array.isArray(value)) return 'array';
 
   const type = typeof value;
-  if (type === "number") {
-    return Number.isInteger(value) ? "integer" : "number";
+  if (type === 'number') {
+    return Number.isInteger(value) ? 'integer' : 'number';
   }
   return type;
 };
 export const transformJsonToArray = (
-  data: Record<string, FlexibleType>,
+  data: Record<string, FlexibleType>
 ): Record<string, FlexibleType>[] => {
   const processData = (
     data: FlexibleType[] | Record<string, FlexibleType>,
     parentType: string,
-    isTopLevel: boolean = false,
+    isTopLevel: boolean = false
   ): Record<string, FlexibleType> => {
     const baseAttributes = {
-      description: "",
+      description: '',
       from: 2,
-      location: "query",
+      location: 'query',
       open: true,
       required: true,
-      ...(!isTopLevel && parentType === "array" && { arraySon: true }),
+      ...(!isTopLevel && parentType === 'array' && { arraySon: true }),
     };
 
     if (Array.isArray(data)) {
-      const children = data.map((item) => {
+      const children = data.map(item => {
         const type = getValueType(item);
 
-        if (type !== "object" && type !== "array") {
+        if (type !== 'object' && type !== 'array') {
           return {
             id: uuid(),
-            name: "[Array Item]",
+            name: '[Array Item]',
             default: item,
             type,
             arraySon: true,
-            fatherType: "array",
+            fatherType: 'array',
             ...baseAttributes,
           };
         }
 
         return {
           id: uuid(),
-          name: "[Array Item]",
-          ...processData(item as Record<string, FlexibleType>, "array"),
+          name: '[Array Item]',
+          ...processData(item as Record<string, FlexibleType>, 'array'),
           arraySon: true,
-          fatherType: "array",
+          fatherType: 'array',
           ...baseAttributes,
         };
       });
@@ -230,23 +230,23 @@ export const transformJsonToArray = (
       return {
         id: uuid(),
         default: data,
-        type: "array",
+        type: 'array',
         children,
         ...(!isTopLevel && { fatherType: parentType }),
         ...baseAttributes,
       };
     }
 
-    if (typeof data === "object" && data !== null) {
+    if (typeof data === 'object' && data !== null) {
       const children = Object.entries(data).map(([key, value]) => {
         const type = getValueType(value);
 
-        if (type === "object" || type === "array") {
+        if (type === 'object' || type === 'array') {
           return {
             id: uuid(),
             name: key,
-            ...processData(value as Record<string, FlexibleType>, "object"),
-            fatherType: "object",
+            ...processData(value as Record<string, FlexibleType>, 'object'),
+            fatherType: 'object',
             ...baseAttributes,
           };
         }
@@ -256,14 +256,14 @@ export const transformJsonToArray = (
           name: key,
           default: value,
           type,
-          fatherType: "object",
+          fatherType: 'object',
           ...baseAttributes,
         };
       });
 
       return {
         id: uuid(),
-        type: "object",
+        type: 'object',
         children,
         ...(!isTopLevel && { fatherType: parentType }),
         ...baseAttributes,
@@ -280,23 +280,23 @@ export const transformJsonToArray = (
   };
 
   // 只处理对象作为根节点的情况
-  if (typeof data !== "object" || data === null || Array.isArray(data)) {
+  if (typeof data !== 'object' || data === null || Array.isArray(data)) {
     return [];
   }
   return Object.entries(data).map(([key, value]) => {
     const type = getValueType(value);
 
-    if (type === "object" || type === "array") {
+    if (type === 'object' || type === 'array') {
       return {
         id: uuid(),
         name: key,
         ...processData(value as Record<string, FlexibleType>, type, true), // 标记为顶层元素
-        description: "",
+        description: '',
         from: 2,
-        location: "query",
+        location: 'query',
         open: true,
         required: true,
-        ...(type !== "object" && { startDisabled: false }),
+        ...(type !== 'object' && { startDisabled: false }),
       };
     }
 
@@ -305,9 +305,9 @@ export const transformJsonToArray = (
       name: key,
       default: value,
       type,
-      description: "",
+      description: '',
       from: 2,
-      location: "query",
+      location: 'query',
       open: true,
       required: true,
       startDisabled: !value,
@@ -316,7 +316,7 @@ export const transformJsonToArray = (
 };
 
 export const extractAllIdsOptimized = (
-  data: JsonObject[] | Record<string, JsonObject>,
+  data: JsonObject[] | Record<string, JsonObject>
 ): string[] => {
   const ids: string[] = [];
   const stack = Array.isArray(data) ? [...data] : [data];
@@ -324,7 +324,7 @@ export const extractAllIdsOptimized = (
   while (stack.length) {
     const node = stack.pop();
 
-    if (node?.type === "array" || node?.type === "object") {
+    if (node?.type === 'array' || node?.type === 'object') {
       ids.push(node.id as string);
     }
 
@@ -339,55 +339,55 @@ export const extractAllIdsOptimized = (
 export const convertToDesiredFormat = (
   data: Record<string, JsonObject | JsonArray>,
   parentType: string | null = null,
-  isArraySon: boolean = false,
+  isArraySon: boolean = false
 ): Record<string, FlexibleType>[] => {
   return Object.entries(data).map(([key, value]) => {
     const type = getValueType(value);
-    const isComplexType = type === "object" || type === "array";
+    const isComplexType = type === 'object' || type === 'array';
 
     const baseItem: Record<string, FlexibleType> = {
       id: uuid(),
       name: key,
-      description: isComplexType ? "" : value === null ? "" : String(value),
+      description: isComplexType ? '' : value === null ? '' : String(value),
       type,
       open: true,
-      nameErrMsg: "",
-      descriptionErrMsg: "",
+      nameErrMsg: '',
+      descriptionErrMsg: '',
     };
 
-    if (parentType === "array" || isArraySon) {
-      baseItem.fatherType = parentType || "";
+    if (parentType === 'array' || isArraySon) {
+      baseItem.fatherType = parentType || '';
       baseItem.arraySon = true;
     }
 
     if (isComplexType) {
-      if (type === "array") {
-        baseItem.children = (value as JsonArray)?.map((item) => ({
+      if (type === 'array') {
+        baseItem.children = (value as JsonArray)?.map(item => ({
           id: uuid(),
-          name: "[Array Item]",
-          description: typeof item === "object" ? "" : item,
+          name: '[Array Item]',
+          description: typeof item === 'object' ? '' : item,
           type:
-            typeof item === "object" && !Array.isArray(item)
-              ? "object"
+            typeof item === 'object' && !Array.isArray(item)
+              ? 'object'
               : typeof item,
           open: true,
-          fatherType: "array",
+          fatherType: 'array',
           arraySon: true,
-          descriptionErrMsg: "",
+          descriptionErrMsg: '',
           children:
-            typeof item === "object"
+            typeof item === 'object'
               ? convertToDesiredFormat(
                   item as Record<string, JsonObject | JsonArray>,
-                  "array",
-                  true,
+                  'array',
+                  true
                 )
               : undefined,
         }));
       } else {
         baseItem.children = convertToDesiredFormat(
           value as Record<string, JsonObject | JsonArray>,
-          "object",
-          isArraySon,
+          'object',
+          isArraySon
         );
       }
     }
@@ -419,12 +419,12 @@ export interface PresignResponse {
 
 export async function uploadFile(
   file: File,
-  module: string,
+  module: string
 ): Promise<UploadFileResponse> {
   try {
     // module name + 时间戳
-    const objectKey = `${module}/${Date.now()}.${file.name.split(".").pop() || ""}`;
-    const response = await http.get<PresignResponse>("/api/s3/presign", {
+    const objectKey = `${module}/${Date.now()}.${file.name.split('.').pop() || ''}`;
+    const response = await http.get<PresignResponse>('/api/s3/presign', {
       params: {
         objectKey: objectKey,
         contentType: file.type,
@@ -434,15 +434,15 @@ export async function uploadFile(
     const putResponse = await axios
       .create({
         headers: {
-          "Content-Type": file.type,
+          'Content-Type': file.type,
         },
       })
       .put(url, file, {
         headers: {
-          "Content-Type": file.type,
+          'Content-Type': file.type,
         },
       });
-    const fileUrl = url.split("?")[0];
+    const fileUrl = url.split('?')[0];
     return {
       url: fileUrl,
       objectKey: responseObjectKey,
@@ -451,7 +451,7 @@ export async function uploadFile(
     };
   } catch (error: unknown) {
     const errorMessage =
-      error instanceof Error ? error.message : "Failed to upload image";
+      error instanceof Error ? error.message : 'Failed to upload image';
     throw new Error(errorMessage);
   }
 }

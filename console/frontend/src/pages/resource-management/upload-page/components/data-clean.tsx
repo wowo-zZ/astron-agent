@@ -198,7 +198,7 @@ const FailedFilesSection: React.FC<{
           <div className="flex items-center overflow-hidden">
             <img
               src={typeList.get(
-                generateType(u.type?.toLowerCase() || "") || "",
+                generateType(u.type?.toLowerCase() || "") || ""
               )}
               className="w-[22px] h-[22px]"
               alt=""
@@ -317,7 +317,7 @@ const SegmentationSettings: React.FC<{
             <div className="text-sm font-medium text-second">
               {t("knowledge.segmentIdentifier")}
             </div>
-            <div ref={knowledgeSelectRef} className="relative mt-1.5">
+            <div ref={knowledgeSelectRef} className="relative mt-1.5 h-[40px]">
               <Input
                 value={configDetail.seperator}
                 onChange={(event) => {
@@ -331,7 +331,7 @@ const SegmentationSettings: React.FC<{
               />
             </div>
             <div className="mt-6 text-sm font-medium text-second">
-              {t("knowledge.segmentLength")}{" "}
+              {t("knowledge.segmentLength")}
               <span className="text-xs text-desc">
                 {t("knowledge.supportSegmentLength", {
                   min: lengthRange[0],
@@ -550,7 +550,7 @@ const SegmentPreviewContent: React.FC<{
                 src={
                   item.fileInfoV2 &&
                   typeList.get(
-                    generateType(item.fileInfoV2.type?.toLowerCase()) || "",
+                    generateType(item.fileInfoV2.type?.toLowerCase()) || ""
                   )
                 }
                 className="w-4 h-4 ml-1"

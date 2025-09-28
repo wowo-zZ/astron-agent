@@ -1,10 +1,9 @@
-import { useCallback } from "react";
-import { useTranslation } from "react-i18next";
-import { message } from "antd";
-import { v4 as uuid } from "uuid";
-import { cloneDeep } from "lodash";
-import { useTableAddContext } from "../context/table-add-context";
-import { TableField, DatabaseItem } from "@/types/database";
+import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import { message } from 'antd';
+import { cloneDeep } from 'lodash';
+import { useTableAddContext } from '../context/table-add-context';
+import { TableField, DatabaseItem } from '@/types/database';
 
 /**
  * 表格导入操作Hook
@@ -12,7 +11,7 @@ import { TableField, DatabaseItem } from "@/types/database";
 export const useTableImportOps = (): {
   mergeAndDiscardDuplicates: (
     arr1: TableField[],
-    arr2: DatabaseItem[],
+    arr2: DatabaseItem[]
   ) => {
     mergedArray: (TableField | DatabaseItem)[];
     hasDuplicate: boolean;
@@ -20,7 +19,7 @@ export const useTableImportOps = (): {
   handleUpdateSheet: (data?: DatabaseItem[]) => void;
   markOperationTypes: (
     originalArray: TableField[],
-    updatedArray: TableField[],
+    updatedArray: TableField[]
   ) => TableField[];
 } => {
   const { t } = useTranslation();
@@ -29,7 +28,7 @@ export const useTableImportOps = (): {
   const mergeAndDiscardDuplicates = useCallback(
     (
       arr1: TableField[],
-      arr2: DatabaseItem[],
+      arr2: DatabaseItem[]
     ): {
       mergedArray: (TableField | DatabaseItem)[];
       hasDuplicate: boolean;
@@ -37,13 +36,17 @@ export const useTableImportOps = (): {
       const mergedArray: (TableField | DatabaseItem)[] = [...arr1];
       let hasDuplicate = false;
 
-      arr2.forEach((item2) => {
-        const existingItem = arr1.find((item1) => item1.name === item2.name);
+      // 获取当前最大ID，确保新字段ID不重复
+      let maxId = arr1.reduce((max, item) => Math.max(max, item.id), 0);
+
+      arr2.forEach(item2 => {
+        const existingItem = arr1.find(item1 => item1.name === item2.name);
         if (!existingItem) {
+          maxId += 1;
           mergedArray.push({
             ...item2,
-            id: Number(uuid()),
-            type: typeof item2.type === "string" ? item2.type : "String",
+            id: maxId,
+            type: typeof item2.type === 'string' ? item2.type : 'String',
             isSystem: false,
             isRequired: false,
           } as TableField);
@@ -54,7 +57,7 @@ export const useTableImportOps = (): {
 
       return { mergedArray, hasDuplicate };
     },
-    [],
+    []
   );
 
   const handleUpdateSheet = useCallback(
@@ -63,13 +66,13 @@ export const useTableImportOps = (): {
 
       const { mergedArray, hasDuplicate } = mergeAndDiscardDuplicates(
         state.dataSource,
-        data,
+        data
       );
 
       actions.setDataSource(mergedArray as TableField[]);
 
       if (hasDuplicate) {
-        message.warning(t("database.duplicateFieldsIgnored"));
+        message.warning(t('database.duplicateFieldsIgnored'));
       }
 
       window.setTimeout(() => {
@@ -82,13 +85,13 @@ export const useTableImportOps = (): {
       mergeAndDiscardDuplicates,
       databaseRef,
       t,
-    ],
+    ]
   );
 
   // 字段操作类型标记
   const markOperationTypes = useCallback(
     (originalArray: TableField[], updatedArray: TableField[]): TableField[] => {
-      const originalMap = new Map(originalArray.map((item) => [item.id, item]));
+      const originalMap = new Map(originalArray.map(item => [item.id, item]));
       const result: TableField[] = [];
 
       for (const updatedItem of updatedArray) {
@@ -114,7 +117,7 @@ export const useTableImportOps = (): {
 
       return result;
     },
-    [],
+    []
   );
 
   return {

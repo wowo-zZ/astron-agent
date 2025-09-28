@@ -1,5 +1,5 @@
-import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 /** 虚拟人项接口 */
 export interface AvatarItem {
@@ -43,7 +43,7 @@ export interface MultiModleState {
 // 创建Zustand store
 export const useMultiModleStore = create<MultiModleState>()(
   persist(
-    (set) => ({
+    set => ({
       // 虚拟人列表
       avaList: [],
       setAvaList: (list: AvatarItem[]): void => set({ avaList: list }),
@@ -62,8 +62,8 @@ export const useMultiModleStore = create<MultiModleState>()(
       setSpeakList: (list: SpeakerItem[]): void => set({ speakList: list }),
     }),
     {
-      name: "multi-modle-storage", // 本地存储键名
+      name: 'multi-modle-storage', // 本地存储键名
       storage: createJSONStorage(() => localStorage), // 使用localStorage
-    },
-  ),
+    }
+  )
 );

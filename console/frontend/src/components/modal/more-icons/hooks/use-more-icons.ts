@@ -1,8 +1,8 @@
-import { avatarImageGenerate } from "@/services/common";
-import { AvatarType } from "@/types/resource";
-import { message, UploadFile } from "antd";
-import { UploadChangeParam, UploadProps } from "antd/es/upload";
-import React, { useEffect, useMemo, useState } from "react";
+import { avatarImageGenerate } from '@/services/common';
+import { AvatarType } from '@/types/resource';
+import { message, UploadFile } from 'antd';
+import { UploadChangeParam, UploadProps } from 'antd/es/upload';
+import React, { useEffect, useMemo, useState } from 'react';
 
 export const useMoreIcons = ({
   botColor,
@@ -76,17 +76,17 @@ export const useMoreIcons = ({
     name?: string;
     code?: string;
   }>({});
-  const [previewColor, setPreviewColor] = useState("");
-  const [activeTab, setActiveTab] = useState<string | undefined>("gallery");
-  const [hoverTab, setHoverTab] = useState<string | undefined>("");
+  const [previewColor, setPreviewColor] = useState('');
+  const [activeTab, setActiveTab] = useState<string | undefined>('gallery');
+  const [hoverTab, setHoverTab] = useState<string | undefined>('');
   const [uploadImageObject, setUploadImageObject] = useState({
-    downloadLink: "",
-    s3Key: "",
+    downloadLink: '',
+    s3Key: '',
   });
-  const [generateImageDescription, setGenerateImageDescription] = useState("");
+  const [generateImageDescription, setGenerateImageDescription] = useState('');
   const [generateImageObject, setGenerateImageObject] = useState({
-    downloadLink: "",
-    s3Key: "",
+    downloadLink: '',
+    s3Key: '',
   });
   const [loading, setLoading] = useState(false);
 
@@ -96,34 +96,34 @@ export const useMoreIcons = ({
       setPreviewColor(botColor);
     } else {
       setPreviewIcon(icons[0] || {});
-      setPreviewColor(colors[0]?.name || "");
+      setPreviewColor(colors[0]?.name || '');
     }
   }, []);
 
   function generateImage(): void {
     if (loading) return;
     if (!generateImageDescription?.trim()) {
-      message.error("描述不能为空！");
+      message.error('描述不能为空！');
       return;
     }
     setLoading(true);
     avatarImageGenerate(generateImageDescription)
-      .then((data) => {
+      .then(data => {
         setGenerateImageObject(data as { downloadLink: string; s3Key: string });
       })
       .finally(() => setLoading(false));
   }
 
   function handleOk(): void {
-    if (activeTab === "gallery") {
+    if (activeTab === 'gallery') {
       setBotIcon(previewIcon as { value: string; name: string; code: string });
       setBotColor(previewColor);
-    } else if (activeTab === "upload") {
+    } else if (activeTab === 'upload') {
       setBotIcon({ ...botIcon, value: uploadImageObject.s3Key });
-      setBotColor("");
+      setBotColor('');
     } else {
       setBotIcon({ ...botIcon, value: generateImageObject.s3Key });
-      setBotColor("");
+      setBotColor('');
     }
 
     setShowModal(false);
@@ -131,21 +131,21 @@ export const useMoreIcons = ({
 
   function beforeUpload(file: UploadFile): boolean {
     const maxSize = 2 * 1024 * 1024;
-    if (file?.size || 0 > maxSize) {
-      message.error("上传文件大小不能超出2M！");
+    if ((file?.size || 0) > maxSize) {
+      message.error('上传文件大小不能超出2M！');
       return false;
     }
     const isJpgOrPng = [
-      "jpg",
-      "jpeg",
-      "png",
-      "gif",
-      "webp",
-      "bmp",
-      "tiff",
-    ].includes(file.type?.split("/").pop() || "");
+      'jpg',
+      'jpeg',
+      'png',
+      'gif',
+      'webp',
+      'bmp',
+      'tiff',
+    ].includes(file.type?.split('/').pop() || '');
     if (!isJpgOrPng) {
-      message.error("请上传JPG和PNG等格式的图片文件");
+      message.error('请上传JPG和PNG等格式的图片文件');
       return false;
     } else {
       return true;
@@ -153,13 +153,16 @@ export const useMoreIcons = ({
   }
 
   const uploadProps = {
-    name: "file",
-    action: "/xingchen-api/image/upload",
+    name: 'file',
+    action: '/xingchen-api/image/upload',
     showUploadList: false,
-    accept: ".png,.jpg,.jpeg,.gif,.webp,.bmp,.tiff",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+    },
+    accept: '.png,.jpg,.jpeg,.gif,.webp,.bmp,.tiff',
     beforeUpload,
     onChange: (info: UploadChangeParam<UploadFile>): void => {
-      if (info.file.status === "done") {
+      if (info.file.status === 'done') {
         if (
           info.file.response &&
           info.file.response.data &&
@@ -168,7 +171,7 @@ export const useMoreIcons = ({
           const data = info.file.response.data;
           setUploadImageObject(data as { downloadLink: string; s3Key: string });
         } else {
-          message.error(info.file.response?.message || "");
+          message.error(info.file.response?.message || '');
         }
       }
     },
@@ -176,8 +179,8 @@ export const useMoreIcons = ({
 
   const checkEnableSave = useMemo(() => {
     return (
-      (activeTab === "upload" && !uploadImageObject.downloadLink) ||
-      (activeTab === "chat" && !generateImageObject.downloadLink)
+      (activeTab === 'upload' && !uploadImageObject.downloadLink) ||
+      (activeTab === 'chat' && !generateImageObject.downloadLink)
     );
   }, [activeTab, uploadImageObject, generateImageObject]);
   return {

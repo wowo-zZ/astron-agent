@@ -1,5 +1,5 @@
 // Chat Debugger 模块的类型定义
-import React from "react";
+import React from 'react';
 
 // 开始节点参数类型定义
 export interface StartNodeType {
@@ -63,7 +63,7 @@ export interface ChatInfoType {
 // 聊天列表项类型定义
 export interface ChatListItem {
   id: string;
-  type: "ask" | "answer" | "divider";
+  type: 'ask' | 'answer' | 'divider';
   inputs?: StartNodeType[];
   messageContent?: string;
   reasoningContent?: string;
@@ -90,7 +90,7 @@ export interface ResponseResult {
   rawOutput?: unknown;
   nodeAnswerContent?: string;
   reasoningContent?: string;
-  status: "success" | "failed";
+  status: 'success' | 'failed';
   failedReason?: string;
   answerMode?: number;
 }
@@ -113,7 +113,7 @@ export interface NodeDebuggerResult {
 
 // 节点数据类型扩展
 export interface ChatDebuggerNodeData {
-  status?: "running" | "success" | "failed" | "cancel" | "";
+  status?: 'running' | 'success' | 'failed' | 'cancel' | '';
   debuggerResult?: NodeDebuggerResult;
   updatable?: boolean;
 }
@@ -150,7 +150,7 @@ export interface WorkflowChatParams {
 export interface ResumeChatParams {
   flow_id?: string;
   eventId: string;
-  eventType: "resume" | "ignore" | "abort";
+  eventType: 'resume' | 'ignore' | 'abort';
   content?: string;
   version?: string;
   promptDebugger?: boolean;
@@ -189,7 +189,7 @@ export interface ChatContentProps {
   setUserWheel: (userWheel: boolean) => void;
   chatList: ChatListItem[];
   setChatList: (
-    chatList: ChatListItem[] | ((prev: ChatListItem[]) => ChatListItem[]),
+    chatList: ChatListItem[] | ((prev: ChatListItem[]) => ChatListItem[])
   ) => void;
   startNodeParams: StartNodeType[];
   resetNodesAndEdges: () => { nodes: ReactFlowNode[]; edges: ReactFlowEdge[] };
@@ -197,7 +197,7 @@ export interface ChatContentProps {
     nodes: ReactFlowNode[],
     edges: ReactFlowEdge[],
     inputs?: StartNodeType[],
-    regen?: boolean,
+    regen?: boolean
   ) => void;
   debuggering: boolean;
   suggestProblem: string[];
@@ -261,7 +261,7 @@ export interface ChatInputProps {
   interruptChat: InterruptChatType;
   startNodeParams: StartNodeType[];
   setStartNodeParams: (
-    params: StartNodeType[] | ((prev: StartNodeType[]) => StartNodeType[]),
+    params: StartNodeType[] | ((prev: StartNodeType[]) => StartNodeType[])
   ) => void;
   textareRef: React.RefObject<HTMLTextAreaElement>;
   handleEnterKey: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
@@ -298,7 +298,7 @@ export interface WorkflowEdge extends ReactFlowEdge {
 
 // Custom Edge 相关类型定义
 export interface EdgeData {
-  edgeType?: "polyline" | "bezier";
+  edgeType?: 'polyline' | 'bezier';
 }
 
 // Custom Edge Props 类型定义（使用ReactFlow的Position类型）
@@ -309,8 +309,8 @@ export interface CustomEdgeProps {
   sourceY: number;
   targetX: number;
   targetY: number;
-  sourcePosition: import("reactflow").Position | undefined;
-  targetPosition: import("reactflow").Position | undefined;
+  sourcePosition: import('reactflow').Position | undefined;
+  targetPosition: import('reactflow').Position | undefined;
   style?: React.CSSProperties;
   markerEnd?: string;
 }
@@ -511,7 +511,7 @@ export interface SingleNodeDebuggingProps {
   setOpen: (open: boolean) => void;
   refInputs: RefInput[];
   setRefInputs: (
-    inputs: RefInput[] | ((prev: RefInput[]) => RefInput[]),
+    inputs: RefInput[] | ((prev: RefInput[]) => RefInput[])
   ) => void;
   nodeDebugExect: (originalNode: unknown, debuggerNode: unknown) => void;
 }
@@ -638,6 +638,40 @@ export interface IFlyCollectorType {
   onEvent: (
     eventName: string,
     params: Record<string, unknown>,
-    category: string,
+    category: string
+  ) => void;
+}
+
+export interface UseChatContentProps {
+  advancedConfig: ChatContentAdvancedConfig;
+  goodFeedback: (id: string | undefined, sid: string) => void;
+  badFeedback: (id: string | undefined, sid: string) => void;
+  modalVisible: boolean;
+  sid: string | undefined;
+  modalType: 'good' | 'bad';
+  setModalVisible: (visible: boolean) => void;
+  handleActiveStyle: (style: string) => void;
+  renderInputElement: (input: unknown) => React.ReactElement;
+  setSid: (sid: string) => void;
+  copyData: (data: unknown) => void;
+}
+
+export interface UseChatInputProps {
+  uploadComplete: (
+    event: ProgressEvent<EventTarget>,
+    index: number,
+    fileId: string
+  ) => void;
+  handleFileUpload: (
+    file: File,
+    index: number,
+    multiple: boolean,
+    fileId: string
+  ) => void;
+  handleDeleteFile: (index: number, fileId: string) => void;
+  handleChangeParam: (
+    index: number,
+    fn: (data: StartNodeType, value: unknown) => void,
+    value: unknown
   ) => void;
 }

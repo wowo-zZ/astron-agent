@@ -114,6 +114,7 @@ ehthumbs.db
 
 !console/frontend/.env.production
 !console/frontend/.env.development
+!console/frontend/.env.test
 
 # Logs
 *.log

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect } from 'react';
 
 /**
  * 无限滚动 hook
@@ -8,7 +8,7 @@ import React, { useRef, useEffect } from "react";
  */
 export const useInfiniteScroll = (
   callback: () => void,
-  hasMore: boolean,
+  hasMore: boolean
 ): {
   targetRef: React.RefObject<HTMLDivElement>;
   loading: React.MutableRefObject<boolean>;
@@ -17,7 +17,7 @@ export const useInfiniteScroll = (
   const loading = useRef(false);
 
   useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
+    const observer = new IntersectionObserver(entries => {
       if (entries[0]?.isIntersecting && hasMore && !loading.current) {
         callback();
       }

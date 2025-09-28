@@ -1,16 +1,16 @@
-import GlobalMarkDown from "@/components/global-markdown";
-import { typeList } from "@/constants";
-import { HitResult } from "@/types/resource";
-import { generateType } from "@/utils/utils";
-import { Button, Input, Progress } from "antd";
-import Lottie from "lottie-react";
-import React, { FC } from "react";
-import { useTranslation } from "react-i18next";
+import GlobalMarkDown from '@/components/global-markdown';
+import { typeList } from '@/constants';
+import { HitResult } from '@/types/resource';
+import { generateType } from '@/utils/utils';
+import { Button, Input, Progress } from 'antd';
+import Lottie from 'lottie-react';
+import React, { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 
-import mingzhongAnimation from "@/constants/lottie-react/mingzhong.json";
-import hit from "@/assets/imgs/knowledge/icon_zhishi_target_white.png";
-import order from "@/assets/imgs/knowledge/icon_zhishi_order.png";
-import target from "@/assets/imgs/knowledge/icon_target.png";
+import mingzhongAnimation from '@/constants/lottie-react/mingzhong.json';
+import hit from '@/assets/imgs/knowledge/icon_zhishi_target_white.png';
+import order from '@/assets/imgs/knowledge/icon_zhishi_order.png';
+import target from '@/assets/imgs/knowledge/icon_target.png';
 const { TextArea } = Input;
 export const HistoryContent: FC<{
   history: HitResult[];
@@ -43,19 +43,19 @@ export const HistoryContent: FC<{
         className="h-full flex flex-col overflow-auto pr-6 border-r border-[#E2E8FF]"
         ref={historyRef}
         onScroll={handleScroll}
-        style={{ width: "35%" }}
+        style={{ width: '35%' }}
       >
         <div className="w-full">
           <div className="text-second text-lg font-medium shrink-0">
-            {t("knowledge.queryText")}
+            {t('knowledge.queryText')}
           </div>
           <TextArea
             value={searchValue}
-            onChange={(event) => setSearchValue(event.target.value)}
-            placeholder={t("knowledge.pleaseEnter")}
+            onChange={event => setSearchValue(event.target.value)}
+            placeholder={t('knowledge.pleaseEnter')}
             className="global-textarea mt-3 shrink-0"
-            style={{ height: 152, resize: "none" }}
-            onPressEnter={(event) => {
+            style={{ height: 152, resize: 'none' }}
+            onPressEnter={event => {
               event.stopPropagation();
               event.preventDefault();
               searchAnswer();
@@ -70,8 +70,8 @@ export const HistoryContent: FC<{
             >
               <img src={hit} className="w-4 h-4" alt="" />
               <span className="text-sm">
-                {t("knowledge.query")}
-                {searching && t("knowledge.querying")}
+                {t('knowledge.query')}
+                {searching && t('knowledge.querying')}
               </span>
             </Button>
           </div>
@@ -79,20 +79,20 @@ export const HistoryContent: FC<{
         <div className="flex-1 w-full flex flex-col flex-shrink-0 min-h-[150px]">
           <div className="mt-8">
             <div className="text-second text-lg font-medium">
-              {t("knowledge.recentQueries")}
+              {t('knowledge.recentQueries')}
             </div>
           </div>
           <div className="mt-3 w-full flex-1 flex flex-col">
             <div className="w-full flex px-5 py-[18px] bg-[#f9fafb] text-[#a4a4a4] text-xs font-medium">
-              <span style={{ flex: 2 }}>{t("knowledge.queryTextHeader")}</span>
-              <span style={{ flex: 1 }}>{t("knowledge.testTime")}</span>
+              <span style={{ flex: 2 }}>{t('knowledge.queryTextHeader')}</span>
+              <span style={{ flex: 1 }}>{t('knowledge.testTime')}</span>
             </div>
             <div className="flex-1">
               {history.map((item, index) => (
                 <div
                   key={index}
                   className="flex items-center px-5 py-2.5 text-second font-medium border-b border-[#e9eff6] cursor-pointer"
-                  onClick={() => setSearchValue(item.query || "")}
+                  onClick={() => setSearchValue(item.query || '')}
                 >
                   <span
                     style={{ flex: 2 }}
@@ -110,21 +110,21 @@ export const HistoryContent: FC<{
           </div>
         </div>
       </div>
-      <div className="h-full" style={{ width: "65%" }}>
+      <div className="h-full" style={{ width: '65%' }}>
         {!searching &&
           (!answers.length ? (
             <div className="mt-[80px] flex flex-col justify-center items-center">
               <img src={target} className="w-16 h-16" alt="" />
               <p className="mt-8 text-base text-[#C0C4CC] font-medium">
-                {t("knowledge.hitKnowledgeParagraphsWillShowHere")}
+                {t('knowledge.hitKnowledgeParagraphsWillShowHere')}
               </p>
             </div>
           ) : (
             <div className="pt-6 h-full flex flex-col pl-6">
               <div className="title-second">
-                {t("knowledge.hitParagraphs")}
+                {t('knowledge.hitParagraphs')}
                 <span className="inline-block ml-2 rounded-md bg-[#F0F3F9] px-2 py-0.5 text-desc">
-                  {answers.length} {t("knowledge.paragraphs")}
+                  {answers.length} {t('knowledge.paragraphs')}
                 </span>
               </div>
               <div className="flex-1 overflow-auto grid grid-cols-2 gap-4 pr-6">
@@ -143,8 +143,8 @@ export const HistoryContent: FC<{
                         <span
                           className="ml-1 text-xs text-[#F6B728]"
                           style={{
-                            fontFamily: "SF Pro Text, SF Pro Text-600",
-                            fontStyle: "italic",
+                            fontFamily: 'SF Pro Text, SF Pro Text-600',
+                            fontStyle: 'italic',
                           }}
                         >
                           00{index + 1}
@@ -158,8 +158,8 @@ export const HistoryContent: FC<{
                         <span
                           className="text-[#275EFF] font-medium ml-2"
                           style={{
-                            fontFamily: "SF Pro Text, SF Pro Text-600",
-                            fontStyle: "italic",
+                            fontFamily: 'SF Pro Text, SF Pro Text-600',
+                            fontStyle: 'italic',
                           }}
                         >
                           {item.score}
@@ -176,8 +176,8 @@ export const HistoryContent: FC<{
                       <img
                         src={typeList.get(
                           generateType(
-                            item.fileInfo && item.fileInfo.type?.toLowerCase(),
-                          ) || "",
+                            item.fileInfo && item.fileInfo.type?.toLowerCase()
+                          ) || ''
                         )}
                         className="w-4 h-4"
                         alt=""
@@ -201,7 +201,7 @@ export const HistoryContent: FC<{
                 animationData={mingzhongAnimation}
                 loop={true}
                 autoplay={true}
-                style={{ width: "100%", height: "auto" }}
+                style={{ width: '100%', height: 'auto' }}
               />
             </div>
             <div className="bg-[#F8FAFF] rounded-xl flex-1 p-4">
@@ -209,7 +209,7 @@ export const HistoryContent: FC<{
                 animationData={mingzhongAnimation}
                 loop={true}
                 autoplay={true}
-                style={{ width: "100%", height: "auto" }}
+                style={{ width: '100%', height: 'auto' }}
               />
             </div>
           </div>

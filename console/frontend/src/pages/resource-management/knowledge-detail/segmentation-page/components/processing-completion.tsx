@@ -1,14 +1,14 @@
-import React, { FC } from "react";
-import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { typeList } from "@/constants";
-import { generateType } from "@/utils/utils";
+import React, { FC } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { typeList } from '@/constants';
+import { generateType } from '@/utils/utils';
 
-import arrowLeft from "@/assets/imgs/knowledge/icon_zhishi_arrow-left.png";
-import block from "@/assets/imgs/knowledge/zhishi_target_block2.png";
-import restart from "@/assets/imgs/knowledge/bnt_zhishi_restart.png";
-import { FileInfoV2 } from "@/types/resource";
-import { useProcessingCompletion } from "../hooks/use-processing-completion";
+import arrowLeft from '@/assets/imgs/knowledge/icon_zhishi_arrow-left.png';
+import block from '@/assets/imgs/knowledge/zhishi_target_block2.png';
+import restart from '@/assets/imgs/knowledge/bnt_zhishi_restart.png';
+import { FileInfoV2 } from '@/types/resource';
+import { useProcessingCompletion } from '../hooks/use-processing-completion';
 
 const ProcessingCompletion: FC<{
   tag: string;
@@ -40,7 +40,7 @@ const ProcessingCompletion: FC<{
         >
           <img
             src={typeList.get(
-              generateType(fileInfo?.type?.toLowerCase()) || "",
+              generateType(fileInfo?.type?.toLowerCase()) || ''
             )}
             className="w-[22px] h-[22px] flex-shrink-0"
             alt=""
@@ -54,31 +54,31 @@ const ProcessingCompletion: FC<{
             <div className="w-3/4 mx-auto">
               <div className="flex items-end text-lg font-medium text-second">
                 <span className="leading-none">
-                  {embed === "failed"
-                    ? t("knowledge.embeddingFailed")
-                    : t("knowledge.fileParsingEmbedding")}
+                  {embed === 'failed'
+                    ? t('knowledge.embeddingFailed')
+                    : t('knowledge.fileParsingEmbedding')}
                 </span>
-                {embed === "failed" && (
+                {embed === 'failed' && (
                   <div
                     className="flex items-end cursor-pointer"
                     onClick={() => embedding()}
                   >
                     <img src={restart} className="w-4 h-4 ml-2" alt="" />
                     <span className="ml-1.5 text-[#275EFF] text-xs">
-                      {t("knowledge.retry")}
+                      {t('knowledge.retry')}
                     </span>
                   </div>
                 )}
               </div>
               <div
                 className={`w-full ${
-                  embed === "failed" ? "bg-[#fef6f5]" : "bg-[#F6F6FD]"
+                  embed === 'failed' ? 'bg-[#fef6f5]' : 'bg-[#F6F6FD]'
                 } rouned-xl p-2.5 flex items-center justify-between mt-3`}
               >
                 <div className="flex items-center">
                   <img
                     src={typeList.get(
-                      generateType(fileInfo?.type?.toLowerCase()) || "",
+                      generateType(fileInfo?.type?.toLowerCase()) || ''
                     )}
                     className="w-[22px] h-[22px]"
                     alt=""
@@ -92,9 +92,9 @@ const ProcessingCompletion: FC<{
             </div>
             <div className="mt-9">
               <div className="flex items-end text-lg font-medium text-second">
-                <span>{t("knowledge.segmentPreview")}</span>
+                <span>{t('knowledge.segmentPreview')}</span>
                 <span className="ml-2 text-sm text-desc">
-                  {t("knowledge.segmentPreviewWillBeAvailableAfterEmbedding")}
+                  {t('knowledge.segmentPreviewWillBeAvailableAfterEmbedding')}
                 </span>
               </div>
             </div>
@@ -111,48 +111,48 @@ const ProcessingCompletion: FC<{
             </div>
           </div>
         </div>
-        {embed === "failed" && (
+        {embed === 'failed' && (
           <div
             className="h-full border-l border-[#E2E8FF] p-6"
-            style={{ width: "35%" }}
+            style={{ width: '35%' }}
           >
             <h2 className="text-2xl font-semibold text-second">
-              {t("knowledge.technicalParameters")}
+              {t('knowledge.technicalParameters')}
             </h2>
             <div className="grid grid-cols-2 mt-3">
               <div className="flex flex-col">
                 <div className="font-medium text-second">
-                  {t("knowledge.segmentationRules")}
+                  {t('knowledge.segmentationRules')}
                 </div>
                 <p className="text-[#757575] text-xl font-medium">
                   {parameters.sliceType === 0
-                    ? t("knowledge.automatic")
-                    : t("knowledge.customized")}
+                    ? t('knowledge.automatic')
+                    : t('knowledge.customized')}
                 </p>
               </div>
               <div className="flex flex-col">
                 <div className="font-medium text-second">
-                  {t("knowledge.paragraphLength")}
+                  {t('knowledge.paragraphLength')}
                 </div>
                 <p className="text-[#757575] text-xl font-medium">
-                  {parameters.lengthRange && parameters.lengthRange[1]}{" "}
-                  {t("knowledge.characters")}
+                  {parameters.lengthRange && parameters.lengthRange[1]}{' '}
+                  {t('knowledge.characters')}
                 </p>
               </div>
               <div className="flex flex-col mt-6">
                 <div className="font-medium text-second">
-                  {t("knowledge.averageParagraphLength")}
+                  {t('knowledge.averageParagraphLength')}
                 </div>
                 <p className="text-[#757575] text-xl font-medium">
-                  {parameters.knowledgeAvgLength} {t("knowledge.characters")}
+                  {parameters.knowledgeAvgLength} {t('knowledge.characters')}
                 </p>
               </div>
               <div className="flex flex-col mt-6">
                 <div className="font-medium text-second">
-                  {t("knowledge.paragraphCount")}
+                  {t('knowledge.paragraphCount')}
                 </div>
                 <p className="text-[#757575] text-xl font-medium">
-                  {parameters.knowledgeCount} {t("knowledge.paragraphs")}
+                  {parameters.knowledgeCount} {t('knowledge.paragraphs')}
                 </p>
               </div>
             </div>

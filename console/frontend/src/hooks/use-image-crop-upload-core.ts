@@ -1,11 +1,11 @@
-import { ChangeEvent, useCallback } from "react";
-import { CroppedAreaPixels } from "./use-image-crop-upload";
+import { ChangeEvent, useCallback } from 'react';
+import { CroppedAreaPixels } from './use-image-crop-upload';
 import {
   validateImageFile,
   compressImageFile,
   logPerformance,
   readFileAsDataURL,
-} from "./use-image-crop-upload-helpers";
+} from './use-image-crop-upload-helpers';
 
 interface FileChangeHandlerOptions {
   maxSizeMB: number;
@@ -22,7 +22,7 @@ interface FileChangeHandlerOptions {
 }
 
 export const createFileChangeHandler = (
-  options: FileChangeHandlerOptions,
+  options: FileChangeHandlerOptions
 ): ((e: ChangeEvent<HTMLInputElement>) => Promise<void>) => {
   const {
     maxSizeMB,
@@ -47,7 +47,7 @@ export const createFileChangeHandler = (
       if (!file) return; // Add null check for file
 
       // Reset state
-      setCompressedSrc("");
+      setCompressedSrc('');
       setFormData(undefined);
 
       // Validate file
@@ -64,12 +64,12 @@ export const createFileChangeHandler = (
         const loadEndMs = window.performance.now();
 
         logPerformance(
-          "原图读取耗时(ms)",
+          '原图读取耗时(ms)',
           {
             总耗时: Number((loadEndMs - startTimeMs).toFixed(2)),
             读取: Number((loadEndMs - readStartMs).toFixed(2)),
           },
-          logPerf,
+          logPerf
         );
 
         setUploadedSrc(uploadedDataURL);
@@ -80,14 +80,14 @@ export const createFileChangeHandler = (
         const compressedFile = await compressImageFile(
           file,
           compressQuality,
-          compressConvertSize,
+          compressConvertSize
         );
         const compressEndMs = window.performance.now();
 
         logPerformance(
-          "压缩耗时(ms)",
+          '压缩耗时(ms)',
           { 耗时: Number((compressEndMs - compressStartMs).toFixed(2)) },
-          logPerf,
+          logPerf
         );
 
         const compressedDataURL = await readFileAsDataURL(compressedFile);
@@ -95,8 +95,8 @@ export const createFileChangeHandler = (
       } catch (err: unknown) {
         // eslint-disable-next-line no-console
         console.warn(
-          "[useImageCropUpload] 压缩失败，使用原图作为兜底：",
-          err instanceof Error ? err.message : err,
+          '[useImageCropUpload] 压缩失败，使用原图作为兜底：',
+          err instanceof Error ? err.message : err
         );
       }
     },
@@ -112,14 +112,14 @@ export const createFileChangeHandler = (
       setFormData,
       setUploadedSrc,
       setVisible,
-    ],
+    ]
   );
 };
 
 export const createCropCompleteHandler = (
   compressedSrc: string,
   generateCroppedFormData: (src: string, pixels: CroppedAreaPixels) => void,
-  lastCroppedAreaPixelsRef: { current: CroppedAreaPixels | null },
+  lastCroppedAreaPixelsRef: { current: CroppedAreaPixels | null }
 ): ((_: unknown, croppedAreaPixels: CroppedAreaPixels) => void) => {
   return useCallback(
     (_: unknown, croppedAreaPixels: CroppedAreaPixels) => {
@@ -128,6 +128,6 @@ export const createCropCompleteHandler = (
         generateCroppedFormData(compressedSrc, croppedAreaPixels);
       }
     },
-    [compressedSrc, generateCroppedFormData],
+    [compressedSrc, generateCroppedFormData]
   );
 };

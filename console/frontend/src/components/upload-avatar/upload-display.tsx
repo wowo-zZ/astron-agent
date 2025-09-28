@@ -1,12 +1,12 @@
-import React, { useState, useRef } from "react";
-import { message } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
-import PulseLoader from "react-spinners/PulseLoader";
-import styles from "./index.module.scss";
-import classNames from "classnames";
-import Compressor from "compressorjs";
-import { useTranslation } from "react-i18next";
-import { aiGenerateCover } from "@/services/spark-common";
+import React, { useState, useRef } from 'react';
+import { message } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import PulseLoader from 'react-spinners/PulseLoader';
+import styles from './index.module.scss';
+import classNames from 'classnames';
+import Compressor from 'compressorjs';
+import { useTranslation } from 'react-i18next';
+import { aiGenerateCover } from '@/services/spark-common';
 
 interface UploadDisplayProps {
   name?: string;
@@ -33,7 +33,7 @@ const UploadDisplay: React.FC<UploadDisplayProps> = ({
   // 触发上传
   const triggerFileSelectPopup = () => {
     if (inputRef.current) {
-      inputRef.current.value = "";
+      inputRef.current.value = '';
       inputRef.current.click();
     }
   };
@@ -41,7 +41,7 @@ const UploadDisplay: React.FC<UploadDisplayProps> = ({
   const compressImage = (
     imageFile: File,
     quality: number,
-    convertSize: number,
+    convertSize: number
   ) => {
     return new Promise<File>((resolve, reject) => {
       new Compressor(imageFile, {
@@ -70,26 +70,26 @@ const UploadDisplay: React.FC<UploadDisplayProps> = ({
     const file = files.item(0);
     if (!file) return;
 
-    if (file.type.startsWith("image/")) {
+    if (file.type.startsWith('image/')) {
       if (file.size > 5 * 1024 * 1024) {
-        message.error(t("configBase.fileSizeCannotExceed5MB"));
+        message.error(t('configBase.fileSizeCannotExceed5MB'));
         return;
       }
       const newFile = await compressImage(file, 0.2, 1000000);
       const reader = new FileReader();
-      reader.addEventListener("load", () => {
+      reader.addEventListener('load', () => {
         onImageSelected(reader.result as string);
       });
       reader.readAsDataURL(newFile);
     } else {
-      message.error(t("configBase.onlyUploadImage"));
+      message.error(t('configBase.onlyUploadImage'));
     }
   };
 
   // ai生成图片
   const aiGenerateCoverFn = async () => {
     if (!botDesc || !name) {
-      message.error(t("configBase.aiGenerateDesc"));
+      message.error(t('configBase.aiGenerateDesc'));
       return;
     }
     try {
@@ -111,13 +111,13 @@ const UploadDisplay: React.FC<UploadDisplayProps> = ({
         accept="image/*"
         ref={inputRef}
         onChange={onFileChange}
-        style={{ display: "none" }}
+        style={{ display: 'none' }}
       />
       <div
         className={classNames(
           styles.box,
           coverUrl && styles.noBorder,
-          flag && styles.flag,
+          flag && styles.flag
         )}
         onClick={loading ? () => null : triggerFileSelectPopup}
       >
@@ -131,8 +131,8 @@ const UploadDisplay: React.FC<UploadDisplayProps> = ({
             />
           ) : (
             <div className={styles.up_btn}>
-              <PlusOutlined style={{ fontSize: "26px", marginBottom: "4px" }} />
-              <span>{t("configBase.clickUpload")}</span>
+              <PlusOutlined style={{ fontSize: '26px', marginBottom: '4px' }} />
+              <span>{t('configBase.clickUpload')}</span>
             </div>
           ))}
         {reUploadImg && (
@@ -141,8 +141,8 @@ const UploadDisplay: React.FC<UploadDisplayProps> = ({
             onMouseLeave={() => setReUploadImg(false)}
           >
             <div className={styles.up_btn}>
-              <PlusOutlined style={{ fontSize: "26px", marginBottom: "4px" }} />
-              <span>{t("configBase.reUpload")}</span>
+              <PlusOutlined style={{ fontSize: '26px', marginBottom: '4px' }} />
+              <span>{t('configBase.reUpload')}</span>
             </div>
           </div>
         )}
@@ -156,7 +156,7 @@ const UploadDisplay: React.FC<UploadDisplayProps> = ({
             src="https://aixfyun-cn-bj.xfyun.cn/bbs/28921.014458559814/%E7%A7%91%E6%8A%80.svg"
             alt=""
           />
-          <span>{t("configBase.aiGenerate")}</span>
+          <span>{t('configBase.aiGenerate')}</span>
         </div>
       )}
     </div>

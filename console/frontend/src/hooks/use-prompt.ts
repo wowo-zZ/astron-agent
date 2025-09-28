@@ -1,5 +1,5 @@
-import { useEffect, useCallback, useRef } from "react";
-import { useBeforeUnload, useBlocker, type Blocker } from "react-router-dom";
+import { useEffect, useCallback, useRef } from 'react';
+import { useBeforeUnload, useBlocker, type Blocker } from 'react-router-dom';
 
 interface BeforeUnloadEvent {
   returnValue: string;
@@ -20,12 +20,12 @@ const usePrompt = (hasUnsavedChanges: boolean, message: string): void => {
       (event: BeforeUnloadEvent): void => {
         if (hasUnsavedChanges) {
           event.preventDefault();
-          event.returnValue = "";
+          event.returnValue = '';
         }
       },
-      [hasUnsavedChanges],
+      [hasUnsavedChanges]
     ),
-    { capture: false },
+    { capture: false }
   );
 
   return;
@@ -38,12 +38,12 @@ interface PromptProps {
 
 function Prompt({ onLocationChange, hasUnsavedChanges }: PromptProps) {
   const blocker = useBlocker(
-    hasUnsavedChanges ? onLocationChange : false,
+    hasUnsavedChanges ? onLocationChange : false
   ) as Blocker;
   const prevState = useRef(blocker.state);
 
   useEffect(() => {
-    if (blocker.state === "blocked") {
+    if (blocker.state === 'blocked') {
       blocker.reset();
     }
     prevState.current = blocker.state;

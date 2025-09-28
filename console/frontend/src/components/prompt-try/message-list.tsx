@@ -1,0 +1,199 @@
+import { ReactElement, useEffect, useRef, MutableRefObject } from 'react';
+import type { MessageListType, BotInfoType } from '@/types/chat';
+import errorIcon from '@/assets/imgs/sparkImg/errorIcon.svg';
+import LoadingAnimate from '@/constants/lottie-react/chat-loading.json';
+import { Progress, Skeleton } from 'antd';
+import useUserStore from '@/store/user-store';
+import useChatStore from '@/store/chat-store';
+import { getLanguageCode } from '@/utils/http';
+import Lottie from 'lottie-react';
+import DeepThinkProgress from '@/pages/chat-page/components/deep-think-progress';
+import MarkdownRender from '@/components/markdown-render';
+import useBindEvents from '@/hooks/search-event-bind';
+import SourceInfoBox from '@/pages/chat-page/components/source-info-box';
+import UseToolsInfo from '@/pages/chat-page/components/use-tools-info';
+import { useTranslation } from 'react-i18next';
+
+const MessageList = (props: {
+  messageList: MessageListType[];
+  botInfo: BotInfoType;
+  coverUrl: string;
+  inputExample: string[];
+  handleSendMessage: (text?: string) => void;
+  stopAnswer: () => void;
+}): ReactElement => {
+  const {
+    messageList,
+    botInfo,
+    handleSendMessage,
+    coverUrl,
+    inputExample,
+    stopAnswer,
+  } = props;
+  const languageCode = getLanguageCode();
+  const scrollAnchorRef = useRef<HTMLDivElement>(null);
+  const answerPercent = useChatStore((state: any) => state.answerPercent); //回答进度条
+  const isLoading = useChatStore(state => state.isLoading); //是否正在加载
+  const streamId = useChatStore(state => state.streamId); //流式回复id
+  const { user } = useUserStore();
+  const lastClickedQA: MutableRefObject<MessageListType | null> =
+    useRef<MessageListType | null>(null);
+  const { bindTagClickEvent } = useBindEvents(lastClickedQA);
+  const { t } = useTranslation();
+
+  useEffect((): void => {
+    bindTagClickEvent();
+    scrollAnchorRef.current?.scrollIntoView();
+  }, [messageList.length]);
+
+  const renderHeaderAndRecommend = (): ReactElement => (
+    <div className="w-full mx-auto flex text-[#43436b] mt-3">
+      <div className="bg-[#f8faff] rounded-[0px_18px_18px_18px] p-[14px_19px] w-full border border-[#d3dbf8]">
+        <div className="m-3 p-5 rounded-18px bg-[#f2f5fe] flex items-center">
+          <img
+            src={coverUrl || errorIcon}
+            className="w-12 h-12 rounded-full object-cover mr-3"
+          />
+          <div className="flex flex-col gap-2">
+            <h2 className="text-base font-normal text-[#43436b]">
+              {botInfo?.botName || t('configBase.promptTry.hereIsTheAgentName')}
+            </h2>
+            <div className="text-sm font-normal text-[#43436b]">
+              {botInfo?.botDesc ||
+                t('configBase.promptTry.hereIsTheAgentIntroduction')}
+            </div>
+          </div>
+        </div>
+        {inputExample?.some((ex: string) => ex) && (
+          <div className="m-3 p-5 rounded-18px bg-[#f2f5fe] flex justify-between items-center">
+            <div className="flex flex-wrap gap-2">
+              {inputExample?.map((ex: string) => {
+                return ex ? (
+                  <div
+                    className="bg-[#ffffff] rounded-10px border border-[#4671f5] p-2"
+                    onClick={() => {
+                      handleSendMessage(ex);
+                    }}
+                  >
+                    {ex.length > 15 ? ex.slice(0, 15) + '...' : ex}
+                  </div>
+                ) : null;
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  //渲染问题
+
+  const renderReq = (item: MessageListType): ReactElement => {
+    return (
+      <div
+        key={item.id}
+        className="text-white py-2.5 flex leading-[1.4] h-auto"
+      >
+        <img src={user?.avatar} alt="" className="h-6 w-6 rounded-full mr-4" />
+        <div className="bg-[#257eff] rounded-[0px_18px_18px_18px] p-[14px_19px] relative max-w-full">
+          <div className="text-base font-normal text-white leading-[25px] whitespace-pre-wrap w-auto break-words">
+            {item.message}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  //渲染回复
+  const renderResp = (item: MessageListType): ReactElement => {
+    const showLoading = !item.sid && (isLoading || !!answerPercent);
+    return (
+      <div
+        className="mt-[14px] w-[inherit] max-w-full"
+        onClick={() => (lastClickedQA.current = item)}
+      >
+        <div className="flex w-full mb-3">
+          <img
+            src={botInfo.avatar}
+            alt="avatar"
+            className="w-6 h-6 rounded-full mr-4 object-cover"
+          />
+          <div className="bg-[#f8faff] rounded-[0px_18px_18px_18px] p-[14px_19px] w-auto text-[#333333] max-w-full min-w-[10%] border border-[#d3dbf8]">
+            {showLoading && (
+              <div className="flex items-center w-auto max-w-xs mb-2">
+                <Lottie
+                  animationData={LoadingAnimate}
+                  loop={true}
+                  className="w-[30px] h-[30px] mr-1"
+                  rendererSettings={{
+                    preserveAspectRatio: 'xMidYMid slice',
+                  }}
+                />
+                <span className="text-sm text-gray-500">
+                  {languageCode === 'zh' ? '正在回答中...' : 'Processing...'}
+                </span>
+                {!!answerPercent && (
+                  <Progress
+                    percent={answerPercent}
+                    size="small"
+                    strokeColor="#6178FF"
+                    className="ml-2 flex-1"
+                  />
+                )}
+              </div>
+            )}
+
+            {/* 使用工具 */}
+            <UseToolsInfo
+              allToolsList={item?.tools || []}
+              loading={!isLoading && !!streamId}
+            />
+            {/* 思考链 */}
+            <DeepThinkProgress answerItem={item} />
+            {/* 回答内容 */}
+            <MarkdownRender
+              content={item.message}
+              isSending={!!streamId && !item.sid}
+            />
+          </div>
+        </div>
+        {!!streamId && !item.sid && (
+          <div
+            className="text-sm text-[#9194bf] bg-white cursor-pointer ml-10 hover:text-[#257eff]"
+            onClick={() => {
+              stopAnswer();
+            }}
+          >
+            {t('configBase.promptTry.stopOutput')}
+          </div>
+        )}
+        {item?.sid && <SourceInfoBox traceSource={item?.traceSource} />}
+      </div>
+    );
+  };
+
+  return (
+    <div className="relative w-full flex flex-col flex-1 overflow-hidden ">
+      <div
+        className="w-full flex flex-col-reverse items-center overflow-y-auto"
+        style={{ scrollbarWidth: 'none' }}
+      >
+        <div ref={scrollAnchorRef} />
+        {messageList
+          .slice()
+          .reverse()
+          .map((item: MessageListType, index: number) => {
+            return (
+              <div className="w-full" key={index}>
+                {item?.reqId === 'USER' && renderReq(item)}
+                {item?.reqId === 'BOT' && renderResp(item)}
+              </div>
+            );
+          })}
+        {renderHeaderAndRecommend()}
+      </div>
+    </div>
+  );
+};
+
+export default MessageList;

@@ -1,8 +1,8 @@
-import React, { useRef } from "react";
-import { Card, Tooltip } from "antd";
-import styles from "./index.module.scss";
+import React, { useRef } from 'react';
+import { Card, Tooltip } from 'antd';
+import styles from './index.module.scss';
 
-import spaceAvatar from "@/assets/imgs/space/spaceAvatar.png";
+import spaceAvatar from '@/assets/imgs/space/spaceAvatar.png';
 
 interface SpaceItem {
   id: string;

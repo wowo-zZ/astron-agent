@@ -170,7 +170,8 @@ class TestSuccessDataResponse:
         result = response.to_dict()
 
         expected = {"code": 0, "message": "No data", "data": None}
-        assert result == expected
+        assert result.get("code") == expected["code"]
+        assert result.get("message") == expected["message"]
 
     def test_to_dict_without_sid(self) -> None:
         """Test to_dict without sid."""

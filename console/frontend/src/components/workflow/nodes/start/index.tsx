@@ -1,9 +1,9 @@
-import React, { memo } from "react";
-import { useTranslation } from "react-i18next";
-import OutputParams from "@/components/workflow/nodes/components/outputs";
-import { useNodeCommon } from "@/components/workflow/hooks/useNodeCommon";
+import React, { memo } from 'react';
+import { useTranslation } from 'react-i18next';
+import OutputParams from '@/components/workflow/nodes/components/outputs';
+import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
 
-export const StartDetail = memo((props) => {
+export const StartDetail = memo(props => {
   const { id, data } = props;
   const { isIteratorStart } = useNodeCommon({ id, data });
   const { t } = useTranslation();
@@ -18,7 +18,7 @@ export const StartDetail = memo((props) => {
         disabled={isIteratorStart}
       >
         <div className="text-base font-medium">
-          {t("workflow.nodes.common.input")}
+          {t('workflow.nodes.common.input')}
         </div>
       </OutputParams>
     </div>

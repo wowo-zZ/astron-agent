@@ -1,22 +1,22 @@
-import React, { useCallback, useState, memo } from "react";
-import { cloneDeep } from "lodash";
-import { FlowInputNumber, FLowCollapse } from "@/components/workflow/ui";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
+import React, { useCallback, useState, memo } from 'react';
+import { cloneDeep } from 'lodash';
+import { FlowInputNumber, FLowCollapse } from '@/components/workflow/ui';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
 
 function index({ id, data, children }): React.ReactElement {
-  const getCurrentStore = useFlowsManager((state) => state.getCurrentStore);
+  const getCurrentStore = useFlowsManager(state => state.getCurrentStore);
   const currentStore = getCurrentStore();
-  const canPublishSetNot = useFlowsManager((state) => state.canPublishSetNot);
+  const canPublishSetNot = useFlowsManager(state => state.canPublishSetNot);
   const autoSaveCurrentFlow = useFlowsManager(
-    (state) => state.autoSaveCurrentFlow,
+    state => state.autoSaveCurrentFlow
   );
-  const setNode = currentStore((state) => state.setNode);
+  const setNode = currentStore(state => state.setNode);
   const [showParams, setShowParams] = useState(true);
 
   // 节点参数改变
   const handleChangeNodeParam = useCallback(
     (fn, value) => {
-      setNode(id, (old) => {
+      setNode(id, old => {
         fn(old.data, value);
         return {
           ...cloneDeep(old),
@@ -25,7 +25,7 @@ function index({ id, data, children }): React.ReactElement {
       autoSaveCurrentFlow();
       canPublishSetNot();
     },
-    [id, autoSaveCurrentFlow, canPublishSetNot],
+    [id, autoSaveCurrentFlow, canPublishSetNot]
   );
 
   return (
@@ -48,18 +48,18 @@ function index({ id, data, children }): React.ReactElement {
                 min={1}
                 max={1000}
                 precision={0}
-                onChange={(value) => {
+                onChange={value => {
                   handleChangeNodeParam(
                     (data, value) => (data.nodeParam.limit = value),
-                    value,
+                    value
                   );
                 }}
-                onBlur={(e) => {
+                onBlur={e => {
                   const value = e.target.value;
-                  if (!value && typeof value !== "number") {
+                  if (!value && typeof value !== 'number') {
                     handleChangeNodeParam(
                       (data, value) => (data.nodeParam.limit = value),
-                      1,
+                      1
                     );
                   }
                 }}

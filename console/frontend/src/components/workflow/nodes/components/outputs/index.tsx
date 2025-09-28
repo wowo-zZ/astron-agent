@@ -1,11 +1,11 @@
-import React, { useMemo, memo } from "react";
-import { cloneDeep } from "lodash";
-import { useTranslation } from "react-i18next";
-import { FLowCollapse, FLowTree } from "@/components/workflow/ui";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import { useNodeCommon } from "@/components/workflow/hooks/useNodeCommon";
+import React, { useMemo, memo } from 'react';
+import { cloneDeep } from 'lodash';
+import { useTranslation } from 'react-i18next';
+import { FLowCollapse, FLowTree } from '@/components/workflow/ui';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
 
-import inputAddIcon from "@/assets/imgs/workflow/input-add-icon.png";
+import inputAddIcon from '@/assets/imgs/workflow/input-add-icon.png';
 
 function index({ id, data, children }): React.ReactElement {
   const {
@@ -15,7 +15,7 @@ function index({ id, data, children }): React.ReactElement {
     isStartNode,
   } = useNodeCommon({ id, data });
   const { t } = useTranslation();
-  const canvasesDisabled = useFlowsManager((state) => state.canvasesDisabled);
+  const canvasesDisabled = useFlowsManager(state => state.canvasesDisabled);
 
   const treeData = useMemo(() => {
     return addUniqueComponentToProperties(cloneDeep(outputs));
@@ -36,15 +36,15 @@ function index({ id, data, children }): React.ReactElement {
         <div className="rounded-md">
           <div className="flex items-start gap-3 text-desc px-[18px] mb-4">
             <h4 className="w-1/4">
-              {t("workflow.nodes.common.parameterName")}
+              {t('workflow.nodes.common.parameterName')}
             </h4>
             <h4 className="w-1/4">
-              {t("workflow.nodes.common.parameterValue")}
+              {t('workflow.nodes.common.parameterValue')}
             </h4>
-            <h4 className="flex-1">''</h4>
+            <h4 className="flex-1"></h4>
             {isStartNode && (
               <h4 className="w-[50px]">
-                {t("workflow.nodes.common.required")}
+                {t('workflow.nodes.common.required')}
               </h4>
             )}
             {outputs.length > 1 && <span className="w-5 h-5"></span>}
@@ -52,7 +52,7 @@ function index({ id, data, children }): React.ReactElement {
           <div className="pr-[18px]">
             <FLowTree
               fieldNames={{
-                children: "properties",
+                children: 'properties',
               }}
               showLine={false}
               treeData={treeData}
@@ -65,7 +65,7 @@ function index({ id, data, children }): React.ReactElement {
               onClick={() => handleAddOutputLine()}
             >
               <img src={inputAddIcon} className="w-3 h-3" alt="" />
-              <span>{t("workflow.nodes.common.add")}</span>
+              <span>{t('workflow.nodes.common.add')}</span>
             </div>
           )}
         </div>

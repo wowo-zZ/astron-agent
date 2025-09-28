@@ -1,4 +1,4 @@
-import { AxiosResponse } from "axios";
+import { AxiosResponse } from 'axios';
 //define the pagination data of response
 type ResponseResultPage<T = unknown> = {
   pageData: T[];
@@ -27,16 +27,13 @@ declare global {
   }
 
   const performance: Performance;
+}
 
-  // GeeGuard 极验类型定义
-  interface Window {
-    initGeeGuard: (
-      config: { appId: string },
-      callback: (res: {
-        status: string;
-        data: { gee_token: string; local_id: string };
-      }) => void,
-    ) => void;
+declare module 'js-base64' {
+  // 明确声明模块名，与导入的包名一致
+  export class Base64 {
+    static encode(str: string): string;
+    static decode(str: string): string;
   }
 }
 

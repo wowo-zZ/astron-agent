@@ -19,14 +19,14 @@ export const isConfigValid = (config: {
   max: number;
   seperator: string;
 }): boolean => {
-  return config.min > 0 && config.max > 0 && config.seperator.trim() !== "";
+  return config.min > 0 && config.max > 0 && config.seperator.trim() !== '';
 };
 
 /**
  * 格式化分隔符
  */
 export const formatSeparator = (separator: string): string => {
-  return separator.replace("\\n", "\n");
+  return separator.replace('\\n', '\n');
 };
 
 /**
@@ -35,7 +35,7 @@ export const formatSeparator = (separator: string): string => {
 export const generateSliceConfig = (
   tag: string,
   configDetail: { min: number; max: number; seperator: string },
-  fileIds: (string | number)[],
+  fileIds: (string | number)[]
 ): {
   tag: string;
   sliceConfig: {
@@ -61,7 +61,7 @@ export const generateSliceConfig = (
  */
 export const generateStatusParams = (
   tag: string,
-  fileIds: (string | number)[],
+  fileIds: (string | number)[]
 ): {
   indexType: number;
   tag: string;
@@ -81,7 +81,7 @@ export const generatePageParams = (
   tag: string,
   fileIds: (string | number)[],
   pageNo: number,
-  pageSize: number = 10,
+  pageSize: number = 10
 ): {
   tag: string;
   fileIds: (string | number)[];

@@ -27,3 +27,16 @@ export interface AgentPromptItem {
     name: string;
   };
 }
+
+export interface useSelectPromptType {
+  dataSource: AgentPromptItem[];
+  setDataSource: (dataSource: AgentPromptItem[]) => void;
+  value: string;
+  setValue: (value: string) => void;
+  loading: boolean;
+  setLoading: (loading: boolean) => void;
+  currentTemplateId: string;
+  setCurrentTemplateId: (currentTemplateId: string) => void;
+  handleAddTemplateDataToNode: (res: AgentPromptItem) => void;
+  currentTemplate: unknown;
+}

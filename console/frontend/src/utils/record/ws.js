@@ -26,21 +26,21 @@ class Ws {
   assembleRequestUrl() {
     return (
       `${this.tokenParam.url}` +
-      "?appid=" +
+      '?appid=' +
       this.tokenParam.appid +
-      "&ts=" +
+      '&ts=' +
       this.tokenParam.ts +
-      "&signa=" +
+      '&signa=' +
       this.tokenParam.signa +
       `&vadMdn=2`
     );
   }
 
   createWs() {
-    console.log("ws init");
+    console.log('ws init');
     window.WebSocket = window.WebSocket || window.MozWebSocket;
     const url = this.assembleRequestUrl();
-    if ("WebSocket" in window) {
+    if ('WebSocket' in window) {
       // 实例化
       this.ws = new WebSocket(url);
       // 监听事件
@@ -49,16 +49,16 @@ class Ws {
       this.onclose();
       this.onmessage();
     } else {
-      console.log("你的浏览器不支持 WebSocket");
+      console.log('你的浏览器不支持 WebSocket');
     }
   }
 
   // 监听成功
   onopen() {
     this.ws.onopen = () => {
-      console.log(this.ws, "onopen");
+      console.log(this.ws, 'onopen');
       // 发送成功连接之前所发送失败的消息
-      this.errorStack.forEach((message) => {
+      this.errorStack.forEach(message => {
         this.send(message);
       });
       this.errorStack = [];
@@ -68,7 +68,7 @@ class Ws {
 
   // 监听错误
   onerror() {
-    this.ws.onerror = (err) => {
+    this.ws.onerror = err => {
       this.reconnection();
       this.isReconnectionLoading = false;
     };
@@ -87,12 +87,12 @@ class Ws {
 
   // 接收 WebSocket 消息
   onmessage = async () => {
-    this.ws.onmessage = (event) => {
+    this.ws.onmessage = event => {
       try {
         const data = JSON.parse(event.data);
         this.handlemessage(data);
       } catch (error) {
-        console.log(error, "error");
+        console.log(error, 'error');
       }
     };
   };

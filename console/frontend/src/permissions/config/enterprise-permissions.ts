@@ -7,7 +7,7 @@ import {
   ModuleType,
   OperationType,
   RolePermissionConfig,
-} from "../permission-type";
+} from '@/types/permission';
 
 export const ENTERPRISE_PERMISSIONS: RolePermissionConfig[] = [
   // 企业空间 - 超级管理员

@@ -1,49 +1,49 @@
-import React, { FC } from "react";
-import { Switch, Tag, Spin } from "antd";
+import React, { FC } from 'react';
+import { Switch, Tag, Spin } from 'antd';
 
 import {
   EditChunk,
   CreateChunk,
   DeleteChunk,
-} from "./components/modal-components";
+} from './components/modal-components';
 
-import { downloadExcel, generateType } from "@/utils/utils";
-import { typeList, tagTypeClass } from "@/constants";
-import GlobalMarkDown from "@/components/global-markdown";
+import { downloadExcel, generateType } from '@/utils/utils';
+import { typeList, tagTypeClass } from '@/constants';
+import GlobalMarkDown from '@/components/global-markdown';
 
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 
-import arrowLeft from "@/assets/imgs/knowledge/icon_zhishi_arrow-left.png";
-import add from "@/assets/imgs/knowledge/icon_zhishi_add.png";
-import datasetting from "@/assets/imgs/knowledge/icon_zhishi_datasetting.png";
-import layoutAct from "@/assets/imgs/knowledge/icon_zhishi_layout_act.png";
-import layout from "@/assets/imgs/knowledge/icon_zhishi_layout.png";
-import target from "@/assets/imgs/knowledge/icon_zhishi_target_act_1.png";
-import text from "@/assets/imgs/knowledge/icon_zhishi_text.png";
-import del from "@/assets/imgs/main/icon_bot_del_act.png";
-import order from "@/assets/imgs/knowledge/icon_zhishi_order.png";
-import search from "@/assets/imgs/knowledge/icon_zhishi_search.png";
-import useradd from "@/assets/imgs/knowledge/icon_zhishi_useradd.png";
-import download from "@/assets/imgs/knowledge/icon_zhishi_download.png";
-import select from "@/assets/imgs/knowledge/icon_nav_dropdown.png";
+import arrowLeft from '@/assets/imgs/knowledge/icon_zhishi_arrow-left.png';
+import add from '@/assets/imgs/knowledge/icon_zhishi_add.png';
+import datasetting from '@/assets/imgs/knowledge/icon_zhishi_datasetting.png';
+import layoutAct from '@/assets/imgs/knowledge/icon_zhishi_layout_act.png';
+import layout from '@/assets/imgs/knowledge/icon_zhishi_layout.png';
+import target from '@/assets/imgs/knowledge/icon_zhishi_target_act_1.png';
+import text from '@/assets/imgs/knowledge/icon_zhishi_text.png';
+import del from '@/assets/imgs/main/icon_bot_del_act.png';
+import order from '@/assets/imgs/knowledge/icon_zhishi_order.png';
+import search from '@/assets/imgs/knowledge/icon_zhishi_search.png';
+import useradd from '@/assets/imgs/knowledge/icon_zhishi_useradd.png';
+import download from '@/assets/imgs/knowledge/icon_zhishi_download.png';
+import select from '@/assets/imgs/knowledge/icon_nav_dropdown.png';
 import {
   Chunk,
   FileInfoV2,
   FileItem,
   FileSummaryResponse,
   TagDto,
-} from "@/types/resource";
-import { useFilePage } from "./hooks/use-file-page";
-import { useNavigate } from "react-router-dom";
+} from '@/types/resource';
+import { useFilePage } from './hooks/use-file-page';
+import { useNavigate } from 'react-router-dom';
 
 const statusMap = {
-  "-1": "error",
-  "0": "processing",
-  "1": "error",
-  "2": "processing",
-  "3": "processing",
-  "4": "error",
-  "5": "success",
+  '-1': 'error',
+  '0': 'processing',
+  '1': 'error',
+  '2': 'processing',
+  '3': 'processing',
+  '4': 'error',
+  '5': 'success',
 };
 
 const FilePage: FC = () => {
@@ -91,7 +91,7 @@ const FilePage: FC = () => {
     >
       {editModal && (
         <EditChunk
-          fileId={fileId || ""}
+          fileId={fileId || ''}
           fileInfo={fileInfo}
           resetKnowledge={resetKnowledge}
           currentChunk={currentChunk}
@@ -102,7 +102,7 @@ const FilePage: FC = () => {
       )}
       {addModal && (
         <CreateChunk
-          fileId={fileId || ""}
+          fileId={fileId || ''}
           resetKnowledge={resetKnowledge}
           setAddModal={setAddModal}
         />
@@ -117,8 +117,8 @@ const FilePage: FC = () => {
       )}
       <FilePageParams
         repoId={repoId}
-        tag={tag || ""}
-        pid={pid || ""}
+        tag={tag || ''}
+        pid={pid || ''}
         otherFiles={otherFiles}
         showMore={showMore}
         setShowMore={setShowMore}
@@ -131,7 +131,7 @@ const FilePage: FC = () => {
         setShowParameter={setShowParameter}
         showParameter={showParameter}
         setAddModal={setAddModal}
-        fileId={fileId || ""}
+        fileId={fileId || ''}
       />
       <FilePageChunks
         chunks={chunks}
@@ -151,7 +151,7 @@ const FilePage: FC = () => {
         fetchDataDebounce={fetchDataDebounce}
         loadingData={loadingData}
         isViolation={isViolation}
-        fileId={fileId || ""}
+        fileId={fileId || ''}
         fileInfo={fileInfo}
         setIsViolation={setIsViolation}
       />
@@ -209,7 +209,7 @@ export const FilePageParams: FC<{
                 state: {
                   parentId: pid,
                 },
-              },
+              }
             )
           }
           alt=""
@@ -217,9 +217,9 @@ export const FilePageParams: FC<{
         <span
           className="flex justify-between items-center py-2 px-3.5 bg-[#F9FAFB] w-[400px] relative rounded-lg"
           style={{
-            cursor: otherFiles.length > 0 ? "pointer" : "auto",
+            cursor: otherFiles.length > 0 ? 'pointer' : 'auto',
           }}
-          onClick={(event) => {
+          onClick={event => {
             event.stopPropagation();
             setShowMore(!showMore);
           }}
@@ -227,7 +227,7 @@ export const FilePageParams: FC<{
           <div className="flex items-center flex-1 w-full">
             <img
               src={typeList.get(
-                generateType(fileInfo?.type?.toLowerCase()) || "",
+                generateType(fileInfo?.type?.toLowerCase()) || ''
               )}
               className="w-[22px] h-[22px] flex-shrink-0"
               alt=""
@@ -244,23 +244,23 @@ export const FilePageParams: FC<{
           )}
           {showMore && otherFiles.length > 0 && (
             <div className="absolute right-0 top-[42px] list-options py-3.5 pt-2 w-full z-50 max-h-[205px] overflow-auto">
-              {otherFiles.map((item) => (
+              {otherFiles.map(item => (
                 <div
                   key={item.id}
                   className="w-full px-5 py-1.5 pr-4 text-desc font-medium hover:bg-[#F9FAFB] flex items-center cursor-pointer"
                   onClick={() => {
-                    (searchRef.current as HTMLInputElement).value = "";
+                    (searchRef.current as HTMLInputElement).value = '';
                     // searchRef.current.setAttribute('placeholder', '请输入')
-                    setSearchValue("");
+                    setSearchValue('');
                     setIsViolation(false);
                     navigate(
-                      `/resource/knowledge/detail/${repoId}/file?parentId=${item.pid}&fileId=${item.id}&tag=${tag}`,
+                      `/resource/knowledge/detail/${repoId}/file?parentId=${item.pid}&fileId=${item.id}&tag=${tag}`
                     );
                   }}
                 >
                   <img
                     src={typeList.get(
-                      generateType((item.type || "")?.toLowerCase()) || "",
+                      generateType((item.type || '')?.toLowerCase()) || ''
                     )}
                     className="flex-shrink-0 w-4 h-4"
                     alt=""
@@ -280,27 +280,27 @@ export const FilePageParams: FC<{
           <div className="flex items-center gap-2 ml-2">
             <span
               className={`rounded-full w-[6px] h-[6px] ${
-                fileStatusMsg === "processing"
-                  ? "bg-[#FF9602]"
-                  : fileStatusMsg === "error"
-                    ? "bg-[#F74E43]"
-                    : "bg-[#1FC92D]"
+                fileStatusMsg === 'processing'
+                  ? 'bg-[#FF9602]'
+                  : fileStatusMsg === 'error'
+                    ? 'bg-[#F74E43]'
+                    : 'bg-[#1FC92D]'
               }`}
             ></span>
             <span
               className={`text-[14px] ${
-                fileStatusMsg === "processing"
-                  ? "text-[#FF9602]"
-                  : fileStatusMsg === "error"
-                    ? "text-[#F74E43]"
-                    : "text-[#1FC92D]"
+                fileStatusMsg === 'processing'
+                  ? 'text-[#FF9602]'
+                  : fileStatusMsg === 'error'
+                    ? 'text-[#F74E43]'
+                    : 'text-[#1FC92D]'
               }`}
             >
-              {fileStatusMsg === "processing"
-                ? t("knowledge.progress")
-                : fileStatusMsg === "error"
-                  ? t("knowledge.parseFail")
-                  : t("knowledge.parseSuccess")}
+              {fileStatusMsg === 'processing'
+                ? t('knowledge.progress')
+                : fileStatusMsg === 'error'
+                  ? t('knowledge.parseFail')
+                  : t('knowledge.parseSuccess')}
             </span>
           </div>
         )}
@@ -309,23 +309,23 @@ export const FilePageParams: FC<{
         <div
           className="flex items-center px-4 py-2 rounded-[10px] border border-[#D7DFE9]"
           style={{
-            cursor: fileStatusMsg !== "success" ? "not-allowed" : "pointer",
+            cursor: fileStatusMsg !== 'success' ? 'not-allowed' : 'pointer',
           }}
           onClick={handleEnableFile}
         >
           <span
             className={`w-[6px] h-[6px] ${
-              fileInfo.enabled ? "bg-[#1FC92D]" : "bg-[#7F7F7F]"
+              fileInfo.enabled ? 'bg-[#1FC92D]' : 'bg-[#7F7F7F]'
             } rounded-full`}
           ></span>
           <span
             className={`${
-              fileInfo.enabled ? "text-[#1FC92D]" : "text-[#7F7F7F]"
+              fileInfo.enabled ? 'text-[#1FC92D]' : 'text-[#7F7F7F]'
             } text-sm ml-2`}
           >
             {fileInfo.enabled
-              ? t("knowledge.enabled")
-              : t("knowledge.disabled")}
+              ? t('knowledge.enabled')
+              : t('knowledge.disabled')}
           </span>
         </div>
 
@@ -333,28 +333,28 @@ export const FilePageParams: FC<{
           className="border border-[#D7DFE9] flex items-center px-4 py-2"
           style={{
             borderRadius: 10,
-            cursor: fileStatusMsg !== "success" ? "not-allowed" : "pointer",
+            cursor: fileStatusMsg !== 'success' ? 'not-allowed' : 'pointer',
           }}
           onClick={() => {
-            if (fileStatusMsg !== "success") return;
+            if (fileStatusMsg !== 'success') return;
             setAddModal(true);
           }}
         >
           <img src={add} className="w-4 h-4" alt="" />
-          <span className="ml-2 text-sm text-second">{t("common.add")}</span>
+          <span className="ml-2 text-sm text-second">{t('common.add')}</span>
         </div>
         <div
           className="border border-[#D7DFE9] flex items-center px-5 py-2 cursor-pointer"
           style={{ borderRadius: 10 }}
           onClick={() =>
             navigate(
-              `/resource/knowledge/detail/${repoId}/segmentation?parentId=${pid}&fileId=${fileId}&tag=${tag}`,
+              `/resource/knowledge/detail/${repoId}/segmentation?parentId=${pid}&fileId=${fileId}&tag=${tag}`
             )
           }
         >
           <img src={datasetting} className="w-4 h-4" alt="" />
           <span className="ml-2 text-sm text-second">
-            {t("knowledge.segmentSettings")}
+            {t('knowledge.segmentSettings')}
           </span>
         </div>
         <div
@@ -423,7 +423,7 @@ export const FilePageChunks: FC<{
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <div className="bg-[#F0F3F9] rounded-md py-0.5 px-2 text-desc flex-shrink-0">
-              {t("knowledge.violationParagraphs", { count: violationTotal })}
+              {t('knowledge.violationParagraphs', { count: violationTotal })}
             </div>
             <div className="relative">
               <img
@@ -434,7 +434,7 @@ export const FilePageChunks: FC<{
               <input
                 ref={searchRef}
                 className="global-input ml-3 w-[320px] pl-10 h-10"
-                placeholder={t("knowledge.pleaseEnter")}
+                placeholder={t('knowledge.pleaseEnter')}
                 onChange={fetchDataDebounce}
               />
             </div>
@@ -443,19 +443,19 @@ export const FilePageChunks: FC<{
             <div className="flex items-center gap-4">
               <div
                 className="flex items-center gap-1 text-[#275EFF] text-xs cursor-pointer"
-                onClick={() => downloadExcel([fileId || ""], 1, fileInfo.name)}
+                onClick={() => downloadExcel([fileId || ''], 1, fileInfo.name)}
               >
                 <img src={download} className="w-4 h-4" alt="" />
-                <span>{t("knowledge.downloadViolationDetails")}</span>
+                <span>{t('knowledge.downloadViolationDetails')}</span>
               </div>
               <div className="flex items-center gap-1.5 text-sm font-medium">
                 <Switch
                   size="small"
                   className="list-switch"
                   checked={isViolation}
-                  onChange={(checked) => setIsViolation(checked)}
+                  onChange={checked => setIsViolation(checked)}
                 />
-                <span>{t("knowledge.violationKnowledge")}</span>
+                <span>{t('knowledge.violationKnowledge')}</span>
               </div>
             </div>
           )}
@@ -478,26 +478,26 @@ export const FilePageChunks: FC<{
       </div>
       <div
         className="h-full border-l border-[#E2E8FF] transition-all overflow-auto"
-        style={{ width: showParameter ? "16%" : "0px" }}
+        style={{ width: showParameter ? '16%' : '0px' }}
       >
         <div className="w-full h-full px-6">
           <h2 className="text-2xl font-semibold text-second">
-            {t("knowledge.technicalParameters")}
+            {t('knowledge.technicalParameters')}
           </h2>
           <div className="flex flex-col gap-3 mt-3">
             <div className="flex flex-col">
               <div className="font-medium text-second">
-                {t("knowledge.segmentIdentifier")}
+                {t('knowledge.segmentIdentifier')}
               </div>
               <p className="text-[#757575] text-xl font-medium">
                 {parameters.sliceType === 0
-                  ? t("knowledge.automatic")
-                  : t("knowledge.customized")}
+                  ? t('knowledge.automatic')
+                  : t('knowledge.customized')}
               </p>
             </div>
             <div className="flex flex-col">
               <div className="font-medium text-second">
-                {t("knowledge.hitCount")}
+                {t('knowledge.hitCount')}
               </div>
               <p className="text-[#757575] text-xl font-medium">
                 {parameters.hitCount}
@@ -505,44 +505,44 @@ export const FilePageChunks: FC<{
             </div>
             <div className="flex flex-col">
               <div className="font-medium text-second">
-                {t("knowledge.paragraphLength")}
+                {t('knowledge.paragraphLength')}
               </div>
-              {fileStatusMsg === "processing" ? (
+              {fileStatusMsg === 'processing' ? (
                 <p className="text-[#757575] text-xl font-medium">
-                  {t("knowledge.progress")}
+                  {t('knowledge.progress')}
                 </p>
               ) : (
                 <p className="text-[#757575] text-xl font-medium">
-                  {parameters.lengthRange && parameters.lengthRange[1]}{" "}
-                  {t("knowledge.characters")}
+                  {parameters.lengthRange && parameters.lengthRange[1]}{' '}
+                  {t('knowledge.characters')}
                 </p>
               )}
             </div>
             <div className="flex flex-col">
               <div className="font-medium text-second">
-                {t("knowledge.averageParagraphLength")}
+                {t('knowledge.averageParagraphLength')}
               </div>
-              {fileStatusMsg === "processing" ? (
+              {fileStatusMsg === 'processing' ? (
                 <p className="text-[#757575] text-xl font-medium">
-                  {t("knowledge.progress")}
+                  {t('knowledge.progress')}
                 </p>
               ) : (
                 <p className="text-[#757575] text-xl font-medium">
-                  {parameters.knowledgeAvgLength} {t("knowledge.characters")}
+                  {parameters.knowledgeAvgLength} {t('knowledge.characters')}
                 </p>
               )}
             </div>
             <div className="flex flex-col">
               <div className="font-medium text-second">
-                {t("knowledge.paragraphCount")}
+                {t('knowledge.paragraphCount')}
               </div>
-              {fileStatusMsg === "processing" ? (
+              {fileStatusMsg === 'processing' ? (
                 <p className="text-[#757575] text-xl font-medium">
-                  {t("knowledge.progress")}
+                  {t('knowledge.progress')}
                 </p>
               ) : (
                 <p className="text-[#757575] text-xl font-medium">
-                  {parameters.knowledgeCount} {t("knowledge.paragraphs")}
+                  {parameters.knowledgeCount} {t('knowledge.paragraphs')}
                 </p>
               )}
             </div>
@@ -601,15 +601,15 @@ export const ChunkContent: FC<{
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                    {["block", "review"].includes(item.auditSuggest || "") && (
+                    {['block', 'review'].includes(item.auditSuggest || '') && (
                       <div className="rounded border border-[#FFA19B] bg-[#fff5f4] px-2 py-1 text-[#E92215] text-xs mr-2.5">
-                        {t("knowledge.violation")}
+                        {t('knowledge.violation')}
                       </div>
                     )}
                     <img src={order} className="w-3 h-3" alt="" />
                     <span
                       className="ml-1 text-xs text-[#F6B728]"
-                      style={{ fontFamily: "SF Pro Text, SF Pro Text-600" }}
+                      style={{ fontFamily: 'SF Pro Text, SF Pro Text-600' }}
                     >
                       00{index + 1}
                     </span>
@@ -617,7 +617,7 @@ export const ChunkContent: FC<{
                       <div className="flex items-center">
                         <img src={useradd} className="w-3 h-3 ml-1.5" alt="" />
                         <span className="ml-1 text-desc">
-                          {t("knowledge.manual")}
+                          {t('knowledge.manual')}
                         </span>
                       </div>
                     )}
@@ -634,18 +634,18 @@ export const ChunkContent: FC<{
                     <div className="flex items-center">
                       <span
                         className={`w-2 h-2 ${
-                          item.enabled ? "bg-[#13A10E]" : "bg-[#757575]"
+                          item.enabled ? 'bg-[#13A10E]' : 'bg-[#757575]'
                         } rounded-full`}
                       ></span>
                       <span className="text-desc ml-1.5">
                         {item.enabled
-                          ? t("knowledge.enabled")
-                          : t("knowledge.disabled")}
+                          ? t('knowledge.enabled')
+                          : t('knowledge.disabled')}
                       </span>
                     </div>
                     <Switch
-                      disabled={["block", "review"].includes(
-                        item.auditSuggest || "",
+                      disabled={['block', 'review'].includes(
+                        item.auditSuggest || ''
                       )}
                       size="small"
                       checked={item.enabled ? true : false}
@@ -665,13 +665,13 @@ export const ChunkContent: FC<{
                   />
                 </div>
                 <div className="items-start justify-between hidden w-full mt-2 group-hover:flex">
-                  {["block", "review"].includes(item.auditSuggest || "") ? (
+                  {['block', 'review'].includes(item.auditSuggest || '') ? (
                     <div className="flex flex-1 overflow-hidden">
                       <span
                         className="flex-1 text-sm font-semibold text-overflow"
                         title={item.auditDetail}
                       >
-                        {t("knowledge.violationReason", {
+                        {t('knowledge.violationReason', {
                           reason: item.auditDetail,
                         })}
                       </span>
@@ -684,7 +684,7 @@ export const ChunkContent: FC<{
                             <Tag
                               key={index}
                               className={
-                                tagTypeClass.get(t.type as number) || ""
+                                tagTypeClass.get(t.type as number) || ''
                               }
                             >
                               <span
@@ -700,7 +700,7 @@ export const ChunkContent: FC<{
                             <Tag
                               key={index}
                               className={
-                                tagTypeClass.get(t.type as number) || ""
+                                tagTypeClass.get(t.type as number) || ''
                               }
                             >
                               <span
@@ -717,7 +717,7 @@ export const ChunkContent: FC<{
                         !moreTagsId.includes(item.id) && (
                           <span
                             className="rounded-md inline-block bg-[#F0F3F9] px-2 py-1 h-6 text-desc mb-1 cursor-pointer"
-                            onClick={(e) => {
+                            onClick={e => {
                               e.stopPropagation();
                               moreTagsId.push(item.id);
                               setMoreTagsId([...moreTagsId]);
@@ -730,7 +730,7 @@ export const ChunkContent: FC<{
                   )}
                   <div
                     className="w-6 h-6 border border-[#D7DFE9] flex justify-center items-center rounded-md cursor-pointer"
-                    onClick={(e) => {
+                    onClick={e => {
                       e.stopPropagation();
                       setCurrentChunk(item);
                       setDeleteModal(true);

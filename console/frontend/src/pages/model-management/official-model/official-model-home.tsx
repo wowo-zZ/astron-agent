@@ -1,13 +1,13 @@
-import React, { useRef } from "react";
-import ModelManagementHeader from "../components/model-management-header";
-import CategoryAside from "../components/category-aside";
-import { CategoryAsideRef } from "@/types/model";
-import ModelCardList from "../components/model-card-list";
-import ModelModalComponents from "../components/model-modal-components";
-import { ModelProvider, useModelContext } from "../context/model-context";
-import { useModelInitializer } from "../hooks/use-model-initializer";
-import { useModelOperations } from "../hooks/use-model-operations";
-import { useModelFilters } from "../hooks/use-model-filters";
+import React, { useRef } from 'react';
+import ModelManagementHeader from '../components/model-management-header';
+import CategoryAside from '../components/category-aside';
+import { CategoryAsideRef } from '@/types/model';
+import ModelCardList from '../components/model-card-list';
+import ModelModalComponents from '../components/model-modal-components';
+import { ModelProvider, useModelContext } from '../context/model-context';
+import { useModelInitializer } from '../hooks/use-model-initializer';
+import { useModelOperations } from '../hooks/use-model-operations';
+import { useModelFilters } from '../hooks/use-model-filters';
 
 // 官方模型页面内容组件
 const OfficialModelContent: React.FC = () => {
@@ -25,8 +25,8 @@ const OfficialModelContent: React.FC = () => {
       <div
         className="flex-none pt-4 pb-2 sm:pt-4 sm:pb-2 lg:pt-5 lg:pb-2 mt-1"
         style={{
-          paddingLeft: "7%",
-          paddingRight: "7%",
+          paddingLeft: '7%',
+          paddingRight: '7%',
         }}
       >
         <ModelManagementHeader

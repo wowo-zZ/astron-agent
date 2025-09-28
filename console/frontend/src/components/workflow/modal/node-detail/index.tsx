@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState, useMemo } from "react";
-import { getCommonConfig } from "@/services/common";
-import MarkdownRender from "@/components/markdown-render";
-import { NodeDetailProps, NodeTemplateItem } from "@/components/workflow/types";
-import { Icons } from "@/components/workflow/icons";
+import React, { useEffect, useRef, useState, useMemo } from 'react';
+import { getCommonConfig } from '@/services/common';
+import MarkdownRender from '@/components/markdown-render';
+import { NodeDetailProps, NodeTemplateItem } from '@/components/workflow/types';
+import { Icons } from '@/components/workflow/icons';
 
 function NodeDetail({
   currentNodeId,
@@ -13,8 +13,8 @@ function NodeDetail({
 
   useEffect(() => {
     const params = {
-      category: "TEMPLATE",
-      code: "node",
+      category: 'TEMPLATE',
+      code: 'node',
     };
     getCommonConfig(params).then((data: unknown) => {
       setNodeTemplate(JSON.parse(data?.value));
@@ -22,7 +22,7 @@ function NodeDetail({
   }, []);
 
   useEffect(() => {
-    const dom = document.getElementById("flow-container");
+    const dom = document.getElementById('flow-container');
     if (dom && nodeDetailRef.current) {
       const left = dom.getBoundingClientRect()?.left;
       nodeDetailRef.current.style.left = `${left + 16}px`;
@@ -31,7 +31,7 @@ function NodeDetail({
 
   const currentTemplateNode = useMemo(() => {
     return nodeTemplate?.find(
-      (item: NodeTemplateItem) => item?.idType === currentNodeId,
+      (item: NodeTemplateItem) => item?.idType === currentNodeId
     );
   }, [nodeTemplate, currentNodeId]);
 
@@ -39,11 +39,11 @@ function NodeDetail({
     <div
       className="node-detail-template fixed top-[104px] left-0  bg-[#fff]"
       style={{
-        height: "calc(100vh - 152px)",
-        borderRadius: "10px",
-        boxShadow: "0px 2px 11px 0px rgba(0,0,0,0.06)",
-        padding: "11px 5px 16px 11px",
-        width: "30%",
+        height: 'calc(100vh - 152px)',
+        borderRadius: '10px',
+        boxShadow: '0px 2px 11px 0px rgba(0,0,0,0.06)',
+        padding: '11px 5px 16px 11px',
+        width: '30%',
         zIndex: 998,
       }}
       ref={nodeDetailRef}

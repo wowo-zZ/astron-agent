@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { Modal, Button, Input, Form } from "antd";
-import { useTranslation } from "react-i18next";
-import { DatabaseItem } from "@/types/database";
+import React, { useEffect, useState } from 'react';
+import { Modal, Button, Input, Form } from 'antd';
+import { useTranslation } from 'react-i18next';
+import { DatabaseItem } from '@/types/database';
 
 const { TextArea } = Input;
 
@@ -9,7 +9,7 @@ const CreateDatabase = (props: {
   open: boolean;
   handleOk: (values: DatabaseItem) => Promise<void>;
   handleCancel: () => void;
-  type: "add" | "edit";
+  type: 'add' | 'edit';
   info?: DatabaseItem;
 }): React.JSX.Element => {
   const { t } = useTranslation();
@@ -18,10 +18,10 @@ const CreateDatabase = (props: {
   const [loading, setLoading] = useState(false);
 
   const onSave = (): void => {
-    form.validateFields().then(async (values) => {
+    form.validateFields().then(async values => {
       try {
         setLoading(true);
-        if (type == "edit") {
+        if (type == 'edit') {
           await handleOk({
             ...info,
             ...values,
@@ -37,7 +37,7 @@ const CreateDatabase = (props: {
   };
 
   useEffect(() => {
-    if (type == "edit") {
+    if (type == 'edit') {
       form.setFieldsValue({
         ...info,
       });
@@ -51,7 +51,7 @@ const CreateDatabase = (props: {
       autoInsertSpace={false}
       onClick={handleCancel}
     >
-      {t("database.cancel")}
+      {t('database.cancel')}
     </Button>,
     <Button
       key="submit"
@@ -61,14 +61,14 @@ const CreateDatabase = (props: {
       loading={loading}
       onClick={onSave}
     >
-      {t("database.confirm")}
+      {t('database.confirm')}
     </Button>,
   ];
 
   return (
     <Modal
-      title={`${type == "add" ? t("database.create") : t("database.edit")}${t(
-        "database.database",
+      title={`${type == 'add' ? t('database.create') : t('database.edit')}${t(
+        'database.database'
       )}`}
       open={open}
       width={600}
@@ -89,46 +89,46 @@ const CreateDatabase = (props: {
       <div className="pt-[24px]">
         <Form layout="vertical" form={form} name="control-hooks">
           <Form.Item
-            label={t("database.databaseName")}
+            label={t('database.databaseName')}
             name="name"
             rules={[
               {
                 required: true,
-                message: t("database.pleaseEnterDatabaseName"),
+                message: t('database.pleaseEnterDatabaseName'),
               },
               {
                 pattern: /^[a-z][a-z0-9_]*$/,
-                message: t("database.nameValidationMessage"),
+                message: t('database.nameValidationMessage'),
               },
             ]}
           >
             <Input
-              disabled={type == "edit"}
-              variant={type == "edit" ? "borderless" : "outlined"}
-              placeholder={t("database.pleaseEnter")}
-              className={`h-[40px] ${type === "add" ? "global-input" : ""}`}
+              disabled={type == 'edit'}
+              variant={type == 'edit' ? 'borderless' : 'outlined'}
+              placeholder={t('database.pleaseEnter')}
+              className={`h-[40px] ${type === 'add' ? 'global-input' : ''}`}
               maxLength={20}
-              showCount={type === "add"}
+              showCount={type === 'add'}
             />
           </Form.Item>
           <Form.Item
-            label={t("database.databaseDescription")}
+            label={t('database.databaseDescription')}
             name="description"
           >
             <TextArea
-              placeholder={t("database.pleaseEnterDatabaseDescription")}
+              placeholder={t('database.pleaseEnterDatabaseDescription')}
               maxLength={200}
               className="h-[100px] border-[#E4EAFF]"
               styles={{
                 count: {
-                  color: "#B2B2B2",
-                  fontWeight: "normal",
-                  position: "absolute",
-                  bottom: "2px",
-                  right: "8px",
+                  color: '#B2B2B2',
+                  fontWeight: 'normal',
+                  position: 'absolute',
+                  bottom: '2px',
+                  right: '8px',
                 },
               }}
-              style={{ resize: "none" }}
+              style={{ resize: 'none' }}
               showCount
             />
           </Form.Item>

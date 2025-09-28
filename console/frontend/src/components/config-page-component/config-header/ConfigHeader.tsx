@@ -1,14 +1,14 @@
-import React, { useState, useRef, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import Collapse from "@/assets/imgs/sparkImg/Collapse.png";
-import errorIcon from "@/assets/imgs/sparkImg/errorIcon.svg";
+import Collapse from '@/assets/imgs/sparkImg/Collapse.png';
+import errorIcon from '@/assets/imgs/sparkImg/errorIcon.svg';
 
-import eventBus from "@/utils/event-bus";
-import { message } from "antd";
-import { useTranslation } from "react-i18next";
+import eventBus from '@/utils/event-bus';
+import { message } from 'antd';
+import { useTranslation } from 'react-i18next';
 
-import styles from "./ConfigHeader.module.scss";
+import styles from './ConfigHeader.module.scss';
 
 interface ConfigHeaderProps {
   currentRobot?: {
@@ -41,8 +41,8 @@ function ConfigHeader(props: ConfigHeaderProps) {
   const [showDropList, setShowDropList] = useState(false);
 
   useEffect(() => {
-    document.body.addEventListener("click", clickOutside);
-    return () => document.body.removeEventListener("click", clickOutside);
+    document.body.addEventListener('click', clickOutside);
+    return () => document.body.removeEventListener('click', clickOutside);
   }, []);
 
   function clickOutside(event: MouseEvent) {
@@ -58,8 +58,8 @@ function ConfigHeader(props: ConfigHeaderProps) {
     <div
       className={`${styles.configHeader} w-full h-[80px] bg-[#fff] border-b border-[#e2e8ff] flex justify-between items-center px-6 py-5`}
       style={{
-        borderRadius: "0px 0px 24px 24px",
-        border: "0",
+        borderRadius: '0px 0px 24px 24px',
+        border: '0',
       }}
     >
       <div
@@ -84,14 +84,14 @@ function ConfigHeader(props: ConfigHeaderProps) {
               <span className={styles.botName}>
                 {props.baseinfo?.botName ||
                   props.detailInfo?.botName ||
-                  t("configBase.agentName")}
+                  t('configBase.agentName')}
               </span>
             </div>
             <div>
               <span
                 className={`${styles.botStatu_fabu} ${
                   props.detailInfo?.botStatus === 2
-                    ? ""
+                    ? ''
                     : props.detailInfo?.botStatus === 3
                       ? styles.botStatu_fail
                       : props.detailInfo?.botStatus === 1 ||
@@ -101,20 +101,20 @@ function ConfigHeader(props: ConfigHeaderProps) {
                 }`}
               >
                 {props.detailInfo?.botStatus === 2
-                  ? t("configBase.botStatus2")
+                  ? t('configBase.botStatus2')
                   : props.detailInfo?.botStatus === 3
-                    ? t("configBase.botStatus3")
+                    ? t('configBase.botStatus3')
                     : props.detailInfo?.botStatus === 1 ||
                         props.detailInfo?.botStatus === 4
-                      ? t("configBase.botStatus4")
-                      : t("configBase.botStatus0")}
+                      ? t('configBase.botStatus4')
+                      : t('configBase.botStatus0')}
               </span>
             </div>
           </div>
         </div>
         <div
           className="flex items-center relative gap-2"
-          onClick={(e) => {
+          onClick={e => {
             e.stopPropagation();
             setShowDropList(true);
           }}
@@ -122,16 +122,16 @@ function ConfigHeader(props: ConfigHeaderProps) {
           {currentRobot?.id && (
             <img
               style={{
-                borderRadius: currentRobot.color ? "" : "4px",
+                borderRadius: currentRobot.color ? '' : '4px',
               }}
-              src={`${currentRobot.address ?? ""}${currentRobot.avatarIcon ?? ""}`}
+              src={`${currentRobot.address ?? ''}${currentRobot.avatarIcon ?? ''}`}
               className="w-[26px] h-[26px] flex-shrink-0"
               alt=""
             />
           )}
           <div
             className="text-second font-semibold text-overflow text-2xl"
-            title={currentRobot?.name || ""}
+            title={currentRobot?.name || ''}
           >
             {/* {currentRobot?.name || t('configBase.agentName')} */}
           </div>
@@ -146,12 +146,12 @@ function ConfigHeader(props: ConfigHeaderProps) {
       <div className="flex flex-1 items-center gap-6 justify-center">
         <div
           className={`flex items-center px-5 py-2.5  rounded-[10px] font-medium cursor-pointer  h-[36px]  ${
-            currentTab === "base" ? "config-tabs-active" : "config-tabs-normal"
+            currentTab === 'base' ? 'config-tabs-active' : 'config-tabs-normal'
           }`}
-          onClick={(e) => {
+          onClick={e => {
             e.stopPropagation();
             setShowDropList(false);
-            if (searchParams.get("flag") === "true") {
+            if (searchParams.get('flag') === 'true') {
               return navigate(`/space/config/base?botId=${props.botId}`, {
                 replace: true,
               });
@@ -163,7 +163,7 @@ function ConfigHeader(props: ConfigHeaderProps) {
                   : `/space/config/base?botId=${props.botId}`,
                 {
                   replace: true,
-                },
+                }
               );
             }
           }}
@@ -171,31 +171,31 @@ function ConfigHeader(props: ConfigHeaderProps) {
           <span className="base-icon"></span>
           <span
             className="ml-2 "
-            style={{ whiteSpace: "nowrap", fontSize: "14px" }}
+            style={{ whiteSpace: 'nowrap', fontSize: '14px' }}
           >
-            {t("configBase.createAgent")}
+            {t('configBase.createAgent')}
           </span>
         </div>
         <div
           className={`flex items-center px-5 py-2.5  rounded-[10px] font-medium cursor-pointer  h-[36px]  ${
-            currentTab === "overview"
-              ? "config-tabs-active"
-              : "config-tabs-normal"
+            currentTab === 'overview'
+              ? 'config-tabs-active'
+              : 'config-tabs-normal'
           }`}
           onClick={() => {
-            if (searchParams.get("create") === "true") {
-              return message.info(t("configBase.createAgentFirst"));
+            if (searchParams.get('create') === 'true') {
+              return message.info(t('configBase.createAgentFirst'));
             }
-            eventBus.emit("eventSavebot");
+            eventBus.emit('eventSavebot');
             return;
           }}
         >
           <span className="overview-icon"></span>
           <span
             className="ml-2"
-            style={{ whiteSpace: "nowrap", fontSize: "14px" }}
+            style={{ whiteSpace: 'nowrap', fontSize: '14px' }}
           >
-            {t("configBase.analyze")}
+            {t('configBase.analyze')}
           </span>
         </div>
       </div>

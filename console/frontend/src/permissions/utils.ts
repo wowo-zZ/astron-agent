@@ -4,8 +4,8 @@ import {
   ModuleType,
   OperationType,
   RolePermissionConfig,
-} from "./permission-type";
-import { PERMISSIONS } from "./config";
+} from '@/types/permission';
+import { PERMISSIONS } from './config';
 
 // ==================== 权限检查工具函数 ====================
 
@@ -14,10 +14,10 @@ import { PERMISSIONS } from "./config";
  */
 export function getRoleConfig(
   spaceType: SpaceType,
-  roleType: RoleType,
+  roleType: RoleType
 ): RolePermissionConfig | undefined {
   return PERMISSIONS.find(
-    (config) => config.spaceType === spaceType && config.roleType === roleType,
+    config => config.spaceType === spaceType && config.roleType === roleType
   );
 }
 
@@ -27,13 +27,13 @@ export function getRoleConfig(
 export function hasModulePermission(
   userRole: { spaceType: SpaceType; roleType: RoleType },
   module: ModuleType,
-  operation: OperationType,
+  operation: OperationType
 ): boolean {
   const config = getRoleConfig(userRole.spaceType, userRole.roleType);
   if (!config) return false;
 
   const modulePermission = config.modulePermissions.find(
-    (mp) => mp.module === module,
+    mp => mp.module === module
   );
   if (!modulePermission) return false;
   return modulePermission.operations.includes(operation);
@@ -44,13 +44,13 @@ export function hasModulePermission(
  */
 export function getModulePermissions(
   userRole: { spaceType: SpaceType; roleType: RoleType },
-  module: ModuleType,
+  module: ModuleType
 ): OperationType[] {
   const config = getRoleConfig(userRole.spaceType, userRole.roleType);
   if (!config) return [];
 
   const modulePermission = config.modulePermissions.find(
-    (mp) => mp.module === module,
+    mp => mp.module === module
   );
   return modulePermission?.operations || [];
 }
@@ -65,7 +65,7 @@ export function getAccessibleModules(userRole: {
   const config = getRoleConfig(userRole.spaceType, userRole.roleType);
   if (!config) return [];
 
-  return config.modulePermissions.map((mp) => mp.module);
+  return config.modulePermissions.map(mp => mp.module);
 }
 
 /**
@@ -75,13 +75,13 @@ export function checkResourceRestrictions(
   userRole: { spaceType: SpaceType; roleType: RoleType },
   module: ModuleType,
   resourceOwnerId?: string,
-  currentUserId?: string,
+  currentUserId?: string
 ): boolean {
   const config = getRoleConfig(userRole.spaceType, userRole.roleType);
   if (!config) return false;
 
   const modulePermission = config.modulePermissions.find(
-    (mp) => mp.module === module,
+    mp => mp.module === module
   );
   if (!modulePermission?.restrictions) return true;
 

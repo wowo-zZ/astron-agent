@@ -1,10 +1,10 @@
-import { ReactElement, useEffect, useState } from "react";
-import { Modal, Form, message } from "antd";
-import { useLoginStore } from "@/store/login-store";
-import useLogin from "@/hooks/use-login";
-import LoginFormContainer from "./login-form-container";
-import RegisterFormContainer from "./register-form-container";
-import styles from "./index.module.scss";
+import { ReactElement, useEffect, useState } from 'react';
+import { Modal, Form, message } from 'antd';
+import { useLoginStore } from '@/store/login-store';
+import useLogin from '@/hooks/use-login';
+import LoginFormContainer from './login-form-container';
+import RegisterFormContainer from './register-form-container';
+import styles from './index.module.scss';
 
 interface LoginModalProps {
   onLogin?: (_credentials: { username: string; password: string }) => void;
@@ -24,8 +24,8 @@ const LoginModal = ({ onLogin, onCancel }: LoginModalProps): ReactElement => {
       setIsMobile(window.innerWidth < 768);
     };
 
-    window.addEventListener("resize", handleResize);
-    return (): void => window.removeEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
+    return (): void => window.removeEventListener('resize', handleResize);
   }, []);
 
   // 当弹窗显示时重置表单
@@ -34,15 +34,15 @@ const LoginModal = ({ onLogin, onCancel }: LoginModalProps): ReactElement => {
       form.resetFields();
 
       // 检查并添加bd_vid到URL参数
-      const bdVid = sessionStorage.getItem("bd_vid");
+      const bdVid = sessionStorage.getItem('bd_vid');
       if (bdVid) {
         const searchParams: URLSearchParams = new URLSearchParams(
-          window.location.search,
+          window.location.search
         );
-        if (!searchParams.has("bd_vid")) {
-          searchParams.set("bd_vid", bdVid);
+        if (!searchParams.has('bd_vid')) {
+          searchParams.set('bd_vid', bdVid);
           const newUrl = `${window.location.pathname}?${searchParams.toString()}`;
-          window.history.pushState({}, "", newUrl);
+          window.history.pushState({}, '', newUrl);
         }
       }
     }
@@ -66,7 +66,7 @@ const LoginModal = ({ onLogin, onCancel }: LoginModalProps): ReactElement => {
       //   message.error(response.message || '注册失败');
       // }
     } catch (err) {
-      message.error("注册失败，请检查网络连接");
+      message.error('注册失败，请检查网络连接');
     }
   };
 
@@ -101,7 +101,7 @@ const LoginModal = ({ onLogin, onCancel }: LoginModalProps): ReactElement => {
       //   message.error(response.message || '登录失败');
       // }
     } catch (error) {
-      message.error("登录失败，请检查网络连接");
+      message.error('登录失败，请检查网络连接');
     }
   };
 
@@ -126,7 +126,7 @@ const LoginModal = ({ onLogin, onCancel }: LoginModalProps): ReactElement => {
       <div
         className={`
         relative flex
-        ${isMobile ? "justify-center mx-4 mt-3" : "flex-row-reverse"}
+        ${isMobile ? 'justify-center mx-4 mt-3' : 'flex-row-reverse'}
       `}
       >
         {/* 登录/注册表单容器 */}

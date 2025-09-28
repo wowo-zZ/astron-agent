@@ -1,5 +1,5 @@
-import { ReactElement } from "react";
-import { Form, Button, Input, FormInstance, Alert, Spin } from "antd";
+import { ReactElement } from 'react';
+import { Form, Button, Input, FormInstance, Alert, Spin } from 'antd';
 
 interface RegisterFormContainerProps {
   onRegister: (userData: {
@@ -31,7 +31,7 @@ const RegisterFormContainer = ({
       username: values.username,
       password: values.password,
       nickname: values.nickname,
-      avatar: "", // 默认为空，可以后续扩展头像上传功能
+      avatar: '', // 默认为空，可以后续扩展头像上传功能
     };
     await onRegister(userData);
   };
@@ -68,12 +68,12 @@ const RegisterFormContainer = ({
             name="username"
             label="用户名"
             rules={[
-              { required: true, message: "请输入用户名" },
-              { min: 3, message: "用户名至少3个字符" },
-              { max: 20, message: "用户名最多20个字符" },
+              { required: true, message: '请输入用户名' },
+              { min: 3, message: '用户名至少3个字符' },
+              { max: 20, message: '用户名最多20个字符' },
               {
                 pattern: /^[a-zA-Z0-9_]+$/,
-                message: "用户名只能包含字母、数字和下划线",
+                message: '用户名只能包含字母、数字和下划线',
               },
             ]}
           >
@@ -85,9 +85,9 @@ const RegisterFormContainer = ({
             name="nickname"
             label="昵称"
             rules={[
-              { required: true, message: "请输入昵称" },
-              { min: 2, message: "昵称至少2个字符" },
-              { max: 50, message: "昵称最多50个字符" },
+              { required: true, message: '请输入昵称' },
+              { min: 2, message: '昵称至少2个字符' },
+              { max: 50, message: '昵称最多50个字符' },
             ]}
           >
             <Input size="large" placeholder="请输入昵称" />
@@ -98,9 +98,9 @@ const RegisterFormContainer = ({
             name="password"
             label="密码"
             rules={[
-              { required: true, message: "请输入密码" },
-              { min: 6, message: "密码至少6个字符" },
-              { max: 50, message: "密码最多50个字符" },
+              { required: true, message: '请输入密码' },
+              { min: 6, message: '密码至少6个字符' },
+              { max: 50, message: '密码最多50个字符' },
             ]}
           >
             <Input.Password size="large" placeholder="请输入密码" />
@@ -110,19 +110,19 @@ const RegisterFormContainer = ({
           <Form.Item
             name="confirmPassword"
             label="确认密码"
-            dependencies={["password"]}
+            dependencies={['password']}
             rules={[
-              { required: true, message: "请确认密码" },
+              { required: true, message: '请确认密码' },
               ({
                 getFieldValue,
               }): {
                 validator: (_: unknown, value: string) => Promise<void>;
               } => ({
                 validator(_: unknown, value: string): Promise<void> {
-                  if (!value || getFieldValue("password") === value) {
+                  if (!value || getFieldValue('password') === value) {
                     return Promise.resolve();
                   }
-                  return Promise.reject(new Error("两次输入的密码不一致"));
+                  return Promise.reject(new Error('两次输入的密码不一致'));
                 },
               }),
             ]}
@@ -141,7 +141,7 @@ const RegisterFormContainer = ({
               disabled={loading}
               className="h-12 bg-gradient-to-r from-[#275EFF] to-[#C927FF] border-none rounded-lg font-medium text-base hover:opacity-90 transition-opacity"
             >
-              {loading ? "注册中..." : "注册"}
+              {loading ? '注册中...' : '注册'}
             </Button>
           </Form.Item>
         </Form>

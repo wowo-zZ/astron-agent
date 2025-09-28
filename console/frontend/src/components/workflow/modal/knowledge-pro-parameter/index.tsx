@@ -1,32 +1,32 @@
-import React, { useState, useEffect } from "react";
-import { createPortal } from "react-dom";
-import { Slider, Button } from "antd";
-import { useTranslation } from "react-i18next";
-import { FlowInputNumber } from "@/components/workflow/ui";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import { useMemoizedFn } from "ahooks";
-import { cloneDeep } from "lodash";
-import { KnowledgeProRepoConfig } from "@/components/workflow/types";
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { Slider, Button } from 'antd';
+import { useTranslation } from 'react-i18next';
+import { FlowInputNumber } from '@/components/workflow/ui';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import { useMemoizedFn } from 'ahooks';
+import { cloneDeep } from 'lodash';
+import { KnowledgeProRepoConfig } from '@/components/workflow/types';
 
 const KnowledgeProParameter = (): React.ReactElement => {
   const { t } = useTranslation();
 
   const [repoConfig, setRepoConfig] = useState<KnowledgeProRepoConfig>({});
   const knowledgeProParameterModalInfo = useFlowsManager(
-    (state) => state.knowledgeProParameterModalInfo,
+    state => state.knowledgeProParameterModalInfo
   );
   const setKnowledgeProParameterModalInfo = useFlowsManager(
-    (state) => state.setKnowledgeProParameterModalInfo,
+    state => state.setKnowledgeProParameterModalInfo
   );
   const autoSaveCurrentFlow = useFlowsManager(
-    (state) => state.autoSaveCurrentFlow,
+    state => state.autoSaveCurrentFlow
   );
-  const canPublishSetNot = useFlowsManager((state) => state.canPublishSetNot);
-  const currentStore = useFlowsManager((state) => state.getCurrentStore());
-  const setNode = currentStore((state) => state.setNode);
-  const nodes = currentStore((state) => state.nodes);
+  const canPublishSetNot = useFlowsManager(state => state.canPublishSetNot);
+  const currentStore = useFlowsManager(state => state.getCurrentStore());
+  const setNode = currentStore(state => state.setNode);
+  const nodes = currentStore(state => state.nodes);
   const currentNode = nodes.find(
-    (node) => node.id === knowledgeProParameterModalInfo.nodeId,
+    node => node.id === knowledgeProParameterModalInfo.nodeId
   );
 
   useEffect(() => {
@@ -38,7 +38,7 @@ const KnowledgeProParameter = (): React.ReactElement => {
 
   const handleParameterChange = useMemoizedFn((fn: (old: unknown) => void) => {
     autoSaveCurrentFlow();
-    setNode(currentNode?.id, (old) => {
+    setNode(currentNode?.id, old => {
       fn(old);
       return {
         ...cloneDeep(old),
@@ -48,13 +48,13 @@ const KnowledgeProParameter = (): React.ReactElement => {
   });
 
   const handleOk = useMemoizedFn(() => {
-    handleParameterChange((old) => {
+    handleParameterChange(old => {
       old.data.nodeParam.repoTopK = repoConfig?.repoTopK;
       old.data.nodeParam.score = repoConfig?.score;
     });
     setKnowledgeProParameterModalInfo({
       open: false,
-      nodeId: "",
+      nodeId: '',
     });
   });
 
@@ -65,16 +65,16 @@ const KnowledgeProParameter = (): React.ReactElement => {
             <div className="mask">
               <div className="modalContent w-[454px]">
                 <p className="text-second font-medium">
-                  {t("workflow.nodes.knowledgeProNode.parameterModal.topK")}
+                  {t('workflow.nodes.knowledgeProNode.parameterModal.topK')}
                 </p>
                 <p className="text-[#7F7F7F] text-xs mt-1.5">
                   {t(
-                    "workflow.nodes.knowledgeProNode.parameterModal.topKDescription",
+                    'workflow.nodes.knowledgeProNode.parameterModal.topKDescription'
                   )}
                 </p>
                 <p className="text-[#7F7F7F] text-xs mt-5">
                   {t(
-                    "workflow.nodes.knowledgeProNode.parameterModal.topKExample",
+                    'workflow.nodes.knowledgeProNode.parameterModal.topKExample'
                   )}
                 </p>
                 <div className="flex flex-1">
@@ -83,7 +83,7 @@ const KnowledgeProParameter = (): React.ReactElement => {
                     max={5}
                     value={repoConfig.repoTopK}
                     className="flex-1 config-slider"
-                    onChange={(value) =>
+                    onChange={value =>
                       setRepoConfig({
                         ...repoConfig,
                         repoTopK: value,
@@ -96,7 +96,7 @@ const KnowledgeProParameter = (): React.ReactElement => {
                     onChange={(value: number | null) => {
                       setRepoConfig({
                         ...repoConfig,
-                        repoTopK: typeof value === "number" ? value : 3,
+                        repoTopK: typeof value === 'number' ? value : 3,
                       });
                     }}
                     min={1}
@@ -105,11 +105,11 @@ const KnowledgeProParameter = (): React.ReactElement => {
                   />
                 </div>
                 <p className="text-second font-medium mt-2.5">
-                  {t("workflow.promptDebugger.scoreThresholdLabel")}
+                  {t('workflow.promptDebugger.scoreThresholdLabel')}
                 </p>
                 <p className="text-desc mt-1.5">
                   {t(
-                    "workflow.nodes.knowledgeProNode.parameterModal.scoreThresholdDescription",
+                    'workflow.nodes.knowledgeProNode.parameterModal.scoreThresholdDescription'
                   )}
                 </p>
                 <div className="flex flex-1">
@@ -119,7 +119,7 @@ const KnowledgeProParameter = (): React.ReactElement => {
                     step={0.01}
                     value={repoConfig.score}
                     className="flex-1 config-slider"
-                    onChange={(value) =>
+                    onChange={value =>
                       setRepoConfig({
                         ...repoConfig,
                         score: value,
@@ -147,7 +147,7 @@ const KnowledgeProParameter = (): React.ReactElement => {
                     className="px-[48px]"
                     onClick={handleOk}
                   >
-                    {t("common.save")}
+                    {t('common.save')}
                   </Button>
                   <Button
                     type="text"
@@ -155,16 +155,16 @@ const KnowledgeProParameter = (): React.ReactElement => {
                     onClick={() =>
                       setKnowledgeProParameterModalInfo({
                         open: false,
-                        nodeId: "",
+                        nodeId: '',
                       })
                     }
                   >
-                    {t("common.cancel")}
+                    {t('common.cancel')}
                   </Button>
                 </div>
               </div>
             </div>,
-            document.body,
+            document.body
           )
         : null}
     </>

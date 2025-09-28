@@ -1,12 +1,12 @@
-import React, { FC } from "react";
-import { Table, Button } from "antd";
+import React, { FC } from 'react';
+import { Table, Button } from 'antd';
 
-import close from "@/assets/imgs/workflow/modal-close.png";
+import close from '@/assets/imgs/workflow/modal-close.png';
 
-import { InputParamsData } from "@/types/resource";
+import { InputParamsData } from '@/types/resource';
 
-import { useArrayDefault } from "./hooks/use-array-default";
-import { useColumns } from "./hooks/use-columns";
+import { useArrayDefault } from './hooks/use-array-default';
+import { useColumns } from './hooks/use-columns';
 
 const ArrayDefault: FC<{
   setArrayDefaultModal: (value: boolean) => void;
@@ -59,7 +59,7 @@ const ArrayDefault: FC<{
         <div
           className="flex-1 pr-6 overflow-auto"
           style={{
-            maxHeight: "50vh",
+            maxHeight: '50vh',
           }}
         >
           <Table
@@ -71,10 +71,10 @@ const ArrayDefault: FC<{
               expandIcon: customExpandIcon,
               expandedRowKeys,
             }}
-            rowKey={(record) => record?.id}
+            rowKey={record => record?.id}
             locale={{
               emptyText: (
-                <div style={{ padding: "20px" }}>
+                <div style={{ padding: '20px' }}>
                   <p className="text-[#333333]">暂无数据</p>
                 </div>
               ),

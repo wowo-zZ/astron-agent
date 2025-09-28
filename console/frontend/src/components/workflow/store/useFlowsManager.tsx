@@ -1,6 +1,6 @@
-import { create } from "zustand";
-import { FlowType } from "@/components/workflow/types";
-import { FlowsManagerStoreType } from "@/components/workflow/types/zustand/flowsManager";
+import { create } from 'zustand';
+import { FlowType } from '@/components/workflow/types';
+import { FlowsManagerStoreType } from '@/components/workflow/types/zustand/flowsManager';
 import {
   initialStatus,
   addModelParamsToNode,
@@ -19,9 +19,9 @@ import {
   setAgentStrategy,
   setKnowledgeProStrategy,
   setHistorys,
-} from "./flow-manager-function";
-import useFlowStore from "./useFlowStore";
-import useIteratorFlowStore from "./useIteratorFlowStore";
+} from './flow-manager-function';
+import useFlowStore from './useFlowStore';
+import useIteratorFlowStore from './useIteratorFlowStore';
 
 const useFlowsManagerStore = create<FlowsManagerStoreType>((set, get) => ({
   ...initialStatus,
@@ -32,10 +32,10 @@ const useFlowsManagerStore = create<FlowsManagerStoreType>((set, get) => ({
   setHistoryVersionData: (historyVersionData: unknown): void =>
     set({ historyVersionData }),
   setDecisionNodeTransformationModal: (
-    decisionNodeTransformationModal: boolean,
+    decisionNodeTransformationModal: boolean
   ): void => set({ decisionNodeTransformationModal }),
   setChatHistoryTransformationModal: (
-    chatHistoryTransformationModal: boolean,
+    chatHistoryTransformationModal: boolean
   ): void => set({ chatHistoryTransformationModal }),
   setAutonomousMode: (autonomousMode: boolean): void => set({ autonomousMode }),
   setShowAiuiTips: (showAiuiTips: boolean): void => set({ showAiuiTips }),
@@ -61,6 +61,8 @@ const useFlowsManagerStore = create<FlowsManagerStoreType>((set, get) => ({
     set({ toolModalInfo }),
   setFlowModalInfo: (flowModalInfo: { open: boolean }): void =>
     set({ flowModalInfo }),
+  setRpaModalInfo: (rpaModalInfo: { open: boolean }): void =>
+    set({ rpaModalInfo }),
   setKnowledgeDetailModalInfo: (knowledgeDetailModalInfo: {
     open: boolean;
     nodeId: string;
@@ -79,7 +81,7 @@ const useFlowsManagerStore = create<FlowsManagerStoreType>((set, get) => ({
   }): void => set({ clearFlowCanvasModalInfo }),
   setCycleEdges: (change): void => {
     const cycleEdges =
-      typeof change === "function" ? change(get().cycleEdges) : change;
+      typeof change === 'function' ? change(get().cycleEdges) : change;
     set({
       cycleEdges,
     });
@@ -91,7 +93,7 @@ const useFlowsManagerStore = create<FlowsManagerStoreType>((set, get) => ({
     setKnowledgeProStrategy(change, get, set),
   setNodeList: (change): void => {
     const nodeList =
-      typeof change === "function" ? change(get().nodeList) : change;
+      typeof change === 'function' ? change(get().nodeList) : change;
     set({
       nodeList,
     });
@@ -105,7 +107,7 @@ const useFlowsManagerStore = create<FlowsManagerStoreType>((set, get) => ({
   setFlows: (flows: FlowType[]): void => {
     set({
       flows,
-      currentFlow: flows.find((flow) => flow.id == get().currentFlowId),
+      currentFlow: flows.find(flow => flow.id == get().currentFlowId),
     });
   },
   setErrNodes: (errNodes: unknown): void => {
@@ -115,7 +117,7 @@ const useFlowsManagerStore = create<FlowsManagerStoreType>((set, get) => ({
   },
   setCurrentFlow: (change): void => {
     const newChange =
-      typeof change === "function"
+      typeof change === 'function'
         ? change(get().currentFlow as FlowType)
         : change;
     set({
@@ -141,7 +143,7 @@ const useFlowsManagerStore = create<FlowsManagerStoreType>((set, get) => ({
   }): void => set({ selectAgentPromptModalInfo }),
   setDefaultValueModalInfo: (change): void => {
     const defaultValueModalInfo =
-      typeof change === "function"
+      typeof change === 'function'
         ? change(get().defaultValueModalInfo)
         : change;
     set({
@@ -150,7 +152,7 @@ const useFlowsManagerStore = create<FlowsManagerStoreType>((set, get) => ({
   },
   setNodeInfoEditDrawerlInfo: (change): void => {
     const nodeInfoEditDrawerlInfo =
-      typeof change === "function"
+      typeof change === 'function'
         ? change(get().nodeInfoEditDrawerlInfo)
         : change;
     set({
@@ -159,7 +161,7 @@ const useFlowsManagerStore = create<FlowsManagerStoreType>((set, get) => ({
   },
   setPromptOptimizeModalInfo: (change): void => {
     const promptOptimizeModalInfo =
-      typeof change === "function"
+      typeof change === 'function'
         ? change(get().promptOptimizeModalInfo)
         : change;
     set({
@@ -168,14 +170,14 @@ const useFlowsManagerStore = create<FlowsManagerStoreType>((set, get) => ({
   },
   setUpdateNodeInputData: (change): void => {
     const updateNodeInputData =
-      typeof change === "function" ? change(get().updateNodeInputData) : change;
+      typeof change === 'function' ? change(get().updateNodeInputData) : change;
     set({
       updateNodeInputData,
     });
   },
   setOpenOperationResult: (change): void => {
     const openOperationResult =
-      typeof change === "function" ? change(get().openOperationResult) : change;
+      typeof change === 'function' ? change(get().openOperationResult) : change;
     set({
       openOperationResult,
     });

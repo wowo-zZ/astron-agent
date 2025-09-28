@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { listPreviewKnowledgeByPage } from "@/services/knowledge";
-import { modifyChunks } from "@/utils/utils";
-import { Chunk } from "@/types/resource";
+import React, { useState, useEffect } from 'react';
+import { listPreviewKnowledgeByPage } from '@/services/knowledge';
+import { modifyChunks } from '@/utils/utils';
+import { Chunk } from '@/types/resource';
 
 interface UsePaginationProps {
   tag: string;
@@ -16,7 +16,7 @@ interface UsePaginationProps {
  * 分页和滚动相关的 hook
  */
 export const usePagination = (
-  props: UsePaginationProps,
+  props: UsePaginationProps
 ): {
   pageNumber: number;
   hasMore: boolean;
@@ -37,10 +37,10 @@ export const usePagination = (
       pageNo: pageNumber,
       pageSize: 10,
     };
-    listPreviewKnowledgeByPage(params).then((data) => {
+    listPreviewKnowledgeByPage(params).then(data => {
       const newChunks = modifyChunks(data.pageData || []);
-      setChunks((prevItems) => [...prevItems, ...newChunks]);
-      setPageNumber((prevPageNumber) => prevPageNumber + 1);
+      setChunks(prevItems => [...prevItems, ...newChunks]);
+      setPageNumber(prevPageNumber => prevPageNumber + 1);
       loading = false;
       if (total > chunks.length + 10) {
         setHasMore(true);
@@ -76,12 +76,12 @@ export const usePagination = (
   useEffect(() => {
     const element = chunkRef.current;
     if (element) {
-      element.addEventListener("scroll", handleScroll);
+      element.addEventListener('scroll', handleScroll);
     }
 
     return (): void => {
       if (element) {
-        element.removeEventListener("scroll", handleScroll);
+        element.removeEventListener('scroll', handleScroll);
       }
     };
   }, [pageNumber, hasMore, chunks]);

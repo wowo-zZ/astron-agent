@@ -1,11 +1,11 @@
-import React, { useMemo, useCallback, memo } from "react";
-import { Drawer, Form, Button } from "antd";
-import { cloneDeep } from "lodash";
-import { isJSON } from "@/utils";
-import { useMemoizedFn } from "ahooks";
-import { renderType } from "@/components/workflow/utils/reactflowUtils";
-import { useNodeCommon } from "@/components/workflow/hooks/useNodeCommon";
-import { renderParamInput } from "@/components/workflow/nodes/node-common";
+import React, { useMemo, useCallback, memo } from 'react';
+import { Drawer, Form, Button } from 'antd';
+import { cloneDeep } from 'lodash';
+import { isJSON } from '@/utils';
+import { useMemoizedFn } from 'ahooks';
+import { renderType } from '@/components/workflow/utils/reactflowUtils';
+import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import { renderParamInput } from '@/components/workflow/nodes/node-common';
 
 // 类型导入
 import {
@@ -13,10 +13,11 @@ import {
   RefInput,
   UploadFileItem,
   UploadResponse,
-} from "@/components/workflow/types";
+  UseSingleNodeDebuggingReturn,
+} from '@/components/workflow/types';
 
 // 从统一的图标管理中导入
-import { Icons } from "@/components/workflow/icons";
+import { Icons } from '@/components/workflow/icons';
 
 // 获取 Single Node Debugging 模块的图标
 const icons = Icons.singleNodeDebugging;
@@ -26,8 +27,8 @@ const useSingleNodeDebugging = (
   refInputs,
   setRefInputs,
   nodeDebugExect,
-  clearData,
-) => {
+  clearData
+): UseSingleNodeDebuggingReturn => {
   const { currentNode } = useNodeCommon({ id });
 
   const handleRun = useMemoizedFn((): void => {
@@ -35,25 +36,25 @@ const useSingleNodeDebugging = (
     if (debuggerNode.data?.inputs) {
       debuggerNode.data.inputs.forEach((input: unknown) => {
         const currentRefInput = refInputs?.find(
-          (refInput: RefInput) => refInput.id === input.id,
+          (refInput: RefInput) => refInput.id === input.id
         );
         if (currentRefInput) {
-          input.schema.value.type = "literal";
+          input.schema.value.type = 'literal';
           input.schema.type = currentRefInput.type;
-          if (currentRefInput.fileType && currentRefInput.type === "string") {
+          if (currentRefInput.fileType && currentRefInput.type === 'string') {
             input.schema.value.content = (
               currentRefInput.default as UploadFileItem[]
             )?.[0]?.url;
           } else if (
             currentRefInput.fileType &&
-            currentRefInput.type === "array-string"
+            currentRefInput.type === 'array-string'
           ) {
             input.schema.value.content = (
               currentRefInput.default as UploadFileItem[]
             )?.map((item: UploadFileItem) => item?.url);
           } else if (
-            currentRefInput.type === "object" ||
-            currentRefInput.type.includes("array")
+            currentRefInput.type === 'object' ||
+            currentRefInput.type.includes('array')
           ) {
             input.schema.value.content =
               isJSON(currentRefInput.default as string) &&
@@ -65,9 +66,9 @@ const useSingleNodeDebugging = (
       });
       debuggerNode.data.inputs = debuggerNode.data.inputs?.filter(
         (input: unknown) =>
-          (typeof input?.schema?.value?.content === "string" &&
+          (typeof input?.schema?.value?.content === 'string' &&
             input?.schema?.value?.content) ||
-          typeof input?.schema?.value?.content !== "string",
+          typeof input?.schema?.value?.content !== 'string'
       );
     }
     nodeDebugExect(currentNode, debuggerNode);
@@ -78,7 +79,7 @@ const useSingleNodeDebugging = (
     (
       index: number,
       fn: (data: RefInput, value: unknown) => void,
-      value: unknown,
+      value: unknown
     ): void => {
       setRefInputs((old: RefInput[]) => {
         const currentInput = old.find((_: RefInput, i: number) => i === index);
@@ -87,13 +88,13 @@ const useSingleNodeDebugging = (
         }
         return cloneDeep(old);
       });
-    },
+    }
   );
 
   const validateParam = useMemoizedFn(
     (params: RefInput, nodeType?: string): boolean => {
       if (
-        ["plugin", "flow"].includes(String(nodeType || "")) &&
+        ['plugin', 'flow'].includes(String(nodeType || '')) &&
         !params?.required
       ) {
         return true;
@@ -105,27 +106,27 @@ const useSingleNodeDebugging = (
         return (
           (params?.default as UploadFileItem[])?.length > 0 &&
           (params?.default as UploadFileItem[])?.every(
-            (item: UploadFileItem) => !item?.loading,
+            (item: UploadFileItem) => !item?.loading
           )
         );
       }
 
-      if (params.type === "object" || params.type?.includes("array")) {
+      if (params.type === 'object' || params.type?.includes('array')) {
         return isJSON(params?.default as string);
       }
 
-      if (params.type === "string") {
+      if (params.type === 'string') {
         return Boolean((params?.default as string)?.trim());
       }
 
       return true;
-    },
+    }
   );
 
   const canRunDebugger = useMemo((): boolean => {
     return (
       refInputs?.every((params: RefInput) =>
-        validateParam(params, currentNode?.nodeType),
+        validateParam(params, currentNode?.nodeType)
       ) ?? false
     );
   }, [refInputs, currentNode]);
@@ -134,10 +135,10 @@ const useSingleNodeDebugging = (
     (
       event: ProgressEvent<EventTarget>,
       index: number,
-      fileId: string,
+      fileId: string
     ): void => {
       const res: UploadResponse = JSON.parse(
-        (event.currentTarget as XMLHttpRequest).responseText,
+        (event.currentTarget as XMLHttpRequest).responseText
       );
       if (res.code === 0) {
         setRefInputs((oldNodeParams: RefInput[]) => {
@@ -151,7 +152,7 @@ const useSingleNodeDebugging = (
           return cloneDeep(oldNodeParams);
         });
       }
-    },
+    }
   );
 
   const handleFileUpload = useMemoizedFn(
@@ -174,7 +175,7 @@ const useSingleNodeDebugging = (
         ];
       }
       setRefInputs([...refInputs]);
-    },
+    }
   );
 
   const handleDeleteFile = useMemoizedFn(
@@ -188,7 +189,7 @@ const useSingleNodeDebugging = (
         }
         return newParams;
       });
-    },
+    }
   );
   return {
     handleRun,
@@ -228,7 +229,7 @@ function SingleNodeDebugging({
     refInputs,
     setRefInputs,
     nodeDebugExect,
-    clearData,
+    clearData
   );
 
   return (
@@ -241,11 +242,11 @@ function SingleNodeDebugging({
     >
       <div
         className="w-full h-full p-5 pt-8 flex flex-col"
-        onKeyDown={(e) => e.stopPropagation()}
+        onKeyDown={e => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
           <span className="font-semibold text-lg">
-            测试{String(currentNode?.data?.label || "")}节点
+            测试{String(currentNode?.data?.label || '')}节点
           </span>
           <img
             src={icons.close}
@@ -257,12 +258,12 @@ function SingleNodeDebugging({
         <div className="flex-1 mt-4">
           <div className="flex items-center gap-3">
             <img
-              src={String(currentNode?.data?.icon || "")}
+              src={String(currentNode?.data?.icon || '')}
               className="w-5 h-5"
               alt=""
             />
             <span className="text-base font-medium">
-              {String(currentNode?.data?.label || "")}节点
+              {String(currentNode?.data?.label || '')}节点
             </span>
           </div>
           <div className="mt-4 flex flex-col gap-4">

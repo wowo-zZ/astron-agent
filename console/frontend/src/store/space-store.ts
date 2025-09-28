@@ -1,5 +1,5 @@
-import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 export interface SpaceStore {
   isShowSpacePopover: boolean;
@@ -24,14 +24,14 @@ interface SpaceActions {
 
 const useSpaceStore = create<SpaceStore & SpaceActions>()(
   persist(
-    (set) => ({
+    set => ({
       isShowSpacePopover: false,
-      spaceName: "",
-      spaceId: "",
-      enterpriseId: "",
-      enterpriseName: "",
-      spaceType: "personal",
-      spaceAvatar: "",
+      spaceName: '',
+      spaceId: '',
+      enterpriseId: '',
+      enterpriseName: '',
+      spaceType: 'personal',
+      spaceAvatar: '',
       setIsShowSpacePopover: (isShowSpacePopover: boolean): void => {
         set({ isShowSpacePopover });
       },
@@ -58,17 +58,17 @@ const useSpaceStore = create<SpaceStore & SpaceActions>()(
       },
     }),
     {
-      name: "space-storage",
+      name: 'space-storage',
       storage: createJSONStorage(() => sessionStorage), // 关键配置
-      partialize: (state) => ({
+      partialize: state => ({
         spaceId: state.spaceId,
         spaceName: state.spaceName,
-        enterpriseId: `${state.enterpriseId || ""}`,
+        enterpriseId: `${state.enterpriseId || ''}`,
         spaceType: state.spaceType,
         spaceAvatar: state.spaceAvatar,
       }),
-    },
-  ),
+    }
+  )
 );
 
 export default useSpaceStore;

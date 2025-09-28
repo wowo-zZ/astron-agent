@@ -1,10 +1,17 @@
-import { useState, useMemo, useCallback, JSX } from "react";
-import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
-import { Switch, message } from "antd";
+import { useState, useMemo, useCallback, JSX } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { Switch, message } from 'antd';
+import JSEncrypt from 'jsencrypt';
 
-import { DeleteModal, CreateModal } from "./modal-component";
-import { enabledModelAPI } from "@/services/model";
+import { DeleteModal, CreateModal } from './modal-component';
+import {
+  enabledModelAPI,
+  getModelDetail,
+  modelCreate,
+  createOrUpdateLocalModel,
+  modelRsaPublicKey,
+} from '@/services/model';
 import {
   ModelInfo,
   CategoryNode,
@@ -12,13 +19,99 @@ import {
   ShelfStatus,
   LocalModelStatus,
   ModelCreateType,
-} from "@/types/model";
-import { ResponseBusinessError } from "@/types/global";
+} from '@/types/model';
+import { ResponseBusinessError } from '@/types/global';
+import i18next from 'i18next';
+
+// 加密API密钥工具函数
+const encryptApiKey = (publicKey: string, apiKey: string): string => {
+  const encrypt = new JSEncrypt();
+  encrypt.setPublicKey(publicKey);
+  const encrypted = encrypt.encrypt(apiKey);
+  if (!encrypted) {
+    throw new Error('API密钥加密失败');
+  }
+  return encrypted;
+};
+
+// 重新发布模型函数
+const republishModel = async (
+  model: ModelInfo,
+  getModels: () => void
+): Promise<void> => {
+  try {
+    // 获取模型详细信息
+    const modelDetail = await getModelDetail({
+      modelId: model.id,
+      llmSource: model.llmSource,
+    });
+
+    if (model.type === ModelCreateType.LOCAL) {
+      // 本地模型重新发布
+      const localModelParams = {
+        id: model.id,
+        modelName: modelDetail.name,
+        domain: modelDetail.domain,
+        description: modelDetail.desc,
+        icon: modelDetail.icon,
+        color: modelDetail.color || '',
+        acceleratorCount: modelDetail.acceleratorCount || 1,
+        modelPath: modelDetail.domain, // 使用domain作为modelPath
+        modelCategoryReq: {}, // 根据需要构建分类信息
+      };
+
+      await createOrUpdateLocalModel(localModelParams);
+    } else {
+      // 第三方模型重新发布
+      const publicKey = await modelRsaPublicKey();
+      const encryptedApiKey = encryptApiKey(
+        publicKey,
+        modelDetail.apiKey || ''
+      );
+
+      // 解析配置参数
+      let config = [];
+      if (modelDetail.config && typeof modelDetail.config === 'string') {
+        try {
+          config = JSON.parse(modelDetail.config);
+        } catch (e) {
+          console.warn('解析模型配置失败:', e);
+        }
+      }
+
+      const submitParams = {
+        id: model.id,
+        endpoint: modelDetail.url,
+        apiKey: encryptedApiKey,
+        apiKeyMasked: false, // 因为重新发布，不需要掩码
+        modelName: modelDetail.name,
+        description: modelDetail.desc,
+        domain: modelDetail.domain,
+        tag: modelDetail.tag || [],
+        icon: modelDetail.icon,
+        config,
+        modelCategoryReq: {}, // 根据需要构建分类信息
+      };
+
+      await modelCreate(submitParams);
+    }
+
+    message.success(i18next.t('model.republishSuccess'));
+    getModels(); // 刷新模型列表
+  } catch (error) {
+    console.error('重新发布失败:', error);
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : i18next.t('model.republishFailed');
+    message.error(errorMessage);
+  }
+};
 
 function collectNames(nodes: CategoryNode[] = []): string[] {
   const res: string[] = [];
   function dfs(list: CategoryNode[]): void {
-    list.forEach((item) => {
+    list.forEach(item => {
       res.push(item.name);
       if (item.children?.length) {
         dfs(item.children);
@@ -32,35 +125,35 @@ function collectNames(nodes: CategoryNode[] = []): string[] {
 // 检查模型状态
 function checkLocalModelStatus(model: ModelInfo): boolean {
   return [LocalModelStatus.FAILED, LocalModelStatus.PENDING].includes(
-    model.status,
+    model.status
   );
 }
 
 // 获取发布状态样式和文本
-function getPublishStatusInfo(
-  status: LocalModelStatus,
-  t: (key: string) => string,
-): { text: string; className: string } {
+function getPublishStatusInfo(status: LocalModelStatus): {
+  text: string;
+  className: string;
+} {
   switch (status) {
     case LocalModelStatus.RUNNING:
       return {
-        text: t("model.publishRunning"),
-        className: "bg-[#dfffce] text-[#3DC253]",
+        text: i18next.t('model.publishRunning'),
+        className: 'bg-[#dfffce] text-[#3DC253]',
       };
     case LocalModelStatus.PENDING:
       return {
-        text: t("model.publishPending"),
-        className: "bg-[#FFF4E5] text-[#EBA300]",
+        text: i18next.t('model.publishPending'),
+        className: 'bg-[#FFF4E5] text-[#EBA300]',
       };
     case LocalModelStatus.FAILED:
       return {
-        text: t("model.publishFailed"),
-        className: "bg-[#FEEDEC] text-[#F74E43]",
+        text: i18next.t('model.publishFailed'),
+        className: 'bg-[#FEEDEC] text-[#F74E43]',
       };
     default:
       return {
-        text: "",
-        className: "",
+        text: '',
+        className: '',
       };
   }
 }
@@ -88,12 +181,12 @@ function ModelCardHeader({
             style={{
               background: model.color
                 ? model.color
-                : `url(${model.address || ""}${model.icon}) no-repeat center / cover`,
+                : `url(${model.address || ''}${model.icon}) no-repeat center / cover`,
             }}
           >
             {model.color && (
               <img
-                src={`${model.address || ""}${model.icon}`}
+                src={`${model.address || ''}${model.icon}`}
                 className="w-[28px] h-[28px]"
                 alt=""
               />
@@ -108,7 +201,7 @@ function ModelCardHeader({
           <span className="font-semibold text-gray-900">{model.name}</span>
           {model.llmSource === LLMSource.CUSTOM &&
             ((): JSX.Element | null => {
-              const statusInfo = getPublishStatusInfo(model.status, t);
+              const statusInfo = getPublishStatusInfo(model.status);
               return statusInfo.text ? (
                 <span
                   className={`${statusInfo.className} rounded-[12px] px-2 py-1 inline-block text-[12px] text-center ml-2`}
@@ -119,28 +212,28 @@ function ModelCardHeader({
             })()}
           <span
             style={{
-              borderRadius: "12.5px",
-              padding: "2px 8px",
-              color: "#fff",
-              marginLeft: "20px",
+              borderRadius: '12.5px',
+              padding: '2px 8px',
+              color: '#fff',
+              marginLeft: '20px',
               background:
                 model.shelfStatus === ShelfStatus.WAIT_OFF_SHELF
-                  ? "#F74E43"
+                  ? '#F74E43'
                   : model.shelfStatus === ShelfStatus.OFF_SHELF
-                    ? "#7F7F7F"
-                    : "",
+                    ? '#7F7F7F'
+                    : '',
             }}
           >
             {model.shelfStatus === ShelfStatus.WAIT_OFF_SHELF
-              ? t("model.toBeOffShelf")
+              ? t('model.toBeOffShelf')
               : model.shelfStatus === ShelfStatus.OFF_SHELF
-                ? t("model.offShelf")
-                : ""}
+                ? t('model.offShelf')
+                : ''}
           </span>
           <p className="text-sm text-gray-500 flex flex-wrap gap-x-2 gap-2 mt-2">
             {modelCategoryTags
-              .filter((name) => name !== t("model.other"))
-              .map((name) => (
+              .filter(name => name !== t('model.other'))
+              .map(name => (
                 <span
                   key={name}
                   className="px-1.5 py-0.5 text-xs rounded-sm bg-[#E4EAFF] opacity-60 text-[#000000]"
@@ -149,12 +242,12 @@ function ModelCardHeader({
                 </span>
               ))}
             {modelScenarioTags
-              .filter((name) => name !== t("model.other"))
-              .map((name) => (
+              .filter(name => name !== t('model.other'))
+              .map(name => (
                 <span
                   key={name}
                   className="px-1.5 py-0.5 text-xs rounded-sm bg-[#E8E8EA] opacity-60"
-                  style={{ color: "#000000" }}
+                  style={{ color: '#000000' }}
                 >
                   {name}
                 </span>
@@ -166,21 +259,24 @@ function ModelCardHeader({
         <Switch
           size="small"
           checked={enabled}
-          disabled={checkLocalModelStatus(model)}
+          disabled={[
+            LocalModelStatus.FAILED,
+            LocalModelStatus.PENDING,
+          ].includes(model.status)}
           className={
             model.enabled
-              ? "[&_.ant-switch-inner]:bg-[#275EFF]"
-              : "[&_.ant-switch-inner]:bg-gray-400"
+              ? '[&_.ant-switch-inner]:bg-[#275EFF]'
+              : '[&_.ant-switch-inner]:bg-gray-400'
           }
           onChange={(checked, e) => {
             e.stopPropagation();
             setEnabled(checked);
-            enabledModelAPI(model.id, model.llmSource, checked ? "on" : "off")
+            enabledModelAPI(model.id, model.llmSource, checked ? 'on' : 'off')
               .then(() => {
                 message.success(
                   checked
-                    ? t("model.modelEnableSuccess")
-                    : t("model.modelDisableSuccess"),
+                    ? t('model.modelEnableSuccess')
+                    : t('model.modelDisableSuccess')
                 );
                 getModels();
               })
@@ -241,7 +337,7 @@ function ModelCardFooter({
           <div className="relative">
             <button
               className="w-6 h-6 flex items-center justify-center rounded-[4px] font-extrabold text-[20px] text-[#7F7F7F] hover:text-black"
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation();
                 setMenuVisible(!menuVisible);
               }}
@@ -254,48 +350,36 @@ function ModelCardFooter({
                 onMouseLeave={() => setMenuVisible(false)}
               >
                 <button
-                  className={`block w-full text-left px-3 py-1 text-sm ${
-                    model.status === LocalModelStatus.PENDING
-                      ? "text-gray-400 cursor-not-allowed"
-                      : "hover:bg-gray-100"
-                  }`}
-                  disabled={model.status === LocalModelStatus.PENDING}
-                  onClick={(e) => {
-                    if (model.status === LocalModelStatus.PENDING) return;
+                  className={`block w-full text-left px-3 py-1 text-sm hover:bg-gray-100`}
+                  onClick={e => {
                     e.stopPropagation();
                     setModelId(model.id);
                     setCreateModal(true);
                     setMenuVisible(false);
                   }}
                 >
-                  {t("model.editAction")}
+                  {t('model.editAction')}
                 </button>
                 <button
-                  className={`block w-full text-left px-3 py-1 text-sm ${
-                    checkLocalModelStatus(model)
-                      ? "text-gray-400 cursor-not-allowed"
-                      : "hover:bg-gray-100 text-red-600"
-                  }`}
-                  disabled={checkLocalModelStatus(model)}
-                  onClick={(e) => {
+                  className={`block w-full text-left px-3 py-1 text-sm hover:bg-gray-100 text-red-600`}
+                  onClick={e => {
                     e.stopPropagation();
-                    if (checkLocalModelStatus(model)) return;
                     setDeleteModal(true);
                     setMenuVisible(false);
                   }}
                 >
-                  {t("model.deleteAction")}
+                  {t('model.deleteAction')}
                 </button>
                 {model.status === LocalModelStatus.FAILED && (
                   <button
                     className="block w-full text-left px-3 py-1 hover:bg-gray-100 text-sm text-blue-600"
-                    onClick={(e) => {
+                    onClick={e => {
                       e.stopPropagation();
-                      // TODO: 实现重新发布逻辑
                       setMenuVisible(false);
+                      republishModel(model, getModels);
                     }}
                   >
-                    {t("model.republish")}
+                    {t('model.republish')}
                   </button>
                 )}
               </div>
@@ -307,13 +391,13 @@ function ModelCardFooter({
         <CreateModal
           setCreateModal={setCreateModal}
           getModels={getModels}
-          modelId={modelId?.toString() || ""}
+          modelId={modelId?.toString() || ''}
           categoryTree={categoryTree}
         />
       )}
       {deleteModal && (
         <DeleteModal
-          msg={t("model.deleteWarning")}
+          msg={t('model.deleteWarning')}
           setDeleteModal={setDeleteModal}
           currentModel={model}
           getModels={getModels}
@@ -349,9 +433,9 @@ function ModelCard({
   const getTags = useCallback(
     (keys: string[]): string[] => {
       const tags: string[] = [];
-      keys.forEach((key) => {
+      keys.forEach(key => {
         const node = model.categoryTree?.find(
-          (n: CategoryNode) => n.key === key,
+          (n: CategoryNode) => n.key === key
         );
         if (node) {
           tags.push(...collectNames(node.children));
@@ -359,47 +443,49 @@ function ModelCard({
       });
       return tags.filter((v, i, arr) => arr.indexOf(v) === i);
     },
-    [model.categoryTree],
+    [model.categoryTree]
   );
 
   const modelCategoryTags = useMemo(
-    () => getTags(["modelCategory"]),
-    [getTags],
+    () => getTags(['modelCategory']),
+    [getTags]
   );
   const modelScenarioTags = useMemo(
-    () => getTags(["modelScenario"]),
-    [getTags],
+    () => getTags(['modelScenario']),
+    [getTags]
   );
-  const modelProvider = useMemo(() => getTags(["modelProvider"]), [getTags]);
+  const modelProvider = useMemo(() => getTags(['modelProvider']), [getTags]);
   const languageSupport = useMemo(
-    () => getTags(["languageSupport"]),
-    [getTags],
+    () => getTags(['languageSupport']),
+    [getTags]
   );
   const contextLengthTag = useMemo(
-    () => getTags(["contextLengthTag"]),
-    [getTags],
+    () => getTags(['contextLengthTag']),
+    [getTags]
   );
 
   const formatDate = (d: Date): string => {
     const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
     return `${y}-${m}-${day}`;
   };
 
   const bottomTexts = [
+    model.type === ModelCreateType.LOCAL && t('model.localUploadModel'),
+    model.type === ModelCreateType.THIRD_PARTY && t('model.thirdPartyModel'),
     modelProvider?.[0],
-    languageSupport?.[0] && `${t("model.language")}${languageSupport[0]}`,
+    languageSupport?.[0] && `${t('model.language')}${languageSupport[0]}`,
     contextLengthTag?.[0] &&
-      `${t("model.contextLengthLabel")}${contextLengthTag[0]}`,
+      `${t('model.contextLengthLabel')}${contextLengthTag[0]}`,
     model.updateTime &&
-      `${formatDate(new Date(model.updateTime))} ${t("model.updated")}`,
+      `${formatDate(new Date(model.updateTime))} ${t('model.updated')}`,
   ].filter(Boolean);
 
   const handleUse = (): void => {
     navigate(
       `/management/model/detail/${model.id}?llmSource=${model.llmSource}&modelIcon=${model.icon}`,
-      { state: { model, bottomTexts } }, // ← 整个 model 放在 state
+      { state: { model, bottomTexts } }
     );
   };
 

@@ -1,34 +1,42 @@
-import styles from "./index.module.scss";
-import teamIcon from "@/assets/imgs/sidebar/team-avatar.svg";
-import personalIcon from "@/assets/imgs/sidebar/person-avatar.svg";
-import switchArrow from "@/assets/imgs/sidebar/switch.svg";
-import personalCenterIcon from "@/assets/imgs/sidebar/person-center.svg";
-import orderIcon from "@/assets/imgs/trace/orderIcon.svg";
-import feedbackIcon from "@/assets/imgs/sidebar/feedback.svg";
-import logoutIcon from "@/assets/imgs/sidebar/logout.svg";
+import styles from './index.module.scss';
+import teamIcon from '@/assets/imgs/sidebar/team-avatar.svg';
+import personalIcon from '@/assets/imgs/sidebar/person-avatar.svg';
+import switchArrow from '@/assets/imgs/sidebar/switch.svg';
+import personalCenterIcon from '@/assets/imgs/sidebar/person-center.svg';
+import orderIcon from '@/assets/imgs/trace/orderIcon.svg';
+import feedbackIcon from '@/assets/imgs/sidebar/feedback.svg';
+import logoutIcon from '@/assets/imgs/sidebar/logout.svg';
 // import HeaderFeedbackModal from '@/components/header-feedback-modal';
-import spaceChooseIcon from "@/assets/imgs/sidebar/space-choosed.png";
+import spaceChooseIcon from '@/assets/imgs/sidebar/space-choosed.png';
 // import config from '@/config/index';
 // import SSO from '@/lib/sso.min.js';
-import { useState, useMemo, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import classNames from "classnames";
-import { Popover, Tooltip } from "antd";
-import useSpaceStore from "@/store/space-store";
-import useEnterpriseStore from "@/store/enterprise-store";
-import { useSpaceType } from "@/hooks/use-space-type";
-import { useEnterprise } from "@/hooks/use-enterprise";
-import { useTranslation } from "react-i18next";
-import { visitSpace } from "@/services/space";
-import { handleLogout } from "@/utils/auth";
+import { useState, useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import classNames from 'classnames';
+import { Popover, Tooltip } from 'antd';
+import useSpaceStore from '@/store/space-store';
+import useEnterpriseStore from '@/store/enterprise-store';
+import { useSpaceType } from '@/hooks/use-space-type';
+import { useEnterprise } from '@/hooks/use-enterprise';
+import { useTranslation } from 'react-i18next';
+import { visitSpace } from '@/services/space';
+import { handleLogout } from '@/utils/auth';
 
 const spaceRole = {
-  "1": "超级管理者",
-  "2": "管理员",
-  "3": "成员",
+  '1': '超级管理者',
+  '2': '管理员',
+  '3': '成员',
 } as const;
 
-const ControlModal = ({ onClose }: { onClose?: () => void }) => {
+const ControlModal = ({
+  onClose,
+  isPersonCenterOpen,
+  setIsPersonCenterOpen,
+}: {
+  onClose?: () => void;
+  isPersonCenterOpen: boolean;
+  setIsPersonCenterOpen: (visible: boolean) => void;
+}) => {
   const { joinedEnterpriseList, info, setEnterpriseInfo } =
     useEnterpriseStore();
   const [feedbackModalVisible, setFeedbackModalVisible] = useState(false);
@@ -43,24 +51,24 @@ const ControlModal = ({ onClose }: { onClose?: () => void }) => {
 
   // 根据spaceType统一获取当前空间列表和配置
   const spaceConfig = useMemo(() => {
-    const isPersonal = spaceType === "personal";
+    const isPersonal = spaceType === 'personal';
     return {
       icon: isPersonal ? personalIcon : teamIcon,
       displayType: isPersonal
-        ? "个人版"
+        ? '个人版'
         : info?.serviceType === 3
-          ? "定制版"
-          : "团队/企业版",
-      oppositeType: isPersonal ? "团队/企业版" : "个人版",
+          ? '定制版'
+          : '团队/企业版',
+      oppositeType: isPersonal ? '团队/企业版' : '个人版',
       oppositeIcon: isPersonal ? teamIcon : personalIcon,
-      oppositeSpaceType: isPersonal ? "team" : "personal", // 相反的spaceType值
+      oppositeSpaceType: isPersonal ? 'team' : 'personal', // 相反的spaceType值
       chooseSpaceId: isPersonal ? spaceId : enterpriseId,
     };
   }, [spaceType, spaceId, enterpriseId]);
 
   // 统一的空间点击处理函数
   const handleSpaceClick = (item: any) => {
-    setSpaceType("team");
+    setSpaceType('team');
     handleTeamSwitch(item.id);
     onClose?.();
     setEnterpriseInfo({
@@ -72,32 +80,32 @@ const ControlModal = ({ onClose }: { onClose?: () => void }) => {
   };
   const handleTeamChoose = async () => {
     setEnterpriseInfo({
-      id: "",
-      logoUrl: "",
-      avatarUrl: "",
-      name: "",
+      id: '',
+      logoUrl: '',
+      avatarUrl: '',
+      name: '',
       role: 0,
-      roleTypeText: "",
-      officerName: "",
-      orgId: "",
+      roleTypeText: '',
+      officerName: '',
+      orgId: '',
       serviceType: 1,
-      uid: "",
-      createTime: "",
-      updateTime: "",
-      expireTime: "",
+      uid: '',
+      createTime: '',
+      updateTime: '',
+      expireTime: '',
     });
-    await visitEnterprise("");
-    setEnterpriseId("");
+    await visitEnterprise('');
+    setEnterpriseId('');
     setShowSpacePopover(false);
-    setSpaceType("personal");
-    navigate("/space/agent");
+    setSpaceType('personal');
+    navigate('/space/agent');
     getLastVisitSpace();
     onClose?.();
   };
   // 选择空间弹窗内容
   const tempPopover = (
     <div className={styles.choose_content}>
-      {spaceType !== "personal" && (
+      {spaceType !== 'personal' && (
         <div
           className={styles.choose_content_title}
           onClick={() => {
@@ -106,8 +114,8 @@ const ControlModal = ({ onClose }: { onClose?: () => void }) => {
           style={{
             borderBottom:
               joinedEnterpriseList?.length > 1
-                ? "1px solid rgba(226, 232, 255, 0.5)"
-                : "none",
+                ? '1px solid rgba(226, 232, 255, 0.5)'
+                : 'none',
           }}
         >
           <img
@@ -124,13 +132,13 @@ const ControlModal = ({ onClose }: { onClose?: () => void }) => {
       <div
         className={classNames(
           styles.choose_content_list,
-          spaceType === "personal" && styles.choose_content_list_personal,
+          spaceType === 'personal' && styles.choose_content_list_personal
         )}
       >
         {joinedEnterpriseList
           ?.filter(
             (item: any) =>
-              !isTeamSpace() || item.id !== Number(spaceConfig.chooseSpaceId),
+              !isTeamSpace() || item.id !== Number(spaceConfig.chooseSpaceId)
           )
           ?.map((item: any) => (
             <div
@@ -159,7 +167,7 @@ const ControlModal = ({ onClose }: { onClose?: () => void }) => {
                   </div>
                 </div>
                 <div className={styles.text_sub}>
-                  {item.serviceType === 3 ? "定制版" : "团队/企业版"}
+                  {item.serviceType === 3 ? '定制版' : '团队/企业版'}
                 </div>
               </div>
               {/* {item.id === Number(spaceConfig.chooseSpaceId) && (
@@ -176,14 +184,14 @@ const ControlModal = ({ onClose }: { onClose?: () => void }) => {
   );
   //个人中心点击
   const handlePersonalCenter = () => {
-    // setPersonCenterVisible(true);
+    setIsPersonCenterOpen(true);
     onClose?.();
   };
 
   //订单点击
   const handleOrder = () => {
     // navigate('/OrderManagement');
-    navigate("/orderRights");
+    navigate('/orderRights');
     onClose?.();
   };
 
@@ -209,7 +217,7 @@ const ControlModal = ({ onClose }: { onClose?: () => void }) => {
   useEffect(() => {
     if (enterpriseId) {
       const enterprise = joinedEnterpriseList.find(
-        (item) => Number(item.id) === Number(enterpriseId),
+        item => Number(item.id) === Number(enterpriseId)
       );
       setEnterpriseInfo({
         ...enterprise,
@@ -224,18 +232,18 @@ const ControlModal = ({ onClose }: { onClose?: () => void }) => {
       <Popover
         placement="rightTop"
         arrow={false}
-        trigger={joinedEnterpriseList?.length > 0 ? "click" : []}
+        trigger={joinedEnterpriseList?.length > 0 ? 'click' : []}
         content={tempPopover}
         overlayClassName={styles.choose_space_popover_content}
         open={showSpacePopover}
-        onOpenChange={(visible) => {
+        onOpenChange={visible => {
           setShowSpacePopover(visible);
         }}
       >
         <div className={styles.title}>
           <img
             src={
-              spaceType === "personal"
+              spaceType === 'personal'
                 ? personalIcon
                 : info.avatarUrl || spaceConfig.icon
             }
@@ -244,12 +252,12 @@ const ControlModal = ({ onClose }: { onClose?: () => void }) => {
           />
           <div className={styles.title_text}>
             <Tooltip
-              title={spaceType === "personal" ? "" : info.name}
+              title={spaceType === 'personal' ? '' : info.name}
               placement="top"
               overlayClassName="black-tooltip"
             >
               <div className={styles.title_name}>
-                {spaceType === "personal" ? "星辰" : info.name}
+                {spaceType === 'personal' ? '星辰' : info.name}
               </div>
             </Tooltip>
             <div className={styles.title_sub}>{spaceConfig.displayType}</div>
@@ -265,10 +273,10 @@ const ControlModal = ({ onClose }: { onClose?: () => void }) => {
       </Popover>
 
       <div className={styles.content}>
-        {/* <div className={styles.content_item} onClick={handlePersonalCenter}>
+        <div className={styles.content_item} onClick={handlePersonalCenter}>
           <img src={personalCenterIcon} alt="" />
           <div>{t('sidebar.personalCenter')}</div>
-        </div> */}
+        </div>
         {/* <div className={styles.content_item} onClick={handleOrder}>
           <img src={orderIcon} alt="" />
           <div>{t('sidebar.orderManagement')}</div>
@@ -282,7 +290,7 @@ const ControlModal = ({ onClose }: { onClose?: () => void }) => {
           onClick={handleLogout}
         >
           <img src={logoutIcon} alt="" />
-          <div>{t("sidebar.logout")}</div>
+          <div>{t('sidebar.logout')}</div>
         </div>
       </div>
 

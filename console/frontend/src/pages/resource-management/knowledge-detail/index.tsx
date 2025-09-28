@@ -1,20 +1,20 @@
-import React, { useEffect, useState, FC } from "react";
-import { Routes, Route, useLocation, useSearchParams } from "react-router-dom";
-import { getKnowledgeDetail } from "@/services/knowledge";
+import React, { useEffect, useState, FC } from 'react';
+import { Routes, Route, useLocation, useSearchParams } from 'react-router-dom';
+import { getKnowledgeDetail } from '@/services/knowledge';
 
-import KnowledgeHeader from "./components/knowledge-header";
+import KnowledgeHeader from './components/knowledge-header';
 
-import DocumentPage from "./document-page";
-import HitPage from "./hit-page";
-import SettingPage from "./setting-page";
-import SegmentationPage from "./segmentation-page";
-import FilePage from "./file-page";
-import { RepoItem } from "../../../types/resource";
-import { getRouteId } from "@/utils/utils";
+import DocumentPage from './document-page';
+import HitPage from './hit-page';
+import SettingPage from './setting-page';
+import SegmentationPage from './segmentation-page';
+import FilePage from './file-page';
+import { RepoItem } from '../../../types/resource';
+import { getRouteId } from '@/utils/utils';
 
 const KnowledgeDetail: FC = () => {
   const [searchParams] = useSearchParams();
-  const tag = searchParams.get("tag");
+  const tag = searchParams.get('tag');
   const repoId = getRouteId();
   const location = useLocation();
   const pid = location.state?.parentId || -1;
@@ -25,7 +25,7 @@ const KnowledgeDetail: FC = () => {
   }, [location, tag]);
 
   function initData(): void {
-    getKnowledgeDetail(repoId, tag || "").then((data: RepoItem) => {
+    getKnowledgeDetail(repoId, tag || '').then((data: RepoItem) => {
       setKnowledgeInfo(data);
     });
   }
@@ -35,14 +35,14 @@ const KnowledgeDetail: FC = () => {
       <KnowledgeHeader
         repoId={repoId}
         pid={pid}
-        tag={tag || ""}
+        tag={tag || ''}
         knowledgeInfo={knowledgeInfo}
       />
       <div className="flex-1 w-full h-full pb-6 overflow-hidden">
         <Routes>
           <Route
             path="/:id/document"
-            element={<DocumentPage tag={tag || ""} repoId={repoId} pid={pid} />}
+            element={<DocumentPage tag={tag || ''} repoId={repoId} pid={pid} />}
           />
           <Route path="/:id/hit" element={<HitPage repoId={repoId} />} />
           <Route

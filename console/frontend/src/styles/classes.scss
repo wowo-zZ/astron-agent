@@ -102,7 +102,7 @@
       display: none;
       width: 32px;
       height: 32px;
-      background: url('../assets/imgs/main/icon_bot_addabot.png') no-repeat
+      background: url("../assets/imgs/main/icon_bot_addabot.png") no-repeat
         center;
       background-size: cover;
     }
@@ -120,7 +120,7 @@
     .logo {
       width: 48px;
       height: 48px;
-      background: url('../assets/imgs/knowledge/logo_zhishi_blue.svg') no-repeat
+      background: url("../assets/imgs/knowledge/logo_zhishi_blue.svg") no-repeat
         center;
       background-size: cover;
     }
@@ -128,7 +128,7 @@
     .agent-icon {
       width: 48px;
       height: 48px;
-      background: url('../assets/imgs/agent/agent-icon-normal.svg') no-repeat
+      background: url("../assets/imgs/agent/agent-icon-normal.svg") no-repeat
         center;
       background-size: cover;
     }
@@ -136,7 +136,7 @@
     .database-icon {
       width: 48px;
       height: 48px;
-      background: url('../assets/imgs/database/database-icon-normal.svg')
+      background: url("../assets/imgs/database/database-icon-normal.svg")
         no-repeat center;
       background-size: cover;
     }
@@ -144,7 +144,7 @@
     .flow-icon {
       width: 48px;
       height: 48px;
-      background: url('../assets/imgs/workflow/flow-icon-normal.svg') no-repeat
+      background: url("../assets/imgs/workflow/flow-icon-normal.svg") no-repeat
         center;
       background-size: cover;
     }
@@ -170,7 +170,7 @@
     .logo {
       width: 48px;
       height: 48px;
-      background: url('../assets/imgs/knowledge/logo_zhishi_white.svg')
+      background: url("../assets/imgs/knowledge/logo_zhishi_white.svg")
         no-repeat center;
       background-size: cover;
     }
@@ -178,7 +178,7 @@
     .agent-icon {
       width: 48px;
       height: 48px;
-      background: url('../assets/imgs/agent/agent-icon-active.svg') no-repeat
+      background: url("../assets/imgs/agent/agent-icon-active.svg") no-repeat
         center;
       background-size: cover;
     }
@@ -186,7 +186,7 @@
     .database-icon {
       width: 48px;
       height: 48px;
-      background: url('../assets/imgs/database/database-icon-active.svg')
+      background: url("../assets/imgs/database/database-icon-active.svg")
         no-repeat center;
       background-size: cover;
     }
@@ -194,7 +194,7 @@
     .flow-icon {
       width: 48px;
       height: 48px;
-      background: url('../assets/imgs/workflow/flow-icon-active.svg') no-repeat
+      background: url("../assets/imgs/workflow/flow-icon-active.svg") no-repeat
         center;
       background-size: cover;
     }
@@ -239,7 +239,7 @@
       display: none;
       width: 32px;
       height: 32px;
-      background: url('../assets/imgs/main/icon_bot_addabot.png') no-repeat
+      background: url("../assets/imgs/main/icon_bot_addabot.png") no-repeat
         center;
       background-size: cover;
     }
@@ -257,7 +257,7 @@
     .logo {
       width: 48px;
       height: 48px;
-      background: url('../assets/imgs/plugin/logo_gongju_blue.svg') no-repeat
+      background: url("../assets/imgs/plugin/logo_gongju_blue.svg") no-repeat
         center;
       background-size: cover;
     }
@@ -265,7 +265,7 @@
     .model-icon {
       width: 48px;
       height: 48px;
-      background: url('../assets/imgs/modelManage/icon_bot_model_normal.png')
+      background: url("../assets/imgs/modelManage/icon_bot_model_normal.png")
         no-repeat center;
       background-size: cover;
     }
@@ -287,7 +287,7 @@
     .logo {
       width: 48px;
       height: 48px;
-      background: url('../assets/imgs/plugin/logo_gongju_white.svg') no-repeat
+      background: url("../assets/imgs/plugin/logo_gongju_white.svg") no-repeat
         center;
       background-size: cover;
     }
@@ -295,7 +295,7 @@
     .model-icon {
       width: 48px;
       height: 48px;
-      background: url('../assets/imgs/modelManage/icon_bot_model_act.png')
+      background: url("../assets/imgs/modelManage/icon_bot_model_act.png")
         no-repeat center;
       background-size: cover;
     }
@@ -308,6 +308,104 @@
   }
 
   .plugin-no-hover {
+    background: rgba(246, 246, 253, 0.5);
+
+    .color-mask {
+      width: 0px;
+      height: 0px;
+      animation: notCover 0.2s;
+    }
+  }
+  .rpa-card-add-container {
+    min-height: 192px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid #d3dbf8;
+    background: #f2f5fe;
+    border-radius: 18px;
+
+    .rpa-card-add {
+      position: absolute;
+      width: 100%;
+      left: 0;
+      top: 0;
+      z-index: 10;
+      cursor: pointer;
+      padding: 24px 24px 24px 32px;
+      min-height: 192px;
+    }
+
+    .add-icon {
+      display: none;
+      width: 32px;
+      height: 32px;
+      background: url("../assets/imgs/main/icon_bot_addabot.png") no-repeat
+        center;
+      background-size: cover;
+    }
+
+    .color-mask {
+      position: absolute;
+      z-index: 9;
+      right: 0;
+      bottom: 0;
+      border-radius: 50%;
+      background: #275eff;
+      transform: translate(50%, 50%);
+    }
+
+    .logo {
+      width: 48px;
+      height: 48px;
+      background: url("../assets/imgs/rpa/logo_rpa_blue.svg") no-repeat center;
+      background-size: cover;
+    }
+
+    .model-icon {
+      width: 48px;
+      height: 48px;
+      background: url("../assets/imgs/modelManage/icon_bot_model_normal.png")
+        no-repeat center;
+      background-size: cover;
+    }
+  }
+
+  .rpa-hover {
+    .add-icon {
+      display: block;
+    }
+
+    .add-name {
+      color: #ffffff;
+    }
+
+    .add-desc {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .logo {
+      width: 48px;
+      height: 48px;
+      background: url("../assets/imgs/rpa/logo_rpa_white.svg") no-repeat center;
+      background-size: cover;
+    }
+
+    .model-icon {
+      width: 48px;
+      height: 48px;
+      background: url("../assets/imgs/modelManage/icon_bot_model_act.png")
+        no-repeat center;
+      background-size: cover;
+    }
+
+    .color-mask {
+      width: 1200px;
+      height: 1200px;
+      animation: coverContainer 0.5s;
+    }
+  }
+
+  .rpa-no-hover {
     background: rgba(246, 246, 253, 0.5);
 
     .color-mask {
@@ -350,7 +448,7 @@
     .edit-icon {
       width: 16px;
       height: 16px;
-      background: url('../assets/imgs/main/icon_bot_edit_normal.png') no-repeat
+      background: url("../assets/imgs/main/icon_bot_edit_normal.png") no-repeat
         center;
       background-size: cover;
     }
@@ -363,7 +461,7 @@
       font-weight: 500;
 
       .edit-icon {
-        background: url('../assets/imgs/main/icon_bot_edit_act.png') no-repeat
+        background: url("../assets/imgs/main/icon_bot_edit_act.png") no-repeat
           center;
         background-size: cover;
       }
@@ -372,7 +470,7 @@
     .setting-icon {
       width: 16px;
       height: 16px;
-      background: url('../assets/imgs/main/icon_bot_set_normal.png') no-repeat
+      background: url("../assets/imgs/main/icon_bot_set_normal.png") no-repeat
         center;
       background-size: cover;
     }
@@ -380,7 +478,7 @@
     .chat-icon {
       width: 16px;
       height: 16px;
-      background: url('../assets/imgs/main/icon_bot_chat_normal.png') no-repeat
+      background: url("../assets/imgs/main/icon_bot_chat_normal.png") no-repeat
         center;
       background-size: cover;
     }
@@ -388,7 +486,7 @@
     .copy-icon {
       width: 10px;
       height: 12px;
-      background: url('../assets/imgs/main/icon_bot_copy_normal.svg') no-repeat
+      background: url("../assets/imgs/main/icon_bot_copy_normal.svg") no-repeat
         center;
       background-size: cover;
     }
@@ -396,7 +494,7 @@
     .share-icon {
       width: 14px;
       height: 14px;
-      background: url('../assets/imgs/main/icon_bot_share_normal.svg') no-repeat
+      background: url("../assets/imgs/main/icon_bot_share_normal.svg") no-repeat
         center;
       background-size: cover;
     }
@@ -410,7 +508,7 @@
       font-weight: 500;
 
       .chat-icon {
-        background: url('../assets/imgs/main/icon_bot_chat_act.png') no-repeat
+        background: url("../assets/imgs/main/icon_bot_chat_act.png") no-repeat
           center;
         background-size: cover;
       }
@@ -418,7 +516,7 @@
       .copy-icon {
         width: 10px;
         height: 12px;
-        background: url('../assets/imgs/main/icon_bot_copy_act.svg') no-repeat
+        background: url("../assets/imgs/main/icon_bot_copy_act.svg") no-repeat
           center;
         background-size: cover;
       }
@@ -426,7 +524,7 @@
       .share-icon {
         width: 14px;
         height: 14px;
-        background: url('../assets/imgs/main/icon_bot_share_act.svg') no-repeat
+        background: url("../assets/imgs/main/icon_bot_share_act.svg") no-repeat
           center;
         background-size: cover;
       }
@@ -437,7 +535,7 @@
       box-shadow: 0px 10px 20px 0px rgba(0, 18, 70, 0.08);
 
       .setting-act {
-        background: url('../assets/imgs/main/icon_bot_set_act.png') no-repeat;
+        background: url("../assets/imgs/main/icon_bot_set_act.png") no-repeat;
         background-size: cover;
       }
 
@@ -492,7 +590,7 @@
       display: none;
       width: 32px;
       height: 32px;
-      background: url('../assets/imgs/main/icon_bot_addabot.png') no-repeat
+      background: url("../assets/imgs/main/icon_bot_addabot.png") no-repeat
         center;
       background-size: cover;
     }
@@ -509,7 +607,7 @@
     .logo-blue {
       width: 60px;
       height: 42px;
-      background: url('../assets/imgs/main/logo_feiyun_blue.png') no-repeat
+      background: url("../assets/imgs/main/logo_feiyun_blue.png") no-repeat
         center;
       background-size: cover;
     }
@@ -524,7 +622,7 @@
       background: transparent;
 
       .logo-white {
-        background: url('../assets/imgs/main/logo_feiyun_white.png') no-repeat
+        background: url("../assets/imgs/main/logo_feiyun_white.png") no-repeat
           center;
         background-size: cover;
       }
@@ -588,7 +686,7 @@
   .delete-icon {
     width: 16px;
     height: 16px;
-    background: url('../assets/imgs/main/icon_bot_del_normal.png') no-repeat
+    background: url("../assets/imgs/main/icon_bot_del_normal.png") no-repeat
       center;
     background-size: cover;
   }
@@ -601,7 +699,7 @@
       font-weight: 500;
 
       .delete-icon {
-        background: url('../assets/imgs/main/icon_bot_del_act.png') no-repeat
+        background: url("../assets/imgs/main/icon_bot_del_act.png") no-repeat
           center;
         background-size: cover;
       }
@@ -646,7 +744,7 @@
       z-index: 10;
       width: 24px;
       height: 24px;
-      background: url('../assets/imgs/chat/btn_chat_send_unactive.png')
+      background: url("../assets/imgs/chat/btn_chat_send_unactive.png")
         no-repeat center;
       background-size: cover;
     }
@@ -656,7 +754,7 @@
       z-index: 10;
       width: 24px;
       height: 24px;
-      background: url('../assets/imgs/common/magic-fill.png') no-repeat center;
+      background: url("../assets/imgs/common/magic-fill.png") no-repeat center;
       background-size: cover;
     }
 
@@ -665,7 +763,7 @@
       z-index: 10;
       width: 24px;
       height: 24px;
-      background: url('../assets/imgs/chat/btn_chat_mic_normal.png') no-repeat
+      background: url("../assets/imgs/chat/btn_chat_mic_normal.png") no-repeat
         center;
       background-size: cover;
     }
@@ -675,20 +773,20 @@
       z-index: 10;
       width: 24px;
       height: 24px;
-      background: url('../assets/imgs/chat/btn_chat_mic_end.png') no-repeat
+      background: url("../assets/imgs/chat/btn_chat_mic_end.png") no-repeat
         center;
       background-size: cover;
     }
   }
 
   .user-chat-input:focus + .send-btns .send-img {
-    background: url('../assets/imgs/chat/btn_chat_send_active.png') no-repeat
+    background: url("../assets/imgs/chat/btn_chat_send_active.png") no-repeat
       center;
     background-size: cover;
   }
 
   .user-chat-input:focus + .send-btns .ai-chat-img {
-    background: url('../assets/imgs/common/magic-fill-active.png') no-repeat
+    background: url("../assets/imgs/common/magic-fill-active.png") no-repeat
       center;
     background-size: cover;
   }
@@ -714,7 +812,7 @@
     .usermanage-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/sidebar/icon_nav_usersetting1_act@2x.png')
+      background: url("../assets/imgs/sidebar/icon_nav_usersetting1_act@2x.png")
         no-repeat center;
       background-size: cover;
     }
@@ -722,7 +820,7 @@
     .modelmanage-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/sidebar/icon_nav_plugin_normal@2x.png')
+      background: url("../assets/imgs/sidebar/icon_nav_plugin_normal@2x.png")
         no-repeat center;
       background-size: cover;
     }
@@ -730,7 +828,7 @@
     .overview-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/common/icon_bot_setting_preview.png')
+      background: url("../assets/imgs/common/icon_bot_setting_preview.png")
         no-repeat center;
       background-size: cover;
     }
@@ -738,7 +836,7 @@
     .flow-arrange-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/common/icon_flow__arrange_act.png')
+      background: url("../assets/imgs/common/icon_flow__arrange_act.png")
         no-repeat center;
       background-size: cover;
     }
@@ -746,7 +844,7 @@
     .base-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/knowledge/icon_zhishi_setting_act.png')
+      background: url("../assets/imgs/knowledge/icon_zhishi_setting_act.png")
         no-repeat center;
       background-size: cover;
     }
@@ -754,7 +852,7 @@
     .document-setting {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/knowledge/icon_zhishi_setting_act.png')
+      background: url("../assets/imgs/knowledge/icon_zhishi_setting_act.png")
         no-repeat center;
       background-size: cover;
     }
@@ -762,7 +860,7 @@
     .document-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/knowledge/icon_zhishi_file_act.png')
+      background: url("../assets/imgs/knowledge/icon_zhishi_file_act.png")
         no-repeat center;
       background-size: cover;
     }
@@ -770,7 +868,7 @@
     .hit-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/knowledge/icon_zhishi_target_act.png')
+      background: url("../assets/imgs/knowledge/icon_zhishi_target_act.png")
         no-repeat center;
       background-size: cover;
     }
@@ -778,7 +876,7 @@
     .parameter-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/plugin/icon_gongju_adjust_act.png')
+      background: url("../assets/imgs/plugin/icon_gongju_adjust_act.png")
         no-repeat center;
       background-size: cover;
     }
@@ -786,7 +884,7 @@
     .test-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/plugin/icon_gongju_test_act.png')
+      background: url("../assets/imgs/plugin/icon_gongju_test_act.png")
         no-repeat center;
       background-size: cover;
     }
@@ -800,14 +898,14 @@
     .main-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/main/icon_nav_bot.png') no-repeat center;
+      background: url("../assets/imgs/main/icon_nav_bot.png") no-repeat center;
       background-size: cover;
     }
 
     .usermanage-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/sidebar/icon_nav_usersetting_act@2x.png')
+      background: url("../assets/imgs/sidebar/icon_nav_usersetting_act@2x.png")
         no-repeat center;
       background-size: cover;
     }
@@ -815,7 +913,7 @@
     .modelmanage-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/sidebar/icon_nav_model_normal@2x.png')
+      background: url("../assets/imgs/sidebar/icon_nav_model_normal@2x.png")
         no-repeat center;
       background-size: cover;
     }
@@ -823,7 +921,7 @@
     .overview-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/common/icon_bot_setting_preview_normal.png')
+      background: url("../assets/imgs/common/icon_bot_setting_preview_normal.png")
         no-repeat center;
       background-size: cover;
     }
@@ -831,7 +929,7 @@
     .flow-arrange-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/common/icon_flow__arrange.png') no-repeat
+      background: url("../assets/imgs/common/icon_flow__arrange.png") no-repeat
         center;
       background-size: cover;
     }
@@ -839,7 +937,7 @@
     .base-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/knowledge/icon_zhishi_setting.png')
+      background: url("../assets/imgs/knowledge/icon_zhishi_setting.png")
         no-repeat center;
       background-size: cover;
     }
@@ -847,7 +945,7 @@
     .document-setting {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/knowledge/icon_zhishi_setting.png')
+      background: url("../assets/imgs/knowledge/icon_zhishi_setting.png")
         no-repeat center;
       background-size: cover;
     }
@@ -855,7 +953,7 @@
     .document-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/knowledge/icon_zhishi_file.png') no-repeat
+      background: url("../assets/imgs/knowledge/icon_zhishi_file.png") no-repeat
         center;
       background-size: cover;
     }
@@ -863,7 +961,7 @@
     .hit-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/knowledge/icon_zhishi_target.png')
+      background: url("../assets/imgs/knowledge/icon_zhishi_target.png")
         no-repeat center;
       background-size: cover;
     }
@@ -871,7 +969,7 @@
     .parameter-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/plugin/icon_gongju_adjust.png') no-repeat
+      background: url("../assets/imgs/plugin/icon_gongju_adjust.png") no-repeat
         center;
       background-size: cover;
     }
@@ -879,7 +977,7 @@
     .test-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/plugin/icon_gongju_test.png') no-repeat
+      background: url("../assets/imgs/plugin/icon_gongju_test.png") no-repeat
         center;
       background-size: cover;
     }
@@ -892,7 +990,7 @@
     .usermanage-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/sidebar/icon_nav_usersetting1_act@2x.png')
+      background: url("../assets/imgs/sidebar/icon_nav_usersetting1_act@2x.png")
         no-repeat center;
       background-size: cover;
     }
@@ -900,7 +998,7 @@
     .modelmanage-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/sidebar/icon_nav_plugin_normal@2x.png')
+      background: url("../assets/imgs/sidebar/icon_nav_plugin_normal@2x.png")
         no-repeat center;
       background-size: cover;
     }
@@ -908,7 +1006,7 @@
     .overview-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/common/icon_bot_setting_preview.png')
+      background: url("../assets/imgs/common/icon_bot_setting_preview.png")
         no-repeat center;
       background-size: cover;
     }
@@ -916,7 +1014,7 @@
     .flow-arrange-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/common/icon_flow__arrange_act.png')
+      background: url("../assets/imgs/common/icon_flow__arrange_act.png")
         no-repeat center;
       background-size: cover;
     }
@@ -924,7 +1022,7 @@
     .base-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/knowledge/icon_zhishi_setting_act.png')
+      background: url("../assets/imgs/knowledge/icon_zhishi_setting_act.png")
         no-repeat center;
       background-size: cover;
     }
@@ -932,7 +1030,7 @@
     .document-setting {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/knowledge/icon_zhishi_setting_act.png')
+      background: url("../assets/imgs/knowledge/icon_zhishi_setting_act.png")
         no-repeat center;
       background-size: cover;
     }
@@ -940,7 +1038,7 @@
     .document-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/knowledge/icon_zhishi_file_act.png')
+      background: url("../assets/imgs/knowledge/icon_zhishi_file_act.png")
         no-repeat center;
       background-size: cover;
     }
@@ -948,7 +1046,7 @@
     .hit-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/knowledge/icon_zhishi_target_act.png')
+      background: url("../assets/imgs/knowledge/icon_zhishi_target_act.png")
         no-repeat center;
       background-size: cover;
     }
@@ -956,7 +1054,7 @@
     .parameter-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/plugin/icon_gongju_adjust_act.png')
+      background: url("../assets/imgs/plugin/icon_gongju_adjust_act.png")
         no-repeat center;
       background-size: cover;
     }
@@ -964,7 +1062,7 @@
     .test-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/plugin/icon_gongju_test_act.png')
+      background: url("../assets/imgs/plugin/icon_gongju_test_act.png")
         no-repeat center;
       background-size: cover;
     }
@@ -977,28 +1075,35 @@
     .database-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/svgs/nav-database.svg') no-repeat center;
+      background: url("../assets/svgs/nav-database.svg") no-repeat center;
       background-size: cover;
     }
 
     .flow-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/svgs/nav-flow.svg') no-repeat center;
+      background: url("../assets/svgs/nav-flow.svg") no-repeat center;
       background-size: cover;
     }
 
     .knowledge-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/svgs/nav-knowledge.svg') no-repeat center;
+      background: url("../assets/svgs/nav-knowledge.svg") no-repeat center;
       background-size: cover;
     }
 
     .plugin-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/svgs/nav-plugin.svg') no-repeat center;
+      background: url("../assets/svgs/nav-plugin.svg") no-repeat center;
+      background-size: cover;
+    }
+
+    .rpa-icon {
+      width: 18px;
+      height: 18px;
+      background: url("../assets/svgs/nav-rpa.svg") no-repeat center;
       background-size: cover;
     }
 
@@ -1008,28 +1113,35 @@
       .database-icon {
         width: 18px;
         height: 18px;
-        background: url('../assets/svgs/nav-database-act.svg') no-repeat center;
+        background: url("../assets/svgs/nav-database-act.svg") no-repeat center;
         background-size: cover;
       }
 
       .flow-icon {
         width: 18px;
         height: 18px;
-        background: url('../assets/svgs/nav-flow-act.svg') no-repeat center;
+        background: url("../assets/svgs/nav-flow-act.svg") no-repeat center;
         background-size: cover;
       }
 
       .knowledge-icon {
         width: 18px;
         height: 18px;
-        background: url('../assets/svgs/nav-knowledge-act.svg') no-repeat center;
+        background: url("../assets/svgs/nav-knowledge-act.svg") no-repeat center;
         background-size: cover;
       }
 
       .plugin-icon {
         width: 18px;
         height: 18px;
-        background: url('../assets/svgs/nav-plugin-act.svg') no-repeat center;
+        background: url("../assets/svgs/nav-plugin-act.svg") no-repeat center;
+        background-size: cover;
+      }
+
+      .rpa-icon {
+        width: 18px;
+        height: 18px;
+        background: url("../assets/svgs/nav-rpa-act.svg") no-repeat center;
         background-size: cover;
       }
     }
@@ -1041,28 +1153,35 @@
     .database-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/svgs/nav-database-act.svg') no-repeat center;
+      background: url("../assets/svgs/nav-database-act.svg") no-repeat center;
       background-size: cover;
     }
 
     .flow-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/svgs/nav-flow-act.svg') no-repeat center;
+      background: url("../assets/svgs/nav-flow-act.svg") no-repeat center;
       background-size: cover;
     }
 
     .knowledge-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/svgs/nav-knowledge-act.svg') no-repeat center;
+      background: url("../assets/svgs/nav-knowledge-act.svg") no-repeat center;
       background-size: cover;
     }
 
     .plugin-icon {
       width: 18px;
       height: 18px;
-      background: url('../assets/svgs/nav-plugin-act.svg') no-repeat center;
+      background: url("../assets/svgs/nav-plugin-act.svg") no-repeat center;
+      background-size: cover;
+    }
+
+    .rpa-icon {
+      width: 18px;
+      height: 18px;
+      background: url("../assets/svgs/nav-rpa-act.svg") no-repeat center;
       background-size: cover;
     }
   }
@@ -1121,8 +1240,8 @@
   textarea {
     font-size: 14px;
     font-family:
-      'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Hiragino Sans GB',
-      'Heiti SC', 'Microsoft YaHei', 'WenQuanYi Micro Hei', sans-serif !important;
+      "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB",
+      "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif !important;
     font-weight: 500;
     color: var(--second-color) !important;
     background: transparent !important;
@@ -1139,8 +1258,8 @@
     border: 1px solid transparent !important;
     background: #fff !important;
     font-family:
-      'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Hiragino Sans GB',
-      'Heiti SC', 'Microsoft YaHei', 'WenQuanYi Micro Hei', sans-serif !important;
+      "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB",
+      "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif !important;
     color: #111928 !important;
   }
 
@@ -1154,8 +1273,8 @@
     color: #a4a4a4;
     font-size: 12px;
     font-family:
-      'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Hiragino Sans GB',
-      'Heiti SC', 'Microsoft YaHei', 'WenQuanYi Micro Hei', sans-serif;
+      "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB",
+      "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
   }
 
   .global-input:focus,
@@ -1571,7 +1690,7 @@ textarea {
       position: relative;
 
       &::before {
-        content: '';
+        content: "";
         position: absolute;
         left: 0px;
         top: 0px;
@@ -1615,7 +1734,7 @@ textarea {
       word-wrap: break-word;
     }
 
-    a[target='_blank'] {
+    a[target="_blank"] {
       color: #275eff !important;
     }
 
@@ -1651,7 +1770,7 @@ textarea {
     }
 
     .global-markdown-flashing-cursor::after {
-      content: '|';
+      content: "|";
       font-weight: normal;
       font-size: inherit;
       color: black;
@@ -1720,7 +1839,7 @@ textarea {
   position: absolute;
   left: 0;
   top: -60px;
-  background: url('../assets/imgs/home/bg_ggj_up.png') no-repeat center;
+  background: url("../assets/imgs/home/bg_ggj_up.png") no-repeat center;
   background-size: cover;
 }
 
@@ -1731,7 +1850,7 @@ textarea {
   position: absolute;
   left: 0;
   bottom: -60px;
-  background: url('../assets/imgs/home/bg_ggj_down.png') no-repeat center;
+  background: url("../assets/imgs/home/bg_ggj_down.png") no-repeat center;
   background-size: cover;
 }
 
@@ -1742,7 +1861,7 @@ textarea {
   position: absolute;
   left: 34px;
   top: 140px;
-  background: url('../assets/imgs/home/bg_grid_up.png') no-repeat center;
+  background: url("../assets/imgs/home/bg_grid_up.png") no-repeat center;
   background-size: cover;
 }
 
@@ -1753,7 +1872,7 @@ textarea {
   position: absolute;
   left: 34px;
   top: 60px;
-  background: url('../assets/imgs/home/bg_grid_down.png') no-repeat center;
+  background: url("../assets/imgs/home/bg_grid_down.png") no-repeat center;
   background-size: cover;
 }
 
@@ -1870,7 +1989,7 @@ textarea {
     .tool {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/workflow/tool-create-tool-active.png')
+      background: url("../assets/imgs/workflow/tool-create-tool-active.png")
         no-repeat center;
       background-size: cover;
     }
@@ -1878,7 +1997,7 @@ textarea {
     .mcp {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/workflow/tool-create-mcp-active.png')
+      background: url("../assets/imgs/workflow/tool-create-mcp-active.png")
         no-repeat center;
       background-size: cover;
     }
@@ -1886,7 +2005,7 @@ textarea {
     .knowledge {
       width: 14px;
       height: 16px;
-      background: url('../assets/imgs/workflow/tool-knowledge-active.svg')
+      background: url("../assets/imgs/workflow/tool-knowledge-active.svg")
         no-repeat center;
       background-size: cover;
     }
@@ -1895,7 +2014,7 @@ textarea {
   .tool {
     width: 18px;
     height: 18px;
-    background: url('../assets/imgs/workflow/tool-create-tool.png') no-repeat
+    background: url("../assets/imgs/workflow/tool-create-tool.png") no-repeat
       center;
     background-size: cover;
   }
@@ -1903,7 +2022,7 @@ textarea {
   .mcp {
     width: 18px;
     height: 18px;
-    background: url('../assets/imgs/workflow/tool-create-mcp.png') no-repeat
+    background: url("../assets/imgs/workflow/tool-create-mcp.png") no-repeat
       center;
     background-size: cover;
   }
@@ -1911,7 +2030,7 @@ textarea {
   .knowledge {
     width: 14px;
     height: 16px;
-    background: url('../assets/imgs/workflow/tool-knowledge.svg') no-repeat
+    background: url("../assets/imgs/workflow/tool-knowledge.svg") no-repeat
       center;
     background-size: cover;
   }
@@ -1932,7 +2051,7 @@ textarea {
     .offical {
       width: 14px;
       height: 14px;
-      background: url('../assets/imgs/workflow/tool-create-public-active.png')
+      background: url("../assets/imgs/workflow/tool-create-public-active.png")
         no-repeat center;
       background-size: cover;
     }
@@ -1940,7 +2059,7 @@ textarea {
     .person {
       width: 14px;
       height: 14px;
-      background: url('../assets/imgs/workflow/tool-create-person-active.png')
+      background: url("../assets/imgs/workflow/tool-create-person-active.png")
         no-repeat center;
       background-size: cover;
     }
@@ -1948,7 +2067,7 @@ textarea {
     .add-plugin {
       width: 14px;
       height: 14px;
-      background: url('../assets/imgs/common/add-blue.png') no-repeat center;
+      background: url("../assets/imgs/common/add-blue.png") no-repeat center;
       background-size: cover;
     }
   }
@@ -1956,7 +2075,7 @@ textarea {
   .offical {
     width: 14px;
     height: 14px;
-    background: url('../assets/imgs/workflow/tool-create-public.png') no-repeat
+    background: url("../assets/imgs/workflow/tool-create-public.png") no-repeat
       center;
     background-size: cover;
   }
@@ -1964,7 +2083,7 @@ textarea {
   .person {
     width: 14px;
     height: 14px;
-    background: url('../assets/imgs/workflow/tool-create-person.png') no-repeat
+    background: url("../assets/imgs/workflow/tool-create-person.png") no-repeat
       center;
     background-size: cover;
   }
@@ -1972,7 +2091,7 @@ textarea {
   .add-plugin {
     width: 14px;
     height: 14px;
-    background: url('../assets/imgs/common/add-blue.png') no-repeat center;
+    background: url("../assets/imgs/common/add-blue.png") no-repeat center;
     background-size: cover;
   }
 }
@@ -1982,7 +2101,7 @@ textarea {
 }
 
 .botSquare-background {
-  background: url('../assets/imgs/botSquare/bannerBg.png') no-repeat center;
+  background: url("../assets/imgs/botSquare/bannerBg.png") no-repeat center;
   background-size: cover;
 }
 
@@ -1990,7 +2109,7 @@ textarea {
   cursor: pointer;
   width: 16px;
   height: 16px;
-  background: url('../assets/imgs/chat/play_normal.png') no-repeat center;
+  background: url("../assets/imgs/chat/play_normal.png") no-repeat center;
   background-size: cover;
 }
 
@@ -1998,7 +2117,7 @@ textarea {
   cursor: pointer;
   width: 16px;
   height: 16px;
-  background: url('../assets/imgs/chat/play_muted.png') no-repeat center;
+  background: url("../assets/imgs/chat/play_muted.png") no-repeat center;
   background-size: cover;
 }
 
@@ -2010,22 +2129,22 @@ textarea {
 
   @keyframes changeBackground {
     0% {
-      background-image: url('../assets/imgs/chat/play_active1.png');
+      background-image: url("../assets/imgs/chat/play_active1.png");
       background-size: cover;
     }
 
     33% {
-      background-image: url('../assets/imgs/chat/play_active2.png');
+      background-image: url("../assets/imgs/chat/play_active2.png");
       background-size: cover;
     }
 
     66% {
-      background-image: url('../assets/imgs/chat/play_active3.png');
+      background-image: url("../assets/imgs/chat/play_active3.png");
       background-size: cover;
     }
 
     100% {
-      background-image: url('../assets/imgs/chat/play_active1.png');
+      background-image: url("../assets/imgs/chat/play_active1.png");
       background-size: cover;
     }
   }
@@ -2033,13 +2152,13 @@ textarea {
 
 .home-play-normal {
   cursor: pointer;
-  background: url('../assets/imgs/chat/home_play_normal.png') no-repeat center;
+  background: url("../assets/imgs/chat/home_play_normal.png") no-repeat center;
   background-size: cover;
 }
 
 .home-play-muted {
   cursor: pointer;
-  background: url('../assets/imgs/chat/home_play_muted.png') no-repeat center;
+  background: url("../assets/imgs/chat/home_play_muted.png") no-repeat center;
   background-size: cover;
 }
 
@@ -2049,29 +2168,29 @@ textarea {
 
   @keyframes changeHomeBackground {
     0% {
-      background-image: url('../assets/imgs/chat/home_play_active1.png');
+      background-image: url("../assets/imgs/chat/home_play_active1.png");
       background-size: cover;
     }
 
     33% {
-      background-image: url('../assets/imgs/chat/home_play_active2.png');
+      background-image: url("../assets/imgs/chat/home_play_active2.png");
       background-size: cover;
     }
 
     66% {
-      background-image: url('../assets/imgs/chat/home_play_active3.png');
+      background-image: url("../assets/imgs/chat/home_play_active3.png");
       background-size: cover;
     }
 
     100% {
-      background-image: url('../assets/imgs/chat/home_play_active1.png');
+      background-image: url("../assets/imgs/chat/home_play_active1.png");
       background-size: cover;
     }
   }
 }
 
 .flow-tool-modal-left {
-  background: url('../assets/imgs/workflow/tool-modal-left.png') no-repeat
+  background: url("../assets/imgs/workflow/tool-modal-left.png") no-repeat
     center;
   background-size: cover;
 }
@@ -2090,8 +2209,8 @@ textarea {
   }
 
   font-family:
-    'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Hiragino Sans GB',
-    'Heiti SC', 'Microsoft YaHei', 'WenQuanYi Micro Hei', sans-serif !important;
+    "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB",
+    "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif !important;
 }
 
 .dataset-excel-preview {
@@ -2146,13 +2265,13 @@ textarea {
   cursor: pointer;
   width: 28px;
   height: 28px;
-  background: url('../assets/imgs/model/tag_checked.png') no-repeat center;
+  background: url("../assets/imgs/model/tag_checked.png") no-repeat center;
   background-size: cover;
 
   &:hover {
     width: 28px;
     height: 28px;
-    background: url('../assets/imgs/model/tag_checked_active.png') no-repeat
+    background: url("../assets/imgs/model/tag_checked_active.png") no-repeat
       center;
     background-size: cover;
   }
@@ -2163,14 +2282,14 @@ textarea {
     cursor: pointer;
     width: 14px;
     height: 14px;
-    background: url('../assets/imgs/prompt/debugger-copy-icon.svg') no-repeat
+    background: url("../assets/imgs/prompt/debugger-copy-icon.svg") no-repeat
       center;
     background-size: cover;
 
     &:hover {
       width: 14px;
       height: 14px;
-      background: url('../assets/imgs/prompt/debugger-copy-icon-hover.svg')
+      background: url("../assets/imgs/prompt/debugger-copy-icon-hover.svg")
         no-repeat center;
       background-size: cover;
     }
@@ -2180,14 +2299,14 @@ textarea {
     cursor: pointer;
     width: 14px;
     height: 14px;
-    background: url('../assets/imgs/prompt/debugger-detail-icon.svg') no-repeat
+    background: url("../assets/imgs/prompt/debugger-detail-icon.svg") no-repeat
       center;
     background-size: cover;
 
     &:hover {
       width: 14px;
       height: 14px;
-      background: url('../assets/imgs/prompt/debugger-detail-icon-hover.svg')
+      background: url("../assets/imgs/prompt/debugger-detail-icon-hover.svg")
         no-repeat center;
       background-size: cover;
     }
@@ -2197,14 +2316,14 @@ textarea {
     cursor: pointer;
     width: 14px;
     height: 14px;
-    background: url('../assets/imgs/prompt/prompt-chat-refresh.svg') no-repeat
+    background: url("../assets/imgs/prompt/prompt-chat-refresh.svg") no-repeat
       center;
     background-size: cover;
 
     &:hover {
       width: 14px;
       height: 14px;
-      background: url('../assets/imgs/prompt/prompt-chat-refresh-hover.svg')
+      background: url("../assets/imgs/prompt/prompt-chat-refresh-hover.svg")
         no-repeat center;
       background-size: cover;
     }
@@ -2216,14 +2335,14 @@ textarea {
     cursor: pointer;
     width: 18px;
     height: 18px;
-    background: url('../assets/imgs/prompt/copy-benchmark-info.svg') no-repeat
+    background: url("../assets/imgs/prompt/copy-benchmark-info.svg") no-repeat
       center;
     background-size: cover;
 
     &:hover {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/prompt/copy-benchmark-info-hover.svg')
+      background: url("../assets/imgs/prompt/copy-benchmark-info-hover.svg")
         no-repeat center;
       background-size: cover;
     }
@@ -2233,14 +2352,14 @@ textarea {
     cursor: pointer;
     width: 18px;
     height: 18px;
-    background: url('../assets/imgs/prompt/prompt-restore-canvas.svg') no-repeat
+    background: url("../assets/imgs/prompt/prompt-restore-canvas.svg") no-repeat
       center;
     background-size: cover;
 
     &:hover {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/prompt/prompt-restore-canvas-hover.svg')
+      background: url("../assets/imgs/prompt/prompt-restore-canvas-hover.svg")
         no-repeat center;
       background-size: cover;
     }
@@ -2250,14 +2369,14 @@ textarea {
     cursor: pointer;
     width: 18px;
     height: 18px;
-    background: url('../assets/imgs/prompt/prompt-set-benchmark.svg') no-repeat
+    background: url("../assets/imgs/prompt/prompt-set-benchmark.svg") no-repeat
       center;
     background-size: cover;
 
     &:hover {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/prompt/prompt-set-benchmark-hover.svg')
+      background: url("../assets/imgs/prompt/prompt-set-benchmark-hover.svg")
         no-repeat center;
       background-size: cover;
     }
@@ -2267,14 +2386,14 @@ textarea {
     cursor: pointer;
     width: 18px;
     height: 18px;
-    background: url('../assets/imgs/prompt/arrow-up-down-line.svg') no-repeat
+    background: url("../assets/imgs/prompt/arrow-up-down-line.svg") no-repeat
       center;
     background-size: cover;
 
     &:hover {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/prompt/arrow-up-down-line-hover.svg')
+      background: url("../assets/imgs/prompt/arrow-up-down-line-hover.svg")
         no-repeat center;
       background-size: cover;
     }
@@ -2284,14 +2403,14 @@ textarea {
     cursor: pointer;
     width: 18px;
     height: 18px;
-    background: url('../assets/imgs/prompt/model-config-item-delete.svg')
+    background: url("../assets/imgs/prompt/model-config-item-delete.svg")
       no-repeat center;
     background-size: cover;
 
     &:hover {
       width: 18px;
       height: 18px;
-      background: url('../assets/imgs/prompt/model-config-item-delete-hover.svg')
+      background: url("../assets/imgs/prompt/model-config-item-delete-hover.svg")
         no-repeat center;
       background-size: cover;
     }
@@ -2303,14 +2422,14 @@ textarea {
     cursor: pointer;
     width: 16px;
     height: 16px;
-    background: url('../assets/imgs/workflow/comparative-debugging-icon.svg')
+    background: url("../assets/imgs/workflow/comparative-debugging-icon.svg")
       no-repeat center;
     background-size: cover;
 
     &:hover {
       width: 16px;
       height: 16px;
-      background: url('../assets/imgs/workflow/comparative-debugging-icon-hover.svg')
+      background: url("../assets/imgs/workflow/comparative-debugging-icon-hover.svg")
         no-repeat center;
       background-size: cover;
     }
@@ -2320,14 +2439,14 @@ textarea {
     cursor: pointer;
     width: 16px;
     height: 16px;
-    background: url('../assets/imgs/workflow/workflow-export-icon.svg')
+    background: url("../assets/imgs/workflow/workflow-export-icon.svg")
       no-repeat center;
     background-size: cover;
 
     &:hover {
       width: 16px;
       height: 16px;
-      background: url('../assets/imgs/workflow/flow-export-icon-active.svg')
+      background: url("../assets/imgs/workflow/flow-export-icon-active.svg")
         no-repeat center;
       background-size: cover;
     }
@@ -2337,14 +2456,14 @@ textarea {
     cursor: pointer;
     width: 16px;
     height: 16px;
-    background: url('../assets/imgs/workflow/versionManagement-icon.svg')
+    background: url("../assets/imgs/workflow/versionManagement-icon.svg")
       no-repeat center;
     background-size: cover;
 
     &:hover {
       width: 16px;
       height: 16px;
-      background: url('../assets/imgs/workflow/versionManagement-icon-hover.svg')
+      background: url("../assets/imgs/workflow/versionManagement-icon-hover.svg")
         no-repeat center;
       background-size: cover;
     }
@@ -2354,14 +2473,14 @@ textarea {
     cursor: pointer;
     width: 16px;
     height: 16px;
-    background: url('../assets/imgs/workflow/advanced-configuration-icon.svg')
+    background: url("../assets/imgs/workflow/advanced-configuration-icon.svg")
       no-repeat center;
     background-size: cover;
 
     &:hover {
       width: 16px;
       height: 16px;
-      background: url('../assets/imgs/workflow/advanced-configuration-icon-hover.svg')
+      background: url("../assets/imgs/workflow/advanced-configuration-icon-hover.svg")
         no-repeat center;
       background-size: cover;
     }
@@ -2396,7 +2515,6 @@ textarea {
   background: transparent !important;
   border: none !important;
   color: #000000;
-  padding: 24px;
   font-size: 14px;
   box-shadow: none !important;
   font-weight: 400 !important;

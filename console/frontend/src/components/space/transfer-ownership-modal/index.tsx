@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { Modal, Input, Button, Select, message } from "antd";
-import { UserOutlined } from "@ant-design/icons";
-import ButtonGroup from "@/components/button-group/button-group";
-import type { ButtonConfig } from "@/components/button-group/types";
+import React, { useState, useEffect, useMemo } from 'react';
+import { Modal, Input, Button, Select, message } from 'antd';
+import { UserOutlined } from '@ant-design/icons';
+import ButtonGroup from '@/components/button-group/button-group';
+import type { ButtonConfig } from '@/components/button-group/types';
 
-import styles from "./index.module.scss";
+import styles from './index.module.scss';
 
-import { getEnterpriseSpaceMemberList, transferSpace } from "@/services/space";
-import { useSpaceI18n } from "@/pages/space/hooks/use-space-i18n";
+import { getEnterpriseSpaceMemberList, transferSpace } from '@/services/space';
+import { useSpaceI18n } from '@/pages/space/hooks/use-space-i18n';
 
 const { Option } = Select;
 
@@ -42,7 +42,7 @@ const TransferOwnershipModal: React.FC<TransferOwnershipModalProps> = ({
         acc[curr.value] = curr.label;
         return acc;
       },
-      {} as Record<string, string>,
+      {} as Record<string, string>
     );
   }, [memberRoleOptions]);
 
@@ -56,7 +56,7 @@ const TransferOwnershipModal: React.FC<TransferOwnershipModalProps> = ({
     setLoading(true);
     try {
       const res: any = await getEnterpriseSpaceMemberList();
-      console.log(res, "------------ getEnterpriseSpaceMemberList -----------");
+      console.log(res, '------------ getEnterpriseSpaceMemberList -----------');
       const members = (res || []).map((item: any) => {
         const { uid, nickname, role } = item;
         return { id: uid, username: nickname, role };
@@ -75,14 +75,14 @@ const TransferOwnershipModal: React.FC<TransferOwnershipModalProps> = ({
 
   const handleSubmit = async () => {
     if (!selectedMemberId) {
-      message.warning("请选择要转让的成员");
+      message.warning('请选择要转让的成员');
       return;
     }
 
     try {
       const res = await transferSpace({ uid: selectedMemberId });
-      console.log(res, "------------ transferSpace -----------");
-      message.success("转让成功");
+      console.log(res, '------------ transferSpace -----------');
+      message.success('转让成功');
       onSuccess?.();
       handleClose();
     } catch (err: any) {
@@ -91,21 +91,21 @@ const TransferOwnershipModal: React.FC<TransferOwnershipModalProps> = ({
   };
 
   const handleClose = () => {
-    setSelectedMemberId("");
+    setSelectedMemberId('');
     onClose();
   };
 
   const buttons: ButtonConfig[] = [
     {
-      key: "cancel",
-      text: "取消",
-      type: "default",
+      key: 'cancel',
+      text: '取消',
+      type: 'default',
       onClick: () => handleClose(),
     },
     {
-      key: "submit",
-      text: "确认",
-      type: "primary",
+      key: 'submit',
+      text: '确认',
+      type: 'primary',
       onClick: () => handleSubmit(),
       disabled: !selectedMemberId,
     },
@@ -144,7 +144,7 @@ const TransferOwnershipModal: React.FC<TransferOwnershipModalProps> = ({
                 .includes(input.toLowerCase())
             }
           >
-            {memberList.map((member) => (
+            {memberList.map(member => (
               <Option key={member.id} value={member.id}>
                 <div className={styles.memberOption}>
                   <UserOutlined className={styles.memberIcon} />

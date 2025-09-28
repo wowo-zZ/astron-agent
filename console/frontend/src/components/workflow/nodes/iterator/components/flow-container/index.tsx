@@ -1,33 +1,31 @@
-import React, { useEffect, useCallback, useState } from "react";
-import { Background, Panel } from "reactflow";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
+import React, { useEffect, useCallback, useState } from 'react';
+import { Background, Panel } from 'reactflow';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
 
-import fullScreenIcon from "@/assets/imgs/workflow/full-screen-icon.png";
+import fullScreenIcon from '@/assets/imgs/workflow/full-screen-icon.png';
 
 function index(props): React.ReactElement {
   const { id } = props;
 
-  const getCurrentStore = useFlowsManager((state) => state.getCurrentStore);
+  const getCurrentStore = useFlowsManager(state => state.getCurrentStore);
   const currentStore = getCurrentStore();
-  const iteratorId = useFlowsManager((state) => state.iteratorId);
-  const setIteratorId = useFlowsManager((state) => state.setIteratorId);
-  const showIterativeModal = useFlowsManager(
-    (state) => state.showIterativeModal,
-  );
+  const iteratorId = useFlowsManager(state => state.iteratorId);
+  const setIteratorId = useFlowsManager(state => state.setIteratorId);
+  const showIterativeModal = useFlowsManager(state => state.showIterativeModal);
   const setShowIterativeModal = useFlowsManager(
-    (state) => state.setShowIterativeModal,
+    state => state.setShowIterativeModal
   );
-  const setCurrentStore = useFlowsManager((state) => state.setCurrentStore);
+  const setCurrentStore = useFlowsManager(state => state.setCurrentStore);
   const setNodeInfoEditDrawerlInfo = useFlowsManager(
-    (state) => state.setNodeInfoEditDrawerlInfo,
+    state => state.setNodeInfoEditDrawerlInfo
   );
-  const nodes = currentStore((state) => state.nodes);
+  const nodes = currentStore(state => state.nodes);
   const [style, setStyle] = useState({
     width: 0,
     height: 0,
   });
 
-  const getDimensions = useCallback((positions) => {
+  const getDimensions = useCallback(positions => {
     if (!positions.length) return { width: 0, height: 0 };
 
     let minX = positions[0].position.x;
@@ -35,7 +33,7 @@ function index(props): React.ReactElement {
     let minY = positions[0].position.y;
     let maxY = positions[0].position.y;
 
-    positions.forEach((item) => {
+    positions.forEach(item => {
       const { x, y } = item.position;
       if (x < minX) minX = x;
       if (x > maxX) maxX = x;
@@ -50,7 +48,7 @@ function index(props): React.ReactElement {
   }, []);
 
   useEffect(() => {
-    const iterationNodes = nodes?.filter((node) => node?.data?.parentId === id);
+    const iterationNodes = nodes?.filter(node => node?.data?.parentId === id);
     const { width, height } = getDimensions(iterationNodes);
     setStyle({
       width,
@@ -61,7 +59,7 @@ function index(props): React.ReactElement {
   useEffect(() => {
     if (iteratorId === id && !showIterativeModal) {
       const iterationNodes = nodes?.filter(
-        (node) => node?.data?.parentId === iteratorId,
+        node => node?.data?.parentId === iteratorId
       );
       const { width, height } = getDimensions(iterationNodes);
       setStyle({
@@ -82,14 +80,14 @@ function index(props): React.ReactElement {
       <Panel position="top-right">
         <div
           className="w-[28px] h-[28px] rounded-md flex items-center justify-center bg-[#fff] shadow-md cursor-pointer"
-          onClick={(e) => {
+          onClick={e => {
             e.stopPropagation();
             setIteratorId(id);
             setShowIterativeModal(true);
-            setCurrentStore("iterator");
+            setCurrentStore('iterator');
             setNodeInfoEditDrawerlInfo({
               open: false,
-              nodeId: "",
+              nodeId: '',
             });
           }}
         >

@@ -1,5 +1,5 @@
-import { FC } from "react";
-import { Spin } from "antd";
+import { FC } from 'react';
+import { Spin } from 'antd';
 
 const Loading: FC = () => {
   return (

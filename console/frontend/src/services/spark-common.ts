@@ -1,6 +1,6 @@
-import http from "../utils/http";
-import qs from "qs";
-import { Base64 } from "js-base64";
+import http from '../utils/http';
+import qs from 'qs';
+import { Base64 } from 'js-base64';
 
 /**
  * 更新用户个人资料
@@ -10,7 +10,7 @@ import { Base64 } from "js-base64";
 export const uploadUserProfile = (formData: FormData): Promise<any> =>
   http.put(`/user/profile/update`, formData, {
     headers: {
-      "Content-Type": "multipart/form-data",
+      'Content-Type': 'multipart/form-data',
     },
     timeout: 20000,
   });
@@ -44,7 +44,7 @@ export const aiGenerateCover = (params: any): Promise<any> => {
 export const uploadBotImg = (formData: FormData): Promise<any> => {
   return http.post(`/personality/upload`, formData, {
     headers: {
-      "Content-Type": "multipart/form-data",
+      'Content-Type': 'multipart/form-data',
     },
   });
 };
@@ -67,7 +67,7 @@ export const getLoginCaptcha = () => {
 export const getVerifyCode = (params: any) => {
   return http.post(`/login/mobile/send-verify-code`, params, {
     headers: {
-      "Content-Type": "multipart/form-data",
+      'Content-Type': 'multipart/form-data',
     },
   });
 };
@@ -76,7 +76,7 @@ export const getVerifyCode = (params: any) => {
 export const phoneLogin = (params: any) => {
   return http.post(`/login/phone-quick-login`, params, {
     headers: {
-      "Content-Type": "multipart/form-data",
+      'Content-Type': 'multipart/form-data',
     },
   });
 };
@@ -85,10 +85,10 @@ export const phoneLogin = (params: any) => {
 export const passwordlogin = (params: any) => {
   return http({
     url: `/login/check-account`,
-    method: "POST",
+    method: 'POST',
     data: params,
     headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
+      'Content-Type': 'application/x-www-form-urlencoded',
     },
   });
   // return http.post(`/login/check-account`, params);
@@ -96,21 +96,21 @@ export const passwordlogin = (params: any) => {
 
 // 检查用户信息
 export const checkUserInfo = () => {
-  let referOrigin = "";
+  let referOrigin = '';
   try {
     referOrigin = Base64.encode(window.location.href);
   } catch (e) {
-    referOrigin = "";
+    referOrigin = '';
   }
   // register_from
-  const register_from = localStorage.getItem("registerFrom") || "";
+  const register_from = localStorage.getItem('registerFrom') || '';
   return http.get(
-    `/checkUser${register_from ? `?register_from=${register_from}` : ""}`,
+    `/checkUser${register_from ? `?register_from=${register_from}` : ''}`,
     {
       headers: {
         Referorigin: referOrigin,
       },
-    },
+    }
   );
 };
 
@@ -130,8 +130,8 @@ export const getBotDetailInfo = (params: any) => {
 
 export const clearParameter = (params: any) => {
   return http.request({
-    url: "/u/bot/v2/clear-parameter",
-    method: "post",
+    url: '/u/bot/v2/clear-parameter',
+    method: 'post',
     data: params,
   });
 };
@@ -148,8 +148,8 @@ export const cancelLikeAgent = (botId: any) => {
 
 export const errorFeedback = (params: any) => {
   return http.request({
-    url: "/u/bot/v2/errorFeedback",
-    method: "post",
+    url: '/u/bot/v2/errorFeedback',
+    method: 'post',
     data: params,
   });
 };
@@ -162,8 +162,8 @@ export const getStoryKey = (params: any): Promise<any> => {
 //创作中心申请历史
 export const getMyApplyHistory = (params: any) => {
   return http.request({
-    url: "/bot/check-list",
-    method: "POST",
+    url: '/bot/check-list',
+    method: 'POST',
     data: params,
   });
 };
@@ -171,8 +171,8 @@ export const getMyApplyHistory = (params: any) => {
 //助手创作中心获取我创建的助手
 export const getMyCreateBotList = (params: any) => {
   return http.request({
-    url: "/bot/created-list",
-    method: "POST",
+    url: '/bot/created-list',
+    method: 'POST',
     data: params,
   });
 };
@@ -182,7 +182,7 @@ export const removeBotApplyRecord = (params: any) => {
   return http.post(`/bot/remove-bot`, params);
 };
 
-//申请下架助手
+//申请下架助手 -- NOTE: 发布模块原有逻辑, 用新接口后应该删去
 export const applyCancelUpload = (params: any) => {
   return http.post(`/bot/take-off-bot`, params);
 };
@@ -190,8 +190,8 @@ export const applyCancelUpload = (params: any) => {
 //提交助手审核
 export const sendApplyBot = (params: any): Promise<{ botId: number }> => {
   return http.request({
-    url: "/bot/send-approval",
-    method: "POST",
+    url: '/bot/send-approval',
+    method: 'POST',
     data: params,
   });
 };
@@ -204,8 +204,8 @@ export const getBotInfo = (params: any) => {
 //创作中心申请历史
 export const releasedBotWithChannel = (params: any) => {
   return http.request({
-    url: "/bot/releasedBotWithChannel",
-    method: "POST",
+    url: '/bot/releasedBotWithChannel',
+    method: 'POST',
     data: params,
   });
 };
@@ -222,7 +222,7 @@ export const submitBotBaseInfo = (params: any): Promise<any> => {
 };
 
 export const cancelBindWx = (params: any) => {
-  return http.post("/bot/offiaccount/unbind", params);
+  return http.post('/bot/offiaccount/unbind', params);
 };
 
 // 从星辰来的发布
@@ -239,11 +239,16 @@ export const getChainInfo = (params: any): Promise<any> => {
 export const getWechatAuthUrl = (
   botId: any,
   appid: string,
-  redirectUrl: string,
+  redirectUrl: string
 ) => {
   return http.get(
-    `/bot/offiaccount/auth-url/get?botId=${botId}&appid=${appid}&redirectUrl=${redirectUrl}`,
+    `/bot/offiaccount/auth-url/get?botId=${botId}&appid=${appid}&redirectUrl=${redirectUrl}`
   );
+};
+
+// 点击调试前
+export const getInputsType = (params: any) => {
+  return http.post(`/xingchen-api/u/bot/v2/getInputsType`, params);
 };
 
 // mcp发布
@@ -295,7 +300,7 @@ export const getApiHistory = (botId: any, type: number): Promise<any> => {
 // web应用
 // 获取信息
 export const getWebAppInfo = (
-  botId: any,
+  botId: any
 ): Promise<{ url: string; botwebStatus: number }> => {
   return http.get(`/bot/web/info?botId=${botId}`);
 };
@@ -312,9 +317,9 @@ export const getWebAppUsage = (botId: any) => {
 
 // 用量监控chart
 export const getWebAppUsageChart = (
-  type: "message" | "new" | "pv" | "active",
+  type: 'message' | 'new' | 'pv' | 'active',
   botId: any,
-  daytype: number,
+  daytype: number
 ): Promise<any> => {
   return http.get(`/bot/web/usage/${type}?botId=${botId}&type=${daytype}`);
 };
@@ -346,17 +351,17 @@ export const getStarTemplateGroup = (): Promise<any> => {
 
 // 获取知识库信息源
 export const getDataSource = () => {
-  return http.get("/dataset/getDataset");
+  return http.get('/dataset/getDataset');
 };
 
 // 生成输入示例
 export const generateInputExample = (params: any) => {
   return http({
     url: `/bot/generateInputExample`,
-    method: "POST",
+    method: 'POST',
     data: params,
     headers: {
-      "Content-Type": "multipart/form-data",
+      'Content-Type': 'multipart/form-data',
     },
   });
   // return http.post(`/login/check-account`, params);
@@ -388,10 +393,10 @@ export const updateCustomVCN = (params: any): Promise<any> => {
 export const createOnceTrainTask = (params: any): Promise<any> => {
   return http({
     url: `/customVCN/v2/create?sex=${params.sex}&index=${params.sampleIndex}`,
-    method: "POST",
+    method: 'POST',
     data: params.formData,
     headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
+      'Content-Type': 'application/x-www-form-urlencoded',
     },
   });
 };
@@ -409,7 +414,7 @@ export const updateBot = (params: any) => {
 // 知识库
 export const listRepos = () => {
   return http.get(
-    `/repo/list?pageNo=1&pageSize=999&content=&orderBy=create_time`,
+    `/repo/list?pageNo=1&pageSize=999&content=&orderBy=create_time`
   );
 };
 
@@ -432,7 +437,7 @@ export const updateDoneBot = (params: any) => {
 export const promptList = (params: any) => {
   return http({
     url: `/prompt/manage/list`,
-    method: "POST",
+    method: 'POST',
     data: params,
     // headers: {
     //   "Content-Type": "multipart/form-data"
@@ -444,10 +449,10 @@ export const promptList = (params: any) => {
 export const createPrompt = (params: any) => {
   return http({
     url: `/prompt/manage/create`,
-    method: "POST",
+    method: 'POST',
     data: params,
     headers: {
-      "Content-Type": "multipart/form-data",
+      'Content-Type': 'multipart/form-data',
     },
   });
 };
@@ -456,10 +461,10 @@ export const createPrompt = (params: any) => {
 export const deletePrompt = (params: any) => {
   return http({
     url: `/prompt/manage/delete`,
-    method: "POST",
+    method: 'POST',
     data: params,
     headers: {
-      "Content-Type": "multipart/form-data",
+      'Content-Type': 'multipart/form-data',
     },
   });
 };
@@ -470,17 +475,17 @@ export const deletePrompt = (params: any) => {
 //获取分析页数据
 export const getAnalysisData = (params: any) => {
   return http.get(
-    `/dashboard/details?botId=${params.botId}&overviewDays=${params.overviewDays}&channelDays=${params.channelDays}`,
+    `/dashboard/details?botId=${params.botId}&overviewDays=${params.overviewDays}&channelDays=${params.channelDays}`
   );
 };
 // prompt详情
 export const promptDetail = (params: any) => {
   return http({
     url: `/prompt/manage/detail`,
-    method: "POST",
+    method: 'POST',
     data: params,
     headers: {
-      "Content-Type": "multipart/form-data",
+      'Content-Type': 'multipart/form-data',
     },
   });
 };
@@ -499,10 +504,10 @@ export const promptCommit = (params: any) => {
 export const listVersion = (params: any) => {
   return http({
     url: `/prompt/manage/listVersion`,
-    method: "POST",
+    method: 'POST',
     data: params,
     headers: {
-      "Content-Type": "multipart/form-data",
+      'Content-Type': 'multipart/form-data',
     },
   });
 };
@@ -511,10 +516,10 @@ export const listVersion = (params: any) => {
 export const promptBack = (params: any) => {
   return http({
     url: `/prompt/manage/revert`,
-    method: "POST",
+    method: 'POST',
     data: params,
     headers: {
-      "Content-Type": "multipart/form-data",
+      'Content-Type': 'multipart/form-data',
     },
   });
 };
@@ -522,7 +527,7 @@ export const promptBack = (params: any) => {
 /** ## 工作流发布版本列表 */
 export const getVersionList = (params: any) => {
   return http.get(
-    `/workflow/version/list_botId?botId=${params.botId}&size=${params.size}&current=${params.current}`,
+    `/workflow/version/list_botId?botId=${params.botId}&size=${params.size}&current=${params.current}`
   );
 };
 

@@ -1,13 +1,13 @@
-import React, { useEffect } from "react";
-import ReactMarkdown from "react-markdown";
-import rehypeRaw from "rehype-raw";
-import remarkGfm from "remark-gfm";
-import remarkMath from "remark-math";
-import rehypeKatex from "rehype-katex";
-import { v4 as uuid } from "uuid";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { github } from "react-syntax-highlighter/dist/esm/styles/hljs";
-import customFootnotePlugin from "./custom-footnote-plugin";
+import React, { useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import { v4 as uuid } from 'uuid';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { github } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import customFootnotePlugin from './custom-footnote-plugin';
 
 function index({ content, isSending = false }): React.ReactElement {
   const globalMarkdownId = uuid();
@@ -15,19 +15,19 @@ function index({ content, isSending = false }): React.ReactElement {
   function addCursorToLastElement(): void {
     // 清除之前的光标类
     const container = document.getElementById(globalMarkdownId);
-    const mdContainer = container?.querySelector(".global-markdown");
+    const mdContainer = container?.querySelector('.global-markdown');
     const previousCursor = mdContainer?.querySelector(
-      ".global-markdown-flashing-cursor",
+      '.global-markdown-flashing-cursor'
     );
     if (previousCursor) {
-      previousCursor.classList.remove("global-markdown-flashing-cursor");
+      previousCursor.classList.remove('global-markdown-flashing-cursor');
     }
 
     // 获取最后一个子元素
     const lastElement = getLastDeepestChild(mdContainer);
 
     if (lastElement) {
-      lastElement.classList.add("global-markdown-flashing-cursor");
+      lastElement.classList.add('global-markdown-flashing-cursor');
     }
   }
   function getLastDeepestChild(element): unknown {
@@ -43,11 +43,11 @@ function index({ content, isSending = false }): React.ReactElement {
   function clearCursorToLastElement(): void {
     const container = document.getElementById(globalMarkdownId);
     const previousCursor = container?.querySelectorAll(
-      ".global-markdown-flashing-cursor",
+      '.global-markdown-flashing-cursor'
     );
     if (previousCursor) {
       Array.from(previousCursor).forEach(function (element) {
-        element.classList.remove("global-markdown-flashing-cursor");
+        element.classList.remove('global-markdown-flashing-cursor');
       });
     }
   }
@@ -67,7 +67,7 @@ function index({ content, isSending = false }): React.ReactElement {
   );
 
   const ImageRenderer = ({ src, alt }): React.ReactElement => (
-    <img src={src} alt={alt} style={{ maxWidth: "100%" }} />
+    <img src={src} alt={alt} style={{ maxWidth: '100%' }} />
   );
 
   // 作用域化样式函数
@@ -77,28 +77,28 @@ function index({ content, isSending = false }): React.ReactElement {
       /([^{]+)\{([^}]*)\}/g,
       (match, selectors, stylesBlock) => {
         // 处理每个选择器：为每个选择器添加作用域类，但排除@开头的规则（如媒体查询）
-        if (selectors.trim().startsWith("@")) {
+        if (selectors.trim().startsWith('@')) {
           return match; // 媒体查询
         }
 
         const scopedSelectors = selectors
-          .split(",")
-          .map((selector) => {
+          .split(',')
+          .map(selector => {
             const trimmed = selector.trim();
             // 选择器是:root或html/body等，特殊处理
             if (
-              trimmed === ":root" ||
-              trimmed === "html" ||
-              trimmed === "body"
+              trimmed === ':root' ||
+              trimmed === 'html' ||
+              trimmed === 'body'
             ) {
               return `[data-${globalMarkdownId}]`;
             }
             return `.${scopeClass} ${trimmed}`;
           })
-          .join(", ");
+          .join(', ');
 
         return `${scopedSelectors} {${stylesBlock}}`;
-      },
+      }
     );
   };
 
@@ -106,10 +106,10 @@ function index({ content, isSending = false }): React.ReactElement {
     const { children, node, ...rest } = props;
     // 从style标签中获取样式内容
     const styleContent = Array.isArray(children)
-      ? children.join("")
-      : children || "";
+      ? children.join('')
+      : children || '';
     // 添加作用域
-    const scopedStyles = scopeStyles(styleContent, "markdown-body");
+    const scopedStyles = scopeStyles(styleContent, 'markdown-body');
 
     return <style {...rest}>{scopedStyles}</style>;
   };
@@ -135,7 +135,7 @@ function index({ content, isSending = false }): React.ReactElement {
           code(props) {
             const { children, className, node, ...rest } = props;
 
-            const match = /language-(\w+)/.exec(className || "");
+            const match = /language-(\w+)/.exec(className || '');
             return match && children ? (
               <SyntaxHighlighter
                 {...rest}

@@ -1,14 +1,14 @@
-import React, { useMemo } from "react";
-import { Modal, Button, message } from "antd";
-import styles from "./index.module.scss";
-import warningImg from "@/assets/imgs/space/warning.png";
+import React, { useMemo } from 'react';
+import { Modal, Button, message } from 'antd';
+import styles from './index.module.scss';
+import warningImg from '@/assets/imgs/space/warning.png';
 
-import useOrderStore from "@/store/spark-store/order-store";
-import { useSpaceType } from "@/hooks/use-space-type";
-import { useEnterprise } from "@/hooks/use-enterprise";
-import { useNavigate } from "react-router-dom";
+import useOrderStore from '@/store/spark-store/order-store';
+import { useSpaceType } from '@/hooks/use-space-type';
+import { useEnterprise } from '@/hooks/use-enterprise';
+import { useNavigate } from 'react-router-dom';
 
-import { quitEnterprise } from "@/services/enterprise";
+import { quitEnterprise } from '@/services/enterprise';
 
 interface LeaveTeamModalProps {
   open: boolean;
@@ -22,11 +22,11 @@ const LeaveTeamModal: React.FC<LeaveTeamModalProps> = ({
   onConfirm,
 }) => {
   const navigate = useNavigate();
-  const orderType = useOrderStore((state) => state.userOrderType);
+  const orderType = useOrderStore(state => state.userOrderType);
   const { getJoinedEnterpriseList } = useEnterprise();
   const { handleTeamSwitch, switchToPersonal } = useSpaceType(navigate);
   const infoObj = useMemo(() => {
-    const orderTypeText = orderType === "enterprise" ? "企业" : "团队";
+    const orderTypeText = orderType === 'enterprise' ? '企业' : '团队';
     return {
       type: orderTypeText,
       title: `离开${orderTypeText}`,
@@ -42,7 +42,7 @@ const LeaveTeamModal: React.FC<LeaveTeamModalProps> = ({
     try {
       // 执行离开团队操作
       const leaveRes: any = await quitEnterprise();
-      console.log(leaveRes, "----------- leaveRes ------------");
+      console.log(leaveRes, '----------- leaveRes ------------');
 
       message.success(leaveRes);
       onClose();

@@ -1,12 +1,12 @@
-import React, { memo } from "react";
-import { Segmented, Pagination } from "antd";
-import { useTranslation } from "react-i18next";
-import DataBaseTableAdd from "../database-table-add";
-import TestTable from "./test-table";
-import ImportDataModal from "../../database/components/import-data-modal";
-import ActionButtons from "./action-buttons";
-import { useDatabaseState, useTestTableRef } from "../context/database-context";
-import { useDatabaseActions } from "../hooks/use-database-actions";
+import React, { memo } from 'react';
+import { Segmented, Pagination } from 'antd';
+import { useTranslation } from 'react-i18next';
+import DataBaseTableAdd from '../database-table-add';
+import TestTable from './test-table';
+import ImportDataModal from '../../database/components/import-data-modal';
+import ActionButtons from './action-buttons';
+import { useDatabaseState, useTestTableRef } from '../context/database-context';
+import { useDatabaseActions } from '../hooks/use-database-actions';
 
 /**
  * 主内容区组件
@@ -33,24 +33,24 @@ const MainContent: React.FC = () => {
 
   // Tab配置
   const tabOptions = [
-    { value: 1, label: t("database.tableStructure") },
-    { value: 2, label: t("database.testData") },
-    { value: 3, label: t("database.onlineData") },
+    { value: 1, label: t('database.tableStructure') },
+    { value: 2, label: t('database.testData') },
+    { value: 3, label: t('database.onlineData') },
   ];
 
   // 下载工具函数
   const downloadTableData = (res: {
     data?: Blob;
-    headers?: { "content-disposition": string };
+    headers?: { 'content-disposition': string };
   }): void => {
     const generateFileName = (contentDisposition: string): string => {
-      let fileName = "download.xlsx";
-      if (contentDisposition && contentDisposition.includes("filename=")) {
-        const fileNamePart = contentDisposition.split("filename=")[1];
+      let fileName = 'download.xlsx';
+      if (contentDisposition && contentDisposition.includes('filename=')) {
+        const fileNamePart = contentDisposition.split('filename=')[1];
         if (fileNamePart) {
-          const firstPart = fileNamePart.split(";")[0];
+          const firstPart = fileNamePart.split(';')[0];
           if (firstPart) {
-            fileName = firstPart.replace(/['"]/g, "");
+            fileName = firstPart.replace(/['"]/g, '');
             fileName = decodeURIComponent(fileName);
           }
         }
@@ -59,10 +59,10 @@ const MainContent: React.FC = () => {
     };
 
     const url = window.URL.createObjectURL(res?.data || new Blob());
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = url;
     link.download = generateFileName(
-      res?.headers?.["content-disposition"] || "",
+      res?.headers?.['content-disposition'] || ''
     );
     link.click();
     window.URL.revokeObjectURL(url);
@@ -70,7 +70,7 @@ const MainContent: React.FC = () => {
   };
 
   // 事件处理函数
-  const handleAddField = (): void => openModal("addRow");
+  const handleAddField = (): void => openModal('addRow');
 
   const handleBatchDeleteField = async (): Promise<void> => {
     const rows = testTableRef.current?.getSelectRows();
@@ -79,7 +79,7 @@ const MainContent: React.FC = () => {
     }
   };
 
-  const handleImportTableData = (): void => openModal("import");
+  const handleImportTableData = (): void => openModal('import');
 
   const handleExportTableData = async (): Promise<void> => {
     const rowKeys = testTableRef.current?.getSelectRowKeys();
@@ -87,7 +87,7 @@ const MainContent: React.FC = () => {
       currentSheet,
       dataType,
       rowKeys || [],
-      downloadTableData,
+      downloadTableData
     );
   };
 
@@ -119,7 +119,7 @@ const MainContent: React.FC = () => {
       {/* 导入数据弹框 */}
       <ImportDataModal
         visible={importModalOpen}
-        handleCancel={(): void => closeModal("import")}
+        handleCancel={(): void => closeModal('import')}
         onImport={refreshCurrentTableData}
         type={dataType}
         info={currentSheet || undefined}
@@ -149,7 +149,7 @@ const MainContentBody: React.FC = () => {
   if (!currentSheet) {
     return (
       <div className="flex-1 flex items-center justify-center text-[#B2B2B2] text-[14px]">
-        {t("database.noData")}
+        {t('database.noData')}
       </div>
     );
   }
@@ -167,7 +167,7 @@ const MainContentBody: React.FC = () => {
   if (!testDataSource.length) {
     return (
       <div className="flex items-center justify-center flex-1 text-sm text-[#B2B2B2]">
-        {t("database.noData")}
+        {t('database.noData')}
       </div>
     );
   }
@@ -185,7 +185,7 @@ const MainContentBody: React.FC = () => {
       />
       <div className="relative flex items-center justify-center px-6 h-[80px]">
         <div className="text-[#979797] text-sm pt-4 absolute left-0">
-          {t("database.totalDataItems", { total: pagination.total })}
+          {t('database.totalDataItems', { total: pagination.total })}
         </div>
         <Pagination
           className="flow-pagination-template custom-pagination flex-none"

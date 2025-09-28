@@ -380,7 +380,7 @@ public class WorkflowService extends ServiceImpl<WorkflowMapper, Workflow> {
             if (StringUtils.isNotBlank(w.getData())) {
                 vo.setIoInversion(getIoTrans(JSON.parseObject(w.getData(), BizWorkflowData.class).getNodes()));
             }
-            vo.setSourceCode(CommonConst.Platform.COMMON);
+            vo.setSourceCode(String.valueOf(CommonConst.PlatformCode.COMMON));
             vo.setVersion(workflowVersionMap.get(w.getFlowId()));
 
             if (status != null && status != -1) {
@@ -482,7 +482,7 @@ public class WorkflowService extends ServiceImpl<WorkflowMapper, Workflow> {
         org.springframework.beans.BeanUtils.copyProperties(workflow, vo);
         vo.setAddress(s3Util.getS3Prefix());
         vo.setColor(workflow.getAvatarColor());
-        vo.setSourceCode(CommonConst.Platform.COMMON);
+        vo.setSourceCode(String.valueOf(CommonConst.PlatformCode.COMMON));
 
         if (StringUtils.isBlank(workflow.getExt())) {
             UserLangChainInfo userLangChainInfo = userLangChainInfoDao.selectOne(new LambdaQueryWrapper<UserLangChainInfo>().eq(UserLangChainInfo::getFlowId, workflow.getFlowId()));

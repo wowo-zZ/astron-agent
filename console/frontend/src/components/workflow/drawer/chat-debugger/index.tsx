@@ -5,13 +5,13 @@ import React, {
   useState,
   useEffect,
   memo,
-} from "react";
-import { useTranslation } from "react-i18next";
-import { Drawer, Button } from "antd";
-import { cloneDeep } from "lodash";
-import { v4 as uuid } from "uuid";
-import useFlowsManager from "@/components/workflow/store/useFlowsManager";
-import useFlowStore from "@/components/workflow/store/useFlowStore";
+} from 'react';
+import { useTranslation } from 'react-i18next';
+import { Drawer, Button } from 'antd';
+import { cloneDeep } from 'lodash';
+import { v4 as uuid } from 'uuid';
+import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowStore from '@/components/workflow/store/useFlowStore';
 import {
   buildFlowAPI,
   getInputsType,
@@ -20,21 +20,21 @@ import {
   workflowDialogClear,
   addComparisons,
   workflowDeleteComparisons,
-} from "@/services/flow";
-import { nextQuestionAdvice } from "@/services/common";
-import { isJSON } from "@/utils";
+} from '@/services/flow';
+import { nextQuestionAdvice } from '@/services/common';
+import { isJSON } from '@/utils';
 import {
   validateInputJSON,
   generateDefaultInput,
   generateValidationSchema,
   generateInputsAndOutputsOrder,
-} from "@/components/workflow/utils/reactflowUtils";
-import { fetchEventSource } from "@microsoft/fetch-event-source";
-import DeleteChatHistory from "@/components/workflow/modal/delete-chat-history";
-import ChatContent from "./components/chat-content";
-import ChatInput from "./components/chat-input";
+} from '@/components/workflow/utils/reactflowUtils';
+import { fetchEventSource } from '@microsoft/fetch-event-source';
+import DeleteChatHistory from '@/components/workflow/modal/delete-chat-history';
+import ChatContent from './components/chat-content';
+import ChatInput from './components/chat-input';
 // import useChat from '@/hooks/useChat';
-import { getPublicResult } from "@/services/common";
+import { getPublicResult } from '@/services/common';
 
 // 类型导入
 import {
@@ -49,19 +49,19 @@ import {
   WebSocketMessageData,
   ReactFlowNode,
   ReactFlowEdge,
-} from "@/components/workflow/types";
+} from '@/components/workflow/types';
 
 // 从统一的图标管理中导入
-import { Icons } from "@/components/workflow/icons";
+import { Icons } from '@/components/workflow/icons';
 
 // 获取 Chat Debugger 模块的图标
 const icons = Icons.chatDebugger;
 
 const initInterruptChat: InterruptChatType = {
-  eventId: "",
+  eventId: '',
   interrupt: false,
-  nodeId: "",
-  type: "",
+  nodeId: '',
+  type: '',
   option: null,
   needReply: true,
 };
@@ -69,11 +69,11 @@ const initInterruptChat: InterruptChatType = {
 const initChatInfo: ChatInfoType = {
   question: [],
   answer: {
-    messageContent: "",
-    reasoningContent: "",
-    content: "",
+    messageContent: '',
+    reasoningContent: '',
+    content: '',
   },
-  answerItem: "",
+  answerItem: '',
   option: null,
 };
 
@@ -82,43 +82,40 @@ export function ChatDebuggerContent({
   setOpen,
 }: ChatDebuggerContentProps): React.ReactElement {
   const { t } = useTranslation();
-  const versionId = useRef<string>("");
-  // const { handleFlowToChat } = useChat();
+  const versionId = useRef<string>('');
   const buildPassRef = useRef<boolean>(false);
   const textareRef = useRef<HTMLTextAreaElement>(null);
-  const chatIdRef = useRef<string>(uuid().replace(/-/g, ""));
-  const currentFollowNodeId = useRef<string>("");
+  const chatIdRef = useRef<string>(uuid().replace(/-/g, ''));
+  const currentFollowNodeId = useRef<string>('');
   const controllerRef = useRef<AbortController | null>(null);
   const isMounted = useRef<boolean>(false);
   const wsMessageStatus = useRef<string | null>(null);
-  const messageNodeTextQueue = useRef<string>("");
-  const endNodeReasoningTextQueue = useRef<string>("");
-  const endNodeTextQueue = useRef<string>("");
+  const messageNodeTextQueue = useRef<string>('');
+  const endNodeReasoningTextQueue = useRef<string>('');
+  const endNodeTextQueue = useRef<string>('');
   const preRunningNodeIds = useRef<string[]>([]);
   const chatInfoRef = useRef<ChatInfoType>(cloneDeep(initChatInfo));
-  const flowResult = useFlowsManager((state) => state.flowResult);
-  const errNodes = useFlowsManager((state) => state.errNodes);
-  const currentFlow = useFlowsManager((state) => state.currentFlow) as
+  const flowResult = useFlowsManager(state => state.flowResult);
+  const errNodes = useFlowsManager(state => state.errNodes);
+  const currentFlow = useFlowsManager(state => state.currentFlow) as
     | FlowType
     | undefined;
-  const currentStore = useFlowsManager((state) => state.getCurrentStore());
-  const setFlowResult = useFlowsManager((state) => state.setFlowResult);
-  const setCanPublish = useFlowsManager((state) => state.setCanPublish);
-  const autonomousMode = useFlowsManager((state) => state.autonomousMode);
-  const setShowNodeList = useFlowsManager((state) => state.setShowNodeList);
+  const currentStore = useFlowsManager(state => state.getCurrentStore());
+  const setFlowResult = useFlowsManager(state => state.setFlowResult);
+  const setCanPublish = useFlowsManager(state => state.setCanPublish);
+  const autonomousMode = useFlowsManager(state => state.autonomousMode);
+  const setShowNodeList = useFlowsManager(state => state.setShowNodeList);
   const setCanvasesDisabled = useFlowsManager(
-    (state) => state.setCanvasesDisabled,
+    state => state.setCanvasesDisabled
   );
-  const historyVersion = useFlowsManager((state) => state.historyVersion);
-  const historyVersionData = useFlowsManager(
-    (state) => state.historyVersionData,
-  );
-  const nodes = useFlowStore((state) => state.nodes);
-  const edges = useFlowStore((state) => state.edges);
-  const moveToPosition = currentStore((state) => state.moveToPosition);
-  const setNode = useFlowStore((state) => state.setNode);
-  const setNodes = useFlowStore((state) => state.setNodes);
-  const setEdges = useFlowStore((state) => state.setEdges);
+  const historyVersion = useFlowsManager(state => state.historyVersion);
+  const historyVersionData = useFlowsManager(state => state.historyVersionData);
+  const nodes = useFlowStore(state => state.nodes);
+  const edges = useFlowStore(state => state.edges);
+  const moveToPosition = currentStore(state => state.moveToPosition);
+  const setNode = useFlowStore(state => state.setNode);
+  const setNodes = useFlowStore(state => state.setNodes);
+  const setEdges = useFlowStore(state => state.setEdges);
   const [startNodeParams, setStartNodeParams] = useState<StartNodeType[]>([]);
   const [chatList, setChatList] = useState<ChatListItem[]>([]);
   const [debuggering, setDebuggering] = useState<boolean>(false);
@@ -136,22 +133,22 @@ export function ChatDebuggerContent({
     if (!flowResult?.status) {
       controllerRef?.current?.abort();
       handleWorkflowDeleteComparisons();
-      wsMessageStatus.current = "end";
+      wsMessageStatus.current = 'end';
       setInterruptChat({ ...initInterruptChat });
 
-      setNodes((old) => {
-        old.forEach((node) => (node.data.status = ""));
+      setNodes(old => {
+        old.forEach(node => (node.data.status = ''));
         return cloneDeep(old);
       });
-      setEdges((edges) =>
-        edges?.map((edge) => ({
+      setEdges(edges =>
+        edges?.map(edge => ({
           ...edge,
           animated: false,
           style: {
-            stroke: "#275EFF",
+            stroke: '#275EFF',
             strokeWidth: 2,
           },
-        })),
+        }))
       );
     }
   }, [flowResult?.status, currentFlow?.flowId]);
@@ -178,28 +175,28 @@ export function ChatDebuggerContent({
       getDialogueAPI(id, 1).then((data: unknown[]) => {
         const chatList: ChatListItem[] = [];
         let chatId = data?.[0]?.chatId || null;
-        data?.forEach((chat) => {
+        data?.forEach(chat => {
           const currentChatId = chat?.chatId;
           if (currentChatId !== chatId) {
             chatList.unshift({
               id: uuid(),
-              type: "divider",
+              type: 'divider',
             });
           }
 
           chatList.unshift({
             ...chat,
             id: chat?.id,
-            type: "answer",
-            messageContent: JSON.parse(chat?.answer)?.messageContent || "",
-            reasoningContent: JSON.parse(chat?.answer)?.reasoningContent || "",
-            content: JSON.parse(chat?.answer)?.content || "",
+            type: 'answer',
+            messageContent: JSON.parse(chat?.answer)?.messageContent || '',
+            reasoningContent: JSON.parse(chat?.answer)?.reasoningContent || '',
+            content: JSON.parse(chat?.answer)?.content || '',
             option: JSON.parse(chat?.answer)?.option,
           });
           chatList.unshift({
             ...chat,
             id: uuid(),
-            type: "ask",
+            type: 'ask',
             inputs: JSON.parse(chat?.question),
           });
           chatId = currentChatId;
@@ -207,13 +204,13 @@ export function ChatDebuggerContent({
         if (shouldAddDivider && data.length !== 0) {
           chatList.push({
             id: uuid(),
-            type: "divider",
+            type: 'divider',
           });
         }
         setChatList(chatList);
       });
     },
-    [],
+    []
   );
 
   useEffect(() => {
@@ -225,10 +222,10 @@ export function ChatDebuggerContent({
       controllerRef?.current?.abort();
       handleWorkflowDeleteComparisons();
     };
-    window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener('beforeunload', handleBeforeUnload);
     return (): void => {
       clearNodeStatus();
-      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
       handleWorkflowDeleteComparisons();
       controllerRef?.current?.abort();
     };
@@ -251,21 +248,21 @@ export function ChatDebuggerContent({
       const yPos = currentNode?.position?.y || 0;
       moveToPosition({ x: -xPos * zoom + 200, y: -yPos * zoom + 200, zoom });
     },
-    [moveToPosition],
+    [moveToPosition]
   );
 
   const startNode = useMemo(() => {
-    return nodes?.find((node: ReactFlowNode) => node.nodeType === "node-start");
+    return nodes?.find((node: ReactFlowNode) => node.nodeType === 'node-start');
   }, [nodes]);
 
   useEffect(() => {
     open &&
       setStartNodeParams(
-        startNode?.data?.outputs?.map((input) => {
+        startNode?.data?.outputs?.map(input => {
           const errorMsg =
-            input?.schema?.type === "object"
-              ? validateInputJSON("{}", generateValidationSchema(input))
-              : "";
+            input?.schema?.type === 'object'
+              ? validateInputJSON('{}', generateValidationSchema(input))
+              : '';
           const allowedFileType = input?.allowedFileType?.[0];
           return {
             name: input.name,
@@ -274,22 +271,22 @@ export function ChatDebuggerContent({
             fileType: input?.fileType,
             default: allowedFileType
               ? []
-              : input?.schema?.type === "object"
-                ? "{}"
-                : input?.schema?.type.includes("array")
-                  ? "[]"
+              : input?.schema?.type === 'object'
+                ? '{}'
+                : input?.schema?.type.includes('array')
+                  ? '[]'
                   : generateDefaultInput(input?.schema?.type),
             description: input?.schema?.default,
             required: input?.required,
             validationSchema:
-              input?.schema?.type === "object" ||
-              (input?.schema?.type.includes("array") && !input?.fileType)
+              input?.schema?.type === 'object' ||
+              (input?.schema?.type.includes('array') && !input?.fileType)
                 ? generateValidationSchema(input)
                 : null,
             errorMsg: errorMsg,
             originErrorMsg: errorMsg,
           };
-        }) || [],
+        }) || []
       );
   }, [startNode, open]);
 
@@ -299,11 +296,11 @@ export function ChatDebuggerContent({
 
   const pushAskToChatList = useCallback(
     (inputs, nodes, nodeId): void => {
-      setChatList((chatList) => {
+      setChatList(chatList => {
         const newInputs = inputs || cloneDeep(startNodeParams);
         const askParams: ChatListItem = {
           id: uuid(),
-          type: "ask",
+          type: 'ask',
           inputs: newInputs,
         };
         chatInfoRef.current.question = newInputs;
@@ -312,17 +309,17 @@ export function ChatDebuggerContent({
       });
       handleMoveToPosition(nodeId, nodes);
     },
-    [startNodeParams, setChatList],
+    [startNodeParams, setChatList]
   );
 
   const pushAnswerToChatList = useCallback(() => {
-    setChatList((chatList) => {
+    setChatList(chatList => {
       const answerParams: ChatListItem = {
         id: uuid(),
-        type: "answer",
-        messageContent: "",
-        content: "",
-        reasoningContent: "",
+        type: 'answer',
+        messageContent: '',
+        content: '',
+        reasoningContent: '',
       };
       chatList.push(answerParams);
       return [...chatList];
@@ -332,34 +329,34 @@ export function ChatDebuggerContent({
   const pushContentToAnswer = useCallback(
     (key, content): void => {
       const queue =
-        key === "messageContent"
+        key === 'messageContent'
           ? messageNodeTextQueue
-          : key === "reasoningContent"
+          : key === 'reasoningContent'
             ? endNodeReasoningTextQueue
             : endNodeTextQueue;
       queue.current = queue.current + content;
     },
-    [chatList, setChatList],
+    [chatList, setChatList]
   );
 
   const clearNodeStatus = useCallback(() => {
     chatInfoRef.current = cloneDeep(initChatInfo);
     if (textareRef.current) {
-      textareRef.current.value = "";
+      textareRef.current.value = '';
     }
     //@ts-ignore
-    setStartNodeParams((startNodeParams) =>
-      startNodeParams?.map((input) => ({
+    setStartNodeParams(startNodeParams =>
+      startNodeParams?.map(input => ({
         ...input,
         errorMsg: input?.originErrorMsg,
         default: input?.fileType
           ? []
-          : input?.type === "object"
-            ? "{}"
-            : input?.type?.includes("array")
-              ? "[]"
+          : input?.type === 'object'
+            ? '{}'
+            : input?.type?.includes('array')
+              ? '[]'
               : generateDefaultInput(input?.type),
-      })),
+      }))
     );
   }, [setStartNodeParams]);
 
@@ -375,14 +372,14 @@ export function ChatDebuggerContent({
       answer: JSON.stringify(chatInfoRef?.current?.answer),
     };
     saveDialogueAPI(params).then(
-      () => currentFlow?.id && getDialogues(currentFlow.id),
+      () => currentFlow?.id && getDialogues(currentFlow.id)
     );
   }, [currentFlow, nodes, edges]);
 
   const handleSynchronizeDataToXfyun = useCallback(() => {
     const botId = isJSON(currentFlow?.ext)
       ? JSON.parse(currentFlow?.ext)?.botId
-      : "";
+      : '';
     const params = {
       botId,
     };
@@ -392,146 +389,146 @@ export function ChatDebuggerContent({
   const handleMessageEnd = useCallback(
     (data: WebSocketMessageData) => {
       const flowResult: FlowResultType = {
-        status: data.code === 0 ? "success" : "failed",
+        status: data.code === 0 ? 'success' : 'failed',
         timeCost: (data?.executedTime || 0).toString(),
-        totalTokens: (data?.usage?.["total_tokens"] || 0).toString(),
+        totalTokens: (data?.usage?.['total_tokens'] || 0).toString(),
       };
-      wsMessageStatus.current = "end";
+      wsMessageStatus.current = 'end';
       setShowNodeList(true);
       setFlowResult(flowResult);
-      setEdges((edges) =>
-        edges?.map((edge) => ({
+      setEdges(edges =>
+        edges?.map(edge => ({
           ...edge,
           animated: false,
           style: {
-            stroke: "#275EFF",
+            stroke: '#275EFF',
             strokeWidth: 2,
           },
-        })),
+        }))
       );
       !historyVersion && setCanvasesDisabled(false);
       setInterruptChat({ ...initInterruptChat });
       handleRunningNodeStatus();
     },
-    [startNodeParams, setDebuggering, autonomousMode, nodes, edges],
+    [startNodeParams, setDebuggering, autonomousMode, nodes, edges]
   );
 
   const handleMessage = useCallback(
     (nodes: ReactFlowNode[], edges: ReactFlowEdge[], e: MessageEvent) => {
       if (e.data && isJSON(e.data)) {
         const data: WebSocketMessageData = JSON.parse(e.data);
-        const flowResult = data.choices?.[0]?.["finish_reason"];
-        const node = data?.["workflow_step"]?.node;
+        const flowResult = data.choices?.[0]?.['finish_reason'];
+        const node = data?.['workflow_step']?.node;
         const nodeId = node?.id;
-        const nodeStatus = node?.["finish_reason"];
+        const nodeStatus = node?.['finish_reason'];
         const content = data.choices?.[0]?.delta?.content;
         const responseResult = {
-          timeCost: node?.["executed_time"],
-          tokenCost: node?.usage?.["total_tokens"],
+          timeCost: node?.['executed_time'],
+          tokenCost: node?.usage?.['total_tokens'],
           inputs: node?.inputs,
           outputs: node?.outputs,
-          errorOutputs: node?.["error_outputs"],
-          rawOutput: node?.ext?.["raw_output"],
+          errorOutputs: node?.['error_outputs'],
+          rawOutput: node?.ext?.['raw_output'],
           nodeAnswerContent: content,
           reasoningContent:
-            data?.choices?.[0]?.delta?.["reasoning_content"] || "",
-          status: data?.code === 0 ? "success" : "failed",
+            data?.choices?.[0]?.delta?.['reasoning_content'] || '',
+          status: data?.code === 0 ? 'success' : 'failed',
           failedReason: data?.message,
-          answerMode: node?.id?.startsWith("message")
+          answerMode: node?.id?.startsWith('message')
             ? 1
-            : node?.ext?.["answer_mode"],
+            : node?.ext?.['answer_mode'],
         };
         chatInfoRef.current.sid = data?.id;
         if (data?.code === 21103) {
           //审核不通过
-          messageNodeTextQueue.current = "";
-          endNodeReasoningTextQueue.current = "";
-          endNodeTextQueue.current = "";
-          setChatList((chatList) => {
+          messageNodeTextQueue.current = '';
+          endNodeReasoningTextQueue.current = '';
+          endNodeTextQueue.current = '';
+          setChatList(chatList => {
             chatInfoRef.current.answer = {
-              messageContent: "",
-              reasoningContent: "",
+              messageContent: '',
+              reasoningContent: '',
               content: data?.message,
             };
-            chatList[chatList.length - 1].messageContent = "";
-            chatList[chatList.length - 1].reasoningContent = "";
+            chatList[chatList.length - 1].messageContent = '';
+            chatList[chatList.length - 1].reasoningContent = '';
             chatList[chatList.length - 1].content = data?.message;
             return [...chatList];
           });
           handleMessageEnd(data);
-        } else if (flowResult === null && nodeId !== "flow_obj") {
+        } else if (flowResult === null && nodeId !== 'flow_obj') {
           handleNodeStatusChange(
             nodes,
             edges,
             nodeId,
-            nodeStatus === null ? "ing" : nodeStatus,
-            responseResult,
+            nodeStatus === null ? 'ing' : nodeStatus,
+            responseResult
           );
-        } else if (flowResult === "interrupt") {
-          const content = data?.["event_data"]?.value?.content;
+        } else if (flowResult === 'interrupt') {
+          const content = data?.['event_data']?.value?.content;
           handleNodeStatusChange(
             nodes,
             edges,
             nodeId,
             nodeStatus,
-            responseResult,
+            responseResult
           );
-          pushContentToAnswer("content", content);
-          wsMessageStatus.current = "end";
+          pushContentToAnswer('content', content);
+          wsMessageStatus.current = 'end';
           setInterruptChat({
             interrupt: true,
-            eventId: data?.["event_data"]?.event_id || "",
-            nodeId: nodeId || "",
+            eventId: data?.['event_data']?.event_id || '',
+            nodeId: nodeId || '',
             option:
-              data?.["event_data"]?.value?.option?.filter(
-                (item) => item.id !== "default",
+              data?.['event_data']?.value?.option?.filter(
+                item => item.id !== 'default'
               ) || null,
-            type: data?.["event_data"]?.value?.type || "",
-            needReply: data?.["event_data"]?.need_reply || false,
+            type: data?.['event_data']?.value?.type || '',
+            needReply: data?.['event_data']?.need_reply || false,
           });
           chatInfoRef.current.answer.option = data?.[
-            "event_data"
-          ]?.value?.option?.filter((item) => item.id !== "default");
-        } else if (flowResult === "stop") {
+            'event_data'
+          ]?.value?.option?.filter(item => item.id !== 'default');
+        } else if (flowResult === 'stop') {
           if (data.code !== 0) {
-            pushContentToAnswer("content", data?.message);
+            pushContentToAnswer('content', data?.message);
           }
           handleMessageEnd(data);
         }
       }
     },
-    [startNodeParams, setDebuggering, autonomousMode],
+    [startNodeParams, setDebuggering, autonomousMode]
   );
 
   const handleResumeChat = useCallback(
     (content): void => {
-      wsMessageStatus.current = "start";
+      wsMessageStatus.current = 'start';
       setDebuggering(true);
       pushAskToChatList(
         [
           {
-            name: "AGENT_USER_INPUT",
-            type: "string",
+            name: 'AGENT_USER_INPUT',
+            type: 'string',
             default:
-              content || t("workflow.nodes.chatDebugger.userIgnoredQuestion"),
-            description: t("workflow.nodes.chatDebugger.userCurrentRoundInput"),
+              content || t('workflow.nodes.chatDebugger.userIgnoredQuestion'),
+            description: t('workflow.nodes.chatDebugger.userCurrentRoundInput'),
             required: true,
             validationSchema: null,
-            errorMsg: "",
-            originErrorMsg: "",
+            errorMsg: '',
+            originErrorMsg: '',
           },
         ],
         nodes,
-        interruptChat?.nodeId,
+        interruptChat?.nodeId
       );
       pushAnswerToChatList();
       clearNodeStatus();
-      const url = "http://172.29.201.92:8080/workflow/resume";
-      const latestAccessToken = localStorage.getItem("accessToken");
+      const url = 'http://172.29.201.92:8080/workflow/resume';
+      const latestAccessToken = localStorage.getItem('accessToken');
       const params = {
         flow_id: currentFlow?.flowId,
         eventId: interruptChat?.eventId,
-        eventType: content ? "resume" : "ignore",
+        eventType: content ? 'resume' : 'ignore',
         content,
       };
       if (versionId.current) {
@@ -539,10 +536,10 @@ export function ChatDebuggerContent({
         params.promptDebugger = true;
       }
       fetchEventSource(url, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + latestAccessToken,
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + latestAccessToken,
         },
         body: JSON.stringify(params),
         signal: controllerRef?.current?.signal,
@@ -555,7 +552,7 @@ export function ChatDebuggerContent({
         },
       });
     },
-    [nodes, interruptChat],
+    [nodes, interruptChat]
   );
 
   const handleRunDebugger = useCallback(
@@ -568,7 +565,7 @@ export function ChatDebuggerContent({
         nextQuestionAdvice({
           question: inputs?.[0]?.default || startNodeParams?.[0]?.default,
         })
-          .then((data) => {
+          .then(data => {
             setSuggestProblem(() => data);
           })
           .finally(() => setSuggestLoading(false));
@@ -604,14 +601,14 @@ export function ChatDebuggerContent({
           description: currentFlow?.description,
           data: {
             nodes: nodes?.map(({ nodeType, ...reset }) => {
-              let node = {
+              const node = {
                 ...reset,
                 data: {
                   ...reset?.data,
                   updatable: false,
                 },
               };
-              Reflect.deleteProperty(node.data, "debuggerResult");
+              Reflect.deleteProperty(node.data, 'debuggerResult');
               return node;
             }),
             edges: edges?.map(({ style, animated, ...reset }) => reset),
@@ -626,9 +623,9 @@ export function ChatDebuggerContent({
           preRunningNodeIds.current = [];
           buildPassRef.current = true;
           setFlowResult({
-            status: "running",
-            timeCost: "",
-            totalTokens: "",
+            status: 'running',
+            timeCost: '',
+            totalTokens: '',
           });
           clearNodeStatus();
           setUserWheel(false);
@@ -641,7 +638,7 @@ export function ChatDebuggerContent({
         })
         .catch(() => {
           setDebuggering(false);
-          wsMessageStatus.current = "end";
+          wsMessageStatus.current = 'end';
         });
     },
     [
@@ -651,40 +648,40 @@ export function ChatDebuggerContent({
       setDebuggering,
       autonomousMode,
       advancedConfig?.suggestedQuestionsAfterAnswer?.enabled,
-    ],
+    ]
   );
 
   const handleNodeStatusChange = useCallback(
     (nodes, edges, nodeId, nodeStatus, responseResult): void => {
-      const currentNode = nodes.find((node) => node.id === nodeId);
-      if (nodeId?.startsWith("node-end") && responseResult?.reasoningContent) {
+      const currentNode = nodes.find(node => node.id === nodeId);
+      if (nodeId?.startsWith('node-end') && responseResult?.reasoningContent) {
         pushContentToAnswer(
-          "reasoningContent",
-          responseResult?.reasoningContent,
+          'reasoningContent',
+          responseResult?.reasoningContent
         );
       }
-      if (nodeId?.startsWith("message")) {
+      if (nodeId?.startsWith('message')) {
         pushContentToAnswer(
-          "messageContent",
-          responseResult?.nodeAnswerContent,
+          'messageContent',
+          responseResult?.nodeAnswerContent
         );
       }
-      if (nodeId?.startsWith("node-end")) {
-        pushContentToAnswer("content", responseResult?.nodeAnswerContent);
+      if (nodeId?.startsWith('node-end')) {
+        pushContentToAnswer('content', responseResult?.nodeAnswerContent);
       }
       //记录结束节点的原始输出
-      if (nodeId?.startsWith("node-end") || nodeId?.startsWith("message")) {
+      if (nodeId?.startsWith('node-end') || nodeId?.startsWith('message')) {
         chatInfoRef.current.answerItem =
           chatInfoRef.current.answerItem + responseResult?.nodeAnswerContent;
       }
-      if (nodeStatus === "ing" || nodeStatus === "interrupt") {
-        currentNode.data.status = "running";
+      if (nodeStatus === 'ing' || nodeStatus === 'interrupt') {
+        currentNode.data.status = 'running';
         const beforeContent = currentNode?.data?.debuggerResult?.done
-          ? ""
-          : (currentNode?.data?.debuggerResult?.answerContent ?? "");
+          ? ''
+          : (currentNode?.data?.debuggerResult?.answerContent ?? '');
         const beforeReasoningContent = currentNode?.data?.debuggerResult?.done
-          ? ""
-          : (currentNode?.data?.debuggerResult?.reasoningContent ?? "");
+          ? ''
+          : (currentNode?.data?.debuggerResult?.reasoningContent ?? '');
         currentNode.data.debuggerResult = {
           answerMode: responseResult?.answerMode,
           answerContent: beforeContent + responseResult?.nodeAnswerContent,
@@ -694,73 +691,73 @@ export function ChatDebuggerContent({
         };
       } else {
         const beforeContent =
-          currentNode?.data?.debuggerResult?.answerContent ?? "";
+          currentNode?.data?.debuggerResult?.answerContent ?? '';
         const beforeReasoningContent =
-          currentNode?.data?.debuggerResult?.reasoningContent ?? "";
+          currentNode?.data?.debuggerResult?.reasoningContent ?? '';
         currentNode.data.debuggerResult = {
           timeCost: responseResult?.timeCost || undefined,
           tokenCost: responseResult?.timeCost?.totalTokens || undefined,
           input: generateInputsAndOutputsOrder(
             currentNode,
             responseResult.inputs,
-            "inputs",
+            'inputs'
           ),
           rawOutput: responseResult?.rawOutput,
           output: generateInputsAndOutputsOrder(
             currentNode,
             responseResult.outputs,
-            "outputs",
+            'outputs'
           ),
           errorOutputs: responseResult?.errorOutputs,
-          failedReason: "",
+          failedReason: '',
           answerContent: beforeContent + responseResult?.nodeAnswerContent,
           reasoningContent:
             beforeReasoningContent + responseResult?.reasoningContent,
           answerMode: responseResult?.answerMode,
           done: true,
         };
-        if (responseResult.status === "success") {
-          currentNode.data.status = "success";
+        if (responseResult.status === 'success') {
+          currentNode.data.status = 'success';
         } else {
-          currentNode.data.status = "failed";
+          currentNode.data.status = 'failed';
           currentNode.data.debuggerResult.failedReason =
             responseResult?.failedReason;
         }
         if (
-          nodeId?.startsWith("node-end") &&
+          nodeId?.startsWith('node-end') &&
           responseResult?.answerMode === 0
         ) {
           pushContentToAnswer(
-            "content",
-            JSON.stringify(responseResult?.outputs),
+            'content',
+            JSON.stringify(responseResult?.outputs)
           );
           chatInfoRef.current.answerItem = JSON.stringify(
-            responseResult?.outputs,
+            responseResult?.outputs
           );
         }
-        if (nodeId?.startsWith("message")) {
-          pushContentToAnswer("messageContent", "\n");
+        if (nodeId?.startsWith('message')) {
+          pushContentToAnswer('messageContent', '\n');
         }
       }
       if (preRunningNodeIds?.current?.length > 0) {
         const sourceNodesId = edges
-          ?.filter((edge) => edge?.target === currentNode?.id)
-          ?.map((edge) => edge?.source);
+          ?.filter(edge => edge?.target === currentNode?.id)
+          ?.map(edge => edge?.source);
         const set2 = new Set(sourceNodesId);
-        const intersectionIds = preRunningNodeIds?.current.filter((value) =>
-          set2.has(value),
+        const intersectionIds = preRunningNodeIds?.current.filter(value =>
+          set2.has(value)
         );
-        setEdges((edges) => {
-          edges.forEach((edge) => {
+        setEdges(edges => {
+          edges.forEach(edge => {
             if (
               edge.target === currentNode?.id &&
               intersectionIds?.includes(edge.source)
             ) {
               edge.animated = true;
               edge.style = {
-                stroke: "#275EFF",
+                stroke: '#275EFF',
                 strokeWidth: 2,
-                strokeDasharray: "5 5",
+                strokeDasharray: '5 5',
               };
             }
           });
@@ -770,14 +767,14 @@ export function ChatDebuggerContent({
       setNode(nodeId, cloneDeep(currentNode));
       preRunningNodeIds.current.push(currentNode?.id);
       //跟随模式下需要根据节点移动画布
-      if (currentNode?.id?.startsWith("node-start")) {
+      if (currentNode?.id?.startsWith('node-start')) {
         currentFollowNodeId.current = currentNode?.id;
       }
       if (!autonomousMode) {
         const shouldMoveNode = edges?.some(
-          (edge) =>
+          edge =>
             edge?.source === currentFollowNodeId?.current &&
-            edge?.target === currentNode?.id,
+            edge?.target === currentNode?.id
         );
         if (shouldMoveNode && currentNode?.id) {
           handleMoveToPosition(currentNode?.id, nodes);
@@ -785,18 +782,18 @@ export function ChatDebuggerContent({
         }
       }
     },
-    [autonomousMode],
+    [autonomousMode]
   );
 
   //flow运行结束修改尚在运行中得节点为cancel态
   const handleRunningNodeStatus = useCallback(() => {
-    setNodes((nodes) => {
-      nodes.forEach((node) => {
-        if (node?.data?.status === "running") {
+    setNodes(nodes => {
+      nodes.forEach(node => {
+        if (node?.data?.status === 'running') {
           node.data.debuggerResult.cancelReason = t(
-            "workflow.nodes.chatDebugger.workflowTerminated",
+            'workflow.nodes.chatDebugger.workflowTerminated'
           );
-          node.data.status = "cancel";
+          node.data.status = 'cancel';
         }
       });
       return cloneDeep(nodes);
@@ -805,22 +802,22 @@ export function ChatDebuggerContent({
 
   const runDebugger = useCallback(
     (nodes, edges, enters?, regen = false): void => {
-      const url = "http://172.29.201.92:8080/workflow/chat";
+      const url = 'http://172.29.201.92:8080/workflow/chat';
       controllerRef.current = new AbortController();
       const inputs = {};
       const enterlist = enters ?? startNodeParams;
-      enterlist.forEach((params) => {
+      enterlist.forEach(params => {
         if (
-          params.type === "object" ||
-          (!params.fileType && params.type.includes("array"))
+          params.type === 'object' ||
+          (!params.fileType && params.type.includes('array'))
         ) {
           inputs[params.name] =
             isJSON(params.default as string) &&
             JSON.parse(params.default as string);
-        } else if (params.fileType && params.type === "string") {
+        } else if (params.fileType && params.type === 'string') {
           inputs[params.name] = params.default?.[0]?.url;
-        } else if (params.fileType && params.type === "array-string") {
-          inputs[params.name] = params.default?.map((item) => item?.url);
+        } else if (params.fileType && params.type === 'array-string') {
+          inputs[params.name] = params.default?.map(item => item?.url);
         } else {
           inputs[params.name] = params.default;
         }
@@ -831,16 +828,16 @@ export function ChatDebuggerContent({
         chatId: chatIdRef.current,
         regen,
       };
-      const latestAccessToken = localStorage.getItem("accessToken");
+      const latestAccessToken = localStorage.getItem('accessToken');
       if (historyVersion) {
         params.version = versionId.current;
         params.promptDebugger = true;
       }
       fetchEventSource(url, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + latestAccessToken,
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + latestAccessToken,
         },
         body: JSON.stringify(params),
         signal: controllerRef?.current?.signal,
@@ -853,11 +850,11 @@ export function ChatDebuggerContent({
         },
       });
     },
-    [startNodeParams, setDebuggering, autonomousMode],
+    [startNodeParams, setDebuggering, autonomousMode]
   );
 
   const canRunDebugger = useMemo(() => {
-    if (!debuggering && interruptChat?.type === "option") return false;
+    if (!debuggering && interruptChat?.type === 'option') return false;
     if (
       !debuggering &&
       startNodeParams?.length > 1 &&
@@ -868,19 +865,19 @@ export function ChatDebuggerContent({
           } else if (params.fileType) {
             return params?.default?.length > 0;
           } else if (
-            params.type === "object" ||
-            params.type.includes("array")
+            params.type === 'object' ||
+            params.type.includes('array')
           ) {
             return isJSON(params?.default as string);
-          } else if (params.type === "string") {
+          } else if (params.type === 'string') {
             return (params?.default as string)?.trim();
-          } else if (params.type === "boolean") {
-            return typeof params?.default === "boolean";
+          } else if (params.type === 'boolean') {
+            return typeof params?.default === 'boolean';
           } else {
-            return typeof params?.default !== "string";
+            return typeof params?.default !== 'string';
           }
         } else if (params.fileType) {
-          return params?.default?.every((item) => !item?.loading);
+          return params?.default?.every(item => !item?.loading);
         } else {
           return true;
         }
@@ -902,14 +899,14 @@ export function ChatDebuggerContent({
     preRunningNodeIds.current = [];
     setStartNodeParams([]);
     if (textareRef.current) {
-      textareRef.current.value = "";
+      textareRef.current.value = '';
     }
     setOpen(false);
     if (debuggering) {
       setFlowResult({
-        status: "",
-        timeCost: "",
-        totalTokens: "",
+        status: '',
+        timeCost: '',
+        totalTokens: '',
       });
     }
     setShowNodeList(true);
@@ -930,22 +927,22 @@ export function ChatDebuggerContent({
         const { nodes, edges } = resetNodesAndEdges();
         handleRunDebugger(nodes, edges, [
           {
-            name: "AGENT_USER_INPUT",
-            type: "string",
+            name: 'AGENT_USER_INPUT',
+            type: 'string',
             default: textareRef?.current?.value,
-            description: t("workflow.nodes.chatDebugger.userCurrentRoundInput"),
+            description: t('workflow.nodes.chatDebugger.userCurrentRoundInput'),
             required: true,
             validationSchema: null,
-            errorMsg: "",
-            originErrorMsg: "",
+            errorMsg: '',
+            originErrorMsg: '',
           },
         ]);
       }
     } else if (e.nativeEvent.keyCode === 13 && !e.nativeEvent.shiftKey) {
       e.preventDefault();
-    } else if (e.key === "Tab") {
-      startNodeParams[0].default = startNodeParams[0].default + "\t";
-      textareRef.current.value = textareRef?.current?.value + "\t";
+    } else if (e.key === 'Tab') {
+      startNodeParams[0].default = startNodeParams[0].default + '\t';
+      textareRef.current.value = textareRef?.current?.value + '\t';
       setStartNodeParams([...startNodeParams]);
       e.preventDefault();
     }
@@ -963,11 +960,11 @@ export function ChatDebuggerContent({
     nodes: ReactFlowNode[];
     edges: ReactFlowEdge[];
   } => {
-    wsMessageStatus.current = "start";
+    wsMessageStatus.current = 'start';
     setDebuggering(true);
     const newNodes = cloneDeep(nodes);
-    newNodes.forEach((node) => {
-      node.data.status = "";
+    newNodes.forEach(node => {
+      node.data.status = '';
       node.data.debuggerResult = {};
     });
     setNodes(newNodes);
@@ -979,7 +976,7 @@ export function ChatDebuggerContent({
 
   const deleteAllChat = useCallback((): void => {
     workflowDialogClear(currentFlow?.id, 1).then(() => {
-      chatIdRef.current = uuid().replace(/-/g, "");
+      chatIdRef.current = uuid().replace(/-/g, '');
       setDeleteAllModal(false);
       setChatList([]);
       setInterruptChat({ ...initInterruptChat });
@@ -997,14 +994,14 @@ export function ChatDebuggerContent({
             ? endNodeReasoningTextQueue
             : endNodeTextQueue;
         const contentKey = messageNodeTextQueue?.current
-          ? "messageContent"
+          ? 'messageContent'
           : endNodeReasoningTextQueue?.current
-            ? "reasoningContent"
-            : "content";
+            ? 'reasoningContent'
+            : 'content';
         const value = queue.current.slice(0, 10);
         if (value) {
           queue.current = queue.current.slice(10);
-          setChatList((chatList) => {
+          setChatList(chatList => {
             chatInfoRef.current.answer[contentKey] =
               chatInfoRef.current.answer[contentKey] + value;
             chatList[chatList.length - 1][contentKey] =
@@ -1016,13 +1013,13 @@ export function ChatDebuggerContent({
           !messageNodeTextQueue.current &&
           !endNodeReasoningTextQueue.current &&
           !endNodeTextQueue.current &&
-          wsMessageStatus.current === "end"
+          wsMessageStatus.current === 'end'
         ) {
           setDebuggering(false);
-          setChatList((chatList) => {
+          setChatList(chatList => {
             if (chatList[chatList.length - 1]) {
               chatList[chatList.length - 1].showResponse = true;
-              if (interruptChat?.type === "option") {
+              if (interruptChat?.type === 'option') {
                 chatList[chatList.length - 1].option = interruptChat?.option;
               }
             }
@@ -1045,20 +1042,20 @@ export function ChatDebuggerContent({
   }, [currentFlow]);
 
   const handleStopConversation = useCallback((): void => {
-    chatIdRef.current = uuid().replace(/-/g, "");
+    chatIdRef.current = uuid().replace(/-/g, '');
     if (interruptChat?.interrupt) {
-      const url = "http://172.29.201.92:8080/workflow/resume";
+      const url = 'http://172.29.201.92:8080/workflow/resume';
       const params = {
         flow_id: currentFlow?.flowId,
         eventId: interruptChat?.eventId,
-        eventType: "abort",
+        eventType: 'abort',
       };
-      const latestAccessToken = localStorage.getItem("accessToken");
+      const latestAccessToken = localStorage.getItem('accessToken');
       fetchEventSource(url, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + latestAccessToken,
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + latestAccessToken,
         },
         body: JSON.stringify(params),
         signal: controllerRef?.current?.signal,
@@ -1068,35 +1065,35 @@ export function ChatDebuggerContent({
         },
       });
     }
-    setChatList((chatList) => [
+    setChatList(chatList => [
       ...chatList,
       {
         id: uuid(),
-        type: "divider",
+        type: 'divider',
       },
     ]);
     setInterruptChat({ ...initInterruptChat });
     !historyVersion && setCanvasesDisabled(false);
     setShowNodeList(true);
-    setEdges((edges) =>
-      edges?.map((edge) => ({
+    setEdges(edges =>
+      edges?.map(edge => ({
         ...edge,
         animated: false,
         style: {
-          stroke: "#275EFF",
+          stroke: '#275EFF',
           strokeWidth: 2,
         },
-      })),
+      }))
     );
     setFlowResult({
-      status: "",
-      timeCost: "",
-      totalTokens: "",
+      status: '',
+      timeCost: '',
+      totalTokens: '',
     });
   }, [interruptChat, currentFlow]);
 
   const multiParams = useMemo((): boolean => {
-    const startNode = nodes?.find((node) => node?.nodeType === "node-start");
+    const startNode = nodes?.find(node => node?.nodeType === 'node-start');
     const outputs = startNode?.data?.outputs;
     let multiParams = true;
     if (outputs?.length === 1) {
@@ -1105,7 +1102,7 @@ export function ChatDebuggerContent({
     if (
       outputs?.length === 2 &&
       outputs?.[1]?.fileType &&
-      outputs?.[1]?.schema?.type === "string"
+      outputs?.[1]?.schema?.type === 'string'
     ) {
       multiParams = false;
     }
@@ -1119,13 +1116,13 @@ export function ChatDebuggerContent({
         name: historyVersionData?.name,
       };
       getPublicResult(params)
-        .then((data) => {
+        .then(data => {
           setShowChatDebuggerPage(
-            data?.some((item) => item?.publishResult === "成功"),
+            data?.some(item => item?.publishResult === '成功')
           );
         })
-        .catch((error) => {
-          console.error("获取发布结果详情失败:", error);
+        .catch(error => {
+          console.error('获取发布结果详情失败:', error);
         });
     }
   }, [historyVersion, historyVersionData, currentFlow?.flowId]);
@@ -1134,7 +1131,7 @@ export function ChatDebuggerContent({
     <div
       className="w-full h-full py-4 flex flex-col overflow-hidden"
       tabIndex={0}
-      onKeyDown={(e) => e.stopPropagation()}
+      onKeyDown={e => e.stopPropagation()}
     >
       {deleteAllModal && (
         <DeleteChatHistory
@@ -1146,8 +1143,8 @@ export function ChatDebuggerContent({
         <div className="flex items-center gap-3">
           <span className="font-semibold text-lg">
             {trialRun
-              ? t("workflow.nodes.chatDebugger.dialogue")
-              : t("workflow.nodes.chatDebugger.runResult")}
+              ? t('workflow.nodes.chatDebugger.dialogue')
+              : t('workflow.nodes.chatDebugger.runResult')}
           </span>
         </div>
         <img
@@ -1162,13 +1159,13 @@ export function ChatDebuggerContent({
           <div className="flex items-center gap-2 text-desc">
             <img src={icons.chatListTip} className="w-3 h-3 mt-0.5" alt="" />
             <span>
-              {t("workflow.nodes.chatDebugger.keepOnly10DialogueRecords")}
+              {t('workflow.nodes.chatDebugger.keepOnly10DialogueRecords')}
             </span>
           </div>
           {multiParams ? (
             <div className="text-[#ff9a27] text-sm">
               {t(
-                "workflow.nodes.chatDebugger.multiParamWorkflowOnlySupportDebugAndPublishAsAPI",
+                'workflow.nodes.chatDebugger.multiParamWorkflowOnlySupportDebugAndPublishAsAPI'
               )}
             </div>
           ) : !showChatDebuggerPage ? (
@@ -1186,7 +1183,7 @@ export function ChatDebuggerContent({
                 if (historyVersion) {
                   params.version = historyVersionData?.name;
                 } else {
-                  params.version = "debugger";
+                  params.version = 'debugger';
                 }
                 // handleFlowToChat(params);
               }}
@@ -1197,7 +1194,7 @@ export function ChatDebuggerContent({
                 alt=""
               />
               <span className="text-[#275EFF]">
-                {t("workflow.nodes.chatDebugger.switchToUserDialoguePage")}
+                {t('workflow.nodes.chatDebugger.switchToUserDialoguePage')}
               </span>
             </div>
           )}
@@ -1234,7 +1231,7 @@ export function ChatDebuggerContent({
               className="origin-btn px-[26px]"
               onClick={() => setDeleteAllModal(true)}
             >
-              {t("workflow.nodes.chatDebugger.clearDialogue")}
+              {t('workflow.nodes.chatDebugger.clearDialogue')}
             </Button>
           ) : (
             <div className="h-1"></div>
@@ -1245,7 +1242,7 @@ export function ChatDebuggerContent({
               className="origin-btn px-[24px]"
               onClick={() => clearData()}
             >
-              {t("common.cancel")}
+              {t('common.cancel')}
             </Button>
             <Button
               type="primary"
@@ -1258,16 +1255,16 @@ export function ChatDebuggerContent({
                     const { nodes, edges } = resetNodesAndEdges();
                     handleRunDebugger(nodes, edges, [
                       {
-                        name: "AGENT_USER_INPUT",
-                        type: "string",
+                        name: 'AGENT_USER_INPUT',
+                        type: 'string',
                         default: textareRef?.current?.value,
                         description: t(
-                          "workflow.nodes.chatDebugger.userCurrentRoundInput",
+                          'workflow.nodes.chatDebugger.userCurrentRoundInput'
                         ),
                         required: true,
                         validationSchema: null,
-                        errorMsg: "",
-                        originErrorMsg: "",
+                        errorMsg: '',
+                        originErrorMsg: '',
                       },
                     ]);
                   }
@@ -1279,7 +1276,7 @@ export function ChatDebuggerContent({
               disabled={!canRunDebugger}
             >
               <img src={icons.trialRun} className="w-3 h-3" alt="" />
-              <span>{t("workflow.nodes.chatDebugger.send")}</span>
+              <span>{t('workflow.nodes.chatDebugger.send')}</span>
             </Button>
           </div>
         </div>
@@ -1289,8 +1286,8 @@ export function ChatDebuggerContent({
 }
 
 function ChatDebuggerResult(): React.ReactElement {
-  const open = useFlowsManager((state) => state.chatDebuggerResult);
-  const setOpen = useFlowsManager((state) => state.setChatDebuggerResult);
+  const open = useFlowsManager(state => state.chatDebuggerResult);
+  const setOpen = useFlowsManager(state => state.setChatDebuggerResult);
 
   return (
     <Drawer

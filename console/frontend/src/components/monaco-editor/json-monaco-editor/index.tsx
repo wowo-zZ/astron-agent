@@ -1,24 +1,24 @@
-import MonacoEditor from "../index";
-import { cn } from "@/utils/utils";
-import { FC } from "react";
-import { EditorProps } from "@monaco-editor/react";
+import MonacoEditor from '../index';
+import { cn } from '@/utils/utils';
+import { FC } from 'react';
+import { EditorProps } from '@monaco-editor/react';
 
 const JsonMonacoEditor: FC<EditorProps> = ({
-  value = "",
+  value = '',
   onChange = (value?: string): void => {},
   options = {},
-  className = "",
+  className = '',
   ...reset
 }) => {
   return (
     <MonacoEditor
-      className={cn("global-monaco-editor-json", className)}
+      className={cn('global-monaco-editor-json', className)}
       height="120px"
       defaultLanguage="json"
       value={value}
       onChange={onChange}
       options={{
-        lineNumbers: "off",
+        lineNumbers: 'off',
         quickSuggestions: false,
         suggestOnTriggerCharacters: false,
         folding: false,

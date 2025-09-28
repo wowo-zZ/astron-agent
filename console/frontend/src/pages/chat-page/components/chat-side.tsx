@@ -1,35 +1,35 @@
-import React, { useMemo } from "react";
-import { Tooltip } from "antd";
-import { useTranslation } from "react-i18next";
-import { BotInfoType } from "@/types/chat";
-import codeIcon from "@/assets/imgs/chat/plugin/code.svg";
-import netIcon from "@/assets/imgs/chat/plugin/network.svg";
-import genPicIcon from "@/assets/imgs/chat/plugin/gen-pic.svg";
-import sparkIcon from "@/assets/imgs/chat/plugin/spark-logo.png";
+import React, { useMemo } from 'react';
+import { Tooltip } from 'antd';
+import { useTranslation } from 'react-i18next';
+import { BotInfoType } from '@/types/chat';
+import codeIcon from '@/assets/imgs/chat/plugin/code.svg';
+import netIcon from '@/assets/imgs/chat/plugin/network.svg';
+import genPicIcon from '@/assets/imgs/chat/plugin/gen-pic.svg';
+import sparkIcon from '@/assets/imgs/chat/plugin/spark-logo.png';
 
 // 模型配置类型
 type ModelConfig =
-  | "x1"
-  | "bm4"
-  | "bm3"
-  | "bm3.5"
-  | "pro-128k"
-  | "image_understanding"
-  | "image_understandingv3"
-  | "xaipersonality"
-  | "xdeepseekr1"
-  | "xdeepseekv3"
-  | "xdeepseekv32"
-  | "deepseek-ollama"
-  | "xgemma29bit"
-  | "xop3qwen235b"
-  | "xop3qwen30b"
-  | "plugin"
-  | "knowledge-base"
-  | "flow";
+  | 'x1'
+  | 'bm4'
+  | 'bm3'
+  | 'bm3.5'
+  | 'pro-128k'
+  | 'image_understanding'
+  | 'image_understandingv3'
+  | 'xaipersonality'
+  | 'xdeepseekr1'
+  | 'xdeepseekv3'
+  | 'xdeepseekv32'
+  | 'deepseek-ollama'
+  | 'xgemma29bit'
+  | 'xop3qwen235b'
+  | 'xop3qwen30b'
+  | 'plugin'
+  | 'knowledge-base'
+  | 'flow';
 
 // 工具类型
-type ToolType = "ifly_search" | "text_to_image" | "codeinterpreter";
+type ToolType = 'ifly_search' | 'text_to_image' | 'codeinterpreter';
 
 // 模型信息接口
 interface ModelInfo {
@@ -50,54 +50,54 @@ const ChatSide: React.FC<ChatSideProps> = ({ botInfo }) => {
   const modelInfo = useMemo((): ModelInfo => {
     const config = botInfo?.config || [];
     const sparkModels: ModelConfig[] = [
-      "x1",
-      "bm4",
-      "bm3",
-      "bm3.5",
-      "pro-128k",
-      "image_understanding",
-      "image_understandingv3",
-      "xaipersonality",
+      'x1',
+      'bm4',
+      'bm3',
+      'bm3.5',
+      'pro-128k',
+      'image_understanding',
+      'image_understandingv3',
+      'xaipersonality',
     ];
-    const deepseekR1Models: ModelConfig[] = ["xdeepseekr1"];
-    const deepseekV3Models: ModelConfig[] = ["xdeepseekv3", "xdeepseekv32"];
-    const gemmaModels: ModelConfig[] = ["xgemma29bit"];
-    const qwenModels: ModelConfig[] = ["xop3qwen235b", "xop3qwen30b"];
+    const deepseekR1Models: ModelConfig[] = ['xdeepseekr1'];
+    const deepseekV3Models: ModelConfig[] = ['xdeepseekv3', 'xdeepseekv32'];
+    const gemmaModels: ModelConfig[] = ['xgemma29bit'];
+    const qwenModels: ModelConfig[] = ['xop3qwen235b', 'xop3qwen30b'];
 
-    if (config.some((item) => sparkModels.includes(item as ModelConfig))) {
+    if (config.some(item => sparkModels.includes(item as ModelConfig))) {
       return {
-        name: `${t("chatPage.chatSide.sparkModel")} · ${t("chatPage.chatSide.toolCalling")}`,
-        tooltip: t("chatPage.chatSide.sparkModel"),
+        name: `${t('chatPage.chatSide.sparkModel')} · ${t('chatPage.chatSide.toolCalling')}`,
+        tooltip: t('chatPage.chatSide.sparkModel'),
       };
     }
-    if (config.some((item) => deepseekR1Models.includes(item as ModelConfig))) {
+    if (config.some(item => deepseekR1Models.includes(item as ModelConfig))) {
       return {
-        name: `${t("chatPage.chatSide.deepseekR1Model")} · ${t("chatPage.chatSide.toolCalling")}`,
-        tooltip: t("chatPage.chatSide.deepseekR1Model"),
+        name: `${t('chatPage.chatSide.deepseekR1Model')} · ${t('chatPage.chatSide.toolCalling')}`,
+        tooltip: t('chatPage.chatSide.deepseekR1Model'),
       };
     }
-    if (config.some((item) => deepseekV3Models.includes(item as ModelConfig))) {
+    if (config.some(item => deepseekV3Models.includes(item as ModelConfig))) {
       return {
-        name: `${t("chatPage.chatSide.deepseekV3Model")} · ${t("chatPage.chatSide.toolCalling")}`,
-        tooltip: t("chatPage.chatSide.deepseekV3Model"),
+        name: `${t('chatPage.chatSide.deepseekV3Model')} · ${t('chatPage.chatSide.toolCalling')}`,
+        tooltip: t('chatPage.chatSide.deepseekV3Model'),
       };
     }
-    if (config.some((item) => gemmaModels.includes(item as ModelConfig))) {
+    if (config.some(item => gemmaModels.includes(item as ModelConfig))) {
       return {
-        name: `${t("chatPage.chatSide.gemmaModel")} · ${t("chatPage.chatSide.toolCalling")}`,
-        tooltip: t("chatPage.chatSide.gemmaModel"),
+        name: `${t('chatPage.chatSide.gemmaModel')} · ${t('chatPage.chatSide.toolCalling')}`,
+        tooltip: t('chatPage.chatSide.gemmaModel'),
       };
     }
-    if (config.some((item) => qwenModels.includes(item as ModelConfig))) {
+    if (config.some(item => qwenModels.includes(item as ModelConfig))) {
       return {
-        name: `${t("chatPage.chatSide.qwenModel")} · ${t("chatPage.chatSide.toolCalling")}`,
-        tooltip: t("chatPage.chatSide.qwenModel"),
+        name: `${t('chatPage.chatSide.qwenModel')} · ${t('chatPage.chatSide.toolCalling')}`,
+        tooltip: t('chatPage.chatSide.qwenModel'),
       };
     }
 
     return {
-      name: `${t("chatPage.chatSide.sparkModel")} · ${t("chatPage.chatSide.toolCalling")}`,
-      tooltip: t("chatPage.chatSide.sparkModel"),
+      name: `${t('chatPage.chatSide.sparkModel')} · ${t('chatPage.chatSide.toolCalling')}`,
+      tooltip: t('chatPage.chatSide.sparkModel'),
     };
   }, [botInfo?.config, t]);
 
@@ -109,7 +109,7 @@ const ChatSide: React.FC<ChatSideProps> = ({ botInfo }) => {
   // 获取工具列表
   const toolList = useMemo((): ToolType[] => {
     return (
-      (botInfo?.openedTool?.split(",").filter(Boolean) as ToolType[]) || []
+      (botInfo?.openedTool?.split(',').filter(Boolean) as ToolType[]) || []
     );
   }, [botInfo?.openedTool]);
 
@@ -118,7 +118,7 @@ const ChatSide: React.FC<ChatSideProps> = ({ botInfo }) => {
       {/* 创建者信息 */}
       <div className="flex items-center h-5 mb-3">
         <img
-          src={require("@/assets/imgs/home/author.svg")}
+          src={require('@/assets/imgs/home/author.svg')}
           alt="author"
           className="w-3.5 h-3.5 mr-2"
         />
@@ -136,12 +136,12 @@ const ChatSide: React.FC<ChatSideProps> = ({ botInfo }) => {
       {/* 配置标题 */}
       <div className="flex items-center h-5 mb-3">
         <img
-          src={require("@/assets/imgs/home/setting.svg")}
+          src={require('@/assets/imgs/home/setting.svg')}
           alt="setting"
           className="w-3.5 h-3.5 mr-2"
         />
         <span className="text-sm text-gray-800 font-medium">
-          {t("chatPage.chatSide.configuration")}
+          {t('chatPage.chatSide.configuration')}
         </span>
       </div>
 
@@ -152,13 +152,13 @@ const ChatSide: React.FC<ChatSideProps> = ({ botInfo }) => {
           {botInfo?.config?.length ? (
             <>
               {/* 根据配置显示对应的模型图标 */}
-              {uniqueTools.some((item) =>
+              {uniqueTools.some(item =>
                 [
-                  "xdeepseekr1",
-                  "xdeepseekv3",
-                  "xdeepseekv32",
-                  "deepseek-ollama",
-                ].includes(item),
+                  'xdeepseekr1',
+                  'xdeepseekv3',
+                  'xdeepseekv32',
+                  'deepseek-ollama',
+                ].includes(item)
               ) && (
                 <Tooltip
                   title={modelInfo.tooltip}
@@ -173,9 +173,9 @@ const ChatSide: React.FC<ChatSideProps> = ({ botInfo }) => {
                 </Tooltip>
               )}
 
-              {uniqueTools.includes("xgemma29bit") && (
+              {uniqueTools.includes('xgemma29bit') && (
                 <Tooltip
-                  title={t("chatPage.chatSide.gemmaModel")}
+                  title={t('chatPage.chatSide.gemmaModel')}
                   placement="top"
                 >
                   <img
@@ -186,11 +186,11 @@ const ChatSide: React.FC<ChatSideProps> = ({ botInfo }) => {
                 </Tooltip>
               )}
 
-              {uniqueTools.some((item) =>
-                ["xop3qwen235b", "xop3qwen30b"].includes(item),
+              {uniqueTools.some(item =>
+                ['xop3qwen235b', 'xop3qwen30b'].includes(item)
               ) && (
                 <Tooltip
-                  title={t("chatPage.chatSide.qwenModel")}
+                  title={t('chatPage.chatSide.qwenModel')}
                   placement="top"
                   overlayClassName="black-tooltip"
                 >
@@ -202,7 +202,7 @@ const ChatSide: React.FC<ChatSideProps> = ({ botInfo }) => {
                 </Tooltip>
               )}
 
-              {modelInfo.name.includes("星火大模型") && (
+              {modelInfo.name.includes('星火大模型') && (
                 <Tooltip
                   title={modelInfo.tooltip}
                   placement="top"
@@ -232,61 +232,61 @@ const ChatSide: React.FC<ChatSideProps> = ({ botInfo }) => {
           ) : (
             /* 兼容旧版模型配置 */
             <>
-              {botInfo?.model === "xdeepseekr1" && (
+              {botInfo?.model === 'xdeepseekr1' && (
                 <>
                   <Tooltip
-                    title={t("chatPage.chatSide.deepseekR1Model")}
+                    title={t('chatPage.chatSide.deepseekR1Model')}
                     placement="top"
                     overlayClassName="black-tooltip"
                   >
                     <img
-                      src={require("@/assets/imgs/sparkImg/icon_deepseek.png")}
+                      src={require('@/assets/imgs/sparkImg/icon_deepseek.png')}
                       alt="deepseek"
                       className="w-5 h-5 mr-1.5"
                     />
                   </Tooltip>
                   <Tooltip
-                    title={`${t("chatPage.chatSide.deepseekR1Model")} · ${t("chatPage.chatSide.toolCalling")}`}
+                    title={`${t('chatPage.chatSide.deepseekR1Model')} · ${t('chatPage.chatSide.toolCalling')}`}
                     placement="top"
                     overlayClassName="black-tooltip"
                   >
                     <span className="text-sm text-gray-800 font-normal whitespace-nowrap overflow-hidden text-ellipsis">
-                      {`${t("chatPage.chatSide.deepseekR1Model")} · ${t("chatPage.chatSide.toolCalling")}`}
+                      {`${t('chatPage.chatSide.deepseekR1Model')} · ${t('chatPage.chatSide.toolCalling')}`}
                     </span>
                   </Tooltip>
                 </>
               )}
 
-              {botInfo?.model === "xdeepseekv3" && (
+              {botInfo?.model === 'xdeepseekv3' && (
                 <>
                   <Tooltip
-                    title={t("chatPage.chatSide.deepseekV3Model")}
+                    title={t('chatPage.chatSide.deepseekV3Model')}
                     placement="top"
                     overlayClassName="black-tooltip"
                   >
                     <img
-                      src={require("@/assets/imgs/sparkImg/icon_deepseek.png")}
+                      src={require('@/assets/imgs/sparkImg/icon_deepseek.png')}
                       alt="deepseek"
                       className="w-5 h-5 mr-1.5"
                     />
                   </Tooltip>
                   <Tooltip
-                    title={`${t("chatPage.chatSide.deepseekV3Model")} · ${t("chatPage.chatSide.toolCalling")}`}
+                    title={`${t('chatPage.chatSide.deepseekV3Model')} · ${t('chatPage.chatSide.toolCalling')}`}
                     placement="top"
                     overlayClassName="black-tooltip"
                   >
                     <span className="text-sm text-gray-800 font-normal whitespace-nowrap overflow-hidden text-ellipsis">
-                      {`${t("chatPage.chatSide.deepseekV3Model")} · ${t("chatPage.chatSide.toolCalling")}`}
+                      {`${t('chatPage.chatSide.deepseekV3Model')} · ${t('chatPage.chatSide.toolCalling')}`}
                     </span>
                   </Tooltip>
                 </>
               )}
 
               {(!botInfo?.model ||
-                !["xdeepseekr1", "xdeepseekv3"].includes(botInfo.model)) && (
+                !['xdeepseekr1', 'xdeepseekv3'].includes(botInfo.model)) && (
                 <>
                   <Tooltip
-                    title={t("chatPage.chatSide.sparkModel")}
+                    title={t('chatPage.chatSide.sparkModel')}
                     placement="top"
                     overlayClassName="black-tooltip"
                   >
@@ -297,12 +297,12 @@ const ChatSide: React.FC<ChatSideProps> = ({ botInfo }) => {
                     />
                   </Tooltip>
                   <Tooltip
-                    title={`${t("chatPage.chatSide.sparkModel")} · ${t("chatPage.chatSide.toolCalling")}`}
+                    title={`${t('chatPage.chatSide.sparkModel')} · ${t('chatPage.chatSide.toolCalling')}`}
                     placement="top"
                     overlayClassName="black-tooltip"
                   >
                     <span className="text-sm text-gray-800 font-normal whitespace-nowrap overflow-hidden text-ellipsis">
-                      {`${t("chatPage.chatSide.sparkModel")} · ${t("chatPage.chatSide.toolCalling")}`}
+                      {`${t('chatPage.chatSide.sparkModel')} · ${t('chatPage.chatSide.toolCalling')}`}
                     </span>
                   </Tooltip>
                 </>
@@ -315,9 +315,9 @@ const ChatSide: React.FC<ChatSideProps> = ({ botInfo }) => {
             {/* 新版工具配置显示 */}
             {botInfo?.config?.length ? (
               <>
-                {uniqueTools.includes("plugin") && (
+                {uniqueTools.includes('plugin') && (
                   <Tooltip
-                    title={t("chatPage.chatSide.tool")}
+                    title={t('chatPage.chatSide.tool')}
                     placement="top"
                     overlayClassName="black-tooltip"
                   >
@@ -329,9 +329,9 @@ const ChatSide: React.FC<ChatSideProps> = ({ botInfo }) => {
                   </Tooltip>
                 )}
 
-                {uniqueTools.includes("knowledge-base") && (
+                {uniqueTools.includes('knowledge-base') && (
                   <Tooltip
-                    title={t("chatPage.chatSide.knowledgeBase")}
+                    title={t('chatPage.chatSide.knowledgeBase')}
                     placement="top"
                     overlayClassName="black-tooltip"
                   >
@@ -343,9 +343,9 @@ const ChatSide: React.FC<ChatSideProps> = ({ botInfo }) => {
                   </Tooltip>
                 )}
 
-                {uniqueTools.includes("flow") && (
+                {uniqueTools.includes('flow') && (
                   <Tooltip
-                    title={t("chatPage.chatSide.workflow")}
+                    title={t('chatPage.chatSide.workflow')}
                     placement="top"
                     overlayClassName="black-tooltip"
                   >
@@ -361,9 +361,9 @@ const ChatSide: React.FC<ChatSideProps> = ({ botInfo }) => {
               /* 兼容旧版工具配置 */
               toolList.map((tool: ToolType, index: number) => (
                 <div key={`${tool}-${index}`}>
-                  {tool === "ifly_search" && (
+                  {tool === 'ifly_search' && (
                     <Tooltip
-                      title={t("chatPage.chatSide.webSearch")}
+                      title={t('chatPage.chatSide.webSearch')}
                       placement="top"
                       overlayClassName="black-tooltip"
                     >
@@ -375,9 +375,9 @@ const ChatSide: React.FC<ChatSideProps> = ({ botInfo }) => {
                     </Tooltip>
                   )}
 
-                  {tool === "text_to_image" && (
+                  {tool === 'text_to_image' && (
                     <Tooltip
-                      title={t("chatPage.chatSide.aiImage")}
+                      title={t('chatPage.chatSide.aiImage')}
                       placement="top"
                       overlayClassName="black-tooltip"
                     >
@@ -389,9 +389,9 @@ const ChatSide: React.FC<ChatSideProps> = ({ botInfo }) => {
                     </Tooltip>
                   )}
 
-                  {tool === "codeinterpreter" && (
+                  {tool === 'codeinterpreter' && (
                     <Tooltip
-                      title={t("chatPage.chatSide.codeGeneration")}
+                      title={t('chatPage.chatSide.codeGeneration')}
                       placement="top"
                       overlayClassName="black-tooltip"
                     >

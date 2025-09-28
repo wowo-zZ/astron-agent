@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
 interface LoginState {
   isLoginModalVisible: boolean;
@@ -7,7 +7,7 @@ interface LoginState {
   toggleLoginModal: () => void;
 }
 
-export const useLoginStore = create<LoginState>((set) => ({
+export const useLoginStore = create<LoginState>(set => ({
   isLoginModalVisible: false,
 
   showLoginModal: (): void => set({ isLoginModalVisible: true }),
@@ -15,7 +15,7 @@ export const useLoginStore = create<LoginState>((set) => ({
   hideLoginModal: (): void => set({ isLoginModalVisible: false }),
 
   toggleLoginModal: (): void =>
-    set((state) => ({
+    set(state => ({
       isLoginModalVisible: !state.isLoginModalVisible,
     })),
 }));

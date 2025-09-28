@@ -5,25 +5,25 @@ import React, {
   useRef,
   forwardRef,
   useImperativeHandle,
-} from "react";
-import { Tag, message, Modal } from "antd";
-import { UserOutlined } from "@ant-design/icons";
+} from 'react';
+import { Tag, message, Modal } from 'antd';
+import { UserOutlined } from '@ant-design/icons';
 import SpaceTable, {
   SpaceColumnConfig,
   ActionColumnConfig,
   QueryParams,
   QueryResult,
   SpaceTableRef,
-} from "@/components/space/space-table";
-import { ButtonConfig } from "@/components/button-group";
-import { ModuleType, OperationType } from "@/permissions/permission-type";
-import SpaceTag from "@/components/space/space-tag";
+} from '@/components/space/space-table';
+import { ButtonConfig } from '@/components/button-group';
+import { ModuleType, OperationType } from '@/types/permission';
+import SpaceTag from '@/components/space/space-tag';
 
-import styles from "./index.module.scss";
+import styles from './index.module.scss';
 
-import { getSpaceInviteList, revokeSpaceInvite } from "@/services/space";
-import { STATUS_THEME_MAP_INVITE, PENDING_STATUS } from "@/pages/space/config";
-import { useSpaceI18n } from "@/pages/space/hooks/use-space-i18n";
+import { getSpaceInviteList, revokeSpaceInvite } from '@/services/space';
+import { STATUS_THEME_MAP_INVITE, PENDING_STATUS } from '@/pages/space/config';
+import { useSpaceI18n } from '@/pages/space/hooks/use-space-i18n';
 
 interface Invitation {
   id: string;
@@ -50,10 +50,10 @@ const InvitationManagement = forwardRef<
   (
     {
       spaceId,
-      searchValue: externalSearchValue = "",
-      statusFilter: externalStatusFilter = "all",
+      searchValue: externalSearchValue = '',
+      statusFilter: externalStatusFilter = 'all',
     },
-    ref,
+    ref
   ) => {
     const tableRef = useRef<SpaceTableRef>(null);
     const { invitationStatusTextMap } = useSpaceI18n();
@@ -66,10 +66,10 @@ const InvitationManagement = forwardRef<
 
     // 查询邀请数据的函数
     const queryInvitations = async (
-      params: QueryParams,
+      params: QueryParams
     ): Promise<QueryResult<Invitation>> => {
       // 模拟后端根据参数返回过滤后的数据
-      console.log("邀请管理 API 请求参数:", {
+      console.log('邀请管理 API 请求参数:', {
         current: params.current,
         pageSize: params.pageSize,
         searchValue: params.searchValue,
@@ -104,18 +104,18 @@ const InvitationManagement = forwardRef<
 
     const handleRevokeInvitation = (
       invitationId: string,
-      inviteeNickname: string,
+      inviteeNickname: string
     ) => {
       Modal.confirm({
-        title: "确认撤回",
+        title: '确认撤回',
         content: `确定要撤回对 "${inviteeNickname}" 的邀请吗？`,
-        okText: "确定",
-        cancelText: "取消",
+        okText: '确定',
+        cancelText: '取消',
         onOk: async () => {
           try {
             await revokeSpaceInvite({ inviteId: invitationId });
 
-            message.success("撤回成功");
+            message.success('撤回成功');
           } catch (error: any) {
             message.error(error?.msg || error?.desc);
           } finally {
@@ -141,7 +141,7 @@ const InvitationManagement = forwardRef<
           </SpaceTag>
         );
       },
-      [invitationStatusTextMap],
+      [invitationStatusTextMap]
     );
 
     const getActionButtons = (invitation: Invitation): ButtonConfig[] => {
@@ -151,10 +151,10 @@ const InvitationManagement = forwardRef<
 
       return [
         {
-          key: "recall",
-          text: "撤回",
-          type: "link",
-          size: "small",
+          key: 'recall',
+          text: '撤回',
+          type: 'link',
+          size: 'small',
           permission: {
             module: ModuleType.SPACE,
             operation: OperationType.INVITATION_MANAGE,
@@ -168,9 +168,9 @@ const InvitationManagement = forwardRef<
     // 列配置
     const columns: SpaceColumnConfig<Invitation>[] = [
       {
-        title: "用户名",
-        dataIndex: "inviteeNickname",
-        key: "inviteeNickname",
+        title: '用户名',
+        dataIndex: 'inviteeNickname',
+        key: 'inviteeNickname',
         render: (text: string, record: Invitation) => (
           <div className={styles.inviteeNicknameCell}>
             <span>{text}</span>
@@ -178,24 +178,24 @@ const InvitationManagement = forwardRef<
         ),
       },
       {
-        title: "邀请状态",
-        dataIndex: "status",
-        key: "status",
+        title: '邀请状态',
+        dataIndex: 'status',
+        key: 'status',
         render: (status: number) => getStatusTag(status),
       },
       {
-        title: "加入时间",
-        dataIndex: "createTime",
-        key: "createTime",
+        title: '加入时间',
+        dataIndex: 'createTime',
+        key: 'createTime',
         render: (text: string) => (
-          <span className={styles.createTime}>{text || "-"}</span>
+          <span className={styles.createTime}>{text || '-'}</span>
         ),
       },
     ];
 
     // 操作列配置
     const actionColumn: ActionColumnConfig<Invitation> = {
-      title: "操作",
+      title: '操作',
       width: 200,
       getActionButtons: (record: Invitation) => getActionButtons(record),
     };
@@ -217,7 +217,7 @@ const InvitationManagement = forwardRef<
         />
       </div>
     );
-  },
+  }
 );
 
 export default InvitationManagement;

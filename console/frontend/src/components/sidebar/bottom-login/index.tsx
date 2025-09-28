@@ -1,13 +1,13 @@
-import React, { ReactElement, useState, useEffect } from "react";
-import loginAvatar from "@/assets/imgs/sidebar/avator.png";
-import navDropDown from "@/assets/imgs/sidebar/icon_nav_dropdown.png";
-import useLogin from "@/hooks/use-login";
-import useUserStore from "@/store/user-store";
-import { parseCurrentUserFromToken } from "@/config/casdoor";
-import { handleLoginRedirect } from "@/utils/auth";
-import ControlModal from "../control-modal";
-import { Popover } from "antd";
-import styles from "./index.module.scss";
+import React, { ReactElement, useState, useEffect } from 'react';
+import loginAvatar from '@/assets/imgs/sidebar/avator.png';
+import navDropDown from '@/assets/imgs/sidebar/icon_nav_dropdown.png';
+import useLogin from '@/hooks/use-login';
+import useUserStore from '@/store/user-store';
+import { parseCurrentUserFromToken } from '@/config/casdoor';
+import { handleLoginRedirect } from '@/utils/auth';
+import ControlModal from '../control-modal';
+import { Popover } from 'antd';
+import styles from './index.module.scss';
 
 interface User {
   nickname?: string;
@@ -20,6 +20,8 @@ interface BottomLoginProps {
   isCollapsed: boolean;
   isLogin?: boolean;
   user?: User | undefined;
+  isPersonCenterOpen: boolean;
+  setIsPersonCenterOpen: (visible: boolean) => void;
   // Components
   OrderTypeComponent?: ReactElement | undefined;
 }
@@ -64,7 +66,7 @@ const UserSection: React.FC<UserSectionProps> = ({
                 src={navDropDown}
                 className={`
                   w-4 h-4 ml-2 transition-transform duration-300
-                  ${internalShowModal ? "rotate-180" : ""}
+                  ${internalShowModal ? 'rotate-180' : ''}
                 `}
                 alt=""
               />
@@ -98,7 +100,7 @@ const LoginButton: React.FC<LoginButtonProps> = ({
 // Helper functions to reduce complexity
 const getUserDisplayName = (user?: User): string => {
   const tokenUser = parseCurrentUserFromToken();
-  return user?.nickname || user?.login || tokenUser?.nickname || "";
+  return user?.nickname || user?.login || tokenUser?.nickname || '';
 };
 
 const getUserAvatar = (user?: User): string => {
@@ -109,6 +111,8 @@ const getUserAvatar = (user?: User): string => {
 const BottomLogin = ({
   isCollapsed,
   OrderTypeComponent,
+  isPersonCenterOpen,
+  setIsPersonCenterOpen,
 }: BottomLoginProps): ReactElement => {
   const [internalShowModal, setInternalShowModal] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -118,7 +122,7 @@ const BottomLogin = ({
   // 检查认证状态
   useEffect(() => {
     const checkAuth = (): void => {
-      const token = localStorage.getItem("accessToken");
+      const token = localStorage.getItem('accessToken');
       setIsAuthenticated(Boolean(token));
     };
 
@@ -129,13 +133,13 @@ const BottomLogin = ({
       checkAuth();
     };
 
-    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener('storage', handleStorageChange);
 
     // 也可以设置定时器定期检查
     const interval = window.setInterval(checkAuth, 5000);
 
     return (): void => {
-      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener('storage', handleStorageChange);
       window.clearInterval(interval);
     };
   }, []);
@@ -161,7 +165,7 @@ const BottomLogin = ({
         disabled={loading}
         className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {loading ? "登出中..." : "退出登录"}
+        {loading ? '登出中...' : '退出登录'}
       </button>
     </div>
   );
@@ -194,6 +198,8 @@ const BottomLogin = ({
             onClose={() => {
               setInternalShowModal(false);
             }}
+            isPersonCenterOpen={isPersonCenterOpen}
+            setIsPersonCenterOpen={setIsPersonCenterOpen}
           />
         }
         placement="top"
@@ -203,7 +209,7 @@ const BottomLogin = ({
         forceRender={true}
         open={isLogin && internalShowModal}
         overlayClassName={styles.control_modal_popover}
-        onOpenChange={(visible) => {
+        onOpenChange={visible => {
           setInternalShowModal(visible);
         }}
       >
@@ -232,8 +238,8 @@ const BottomLogin = ({
                     <div className="relative">
                       <img
                         src={navDropDown}
-                        className={`w-4 h-4 ml-2 ${styles["rotate-arrow"]} ${
-                          internalShowModal ? styles.up : ""
+                        className={`w-4 h-4 ml-2 ${styles['rotate-arrow']} ${
+                          internalShowModal ? styles.up : ''
                         }`}
                         alt=""
                       />

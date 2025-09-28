@@ -1,17 +1,17 @@
-import React, { useState, FC } from "react";
-import { Button, Upload, Slider, Input, Spin, UploadProps } from "antd";
-import { avatarGenerationMethods } from "@/constants";
-import uploadAct from "@/assets/imgs/knowledge/icon_zhishi_upload_act.png";
-import zoomIn from "@/assets/imgs/main/icon_zoomin.png";
-import zoomOut from "@/assets/imgs/main/icon_zoomout.png";
-import placeholderImage from "@/assets/imgs/common/ai_chat_placeholder.png";
-import close from "@/assets/imgs/workflow/modal-close.png";
-import { AvatarType } from "@/types/resource";
-import { useMoreIcons } from "./hooks/use-more-icons";
+import React, { useState, FC } from 'react';
+import { Button, Upload, Slider, Input, Spin, UploadProps } from 'antd';
+import { avatarGenerationMethods } from '@/constants';
+import uploadAct from '@/assets/imgs/knowledge/icon_zhishi_upload_act.png';
+import zoomIn from '@/assets/imgs/main/icon_zoomin.png';
+import zoomOut from '@/assets/imgs/main/icon_zoomout.png';
+import placeholderImage from '@/assets/imgs/common/ai_chat_placeholder.png';
+import close from '@/assets/imgs/workflow/modal-close.png';
+import { AvatarType } from '@/types/resource';
+import { useMoreIcons } from './hooks/use-more-icons';
 
 const { Dragger } = Upload;
 
-const Image: FC<{ imageUrl: string; uploadProps: UploadProps }> = (props) => {
+const Image: FC<{ imageUrl: string; uploadProps: UploadProps }> = props => {
   const { imageUrl, uploadProps } = props;
 
   const [scale, setScale] = useState(1);
@@ -25,16 +25,16 @@ const Image: FC<{ imageUrl: string; uploadProps: UploadProps }> = (props) => {
               className="icon-image-container"
               style={{
                 background: `url(${imageUrl}) no-repeat center`,
-                backgroundSize: "cover",
+                backgroundSize: 'cover',
                 transform: `scale(${scale})`,
-                transformOrigin: "center center",
+                transformOrigin: 'center center',
               }}
             >
               <div
                 className="icon-image-container-mask"
                 style={{
                   transform: `scale(${1 / scale})`,
-                  transformOrigin: "center center",
+                  transformOrigin: 'center center',
                 }}
               >
                 <div className="border-4 border-[#275EFF] rounded-xl w-full h-full overflow-hidden">
@@ -42,9 +42,9 @@ const Image: FC<{ imageUrl: string; uploadProps: UploadProps }> = (props) => {
                     className="icon-image-origin"
                     style={{
                       background: `url(${imageUrl}) no-repeat center`,
-                      backgroundSize: "cover",
+                      backgroundSize: 'cover',
                       transform: `scale(${scale})`,
-                      transformOrigin: "center center",
+                      transformOrigin: 'center center',
                     }}
                   ></div>
                 </div>
@@ -68,7 +68,7 @@ const Image: FC<{ imageUrl: string; uploadProps: UploadProps }> = (props) => {
               step={0.1}
               value={scale}
               className="flex-1 config-slider"
-              onChange={(value) => setScale(value)}
+              onChange={value => setScale(value)}
             />
           </div>
           <img
@@ -91,7 +91,7 @@ const MoreIcons: FC<{
   botColor: string;
   setBotColor: (color: string) => void;
   setShowModal: (show: boolean) => void;
-}> = (props) => {
+}> = props => {
   const {
     icons,
     colors,
@@ -133,7 +133,7 @@ const MoreIcons: FC<{
   return (
     <div
       className="mask text-second text-sm font-medium"
-      onClick={(e) => e.stopPropagation()}
+      onClick={e => e.stopPropagation()}
     >
       <div className="p-6 absolute bg-[#fff] rounded-2xl top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 text-second font-medium text-md w-[720px]">
         <div className="text-second text-base font-semibold mb-4 flex items-center justify-between">
@@ -142,7 +142,7 @@ const MoreIcons: FC<{
             src={close}
             className="w-3 h-3 cursor-pointer"
             alt=""
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               setShowModal(false);
             }}
@@ -152,10 +152,10 @@ const MoreIcons: FC<{
           {avatarGenerationMethods.map((item, index) => (
             <div
               key={index}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg cursor-pointer ${[activeTab, hoverTab].includes(item.activeTab) ? "text-[#275EFF] bg-[#F6F9FF]" : ""}`}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg cursor-pointer ${[activeTab, hoverTab].includes(item.activeTab) ? 'text-[#275EFF] bg-[#F6F9FF]' : ''}`}
               onMouseEnter={() => setHoverTab(item.activeTab)}
-              onMouseLeave={() => setHoverTab("")}
-              onClick={(e) => {
+              onMouseLeave={() => setHoverTab('')}
+              onClick={e => {
                 e.stopPropagation();
                 setActiveTab(item.activeTab);
               }}
@@ -173,7 +173,7 @@ const MoreIcons: FC<{
             </div>
           ))}
         </div>
-        {activeTab === "gallery" && (
+        {activeTab === 'gallery' && (
           <GalleryContent
             icons={icons}
             previewIcon={previewIcon}
@@ -184,13 +184,13 @@ const MoreIcons: FC<{
             setShowModal={setShowModal}
           />
         )}
-        {activeTab === "upload" && (
+        {activeTab === 'upload' && (
           <UploadContent
             uploadImageObject={uploadImageObject}
             uploadProps={uploadProps}
           />
         )}
-        {activeTab === "chat" && (
+        {activeTab === 'chat' && (
           <ChatContent
             generateImageObject={generateImageObject}
             generateImageDescription={generateImageDescription}
@@ -204,7 +204,7 @@ const MoreIcons: FC<{
             type="primary"
             disabled={checkEnableSave}
             className="px-[24px]"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               handleOk();
             }}
@@ -214,7 +214,7 @@ const MoreIcons: FC<{
           <Button
             type="text"
             className="origin-btn px-[24px]"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               setShowModal(false);
             }}
@@ -239,7 +239,7 @@ export const GalleryContent: FC<{
   colors: AvatarType[];
   previewColor: string;
   setPreviewColor: (color: string) => void;
-}> = (props) => {
+}> = props => {
   const {
     icons,
     previewIcon,
@@ -254,22 +254,22 @@ export const GalleryContent: FC<{
         <div className="text-[#101828] text-xs font-medium mb-1">常用</div>
         <div className="flex gap-4 flex-wrap">
           {icons
-            .filter((item) => item.code === "common")
+            .filter(item => item.code === 'common')
             .map((item, index) => (
               <div
                 key={index}
                 className="icons-item cursor-pointer"
                 style={{
                   background:
-                    previewIcon.value === item.value ? previewColor : "",
+                    previewIcon.value === item.value ? previewColor : '',
                 }}
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation();
                   setPreviewIcon(item);
                 }}
               >
                 <img
-                  src={(item.name || "") + (item.value || "")}
+                  src={(item.name || '') + (item.value || '')}
                   className="w-8 h-8"
                   alt=""
                 />
@@ -279,22 +279,22 @@ export const GalleryContent: FC<{
         <div className="text-[#101828] text-xs font-medium mb-1 mt-7">运动</div>
         <div className="flex gap-4 flex-wrap">
           {icons
-            .filter((item) => item.code === "sport")
+            .filter(item => item.code === 'sport')
             .map((item, index) => (
               <div
                 key={index}
                 className="icons-item cursor-pointer"
                 style={{
                   background:
-                    previewIcon.value === item.value ? previewColor : "",
+                    previewIcon.value === item.value ? previewColor : '',
                 }}
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation();
                   setPreviewIcon(item);
                 }}
               >
                 <img
-                  src={(item.name || "") + (item.value || "")}
+                  src={(item.name || '') + (item.value || '')}
                   className="w-8 h-8"
                   alt=""
                 />
@@ -304,22 +304,22 @@ export const GalleryContent: FC<{
         <div className="text-[#101828] text-xs font-medium mb-1 mt-7">植物</div>
         <div className="flex gap-4 flex-wrap">
           {icons
-            .filter((item) => item.code === "plant")
+            .filter(item => item.code === 'plant')
             .map((item, index) => (
               <div
                 key={index}
                 className="icons-item cursor-pointer"
                 style={{
                   background:
-                    previewIcon.value === item.value ? previewColor : "",
+                    previewIcon.value === item.value ? previewColor : '',
                 }}
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation();
                   setPreviewIcon(item);
                 }}
               >
                 <img
-                  src={(item.name || "") + (item.value || "")}
+                  src={(item.name || '') + (item.value || '')}
                   className="w-8 h-8"
                   alt=""
                 />
@@ -329,22 +329,22 @@ export const GalleryContent: FC<{
         <div className="text-[#101828] text-xs font-medium mb-1 mt-7">探索</div>
         <div className="flex gap-4 flex-wrap">
           {icons
-            .filter((item) => item.code === "explore")
+            .filter(item => item.code === 'explore')
             .map((item, index) => (
               <div
                 key={index}
                 className="icons-item cursor-pointer"
                 style={{
                   background:
-                    previewIcon.value === item.value ? previewColor : "",
+                    previewIcon.value === item.value ? previewColor : '',
                 }}
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation();
                   setPreviewIcon(item);
                 }}
               >
                 <img
-                  src={(item.name || "") + (item.value || "")}
+                  src={(item.name || '') + (item.value || '')}
                   className="w-8 h-8"
                   alt=""
                 />
@@ -359,10 +359,10 @@ export const GalleryContent: FC<{
         {colors.map((item, index) => (
           <div
             key={index}
-            className={`w-[40px] h-[40px] flex justify-center items-center ${item.name === previewColor ? "color-item-active" : ""} cursor-pointer`}
-            onClick={(e) => {
+            className={`w-[40px] h-[40px] flex justify-center items-center ${item.name === previewColor ? 'color-item-active' : ''} cursor-pointer`}
+            onClick={e => {
               e.stopPropagation();
-              setPreviewColor(item.name || "");
+              setPreviewColor(item.name || '');
             }}
           >
             <span
@@ -379,7 +379,7 @@ export const GalleryContent: FC<{
 export const UploadContent: FC<{
   uploadImageObject: { downloadLink: string; s3Key: string };
   uploadProps: UploadProps;
-}> = (props) => {
+}> = props => {
   const { uploadImageObject, uploadProps } = props;
   return (
     <div className="mt-8">
@@ -411,7 +411,7 @@ export const ChatContent: FC<{
   setGenerateImageDescription: (description: string) => void;
   generateImage: () => void;
   loading: boolean;
-}> = (props) => {
+}> = props => {
   const {
     generateImageObject,
     generateImageDescription,
@@ -425,8 +425,8 @@ export const ChatContent: FC<{
         className="w-full h-[165px] flex items-center justify-center rounded-lg"
         style={{
           background:
-            "linear-gradient(90deg, rgba(223, 231, 253, 0.26) 0%, rgba(239, 227, 253, 0.81) 100%)",
-          border: "1px solid #E4EAFF",
+            'linear-gradient(90deg, rgba(223, 231, 253, 0.26) 0%, rgba(239, 227, 253, 0.81) 100%)',
+          border: '1px solid #E4EAFF',
         }}
       >
         <Spin spinning={loading}>
@@ -446,8 +446,8 @@ export const ChatContent: FC<{
           className="user-chat-input w-full"
           maxLength={80}
           value={generateImageDescription}
-          onChange={(e) => setGenerateImageDescription(e.target.value)}
-          onPressEnter={(e) => {
+          onChange={e => setGenerateImageDescription(e.target.value)}
+          onPressEnter={e => {
             e.stopPropagation();
             e.preventDefault();
             generateImage();
@@ -456,7 +456,7 @@ export const ChatContent: FC<{
         />
         <div className="send-btns">
           <span
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               generateImage();
             }}

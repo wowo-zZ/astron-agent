@@ -1,9 +1,9 @@
-import React from "react";
+import React from 'react';
 
 export const useIfElseNodeCompareOperator = (
-  type,
+  type
 ): React.ReactElement | string => {
-  if (type === "contains") {
+  if (type === 'contains') {
     return (
       <svg
         className="icon-icon icon-icon-coz_proper_superset "
@@ -17,7 +17,7 @@ export const useIfElseNodeCompareOperator = (
       </svg>
     );
   }
-  if (type === "not_contains") {
+  if (type === 'not_contains') {
     return (
       <svg
         className="icon-icon icon-icon-coz_proper_superset_slash "
@@ -31,7 +31,7 @@ export const useIfElseNodeCompareOperator = (
       </svg>
     );
   }
-  if (type === "empty") {
+  if (type === 'empty') {
     return (
       <svg
         className="icon-icon icon-icon-coz_equal "
@@ -45,7 +45,7 @@ export const useIfElseNodeCompareOperator = (
       </svg>
     );
   }
-  if (type === "not_empty") {
+  if (type === 'not_empty') {
     return (
       <svg
         className="icon-icon icon-icon-coz_equal_slash "
@@ -59,19 +59,19 @@ export const useIfElseNodeCompareOperator = (
       </svg>
     );
   }
-  if (type === "is") {
-    return "是";
+  if (type === 'is') {
+    return '是';
   }
-  if (type === "is_not") {
-    return "不是";
+  if (type === 'is_not') {
+    return '不是';
   }
-  if (type === "start_with") {
-    return "开始是";
+  if (type === 'start_with') {
+    return '开始是';
   }
-  if (type === "end_with") {
-    return "结束是";
+  if (type === 'end_with') {
+    return '结束是';
   }
-  if (type === "eq") {
+  if (type === 'eq') {
     return (
       <svg
         className="icon-icon icon-icon-coz_equal "
@@ -85,7 +85,7 @@ export const useIfElseNodeCompareOperator = (
       </svg>
     );
   }
-  if (type === "ne") {
+  if (type === 'ne') {
     return (
       <svg
         className="icon-icon icon-icon-coz_equal_slash "
@@ -99,7 +99,7 @@ export const useIfElseNodeCompareOperator = (
       </svg>
     );
   }
-  if (type === "gt") {
+  if (type === 'gt') {
     return (
       <svg
         className="icon-icon icon-icon-coz_greater "
@@ -113,7 +113,7 @@ export const useIfElseNodeCompareOperator = (
       </svg>
     );
   }
-  if (type === "ge") {
+  if (type === 'ge') {
     return (
       <svg
         className="icon-icon icon-icon-coz_greater_equal "
@@ -127,7 +127,7 @@ export const useIfElseNodeCompareOperator = (
       </svg>
     );
   }
-  if (type === "lt") {
+  if (type === 'lt') {
     return (
       <svg
         className="icon-icon icon-icon-coz_less "
@@ -141,7 +141,7 @@ export const useIfElseNodeCompareOperator = (
       </svg>
     );
   }
-  if (type === "le") {
+  if (type === 'le') {
     return (
       <svg
         className="icon-icon icon-icon-coz_less_equal "
@@ -155,7 +155,7 @@ export const useIfElseNodeCompareOperator = (
       </svg>
     );
   }
-  if (type === "null") {
+  if (type === 'null') {
     return (
       <svg
         className="icon-icon icon-icon-coz_equal "
@@ -169,7 +169,7 @@ export const useIfElseNodeCompareOperator = (
       </svg>
     );
   }
-  if (type === "not_null") {
+  if (type === 'not_null') {
     return (
       <svg
         className="icon-icon icon-icon-coz_equal_slash "

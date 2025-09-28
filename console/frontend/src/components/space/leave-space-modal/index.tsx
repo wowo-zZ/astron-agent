@@ -1,14 +1,14 @@
-import React from "react";
-import { message, Modal } from "antd";
-import ButtonGroup from "@/components/button-group/button-group";
-import type { ButtonConfig } from "@/components/button-group/types";
+import React from 'react';
+import { message, Modal } from 'antd';
+import ButtonGroup from '@/components/button-group/button-group';
+import type { ButtonConfig } from '@/components/button-group/types';
 
-import styles from "./index.module.scss";
+import styles from './index.module.scss';
 
-import warningImg from "@/assets/imgs/space/warning.png";
-import { useNavigate } from "react-router-dom";
-import { leaveSpace } from "@/services/space";
-import { useSpaceType } from "@/hooks/use-space-type";
+import warningImg from '@/assets/imgs/space/warning.png';
+import { useNavigate } from 'react-router-dom';
+import { leaveSpace } from '@/services/space';
+import { useSpaceType } from '@/hooks/use-space-type';
 interface LeaveSpaceModalProps {
   open: boolean;
   onClose: () => void;
@@ -29,7 +29,7 @@ const LeaveSpaceModal: React.FC<LeaveSpaceModalProps> = ({
   const handleLeaveSpace = () => {
     leaveSpace()
       .then(() => {
-        message.success("离开空间成功");
+        message.success('离开空间成功');
         deleteSpaceCb();
         onClose();
       })
@@ -40,15 +40,15 @@ const LeaveSpaceModal: React.FC<LeaveSpaceModalProps> = ({
 
   const buttons: ButtonConfig[] = [
     {
-      key: "cancel",
-      text: "取消",
-      type: "default",
+      key: 'cancel',
+      text: '取消',
+      type: 'default',
       onClick: () => handleClose(),
     },
     {
-      key: "submit",
-      text: "确认",
-      type: "primary",
+      key: 'submit',
+      text: '确认',
+      type: 'primary',
       onClick: () => handleLeaveSpace(),
     },
   ];

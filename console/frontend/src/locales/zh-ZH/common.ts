@@ -87,6 +87,7 @@ const translation = {
     plugin: "插件",
     knowledge: "知识库",
     database: "数据库",
+    rpa: "RPA",
   },
   // ToolInputParameters component translations
   pleaseEnterDefaultValue: "请输入默认值",
