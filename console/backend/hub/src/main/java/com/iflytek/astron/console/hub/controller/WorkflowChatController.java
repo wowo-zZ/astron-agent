@@ -7,14 +7,13 @@ import com.iflytek.astron.console.hub.service.WorkflowChatService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
-import jakarta.validation.Valid;
 
 /**
  * Workflow chat controller
@@ -28,6 +27,8 @@ import jakarta.validation.Valid;
 public class WorkflowChatController {
 
     private final WorkflowChatService workflowChatService;
+
+
 
     /**
      * Start workflow chat stream
