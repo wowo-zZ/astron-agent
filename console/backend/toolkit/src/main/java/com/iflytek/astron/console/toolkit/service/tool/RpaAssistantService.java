@@ -111,7 +111,8 @@ public class RpaAssistantService {
                 assistant.getStatus(),
                 req.fields(),
                 new JSONArray(),
-                assistant.getCreateTime());
+                assistant.getCreateTime(),
+                assistant.getUpdateTime());
     }
 
     /**
@@ -243,7 +244,8 @@ public class RpaAssistantService {
                 a.getStatus(),
                 fields,
                 records,
-                a.getCreateTime());
+                a.getCreateTime(),
+                a.getUpdateTime());
     }
 
     /**
