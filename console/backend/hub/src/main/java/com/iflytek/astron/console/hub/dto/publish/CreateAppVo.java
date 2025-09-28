@@ -20,6 +20,7 @@ public class CreateAppVo {
     @Schema(description = "App Name", example = "translate")
     private String appName;
 
+    @Builder.Default
     @Schema(description = "App Describe", example = "Assistant application for translation")
-    private String appDescribe;
+    private String appDescribe = "";
 }

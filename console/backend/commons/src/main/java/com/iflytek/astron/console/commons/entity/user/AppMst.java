@@ -39,7 +39,10 @@ public class AppMst {
 
     @Schema(description = "App Secret")
     private String appSecret;
-    
+
+    @Schema(description = "App Is Delete")
+    private Integer isDelete;
+
     @Schema(description = "Create time")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")

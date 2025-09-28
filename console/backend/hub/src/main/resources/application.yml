@@ -177,3 +177,7 @@ wechat:
     token: ${WECHAT_TOKEN:your_token}
     # Message encryption/decryption key
     encoding-aes-key: ${WECHAT_ENCODING_AES_KEY:your_encoding_aes_key}
+
+tenant:
+  create-app: http://10.1.87.65:5052/v2/app
+  get-app-detail: http://10.1.87.65:5052/v2/app/details
