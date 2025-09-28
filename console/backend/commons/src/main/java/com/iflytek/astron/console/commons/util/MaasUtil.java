@@ -437,19 +437,22 @@ public class MaasUtil {
             log.error("Failed to parse clone workflow URL: {}", cloneWorkFlowUrl);
             throw new BusinessException(ResponseEnum.CLONE_BOT_FAILED);
         }
-
+        Map<String, String> pubAuth = AuthStringUtil.authMap(baseUrl.toString(), "POST", consumerKey, consumerSecret, null);
         HttpUrl httpUrl = baseUrl.newBuilder()
                 .addQueryParameter("id", String.valueOf(maasId))
                 .addQueryParameter("password", "xfyun")
                 .build();
         Request httpRequest = new Request.Builder()
                 .url(httpUrl)
+                .addHeader("X-Consumer-Username", consumerId)
+                .addHeader("Lang-Code", I18nUtil.getLanguage())
+                .headers(Headers.of(pubAuth))
+                .addHeader(X_AUTH_SOURCE_HEADER, X_AUTH_SOURCE_VALUE)
                 .get()
                 .build();
         String responseBody = "";
         try (Response response = client.newCall(httpRequest).execute()) {
             if (!response.isSuccessful()) {
-                // Handle request failure
                 throw new IOException("Unexpected code " + response);
             }
             ResponseBody body = response.body();
@@ -459,7 +462,6 @@ public class MaasUtil {
                 throw new IOException("Response body is null");
             }
         } catch (IOException e) {
-            // Handle exception
             log.error("Failed to call internal-clone endpoint", e);
             throw new BusinessException(ResponseEnum.CLONE_BOT_FAILED);
         }
