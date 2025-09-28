@@ -58,6 +58,12 @@ mybatis-plus:
     com.iflytek.astron.console.hub.entity,
     com.iflytek.astron.console.commons.entity,
     com.iflytek.astron.console.toolkit.entity.table
+  type-enums-package:
+    com.iflytek.astron.console.commons.enums,
+    com.iflytek.astron.console.hub.enums,
+    com.iflytek.astron.console.toolkit.enums
+  configuration:
+    default-enum-type-handler: org.apache.ibatis.type.EnumTypeHandler
 
 # S3(MinIO) basic configuration
 s3:

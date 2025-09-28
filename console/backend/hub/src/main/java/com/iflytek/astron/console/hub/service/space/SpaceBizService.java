@@ -16,4 +16,6 @@ public interface SpaceBizService {
     ApiResult<Space> visitSpace(Long spaceId);
 
     ApiResult<String> sendMessageCode(Long spaceId);
+
+    ApiResult<Boolean> ossVersionUserUpgrade();
 }

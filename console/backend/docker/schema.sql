@@ -3884,6 +3884,7 @@ CREATE TABLE `user_info`
     `nickname`       varchar(255)                                                  DEFAULT NULL COMMENT 'User nickname',
     `mobile`         varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT 'Mobile number',
     `account_status` tinyint                                                       DEFAULT '0' COMMENT 'Activation status: 0 inactive, 1 active, 2 frozen',
+    `enterprise_service_type` int                                                  DEFAULT '0' COMMENT 'Enterprise service type: 0 none, 1 team, 2 enterprise',
     `user_agreement` tinyint                                                       DEFAULT '0' COMMENT 'Whether agreed to user agreement: 0 not agreed, 1 agreed',
     `deleted`        tinyint                                                       DEFAULT '0' COMMENT 'Logical deletion flag: 0 not deleted, 1 deleted',
     `create_time`    datetime                                                      DEFAULT CURRENT_TIMESTAMP COMMENT 'Creation time',

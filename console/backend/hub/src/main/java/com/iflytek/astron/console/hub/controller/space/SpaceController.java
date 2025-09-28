@@ -94,6 +94,13 @@ public class SpaceController {
         return spaceBizService.deleteSpace(spaceId, mobile, verifyCode);
     }
 
+    @PostMapping("/oss-version-user-upgrade")
+    @Operation(summary = "OSS version user upgrade to enterprise version")
+    @RateLimit(dimension = "USER", window = 1, limit = 1)
+    public ApiResult<Boolean> ossVersionUserUpgrade() {
+        return spaceBizService.ossVersionUserUpgrade();
+    }
+
     // ---------------------------------------------------Personal
     // Version--------------------------------------------------
 

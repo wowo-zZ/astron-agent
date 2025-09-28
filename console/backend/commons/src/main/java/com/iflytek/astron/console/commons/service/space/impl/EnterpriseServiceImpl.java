@@ -64,18 +64,11 @@ public class EnterpriseServiceImpl extends ServiceImpl<EnterpriseMapper, Enterpr
 
     @Override
     public Integer checkNeedCreateTeam() {
-        // TODO refactor: never need to create team for now.
-        return 0;
-        // String uid = RequestContextUtil.getUID();
-        // Enterprise enterprise = getEnterpriseByUid(uid);
-        // if (enterprise != null) {
-        // return 0;
-        // }
-        // OrderInfoUtil.EnterpriseResult result = OrderInfoUtil.getEnterpriseResult(uid);
-        // if (result.getServiceType() == null) {
-        // return 0;
-        // }
-        // return result.getServiceType().getCode();
+        UserInfo userInfo = RequestContextUtil.getUserInfo();
+        if (userInfo == null || userInfo.getEnterpriseServiceType() == null) {
+            return 0;
+        }
+        return userInfo.getEnterpriseServiceType().getCode();
     }
 
     @Override

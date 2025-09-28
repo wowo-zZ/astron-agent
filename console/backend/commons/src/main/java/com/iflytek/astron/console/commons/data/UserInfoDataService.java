@@ -2,6 +2,7 @@ package com.iflytek.astron.console.commons.data;
 
 
 import com.iflytek.astron.console.commons.entity.user.UserInfo;
+import com.iflytek.astron.console.commons.enums.space.EnterpriseServiceTypeEnum;
 
 import java.util.Collection;
 import java.util.List;
@@ -86,6 +87,9 @@ public interface UserInfoDataService {
 
     /** Current user agrees to user agreement */
     boolean agreeUserAgreement();
+
+    /** Update user's enterprise service type */
+    boolean updateUserEnterpriseServiceType(String uid, EnterpriseServiceTypeEnum serviceType);
 
     /** Activate user account */
     boolean activateUser(String uid);

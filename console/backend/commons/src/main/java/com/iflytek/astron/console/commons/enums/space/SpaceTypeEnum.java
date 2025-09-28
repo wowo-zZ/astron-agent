@@ -1,9 +1,12 @@
 package com.iflytek.astron.console.commons.enums.space;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+
 public enum SpaceTypeEnum {
 
     FREE(1, "Free"), PRO(2, "Pro"), TEAM(3, "Team"), ENTERPRISE(4, "Enterprise");
 
+    @EnumValue
     private Integer code;
 
     private String desc;

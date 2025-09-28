@@ -263,4 +263,12 @@ public class SpaceBizServiceImpl implements SpaceBizService {
 
         return ApiResult.success();
     }
+
+    @Override
+    public ApiResult<Boolean> ossVersionUserUpgrade() {
+        String uid = RequestContextUtil.getUID();
+        return ApiResult.success(userInfoDataService.updateUserEnterpriseServiceType(uid, EnterpriseServiceTypeEnum.ENTERPRISE));
+    }
+
+
 }

@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.iflytek.astron.console.commons.constant.ResponseEnum;
 import com.iflytek.astron.console.commons.data.UserInfoDataService;
 import com.iflytek.astron.console.commons.entity.user.UserInfo;
+import com.iflytek.astron.console.commons.enums.space.EnterpriseServiceTypeEnum;
 import com.iflytek.astron.console.commons.exception.BusinessException;
 import com.iflytek.astron.console.commons.mapper.user.UserInfoMapper;
 import com.iflytek.astron.console.commons.util.RequestContextUtil;
@@ -408,6 +409,17 @@ public class UserInfoDataServiceImpl implements UserInfoDataService {
     public boolean agreeUserAgreement() {
         String currentUid = RequestContextUtil.getUID();
         return updateUserAgreement(currentUid, 1);
+    }
+
+    @Override
+    public boolean updateUserEnterpriseServiceType(String uid, EnterpriseServiceTypeEnum serviceType) {
+        if (uid == null) {
+            return false;
+        }
+        LambdaUpdateWrapper<UserInfo> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(UserInfo::getUid, uid)
+                .set(UserInfo::getEnterpriseServiceType, serviceType);
+        return userInfoMapper.update(null, wrapper) > 0;
     }
 
     @Override

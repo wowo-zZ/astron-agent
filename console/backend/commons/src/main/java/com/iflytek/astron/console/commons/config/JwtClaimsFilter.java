@@ -3,6 +3,7 @@ package com.iflytek.astron.console.commons.config;
 import com.iflytek.astron.console.commons.data.UserInfoDataService;
 import com.iflytek.astron.console.commons.dto.user.JwtInfoDto;
 import com.iflytek.astron.console.commons.entity.user.UserInfo;
+import com.iflytek.astron.console.commons.enums.space.EnterpriseServiceTypeEnum;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -83,6 +84,7 @@ public class JwtClaimsFilter extends OncePerRequestFilter {
         userInfo.setAvatar(jwtInfoDto.avatar());
         userInfo.setMobile(jwtInfoDto.mobile());
         userInfo.setAccountStatus(DEFAULT_ACCOUNT_STATUS);
+        userInfo.setEnterpriseServiceType(EnterpriseServiceTypeEnum.NONE);
         userInfo.setUserAgreement(DEFAULT_USER_AGREEMENT);
         userInfo.setCreateTime(LocalDateTime.now());
         userInfo.setUpdateTime(LocalDateTime.now());
