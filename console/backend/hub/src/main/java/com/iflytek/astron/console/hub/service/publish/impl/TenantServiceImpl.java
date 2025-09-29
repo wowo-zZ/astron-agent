@@ -69,7 +69,7 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     public TenantAuth getAppDetail(String appId) {
-        String requestUrl = String.format("%s?app_ids=%s&cloud_id=\"0\"&dev_id=\"1\"", getAppDetail, appId);
+        String requestUrl = String.format("%s?app_ids=%s", getAppDetail, appId);
         Request request = new Request.Builder()
                 .url(requestUrl).method("GET", null).build();
         log.info("TenantServiceImpl getAppDetail: request: {}", request);
