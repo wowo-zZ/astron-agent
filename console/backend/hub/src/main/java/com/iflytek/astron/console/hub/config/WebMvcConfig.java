@@ -18,6 +18,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
             "/api/model/checkModelBase",
             "/workflow/hasQaNode",
             "/workflow/version/update_channel_result",
+            "/home-page/agent-square/get-bot-type-list",
+            "/tool/list-tool-square",
+            "/config-info/tags",
             "/error"
     };
 
