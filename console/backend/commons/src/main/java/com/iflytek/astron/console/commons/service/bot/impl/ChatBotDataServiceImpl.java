@@ -472,6 +472,7 @@ public class ChatBotDataServiceImpl implements ChatBotDataService {
         BotDetail botDetail = chatBotBaseMapper.botDetail(Math.toIntExact(botId));
         botDetail.setId(null);
         ChatBotBase base = new ChatBotBase();
+        BeanUtils.copyProperties(botDetail, base);
         // Set a new assistant name as differentiation
         base.setUid(uid);
         base.setSpaceId(spaceId);
