@@ -1743,30 +1743,6 @@ CREATE TABLE `chat_tree_index`
 ) ENGINE=InnoDB AUTO_INCREMENT=957447502 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Chat history tree linked list information';
 
 -- ----------------------------
--- Table structure for chat_user
--- ----------------------------
-DROP TABLE IF EXISTS `chat_user`;
-CREATE TABLE `chat_user`
-(
-    `id`             bigint       NOT NULL AUTO_INCREMENT COMMENT 'Non-business primary key',
-    `uid`            varchar(128) DEFAULT NULL COMMENT 'Empty if user is not logged in or not registered',
-    `name`           varchar(255) DEFAULT NULL COMMENT 'User name',
-    `avatar`         varchar(512) DEFAULT NULL COMMENT 'Avatar',
-    `nickname`       varchar(255) DEFAULT NULL COMMENT 'User nickname',
-    `mobile`         varchar(255) NOT NULL COMMENT 'Mobile number, no authenticity check, only duplicate check',
-    `is_able`        tinyint      DEFAULT '0' COMMENT 'Activation status: 0 for active, 1 for inactive, 2 for frozen',
-    `create_time`    datetime     DEFAULT CURRENT_TIMESTAMP COMMENT 'Creation time',
-    `update_time`    datetime     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
-    `user_agreement` tinyint      DEFAULT '0' COMMENT 'Whether agreed to user agreement: 0 not agreed, 1 agreed',
-    `date_stamp`     int          DEFAULT NULL COMMENT 'cmp_core.BigdataServicesMonitorDaily',
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uid_unique_index` (`uid`),
-    KEY              `idx_create_time` (`create_time`),
-    KEY              `index_mobile` (`mobile`),
-    KEY              `idx_nickname` (`nickname`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='GPT user authorization information table';
-
--- ----------------------------
 -- Table structure for config_info
 -- ----------------------------
 DROP TABLE IF EXISTS `config_info`;

@@ -53,7 +53,7 @@ public interface UserInfoDataService {
     boolean updateUserAgreement(String uid, int userAgreement);
 
     /** Batch query users by UID */
-    List<UserInfo> findByUids(List<String> uids);
+    List<UserInfo> findByUids(Collection<String> uids);
 
     /** Check whether username exists */
     boolean existsByUsername(String username);
