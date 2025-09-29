@@ -17,6 +17,9 @@ import org.springframework.util.CollectionUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * @author mingsuiyongheng
+ */
 @Service
 @Slf4j
 public class ChatHistoryServiceImpl implements ChatHistoryService {
@@ -30,13 +33,19 @@ public class ChatHistoryServiceImpl implements ChatHistoryService {
     public static final int MAX_HISTORY_NUMBERS = 8000;
 
     public static final String LOOSE_PREFIX_PROMPT = """
-            Please use the following document fragments as known information: []
-            Please answer questions accurately based on the original text of the above passages and your knowledge
-            When answering user questions, please respond in the language the user asked the question
-            If the above content cannot answer user information, combine the information you know to answer user questions
-            Answer user questions concisely and professionally, and do not allow fabricated components to be added to the answer.
+            请将下列文档的片段作为已知信息:[]
+            请根据以上文段的原文和你所知道的知识准确地回答问题
+            当回答用户问题时，请使用户提问的语言回答问题
+            如果以上内容无法回答用户信息，结合你所知道的信息, 回答用户提问
+            简洁而专业地充分回答用户的问题，不允许在答案中添加编造成分。
             """;
 
+    /**
+     * Get historical message records of system bot
+     * @param uid User ID
+     * @param chatId Chat room ID
+     * @return List of system bot message records
+     */
     @Override
     public List<SparkChatRequest.MessageDto> getSystemBotHistory(String uid, Long chatId) {
         // Get question history
@@ -83,6 +92,14 @@ public class ChatHistoryServiceImpl implements ChatHistoryService {
         return messages;
     }
 
+    /**
+     * Get history records for specified user and chat ID
+     *
+     * @param uid User ID
+     * @param chatId Chat ID
+     * @param reqList Request model list
+     * @return Merged chat history records
+     */
     @Override
     public ChatRequestDtoList getHistory(String uid, Long chatId, List<ChatReqModelDto> reqList) {
         if (reqList == null || reqList.isEmpty()) {
@@ -217,7 +234,7 @@ public class ChatHistoryServiceImpl implements ChatHistoryService {
 
             // Insert knowledge content into the placeholder
             promptBuilder.insert(promptBuilder.indexOf("[") + 1, knowledgeStr);
-            promptBuilder.append("\nNext, my input is: {{}}");
+            promptBuilder.append("\n接下来我的输入是：{{}}");
             promptBuilder.insert(promptBuilder.indexOf("{{") + 2, originalAsk);
 
             String enhancedContent = promptBuilder.toString();

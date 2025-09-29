@@ -45,6 +45,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * @author mingsuiyongheng
+ */
 @Slf4j
 @Service
 public class BotChatServiceImpl implements BotChatService {
@@ -71,11 +74,11 @@ public class BotChatServiceImpl implements BotChatService {
     private int maxInputTokens;
 
     public static final String LOOSE_PREFIX_PROMPT = """
-            Please use the following document fragments as known information: []
-            Please answer questions accurately based on the original text of the above passages and your knowledge
-            When answering user questions, please respond in the language the user asked the question
-            If the above content cannot answer user information, combine the information you know to answer user questions
-            Answer user questions concisely and professionally, and do not allow fabricated components to be added to the answer.
+            请将下列文档的片段作为已知信息:[]
+            请根据以上文段的原文和你所知道的知识准确地回答问题
+            当回答用户问题时，请使用户提问的语言回答问题
+            如果以上内容无法回答用户信息，结合你所知道的信息, 回答用户提问
+            简洁而专业地充分回答用户的问题，不允许在答案中添加编造成分。
             """;
 
     @Autowired
@@ -136,6 +139,14 @@ public class BotChatServiceImpl implements BotChatService {
         }
     }
 
+    /**
+     * Method to re-answer messages
+     *
+     * @param requestId Request ID
+     * @param botId Bot ID
+     * @param sseEmitter SSE emitter
+     * @param sseId SSE ID
+     */
     @Override
     public void reAnswerMessageBot(Long requestId, Integer botId, SseEmitter sseEmitter, String sseId) {
         try {
@@ -169,6 +180,20 @@ public class BotChatServiceImpl implements BotChatService {
         }
     }
 
+    /**
+     * Debug chat bot messages
+     *
+     * @param text User input text
+     * @param prompt Prompt text
+     * @param messages Chat message list
+     * @param uid User ID
+     * @param openedTool Opened tools
+     * @param model Model to use
+     * @param modelId Model ID
+     * @param maasDatasetList MaaS dataset list
+     * @param sseEmitter SSE emitter
+     * @param sseId SSE ID
+     */
     @Override
     public void debugChatMessageBot(String text, String prompt, List<String> messages, String uid, String openedTool, String model, Long modelId, List<String> maasDatasetList, SseEmitter sseEmitter, String sseId) {
         int maxInputTokens = this.maxInputTokens;
@@ -194,6 +219,15 @@ public class BotChatServiceImpl implements BotChatService {
         }
     }
 
+    /**
+     * Clear chat window content
+     *
+     * @param chatId Chat window ID
+     * @param uid User ID
+     * @param botId Bot ID
+     * @param botBase Chat bot base information
+     * @return Chat window response object after clearing
+     */
     @Override
     @Transactional
     public ChatListCreateResponse clear(Long chatId, String uid, Integer botId, ChatBotBase botBase) {
@@ -384,7 +418,7 @@ public class BotChatServiceImpl implements BotChatService {
                 .build();
         reqKnowledgeRecordsDataService.create(reqKnowledgeRecords);
         promptBuilder.insert(promptBuilder.indexOf("[") + 1, knowledgeList);
-        promptBuilder.append("\nNext, my input is: {{}}");
+        promptBuilder.append("\n接下来我的输入是：{{}}");
         promptBuilder.insert(promptBuilder.indexOf("{{") + 2, chatBotReqDto.getAsk());
         // Need document Q&A, concatenate prompt and dataset to become the real ask
         String ask = promptBuilder.toString();
@@ -434,7 +468,7 @@ public class BotChatServiceImpl implements BotChatService {
         askBuilder.append(LOOSE_PREFIX_PROMPT);
         List<String> askKnowledgeList = knowledgeService.getChuncks(maasDatasetList, text, 3, true);
         askBuilder.insert(askBuilder.indexOf("[") + 1, askKnowledgeList);
-        askBuilder.append("\nNext, my input is: {{}}");
+        askBuilder.append("\n接下来我的输入是：{{}}");
         askBuilder.insert(askBuilder.indexOf("{{") + 2, text);
         queryMessage.setContent(askBuilder.toString());
 
@@ -518,7 +552,8 @@ public class BotChatServiceImpl implements BotChatService {
             }
 
             currentTokens += messageTokens;
-            result.addFirst(message); // Add to the beginning of the list, maintain time order
+            // Add to the beginning of the list, maintain time order
+            result.addFirst(message); 
         }
 
         return result;
@@ -556,7 +591,8 @@ public class BotChatServiceImpl implements BotChatService {
         log.trace("Token estimation - Chinese characters: {}, English characters: {}, Estimated tokens: {}",
                 chineseChars, englishChars, estimatedTokens);
 
-        return Math.max(estimatedTokens, 1); // At least 1 token
+        // At least 1 token
+        return Math.max(estimatedTokens, 1); 
     }
 
     /**
@@ -572,11 +608,18 @@ public class BotChatServiceImpl implements BotChatService {
         sparkChatRequest.setModel(botConfig.model);
         sparkChatRequest.setMessages(messages);
         sparkChatRequest.setChatId(chatBotReqDto.getChatId().toString());
-        sparkChatRequest.setUserId(chatBotReqDto.getUid().toString());
+        sparkChatRequest.setUserId(chatBotReqDto.getUid());
         sparkChatRequest.setEnableWebSearch(enableWebSearch(botConfig.openedTool));
         return sparkChatRequest;
     }
 
+    /**
+     * Build JSON object for prompt chat request
+     *
+     * @param llmInfoVo LLMInfoVo object containing URL, API key and model information
+     * @param messages List of chat messages
+     * @return JSON object representing the prompt chat request
+     */
     private JSONObject buildPromptChatRequest(LLMInfoVo llmInfoVo, List<SparkChatRequest.MessageDto> messages) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("url", llmInfoVo.getUrl());

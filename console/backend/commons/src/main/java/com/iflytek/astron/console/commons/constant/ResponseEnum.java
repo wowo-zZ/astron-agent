@@ -1,5 +1,7 @@
 package com.iflytek.astron.console.commons.constant;
 
+import lombok.Getter;
+
 /**
  * Response code enumeration class
  */
@@ -365,20 +367,14 @@ public enum ResponseEnum {
     // System errors 9xxxx
     SYSTEM_ERROR(99999, "system.error");
 
+    @Getter
     private final int code;
 
+    @Getter
     private final String messageKey;
 
     ResponseEnum(int code, String messageKey) {
         this.code = code;
         this.messageKey = messageKey;
-    }
-
-    public int getCode() {
-        return code;
-    }
-
-    public String getMessageKey() {
-        return messageKey;
     }
 }

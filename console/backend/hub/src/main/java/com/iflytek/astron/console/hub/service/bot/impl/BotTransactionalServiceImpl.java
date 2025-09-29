@@ -15,9 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 
 /**
- * @author cczhu10
- * @date 2025-06-30
- * @description
+ * @author mingsuiyongheng
  */
 @Service
 @Slf4j
@@ -32,20 +30,28 @@ public class BotTransactionalServiceImpl implements BotTransactionalService {
     @Autowired
     private RedissonClient redissonClient;
 
+    /**
+     * Copy bot
+     *
+     * @param uid User ID
+     * @param botId Bot ID
+     * @param request HTTP request object
+     * @param spaceId Space ID
+     */
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void copyBot(String uid, Integer botId, HttpServletRequest request, Long spaceId) {
         ChatBotBase base = botService.copyBot(uid, botId, spaceId);
         log.info("copy bot : new bot : {}", base);
-        // 新助手的botId就是target id
+        // The botId of the new assistant is the target id
         Long targetId = Long.valueOf(base.getId());
         if (base.getVersion() == 2) {
             botChainService.copyBot(uid, Long.valueOf(botId), targetId, spaceId);
         } else if (base.getVersion() == 3) {
-            // 创建一个事件,在 /massCopySynchronize被消费
+            // Create an event to be consumed at /massCopySynchronize
             redissonClient.getBucket(MaasUtil.generatePrefix(uid, botId)).set(String.valueOf(botId));
             redissonClient.getBucket(MaasUtil.generatePrefix(uid, botId)).expire(Duration.ofSeconds(60));
-            // 同步星辰 MASS
+            // Synchronize Xingchen MAAS
             botChainService.cloneWorkFlow(uid, Long.valueOf(botId), targetId, request, spaceId);
         }
     }
