@@ -421,7 +421,13 @@ const getBaseURL = (): string => {
     return '/xingchen-api';
   }
 
-  // 通过import.meta.env.MODE获取构建时的环境模式
+  // 从环境变量读取baseURL
+  const baseUrlFromEnv = import.meta.env.VITE_BASE_URL;
+  if (baseUrlFromEnv) {
+    return baseUrlFromEnv;
+  }
+
+  // 兜底逻辑：通过import.meta.env.MODE获取构建时的环境模式
   const mode = import.meta.env.MODE;
   switch (mode) {
     case 'development':
@@ -435,6 +441,7 @@ const getBaseURL = (): string => {
 };
 
 export const baseURL = getBaseURL();
+
 
 axios.defaults.baseURL = baseURL;
 export default axios;
