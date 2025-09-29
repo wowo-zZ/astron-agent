@@ -81,6 +81,7 @@ public class TenantServiceImpl implements TenantService {
                 return null;
             }
             reqJson = JSONObject.parseObject(response.body().string());
+            log.error("tenant-service-get-app-detail Lack of return requestUrl: {}, response: {}", requestUrl, reqJson);
             if (reqJson.getInteger("code") == 0 && reqJson.containsKey("data") && reqJson.getJSONObject("data").containsKey("auth_list")) {
                 return JSONArray.parseArray(reqJson.getJSONObject("data").getString("auth_list"), TenantAuth.class).get(0);
             } else {
