@@ -115,6 +115,16 @@ public class UserInfoDataServiceImpl implements UserInfoDataService {
     }
 
     @Override
+    public List<UserInfo> findUsersByUsernames(Collection<String> usernames) {
+        if (usernames.isEmpty()) {
+            return new ArrayList<>();
+        }
+        LambdaQueryWrapper<UserInfo> wrapper = new LambdaQueryWrapper<>();
+        wrapper.in(UserInfo::getUsername, usernames);
+        return userInfoMapper.selectList(wrapper);
+    }
+
+    @Override
     public List<UserInfo> findByNicknameLike(String nickname) {
         if (StringUtils.isBlank(nickname)) {
             return List.of();

@@ -178,6 +178,7 @@ public class WorkflowBotChatServiceImpl implements WorkflowBotChatService {
 
     /**
      * Filter chat request content
+     *
      * @param requestDtoList Chat request list
      */
     private void filterContent(ChatRequestDtoList requestDtoList) {

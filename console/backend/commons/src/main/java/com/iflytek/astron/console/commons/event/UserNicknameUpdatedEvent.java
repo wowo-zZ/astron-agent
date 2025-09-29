@@ -6,6 +6,8 @@ import org.springframework.context.ApplicationEvent;
 @Getter
 public class UserNicknameUpdatedEvent extends ApplicationEvent {
 
+    private static final long serialVersionUID = 1L;
+
     private final String uid;
     private final String oldNickname;
     private final String newNickname;

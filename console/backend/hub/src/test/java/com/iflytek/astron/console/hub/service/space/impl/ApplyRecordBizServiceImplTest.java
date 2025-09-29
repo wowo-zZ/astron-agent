@@ -95,7 +95,7 @@ class ApplyRecordBizServiceImplTest {
     void testJoinEnterpriseSpace_Success_NormalUser() {
         // 准备测试数据
         try (MockedStatic<RequestContextUtil> requestContextMock = mockStatic(RequestContextUtil.class);
-             MockedStatic<EnterpriseInfoUtil> enterpriseInfoMock = mockStatic(EnterpriseInfoUtil.class)) {
+                MockedStatic<EnterpriseInfoUtil> enterpriseInfoMock = mockStatic(EnterpriseInfoUtil.class)) {
 
             // Mock静态方法
             requestContextMock.when(RequestContextUtil::getUID).thenReturn(TEST_UID);
@@ -132,7 +132,7 @@ class ApplyRecordBizServiceImplTest {
         testEnterpriseUser.setRole(EnterpriseRoleEnum.OFFICER.getCode());
 
         try (MockedStatic<RequestContextUtil> requestContextMock = mockStatic(RequestContextUtil.class);
-             MockedStatic<EnterpriseInfoUtil> enterpriseInfoMock = mockStatic(EnterpriseInfoUtil.class)) {
+                MockedStatic<EnterpriseInfoUtil> enterpriseInfoMock = mockStatic(EnterpriseInfoUtil.class)) {
 
             // Mock静态方法
             requestContextMock.when(RequestContextUtil::getUID).thenReturn(TEST_UID);
@@ -163,7 +163,7 @@ class ApplyRecordBizServiceImplTest {
     @DisplayName("申请加入企业空间 - 失败：未加入企业")
     void testJoinEnterpriseSpace_Fail_NotInEnterprise() {
         try (MockedStatic<RequestContextUtil> requestContextMock = mockStatic(RequestContextUtil.class);
-             MockedStatic<EnterpriseInfoUtil> enterpriseInfoMock = mockStatic(EnterpriseInfoUtil.class)) {
+                MockedStatic<EnterpriseInfoUtil> enterpriseInfoMock = mockStatic(EnterpriseInfoUtil.class)) {
 
             // Mock静态方法
             requestContextMock.when(RequestContextUtil::getUID).thenReturn(TEST_UID);
@@ -182,7 +182,7 @@ class ApplyRecordBizServiceImplTest {
     @DisplayName("申请加入企业空间 - 失败：重复申请")
     void testJoinEnterpriseSpace_Fail_DuplicateApplication() {
         try (MockedStatic<RequestContextUtil> requestContextMock = mockStatic(RequestContextUtil.class);
-             MockedStatic<EnterpriseInfoUtil> enterpriseInfoMock = mockStatic(EnterpriseInfoUtil.class)) {
+                MockedStatic<EnterpriseInfoUtil> enterpriseInfoMock = mockStatic(EnterpriseInfoUtil.class)) {
 
             // Mock静态方法
             requestContextMock.when(RequestContextUtil::getUID).thenReturn(TEST_UID);
@@ -205,7 +205,7 @@ class ApplyRecordBizServiceImplTest {
     @DisplayName("申请加入企业空间 - 失败：用户已在空间中")
     void testJoinEnterpriseSpace_Fail_UserAlreadyInSpace() {
         try (MockedStatic<RequestContextUtil> requestContextMock = mockStatic(RequestContextUtil.class);
-             MockedStatic<EnterpriseInfoUtil> enterpriseInfoMock = mockStatic(EnterpriseInfoUtil.class)) {
+                MockedStatic<EnterpriseInfoUtil> enterpriseInfoMock = mockStatic(EnterpriseInfoUtil.class)) {
 
             // Mock静态方法
             requestContextMock.when(RequestContextUtil::getUID).thenReturn(TEST_UID);
@@ -234,7 +234,7 @@ class ApplyRecordBizServiceImplTest {
         testEnterpriseUser.setRole(EnterpriseRoleEnum.OFFICER.getCode());
 
         try (MockedStatic<RequestContextUtil> requestContextMock = mockStatic(RequestContextUtil.class);
-             MockedStatic<EnterpriseInfoUtil> enterpriseInfoMock = mockStatic(EnterpriseInfoUtil.class)) {
+                MockedStatic<EnterpriseInfoUtil> enterpriseInfoMock = mockStatic(EnterpriseInfoUtil.class)) {
 
             // Mock静态方法
             requestContextMock.when(RequestContextUtil::getUID).thenReturn(TEST_UID);
@@ -261,7 +261,7 @@ class ApplyRecordBizServiceImplTest {
     @DisplayName("申请加入企业空间 - 失败：申请保存失败")
     void testJoinEnterpriseSpace_Fail_SaveApplicationFailed() {
         try (MockedStatic<RequestContextUtil> requestContextMock = mockStatic(RequestContextUtil.class);
-             MockedStatic<EnterpriseInfoUtil> enterpriseInfoMock = mockStatic(EnterpriseInfoUtil.class)) {
+                MockedStatic<EnterpriseInfoUtil> enterpriseInfoMock = mockStatic(EnterpriseInfoUtil.class)) {
 
             // Mock静态方法
             requestContextMock.when(RequestContextUtil::getUID).thenReturn(TEST_UID);
@@ -288,7 +288,7 @@ class ApplyRecordBizServiceImplTest {
     @DisplayName("同意加入企业空间 - 成功")
     void testAgreeEnterpriseSpace_Success() {
         try (MockedStatic<RequestContextUtil> requestContextMock = mockStatic(RequestContextUtil.class);
-             MockedStatic<SpaceInfoUtil> spaceInfoMock = mockStatic(SpaceInfoUtil.class)) {
+                MockedStatic<SpaceInfoUtil> spaceInfoMock = mockStatic(SpaceInfoUtil.class)) {
 
             // Mock静态方法
             requestContextMock.when(RequestContextUtil::getUID).thenReturn("admin_uid");
@@ -308,11 +308,9 @@ class ApplyRecordBizServiceImplTest {
             assertNull(result.data());
 
             // 验证申请记录状态更新
-            verify(applyRecordService).updateById(argThat(record -> 
-                record.getStatus().equals(ApplyRecord.Status.APPROVED.getCode()) &&
-                record.getAuditUid().equals("admin_uid") &&
-                record.getAuditTime() != null
-            ));
+            verify(applyRecordService).updateById(argThat(record -> record.getStatus().equals(ApplyRecord.Status.APPROVED.getCode()) &&
+                    record.getAuditUid().equals("admin_uid") &&
+                    record.getAuditTime() != null));
 
             // 验证添加空间用户
             verify(spaceUserService).addSpaceUser(TEST_SPACE_ID, TEST_UID, SpaceRoleEnum.MEMBER);
@@ -380,7 +378,7 @@ class ApplyRecordBizServiceImplTest {
     @DisplayName("同意加入企业空间 - 失败：更新申请记录失败")
     void testAgreeEnterpriseSpace_Fail_UpdateRecordFailed() {
         try (MockedStatic<RequestContextUtil> requestContextMock = mockStatic(RequestContextUtil.class);
-             MockedStatic<SpaceInfoUtil> spaceInfoMock = mockStatic(SpaceInfoUtil.class)) {
+                MockedStatic<SpaceInfoUtil> spaceInfoMock = mockStatic(SpaceInfoUtil.class)) {
 
             // Mock静态方法
             requestContextMock.when(RequestContextUtil::getUID).thenReturn("admin_uid");
@@ -403,7 +401,7 @@ class ApplyRecordBizServiceImplTest {
     @DisplayName("同意加入企业空间 - 失败：添加空间用户失败")
     void testAgreeEnterpriseSpace_Fail_AddSpaceUserFailed() {
         try (MockedStatic<RequestContextUtil> requestContextMock = mockStatic(RequestContextUtil.class);
-             MockedStatic<SpaceInfoUtil> spaceInfoMock = mockStatic(SpaceInfoUtil.class)) {
+                MockedStatic<SpaceInfoUtil> spaceInfoMock = mockStatic(SpaceInfoUtil.class)) {
 
             // Mock静态方法
             requestContextMock.when(RequestContextUtil::getUID).thenReturn("admin_uid");
@@ -428,7 +426,7 @@ class ApplyRecordBizServiceImplTest {
     @DisplayName("拒绝加入企业空间 - 成功")
     void testRefuseEnterpriseSpace_Success() {
         try (MockedStatic<RequestContextUtil> requestContextMock = mockStatic(RequestContextUtil.class);
-             MockedStatic<SpaceInfoUtil> spaceInfoMock = mockStatic(SpaceInfoUtil.class)) {
+                MockedStatic<SpaceInfoUtil> spaceInfoMock = mockStatic(SpaceInfoUtil.class)) {
 
             // Mock静态方法
             requestContextMock.when(RequestContextUtil::getUID).thenReturn("admin_uid");
@@ -446,11 +444,9 @@ class ApplyRecordBizServiceImplTest {
             assertNull(result.data());
 
             // 验证申请记录状态更新
-            verify(applyRecordService).updateById(argThat(record -> 
-                record.getStatus().equals(ApplyRecord.Status.REJECTED.getCode()) &&
-                record.getAuditUid().equals("admin_uid") &&
-                record.getAuditTime() != null
-            ));
+            verify(applyRecordService).updateById(argThat(record -> record.getStatus().equals(ApplyRecord.Status.REJECTED.getCode()) &&
+                    record.getAuditUid().equals("admin_uid") &&
+                    record.getAuditTime() != null));
         }
     }
 
@@ -515,7 +511,7 @@ class ApplyRecordBizServiceImplTest {
     @DisplayName("拒绝加入企业空间 - 失败：更新申请记录失败")
     void testRefuseEnterpriseSpace_Fail_UpdateRecordFailed() {
         try (MockedStatic<RequestContextUtil> requestContextMock = mockStatic(RequestContextUtil.class);
-             MockedStatic<SpaceInfoUtil> spaceInfoMock = mockStatic(SpaceInfoUtil.class)) {
+                MockedStatic<SpaceInfoUtil> spaceInfoMock = mockStatic(SpaceInfoUtil.class)) {
 
             // Mock静态方法
             requestContextMock.when(RequestContextUtil::getUID).thenReturn("admin_uid");

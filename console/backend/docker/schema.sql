@@ -1682,7 +1682,7 @@ CREATE TABLE `chat_resp_records`
     KEY           `idx_reqId` (`req_id`),
     KEY           `idx_sid` (`sid`),
     KEY           `idx_uid_chatId` (`uid`,`chat_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=406 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Chat response record table';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Chat response record table';
 
 -- ----------------------------
 -- Table structure for chat_token_records
@@ -1721,7 +1721,7 @@ CREATE TABLE `chat_trace_source`
     KEY           `chat_trace_source_chat_id_IDX` (`chat_id`) USING BTREE,
     KEY           `chat_trace_source_type_IDX` (`type`) USING BTREE,
     KEY           `chat_trace_source_uid_IDX` (`uid`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Chat trace information storage table';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Chat trace information storage table';
 
 -- ----------------------------
 -- Table structure for chat_tree_index
@@ -1740,7 +1740,7 @@ CREATE TABLE `chat_tree_index`
     KEY              `chat_tree_index_uid_IDX` (`uid`),
     KEY              `chat_tree_index_root_chat_id_IDX` (`root_chat_id`),
     KEY              `idx_child_chat_id` (`child_chat_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=957447502 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Chat history tree linked list information';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Chat history tree linked list information';
 
 -- ----------------------------
 -- Table structure for config_info
@@ -1758,7 +1758,7 @@ CREATE TABLE `config_info`
     `create_time` datetime      DEFAULT '2000-01-01 00:00:00' COMMENT 'Creation time',
     `update_time` datetime      DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1823 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Configuration table';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Configuration table';
 
 -- ----------------------------
 -- Records of config_info
@@ -2146,7 +2146,7 @@ CREATE TABLE `config_info_en`
     `create_time` datetime      DEFAULT '2000-01-01 00:00:00' COMMENT 'Creation time',
     `update_time` datetime      DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1791 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Configuration table - EN';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Configuration table - EN';
 
 -- ----------------------------
 -- Records of config_info_en
@@ -2524,7 +2524,7 @@ CREATE TABLE `core_system_error_code`
     `error_code` int          NOT NULL,
     `error_msg`  varchar(100) NOT NULL,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1841 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Table structure for create_bot_context

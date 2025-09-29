@@ -25,6 +25,9 @@ public interface UserInfoDataService {
     /** Query users by a collection of mobile numbers */
     List<UserInfo> findUsersByMobiles(Collection<String> mobile);
 
+    /** Query users by a collection of usernames */
+    List<UserInfo> findUsersByUsernames(Collection<String> usernames);
+
     /** Fuzzy query users by nickname */
     List<UserInfo> findByNicknameLike(String nickname);
 

@@ -60,7 +60,7 @@ public enum ShelfStatusEnum {
     public static boolean isOffShelf(Integer code) {
         return OFF_SHELF.getCode().equals(code);
     }
-    
+
     /**
      * Check if the action is a publish operation (PUBLISH -> ON_SHELF)
      *
@@ -70,7 +70,7 @@ public enum ShelfStatusEnum {
     public static boolean isPublishAction(String action) {
         return "PUBLISH".equals(action);
     }
-    
+
     /**
      * Check if the action is an offline operation (OFFLINE -> OFF_SHELF)
      *
@@ -80,7 +80,7 @@ public enum ShelfStatusEnum {
     public static boolean isOfflineAction(String action) {
         return "OFFLINE".equals(action);
     }
-    
+
     /**
      * Get target shelf status by action string
      *

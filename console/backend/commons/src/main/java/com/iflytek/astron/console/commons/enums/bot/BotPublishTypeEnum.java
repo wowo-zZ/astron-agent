@@ -3,22 +3,21 @@ package com.iflytek.astron.console.commons.enums.bot;
 import lombok.Getter;
 
 /**
- * Bot发布类型枚举
- * 用于区分不同的发布渠道类型
+ * Bot发布类型枚举 用于区分不同的发布渠道类型
  */
 @Getter
 public enum BotPublishTypeEnum {
-    
+
     /**
      * 发布到市场
      */
     MARKET("MARKET", "市场", 1),
-    
+
     /**
      * 发布为API
      */
     API("API", "API", 2),
-    
+
     /**
      * 发布到MCP
      */
@@ -28,12 +27,12 @@ public enum BotPublishTypeEnum {
      * 类型代码
      */
     private final String code;
-    
+
     /**
      * 类型描述
      */
     private final String desc;
-    
+
     /**
      * 渠道代码（对应数据库中的publish_channel字段）
      */
@@ -44,7 +43,7 @@ public enum BotPublishTypeEnum {
         this.desc = desc;
         this.channelCode = channelCode;
     }
-    
+
     /**
      * 根据代码获取枚举
      */
@@ -59,7 +58,7 @@ public enum BotPublishTypeEnum {
         }
         return null;
     }
-    
+
     /**
      * 根据渠道代码获取枚举
      */
@@ -74,7 +73,7 @@ public enum BotPublishTypeEnum {
         }
         return null;
     }
-    
+
     /**
      * 判断是否为市场发布
      */

@@ -87,19 +87,15 @@ public class UserNicknameEventTest {
         // 7. 验证相关表中的昵称是否已更新
         EnterpriseUser updatedEnterpriseUser = enterpriseUserMapper.selectOne(
                 new LambdaQueryWrapper<EnterpriseUser>()
-                        .eq(EnterpriseUser::getUid, testUid)
-        );
+                        .eq(EnterpriseUser::getUid, testUid));
         assert updatedEnterpriseUser != null;
-        assert newNickname.equals(updatedEnterpriseUser.getNickname()) :
-                "企业用户昵称未更新: " + updatedEnterpriseUser.getNickname();
+        assert newNickname.equals(updatedEnterpriseUser.getNickname()) : "企业用户昵称未更新: " + updatedEnterpriseUser.getNickname();
 
         SpaceUser updatedSpaceUser = spaceUserMapper.selectOne(
                 new LambdaQueryWrapper<SpaceUser>()
-                        .eq(SpaceUser::getUid, testUid)
-        );
+                        .eq(SpaceUser::getUid, testUid));
         assert updatedSpaceUser != null;
-        assert newNickname.equals(updatedSpaceUser.getNickname()) :
-                "空间用户昵称未更新: " + updatedSpaceUser.getNickname();
+        assert newNickname.equals(updatedSpaceUser.getNickname()) : "空间用户昵称未更新: " + updatedSpaceUser.getNickname();
 
         log.info("昵称同步测试通过！所有相关表的昵称已成功更新为: {}", newNickname);
     }
