@@ -29,8 +29,6 @@ public class LLMController {
     }
 
     /**
-     * 前端非要加一个多余的接口取数，不知道起啥名，故叫inter1
-     *
      * @param request
      * @param id
      * @param llmSource
@@ -42,7 +40,7 @@ public class LLMController {
     }
 
     /**
-     * 自定义模型参数
+     * Custom model parameters
      *
      * @param id
      * @param llmSource

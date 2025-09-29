@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 
 /**
- * @author yingpeng
+ * @author mingsuiyongheng
  */
 @Service
 @Slf4j
@@ -28,6 +28,12 @@ public class ShareServiceImpl implements ShareService {
     private ShareDataService shareDataService;
 
 
+    /**
+     * Get bot status
+     * @param relatedId Related ID
+     * @return Bot status
+     * @throws BusinessException If unable to get bot status
+     */
     @Override
     public int getBotStatus(Long relatedId) {
         BotDetail detail = chatBotDataService.getBotDetail(relatedId);

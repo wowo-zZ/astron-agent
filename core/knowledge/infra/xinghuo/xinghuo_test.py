@@ -28,7 +28,7 @@ class TestXinghuoRag:
     """Spark knowledge base interface unit tests"""
 
     @pytest.fixture(autouse=True)
-    def setup(self, monkeypatch):
+    def setup(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """Set up test environment"""
         # Set environment variables
         monkeypatch.setenv("XINGHUO_RAG_URL", "https://test-api.xinghuo.com/")
@@ -55,7 +55,7 @@ class TestXinghuoRag:
         )
 
     @pytest.mark.asyncio
-    async def test_upload_success(self):
+    async def test_upload_success(self) -> None:
         """Test successful file upload"""
         # Mock async_form_request returns successful response
         with patch(
@@ -69,7 +69,7 @@ class TestXinghuoRag:
             assert result == {"fileId": "test_file_id"}
 
     @pytest.mark.asyncio
-    async def test_upload_failure(self):
+    async def test_upload_failure(self) -> None:
         """Test file upload failure"""
         # Mock async_form_request throws exception
         with patch(
@@ -80,7 +80,7 @@ class TestXinghuoRag:
                 await upload("http://example.com/test.txt", {"test": "extend"}, 1)
 
     @pytest.mark.asyncio
-    async def test_split_success(self):
+    async def test_split_success(self) -> None:
         """Test successful document splitting"""
         # Mock async_request returns successful response
         with patch(
@@ -94,7 +94,7 @@ class TestXinghuoRag:
             assert result == {"status": "success"}
 
     @pytest.mark.asyncio
-    async def test_split_retry_success(self):
+    async def test_split_retry_success(self) -> None:
         """Test document splitting succeeds after retries"""
         # Mock async_request fails first two times, succeeds third time
         mock_request = AsyncMock(
@@ -116,7 +116,7 @@ class TestXinghuoRag:
                 assert result == {"status": "success"}
 
     @pytest.mark.asyncio
-    async def test_split_failure_after_retries(self):
+    async def test_split_failure_after_retries(self) -> None:
         """Test document splitting still fails after retries"""
         # Mock async_request always fails
         mock_request = AsyncMock(side_effect=Exception("Always failing"))
@@ -134,7 +134,7 @@ class TestXinghuoRag:
                 assert mock_request.call_count == 3
 
     @pytest.mark.asyncio
-    async def test_get_chunks_success(self):
+    async def test_get_chunks_success(self) -> None:
         """Test successful document chunk retrieval"""
         # Mock get_file_status returns success status
         with patch(
@@ -151,7 +151,7 @@ class TestXinghuoRag:
                 assert result == [{"chunkId": "1", "content": "test"}]
 
     @pytest.mark.asyncio
-    async def test_get_chunks_file_failed(self):
+    async def test_get_chunks_file_failed(self) -> None:
         """Test chunk retrieval when file processing failed"""
         # Mock get_file_status returns failure status
         with patch(
@@ -162,7 +162,7 @@ class TestXinghuoRag:
                 await get_chunks("test_file_id")
 
     @pytest.mark.asyncio
-    async def test_get_chunks_retry_success(self):
+    async def test_get_chunks_retry_success(self) -> None:
         """Test chunk retrieval succeeds after retries"""
         # Mock get_file_status returns processing status first two times, success third time
         mock_status = AsyncMock(
@@ -188,7 +188,7 @@ class TestXinghuoRag:
                     assert result == [{"chunkId": "1", "content": "test"}]
 
     @pytest.mark.asyncio
-    async def test_get_chunks_failure_after_retries(self):
+    async def test_get_chunks_failure_after_retries(self) -> None:
         """Test chunk retrieval still fails after retries"""
         # Mock get_file_status always returns processing status
         mock_status = AsyncMock(return_value=[{"fileStatus": "spliting"}])
@@ -209,7 +209,7 @@ class TestXinghuoRag:
                     assert exc_info.value.code == CodeEnum.GetFileContentFailed.code
 
     @pytest.mark.asyncio
-    async def test_new_topk_search_success(self):
+    async def test_new_topk_search_success(self) -> None:
         """Test successful new hybrid search"""
         # Mock async_request returns search results
         with patch(
@@ -223,7 +223,7 @@ class TestXinghuoRag:
             assert result == {"results": ["result1", "result2"]}
 
     @pytest.mark.asyncio
-    async def test_get_file_status_success(self):
+    async def test_get_file_status_success(self) -> None:
         """Test successful file status retrieval"""
         # Mock async_form_request returns file status
         with patch(
@@ -239,7 +239,7 @@ class TestXinghuoRag:
             assert result == [{"fileId": "test_file_id", "fileStatus": "success"}]
 
     @pytest.mark.asyncio
-    async def test_get_file_info_success(self):
+    async def test_get_file_info_success(self) -> None:
         """Test successful file info retrieval"""
         # Mock async_form_request returns file info
         with patch(
@@ -255,7 +255,7 @@ class TestXinghuoRag:
             assert result == {"fileId": "test_file_id", "fileName": "test.txt"}
 
     @pytest.mark.asyncio
-    async def test_dataset_addchunk_success(self):
+    async def test_dataset_addchunk_success(self) -> None:
         """Test successful chunk addition to dataset"""
         # Mock async_request returns addition result
         with patch(
@@ -270,7 +270,7 @@ class TestXinghuoRag:
             assert result == {"success": True}
 
     @pytest.mark.asyncio
-    async def test_dataset_delchunk_success(self):
+    async def test_dataset_delchunk_success(self) -> None:
         """Test successful chunk deletion from dataset"""
         # Mock async_form_request returns deletion result
         with patch(
@@ -284,7 +284,7 @@ class TestXinghuoRag:
             assert result == {"success": True}
 
     @pytest.mark.asyncio
-    async def test_dataset_updchunk_success(self):
+    async def test_dataset_updchunk_success(self) -> None:
         """Test successful chunk update in dataset"""
         # Mock async_request returns update result
         with patch(
@@ -304,7 +304,7 @@ class TestXinghuoRag:
             assert result == {"success": True}
 
     @pytest.mark.asyncio
-    async def test_async_request_success(self):
+    async def test_async_request_success(self) -> None:
         """Test successful async request"""
         # Mock aiohttp response
         mock_response = AsyncMock()
@@ -332,7 +332,7 @@ class TestXinghuoRag:
                 assert result == {"result": "success"}
 
     @pytest.mark.asyncio
-    async def test_async_request_api_error(self):
+    async def test_async_request_api_error(self) -> None:
         """Test async request API error"""
         # Mock aiohttp response
         mock_response = AsyncMock()
@@ -359,7 +359,7 @@ class TestXinghuoRag:
                     )
 
     @pytest.mark.asyncio
-    async def test_async_request_network_error(self):
+    async def test_async_request_network_error(self) -> None:
         """Test async request network error"""
         with patch("aiohttp.ClientSession.request") as mock_session:
             mock_session.return_value.__aenter__.side_effect = aiohttp.ClientError(
@@ -375,7 +375,7 @@ class TestXinghuoRag:
                     )
 
     @pytest.mark.asyncio
-    async def test_async_request_timeout_error(self):
+    async def test_async_request_timeout_error(self) -> None:
         """Test async request timeout error"""
         with patch("aiohttp.ClientSession.request") as mock_session:
             mock_session.return_value.__aenter__.side_effect = asyncio.TimeoutError()
@@ -389,7 +389,7 @@ class TestXinghuoRag:
                     )
 
     @pytest.mark.asyncio
-    async def test_async_form_request_success(self):
+    async def test_async_form_request_success(self) -> None:
         """Test successful async form request"""
         # Mock aiohttp response
         mock_response = AsyncMock()
@@ -417,7 +417,7 @@ class TestXinghuoRag:
                 assert result == {"result": "success"}
 
     @pytest.mark.asyncio
-    async def test_assemble_spark_auth_headers_async(self):
+    async def test_assemble_spark_auth_headers_async(self) -> None:
         """Test auth header assembly"""
         with patch("time.time", return_value=1234567890):
             result = await assemble_spark_auth_headers_async()

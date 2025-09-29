@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Objects;
 
 /**
- * @author yingpeng
+ * @author mingsuiyongheng
  */
 @Slf4j
 @Tag(name = "Sharing related")
@@ -42,6 +42,11 @@ public class ShareController {
     @Autowired
     private ChatListService chatListService;
 
+    /**
+    * Method defined with @PostMapping annotation to handle GET share key requests
+    * @param body CardAddBody object containing request body
+    * @return Returns an ApiResult object containing share key
+    */
     @SpacePreAuth(key = "AgentController_getShareKey_POST")
     @PostMapping("/get-share-key")
     @Operation(summary = "Get sharing identifier")
@@ -62,6 +67,12 @@ public class ShareController {
         return ApiResult.success(result);
     }
 
+    /**
+    * Add shared agent
+    * @param request HTTP request object
+    * @param shareKey Share key object
+    * @return ApiResult object containing operation result
+    */
     @PostMapping("/add-shared-agent")
     @Operation(summary = "Add shared agent")
     public ApiResult<ChatListCreateResponse> addSharedAgent(HttpServletRequest request, @RequestBody ShareKey shareKey) {

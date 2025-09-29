@@ -1,1 +1,0 @@
-"""Exceptions test module."""

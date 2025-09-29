@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 /**
- * 通用分页响应DTO 对应老代码中的分页返回结构
+ * Generic pagination response DTO corresponding to pagination return structure in legacy code
  *
  * @author Omuigix
  */
@@ -17,42 +17,42 @@ import java.util.List;
 public class PageResponse<T> {
 
     /**
-     * 当前页码
+     * Current page number
      */
     private Integer page;
 
     /**
-     * 页大小
+     * Page size
      */
     private Integer size;
 
     /**
-     * 总记录数
+     * Total record count
      */
     private Long total;
 
     /**
-     * 总页数
+     * Total page count
      */
     private Integer totalPages;
 
     /**
-     * 数据列表
+     * Data list
      */
     private List<T> records;
 
     /**
-     * 是否有下一页
+     * Whether there is a next page
      */
     private Boolean hasNext;
 
     /**
-     * 是否有上一页
+     * Whether there is a previous page
      */
     private Boolean hasPrevious;
 
     /**
-     * 构造分页响应
+     * Construct pagination response
      */
     public static <T> PageResponse<T> of(Integer page, Integer size, Long total, List<T> records) {
         PageResponse<T> response = new PageResponse<>();
@@ -61,11 +61,11 @@ public class PageResponse<T> {
         response.setTotal(total);
         response.setRecords(records);
 
-        // 计算总页数
+        // Calculate total pages
         int totalPages = (int) Math.ceil((double) total / size);
         response.setTotalPages(totalPages);
 
-        // 计算是否有上下页
+        // Calculate whether there are previous/next pages
         response.setHasNext(page < totalPages);
         response.setHasPrevious(page > 1);
 
@@ -73,7 +73,7 @@ public class PageResponse<T> {
     }
 
     /**
-     * 空结果
+     * Empty result
      */
     public static <T> PageResponse<T> empty(Integer page, Integer size) {
         return of(page, size, 0L, List.of());

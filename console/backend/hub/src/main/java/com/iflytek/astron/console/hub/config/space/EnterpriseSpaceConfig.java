@@ -20,7 +20,7 @@ public class EnterpriseSpaceConfig {
 
     @Autowired
     private EnterpriseSpaceService enterpriseSpaceService;
-    
+
 
     @PostConstruct
     public void init() {

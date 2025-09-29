@@ -71,11 +71,11 @@ public class BotChatServiceImpl implements BotChatService {
     private int maxInputTokens;
 
     public static final String LOOSE_PREFIX_PROMPT = """
-            请将下列文档的片段作为已知信息:[]
-            请根据以上文段的原文和你所知道的知识准确地回答问题
-            当回答用户问题时，请使用户提问的语言回答问题
-            如果以上内容无法回答用户信息，结合你所知道的信息, 回答用户提问
-            简洁而专业地充分回答用户的问题，不允许在答案中添加编造成分。
+            Please use the following document fragments as known information: []
+            Please answer questions accurately based on the original text of the above passages and your knowledge
+            When answering user questions, please respond in the language the user asked the question
+            If the above content cannot answer user information, combine the information you know to answer user questions
+            Answer user questions concisely and professionally, and do not allow fabricated components to be added to the answer.
             """;
 
     @Autowired
@@ -384,9 +384,9 @@ public class BotChatServiceImpl implements BotChatService {
                 .build();
         reqKnowledgeRecordsDataService.create(reqKnowledgeRecords);
         promptBuilder.insert(promptBuilder.indexOf("[") + 1, knowledgeList);
-        promptBuilder.append("\n接下来我的输入是：{{}}");
+        promptBuilder.append("\nNext, my input is: {{}}");
         promptBuilder.insert(promptBuilder.indexOf("{{") + 2, chatBotReqDto.getAsk());
-        // 需要文档问答, 把prompt和数据集都拼起来, 成为真正的ask
+        // Need document Q&A, concatenate prompt and dataset to become the real ask
         String ask = promptBuilder.toString();
         SparkChatRequest.MessageDto queryMessage = new SparkChatRequest.MessageDto();
         queryMessage.setRole("user");
@@ -429,12 +429,12 @@ public class BotChatServiceImpl implements BotChatService {
 
         SparkChatRequest.MessageDto queryMessage = new SparkChatRequest.MessageDto();
         queryMessage.setRole("user");
-        // 拼接当前提问
+        // Concatenate current question
         StringBuilder askBuilder = new StringBuilder();
         askBuilder.append(LOOSE_PREFIX_PROMPT);
         List<String> askKnowledgeList = knowledgeService.getChuncks(maasDatasetList, text, 3, true);
         askBuilder.insert(askBuilder.indexOf("[") + 1, askKnowledgeList);
-        askBuilder.append("\n接下来我的输入是：{{}}");
+        askBuilder.append("\nNext, my input is: {{}}");
         askBuilder.insert(askBuilder.indexOf("{{") + 2, text);
         queryMessage.setContent(askBuilder.toString());
 
@@ -444,16 +444,16 @@ public class BotChatServiceImpl implements BotChatService {
 
         if (tokenStats.availableTokens() > 0 && !messages.isEmpty()) {
             List<SparkChatRequest.MessageDto> historyMessages = convertStringMessagesToDto(messages);
-            // maas数据集处理
+            // MaaS dataset processing
             for (SparkChatRequest.MessageDto messageDto : historyMessages) {
-                // 只拼接用户的问题, 不处理回答
+                // Only concatenate user questions, do not process answers
                 if ("user".equals(messageDto.getRole())) {
                     String ask = messageDto.getContent();
                     StringBuilder builder = new StringBuilder();
                     builder.append(LOOSE_PREFIX_PROMPT);
                     List<String> knowledgeList = knowledgeService.getChuncks(maasDatasetList, ask, 3, true);
                     builder.insert(builder.indexOf("[") + 1, knowledgeList);
-                    builder.append("\n接下来我的输入是：{{}}");
+                    builder.append("\nNext, my input is: {{}}");
                     builder.insert(builder.indexOf("{{") + 2, ask);
                     messageDto.setContent(builder.toString());
                 }
@@ -583,7 +583,7 @@ public class BotChatServiceImpl implements BotChatService {
         jsonObject.put("apiKey", llmInfoVo.getApiKey());
         jsonObject.put("model", llmInfoVo.getDomain());
         jsonObject.put("messages", messages);
-        // 将Object转为JSONArray类型
+        // Convert Object to JSONArray type
         Object configObj = llmInfoVo.getConfig();
         JSONArray config = null;
         if (configObj instanceof JSONArray) {

@@ -5,17 +5,17 @@ import com.iflytek.astron.console.commons.entity.space.AgentShareRecord;
 public interface ShareDataService {
 
     /**
-     * 根据用户ID、分享类型、关联ID查找活跃的分享记录
+     * Find active sharing records based on user ID, sharing type, and associated ID
      */
     AgentShareRecord findActiveShareRecord(String uid, int shareType, Long baseId);
 
     /**
-     * 创建新的分享记录
+     * Create a new sharing record
      */
     AgentShareRecord createShareRecord(String uid, Long baseId, String shareKey, int shareType);
 
     /**
-     * 根据分享密钥查找活跃的分享记录
+     * Find active sharing records based on the sharing key
      */
     AgentShareRecord findByShareKey(String shareKey);
 }

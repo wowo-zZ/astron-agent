@@ -20,7 +20,7 @@ class TestAIUIClient:
     """AIUI interface client unit tests"""
 
     @pytest.fixture(autouse=True)
-    def setup(self, monkeypatch):
+    def setup(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """Set up test environment"""
         # Set environment variables
         monkeypatch.setenv("AIUI_API_KEY", "test_api_key")
@@ -46,7 +46,7 @@ class TestAIUIClient:
         )
 
     @pytest.mark.asyncio
-    async def test_chunk_query_success(self):
+    async def test_chunk_query_success(self) -> None:
         """Test successful chunk query"""
         # Mock request returns successful response
         expected_response = {"results": ["result1", "result2"]}
@@ -68,7 +68,7 @@ class TestAIUIClient:
             assert result == expected_response
 
     @pytest.mark.asyncio
-    async def test_document_parse_success_pdf(self):
+    async def test_document_parse_success_pdf(self) -> None:
         """Test successful document parsing (PDF)"""
         # Mock request returns successful response
         expected_response = {"documentId": "test_doc_id", "status": "success"}
@@ -85,7 +85,7 @@ class TestAIUIClient:
             assert result == expected_response
 
     @pytest.mark.asyncio
-    async def test_document_parse_success_url(self):
+    async def test_document_parse_success_url(self) -> None:
         """Test successful document parsing (URL)"""
         # Mock request returns successful response
         expected_response = {"documentId": "test_doc_id", "status": "success"}
@@ -102,7 +102,7 @@ class TestAIUIClient:
             assert result == expected_response
 
     @pytest.mark.asyncio
-    async def test_document_parse_invalid_resource_type(self):
+    async def test_document_parse_invalid_resource_type(self) -> None:
         """Test document parsing - invalid resource type"""
         with pytest.raises(CustomException) as exc_info:
             await document_parse(
@@ -113,7 +113,7 @@ class TestAIUIClient:
         assert "Resource type" in str(exc_info.value.message)
 
     @pytest.mark.asyncio
-    async def test_document_parse_file_type_failed(self):
+    async def test_document_parse_file_type_failed(self) -> None:
         """Test document parsing - file type retrieval failed"""
         # Mock check_not_empty returns False
         with patch("knowledge.utils.verification.check_not_empty", return_value=False):
@@ -124,7 +124,7 @@ class TestAIUIClient:
             assert "File type retrieval failed" in str(exc_info.value.message)
 
     @pytest.mark.asyncio
-    async def test_chunk_split_success(self):
+    async def test_chunk_split_success(self) -> None:
         """Test successful chunk splitting"""
         # Mock request returns successful response
         expected_response = {"chunks": ["chunk1", "chunk2"]}
@@ -147,7 +147,7 @@ class TestAIUIClient:
             assert result == expected_response
 
     @pytest.mark.asyncio
-    async def test_chunk_save_success(self):
+    async def test_chunk_save_success(self) -> None:
         """Test successful chunk saving"""
         # Mock request returns successful response
         expected_response = {"success": True}
@@ -163,7 +163,7 @@ class TestAIUIClient:
             assert result == expected_response
 
     @pytest.mark.asyncio
-    async def test_chunk_delete_success(self):
+    async def test_chunk_delete_success(self) -> None:
         """Test successful chunk deletion"""
         # Mock request returns successful response
         expected_response = {"success": True}
@@ -178,7 +178,7 @@ class TestAIUIClient:
             assert result == expected_response
 
     @pytest.mark.asyncio
-    async def test_get_doc_content_success(self):
+    async def test_get_doc_content_success(self) -> None:
         """Test successful document content retrieval"""
         # Mock request returns successful response
         expected_response = {"content": "test content"}

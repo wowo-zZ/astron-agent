@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/notifications")
-@Tag(name = "Notification Management", description = "消息通知管理接口")
+@Tag(name = "Notification Management", description = "Message notification management interface")
 @Slf4j
 @RequiredArgsConstructor
 public class NotificationController {
@@ -24,56 +24,56 @@ public class NotificationController {
     private final NotificationService notificationService;
 
     @GetMapping("/list")
-    @Operation(summary = "查询当前用户的通知列表", description = "分页查询当前用户的通知消息列表")
+    @Operation(summary = "Query current user's notification list", description = "Paginated query of current user's notification message list")
     public ApiResult<NotificationPageResponse> getUserNotifications(
-            @Parameter(description = "查询参数") @Valid NotificationQueryRequest queryRequest) {
+            @Parameter(description = "Query parameters") @Valid NotificationQueryRequest queryRequest) {
 
         String currentUserUid = RequestContextUtil.getUID();
-        log.debug("查询用户通知列表: uid={}, pageIndex={}, pageSize={}",
+        log.debug("Query user notification list: uid={}, pageIndex={}, pageSize={}",
                 currentUserUid, queryRequest.getPageIndex(), queryRequest.getPageSize());
 
         NotificationPageResponse response = notificationService.getUserNotifications(currentUserUid, queryRequest);
-        log.debug("查询成功，返回 {} 条通知，未读数量: {}",
+        log.debug("Query successful, returned {} notifications, unread count: {}",
                 response.getNotifications().size(), response.getUnreadCount());
 
         return ApiResult.success(response);
     }
 
     @GetMapping("/unread-count")
-    @Operation(summary = "获取当前用户未读通知数量", description = "获取当前用户的未读通知消息数量")
+    @Operation(summary = "Get current user's unread notification count", description = "Get the count of unread notification messages for current user")
     public ApiResult<Long> getUnreadNotificationCount() {
         String currentUserUid = RequestContextUtil.getUID();
-        log.debug("查询用户未读通知数量: uid={}", currentUserUid);
+        log.debug("Query user unread notification count: uid={}", currentUserUid);
 
         long unreadCount = notificationService.getUnreadNotificationCount(currentUserUid);
-        log.debug("用户未读通知数量: {}", unreadCount);
+        log.debug("User unread notification count: {}", unreadCount);
 
         return ApiResult.success(unreadCount);
     }
 
     @PostMapping("/mark-read")
-    @Operation(summary = "标记通知为已读", description = "将指定的通知消息标记为已读状态")
+    @Operation(summary = "Mark notifications as read", description = "Mark specified notification messages as read status")
     public ApiResult<Boolean> markNotificationsAsRead(@Valid @RequestBody MarkReadRequest request) {
         String currentUserUid = RequestContextUtil.getUID();
-        log.info("标记通知为已读: uid={}, markAll={}, notificationIds={}",
+        log.info("Mark notifications as read: uid={}, markAll={}, notificationIds={}",
                 currentUserUid, request.getMarkAll(), request.getNotificationIds());
 
         boolean success = notificationService.markNotificationsAsRead(currentUserUid, request);
-        log.info("标记通知为已读操作完成: success={}", success);
+        log.info("Mark notifications as read operation completed: success={}", success);
 
         return ApiResult.success(success);
     }
 
     @DeleteMapping("/{notificationId}")
-    @Operation(summary = "删除通知", description = "删除指定的通知消息")
+    @Operation(summary = "Delete notification", description = "Delete specified notification message")
     public ApiResult<Boolean> deleteNotification(
-            @Parameter(description = "通知ID") @PathVariable Long notificationId) {
+            @Parameter(description = "Notification ID") @PathVariable Long notificationId) {
 
         String currentUserUid = RequestContextUtil.getUID();
-        log.info("删除通知: uid={}, notificationId={}", currentUserUid, notificationId);
+        log.info("Delete notification: uid={}, notificationId={}", currentUserUid, notificationId);
 
         boolean success = notificationService.deleteNotification(currentUserUid, notificationId);
-        log.info("删除通知操作完成: success={}", success);
+        log.info("Delete notification operation completed: success={}", success);
 
         return ApiResult.success(success);
     }

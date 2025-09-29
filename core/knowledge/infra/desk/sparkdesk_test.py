@@ -20,7 +20,7 @@ class TestSparkDeskClient:
     """SparkDesk knowledge base query module unit tests"""
 
     @pytest.fixture(autouse=True)
-    def setup(self, monkeypatch):
+    def setup(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """Set up test environment"""
         # Set environment variables
         monkeypatch.setenv("DESK_RAG_URL", "https://test-api.sparkdesk.com/v1/query")
@@ -42,7 +42,7 @@ class TestSparkDeskClient:
         monkeypatch.setattr("time.time", MagicMock(return_value=1672574400))
 
     @pytest.mark.asyncio
-    async def test_assemble_auth_headers_async(self):
+    async def test_assemble_auth_headers_async(self) -> None:
         """Test auth header assembly"""
         result = await assemble_auth_headers_async()
 
@@ -58,7 +58,7 @@ class TestSparkDeskClient:
         assert result == expected_headers
 
     @pytest.mark.asyncio
-    async def test_sparkdesk_query_async_with_repo_ids(self):
+    async def test_sparkdesk_query_async_with_repo_ids(self) -> None:
         """Test knowledge base query (with knowledge base ID)"""
         # Mock async_request returns successful response
         expected_response = {"results": ["result1", "result2"]}
@@ -81,7 +81,7 @@ class TestSparkDeskClient:
             assert result == expected_response
 
     @pytest.mark.asyncio
-    async def test_sparkdesk_query_async_without_repo_ids(self):
+    async def test_sparkdesk_query_async_without_repo_ids(self) -> None:
         """Test knowledge base query (without knowledge base ID)"""
         # Mock async_request returns successful response
         expected_response = {"results": ["result1", "result2"]}
@@ -102,7 +102,7 @@ class TestSparkDeskClient:
             assert result == expected_response
 
     @pytest.mark.asyncio
-    async def test_sparkdesk_query_async_with_empty_repo_ids(self):
+    async def test_sparkdesk_query_async_with_empty_repo_ids(self) -> None:
         """Test knowledge base query (empty knowledge base ID list)"""
         # Mock async_request returns successful response
         expected_response = {"results": ["result1", "result2"]}
@@ -123,7 +123,7 @@ class TestSparkDeskClient:
             assert result == expected_response
 
     @pytest.mark.asyncio
-    async def test_async_request_success(self):
+    async def test_async_request_success(self) -> None:
         """Test successful async request"""
         # Mock aiohttp response
         mock_response = AsyncMock()
@@ -155,7 +155,7 @@ class TestSparkDeskClient:
                 assert result == {"result": "success"}
 
     @pytest.mark.asyncio
-    async def test_async_request_api_error(self):
+    async def test_async_request_api_error(self) -> None:
         """Test async request API error"""
         # Mock aiohttp response
         mock_response = AsyncMock()
@@ -175,20 +175,21 @@ class TestSparkDeskClient:
         mock_span.__enter__ = MagicMock(return_value=mock_span_context)
         mock_span.__exit__ = MagicMock(return_value=None)
 
-        with pytest.raises(Exception) as exc_info:
-            # Mock session
-            with patch("aiohttp.ClientSession.request") as mock_session:
-                mock_session.return_value.__aenter__.return_value = mock_response
-                with patch(
-                    "knowledge.infra.desk.sparkdesk.assemble_auth_headers_async",
-                    new=AsyncMock(return_value={"appId": "test"}),
-                ):
-                    with pytest.raises(ThirdPartyException, match="API error"):
-                        await async_request({"test": "data"}, "POST", span=mock_span)
-            assert exc_info.value.code == CodeEnum.DESK_RAGError.code
+        # Mock session
+        with patch("aiohttp.ClientSession.request") as mock_session:
+            mock_session.return_value.__aenter__.return_value = mock_response
+            with patch(
+                "knowledge.infra.desk.sparkdesk.assemble_auth_headers_async",
+                new=AsyncMock(return_value={"appId": "test"}),
+            ):
+                with pytest.raises(ThirdPartyException) as exc_info:
+                    await async_request({"test": "data"}, "POST", span=mock_span)
+
+                assert exc_info.value.code == CodeEnum.DESK_RAGError.code
+                assert "API error" in str(exc_info.value)
 
     @pytest.mark.asyncio
-    async def test_async_request_http_error(self):
+    async def test_async_request_http_error(self) -> None:
         """Test async request HTTP error"""
         # Mock aiohttp response
         mock_response = AsyncMock()
@@ -200,24 +201,22 @@ class TestSparkDeskClient:
         mock_span_context = MagicMock()
         mock_span.__enter__ = MagicMock(return_value=mock_span_context)
         mock_span.__exit__ = MagicMock(return_value=None)
-        with pytest.raises(Exception) as exc_info:
-            # Mock session
-            with patch("aiohttp.ClientSession.request") as mock_session:
-                mock_session.return_value.__aenter__.return_value = mock_response
-                with patch(
-                    "knowledge.infra..desk.sparkdesk.assemble_auth_headers_async",
-                    new=AsyncMock(return_value={"appId": "test"}),
-                ):
-                    with pytest.raises(
-                        ThirdPartyException,
-                        match="SPARKDESK-RAG request failed with status: 500",
-                    ):
-                        await async_request({"test": "data"}, "POST", span=mock_span)
 
-                    assert exc_info.value.code == CodeEnum.DESK_RAGError.code
+        # Mock session
+        with patch("aiohttp.ClientSession.request") as mock_session:
+            mock_session.return_value.__aenter__.return_value = mock_response
+            with patch(
+                "knowledge.infra.desk.sparkdesk.assemble_auth_headers_async",
+                new=AsyncMock(return_value={"appId": "test"}),
+            ):
+                with pytest.raises(ThirdPartyException) as exc_info:
+                    await async_request({"test": "data"}, "POST", span=mock_span)
+
+                assert exc_info.value.code == CodeEnum.DESK_RAGError.code
+                assert "500" in str(exc_info.value)
 
     @pytest.mark.asyncio
-    async def test_async_request_json_decode_error(self):
+    async def test_async_request_json_decode_error(self) -> None:
         """Test async request JSON parsing error"""
         # Mock aiohttp response
         mock_response = AsyncMock()
@@ -232,74 +231,69 @@ class TestSparkDeskClient:
         mock_span_context = MagicMock()
         mock_span.__enter__ = MagicMock(return_value=mock_span_context)
         mock_span.__exit__ = MagicMock(return_value=None)
-        with pytest.raises(Exception) as exc_info:
-            # Mock session
-            with patch("aiohttp.ClientSession.request") as mock_session:
-                mock_session.return_value.__aenter__.return_value = mock_response
-                with patch(
-                    "knowledge.infra..desk.sparkdesk.assemble_auth_headers_async",
-                    new=AsyncMock(return_value={"appId": "test"}),
-                ):
-                    with pytest.raises(
-                        ThirdPartyException, match="Failed to parse JSON response"
-                    ):
-                        await async_request({"test": "data"}, "POST", span=mock_span)
 
-                    assert exc_info.value.code == CodeEnum.DESK_RAGError.code
+        # Mock session
+        with patch("aiohttp.ClientSession.request") as mock_session:
+            mock_session.return_value.__aenter__.return_value = mock_response
+            with patch(
+                "knowledge.infra.desk.sparkdesk.assemble_auth_headers_async",
+                new=AsyncMock(return_value={"appId": "test"}),
+            ):
+                with pytest.raises(ThirdPartyException) as exc_info:
+                    await async_request({"test": "data"}, "POST", span=mock_span)
+
+                assert exc_info.value.code == CodeEnum.DESK_RAGError.code
+                assert "Failed to parse JSON" in str(exc_info.value)
 
     @pytest.mark.asyncio
-    async def test_async_request_timeout_error(self):
+    async def test_async_request_timeout_error(self) -> None:
         """Test async request timeout error"""
         # Mock span object
         mock_span = MagicMock()
         mock_span_context = MagicMock()
         mock_span.__enter__ = MagicMock(return_value=mock_span_context)
         mock_span.__exit__ = MagicMock(return_value=None)
-        with pytest.raises(Exception) as exc_info:
-            # Mock session
-            with patch("aiohttp.ClientSession.request") as mock_session:
-                mock_session.return_value.__aenter__.side_effect = (
-                    asyncio.TimeoutError()
-                )
-                with patch(
-                    "knowledge.infra..desk.sparkdesk.assemble_auth_headers_async",
-                    new=AsyncMock(return_value={"appId": "test"}),
-                ):
-                    with pytest.raises(
-                        ThirdPartyException,
-                        match="Async request to https://test-api.sparkdesk.com/v1/query timed out after 30 seconds",
-                    ):
-                        await async_request({"test": "data"}, "POST", span=mock_span)
 
-                    assert exc_info.value.code == CodeEnum.DESK_RAGError.code
+        # Mock session
+        with patch("aiohttp.ClientSession.request") as mock_session:
+            mock_session.return_value.__aenter__.side_effect = asyncio.TimeoutError()
+            with patch(
+                "knowledge.infra.desk.sparkdesk.assemble_auth_headers_async",
+                new=AsyncMock(return_value={"appId": "test"}),
+            ):
+                with pytest.raises(ThirdPartyException) as exc_info:
+                    await async_request({"test": "data"}, "POST", span=mock_span)
+
+                assert exc_info.value.code == CodeEnum.DESK_RAGError.code
+                assert "timed out" in str(exc_info.value)
 
     @pytest.mark.asyncio
-    async def test_async_request_network_error(self):
+    async def test_async_request_network_error(self) -> None:
         """Test async request network error"""
         # Mock span object
         mock_span = MagicMock()
         mock_span_context = MagicMock()
         mock_span.__enter__ = MagicMock(return_value=mock_span_context)
         mock_span.__exit__ = MagicMock(return_value=None)
-        with pytest.raises(Exception) as exc_info:
-            # Mock session
-            with patch("aiohttp.ClientSession.request") as mock_session:
-                mock_session.return_value.__aenter__.side_effect = aiohttp.ClientError(
-                    "Network error"
-                )
-                with patch(
-                    "knowledge.infra..desk.sparkdesk.assemble_auth_headers_async",
-                    new=AsyncMock(return_value={"appId": "test"}),
-                ):
-                    with pytest.raises(
-                        ThirdPartyException, match="Network error during async request"
-                    ):
-                        await async_request({"test": "data"}, "POST", span=mock_span)
+
+        # Mock session
+        with patch("aiohttp.ClientSession.request") as mock_session:
+            mock_session.return_value.__aenter__.side_effect = aiohttp.ClientError(
+                "Network error"
+            )
+            with patch(
+                "knowledge.infra.desk.sparkdesk.assemble_auth_headers_async",
+                new=AsyncMock(return_value={"appId": "test"}),
+            ):
+                with pytest.raises(ThirdPartyException) as exc_info:
+                    await async_request({"test": "data"}, "POST", span=mock_span)
 
                 assert exc_info.value.code == CodeEnum.DESK_RAGError.code
+                assert "Network error" in str(exc_info.value)
 
     @pytest.mark.asyncio
-    async def test_async_request_without_span(self):
+    async def test_async_request_without_span(self) -> None:
+        """Test async request without span"""
         # Mock aiohttp response
         mock_response = AsyncMock()
         mock_response.status = 200

@@ -434,7 +434,7 @@ class PGSqlNode(BaseNode):
         ) as request_span:
             try:
                 # Replace variable placeholders in conditions with actual values
-                if self.cases and "conditions" in self.cases[0].conditions:
+                if self.cases:
                     for case in self.cases[0].conditions:
                         if case.varIndex in inputs:
                             case.varIndex = inputs[case.varIndex]

@@ -60,8 +60,8 @@ public class ChatBotListDto implements Serializable {
     private Integer botStatus;
     private Integer marketBotId;
     private String botAvatar;
-    private Long marketBotUid;
-    private Long botUid;
+    private String marketBotUid;
+    private String botUid;
     private String clientHide;
     private String creatorName;
     /**

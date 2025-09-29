@@ -2087,7 +2087,7 @@ class WorkflowEngineBuilder:
         if node_type == NodeType.START.value:
             self.start_node_id = node.id
         elif node_type == NodeType.DECISION_MAKING.value:
-            self._handle_DECISION_MAKING_node(node.id, node)
+            self._handle_decision_making_node(node.id, node)
         elif node_type == NodeType.LLM.value:
             self._handle_llm_node(node.id, node)
         elif node_type == NodeType.ITERATION.value:
@@ -2095,7 +2095,7 @@ class WorkflowEngineBuilder:
         elif node_type == NodeType.END.value:
             self._handle_end_node(spark_node_instance)
 
-    def _handle_DECISION_MAKING_node(self, node_id: str, node: Node) -> None:
+    def _handle_decision_making_node(self, node_id: str, node: Node) -> None:
         """
         Handle decision making node.
 

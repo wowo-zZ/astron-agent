@@ -3562,7 +3562,20 @@ public class WorkflowService extends ServiceImpl<WorkflowMapper, Workflow> {
         detailVO.setCreateTime(mcpObject.getString("createTime"));
         detailVO.setLogoUrl(mcpObject.getString("logo"));
         detailVO.setMcpType(mcpObject.getString("mcpType"));
-        detailVO.setContent(mcpObject.getString("content"));
+
+        // Handle content field with proper unescaping for markdown rendering
+        String content = mcpObject.getString("content");
+        if (content != null) {
+            // Unescape common escape sequences that might interfere with markdown rendering
+            content = content.replace("\\n", "\n")
+                    .replace("\\r", "\r")
+                    .replace("\\t", "\t")
+                    .replace("\\\"", "\"")
+                    .replace("\\'", "'")
+                    .replace("\\\\", "\\");
+        }
+        detailVO.setContent(content);
+
         JSONArray tags = mcpObject.getJSONArray("tags");
         if (tags != null) {
             detailVO.setTags(tags.toJavaList(String.class));
@@ -3673,8 +3686,22 @@ public class WorkflowService extends ServiceImpl<WorkflowMapper, Workflow> {
             mcpServerTool.setCreator(mcpObject.getString("creator"));
             mcpServerTool.setCreateTime(mcpObject.getString("createTime"));
             mcpServerTool.setLogoUrl(mcpObject.getString("logo"));
+            mcpServerTool.setName(mcpObject.getString("name"));
             mcpServerTool.setMcpType(mcpObject.getString("mcpType"));
-            mcpServerTool.setContent(mcpObject.getString("content"));
+
+            // Handle content field with proper unescaping for markdown rendering
+            String content = mcpObject.getString("content");
+            if (content != null) {
+                // Unescape common escape sequences that might interfere with markdown rendering
+                content = content.replace("\\n", "\n")
+                        .replace("\\r", "\r")
+                        .replace("\\t", "\t")
+                        .replace("\\\"", "\"")
+                        .replace("\\'", "'")
+                        .replace("\\\\", "\\");
+            }
+            mcpServerTool.setContent(content);
+
             mcpServerTool.setTools(mcpObject.getJSONArray("tools"));
             mcpServerTool.setTags(mcpObject.getJSONArray("tags"));
             mcpServerTool.setAuthorized(mcpObject.getBoolean("authorized"));

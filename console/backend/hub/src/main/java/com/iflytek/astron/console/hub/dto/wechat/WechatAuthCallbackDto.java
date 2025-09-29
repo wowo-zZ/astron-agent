@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 微信授权callback数据DTO
+ * WeChat authorization callback data DTO
  *
  * @author Omuigix
  */
@@ -15,30 +15,30 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "微信授权回调数据DTO")
+@Schema(description = "WeChat authorization callback data DTO")
 public class WechatAuthCallbackDto {
 
-    @Schema(description = "第三方平台AppID")
+    @Schema(description = "Third-party platform AppID")
     private String appId;
 
-    @Schema(description = "信息类型：authorized/updateauthorized/unauthorized")
+    @Schema(description = "Information type: authorized/updateauthorized/unauthorized")
     private String infoType;
 
-    @Schema(description = "授权方AppID")
+    @Schema(description = "Authorizer AppID")
     private String authorizerAppid;
 
-    @Schema(description = "授权码")
+    @Schema(description = "Authorization code")
     private String authorizationCode;
 
-    @Schema(description = "授权码过期时间")
+    @Schema(description = "Authorization code expiration time")
     private String authorizationCodeExpiredTime;
 
-    @Schema(description = "预授权码")
+    @Schema(description = "Pre-authorization code")
     private String preAuthCode;
 
-    @Schema(description = "创建时间")
+    @Schema(description = "Creation time")
     private String createTime;
 
-    @Schema(description = "组件验证票据")
+    @Schema(description = "Component verification ticket")
     private String componentVerifyTicket;
 }

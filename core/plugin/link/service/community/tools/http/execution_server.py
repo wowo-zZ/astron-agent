@@ -74,10 +74,7 @@ def send_telemetry(node_trace):
     if os.getenv(const.OTLP_ENABLE_KEY, "false").lower() == "true":
         kafka_service = get_kafka_producer_service()
         node_trace.start_time = int(round(time.time() * 1000))
-        kafka_service.send(
-            os.getenv(const.KAFKA_TOPIC_KEY),
-            node_trace.to_json()
-        )
+        kafka_service.send(os.getenv(const.KAFKA_TOPIC_KEY), node_trace.to_json())
 
 
 def handle_validation_error(validate_err, span_context, node_trace, m):

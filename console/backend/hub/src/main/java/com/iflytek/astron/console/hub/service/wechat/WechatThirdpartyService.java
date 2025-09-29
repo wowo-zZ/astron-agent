@@ -3,64 +3,64 @@ package com.iflytek.astron.console.hub.service.wechat;
 import com.iflytek.astron.console.hub.dto.wechat.WechatAuthCallbackDto;
 
 /**
- * WeChat第三方平台服务接口
+ * WeChat third-party platform service interface
  *
  * @author Omuigix
  */
 public interface WechatThirdpartyService {
 
     /**
-     * 获取预authorization码
+     * Get pre-authorization code
      *
-     * @param botId botID
-     * @param appid 微信official accountAppID
-     * @param uid userID
-     * @return 预authorization码
+     * @param botId Bot ID
+     * @param appid WeChat official account AppID
+     * @param uid User ID
+     * @return Pre-authorization code
      */
     String getPreAuthCode(Integer botId, String appid, String uid);
 
     /**
-     * 构建微信authorization链接
+     * Build WeChat authorization link
      *
-     * @param preAuthCode 预authorization码
-     * @param appid 微信official accountAppID
-     * @param redirectUrl callback地址
-     * @return authorization链接
+     * @param preAuthCode Pre-authorization code
+     * @param appid WeChat official account AppID
+     * @param redirectUrl Callback URL
+     * @return Authorization link
      */
     String buildAuthUrl(String preAuthCode, String appid, String redirectUrl);
 
     /**
-     * 处理微信授权成功callback
+     * Handle WeChat authorization success callback
      *
-     * @param callbackData callback数据
+     * @param callbackData Callback data
      */
     void handleAuthorizedCallback(WechatAuthCallbackDto callbackData);
 
     /**
-     * 处理微信授权更新callback
+     * Handle WeChat authorization update callback
      *
-     * @param callbackData callback数据
+     * @param callbackData Callback data
      */
     void handleUpdateAuthorizedCallback(WechatAuthCallbackDto callbackData);
 
     /**
-     * 处理微信取消授权callback
+     * Handle WeChat cancel authorization callback
      *
-     * @param callbackData callback数据
+     * @param callbackData Callback data
      */
     void handleUnauthorizedCallback(WechatAuthCallbackDto callbackData);
 
     /**
-     * 刷新validation票据
+     * Refresh verification ticket
      *
-     * @param componentVerifyTicket validation票据
+     * @param componentVerifyTicket Verification ticket
      */
     void refreshVerifyTicket(String componentVerifyTicket);
 
     /**
-     * get第三方平台访问令牌
+     * Get third-party platform access token
      *
-     * @return 访问令牌
+     * @return Access token
      */
     String getComponentAccessToken();
 }

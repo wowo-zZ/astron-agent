@@ -34,6 +34,7 @@ class NodeType(Enum):
     PLUGIN = "plugin"
     QUESTION_ANSWER = "question-answer"
     DATABASE = "database"
+    RPA = "rpa"
 
     @classmethod
     def value_of(cls, value: str) -> "NodeType":

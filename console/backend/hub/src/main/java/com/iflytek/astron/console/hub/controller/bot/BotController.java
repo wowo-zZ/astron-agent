@@ -102,7 +102,7 @@ public class BotController {
         String botId = (String) botJson.get("botId");
         botPermissionUtil.checkBot(Integer.parseInt(botId));
         maasUtil.setBotTag(botJson);
-        log.info("***** uid: {}, botId: {} 提交MASS助手", uid, botId);
+        log.info("***** uid: {}, botId: {} submit MASS assistant", uid, botId);
         String flowId = botJson.getString("flowId");
         JSONObject result = maasUtil.createApi(flowId, tenantId);
         if (Objects.isNull(result)) {
@@ -112,7 +112,7 @@ public class BotController {
     }
 
     /**
-     * 申请下架助手
+     * Apply to take down assistant
      *
      * @param request
      * @param takeoffList
@@ -135,26 +135,26 @@ public class BotController {
     @PostMapping("/updateSynchronize")
     @Transactional(rollbackFor = Exception.class)
     public ApiResult<Long> updateSynchronize(@RequestBody MaasDuplicate update) {
-        log.info("----- 星辰画布更新: {}", JSON.toJSONString(update));
+        log.info("----- Xingchen canvas update: {}", JSON.toJSONString(update));
         Long maasId = update.getMaasId();
         List<UserLangChainInfo> list = userLangChainDataService.findByMaasId(maasId);
         if (Objects.isNull(list) || list.isEmpty()) {
-            log.info("----- 星火未找到星辰的工作流: {}", maasId);
+            log.info("----- Xinghuo did not find Xingchen's workflow: {}", maasId);
             return ApiResult.error(ResponseEnum.DATA_NOT_FOUND);
         }
         Integer botId = list.getFirst().getBotId();
         if (redissonClient.getBucket(MaasUtil.generatePrefix(maasId.toString(), botId)).isExists()) {
-            log.info("----- 星火内部服务,无需处理: {}", JSON.toJSONString(update));
+            log.info("----- Xinghuo internal service, no processing needed: {}", JSON.toJSONString(update));
             redissonClient.getBucket(MaasUtil.generatePrefix(maasId.toString(), botId)).delete();
             return ApiResult.success(botId.longValue());
         }
 
         String inputExamples = update.getInputExample()
                 .stream()
-                // 限制最多取前 3 个元素
+                // Limit to maximum of first 3 elements
                 .limit(3)
                 .collect(Collectors.joining(","));
-        // 更新描述,开场白,输入示例
+        // Update description, opening remarks, input examples
         boolean updateResult = chatBotDataService.updateBotBasicInfo(botId, update.getBotDesc(), update.getPrologue(), inputExamples);
         if (!updateResult) {
             log.error("Failed to update bot basic info for botId: {}", botId);
@@ -164,7 +164,7 @@ public class BotController {
     }
 
     /**
-     * 把助手复制到指定助手
+     * Copy assistant to specified assistant
      */
     @SpacePreAuth(key = "BotV2Controller_copyBot2_POST")
     @PostMapping("/copy-bot")
@@ -172,7 +172,7 @@ public class BotController {
         botPermissionUtil.checkBot(Math.toIntExact(botId));
         String uid = RequestContextUtil.getUID();
         Long spaceId = SpaceInfoUtil.getSpaceId();
-        log.info("***** uid: {} 复制助手: {}", uid, botId);
+        log.info("***** uid: {} copy assistant: {}", uid, botId);
         botTransactionalService.copyBot(uid, Math.toIntExact(botId), request, spaceId);
         return ApiResult.success();
     }

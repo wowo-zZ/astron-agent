@@ -228,7 +228,8 @@ public class DatasetDataServiceImpl implements DatasetDataService {
     @Override
     public List<BotDatasetMaas> findMaasDatasetsByBotIdAndIsAct(Integer botId, Integer isAct) {
         return botDatasetMaasMapper.selectList(Wrappers.lambdaQuery(BotDatasetMaas.class)
-                // 这里没有判断uid, 因为如果该助手上架, 其他人也可使用该助手
+                // There is no judgment on uid here because if this assistant is put on the shelf, other people can
+                // also use this assistant.
                 .eq(BotDatasetMaas::getBotId, botId)
                 .eq(BotDatasetMaas::getIsAct, 1));
     }

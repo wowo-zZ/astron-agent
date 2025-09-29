@@ -14,6 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
+/**
+ * @author mingsuiyongheng
+ */
 @Slf4j
 @Service
 public class ChatRestartServiceImpl implements ChatRestartService {
@@ -24,6 +27,13 @@ public class ChatRestartServiceImpl implements ChatRestartService {
     @Autowired
     private ChatListService chatListService;
 
+    /**
+     * @param rootChatId Root chat ID
+     * @param uid User ID
+     * @param chatListName Chat list name
+     * @return Returns a new chat list creation response
+     * @throws BusinessException Thrown when chat tree index is empty
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ChatListCreateResponse createNewTreeIndexByRootChatId(Long rootChatId, String uid, String chatListName) {

@@ -185,18 +185,18 @@ class AIUIRAGStrategy(RAGStrategy):
         Returns:
             Update result
         """
-        chunk_ids = []
+        chunk_ids: List[str] = []
         if check_not_empty(chunks):
-            chunk_ids = [
-                chunk.get("chunkId")
-                for chunk in chunks
-                if check_not_empty(chunk) and isinstance(chunk, dict)
-            ]
+            for chunk in chunks:
+                if check_not_empty(chunk) and isinstance(chunk, dict):
+                    chunk_id = chunk.get("chunkId")
+                    if chunk_id is not None and isinstance(chunk_id, str):
+                        chunk_ids.append(chunk_id)
 
         # Delete first, then save
-        await self.chunks_delete(doc_id=docId, chunk_ids=chunk_ids, **kwargs)
+        await self.chunks_delete(docId=docId, chunkIds=chunk_ids, **kwargs)
         return await self.chunks_save(
-            doc_id=docId, group=group, uid=uid, chunks=chunks, **kwargs
+            docId=docId, group=group, uid=uid, chunks=chunks, **kwargs
         )
 
     async def chunks_delete(

@@ -63,13 +63,15 @@ public class WorkflowSseEventSourceListener extends EventSourceListener {
 
     public WorkflowSseEventSourceListener(String sseId) {
         this.sseId = sseId;
-        // 不做任何 Bean 获取或 heavy 初始化，遵循“构造器不含业务逻辑”
+        // Do not perform any Bean retrieval or heavy initialization, and follow the principle that
+        // "constructors should not contain business logic".
     }
 
     public WorkflowSseEventSourceListener(String flowId, String sseId, int outputType, boolean promptDebugger, String version) {
         this.flowId = flowId;
         this.sseId = sseId;
-        // 非法值降级，避免构造器抛出异常（CT_CONSTRUCTOR_THROW 告警来源之一）
+        // Degrade illegal values to prevent the constructor from throwing exceptions (one of the sources of
+        // CT_CONSTRUCTOR_THROW warnings)
         if (!ArrayUtil.contains(outputTypeEnum, outputType)) {
             log.warn("unsupported outputType {}, fallback to 1 (Direct output)", outputType);
             this.outputType = 1;
@@ -174,7 +176,7 @@ public class WorkflowSseEventSourceListener extends EventSourceListener {
                 sendFrameLikeTypeWriter(chatResponse, 20L);
                 break;
             default:
-                // 理论不可达，已在构造器里做了降级
+                // Theoretically unreachable; degradation has been implemented in the constructor
                 log.warn("Unsupported outputType {}, fallback to direct output.", outputType);
                 SseEmitterUtil.sendMessage(sseId, chatResponse);
         }

@@ -24,7 +24,7 @@ import java.util.*;
 /**
  * Workflow related
  *
- * @author yingpeng
+ * @author mingsuiyongheng
  */
 @Slf4j
 @RestController
@@ -40,6 +40,11 @@ public class ChatWorkflowController {
     @Autowired
     private WorkflowService workflowService;
 
+    /**
+    * Get workflow information
+    * @param botId Bot ID
+    * @return Workflow information
+    */
     @GetMapping(value = "/info")
     public ApiResult<WorkflowInfoDto> info(@RequestParam Integer botId) {
         WorkflowInfoDto workflowInfo = new WorkflowInfoDto();

@@ -302,7 +302,7 @@ class TestSparkLinkFunctionCallException:
             err=(
                 "Function 'search' called with invalid parameter: "
                 "'limit' must be positive integer, got -5",
-            )
+            ),
         )
 
         assert "search" in exception.message

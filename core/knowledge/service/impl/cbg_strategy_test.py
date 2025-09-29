@@ -1,3 +1,4 @@
+from typing import Any, Dict, List
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -10,21 +11,23 @@ class TestCBGRAGStrategy:
     """CBG RAG strategy unit tests"""
 
     @pytest.fixture
-    def strategy(self):
+    def strategy(self) -> CBGRAGStrategy:
         """Create test strategy instance"""
         return CBGRAGStrategy()
 
     @pytest.fixture
-    def mock_xinghuo(self):
+    def mock_xinghuo(self) -> Any:
         """Mock xinghuo module"""
         with patch("knowledge.service.impl.cbg_strategy.xinghuo") as mock:
             yield mock
 
     @pytest.mark.asyncio
-    async def test_query_success(self, strategy, mock_xinghuo):
+    async def test_query_success(
+        self, strategy: CBGRAGStrategy, mock_xinghuo: Any
+    ) -> None:
         """Test successful query scenario"""
         # Mock return values
-        mock_results = [
+        mock_results: List[Dict[str, Any]] = [
             {
                 "score": 0.95,
                 "fileName": "test.pdf",
@@ -56,16 +59,18 @@ class TestCBGRAGStrategy:
         )
 
     @pytest.mark.asyncio
-    async def test_query_empty_doc_ids(self, strategy):
+    async def test_query_empty_doc_ids(self, strategy: CBGRAGStrategy) -> None:
         """Test query when document ID list is empty"""
         with pytest.raises(ProtocolParamException):
             await strategy.query("test query", doc_ids=[])
 
     @pytest.mark.asyncio
-    async def test_query_below_threshold(self, strategy, mock_xinghuo):
+    async def test_query_below_threshold(
+        self, strategy: CBGRAGStrategy, mock_xinghuo: Any
+    ) -> None:
         """Test results below score threshold"""
         # Mock return values
-        mock_results = [
+        mock_results: List[Dict[str, Any]] = [
             {
                 "score": 0.5,  # Below threshold
                 "fileName": "test.pdf",
@@ -83,10 +88,12 @@ class TestCBGRAGStrategy:
         assert result["results"] == []
 
     @pytest.mark.asyncio
-    async def test_query_string_results(self, strategy, mock_xinghuo):
+    async def test_query_string_results(
+        self, strategy: CBGRAGStrategy, mock_xinghuo: Any
+    ) -> None:
         """Test string result return scenario"""
         # Mock string return value (needs JSON parsing)
-        mock_results = [
+        mock_results: List[str] = [
             '{"score": 0.95, "fileName": "test.pdf", "chunk": {"fileId": "doc1", "id": "chunk1", "content": "Test content"}}'
         ]
 
@@ -100,10 +107,12 @@ class TestCBGRAGStrategy:
         assert result["results"][0]["docId"] == "doc1"
 
     @pytest.mark.asyncio
-    async def test_query_invalid_json_results(self, strategy, mock_xinghuo):
+    async def test_query_invalid_json_results(
+        self, strategy: CBGRAGStrategy, mock_xinghuo: Any
+    ) -> None:
         """Test invalid JSON string return scenario"""
         # Mock invalid JSON string
-        mock_results = ["invalid json string"]
+        mock_results: List[str] = ["invalid json string"]
 
         mock_xinghuo.new_topk_search = AsyncMock(return_value=mock_results)
 
@@ -115,14 +124,16 @@ class TestCBGRAGStrategy:
         assert result["results"] == []
 
     @pytest.mark.asyncio
-    async def test_split_success(self, strategy, mock_xinghuo):
+    async def test_split_success(
+        self, strategy: CBGRAGStrategy, mock_xinghuo: Any
+    ) -> None:
         """Test successful file splitting scenario"""
         # Mock upload return value
-        mock_upload_response = {"fileId": "doc1"}
+        mock_upload_response: Dict[str, Any] = {"fileId": "doc1"}
         mock_xinghuo.upload = AsyncMock(return_value=mock_upload_response)
 
         # Mock chunk retrieval return value
-        mock_chunks = [
+        mock_chunks: List[Dict[str, Any]] = [
             {
                 "dataIndex": "1",
                 "content": "Chunk content 1",
@@ -153,14 +164,16 @@ class TestCBGRAGStrategy:
         mock_xinghuo.get_chunks.assert_called_once_with(file_id="doc1")
 
     @pytest.mark.asyncio
-    async def test_split_default_separator(self, strategy, mock_xinghuo):
+    async def test_split_default_separator(
+        self, strategy: CBGRAGStrategy, mock_xinghuo: Any
+    ) -> None:
         """Test file splitting with default separator"""
         # Mock upload return value
-        mock_upload_response = {"fileId": "doc1"}
+        mock_upload_response: Dict[str, Any] = {"fileId": "doc1"}
         mock_xinghuo.upload = AsyncMock(return_value=mock_upload_response)
 
         # Mock chunk retrieval return value
-        mock_chunks = []
+        mock_chunks: List[Dict[str, Any]] = []
         mock_xinghuo.get_chunks = AsyncMock(return_value=mock_chunks)
 
         # Execute splitting, without providing separator
@@ -208,11 +221,13 @@ class TestCBGRAGStrategy:
                 pytest.fail("wiki_split_extends parameter not found in upload call")
 
     @pytest.mark.asyncio
-    async def test_chunks_save(self, strategy, mock_xinghuo):
+    async def test_chunks_save(
+        self, strategy: CBGRAGStrategy, mock_xinghuo: Any
+    ) -> None:
         """Test chunk saving"""
         mock_xinghuo.dataset_addchunk = AsyncMock(return_value="save_result")
 
-        chunks = [
+        chunks: List[Dict[str, Any]] = [
             {
                 "content": "chunk1 content",
                 "dataIndex": "1",
@@ -225,7 +240,7 @@ class TestCBGRAGStrategy:
         assert result == "save_result"
 
         # Verify call parameters
-        expected_chunks = [
+        expected_chunks: List[Dict[str, Any]] = [
             {
                 "fileId": "doc1",
                 "chunkType": "RAW",
@@ -237,11 +252,15 @@ class TestCBGRAGStrategy:
         mock_xinghuo.dataset_addchunk.assert_called_once_with(chunks=expected_chunks)
 
     @pytest.mark.asyncio
-    async def test_chunks_update(self, strategy, mock_xinghuo):
+    async def test_chunks_update(
+        self, strategy: CBGRAGStrategy, mock_xinghuo: Any
+    ) -> None:
         """Test chunk updating"""
         mock_xinghuo.dataset_updchunk = AsyncMock(return_value="update_result")
 
-        chunks = [{"chunkId": "chunk1", "content": "updated content", "dataIndex": "1"}]
+        chunks: List[Dict[str, Any]] = [
+            {"chunkId": "chunk1", "content": "updated content", "dataIndex": "1"}
+        ]
 
         result = await strategy.chunks_update("doc1", "group1", "user1", chunks)
 
@@ -249,7 +268,9 @@ class TestCBGRAGStrategy:
         mock_xinghuo.dataset_updchunk.assert_called_once_with(chunks[0])
 
     @pytest.mark.asyncio
-    async def test_chunks_delete(self, strategy, mock_xinghuo):
+    async def test_chunks_delete(
+        self, strategy: CBGRAGStrategy, mock_xinghuo: Any
+    ) -> None:
         """Test chunk deletion"""
         mock_xinghuo.dataset_delchunk = AsyncMock(return_value="delete_result")
 
@@ -261,16 +282,16 @@ class TestCBGRAGStrategy:
         )
 
     @pytest.mark.asyncio
-    async def test_chunks_delete_empty_ids(self, strategy):
+    async def test_chunks_delete_empty_ids(self, strategy: CBGRAGStrategy) -> None:
         """Test chunk deletion when ID list is empty"""
         with pytest.raises(ProtocolParamException):
             await strategy.chunks_delete("doc1", [])
 
     @pytest.mark.asyncio
-    async def test_query_doc(self, strategy, mock_xinghuo):
+    async def test_query_doc(self, strategy: CBGRAGStrategy, mock_xinghuo: Any) -> None:
         """Test querying all chunks of a document"""
         # Mock return values
-        mock_chunks = [
+        mock_chunks: List[Dict[str, Any]] = [
             {
                 "dataIndex": "1",
                 "content": "Content with {img1} reference",
@@ -290,10 +311,12 @@ class TestCBGRAGStrategy:
         assert "{img1}" not in result[0]["content"]
 
     @pytest.mark.asyncio
-    async def test_query_doc_name(self, strategy, mock_xinghuo):
+    async def test_query_doc_name(
+        self, strategy: CBGRAGStrategy, mock_xinghuo: Any
+    ) -> None:
         """Test querying document name"""
         # Mock return values
-        mock_file_info = {
+        mock_file_info: Dict[str, Any] = {
             "fileId": "doc1",
             "fileName": "test_file.pdf",
             "fileStatus": "processed",
@@ -305,6 +328,7 @@ class TestCBGRAGStrategy:
         result = await strategy.query_doc_name("doc1")
 
         # Verify results
+        assert result is not None
         assert result["docId"] == "doc1"
         assert result["fileName"] == "test_file.pdf"  # Decoded file name
         assert result["fileStatus"] == "processed"

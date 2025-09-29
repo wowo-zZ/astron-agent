@@ -11,31 +11,31 @@ import lombok.Data;
 
 @Data
 @TableName("req_knowledge_records")
-@Schema(name = "ReqKnowledgeRecords", description = "知识检索结果记录表")
+@Schema(name = "ReqKnowledgeRecords", description = "Knowledge retrieval result record table")
 @Builder
 public class ReqKnowledgeRecords {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    @Schema(description = "用户ID")
+    @Schema(description = "User ID")
     private String uid;
 
-    @Schema(description = "用户提问的主键, 对应用户提问表的主键id")
+    @Schema(description = "Primary key of user question, corresponding to the primary key id of user question table")
     private Long reqId;
 
-    @Schema(description = "用户提问的内容")
+    @Schema(description = "Content of user question")
     private String reqMessage;
 
-    @Schema(description = "检索出的知识")
+    @Schema(description = "Retrieved knowledge")
     private String knowledge;
 
-    @Schema(description = "创建时间")
+    @Schema(description = "Creation time")
     private LocalDateTime createTime;
 
-    @Schema(description = "更新时间")
+    @Schema(description = "Update time")
     private LocalDateTime updateTime;
 
-    @Schema(description = "聊天窗口id, chat_list主键")
+    @Schema(description = "Chat window id, chat_list primary key")
     private Long chatId;
 }
