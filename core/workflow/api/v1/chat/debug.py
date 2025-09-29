@@ -1,3 +1,11 @@
+"""
+Open API debug endpoints for chat system.
+
+This module provides debug-specific API endpoints for chat completions and resume functionality,
+intended for development and troubleshooting purposes only. These endpoints bypass standard
+validation and audit policies and should not be used in production environments.
+"""
+
 import json
 from typing import Annotated, Optional, Union
 

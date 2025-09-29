@@ -11,3 +11,4 @@ Makefile
 .claude
 htmlcov
 .script
+coverage.xml

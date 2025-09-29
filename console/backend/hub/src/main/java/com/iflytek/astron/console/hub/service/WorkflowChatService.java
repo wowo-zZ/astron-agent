@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
+ * @author mingsuiyongheng
  * Workflow conversation service
  */
 @Slf4j
@@ -68,11 +69,10 @@ public class WorkflowChatService {
      */
     public void workflowChatStream(WorkflowChatRequest request, SseEmitter emitter, String streamId,
             ChatReqRecords chatReqRecords, boolean edit) {
-        // if (chatReqRecords == null || chatReqRecords.getUid() == null || chatReqRecords.getChatId() ==
-        // null) {
-        // SseEmitterUtil.completeWithError(emitter, "Chat records are empty");
-        // return;
-        // }
+         if (chatReqRecords == null || chatReqRecords.getUid() == null || chatReqRecords.getChatId() == null) {
+            SseEmitterUtil.completeWithError(emitter, "Chat records are empty");
+            return;
+         }
 
         try {
             // Create AgentClient

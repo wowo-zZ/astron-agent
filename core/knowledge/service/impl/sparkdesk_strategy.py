@@ -5,7 +5,6 @@ Provides Retrieval-Augmented Generation (RAG) functionality based on iFlytek Spa
 
 from typing import Any, Dict, List, Optional
 
-from knowledge.domain.entity.rag_do import ChunkInfo, FileInfo
 from knowledge.infra.desk.sparkdesk import sparkdesk_query_async
 from knowledge.service.rag_strategy import RAGStrategy
 
@@ -143,7 +142,7 @@ class SparkDeskRAGStrategy(RAGStrategy):
             "SparkDesk-RAG does not support chunks_delete operation."
         )
 
-    async def query_doc(self, docId: str, **kwargs: Any) -> List[ChunkInfo]:
+    async def query_doc(self, docId: str, **kwargs: Any) -> List[dict]:
         """
         Query all chunks of a document
 
@@ -159,7 +158,7 @@ class SparkDeskRAGStrategy(RAGStrategy):
         """
         raise NotImplementedError("SparkDesk-RAG does not support query_doc operation.")
 
-    async def query_doc_name(self, docId: str, **kwargs: Any) -> Optional[FileInfo]:
+    async def query_doc_name(self, docId: str, **kwargs: Any) -> Optional[dict]:
         """
         Query document name information
 

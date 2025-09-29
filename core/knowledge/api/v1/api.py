@@ -6,11 +6,13 @@ including document splitting, knowledge chunk saving, updating, deleting, queryi
 """
 
 import json
-from typing import Any, Callable, Tuple, Union
+from typing import Any, Callable, Tuple, Union, cast
 
 from common.otlp.metrics.meter import Meter
 from common.otlp.trace.span import Span
 from common.service import get_otlp_metric_service, get_otlp_span_service
+from common.service.otlp.metric.metric_service import OtlpMetricService
+from common.service.otlp.span.span_service import OtlpSpanService
 from fastapi import APIRouter, Depends, Request
 from loguru import logger
 
@@ -45,9 +47,9 @@ def get_span_and_metric(
 ) -> Tuple[Span, Meter]:
     """Dependency function to create and return Span and Meter instances"""
 
-    metric_service = get_otlp_metric_service()
+    metric_service = cast(OtlpMetricService, get_otlp_metric_service())
     metric = metric_service.get_meter()(func=function_name)
-    span_service = get_otlp_span_service()
+    span_service = cast(OtlpSpanService, get_otlp_span_service())
     span = span_service.get_span()(app_id=app_id)
     return span, metric
 
@@ -91,8 +93,8 @@ async def handle_rag_operation(
             isinstance(result_data, (str, int, float, bool, bytes))
             or result_data is None
         ):
-            # Basic types, set directly
-            span_context.add_info_events({"usr_output": result_data})
+            # Basic types, convert to string for consistent handling
+            span_context.add_info_events({"usr_output": str(result_data)})
         else:
             # Other types (like custom objects), try to stringify
             span_context.add_info_events({"usr_output": str(result_data)})

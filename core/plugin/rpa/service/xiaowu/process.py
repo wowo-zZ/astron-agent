@@ -85,13 +85,16 @@ async def task_monitoring(
             return
 
         start_time = time.time()
-        while (time.time() - start_time) < int(
-            os.getenv(const.XIAOWU_RPA_TIMEOUT_KEY, "300")
-        ):
+        ttl = int(os.getenv(const.XIAOWU_RPA_TIMEOUT_KEY, "300"))
+        while (time.time() - start_time) < ttl:
             span_context.add_info_events(attributes={"query sleep": str(time.time())})
             await asyncio.sleep(
                 int(os.getenv(const.XIAOWU_RPA_TASK_QUERY_INTERVAL_KEY, "10"))
             )
+
+            if (time.time() - start_time) > ttl:
+                break
+
             span_context.add_info_events(attributes={"query start": str(time.time())})
             result = await query_task_status(access_token, task_id)  # Query task
             span_context.add_info_events(attributes={"query finish": str(result)})
@@ -128,6 +131,7 @@ async def task_monitoring(
             code=ErrorCode.TIMEOUT_ERROR.code,
             message=ErrorCode.TIMEOUT_ERROR.message,
         )
+        return
 
 
 def setup_span_and_trace(req: str, sid: Optional[str]) -> Tuple[Span, NodeTraceLog]:

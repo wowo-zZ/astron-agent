@@ -33,6 +33,7 @@ from workflow.engine.nodes.plugin_tool.plugin_node import PluginNode
 from workflow.engine.nodes.question_answer.question_answer_node import (
     QuestionAnswerNode,
 )
+from workflow.engine.nodes.rpa.rpa_node import RPANode
 from workflow.engine.nodes.start.start_node import StartNode
 from workflow.engine.nodes.text_joiner.text_joiner_node import TextJoinerNode
 
@@ -60,4 +61,5 @@ tool_classes = {
     "agent": AgentNode,  # Agent node for autonomous task execution
     "question-answer": QuestionAnswerNode,  # Question-answer node for Q&A processing
     "database": PGSqlNode,  # PostgreSQL database node for data operations
+    "rpa": RPANode,
 }

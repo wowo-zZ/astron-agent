@@ -1,3 +1,10 @@
+"""
+Chat status constants.
+
+This module defines the execution-state constants used to track
+a chat interaction’s life-cycle inside the workflow engine.
+"""
+
 from enum import Enum
 
 
@@ -8,6 +15,7 @@ class ChatStatus(Enum):
     Tracks the execution state of chat operations.
     """
 
+    PING = "ping"
     RUNNING = "running"
     INTERRUPT = "interrupt"
     FINISH_REASON = "stop"

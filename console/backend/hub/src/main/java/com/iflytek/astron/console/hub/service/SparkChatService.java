@@ -28,6 +28,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * @author mingsuiyongheng
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -42,6 +45,11 @@ public class SparkChatService {
     @Autowired
     private ChatRecordModelService chatRecordModelService;
 
+    /**
+    * Create and return an SseEmitter object for handling chat room streaming requests
+    * @param request SparkChatRequest object containing chat room request
+    * @return SseEmitter object for handling chat room streaming requests
+    */
     public SseEmitter chatStream(SparkChatRequest request) {
         SseEmitter emitter = SseEmitterUtil.createSseEmitter();
         String streamId = request.getChatId() + "_" + request.getUserId() + "_" + System.currentTimeMillis();
@@ -64,7 +72,6 @@ public class SparkChatService {
         }
         try {
             SparkModel sparkModel = getSparkModel(request.getModel());
-            // todo: Connection pool configuration
             SparkChatClient client = new SparkChatClient.Builder().signatureHttp(apiPassword, sparkModel).build();
 
             SparkChatParam sendParam = buildSparkChatParam(request);

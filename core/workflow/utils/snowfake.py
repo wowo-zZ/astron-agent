@@ -6,6 +6,7 @@ Snowflake algorithm, which ensures globally unique identifiers across
 distributed systems.
 """
 
+import threading
 import time
 
 from snowflake import SnowflakeGenerator  # type: ignore
@@ -14,6 +15,7 @@ from snowflake import SnowflakeGenerator  # type: ignore
 t = time.time()
 work_id = int(round(t * 1000)) % 1024  # Generate worker ID from current timestamp
 gen = SnowflakeGenerator(work_id)
+lock = threading.Lock()
 
 
 def get_id() -> int:
@@ -22,4 +24,5 @@ def get_id() -> int:
 
     :return: Unique snowflake ID as integer
     """
-    return next(gen)
+    with lock:
+        return next(gen)

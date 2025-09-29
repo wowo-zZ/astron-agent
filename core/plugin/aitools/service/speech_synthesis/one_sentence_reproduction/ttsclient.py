@@ -159,22 +159,9 @@ class TTSClient:
                 message = json.loads(message)
                 self.messages.append(message)  # 存储消息
                 code = message["header"]["code"]
-                _ = message["header"]["sid"]
+                # sid = message["header"]["sid"]
                 if "payload" in message:
-                    audio = message["payload"]["audio"]["audio"]
-                    audio = base64.b64decode(audio)
-                    status = message["payload"]["audio"]["status"]
-                    # print(message)
-                    if status == 2:
-                        # print("ws is closed")
-                        ws.close()
-                    if code != 0:
-                        _ = message["message"]
-                        # print("sid:%s call error:%s code is:%s" % (sid, errMsg, code))
-                    else:
-                        self.audio_data.extend(audio)  # 将音频数据追加到bytearray中
-                        with open("./demo.mp3", "ab") as f:
-                            f.write(audio)
+                    self._process_audio_data(ws, message, code)
             except (json.JSONDecodeError, KeyError, base64.binascii.Error):
                 pass
 
@@ -209,6 +196,23 @@ class TTSClient:
         ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
 
         return self.messages, self.audio_data  # 返回消息和文件路径
+
+    def _process_audio_data(self, ws, message, code):
+        """处理音频数据"""
+        audio = message["payload"]["audio"]["audio"]
+        audio = base64.b64decode(audio)
+        status = message["payload"]["audio"]["status"]
+        # print(message)
+        if status == 2:
+            # print("ws is closed")
+            ws.close()
+        if code == 0:
+            self.audio_data.extend(audio)  # 将音频数据追加到bytearray中
+            with open("./demo.mp3", "ab") as f:
+                f.write(audio)
+        # else:
+            # errMsg = message["message"]
+            # print("sid:%s call error:%s code is:%s" % (sid, errMsg, code))
 
     @staticmethod
     def assemble_ws_auth_url(requset_url, method="GET", api_key="", api_secret=""):

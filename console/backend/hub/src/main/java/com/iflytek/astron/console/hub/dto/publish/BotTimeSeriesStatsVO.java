@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
 /**
- * 智能体时间序列statistics数据VO
+ * Bot time series statistics data VO
  */
 @Data
 @AllArgsConstructor
@@ -15,27 +15,27 @@ import java.time.LocalDate;
 public class BotTimeSeriesStatsVO {
 
     /**
-     * statistics日期
+     * Statistics date
      */
     private LocalDate date;
 
     /**
-     * 当日对话数
+     * Daily conversation count
      */
     private Integer chatCount;
 
     /**
-     * 当日user数
+     * Daily user count
      */
     private Integer userCount;
 
     /**
-     * 当日Token消耗
+     * Daily token consumption
      */
     private Integer tokenCount;
 
     /**
-     * 当日消息轮数
+     * Daily message rounds
      */
     private Integer messageCount;
 }

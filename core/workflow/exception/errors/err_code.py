@@ -239,6 +239,7 @@ class CodeEnum(Enum):
     )  # DEPRECATED
 
     # 21300
+    RPA_REQUEST_ERROR = (21300, "RPA node request failed")
 
     # 21400
 

@@ -9,7 +9,7 @@ from loguru import logger
 from plugin.rpa.consts import const
 from plugin.rpa.errors.error_code import ErrorCode
 from plugin.rpa.exceptions.config_exceptions import InvalidConfigException
-from plugin.rpa.utils.urls.utl_util import is_valid_url
+from plugin.rpa.utils.urls.url_util import is_valid_url
 
 
 # Create task

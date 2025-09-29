@@ -27,7 +27,7 @@ class JsonSchemaValidator:
         """
         self.schema = schema
 
-    def validate(self, data: dict) -> bool:
+    def validate(self, data: Any) -> bool:
         """
         Validate data against the JSON Schema.
 
@@ -109,6 +109,10 @@ class JsonSchemaValidator:
 
             case "object":
                 if isinstance(value, dict):
+                    for key, val in value.items():
+                        value[key] = self._fix_type(
+                            val, props.get("properties", {}).get(key, "")
+                        )
                     return value
                 return {}  # Return empty dict for non-dict values
 

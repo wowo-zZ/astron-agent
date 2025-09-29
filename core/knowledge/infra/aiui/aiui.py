@@ -47,13 +47,13 @@ async def assemble_auth_url(request_path: str, method: str = "POST") -> str:
     date = format_date_time(mktime(now.timetuple()))
 
     signature_origin = f"host: {host}\ndate: {date}\n{method} {path} HTTP/1.1"
-    signature_sha = hmac.new(
+    signature_bytes = hmac.new(
         api_secret.encode("utf-8"),
         signature_origin.encode("utf-8"),
         digestmod=hashlib.sha256,
     ).digest()
 
-    signature_sha = base64.b64encode(signature_sha).decode(encoding="utf-8")
+    signature_sha = base64.b64encode(signature_bytes).decode(encoding="utf-8")
     authorization_origin = (
         f'api_key="{api_key}", algorithm="hmac-sha256", '
         f'headers="host date request-line", signature="{signature_sha}"'
@@ -330,3 +330,4 @@ async def request(
                 raise ThirdPartyException(
                     e=CodeEnum.AIUI_RAGError, msg=f"AIUI Request timeout: {url}"
                 ) from e
+    return {}

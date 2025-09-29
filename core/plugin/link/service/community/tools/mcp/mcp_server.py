@@ -251,10 +251,7 @@ def _log_error_to_kafka(
         )
         kafka_service = get_kafka_producer_service()
         node_trace.start_time = int(round(time.time() * 1000))
-        kafka_service.send(
-            os.getenv(const.KAFKA_TOPIC_KEY),
-            node_trace.to_json()
-        )
+        kafka_service.send(os.getenv(const.KAFKA_TOPIC_KEY), node_trace.to_json())
 
 
 async def _initialize_session(
@@ -472,8 +469,7 @@ async def call_tool(call_info: MCPCallToolRequest = Body()) -> MCPCallToolRespon
                 kafka_service = get_kafka_producer_service()
                 node_trace.start_time = int(round(time.time() * 1000))
                 kafka_service.send(
-                    os.getenv(const.KAFKA_TOPIC_KEY),
-                    node_trace.to_json()
+                    os.getenv(const.KAFKA_TOPIC_KEY), node_trace.to_json()
                 )
 
         return result

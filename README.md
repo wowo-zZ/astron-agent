@@ -4,7 +4,7 @@
 
 ![Logo](docs/logo.svg)
 
-**An enterprise-ready AI agent development platform combining intelligent RPA, enabling agents to not only think but also act—automating workflows across digital and desktop environments.**
+**Astron Agent is an enterprise-grade Agent development platform designed for AI developers and small to medium-sized enterprises.**
 
 [![License](https://img.shields.io/badge/license-apache2.0-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/github/v/release/iflytek/astron-agent)](https://github.com/iflytek/astron-agent/releases)
@@ -18,7 +18,7 @@ English | [简体中文](README-zh.md)
 
 ## 📑 Table of Contents
 
-- [📋 Overview](#-overview)
+- [🔭 What is Astron Agent?](#-What-is-Astron-Agent)
 - [🛠️ Tech Stack](#-tech-stack)
 - [🚀 Quick Start](#-quick-start)
   - [Using Docker](#using-docker)
@@ -29,9 +29,25 @@ English | [简体中文](README-zh.md)
 - [📞 Support](#-support)
 - [📄 License](#-license)
 
-## 📋 Overview
+## 🔭 What is Astron Agent
+Astron Agent is an enterprise-grade Agent development platform designed for AI developers and small to medium-sized enterprises.  
+It not only provides end-to-end capabilities covering model hosting, application development, performance optimization, and access control, but also innovatively integrates intelligent RPA. This allows Agents not only to “think,” but also to truly “act,” completing complex task chains across digital systems and desktop environments.
 
-Astron Agent is an enterprise-ready AI agent development platform combining intelligent RPA, enabling agents to not only think but also act—automating workflows across digital and desktop environments. It provides a one-stop AI agent development platform for individuals and small and medium-sized businesses to complete a variety of practical tasks autonomously or collaboratively.
+### Why Choose Astron Agent?
+- **Consistent and Reliable:** Shares the same core technology with iFLYTEK Starchen Agent platform, inheriting its proven enterprise-grade stability.  
+- **Closed Loop of Thinking + Acting:** Deep integration of intelligent RPA enables Agents to move from “generating answers” to “automatically completing tasks.”  
+- **Dual Value for Developers and Enterprises:** Developers can quickly get started and expand, while SMEs can efficiently implement digital workflows.  
+
+### Key Features
+- **Enterprise-Grade High Availability:** Full-stack capabilities for development, building, optimization, and management. Supports one-click deployment with strong reliability.  
+- **Intelligent RPA Integration:** Enables cross-system process automation, empowering Agents with controllable execution to achieve a complete loop “from decision to action.”  
+- **Ready-to-Use Tool Ecosystem:** Integrated with the rich capabilities of the iFLYTEK Open Platform, validated by millions of developers, supporting plug-and-play access without extra development.  
+- **Flexible Model Support:** Multiple integration options, adaptable to use cases ranging from personal testing to large-scale on-premise enterprise clusters.  
+
+### Developer Support
+- **Multi-language Backend:** Supports mainstream languages such as Java, Go, and Python; frontend adapted to TypeScript + React stack.  
+- **Comprehensive Toolchain:** Provides API documentation, deployment guides, and troubleshooting manuals to reduce learning and maintenance costs.  
+- **One-Click Deployment:** Built-in Dockerized environment for out-of-the-box setup and rapid project launch.  
 
 ## 🛠️ Tech Stack
 

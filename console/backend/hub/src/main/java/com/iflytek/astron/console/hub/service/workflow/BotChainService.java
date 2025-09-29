@@ -8,12 +8,12 @@ import jakarta.servlet.http.HttpServletRequest;
 public interface BotChainService {
 
     /**
-     * 复制助手2.0
+     * Copy assistant 2.0
      */
     void copyBot(String uid, Long sourceId, Long targetId, Long spaceId);
 
     /**
-     * 复制工作流
+     * Copy workflow
      *
      * @param uid uid
      * @param spaceId

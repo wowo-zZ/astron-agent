@@ -11,32 +11,32 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * 智能体对话统计Mapper
+ * Bot conversation statistics Mapper
  */
 @Mapper
 public interface BotConversationStatsMapper extends BaseMapper<BotConversationStats> {
 
 
     /**
-     * 查询智能体总体统计数据
+     * Query bot overall statistics data
      *
-     * @param botId 智能体ID
-     * @param uid 用户ID（可为空，表示查询所有用户）
-     * @param spaceId 空间ID（可为空）
-     * @return 总体统计数据
+     * @param botId Bot ID
+     * @param uid User ID (can be null, means query all users)
+     * @param spaceId Space ID (can be null)
+     * @return Overall statistics data
      */
     BotSummaryStatsVO selectSummaryStats(@Param("botId") Integer botId,
             @Param("uid") Long uid,
             @Param("spaceId") Long spaceId);
 
     /**
-     * 查询智能体时间序列统计数据
+     * Query bot time series statistics data
      *
-     * @param botId 智能体ID
-     * @param startDate 开始日期
-     * @param uid 用户ID（可为空，表示查询所有用户）
-     * @param spaceId 空间ID（可为空）
-     * @return 时间序列统计数据
+     * @param botId Bot ID
+     * @param startDate Start date
+     * @param uid User ID (can be null, means query all users)
+     * @param spaceId Space ID (can be null)
+     * @return Time series statistics data
      */
     List<BotTimeSeriesStatsVO> selectTimeSeriesStats(@Param("botId") Integer botId,
             @Param("startDate") LocalDate startDate,

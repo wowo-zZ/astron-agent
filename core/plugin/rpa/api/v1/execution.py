@@ -34,7 +34,7 @@ async def exec_fun(
             "Cache-Control": "no-cache, no-transform",
             "X-Accel-Buffering": "no",
         }
-        ping_interval = int(os.getenv(const.XIAOWU_RPA_PING_INTERVAL_KEY, "3"))
+        ping_interval = int(os.getenv(const.XIAOWU_RPA_PING_INTERVAL_KEY, "3") or "3")
         acctss_token = (
             Authorization[7:] if Authorization.startswith("Bearer ") else Authorization
         )

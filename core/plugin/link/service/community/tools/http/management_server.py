@@ -100,10 +100,7 @@ def send_telemetry_mgmt(node_trace):
     if os.getenv(const.OTLP_ENABLE_KEY, "false").lower() == "true":
         kafka_service = get_kafka_producer_service()
         node_trace.start_time = int(round(time.time() * 1000))
-        kafka_service.send(
-            os.getenv(const.KAFKA_TOPIC_KEY),
-            node_trace.to_json()
-        )
+        kafka_service.send(os.getenv(const.KAFKA_TOPIC_KEY), node_trace.to_json())
 
 
 def setup_logging_and_metrics_mgmt(span_context, run_params_list, func_name):

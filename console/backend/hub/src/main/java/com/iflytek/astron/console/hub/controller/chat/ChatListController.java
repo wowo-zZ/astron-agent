@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * @author yingpeng
+ * @author mingsuiyongheng
  */
 @RestController
 @Tag(name = "Chat List")
@@ -49,6 +49,11 @@ public class ChatListController {
         return ApiResult.success(allChatList);
     }
 
+    /**
+     * Controller method for creating chat list
+     * @param payload Request body containing chat list creation request data
+     * @return Returns an ApiResult object containing chat list creation response data
+     */
     @PostMapping("/v1/create-chat-list")
     @Operation(summary = "Create Chat List")
     public ApiResult<ChatListCreateResponse> createChatList(
@@ -60,6 +65,12 @@ public class ChatListController {
         return ApiResult.success(chatListService.createChatList(uid, payload.getChatListName(), botId));
     }
 
+    /**
+     * Delete chat list
+     *
+     * @param payload Request body containing chat list ID
+     * @return Result of the delete operation
+     */
     @PostMapping("/v1/del-chat-list")
     @Operation(summary = "Delete Chat List")
     public ApiResult<Boolean> deleteChatList(

@@ -8,7 +8,7 @@ Uses Pydantic for data validation and serialization
 from enum import Enum
 from typing import Any, List, Optional
 
-from pydantic import BaseModel, Field, conlist
+from pydantic import BaseModel, Field
 
 
 class RAGType(str, Enum):
@@ -66,8 +66,8 @@ class ChunkSaveReq(BaseModel):
     docId: str = Field(..., min_length=1, description="Required, minimum length 1")
     group: str = Field(..., min_length=1, description="Required, minimum length 1")
     uid: Optional[str] = Field(default=None, description="User ID")
-    chunks: conlist(Any, min_length=1) = Field(
-        ..., description="Chunk list, must contain at least one element"
+    chunks: List[Any] = Field(
+        ..., min_length=1, description="Chunk list, must contain at least one element"
     )
     ragType: RAGType = Field(..., description="RAG type")
 
@@ -87,8 +87,10 @@ class ChunkUpdateReq(BaseModel):
     docId: str = Field(..., min_length=1, description="Required, minimum length 1")
     group: str = Field(..., min_length=1, description="Required, minimum length 1")
     uid: Optional[str] = Field(default=None, description="User ID")
-    chunks: conlist(dict, min_length=1) = Field(
-        ..., description="Chunk dictionary list, must contain at least one element"
+    chunks: List[dict] = Field(
+        ...,
+        min_length=1,
+        description="Chunk dictionary list, must contain at least one element",
     )
     ragType: RAGType = Field(..., description="RAG type")
 
@@ -120,8 +122,10 @@ class QueryMatch(BaseModel):
     """
 
     docIds: Optional[List[str]] = Field(default=None, description="Document ID list")
-    repoId: conlist(str, min_length=1) = Field(
-        ..., description="Knowledge base ID list, must contain at least one element"
+    repoId: List[str] = Field(
+        ...,
+        min_length=1,
+        description="Knowledge base ID list, must contain at least one element",
     )
     threshold: float = Field(
         default=0, ge=0, le=1, description="Optional, default value 0, range 0~1"

@@ -65,7 +65,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class InviteRecordBizServiceImpl implements InviteRecordBizService {
-    private static final String AES_KEY = "32c8aa9a342a3e130d24e86294709b02";
+    private static final String AES_KEY = "bca4162158f8ab040861208f0bdd674bb237be7cf7d4642bf8fde54bafd7952b";
     private static final int MAX_EXPIRE_TIME = 7;
     @Autowired
     private SpaceUserService spaceUserService;

@@ -377,9 +377,9 @@ class TestResponseIntegration:
             assert response.code == 0
 
         # All error responses should return False for is_success
-        for response in error_responses:
-            assert response.is_success() is False
-            assert response.code != 0
+        for error_response in error_responses:
+            assert error_response.is_success() is False
+            assert error_response.code != 0
 
     def test_response_dict_json_serializable(self) -> None:
         """Test that response dictionaries are JSON serializable."""

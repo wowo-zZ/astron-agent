@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
- * 智能体列表查询请求DTO 对应老代码中的 BotMarketForm
+ * Bot list query request DTO corresponding to BotMarketForm in legacy code
  *
  * @author Omuigix
  */
@@ -25,89 +25,89 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(
-        description = "智能体列表查询请求DTO",
+        description = "Bot list query request DTO",
         name = "BotListRequestDto",
-        title = "智能体列表查询参数")
+        title = "Bot list query parameters")
 public class BotListRequestDto {
 
     /**
-     * 页码 (从1开始)
+     * Page number (starting from 1)
      */
     @Schema(
-            description = "页码，从1开始",
+            description = "Page number, starting from 1",
             example = "1",
             defaultValue = "1",
             minimum = "1",
             required = false)
-    @Min(value = 1, message = "页码必须大于0")
+    @Min(value = 1, message = "Page number must be greater than 0")
     @Builder.Default
     private Integer page = 1;
 
     /**
-     * 页大小
+     * Page size
      */
     @Schema(
-            description = "每页记录数，最大200",
+            description = "Number of records per page, maximum 200",
             example = "10",
             defaultValue = "10",
             minimum = "1",
             maximum = "200",
             required = false)
-    @Min(value = 1, message = "页大小必须大于0")
-    @Max(value = 200, message = "页大小不能超过200")
+    @Min(value = 1, message = "Page size must be greater than 0")
+    @Max(value = 200, message = "Page size cannot exceed 200")
     @Builder.Default
     private Integer size = 10;
 
     /**
-     * 搜索关键词 (智能体名称)
+     * Search keyword (bot name)
      */
     @Schema(
-            description = "搜索关键词，支持智能体名称、描述模糊匹配",
-            example = "客服机器人",
+            description = "Search keyword, supports fuzzy matching of bot name and description",
+            example = "Customer Service Bot",
             maxLength = 100,
             required = false)
-    @Size(max = 100, message = "关键词长度不能超过100")
+    @Size(max = 100, message = "Keyword length cannot exceed 100")
     private String keyword;
 
 
     /**
-     * 发布状态筛选（逗号分隔）
+     * Publish status filter (comma-separated)
      * <ul>
-     * <li>0 = 下架</li>
-     * <li>1 = 上架</li>
+     * <li>0 = Offline</li>
+     * <li>1 = Online</li>
      * </ul>
-     * 支持格式："0" 或 "1" 或 "0,1"
+     * Supported formats: "0" or "1" or "0,1"
      */
     @Schema(
-            description = "发布状态筛选，逗号分隔多个状态。例如：\"0,1\" 表示查询下架和上架的智能体。状态值：0=下架，1=上架",
+            description = "Publish status filter, comma-separated multiple statuses. Example: \"0,1\" means query both offline and online bots. Status values: 0=Offline, 1=Online",
             example = "0,1",
             required = false)
     private String publishStatus;
 
     /**
-     * 版本筛选
+     * Version filter
      * <ul>
-     * <li>1 = 指令式智能体版本</li>
-     * <li>3 = 工作流智能体版本</li>
-     * <li>null = 查询全部版本</li>
+     * <li>1 = Instruction-based bot version</li>
+     * <li>3 = Workflow-based bot version</li>
+     * <li>null = Query all versions</li>
      * </ul>
      */
     @Schema(
-            description = "版本筛选：1=指令式智能体版本，3=工作流智能体版本，不传则查询全部",
+            description = "Version filter: 1=Instruction-based bot version, 3=Workflow-based bot version, omit to query all",
             example = "1",
             allowableValues = {"1", "3"},
             required = false)
     private Integer version;
 
     /**
-     * 排序字段
+     * Sort field
      * <ul>
-     * <li>createTime = 按创建时间排序</li>
-     * <li>updateTime = 按更新时间排序</li>
+     * <li>createTime = Sort by creation time</li>
+     * <li>updateTime = Sort by update time</li>
      * </ul>
      */
     @Schema(
-            description = "排序字段：createTime=按创建时间排序，updateTime=按更新时间排序",
+            description = "Sort field: createTime=Sort by creation time, updateTime=Sort by update time",
             example = "createTime",
             defaultValue = "createTime",
             allowableValues = {"createTime", "updateTime"},
@@ -116,14 +116,14 @@ public class BotListRequestDto {
     private String sortField = "createTime";
 
     /**
-     * 排序方向
+     * Sort direction
      * <ul>
-     * <li>ASC = 升序排列</li>
-     * <li>DESC = 降序排列</li>
+     * <li>ASC = Ascending order</li>
+     * <li>DESC = Descending order</li>
      * </ul>
      */
     @Schema(
-            description = "排序方向：ASC=升序排列，DESC=降序排列",
+            description = "Sort direction: ASC=Ascending order, DESC=Descending order",
             example = "DESC",
             defaultValue = "DESC",
             allowableValues = {"ASC", "DESC"},
@@ -132,13 +132,14 @@ public class BotListRequestDto {
     private String sortDirection = "DESC";
 
     /**
-     * 解析发布状态字符串为整数列表
+     * Parse the release status string into a list of integers
      *
-     * 支持格式： - "1" -> [1] - "1,2" -> [1, 2] - "1,2,3" -> [1, 2, 3] - null或空字符串 -> []
+     * Supported formats: - "1" -> [1] - "1,2" -> [1, 2] - "1,2,3" -> [1, 2, 3] - null or empty string
+     * -> []
      *
-     * 注意：此方法仅用于内部逻辑，不会出现在API文档中
+     * Note: This method is only used for internal logic and will not appear in the API documentation.
      *
-     * @return 解析后的状态列表
+     * @return Parsed status list
      */
     @JsonIgnore
     public List<Integer> getPublishStatusList() {
@@ -153,7 +154,7 @@ public class BotListRequestDto {
                     .map(Integer::parseInt)
                     .collect(Collectors.toList());
         } catch (NumberFormatException e) {
-            // 解析失败时返回空列表，避免抛出异常
+            // Return an empty list when parsing fails to avoid throwing an exception
             return new ArrayList<>();
         }
     }

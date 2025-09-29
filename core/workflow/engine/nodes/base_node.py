@@ -1034,8 +1034,8 @@ class BaseLLMNode(BaseNode):
     model: str = Field(...)
     domain: str = Field(...)
     appId: str = Field(...)
-    apiKey: str = Field(...)
-    apiSecret: str = Field(...)
+    apiKey: str = Field(default="")
+    apiSecret: str = Field(default="")
 
     url: str = Field(default="")
     temperature: float = Field(gt=0, le=1, default=1.0)

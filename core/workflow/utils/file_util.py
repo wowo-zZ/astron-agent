@@ -7,7 +7,6 @@ image extensions,and converting image URLs to Base64 encoded strings.
 """
 
 import base64
-import os
 import random
 import string
 import time
@@ -57,38 +56,14 @@ def get_image_extension(
     return extension
 
 
-def url_to_base64(url: str, delete_file: bool = True) -> str:
+def url_to_base64(url: str) -> str:
     """
-    Convert image URL to Base64 encoded string and optionally delete local file.
+    Convert an image URL to a Base64 encoded string.
 
-    :param url: Image URL to convert
-    :param delete_file: Whether to delete local file after conversion (default: True)
+    :param url: Image URL
     :return: Base64 encoded string
-    :raises Exception: If image download fails
     """
-    # Download image and save to local file
     response = requests.get(url)
     if response.status_code != 200:
         raise Exception(f"Failed to download image from {url}")
-
-    # Get image extension
-    extension = get_image_extension(url, response)
-
-    # Generate unique filename
-    if not extension:
-        extension = "jpg"  # Default extension
-    temp_file_path = generate_unique_filename(extension)
-
-    # Save image to local temporary file
-    with open(temp_file_path, "wb") as image_file:
-        image_file.write(response.content)
-
-    # Convert local image file to Base64 encoding
-    with open(temp_file_path, "rb") as image_file:
-        encoded_string = base64.b64encode(image_file.read()).decode("utf-8")
-
-    # Delete local file if requested
-    if delete_file:
-        os.remove(temp_file_path)
-
-    return encoded_string
+    return str(base64.b64encode(response.content).decode("utf-8"))

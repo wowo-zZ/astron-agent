@@ -19,9 +19,10 @@ import org.springframework.util.StringUtils;
 import java.time.Duration;
 
 /**
- * WeChat第三方平台服务实现
+ * WeChat third-party platform service implementation
  *
- * 优化点： 1. 使用Redisson替代RedisUtil 2. 统一exception处理 3. 优化缓存键management 4. 增强日志记录 5. 提取常量配置
+ * Optimization points: 1. Use Redisson instead of RedisUtil 2. Unified exception handling 3.
+ * Optimize cache key management 4. Enhanced logging 5. Extract constant configuration
  *
  * @author Omuigix
  */
@@ -39,7 +40,7 @@ public class WechatThirdpartyServiceImpl implements WechatThirdpartyService {
     @Value("${wechat.thirdparty.component-secret}")
     private String componentSecret;
 
-    // Redis缓存键前缀
+    // Redis cache key prefix
     private static final String REDIS_KEY_PREFIX = "wechat:thirdparty:";
     private static final String PRE_AUTH_CODE_KEY = REDIS_KEY_PREFIX + "pre_auth_code:";
     private static final String PRE_BIND_KEY = REDIS_KEY_PREFIX + "pre_bind:";
@@ -48,7 +49,7 @@ public class WechatThirdpartyServiceImpl implements WechatThirdpartyService {
     private static final String AUTHORIZATION_ACCESS_TOKEN_KEY = REDIS_KEY_PREFIX + "authorization_access_token:";
     private static final String AUTHORIZATION_REFRESH_TOKEN_KEY = REDIS_KEY_PREFIX + "authorization_refresh_token:";
 
-    // 缓存过期时间
+    // Cache expiration time
     private static final Duration PRE_AUTH_CODE_EXPIRE = Duration.ofSeconds(1800);
     private static final Duration PRE_BIND_EXPIRE = Duration.ofSeconds(1800);
     private static final Duration ACCESS_TOKEN_EXPIRE = Duration.ofSeconds(7200);

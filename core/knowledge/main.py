@@ -70,8 +70,8 @@ def create_app() -> FastAPI:
         for route in app.routes:
             route_infos.append(
                 {
-                    "path": route.path,
-                    "name": route.name,
+                    "path": getattr(route, "path", str(route)),
+                    "name": getattr(route, "name", type(route).__name__),
                     "methods": (
                         list(route.methods) if hasattr(route, "methods") else "chat"
                     ),

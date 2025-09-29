@@ -1,3 +1,4 @@
+from typing import Any, Dict, List
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -9,21 +10,23 @@ class TestAIUIRAGStrategy:
     """AIUI RAG strategy unit tests"""
 
     @pytest.fixture
-    def strategy(self):
+    def strategy(self) -> AIUIRAGStrategy:
         """Create test strategy instance"""
         return AIUIRAGStrategy()
 
     @pytest.fixture
-    def mock_aiui(self):
+    def mock_aiui(self) -> Any:
         """Mock aiui module"""
         with patch("knowledge.service.impl.aiui_strategy.aiui") as mock:
             yield mock
 
     @pytest.mark.asyncio
-    async def test_query_success(self, strategy, mock_aiui):
+    async def test_query_success(
+        self, strategy: AIUIRAGStrategy, mock_aiui: Any
+    ) -> None:
         """Test successful query scenario"""
         # Mock return values
-        mock_response = {
+        mock_response: Dict[str, Any] = {
             "query": "test query",
             "count": 2,
             "results": [
@@ -74,7 +77,9 @@ class TestAIUIRAGStrategy:
         )
 
     @pytest.mark.asyncio
-    async def test_query_empty_results(self, strategy, mock_aiui):
+    async def test_query_empty_results(
+        self, strategy: AIUIRAGStrategy, mock_aiui: Any
+    ) -> None:
         """Test query returning empty results"""
         # Mock empty return values
         mock_aiui.chunk_query = AsyncMock(return_value=None)
@@ -88,10 +93,12 @@ class TestAIUIRAGStrategy:
         assert result["results"] == []
 
     @pytest.mark.asyncio
-    async def test_query_partial_empty_results(self, strategy, mock_aiui):
+    async def test_query_partial_empty_results(
+        self, strategy: AIUIRAGStrategy, mock_aiui: Any
+    ) -> None:
         """Test query returning partial empty results"""
         # Mock partial empty return values
-        mock_response = {
+        mock_response: Dict[str, Any] = {
             "query": "test query",
             "count": 2,
             "results": None,  # This is empty result
@@ -108,14 +115,16 @@ class TestAIUIRAGStrategy:
         assert result["results"] == []
 
     @pytest.mark.asyncio
-    async def test_split_success(self, strategy, mock_aiui):
+    async def test_split_success(
+        self, strategy: AIUIRAGStrategy, mock_aiui: Any
+    ) -> None:
         """Test successful file splitting scenario"""
         # Mock document parsing return values
-        mock_doc_data = {"content": "parsed document content"}
+        mock_doc_data: Dict[str, Any] = {"content": "parsed document content"}
         mock_aiui.document_parse = AsyncMock(return_value=mock_doc_data)
 
         # Mock chunk return values
-        mock_chunk_data = [
+        mock_chunk_data: List[Dict[str, Any]] = [
             {
                 "docId": "doc1",
                 "chunkId": "chunk1",
@@ -157,11 +166,11 @@ class TestAIUIRAGStrategy:
         )
 
     @pytest.mark.asyncio
-    async def test_chunks_save(self, strategy, mock_aiui):
+    async def test_chunks_save(self, strategy: AIUIRAGStrategy, mock_aiui: Any) -> None:
         """Test chunk saving"""
         mock_aiui.chunk_save = AsyncMock(return_value="save_result")
 
-        chunks = [{"content": "chunk1"}, {"content": "chunk2"}]
+        chunks: List[Dict[str, Any]] = [{"content": "chunk1"}, {"content": "chunk2"}]
         result = await strategy.chunks_save("doc1", "group1", "user1", chunks)
 
         assert result == "save_result"
@@ -170,30 +179,39 @@ class TestAIUIRAGStrategy:
         )
 
     @pytest.mark.asyncio
-    async def test_chunks_update(self, strategy, mock_aiui):
+    async def test_chunks_update(
+        self, strategy: AIUIRAGStrategy, mock_aiui: Any
+    ) -> None:
         """Test chunk updating"""
-        # Mock delete and save methods
-        strategy.chunks_delete = AsyncMock()
-        strategy.chunks_save = AsyncMock(return_value="update_result")
+        # Mock delete and save methods using patch
+        with patch.object(
+            strategy, "chunks_delete", new_callable=AsyncMock
+        ) as mock_delete, patch.object(
+            strategy, "chunks_save", new_callable=AsyncMock
+        ) as mock_save:
 
-        chunks = [
-            {"chunkId": "chunk1", "content": "content1"},
-            {"chunkId": "chunk2", "content": "content2"},
-        ]
+            mock_save.return_value = "update_result"
 
-        result = await strategy.chunks_update("doc1", "group1", "user1", chunks)
+            chunks: List[Dict[str, Any]] = [
+                {"chunkId": "chunk1", "content": "content1"},
+                {"chunkId": "chunk2", "content": "content2"},
+            ]
 
-        assert result == "update_result"
-        strategy.chunks_delete.assert_called_once_with(
-            doc_id="doc1", chunk_ids=["chunk1", "chunk2"]
-        )
+            result = await strategy.chunks_update("doc1", "group1", "user1", chunks)
 
-        strategy.chunks_save.assert_called_once_with(
-            doc_id="doc1", group="group1", uid="user1", chunks=chunks
-        )
+            assert result == "update_result"
+            mock_delete.assert_called_once_with(
+                docId="doc1", chunkIds=["chunk1", "chunk2"]
+            )
+
+            mock_save.assert_called_once_with(
+                docId="doc1", group="group1", uid="user1", chunks=chunks
+            )
 
     @pytest.mark.asyncio
-    async def test_chunks_delete(self, strategy, mock_aiui):
+    async def test_chunks_delete(
+        self, strategy: AIUIRAGStrategy, mock_aiui: Any
+    ) -> None:
         """Test chunk deletion"""
         mock_aiui.chunk_delete = AsyncMock(return_value="delete_result")
 
@@ -205,10 +223,10 @@ class TestAIUIRAGStrategy:
         )
 
     @pytest.mark.asyncio
-    async def test_query_doc(self, strategy, mock_aiui):
+    async def test_query_doc(self, strategy: AIUIRAGStrategy, mock_aiui: Any) -> None:
         """Test querying all chunks of a document"""
         # Mock return values
-        mock_data = [
+        mock_data: List[Dict[str, Any]] = [
             {
                 "docId": "doc1",
                 "chunkId": "chunk1",
@@ -236,7 +254,7 @@ class TestAIUIRAGStrategy:
         assert "" in result[0]["content"]
 
     @pytest.mark.asyncio
-    async def test_query_doc_name(self, strategy):
+    async def test_query_doc_name(self, strategy: AIUIRAGStrategy) -> None:
         """Test querying document name"""
         result = await strategy.query_doc_name("doc1")
         assert result is None

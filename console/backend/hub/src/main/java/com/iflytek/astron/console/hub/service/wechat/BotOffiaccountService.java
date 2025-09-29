@@ -5,49 +5,49 @@ import com.iflytek.astron.console.commons.entity.wechat.BotOffiaccount;
 import java.util.List;
 
 /**
- * 智能体与微信公众号bind服务接口
+ * Bot and WeChat official account binding service interface
  *
  * @author Omuigix
  */
 public interface BotOffiaccountService {
 
     /**
-     * 建立智能体与微信公众号的bind关系
+     * Establish binding relationship between bot and WeChat official account
      *
-     * @param botId botID
-     * @param appid 微信official accountAppID
-     * @param uid userID
+     * @param botId Bot ID
+     * @param appid WeChat official account AppID
+     * @param uid User ID
      */
     void bind(Integer botId, String appid, String uid);
 
     /**
-     * 解除微信公众号bind
+     * Unbind WeChat official account
      *
-     * @param appid 微信official accountAppID
+     * @param appid WeChat official account AppID
      */
     void unbind(String appid);
 
     /**
-     * 根据用户ID获取已bind的微信公众号列表
+     * Get bound WeChat official account list by user ID
      *
-     * @param uid userID
-     * @return bind列表
+     * @param uid User ID
+     * @return Binding list
      */
     List<BotOffiaccount> getAccountList(String uid);
 
     /**
-     * 根据微信AppID获取bind的智能体信息
+     * Get bound bot information by WeChat AppID
      *
-     * @param appid 微信official accountAppID
-     * @return bind信息
+     * @param appid WeChat official account AppID
+     * @return Binding information
      */
     BotOffiaccount getByAppid(String appid);
 
     /**
-     * 根据智能体ID获取bind的微信公众号信息
+     * Get bound WeChat official account information by bot ID
      *
-     * @param botId botID
-     * @return bind信息
+     * @param botId Bot ID
+     * @return Binding information
      */
     BotOffiaccount getByBotId(Integer botId);
 }

@@ -64,7 +64,7 @@ class NodeInfo(BaseModel):
     alias_name: str = ""
     """Human-readable name for the node."""
 
-    finish_reason: Literal["stop", "interrupt", None] = None
+    finish_reason: Literal["stop", "interrupt", "ping", None] = None
     """Reason for node completion: 'stop' for normal completion, 'interrupt' for interruption, None for ongoing."""
 
     inputs: dict = {}
@@ -136,7 +136,7 @@ class Choice(BaseModel):
     index: Optional[int] = None
     """Index of this choice in the response."""
 
-    finish_reason: Literal["interrupt", "stop", None] = None
+    finish_reason: Literal["interrupt", "stop", "ping", None] = None
     """Reason for completion: 'stop' for normal completion, 'interrupt' for interruption, None for ongoing."""
 
 
@@ -232,12 +232,16 @@ class LLMGenerate(BaseModel):
             ),
             index=0,
             finish_reason=cast(
-                Literal["interrupt", "stop", None],
+                Literal["interrupt", "stop", "ping", None],
                 (
                     finish_reason
                     if (
                         finish_reason
-                        in [ChatStatus.INTERRUPT.value, ChatStatus.FINISH_REASON.value]
+                        in [
+                            ChatStatus.INTERRUPT.value,
+                            ChatStatus.FINISH_REASON.value,
+                            ChatStatus.PING.value,
+                        ]
                     )
                     else None
                 ),
@@ -287,8 +291,19 @@ class LLMGenerate(BaseModel):
             delta=Delta(role="assistant", content="", reasoning_content=""),
             index=0,
             finish_reason=cast(
-                Literal["interrupt", "stop", None],
-                (finish_reason if (finish_reason in ["interrupt", "stop"]) else None),
+                Literal["interrupt", "stop", "ping", None],
+                (
+                    finish_reason
+                    if (
+                        finish_reason
+                        in [
+                            ChatStatus.INTERRUPT.value,
+                            ChatStatus.FINISH_REASON.value,
+                            ChatStatus.PING.value,
+                        ]
+                    )
+                    else None
+                ),
             ),
         )
         resp = LLMGenerate(
@@ -299,6 +314,34 @@ class LLMGenerate(BaseModel):
             workflow_step=workflow_step,
             choices=[choice],
             event_data=event_data,
+        )
+        return resp
+
+    @staticmethod
+    def _ping(
+        sid: str,
+        code: int = 0,
+        message: str = "Success",
+        node_info: Optional[NodeInfo] = None,
+        progress: float = 1,
+    ) -> "LLMGenerate":
+        workflow_step = WorkflowStep(
+            node=node_info,
+            seq=0,
+            progress=progress,  # Frame sequence number is reassigned when dequeued
+        )
+        choice = Choice(
+            delta=Delta(role="assistant", content="", reasoning_content=""),
+            index=0,
+            finish_reason="ping",
+        )
+        resp = LLMGenerate(
+            code=code,
+            message=message,
+            id=sid,
+            created=int(time.time()),
+            workflow_step=workflow_step,
+            choices=[choice],
         )
         return resp
 
@@ -532,8 +575,19 @@ class LLMGenerate(BaseModel):
             id=node_id,
             alias_name=alias_name,
             finish_reason=cast(
-                Literal["interrupt", "stop", None],
-                (finish_reason if (finish_reason in ["interrupt", "stop"]) else None),
+                Literal["interrupt", "stop", "ping", None],
+                (
+                    finish_reason
+                    if (
+                        finish_reason
+                        in [
+                            ChatStatus.INTERRUPT.value,
+                            ChatStatus.FINISH_REASON.value,
+                            ChatStatus.PING.value,
+                        ]
+                    )
+                    else None
+                ),
             ),
             inputs={},
             outputs={},

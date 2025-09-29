@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * 自定义 AccessDeniedHandler，用于返回 JSON 格式的 403 响应
+ * Custom AccessDeniedHandler for returning JSON formatted 403 responses
  */
 @Component
 @Slf4j

@@ -30,6 +30,9 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * @author mingsuiyongheng
+ */
 @Service
 @Slf4j
 public class ChatListServiceImpl implements ChatListService {
@@ -46,6 +49,15 @@ public class ChatListServiceImpl implements ChatListService {
     @Autowired
     private ModelService modelService;
 
+    /**
+     * Create chat list for restart process
+     *
+     * @param uid          User ID
+     * @param chatListName Chat list name
+     * @param botId        Bot ID
+     * @param chatId       Chat ID
+     * @return Returns chat list creation response object
+     */
     @Override
     public ChatListCreateResponse createChatListForRestart(String uid, String chatListName, Integer botId, long chatId) {
         ChatList latestOne = chatListDataService.findByUidAndChatId(uid, chatId);
@@ -181,9 +193,12 @@ public class ChatListServiceImpl implements ChatListService {
                         latestOne.getCreateTime(), true, latestOne.getFileId(), botId, null, null);
             }
         }
-        if (latestOne != null && latestOne.getId() != null && latestOne.getEnable() == 1 // Old chat list is in normal enabled state
-                && StringUtils.isBlank(latestOne.getEnabledPluginIds()) // Old chat list has no enabled plugins
-                && StringUtils.isBlank(latestOne.getFileId()) // Old chat list has no ChatFile enabled
+        // Old chat list is in normal enabled state
+        if (latestOne != null && latestOne.getId() != null && latestOne.getEnable() == 1
+                // Old chat list has no enabled plugins
+                && StringUtils.isBlank(latestOne.getEnabledPluginIds())
+                // Old chat list has no ChatFile enabled
+                && StringUtils.isBlank(latestOne.getFileId()) 
         ) {
             // Condition met, try to use user's existing chat list
             List<ChatReqRecords> listReqs = chatDataService.findRequestsByChatIdAndUid(latestOne.getId(), uid);
@@ -223,9 +238,6 @@ public class ChatListServiceImpl implements ChatListService {
     /**
      * Logically delete user chat list
      *
-     * @param chatListId
-     * @param uid
-     * @return
      */
     @Override
     public boolean logicDeleteChatList(Long chatListId, String uid) {
@@ -235,11 +247,6 @@ public class ChatListServiceImpl implements ChatListService {
     /**
      * Get chat information data based on botId
      *
-     * @param request
-     * @param uid
-     * @param botId
-     * @param workflowVersion
-     * @return
      */
     @Override
     public BotInfoDto getBotInfo(HttpServletRequest request, String uid, Integer botId, String workflowVersion) {
@@ -259,6 +266,13 @@ public class ChatListServiceImpl implements ChatListService {
         return botInfoDto;
     }
 
+    /**
+     * Get bot model data transfer object
+     * @param request HTTP request object
+     * @param modelId Model ID, may be null
+     * @param model Model name, used when modelId is null
+     * @return Returns bot model data transfer object
+     */
     @Override
     public BotModelDto getBotModelDto(HttpServletRequest request, Long modelId, String model) {
         BotModelDto modelDto = new BotModelDto();
@@ -290,10 +304,6 @@ public class ChatListServiceImpl implements ChatListService {
     /**
      * Clear history button to recreate conversation
      *
-     * @param uid
-     * @param chatListName
-     * @param botId
-     * @return
      */
     @Override
     public ChatListCreateResponse createRestartChat(String uid, String chatListName, Integer botId) {
@@ -320,6 +330,13 @@ public class ChatListServiceImpl implements ChatListService {
                 entity.getCreateTime(), false, null, botId, null, null);
     }
 
+    /**
+    * Logically delete single chat list
+    *
+    * @param chatListId Chat list ID
+    * @param uid User ID
+    * @return Returns true if deletion is successful, otherwise returns false
+    */
     private boolean logicDeleteSingleChatList(Long chatListId, String uid) {
         log.info("***** uid: {} delete single chat window chatId: {}", uid, chatListId);
         ChatList queryEntity = chatListDataService.findByUidAndChatId(uid, chatListId);
