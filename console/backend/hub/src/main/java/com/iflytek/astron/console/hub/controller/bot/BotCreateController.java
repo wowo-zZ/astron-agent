@@ -88,16 +88,15 @@ public class BotCreateController {
             if (botDatasetService.checkDatasetBelong(uid, spaceId, datasetList)) {
                 return ApiResult.error(ResponseEnum.BOT_BELONG_ERROR);
             }
-
+            boolean selfDocumentExist = (datasetList != null && !datasetList.isEmpty());
+            boolean maasDocumentExist = (maasDatasetList != null && !maasDatasetList.isEmpty());
+            int supportDocument = (selfDocumentExist || maasDocumentExist) ? 1 : 0;
+            bot.setSupportDocument(supportDocument);
             // Create bot basic information
             BotInfoDto botInfo = botService.insertBotBasicInfo(uid, bot, spaceId);
             Integer botId = botInfo.getBotId();
 
             // Handle dataset associations
-            boolean selfDocumentExist = (datasetList != null && !datasetList.isEmpty());
-            boolean maasDocumentExist = (maasDatasetList != null && !maasDatasetList.isEmpty());
-            int supportDocument = (selfDocumentExist || maasDocumentExist) ? 1 : 0;
-
             if (selfDocumentExist) {
                 botDatasetService.botAssociateDataset(uid, botId, datasetList, supportDocument);
             }
@@ -183,6 +182,28 @@ public class BotCreateController {
     }
 
     /**
+     * AI generate input examples
+     *
+     * Path: /bot/generateInputExample
+     */
+    @PostMapping(value = "/generate-input-example")
+    @RateLimit(dimension = "USER", window = 1, limit = 1)
+    public ApiResult<List<String>> generateInputExample(@RequestParam String botName,
+                                                        @RequestParam String botDesc,
+                                                        @RequestParam String prompt) {
+        try {
+            if (botName == null || botName.trim().isEmpty()) {
+                return ApiResult.error(ResponseEnum.PARAMS_ERROR);
+            }
+            List<String> examples = botAIService.generateInputExample(botName, botDesc, prompt);
+            return ApiResult.success(examples);
+        } catch (Exception e) {
+            log.error("AI generate input examples failed, botName = {}, botDesc = {}", botName, botDesc, e);
+            return ApiResult.error(ResponseEnum.SYSTEM_ERROR);
+        }
+    }
+
+    /**
      * Large model generates assistant prologue
      *
      * @param form Robot creation form
@@ -234,15 +255,14 @@ public class BotCreateController {
             if (botDatasetService.checkDatasetBelong(uid, spaceId, datasetList)) {
                 return ApiResult.error(ResponseEnum.BOT_BELONG_ERROR);
             }
-
+            boolean selfDocumentExist = (datasetList != null && !datasetList.isEmpty());
+            boolean maasDocumentExist = (maasDatasetList != null && !maasDatasetList.isEmpty());
+            int supportDocument = (selfDocumentExist || maasDocumentExist) ? 1 : 0;
+            bot.setSupportDocument(supportDocument);
             // Update bot basic information
             Boolean result = botService.updateBotBasicInfo(uid, bot, spaceId);
 
             // Handle dataset associations update
-            boolean selfDocumentExist = (datasetList != null && !datasetList.isEmpty());
-            boolean maasDocumentExist = (maasDatasetList != null && !maasDatasetList.isEmpty());
-            int supportDocument = (selfDocumentExist || maasDocumentExist) ? 1 : 0;
-
             if (selfDocumentExist) {
                 botDatasetService.updateDatasetByBot(uid, bot.getBotId(), datasetList, supportDocument);
             }

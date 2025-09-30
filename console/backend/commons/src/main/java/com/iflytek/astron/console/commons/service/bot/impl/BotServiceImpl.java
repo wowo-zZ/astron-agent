@@ -218,6 +218,7 @@ public class BotServiceImpl implements BotService {
         return executeWithLock("user:update:basic:bot:uid:" + uid, () -> {
             validateBotNameForUpdate(uid, bot.getName(), bot.getBotId(), spaceId);
             updateBasicBotInternal(uid, bot);
+            processPromptStruct(bot.getBotId(), bot);
             return Boolean.TRUE;
         });
     }
@@ -332,7 +333,7 @@ public class BotServiceImpl implements BotService {
         botBase.setSupportDocument(bot.getSupportDocument());
         botBase.setPromptType(bot.getPromptType() != null ? bot.getPromptType() : 0);
         botBase.setPrompt(bot.getPrompt());
-        botBase.setPromptSystem(bot.getPromptSystem());
+        botBase.setPromptSystem(1);
         botBase.setSupportUpload(bot.getSupportUpload());
         botBase.setModel(bot.getModel());
         botBase.setVcnCn(bot.getVcnCn());
@@ -351,7 +352,7 @@ public class BotServiceImpl implements BotService {
         botBase.setBackground(bot.getBackground());
         botBase.setVirtualCharacter(bot.getVirtualCharacter());
         botBase.setMassBotId(bot.getMassBotId());
-        botBase.setVersion(bot.getIsSentence());
+        botBase.setVersion(1);
         botBase.setSpaceId(spaceId);
         setInputExamples(botBase, bot.getInputExample(), bot.getInputExampleEn());
         botBase.setBotwebStatus(0);

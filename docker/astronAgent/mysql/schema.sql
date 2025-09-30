@@ -969,6 +969,79 @@ VALUES(12, 'prompt_struct_labels', 'en', '{
         "target_task": "Target Task",
         "requirement_description": "Requirement Description"
     }', 1, '2025-09-20 12:59:57', '2025-09-20 12:59:57');
+INSERT INTO astron_console.ai_prompt_template
+(id, prompt_key, language_code, prompt_content, is_active, created_time, updated_time)
+VALUES(13, 'input_example_generation', 'zh', '
+  助手名称如下:
+
+  {{%s}}
+
+  助手描述如下:
+
+  {{%s}}
+
+  助手指令如下:
+
+  {{%s}}
+
+  注意：
+  助手是将指令模板与用户输入的详细信息共同输送给大模型从而让大模型完成特定任务的应用；助手描述是描述这个助手要完成的功能
+  任务以及用户需要输入什么内容才能更好的实现任务；助手指令是助手给到大模型的指令模板，指令模板与用户输入的详细信息任务共
+  同送给大模型，从而让大模型完成助手任务。
+
+  请按照如下步骤进行处理:
+  1.仔细阅读助手名称、助手描述、助手指令，理解它们需要大模型完成的任务；
+  2.基于上述内容，生成三条作为这个助手的使用用户，需要输入的简短任务描述；
+  3.保证返回的内容与助手的任务相匹配且不重复；
+  4.任务描述的内容尽量具体，不要只是表达维度；
+  5.按行返回你的结果，每条描述一行；
+  6.每条描述的长度不要超过20个汉字；【非常重要！！】
+  7.切忌啰嗦，言简意赅，用短语表达！！！
+
+  确保返回的三条用户输入的详细任务描述要符合使用助手的要求。
+  按照如下格式返回结果:
+  1.context1
+  2.context2
+  3.context3
+  ', 1, '2025-09-30 11:24:14', '2025-09-30 11:24:14');
+INSERT INTO astron_console.ai_prompt_template
+(id, prompt_key, language_code, prompt_content, is_active, created_time, updated_time)
+VALUES(14, 'input_example_generation', 'en', '
+  Assistant name as follows:
+
+  {{%s}}
+
+  Assistant description as follows:
+
+  {{%s}}
+
+  Assistant instructions as follows:
+
+  {{%s}}
+
+  Note:
+  An assistant is an application that sends the instruction template together with the user''s detailed input to
+  the large model to complete a specific task. The assistant description states what the assistant should accomplish
+  and what the user needs to provide. The assistant instructions are the instruction template sent to the model; the
+  template plus the user''s detailed input are used to complete the task.
+
+  Please follow these steps:
+
+  1. Carefully read the assistant name, assistant description, and assistant instructions to understand the intended
+  task.
+  2. Based on the above, generate three short task descriptions that a user would input when using this assistant.
+  3. Ensure the outputs match the assistant task and do not repeat each other.
+  4. Be specific; avoid vague dimensions only.
+  5. Return your results line by line, one description per line.
+  6. Each description must be no more than 20 words. [VERY IMPORTANT!!]
+  7. Be concise and avoid verbosity; use short phrases.
+
+  Ensure the three user input task descriptions are appropriate for this assistant.
+  Return results in the following format:
+  1.context1
+  2.context2
+  3.context3
+  ', 1, '2025-09-30 13:31:59', '2025-09-30 13:31:59');
 COMMIT;
 
 -- ----------------------------
