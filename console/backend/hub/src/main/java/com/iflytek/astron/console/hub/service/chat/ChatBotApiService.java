@@ -8,4 +8,10 @@ public interface ChatBotApiService {
 
     List<ChatBotApi> getBotApiList(String uid);
 
+    boolean exists(Long botId);
+
+    Long selectCount(Integer botId);
+
+    void insert(String uid, Integer botId, String assistantId, String appId, String appSecret, String appKey,
+                String prompt, String pluginIds, String embeddingIds, String apiPath, String description);
 }

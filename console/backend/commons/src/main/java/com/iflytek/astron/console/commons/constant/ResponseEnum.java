@@ -75,8 +75,16 @@ public enum ResponseEnum {
     BOT_CHAIN_UPDATE_ERROR(60031, "error.bot.chain.update.error"),
 
     USER_APP_ID_CREATE_ERROR(60032, "error.app.create.failed"),
+    USER_APP_NAME_REPEAT(60033, "error.app.create.name.repeat"),
+    BOT_API_CREATE_LIMIT_ERROR(60034, "error.bot.api.create.limited"),
 
-    USER_APP_NAME_REPEAT(60032, "error.app.create.name.repeat"),
+    BOT_API_CREATE_REPEAT(60035, "error.bot.api.create.repeat"),
+
+    USER_APP_ID_NOT_EXISTE(60036, "error.app.not.exists"),
+
+    BOT_API_CREATE_ERROR(60037, "error.bot.api.create.failed"),
+
+    BOT_TYPE_NOT_EXISTS(60038, "error.bot.type.not.exists"),
 
     // Space application related errors
     SPACE_APPLICATION_PLEASE_JOIN_ENTERPRISE_FIRST(61001, "space.application.please.join.enterprise.first"),
@@ -138,6 +146,7 @@ public enum ResponseEnum {
     INVITE_UNSUPPORTED_TYPE(64023, "invite.unsupported.type"),
     INVITE_PARAMETER_EXCEPTION(64024, "invite.parameter.exception"),
     INVITE_SPACE_ALREADY_DELETED(64025, "invite.space.already.deleted"),
+    INVITE_PLEASE_UPLOAD_USERNAMES(64026, "invite.please.upload.usernames"),
 
     // Space management related errors
     SPACE_NAME_EXISTS(65001, "space.name.exists"),

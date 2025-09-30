@@ -278,7 +278,7 @@ public class ChatMessageController {
     /**
      * Regenerate conversation result
      */
-    @PostMapping(path = "/reAnswer", produces = "text/event-stream;charset=UTF-8")
+    @PostMapping(path = "/re-answer", produces = "text/event-stream;charset=UTF-8")
     @Operation(summary = "Regenerate conversation result")
     public SseEmitter reAnswer(@RequestParam Long chatId, @RequestParam Long requestId) {
         String sseId = RandomUtil.randomString(8);

@@ -1,6 +1,5 @@
 package com.iflytek.astron.console.commons.service.workflow.impl;
 
-import cn.hutool.core.collection.CollUtil;
 import com.alibaba.fastjson2.JSONObject;
 import com.iflytek.astron.console.commons.entity.bot.BotChatFileParam;
 import com.iflytek.astron.console.commons.entity.chat.ChatFileReq;

@@ -198,7 +198,7 @@ class WorkflowBotChatServiceImplTest {
         when(rBucket.get()).thenReturn("OPTION", "test-event-id");
 
         try (MockedStatic<WorkflowEventData.WorkflowOperation> mockWorkflowOp = mockStatic(WorkflowEventData.WorkflowOperation.class);
-             MockedConstruction<WorkflowClient> mockWorkflowClient = mockConstruction(WorkflowClient.class)) {
+                MockedConstruction<WorkflowClient> mockWorkflowClient = mockConstruction(WorkflowClient.class)) {
 
             mockWorkflowOp.when(() -> WorkflowEventData.WorkflowOperation.resumeDial(resumeOperation)).thenReturn(true);
 

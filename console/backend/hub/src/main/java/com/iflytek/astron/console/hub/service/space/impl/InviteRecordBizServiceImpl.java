@@ -485,8 +485,8 @@ public class InviteRecordBizServiceImpl implements InviteRecordBizService {
             return userInfos.stream().map(i -> {
                 ChatUserVO chatUserVO = new ChatUserVO();
                 chatUserVO.setMobile(mobileMap.get(i.getUid()));
+                chatUserVO.setUsername(i.getUsername());
                 chatUserVO.setNickname(i.getNickname());
-                chatUserVO.setUid(i.getUsername());
                 chatUserVO.setUid(i.getUid());
                 chatUserVO.setAvatar(i.getAvatar());
                 if (joinedUids.contains(i.getUid())) {
@@ -528,6 +528,39 @@ public class InviteRecordBizServiceImpl implements InviteRecordBizService {
             }
             // Upload result file
             String resultUrl = uploadResultExcelFile(chatUserVOS, mobiles);
+            batchChatUserVO.setResultUrl(resultUrl);
+            batchChatUserVO.setChatUserVOS(chatUserVOS);
+            return ApiResult.success(batchChatUserVO);
+        } catch (IOException e) {
+            log.error("Failed to read uploaded file", e);
+            return ApiResult.error(ResponseEnum.INVITE_READ_UPLOAD_FILE_FAILED);
+        }
+    }
+
+    @Override
+    public ApiResult<BatchChatUserVO> searchUsernameBatch(MultipartFile file) {
+        try (InputStream inputStream = file.getInputStream()) {
+            BatchChatUserVO batchChatUserVO = new BatchChatUserVO();
+            // Read file
+            List<String> usernames = readUsernamesFromExcel(inputStream);
+            if (usernames.isEmpty()) {
+                return ApiResult.error(ResponseEnum.INVITE_PLEASE_UPLOAD_USERNAMES);
+            }
+            UserLimitVO userLimit = enterpriseUserBizService.getUserLimit(EnterpriseInfoUtil.getEnterpriseId());
+            if (usernames.size() > userLimit.getRemain()) {
+                return ApiResult.error(ResponseEnum.INVITE_EXCEED_BATCH_IMPORT_LIMIT);
+            }
+            // Query users
+            List<UserInfo> userInfos = userInfoDataService.findUsersByUsernames(
+                    usernames.stream()
+                            .filter(username -> username != null && !username.trim().isEmpty())
+                            .collect(Collectors.toSet()));
+            List<ChatUserVO> chatUserVOS = getChatUserVOS(InviteRecordTypeEnum.ENTERPRISE, userInfos);
+            if (CollectionUtil.isEmpty(chatUserVOS)) {
+                return ApiResult.error(ResponseEnum.INVITE_NO_CORRESPONDING_USERS_FOUND);
+            }
+            // Upload result file
+            String resultUrl = uploadResultExcelFileForUsernames(chatUserVOS, usernames);
             batchChatUserVO.setResultUrl(resultUrl);
             batchChatUserVO.setChatUserVOS(chatUserVOS);
             return ApiResult.success(batchChatUserVO);
@@ -619,5 +652,86 @@ public class InviteRecordBizServiceImpl implements InviteRecordBizService {
                 .headRowNumber(2)
                 .doRead();
         return mobiles;
+    }
+
+    private @NotNull List<String> readUsernamesFromExcel(InputStream inputStream) {
+        List<String> usernames = new ArrayList<>();
+        EasyExcel.read(inputStream, UserInfoExcelDTO.class, new ReadListener<UserInfoExcelDTO>() {
+            @Override
+            public void invoke(UserInfoExcelDTO o, AnalysisContext analysisContext) {
+                usernames.add(o.getUsername());
+            }
+
+            @Override
+            public void doAfterAllAnalysed(AnalysisContext analysisContext) {}
+        })
+                .sheet()
+                .headRowNumber(2)
+                .doRead();
+        return usernames;
+    }
+
+    private @NotNull String uploadResultExcelFileForUsernames(List<ChatUserVO> chatUserVOS, List<String> usernames) {
+        List<UserInfoResultExcelDTO> userInfoResultExcelDTOS = getUserInfoResultDTOSForUsernames(chatUserVOS, usernames);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        EasyExcel.write(outputStream, UserInfoResultExcelDTO.class)
+                .registerWriteHandler(new CellWriteHandler() {
+                    @Override
+                    public void afterCellDispose(CellWriteHandlerContext context) {
+                        if (BooleanUtils.isTrue(context.getHead()) && context.getRowIndex() == 0) {
+                            WriteCellData<?> cellData = context.getFirstCellData();
+                            WriteCellStyle writeCellStyle = cellData.getOrCreateStyle();
+                            writeCellStyle.setFillPatternType(FillPatternType.SOLID_FOREGROUND);
+                            writeCellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+                        }
+                        if (BooleanUtils.isFalse(context.getHead())
+                                && Objects.equals(context.getHeadData().getField().getName(), "result")) {
+                            String value = context.getFirstCellData().getStringValue();
+                            WriteCellData<?> cellData = context.getFirstCellData();
+                            WriteCellStyle writeCellStyle = cellData.getOrCreateStyle();
+                            writeCellStyle.setFillPatternType(FillPatternType.SOLID_FOREGROUND);
+                            if (Objects.equals(value, UserInfoResultEnum.NORMAL.getDesc())) {
+                                writeCellStyle.setFillForegroundColor(IndexedColors.BRIGHT_GREEN.getIndex());
+                            } else if (Objects.equals(value, UserInfoResultEnum.NOT_EXIST.getDesc())) {
+                                writeCellStyle.setFillForegroundColor(IndexedColors.RED.getIndex());
+                            } else if (Objects.equals(value, UserInfoResultEnum.JOINED.getDesc())) {
+                                writeCellStyle.setFillForegroundColor(IndexedColors.TURQUOISE.getIndex());
+                            } else if (Objects.equals(value, UserInfoResultEnum.INVITING.getDesc())) {
+                                writeCellStyle.setFillForegroundColor(IndexedColors.ORANGE.getIndex());
+                            }
+                        }
+                    }
+                })
+                .useDefaultStyle(false)
+                .sheet("Sheet1")
+                .doWrite(userInfoResultExcelDTOS);
+        String fileName = NameUtil.generateUniqueFileName("result.xlsx");
+        return s3ClientUtil.uploadObject("space/" + fileName,
+                MediaType.APPLICATION_OCTET_STREAM_VALUE,
+                new ByteArrayInputStream(outputStream.toByteArray()));
+    }
+
+    private @NotNull List<UserInfoResultExcelDTO> getUserInfoResultDTOSForUsernames(List<ChatUserVO> chatUserVOS, List<String> usernames) {
+        List<UserInfoResultExcelDTO> userInfoResultExcelDTOS = new ArrayList<>();
+        Map<String, ChatUserVO> collect = chatUserVOS.stream()
+                .filter(chatUser -> chatUser.getUid() != null)
+                .collect(Collectors.toMap(ChatUserVO::getUid, i -> i));
+        for (String username : usernames) {
+            UserInfoResultExcelDTO userInfoResultExcelDTO = new UserInfoResultExcelDTO();
+            userInfoResultExcelDTO.setUsername(username);
+            if (StringUtils.isBlank(username)) {
+                userInfoResultExcelDTO.setResult(UserInfoResultEnum.NOT_EXIST.getDesc());
+            } else if (!collect.containsKey(username)) {
+                userInfoResultExcelDTO.setResult(UserInfoResultEnum.NOT_EXIST.getDesc());
+            } else if (collect.get(username).getStatus() == 1) {
+                userInfoResultExcelDTO.setResult(UserInfoResultEnum.JOINED.getDesc());
+            } else if (collect.get(username).getStatus() == 2) {
+                userInfoResultExcelDTO.setResult(UserInfoResultEnum.INVITING.getDesc());
+            } else {
+                userInfoResultExcelDTO.setResult(UserInfoResultEnum.NORMAL.getDesc());
+            }
+            userInfoResultExcelDTOS.add(userInfoResultExcelDTO);
+        }
+        return userInfoResultExcelDTOS;
     }
 }

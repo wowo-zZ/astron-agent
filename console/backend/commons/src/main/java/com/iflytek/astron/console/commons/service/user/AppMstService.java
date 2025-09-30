@@ -13,4 +13,6 @@ public interface AppMstService {
     void insert(String uid, String appId, String appName, String appDescribe, String apiKey, String apiSecret);
 
     List<AppMst> getAppListByUid(String uid);
+
+    AppMst getByAppId(String uid, String appId);
 }

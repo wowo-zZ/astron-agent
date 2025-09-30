@@ -12,6 +12,7 @@ import com.iflytek.astron.console.hub.dto.publish.WechatAuthUrlResponseDto;
 import com.iflytek.astron.console.hub.dto.publish.BotTraceRequestDto;
 import com.iflytek.astron.console.commons.dto.workflow.WorkflowInputsResponseDto;
 import com.iflytek.astron.console.commons.enums.PublishChannelEnum;
+import com.iflytek.astron.console.hub.dto.publish.UnifiedPrepareDto;
 
 /**
  * Bot Publishing Management Service Interface
@@ -163,4 +164,17 @@ public interface BotPublishService {
      * @return Workflow input parameter definitions
      */
     WorkflowInputsResponseDto getInputsType(Integer botId, String uid, Long spaceId);
+
+    // ==================== Publish Prepare Data Management ====================
+
+    /**
+     * Get publish prepare data for different publish types
+     *
+     * @param botId Bot ID
+     * @param type Publish type (market, mcp, feishu, api)
+     * @param currentUid Current user ID
+     * @param spaceId Space ID
+     * @return Unified prepare data
+     */
+    UnifiedPrepareDto getPrepareData(Integer botId, String type, String currentUid, Long spaceId);
 }

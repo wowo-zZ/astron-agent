@@ -25,6 +25,7 @@ import com.iflytek.astron.console.commons.service.bot.ChatBotDataService;
 import com.iflytek.astron.console.commons.service.data.IDatasetInfoService;
 import com.iflytek.astron.console.commons.service.mcp.McpDataService;
 import com.iflytek.astron.console.commons.util.MaasUtil;
+import com.iflytek.astron.console.commons.util.space.SpaceInfoUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -405,9 +406,9 @@ public class ChatBotDataServiceImpl implements ChatBotDataService {
         }
         // Query botId based on spaceId
         List<Integer> spaceBotIdList = chatBotBaseMapper.selectList(Wrappers.lambdaQuery(ChatBotBase.class)
-                .eq(ChatBotBase::getSpaceId, spaceId)
-                .eq(ChatBotBase::getIsDelete, 0)
-                .select(ChatBotBase::getId))
+                        .eq(ChatBotBase::getSpaceId, spaceId)
+                        .eq(ChatBotBase::getIsDelete, 0)
+                        .select(ChatBotBase::getId))
                 .stream()
                 .map(ChatBotBase::getId)
                 .toList();
@@ -613,5 +614,18 @@ public class ChatBotDataServiceImpl implements ChatBotDataService {
             releaseList.add(ReleaseTypeEnum.MCP.getCode());
         }
         return releaseList;
+    }
+
+    @Override
+    public ChatBotBase findOne(String uid, Long botId) {
+        LambdaQueryWrapper<ChatBotBase> botSearch = Wrappers.lambdaQuery(ChatBotBase.class).eq(ChatBotBase::getId, botId);
+        Long spaceId = SpaceInfoUtil.getSpaceId();
+        if (spaceId == null) {
+            botSearch.eq(ChatBotBase::getUid, uid)
+                    .isNull(ChatBotBase::getSpaceId);
+        } else {
+            botSearch.eq(ChatBotBase::getSpaceId, spaceId);
+        }
+        return chatBotBaseMapper.selectOne(botSearch);
     }
 }

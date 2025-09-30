@@ -103,6 +103,7 @@ public class WorkflowBotParamServiceImpl implements WorkflowBotParamService {
 
     /**
      * Function to handle multi-file parameters
+     *
      * @param uid User ID
      * @param chatId Chat room ID
      * @param leftId Left side ID
@@ -144,9 +145,10 @@ public class WorkflowBotParamServiceImpl implements WorkflowBotParamService {
 
         return hasSet;
     }
-    
+
     /**
      * Handle multi-file request input
+     *
      * @param chatFileReqList List containing chat file requests
      * @param uid User ID
      * @param chatId Chat ID
@@ -163,7 +165,7 @@ public class WorkflowBotParamServiceImpl implements WorkflowBotParamService {
             chatDataService.updateFileReqId(chatId, uid, collect, reqId, false, leftId);
         }
     }
-    
+
     /**
      * Handle file request input
      *

@@ -13,6 +13,11 @@ import com.iflytek.astron.console.hub.dto.publish.BotTimeSeriesStatsVO;
 import com.iflytek.astron.console.hub.dto.publish.WechatAuthUrlResponseDto;
 import com.iflytek.astron.console.hub.dto.publish.BotTraceRequestDto;
 import com.iflytek.astron.console.commons.dto.workflow.WorkflowInputsResponseDto;
+import com.iflytek.astron.console.hub.dto.publish.UnifiedPrepareDto;
+import com.iflytek.astron.console.hub.dto.publish.prepare.*;
+import com.iflytek.astron.console.commons.enums.bot.BotPublishTypeEnum;
+import com.iflytek.astron.console.commons.entity.model.McpData;
+import com.iflytek.astron.console.commons.mapper.model.McpDataMapper;
 import com.iflytek.astron.console.hub.service.publish.WorkflowInputService;
 import com.iflytek.astron.console.commons.service.data.UserLangChainDataService;
 import com.iflytek.astron.console.commons.enums.PublishChannelEnum;
@@ -46,6 +51,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  * Bot Publishing Management Service Implementation
@@ -68,6 +74,10 @@ public class BotPublishServiceImpl implements BotPublishService {
     private final WechatThirdpartyService wechatThirdpartyService;
     private final ApplicationEventPublisher eventPublisher;
     private final WorkflowInputService workflowInputService;
+    private final McpDataMapper mcpDataMapper;
+
+    @Value("${maas.mcpHost}")
+    private String mcpHost;
     private final UserLangChainDataService userLangChainDataService;
 
     // Version management related
@@ -548,5 +558,255 @@ public class BotPublishServiceImpl implements BotPublishService {
                 botId, result.getParameters().size());
 
         return result;
+    }
+
+    // ==================== Publish Prepare Data Management ====================
+
+    @Override
+    public UnifiedPrepareDto getPrepareData(Integer botId, String type, String currentUid, Long spaceId) {
+        log.info("Getting prepare data: botId={}, type={}, uid={}, spaceId={}", botId, type, currentUid, spaceId);
+
+        try {
+            // Validate publish type
+            BotPublishTypeEnum publishTypeEnum = BotPublishTypeEnum.getByCode(type);
+            if (publishTypeEnum == null) {
+                return createErrorPrepareResponse("Invalid publish type: " + type);
+            }
+
+            // Get bot basic info first
+            BotDetailResponseDto botDetail = getBotDetail(botId, currentUid, spaceId);
+            if (botDetail == null) {
+                return createErrorPrepareResponse("Bot not found");
+            }
+
+            BasePrepareDto prepareData;
+            switch (publishTypeEnum) {
+                case MARKET:
+                    prepareData = getMarketPrepareData(botId, botDetail, currentUid, spaceId);
+                    break;
+                case MCP:
+                    prepareData = getMcpPrepareData(botId, botDetail, currentUid, spaceId);
+                    break;
+                case FEISHU:
+                    prepareData = getFeishuPrepareData(botId, botDetail, currentUid, spaceId);
+                    break;
+                case API:
+                    prepareData = getApiPrepareData(botId, botDetail, currentUid, spaceId);
+                    break;
+                default:
+                    return createErrorPrepareResponse("Unsupported publish type: " + type);
+            }
+
+            if (prepareData == null) {
+                return createErrorPrepareResponse("Failed to prepare data for type: " + type);
+            }
+
+            UnifiedPrepareDto response = new UnifiedPrepareDto();
+            response.setSuccess(true);
+            response.setData(prepareData);
+
+            log.info("Prepare data retrieved successfully: botId={}, type={}", botId, type);
+            return response;
+
+        } catch (Exception e) {
+            log.error("Failed to get prepare data: botId={}, type={}, uid={}, spaceId={}", 
+                    botId, type, currentUid, spaceId, e);
+            return createErrorPrepareResponse("Failed to get prepare data: " + e.getMessage());
+        }
+    }
+
+    private MarketPrepareDto getMarketPrepareData(Integer botId, BotDetailResponseDto botDetail, String currentUid, Long spaceId) {
+        log.info("Getting market prepare data: botId={}", botId);
+
+        MarketPrepareDto marketData = new MarketPrepareDto();
+        marketData.setPublishType(BotPublishTypeEnum.MARKET.getCode());
+
+        // Get workflow configuration JSON
+        try {
+            String flowId = userLangChainDataService.findFlowIdByBotId(botId);
+            if (flowId != null) {
+                // TODO: Get complete workflow configuration JSON
+                // This should call the workflow service to get the full configuration
+                marketData.setWorkflowConfigJson("{}"); // Placeholder
+            }
+        } catch (Exception e) {
+            log.warn("Failed to get workflow config for market prepare: botId={}", botId, e);
+        }
+
+        // Set bot basic info
+        marketData.setBotName(botDetail.getBotName());
+        marketData.setBotDescription(botDetail.getBotDesc());
+        marketData.setBotAvatar(null); // TODO: Get bot avatar from appropriate source
+
+        // Set multi-file parameter support
+        marketData.setBotMultiFileParam(true); // TODO: Get actual value
+
+        // Set suggested tags and categories
+        marketData.setSuggestedTags(List.of("智能助手", "效率工具"));
+        marketData.setCategoryOptions(List.of("教育", "金融", "医疗", "客服"));
+
+        return marketData;
+    }
+
+    private McpPrepareDto getMcpPrepareData(Integer botId, BotDetailResponseDto botDetail, String currentUid, Long spaceId) {
+        log.info("Getting MCP prepare data: botId={}", botId);
+
+        McpPrepareDto result = new McpPrepareDto();
+        result.setPublishType(BotPublishTypeEnum.MCP.getCode());
+
+        // 1. Set workflow input types
+        result.setInputTypes(getWorkflowInputTypes(botId, currentUid, spaceId));
+
+        // 2. Set suggested configuration
+        result.setSuggestedConfig(buildMcpSuggestedConfig(botId, botDetail));
+
+        // 3. Set MCP content (existing or default)
+        result.setContentInfo(getMcpContentInfo(botId, botDetail));
+
+        return result;
+    }
+
+    private List<McpPrepareDto.InputTypeDto> getWorkflowInputTypes(Integer botId, String currentUid, Long spaceId) {
+        try {
+            WorkflowInputsResponseDto inputsResponse = getInputsType(botId, currentUid, spaceId);
+            if (inputsResponse != null && inputsResponse.getParameters() != null) {
+                return inputsResponse.getParameters().stream()
+                        .map(param -> {
+                            McpPrepareDto.InputTypeDto inputType = new McpPrepareDto.InputTypeDto();
+                            inputType.setName(param.getName());
+                            inputType.setType(param.getType());
+                            inputType.setDescription(param.getDescription());
+                            inputType.setRequired(param.getRequired());
+                            return inputType;
+                        })
+                        .collect(Collectors.toList());
+            }
+        } catch (Exception e) {
+            log.warn("Failed to get input types for MCP prepare: botId={}", botId, e);
+        }
+        return new ArrayList<>();
+    }
+
+    private McpPrepareDto.SuggestedConfig buildMcpSuggestedConfig(Integer botId, BotDetailResponseDto botDetail) {
+        String botName = botDetail.getBotName();
+        String botDesc = botDetail.getBotDesc();
+
+        McpPrepareDto.SuggestedConfig suggestedConfig = new McpPrepareDto.SuggestedConfig();
+        suggestedConfig.setServiceName(botName != null ? botName : "bot-" + botId);
+        suggestedConfig.setOverview("基于工作流的智能助手");
+        suggestedConfig.setContent(botDesc != null ? botDesc : "提供智能对话和任务处理能力");
+        return suggestedConfig;
+    }
+
+    private McpPrepareDto.McpContentInfo getMcpContentInfo(Integer botId, BotDetailResponseDto botDetail) {
+        // Try to get existing MCP data from database
+        McpPrepareDto.McpContentInfo contentInfo = loadExistingMcpContent(botId);
+        
+        if (contentInfo != null) {
+            log.info("Using existing MCP content: botId={}, released={}", botId, contentInfo.getReleased());
+            return contentInfo;
+        }
+
+        // Generate default MCP content for new setup
+        log.info("Generating default MCP content: botId={}", botId);
+        return generateDefaultMcpContent(botId, botDetail);
+    }
+
+    private McpPrepareDto.McpContentInfo loadExistingMcpContent(Integer botId) {
+        try {
+            McpData mcpData = mcpDataMapper.selectLatestByBotId(botId);
+            if (mcpData != null) {
+                McpPrepareDto.McpContentInfo contentInfo = new McpPrepareDto.McpContentInfo();
+                contentInfo.setServerName(mcpData.getServerName());
+                contentInfo.setDescription(mcpData.getDescription());
+                contentInfo.setContent(mcpData.getContent());
+                contentInfo.setIcon(mcpData.getIcon());
+                contentInfo.setServerUrl(mcpData.getServerUrl());
+                contentInfo.setArgs(mcpData.getArgs());
+                contentInfo.setVersionName(mcpData.getVersionName());
+                contentInfo.setReleased(mcpData.getReleased() != null && mcpData.getReleased() == 1 ? "1" : "0");
+                return contentInfo;
+            }
+        } catch (Exception e) {
+            log.warn("Failed to load existing MCP content: botId={}", botId, e);
+        }
+        return null;
+    }
+
+    private McpPrepareDto.McpContentInfo generateDefaultMcpContent(Integer botId, BotDetailResponseDto botDetail) {
+        String botName = botDetail.getBotName();
+        String botDesc = botDetail.getBotDesc();
+
+        McpPrepareDto.McpContentInfo contentInfo = new McpPrepareDto.McpContentInfo();
+        contentInfo.setServerName(botName != null ? botName : "bot-" + botId);
+        contentInfo.setDescription("基于工作流的智能助手");
+        contentInfo.setContent(botDesc != null ? botDesc : "提供智能对话和任务处理能力");
+        contentInfo.setReleased("0"); // Not published yet
+
+        // Generate MCP server URL using mcpHost configuration
+        try {
+            String flowId = userLangChainDataService.findFlowIdByBotId(botId);
+            if (flowId != null && mcpHost != null) {
+                String serverUrl = String.format(mcpHost, flowId);
+                contentInfo.setServerUrl(serverUrl);
+                log.info("Generated MCP server URL: botId={}, flowId={}, serverUrl={}", botId, flowId, serverUrl);
+            }
+        } catch (Exception e) {
+            log.warn("Failed to generate MCP server URL: botId={}", botId, e);
+        }
+
+        return contentInfo;
+    }
+
+    private FeishuPrepareDto getFeishuPrepareData(Integer botId, BotDetailResponseDto botDetail, String currentUid, Long spaceId) {
+        log.info("Getting Feishu prepare data: botId={}", botId);
+
+        FeishuPrepareDto feishuData = new FeishuPrepareDto();
+        feishuData.setPublishType(BotPublishTypeEnum.FEISHU.getCode());
+
+        // TODO: Get actual Feishu app configuration
+        feishuData.setAppId("cli_xxx");
+        feishuData.setAppSecret("xxx");
+
+        // Set bot info
+        feishuData.setBotName(botDetail.getBotName());
+        feishuData.setBotDescription(botDetail.getBotDesc());
+        feishuData.setBotAvatar(null); // TODO: Get bot avatar from appropriate source
+
+        // Set suggested configuration
+        FeishuPrepareDto.SuggestedConfig suggestedConfig = new FeishuPrepareDto.SuggestedConfig();
+        suggestedConfig.setDisplayName("智能助手");
+        suggestedConfig.setDescription("基于工作流的智能助手");
+        feishuData.setSuggestedConfig(suggestedConfig);
+
+        return feishuData;
+    }
+
+    private ApiPrepareDto getApiPrepareData(Integer botId, BotDetailResponseDto botDetail, String currentUid, Long spaceId) {
+        log.info("Getting API prepare data: botId={}", botId);
+
+        ApiPrepareDto apiData = new ApiPrepareDto();
+        apiData.setPublishType(BotPublishTypeEnum.API.getCode());
+
+        // Set API endpoint
+        apiData.setApiEndpoint("/api/v1/chat/" + botId);
+        apiData.setDocumentation("API文档URL");
+        apiData.setApiKey("生成的API Key"); // TODO: Generate actual API key
+        apiData.setAuthType("Bearer");
+
+        // Set suggested configuration
+        ApiPrepareDto.SuggestedConfig suggestedConfig = new ApiPrepareDto.SuggestedConfig();
+        suggestedConfig.setRateLimitPerMinute(100);
+        suggestedConfig.setEnableAuth(true);
+        apiData.setSuggestedConfig(suggestedConfig);
+
+        return apiData;
+    }
+
+    private UnifiedPrepareDto createErrorPrepareResponse(String errorMessage) {
+        UnifiedPrepareDto response = new UnifiedPrepareDto();
+        response.setSuccess(false);
+        response.setErrorMessage(errorMessage);
+        return response;
     }
 }

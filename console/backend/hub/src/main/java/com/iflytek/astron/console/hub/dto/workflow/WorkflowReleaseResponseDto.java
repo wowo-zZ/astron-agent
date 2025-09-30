@@ -7,22 +7,22 @@ import lombok.Data;
  */
 @Data
 public class WorkflowReleaseResponseDto {
-    
+
     /**
      * 工作流版本ID
      */
     private Long workflowVersionId;
-    
+
     /**
      * 工作流版本名称
      */
     private String workflowVersionName;
-    
+
     /**
      * 发布是否成功
      */
     private Boolean success;
-    
+
     /**
      * 错误消息
      */

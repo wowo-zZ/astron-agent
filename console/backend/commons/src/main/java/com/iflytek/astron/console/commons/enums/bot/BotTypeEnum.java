@@ -20,11 +20,11 @@ public enum BotTypeEnum {
     public Integer getType() {
         return type;
     }
-    
+
     public String getDesc() {
         return desc;
     }
-    
+
     /**
      * 根据类型获取枚举
      */
@@ -39,7 +39,7 @@ public enum BotTypeEnum {
         }
         return null;
     }
-    
+
     /**
      * 判断是否为工作流助手
      */
