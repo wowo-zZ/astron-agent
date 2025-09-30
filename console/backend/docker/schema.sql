@@ -176,6 +176,8 @@ INSERT INTO `agent_enterprise_permission` (`id`, `module`, `description`, `permi
                                            `staff`, `available_expired`, `create_time`, `update_time`)
 VALUES (51, 'Invitation Management', 'Enterprise invitation batch search user', 'InviteRecordController_enterpriseBatchSearchUser_POST', 1, 1, 1, 0,
         '2025-01-01 00:00:00', '2025-01-01 00:00:00');
+INSERT INTO `astron_console`.`agent_enterprise_permission` (`module`, `description`, `permission_key`, `officer`, `governor`, `staff`, `available_expired`, `create_time`, `update_time`) VALUES ('邀请管理', '企业邀请批量搜索用户', 'InviteRecordController_enterpriseBatchSearchUsername_POST', 1, 1, 1, 0, '2025-01-01 00:00:00', '2025-01-01 00:00:00');
+INSERT INTO `astron_console`.`agent_enterprise_permission` (`module`, `description`, `permission_key`, `officer`, `governor`, `staff`, `available_expired`, `create_time`, `update_time`) VALUES ('邀请管理', '企业邀请搜索用户', 'InviteRecordController_enterpriseSearchUsername_GET', 1, 1, 0, 0, '2025-01-01 00:00:00', '2025-01-01 00:00:00');
 COMMIT;
 
 -- ----------------------------
