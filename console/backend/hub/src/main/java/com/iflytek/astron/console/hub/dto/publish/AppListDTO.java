@@ -24,4 +24,10 @@ public class AppListDTO {
 
     @Schema(description = "App Describe")
     private String appDescribe;
+
+    @Schema(description = "App Key")
+    private String appKey;
+
+    @Schema(description = "App Secret")
+    private String appSecret;
 }
