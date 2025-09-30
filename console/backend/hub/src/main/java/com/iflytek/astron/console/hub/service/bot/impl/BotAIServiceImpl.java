@@ -655,7 +655,6 @@ public class BotAIServiceImpl implements BotAIService {
         if (StringUtils.isBlank(botName) || StringUtils.length(botName) > 128) {
             throw new BusinessException(PARAMETER_ERROR);
         }
-        // botDesc/prompt 可为空，但限制最大长度防止异常输入
         botDesc = StringUtils.defaultString(StringUtils.left(botDesc, 1000));
         prompt = StringUtils.defaultString(StringUtils.left(prompt, 2000));
 

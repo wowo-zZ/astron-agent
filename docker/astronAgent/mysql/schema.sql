@@ -4515,7 +4515,7 @@ CREATE TABLE IF NOT EXISTS bot_template (
     INDEX idx_status_lang (bot_status, language)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Bot template table';
 
-BEGIN
+BEGIN;
 INSERT INTO astron_console.bot_template
 (id, bot_name, bot_desc, bot_template, bot_type, bot_type_name, input_example, prompt, prompt_struct_list, prompt_type, support_context, bot_status, `language`, create_time, update_time)
 VALUES(1623, 'PPT大纲助手', '请填写您PPT的核心内容，助手会提供PPT大纲', '比如输入"Q2门店销售情况复盘"，我将提供PPT大纲', 10, '职场', '["新员工入职培训","转正答辩","年终总结"]', '', '[{"id":16230,"promptKey":"角色设定","promptValue":"你是一位PPT大纲撰写高手"},{"id":16231,"promptKey":"目标任务","promptValue":"请根据我给出的PPT核心内容，写一个PPT大纲"},{"id":16232,"promptKey":"需求说明","promptValue":"要求结构清晰，有逻辑"},{"id":16233,"promptKey":"风格设定","promptValue":"条理清晰、思维严谨"}]', 1, 1, 2, 'zh', '2025-09-29 15:10:11', '2025-09-30 09:35:58');

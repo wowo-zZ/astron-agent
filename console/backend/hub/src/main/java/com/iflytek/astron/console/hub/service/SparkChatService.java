@@ -255,6 +255,7 @@ public class SparkChatService {
                     finalResult.setLength(0); // Clear existing content
                     thinkingResult.setLength(0); // Clear thinking content
                     finalResult.append(fallbackMessage);
+                    dataObj.put("message", fallbackMessage);
 
                     // Modify the response data to send fallback message to client
                     modifyResponseDataForFallback(dataObj, fallbackMessage);
