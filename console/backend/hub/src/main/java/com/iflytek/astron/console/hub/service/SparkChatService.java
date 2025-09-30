@@ -625,7 +625,7 @@ public class SparkChatService {
 
         if (chatReqRecords != null) {
             completeData.put("chatId", chatReqRecords.getChatId());
-            completeData.put("requestId", chatReqRecords.getId());
+            completeData.put("reqId", chatReqRecords.getId());
         }
 
         return completeData;
