@@ -52,4 +52,13 @@ public class AppMstServiceImpl implements AppMstService {
                 .eq(AppMst::getIsDelete, 0)
                 .orderByDesc(AppMst::getCreateTime));
     }
+
+    @Override
+    public AppMst getByAppId(String uid, String appId) {
+        return appMstMapper.selectOne(Wrappers.lambdaQuery(AppMst.class)
+                .eq(AppMst::getUid, uid)
+                .eq(AppMst::getAppId, appId)
+                .eq(AppMst::getIsDelete, 0)
+                .last("LIMIT 1"));
+    }
 }

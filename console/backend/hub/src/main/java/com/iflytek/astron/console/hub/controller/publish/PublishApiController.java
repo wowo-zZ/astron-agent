@@ -45,22 +45,14 @@ public class PublishApiController {
     @Operation(summary = "Create Bot Api", description = "create bot api with user app")
     @RateLimit(limit = 30, window = 60, dimension = "USER")
     @PostMapping("/create-bot-api")
-    public ApiResult<BotApiInfoDTO> createBotApi(@RequestBody CreateBotApiVo requestBody) {
-        return ApiResult.success(null);
+    public ApiResult<BotApiInfoDTO> createBotApi(@RequestBody CreateBotApiVo createBotApiVo) {
+        return ApiResult.success(publishApiService.createBotApi(createBotApiVo));
     }
 
     @Operation(summary = "Get Api Usage", description = "User api real-time usage")
     @RateLimit(limit = 30, window = 60, dimension = "USER")
     @GetMapping("/usage-real-time")
     public ApiResult<BotApiRealTimeUsageDTO> usageRealTime(@RequestParam Integer botId) {
-        return ApiResult.success(null);
-    }
-
-    @Operation(summary = "Get Api History Usage", description = "User api history usage")
-    @RateLimit(limit = 30, window = 60, dimension = "USER")
-    @GetMapping("/usage-history")
-    public ApiResult<BotApiHistoryUsageDTO> usageHistory(@RequestParam Integer botId,
-            @RequestParam Integer type) {
         return ApiResult.success(null);
     }
 

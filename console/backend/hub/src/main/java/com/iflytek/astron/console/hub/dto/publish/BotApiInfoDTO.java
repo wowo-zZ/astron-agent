@@ -28,11 +28,11 @@ public class BotApiInfoDTO {
     @Schema(description = "App Id", example = "e934fe")
     private String appId;
 
-    @Schema(description = "API Key", example = "user_api_key")
-    private String apiKey;
+    @Schema(description = "App Key", example = "user_app_key")
+    private String appKey;
 
-    @Schema(description = "API Secret", example = "user_api_secret")
-    private String apiSecret;
+    @Schema(description = "App Secret", example = "user_app_secret")
+    private String appSecret;
 
     @Schema(description = "Assistant API endpoint address", example = "https://api.example.com/v1")
     private String serviceUrl;

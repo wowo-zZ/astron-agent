@@ -485,6 +485,7 @@ public class InviteRecordBizServiceImpl implements InviteRecordBizService {
             return userInfos.stream().map(i -> {
                 ChatUserVO chatUserVO = new ChatUserVO();
                 chatUserVO.setMobile(mobileMap.get(i.getUid()));
+                chatUserVO.setUsername(i.getUsername());
                 chatUserVO.setNickname(i.getNickname());
                 chatUserVO.setUid(i.getUid());
                 chatUserVO.setAvatar(i.getAvatar());
@@ -717,7 +718,7 @@ public class InviteRecordBizServiceImpl implements InviteRecordBizService {
                 .collect(Collectors.toMap(ChatUserVO::getUid, i -> i));
         for (String username : usernames) {
             UserInfoResultExcelDTO userInfoResultExcelDTO = new UserInfoResultExcelDTO();
-            userInfoResultExcelDTO.setMobile(username); // Store username in mobile field for now
+            userInfoResultExcelDTO.setUsername(username);
             if (StringUtils.isBlank(username)) {
                 userInfoResultExcelDTO.setResult(UserInfoResultEnum.NOT_EXIST.getDesc());
             } else if (!collect.containsKey(username)) {

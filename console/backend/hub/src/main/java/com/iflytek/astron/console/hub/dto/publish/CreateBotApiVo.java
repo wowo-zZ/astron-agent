@@ -17,9 +17,9 @@ import lombok.NoArgsConstructor;
 public class CreateBotApiVo {
 
     @Schema(description = "Bot ID", example = "123")
-    private Integer botId;
+    private Long botId;
 
-    // 老版创建需要 appId， 新版创建只需要keyId
     @Schema(description = "App Id")
     private String appId;
+
 }
