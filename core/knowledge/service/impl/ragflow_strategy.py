@@ -6,6 +6,7 @@ RAGFlow Strategy Implementation Module
 Provides document processing and knowledge management strategy based on RAGFlow
 """
 
+import json
 import logging
 import os
 import time
@@ -102,9 +103,96 @@ class RagflowRAGStrategy(RAGStrategy):
             logger.error("RAGFlow query exception: %s", e)
             return {"query": query, "count": 0, "results": []}
 
+    def _validate_split_parameters(
+        self, fileUrl: Optional[str], file: Optional[Any]
+    ) -> None:
+        """Validate split method parameters."""
+        if not fileUrl and not file:
+            raise ValueError("Either fileUrl or file must be provided")
+        if fileUrl and file:
+            raise ValueError("Cannot provide both fileUrl and file parameters")
+
+    def _parse_form_data_parameters(
+        self,
+        lengthRange: Optional[List[int]],
+        separator: Optional[List[str]],
+        cutOff: Optional[List[str]],
+    ) -> tuple[Optional[List[int]], Optional[List[str]], Optional[List[str]]]:
+        """Parse form-data parameters from JSON strings."""
+        parsed_length_range = lengthRange
+        parsed_separator = separator
+        parsed_cut_off = cutOff
+
+        if isinstance(lengthRange, str):
+            try:
+                parsed_length_range = json.loads(lengthRange) if lengthRange else None
+            except (json.JSONDecodeError, TypeError):
+                parsed_length_range = None
+
+        if isinstance(separator, str):
+            try:
+                parsed_separator = json.loads(separator) if separator else None
+            except (json.JSONDecodeError, TypeError):
+                parsed_separator = None
+
+        if isinstance(cutOff, str):
+            try:
+                parsed_cut_off = json.loads(cutOff) if cutOff else None
+            except (json.JSONDecodeError, TypeError):
+                parsed_cut_off = None
+
+        return parsed_length_range, parsed_separator, parsed_cut_off
+
+    async def _process_document_upload(self, file_input: Any, dataset_id: str) -> str:
+        """Process document upload and return document ID."""
+        file_content, filename = await RagflowUtils.process_file(file_input)
+        logger.info(
+            "File processing completed: %s, size: %d bytes",
+            filename,
+            len(file_content),
+        )
+
+        upload_response = await ragflow_client.upload_document_to_dataset(
+            dataset_id=dataset_id, file_content=file_content, filename=filename
+        )
+
+        if upload_response and len(upload_response) > 0:
+            doc_object = upload_response[0]
+            doc_id = doc_object.id
+            logger.info("Document uploaded successfully, ID: %s", doc_id)
+            return doc_id
+        else:
+            raise ValueError("File upload failed: no document returned")
+
+    async def _handle_document_parsing(self, dataset_id: str, doc_id: str) -> None:
+        """Handle document parsing and wait for completion."""
+        logger.info("Triggering document parsing...")
+        parse_response = await ragflow_client.parse_documents(dataset_id, [doc_id])
+
+        if parse_response.get("code") == 0:
+            logger.info("Document parsing triggered successfully")
+            try:
+                final_status = await RagflowUtils.wait_for_parsing(
+                    dataset_id, doc_id, max_wait_time=300
+                )
+                logger.info(
+                    "Document parsing completed, final status: %s", final_status
+                )
+            except Exception as parse_error:
+                logger.warning("Parsing wait timeout or error: %s", parse_error)
+                final_status = "TIMEOUT"
+
+            if final_status != "DONE":
+                raise ValueError(
+                    "File parsing timeout or error, please check in RAGFlow"
+                )
+        else:
+            logger.warning("File parsing failed: %s", parse_response)
+            raise ValueError("File parsing failed, please check in RAGFlow")
+
     async def split(
         self,
-        file: str,
+        fileUrl: Optional[str] = None,
         lengthRange: Optional[List[int]] = None,
         overlap: int = 16,
         resourceType: int = 0,
@@ -125,14 +213,14 @@ class RagflowRAGStrategy(RAGStrategy):
         6. Get chunk results and convert format
 
         Args:
-            file: File path or URL
+            fileUrl: File path or URL
             lengthRange: Chunk length range [min_length, max_length]
             overlap: Overlap length
             resourceType: Resource type
             separator: List of separators
             titleSplit: Whether to split by title
             cutOff: Truncation rules
-            **kwargs: Other parameters, including group (dataset name)
+            **kwargs: Other parameters, including group (dataset name), file
 
         Returns:
             List of chunk results in format:
@@ -149,65 +237,39 @@ class RagflowRAGStrategy(RAGStrategy):
         """
         # Get group parameter, use default if not provided
         group = os.getenv("RAGFLOW_DEFAULT_GROUP", "Stellar Knowledge Base")
-        doc_id = None
-        dataset_id = None
+        file = kwargs.get("file")
 
-        logger.info("Starting split request: %s, group: %s", file, group)
+        # Parameter validation
+        self._validate_split_parameters(fileUrl, file)
+
+        # Parse form-data parameters
+        lengthRange, separator, cutOff = self._parse_form_data_parameters(
+            lengthRange, separator, cutOff
+        )
+
+        # Determine which input method is being used
+        file_input = file if file else fileUrl
+        input_type = "file upload" if file else "URL/path"
+        display_name = getattr(file, "filename", fileUrl) if file else fileUrl
+        logger.info(
+            "Starting split request: %s (%s), group: %s",
+            display_name,
+            input_type,
+            group,
+        )
 
         try:
-            # Step 1: Dataset management - use group as dataset name
+            # Step 1: Dataset management
             dataset_id = await RagflowUtils.ensure_dataset(group)
             logger.info("Using dataset: %s, name: %s", dataset_id, group)
 
-            # Step 2: File processing
-            file_content, filename = await RagflowUtils.process_file(file)
-            logger.info(
-                "File processing completed: %s, size: %d bytes",
-                filename,
-                len(file_content),
-            )
+            # Step 2-3: Process document upload
+            doc_id = await self._process_document_upload(file_input, dataset_id)
 
-            # Step 3: Upload document to specified dataset
-            upload_response = await ragflow_client.upload_document_to_dataset(
-                dataset_id=dataset_id, file_content=file_content, filename=filename
-            )
+            # Step 4-5: Handle document parsing
+            await self._handle_document_parsing(dataset_id, doc_id)
 
-            if any(upload_response):
-                doc_info = upload_response[0]
-                doc_id = doc_info.id
-                logger.info("Document uploaded successfully, ID: %s", doc_id)
-
-            if not doc_id:
-                raise ValueError("File upload failed")
-
-            # Step 4: Trigger parsing
-            logger.info("Triggering document parsing...")
-            parse_response = await ragflow_client.parse_documents(dataset_id, [doc_id])
-
-            if parse_response.get("code") == 0:
-                logger.info("Document parsing triggered successfully")
-                # Step 5: Wait for parsing completion
-                try:
-                    final_status = await RagflowUtils.wait_for_parsing(
-                        dataset_id, doc_id, max_wait_time=300
-                    )
-                    logger.info(
-                        "Document parsing completed, final status: %s", final_status
-                    )
-                except Exception as parse_error:
-                    logger.warning("Parsing wait timeout or error: %s", parse_error)
-                    final_status = "TIMEOUT"
-
-                if final_status != "DONE":
-                    raise ValueError(
-                        "File parsing timeout or error, please check in RAGFlow"
-                    )
-
-            else:
-                logger.warning("File parsing failed: %s", parse_response)
-                raise ValueError("File parsing failed, please check in RAGFlow")
-
-            # Step 6: Attempt to get actual chunk content (if API supports)
+            # Step 6: Get chunk content
             chunks_data = await RagflowUtils.get_document_chunks(dataset_id, doc_id)
 
             # Step 7: Convert to standard format

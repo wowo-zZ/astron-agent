@@ -144,7 +144,7 @@ class TestCBGRAGStrategy:
 
         # Execute splitting
         result = await strategy.split(
-            file="test file content",
+            fileUrl="http://test-file-content.pdf",
             lengthRange=[256, 2000],
             overlap=16,
             resourceType=1,
@@ -202,7 +202,7 @@ class TestCBGRAGStrategy:
             print(f"Keyword args: {call_args[1]}")
 
         # Adjust assertions based on actual situation
-        # 如果 wiki_split_extends 是位置参数
+        # If wiki_split_extends is a positional parameter
         if call_args and len(call_args[0]) > 1:
             wiki_split_extends = call_args[0][
                 1

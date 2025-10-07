@@ -36,4 +36,5 @@ dependencies = [
     "python-dotenv>=1.1.1",
     "cryptography>=46.0.1",
     "redis==3.5.3",
+    "pytest>=8.4.2",
 ]

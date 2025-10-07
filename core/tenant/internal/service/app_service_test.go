@@ -112,7 +112,7 @@ func TestDelete(*testing.T) {
 
 }
 
-func TestQueryApp(*testing.T) {
+func TestQueryAuth(*testing.T) {
 	AppPre()
 	appList, err := appService.Query(&AppQuery{
 		//AppIds: []string{"51f9797f", "20bd6593", "9f7beb29"},

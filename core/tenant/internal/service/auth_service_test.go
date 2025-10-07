@@ -34,7 +34,7 @@ func AUthPre() {
 			UserName:     "admin",
 			Password:     "123456",
 			Url:          "(localhost:3306)/tenant",
-			MaxOpenConns: 10,
+			MaxOpenConns: 5,
 			MaxIdleConns: 5,
 		}),
 	}
@@ -90,4 +90,13 @@ func TestQuery(*testing.T) {
 	for _, auth := range authList {
 		fmt.Println(auth.AppId, auth.ApiKey, auth.ApiSecret)
 	}
+}
+
+func TestQueryAppByAPIKey(*testing.T) {
+	AUthPre()
+	app, err := authService.QueryAppByAPIKey("7b709739e8da44536127a333c7603a83")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(app.AppId, app.AppName, app.Source)
 }

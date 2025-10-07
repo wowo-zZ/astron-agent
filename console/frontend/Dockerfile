@@ -14,7 +14,7 @@ RUN npm i --legacy-peer-deps
 COPY console/frontend/ ./
 
 # 执行构建
-RUN npm run build-dev
+RUN npm run build-test
 
 # 第二阶段：部署阶段
 FROM nginx:1.15-alpine

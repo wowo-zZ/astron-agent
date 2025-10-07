@@ -19,7 +19,7 @@ English | [简体中文](README-zh.md)
 ## 📑 Table of Contents
 
 - [🔭 What is Astron Agent?](#-What-is-Astron-Agent)
-- [🛠️ Tech Stack](#-tech-stack)
+- [🛠️ Tech Stack](#%EF%B8%8F-tech-stack)
 - [🚀 Quick Start](#-quick-start)
   - [Using Docker](#using-docker)
 - [📖 Usage Guide](#-usage-guide)

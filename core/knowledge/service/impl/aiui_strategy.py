@@ -6,6 +6,7 @@ Provides Retrieval-Augmented Generation (RAG) functionality based on AIUI
 from typing import Any, Dict, List, Optional
 
 from knowledge.domain.entity.rag_do import ChunkInfo
+from knowledge.exceptions import ProtocolParamException
 from knowledge.infra.aiui import aiui
 from knowledge.service.rag_strategy import RAGStrategy
 from knowledge.utils.verification import check_not_empty
@@ -80,20 +81,20 @@ class AIUIRAGStrategy(RAGStrategy):
 
     async def split(
         self,
-        file: str,
-        lengthRange: List[int],
-        overlap: int,
-        resourceType: int,
-        separator: List[str],
-        titleSplit: bool,
-        cutOff: List[str],
+        fileUrl: Optional[str] = None,
+        lengthRange: Optional[List[int]] = None,
+        overlap: int = 16,
+        resourceType: int = 0,
+        separator: Optional[List[str]] = None,
+        titleSplit: bool = False,
+        cutOff: Optional[List[str]] = None,
         **kwargs: Any
     ) -> List[Dict[str, Any]]:
         """
         Split file into multiple chunks
 
         Args:
-            file: File content
+            fileUrl: File url
             lengthRange: Length range
             overlap: Overlap length
             resourceType: Resource type
@@ -105,6 +106,9 @@ class AIUIRAGStrategy(RAGStrategy):
         Returns:
             List of split chunks
         """
+        if fileUrl is None:
+            raise ProtocolParamException(msg="fileUrl is required")
+
         # Set default values
         lengthRange = lengthRange or [16, 512]
         overlap = overlap or 16
@@ -113,7 +117,7 @@ class AIUIRAGStrategy(RAGStrategy):
 
         # Document parsing
         doc_parse_response_data = await aiui.document_parse(
-            file, resourceType, **kwargs
+            fileUrl, resourceType, **kwargs
         )
 
         # Split chunks

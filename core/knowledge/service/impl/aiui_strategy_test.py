@@ -139,7 +139,7 @@ class TestAIUIRAGStrategy:
 
         # Execute splitting
         result = await strategy.split(
-            file="test file content",
+            fileUrl="http://test-file-content.pdf",
             lengthRange=[16, 512],
             overlap=16,
             resourceType=1,
@@ -155,7 +155,9 @@ class TestAIUIRAGStrategy:
         assert result[0]["title"] == "Chunk 1"
 
         # Verify call parameters
-        mock_aiui.document_parse.assert_called_once_with("test file content", 1)
+        mock_aiui.document_parse.assert_called_once_with(
+            "http://test-file-content.pdf", 1
+        )
         mock_aiui.chunk_split.assert_called_once_with(
             lengthRange=[16, 512],
             document=mock_doc_data,

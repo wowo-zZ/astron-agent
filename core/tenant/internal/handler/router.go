@@ -37,6 +37,7 @@ func InitRouter(e *gin.Engine, conf *config.Config) error {
 	authGroup.POST("", authHandler.SaveAuth)
 	authGroup.DELETE("", authHandler.DeleteAuth)
 	authGroup.GET("/:app_id", authHandler.ListAuth)
+	authGroup.GET("/api_key/:api_key", authHandler.GetAppByAPIKey)
 
 	sidGenerator2.Init(conf.Server.Location, generator.IP, strconv.Itoa(conf.Server.Port))
 	return nil

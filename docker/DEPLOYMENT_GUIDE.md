@@ -57,9 +57,6 @@ RagFlow is an open-source RAG (Retrieval-Augmented Generation) engine that uses 
 # Navigate to RagFlow directory
 cd docker/ragflow
 
-# Copy environment configuration (if exists)
-cp .env.example .env
-
 # Start RagFlow service (including all dependencies)
 docker-compose up -d
 
@@ -83,7 +80,7 @@ docker-compose logs -f ragflow
 - MinIO Console: http://localhost:9001
 
 **Important Configuration Notes:**
-- Uses Elasticsearch by default. To use OpenSearch, modify the profiles configuration in docker-compose.yml
+- Uses Elasticsearch by default. To use opensearch、infinity, modify the DOC_ENGINE configuration in .env
 - Supports GPU acceleration, use `docker-compose-gpu.yml` to start
 
 ### Step 3: Configure astronAgent Core Services

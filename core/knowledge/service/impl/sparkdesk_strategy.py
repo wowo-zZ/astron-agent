@@ -40,20 +40,20 @@ class SparkDeskRAGStrategy(RAGStrategy):
 
     async def split(
         self,
-        file: str,
-        lengthRange: List[int],
-        overlap: int,
-        resourceType: int,
-        separator: List[str],
-        titleSplit: bool,
-        cutOff: List[str],
+        fileUrl: Optional[str] = None,
+        lengthRange: Optional[List[int]] = None,
+        overlap: int = 16,
+        resourceType: int = 0,
+        separator: Optional[List[str]] = None,
+        titleSplit: bool = False,
+        cutOff: Optional[List[str]] = None,
         **kwargs: Any
     ) -> List[Dict[str, Any]]:
         """
         Split file into multiple chunks
 
         Args:
-            file: File content
+            fileUrl: File url
             length_range: Length range
             overlap: Overlap length
             resource_type: Resource type

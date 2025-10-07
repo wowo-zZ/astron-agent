@@ -24,7 +24,8 @@ from workflow.api.v1.flow.publish_auth import publish_auth_router
 from workflow.api.v1.router import sparkflow_router, workflow_router
 from workflow.cache.event_registry import EventRegistry
 from workflow.consts.runtime_env import RuntimeEnv
-from workflow.exception import handlers
+from workflow.extensions.fastapi.handler.validation import validation_exception_handler
+from workflow.extensions.fastapi.middleware.auth import AuthMiddleware
 from workflow.extensions.graceful_shutdown.graceful_shutdown import GracefulShutdown
 from workflow.extensions.middleware.initialize import initialize_services
 
@@ -55,6 +56,8 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
+    app.add_middleware(AuthMiddleware)  # type: ignore[arg-type]
+
     # Include API routers for different endpoints
     # app.include_router(openapi_router)  # Commented out - not currently used
     app.include_router(publish_auth_router)
@@ -64,7 +67,7 @@ def create_app() -> FastAPI:
     # Add global exception handler for request validation errors
     app.add_exception_handler(
         RequestValidationError,
-        handlers.validation_exception_handler,  # type: ignore[arg-type]
+        validation_exception_handler,  # type: ignore[arg-type]
     )
 
     # Configure graceful shutdown handler

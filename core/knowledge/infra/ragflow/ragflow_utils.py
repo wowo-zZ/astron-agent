@@ -11,9 +11,10 @@ import logging
 import os
 import time
 import urllib.parse
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 import aiohttp
+from fastapi import UploadFile
 
 from knowledge.infra.ragflow.ragflow_client import (
     create_dataset,
@@ -220,20 +221,43 @@ class RagflowUtils:
         return file_content, filename
 
     @staticmethod
-    async def process_file(file: str) -> tuple[bytes, str]:
+    async def process_file(file_input: Union[str, UploadFile]) -> tuple[bytes, str]:
         """
-        Process file (download or read)
+        Process file (download, read local file, or handle upload file)
 
         Args:
-            file: File path or URL
+            file_input: File path/URL (str) or UploadFile object
 
         Returns:
             (file content, filename)
         """
-        if file.startswith(("http://", "https://")):
-            return await RagflowUtils._download_url_file(file)
+        if isinstance(file_input, str):
+            # URL logic: only support HTTP/HTTPS URLs
+            if file_input.startswith(("http://", "https://")):
+                return await RagflowUtils._download_url_file(file_input)
+            else:
+                raise ValueError(
+                    f"Unsupported file input: {file_input}. "
+                    "Only HTTP/HTTPS URLs are supported for string input."
+                )
         else:
-            return RagflowUtils._read_local_file(file)
+            # Handle UploadFile objects
+            file_content = await file_input.read()
+            filename = file_input.filename or "uploaded_file"
+
+            logger.info(
+                "Processing uploaded file: %s, size: %d bytes",
+                filename,
+                len(file_content),
+            )
+
+            if len(file_content) == 0:
+                raise Exception("Uploaded file is empty")
+
+            # Reset file pointer for potential future reads
+            await file_input.seek(0)
+
+            return file_content, filename
 
     @staticmethod
     async def get_document_chunks(dataset_id: str, doc_id: str) -> List[Dict[str, Any]]:
