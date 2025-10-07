@@ -427,8 +427,8 @@ def setup_span_and_trace(run_params_list, app_id, uid, caller):
     node_trace = NodeTraceLog(
         service_id="",
         sid=sid or "",
-        app_id=app_id,
-        uid=uid,
+        app_id=str(app_id) if app_id else "",
+        uid=str(uid) if uid else "",
         chat_id=sid or "",
         sub="spark-link",
         caller=caller,

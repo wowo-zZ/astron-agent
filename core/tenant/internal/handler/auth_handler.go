@@ -26,6 +26,11 @@ func NewAuthHandler(authService *service.AuthService) (*AuthHandler, error) {
 func (handler *AuthHandler) ListAuth(c *gin.Context) {
 	sid := c.GetString(keySid)
 	appId := c.Param("app_id")
+	if len(appId) == 0 {
+		resp := newErrResp(ParamErr, "app_id is empty", sid)
+		c.JSON(http.StatusOK, resp)
+		return
+	}
 	auths, err := handler.authService.Query(appId)
 	if err != nil {
 		var appErr service.BizErr
@@ -120,8 +125,40 @@ func (handler *AuthHandler) DeleteAuth(c *gin.Context) {
 		c.JSON(http.StatusOK, resp)
 		return
 	}
-
 	resp := newSuccessResp(nil, sid)
 	c.JSON(http.StatusOK, resp)
 
+}
+
+func (h *AuthHandler) GetAppByAPIKey(c *gin.Context) {
+	sid := c.GetString(keySid)
+	apiKey := c.Param("api_key")
+	if len(apiKey) == 0 {
+		resp := newErrResp(ParamErr, "api_key is empty", sid)
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+	app, err := h.authService.QueryAppByAPIKey(apiKey)
+	if err != nil {
+		var appErr service.BizErr
+		if errors.As(err, &appErr) {
+			log.Printf("request query app_id by api_key[%s] error: %s", apiKey, appErr.Msg())
+			resp := newErrResp(appErr.Code(), appErr.Msg(), sid)
+			c.JSON(http.StatusOK, resp)
+			return
+		}
+		log.Printf("request query app_id by api_key[%s] error: %s", apiKey, err.Error())
+		resp := newErrResp(service.ErrCodeSystem, err.Error(), sid)
+		c.JSON(http.StatusOK, resp)
+		return
+	}
+	resp := newSuccessResp(&AppData{
+		Appid:   app.AppId,
+		Name:    app.AppName,
+		DevId:   app.DevId,
+		Source:  app.Source,
+		Desc:    app.Desc,
+		CloudId: app.ChannelId,
+	}, sid)
+	c.JSON(http.StatusOK, resp)
 }

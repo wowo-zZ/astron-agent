@@ -1,21 +1,25 @@
 package com.iflytek.astron.console.hub.service.workflow;
 
+import com.iflytek.astron.console.hub.dto.workflow.WorkflowReleaseRequestDto;
 import com.iflytek.astron.console.hub.dto.workflow.WorkflowReleaseResponseDto;
 
 /**
- * 工作流发布服务接口 负责处理工作流助手的发布、版本管理和API同步 简化版本：无审核流程，直接发布
+ * Workflow release service interface
+ * Handles workflow bot publishing, version management and API synchronization
+ * Simplified version: no approval process, direct publishing
  */
 public interface WorkflowReleaseService {
-
+    
     /**
-     * 发布工作流助手到指定渠道 直接发布，无需审核
-     *
-     * @param botId 助手ID
-     * @param uid 用户ID
-     * @param spaceId 空间ID
-     * @param publishType 发布类型：MARKET, API, MCP
-     * @return 发布结果
+     * Publish workflow bot to specified channel
+     * Direct publishing without approval process
+     * 
+     * @param botId Bot ID
+     * @param uid User ID
+     * @param spaceId Space ID
+     * @param publishType Publish type: MARKET, API, MCP
+     * @return Publishing result
      */
     WorkflowReleaseResponseDto publishWorkflow(Integer botId, String uid, Long spaceId, String publishType);
-
+    
 }

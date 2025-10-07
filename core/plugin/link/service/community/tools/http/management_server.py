@@ -378,10 +378,10 @@ def delete_version(
 
         node_trace = NodeTraceLog(
             service_id=str(tool_ids) + " " + str(versions),
-            sid=span_context.sid,
-            app_id=span_context.app_id,
-            uid=span_context.uid,
-            chat_id=span_context.sid,
+            sid=str(span_context.sid),
+            app_id=str(span_context.app_id),
+            uid=str(span_context.uid),
+            chat_id=str(span_context.sid),
             sub="spark-link",
             caller=caller,
             log_caller=tool_type,
@@ -501,10 +501,10 @@ def read_version(
 
         node_trace = NodeTraceLog(
             service_id=str(tool_ids),
-            sid=span_context.sid,
-            app_id=span_context.app_id,
-            uid=span_context.uid,
-            chat_id=span_context.sid,
+            sid=str(span_context.sid),
+            app_id=str(span_context.app_id),
+            uid=str(span_context.uid),
+            chat_id=str(span_context.sid),
             sub="spark-link",
             caller=caller,
             log_caller=tool_type,

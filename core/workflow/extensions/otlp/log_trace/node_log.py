@@ -149,7 +149,8 @@ class NodeLog(BaseModel):
         :param key: Key identifier for the input data
         :param data: Input data value to be stored
         """
-        # self.data.input += "\n" + json.dumps({key: data}, ensure_ascii=False)
+        if not isinstance(data, str):
+            data = json.dumps(data, ensure_ascii=False)
         self.data.input.update({key: data})
 
     def append_output_data(self, key: str, data: Any) -> None:
@@ -159,7 +160,8 @@ class NodeLog(BaseModel):
         :param key: Key identifier for the output data
         :param data: Output data value to be stored
         """
-        # self.data.output += "\n" + json.dumps({key: data}, ensure_ascii=False)
+        if not isinstance(data, str):
+            data = json.dumps(data, ensure_ascii=False)
         self.data.output.update({key: data})
 
     def append_usage_data(self, data: Any) -> None:
@@ -179,10 +181,11 @@ class NodeLog(BaseModel):
 
         :param data: Dictionary containing configuration parameters
         """
-        self.data.config.update(data)
-        # for key, value in data.items():
-        #     if not isinstance(value, str):
-        #         self.data.config.update({key: json.dumps(value, ensure_ascii=False)})
+        for key, value in data.items():
+            if not isinstance(value, str):
+                self.data.config.update({key: f"{value}"})
+            else:
+                self.data.config.update({key: value})
 
     def _add_log(self, log_level: str, content: str) -> None:
         """

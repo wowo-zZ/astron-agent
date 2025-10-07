@@ -1,6 +1,7 @@
 package com.iflytek.astron.console.hub.controller.publish;
 
 import com.iflytek.astron.console.commons.annotation.RateLimit;
+import com.iflytek.astron.console.commons.constant.ResponseEnum;
 import com.iflytek.astron.console.commons.response.ApiResult;
 import com.iflytek.astron.console.commons.util.RequestContextUtil;
 import com.iflytek.astron.console.commons.util.space.SpaceInfoUtil;
@@ -15,11 +16,13 @@ import com.iflytek.astron.console.hub.dto.publish.BotVersionVO;
 import com.iflytek.astron.console.hub.dto.publish.WechatAuthUrlRequestDto;
 import com.iflytek.astron.console.hub.dto.publish.WechatAuthUrlResponseDto;
 import com.iflytek.astron.console.hub.dto.publish.BotTraceRequestDto;
-import com.iflytek.astron.console.hub.dto.publish.mcp.McpContentResponseDto;
 import com.iflytek.astron.console.hub.dto.publish.mcp.McpPublishRequestDto;
-import com.iflytek.astron.console.commons.dto.workflow.WorkflowInputsResponseDto;
+import com.iflytek.astron.console.hub.dto.publish.UnifiedPrepareDto;
+import com.iflytek.astron.console.hub.dto.publish.UnifiedPublishRequestDto;
 import com.iflytek.astron.console.hub.service.publish.BotPublishService;
 import com.iflytek.astron.console.hub.service.publish.McpService;
+import com.iflytek.astron.console.hub.strategy.publish.PublishStrategy;
+import com.iflytek.astron.console.hub.strategy.publish.PublishStrategyFactory;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -52,6 +55,7 @@ public class BotPublishController {
 
     private final BotPublishService botPublishService;
     private final McpService mcpService;
+    private final PublishStrategyFactory publishStrategyFactory;
 
     /**
      * Retrieve paginated bot list with advanced filtering
@@ -96,6 +100,87 @@ public class BotPublishController {
         log.info("Bot details retrieved successfully: botId={}, channels={}", botId, result.getPublishChannels());
 
         return ApiResult.success(result);
+    }
+
+    /**
+     * Get Publish Prepare Data
+     *
+     * Unified endpoint to get preparation data for different publish types
+     */
+    @Operation(
+            summary = "Get publish prepare data",
+            description = "Get preparation data needed for publishing to different channels (market, mcp, feishu, api)")
+    @RateLimit(limit = 50, window = 60, dimension = "USER")
+    @GetMapping("/bots/{botId}/prepare")
+    public ApiResult<UnifiedPrepareDto> getPrepareData(
+            @Parameter(description = "Unique bot identifier", required = true)
+            @PathVariable Integer botId,
+            @Parameter(description = "Publish type: market, mcp, feishu, api", required = true)
+            @RequestParam String type) {
+
+        String currentUid = RequestContextUtil.getUID();
+        Long spaceId = SpaceInfoUtil.getSpaceId();
+
+        log.info("Getting publish prepare data: botId={}, type={}, uid={}, spaceId={}", 
+                botId, type, currentUid, spaceId);
+
+        UnifiedPrepareDto prepareData = botPublishService.getPrepareData(botId, type, currentUid, spaceId);
+        return ApiResult.success(prepareData);
+    }
+
+    /**
+     * Unified publish endpoint for all publish types
+     * Supports MARKET, MCP, WECHAT, API, FEISHU publishing with strategy pattern
+     */
+    @Operation(
+            summary = "Unified bot publish endpoint",
+            description = "Publish or offline bot to different channels using strategy pattern"
+    )
+    @RateLimit(limit = 10, window = 60, dimension = "USER")
+    @PostMapping("/bots/{botId}")
+    public ApiResult<Object> unifiedPublish(
+            @Parameter(description = "Bot ID", required = true)
+            @PathVariable Integer botId,
+            @Valid @RequestBody UnifiedPublishRequestDto request) {
+        
+        String currentUid = RequestContextUtil.getUID();
+        Long spaceId = SpaceInfoUtil.getSpaceId();
+        
+        log.info("Unified publish request: botId={}, publishType={}, action={}, currentUid={}, spaceId={}", 
+                botId, request.getPublishType(), request.getAction(), currentUid, spaceId);
+        
+        try {
+            // Validate publish type
+            if (!publishStrategyFactory.isSupported(request.getPublishType())) {
+                return ApiResult.error(ResponseEnum.PARAMETER_ERROR, 
+                        "Unsupported publish type: " + request.getPublishType() + 
+                        ". Supported types: " + publishStrategyFactory.getSupportedTypes());
+            }
+            
+            // Get strategy and execute action
+            PublishStrategy strategy = publishStrategyFactory.getStrategy(request.getPublishType());
+            
+            ApiResult<Object> result;
+            if ("PUBLISH".equalsIgnoreCase(request.getAction())) {
+                result = strategy.publish(botId, request.getPublishData(), currentUid, spaceId);
+            } else if ("OFFLINE".equalsIgnoreCase(request.getAction())) {
+                result = strategy.offline(botId, request.getPublishData(), currentUid, spaceId);
+            } else {
+                return ApiResult.error(ResponseEnum.PARAMETER_ERROR,
+                        "Unsupported action: " + request.getAction() + 
+                        ". Supported actions: PUBLISH, OFFLINE");
+            }
+            
+            log.info("Unified publish completed: botId={}, publishType={}, action={}, success={}", 
+                    botId, request.getPublishType(), request.getAction(), result.code() == 0);
+            
+            return result;
+            
+        } catch (Exception e) {
+            log.error("Unified publish failed: botId={}, publishType={}, action={}", 
+                    botId, request.getPublishType(), request.getAction(), e);
+            return ApiResult.error(ResponseEnum.OPERATION_FAILED, e.getMessage());
+        }
     }
 
     /**
@@ -212,101 +297,6 @@ public class BotPublishController {
         return ApiResult.success(result);
     }
 
-    /**
-     * Generate WeChat Official Account authorization URL
-     */
-    @Operation(
-            summary = "Get WeChat authorization URL",
-            description = "Generate authorization URL for binding bot to WeChat Official Account for publishing")
-    @RateLimit(limit = 10, window = 60, dimension = "USER")
-    @PostMapping("/wechat/auth-url")
-    public ApiResult<WechatAuthUrlResponseDto> getWechatAuthUrl(
-            @Valid @RequestBody WechatAuthUrlRequestDto request) {
-
-        String uid = RequestContextUtil.getUID();
-        Long spaceId = SpaceInfoUtil.getSpaceId();
-
-        log.info("Generating WeChat authorization URL: botId={}, appid={}, redirectUrl={}, uid={}, spaceId={}",
-                request.getBotId(), request.getAppid(), request.getRedirectUrl(), uid, spaceId);
-
-        WechatAuthUrlResponseDto result = botPublishService.getWechatAuthUrl(
-                request.getBotId(), request.getAppid(), request.getRedirectUrl(), uid, spaceId);
-
-        log.info("WeChat authorization URL generated successfully: botId={}", request.getBotId());
-        return ApiResult.success(result);
-    }
-
-    // ==================== MCP Publishing Management ====================
-
-    /**
-     * Get MCP service configuration for a bot
-     */
-    @Operation(
-            summary = "Get MCP service details",
-            description = "Retrieve MCP service configuration including server details, parameters, and publishing status")
-    @RateLimit(limit = 50, window = 60, dimension = "USER")
-    @GetMapping("/mcp/{botId}")
-    public ApiResult<McpContentResponseDto> getMcpContent(
-            @Parameter(description = "Unique bot identifier", required = true)
-            @PathVariable Integer botId) {
-
-        String currentUid = RequestContextUtil.getUID();
-        Long spaceId = SpaceInfoUtil.getSpaceId();
-
-        log.info("Retrieving MCP service details: botId={}, uid={}, spaceId={}", botId, currentUid, spaceId);
-
-        McpContentResponseDto result = mcpService.getMcpContent(botId, currentUid, spaceId);
-
-        log.info("MCP service details retrieved successfully: botId={}, released={}", botId, result.getReleased());
-        return ApiResult.success(result);
-    }
-
-    /**
-     * Get workflow input parameters for MCP publishing
-     */
-    @Operation(
-            summary = "Get bot input parameters",
-            description = "Retrieve dynamic input parameter definitions for workflow bot, used for MCP service configuration")
-    @RateLimit(limit = 50, window = 60, dimension = "USER")
-    @GetMapping("/mcp/{botId}/inputs")
-    public ApiResult<WorkflowInputsResponseDto> getInputsType(
-            @Parameter(description = "Unique bot identifier", required = true)
-            @PathVariable Integer botId) {
-
-        String currentUid = RequestContextUtil.getUID();
-        Long spaceId = SpaceInfoUtil.getSpaceId();
-
-        log.info("Retrieving bot input parameters: botId={}, uid={}, spaceId={}", botId, currentUid, spaceId);
-
-        WorkflowInputsResponseDto result = botPublishService.getInputsType(botId, currentUid, spaceId);
-
-        log.info("Bot input parameters retrieved successfully: botId={}, paramCount={}",
-                botId, result.getParameters().size());
-        return ApiResult.success(result);
-    }
-
-    /**
-     * Publish bot as MCP service
-     */
-    @Operation(
-            summary = "Publish bot to MCP",
-            description = "Publish workflow bot as MCP (Model Context Protocol) service with custom server configuration")
-    @RateLimit(limit = 10, window = 60, dimension = "USER")
-    @PostMapping("/mcp/publish")
-    public ApiResult<Void> publishMcp(@Valid @RequestBody McpPublishRequestDto request) {
-
-        String currentUid = RequestContextUtil.getUID();
-        Long spaceId = SpaceInfoUtil.getSpaceId();
-
-        log.info("Publishing bot to MCP: botId={}, serverName={}, uid={}, spaceId={}",
-                request.getBotId(), request.getServerName(), currentUid, spaceId);
-
-        mcpService.publishMcp(request, currentUid, spaceId);
-
-        log.info("Bot published to MCP successfully: botId={}, serverName={}",
-                request.getBotId(), request.getServerName());
-        return ApiResult.success();
-    }
 
     // ==================== Trace Log Management ====================
 

@@ -28,14 +28,14 @@ class RAGStrategy(ABC):
     @abstractmethod
     async def split(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
-        file: str,
-        lengthRange: List[int],  # pylint: disable=invalid-name
-        overlap: int,
-        resourceType: int,  # pylint: disable=invalid-name
-        separator: List[str],
-        titleSplit: bool,  # pylint: disable=invalid-name
-        cutOff: List[str],  # pylint: disable=invalid-name
-        **kwargs: Any
+        fileUrl: Optional[str] = None,
+        lengthRange: Optional[List[int]] = None,
+        overlap: int = 16,
+        resourceType: int = 0,
+        separator: Optional[List[str]] = None,
+        titleSplit: bool = False,
+        cutOff: Optional[List[str]] = None,
+        **kwargs: Any  # pylint: disable=invalid-name
     ) -> List[Dict[str, Any]]:
         """Split file into chunks."""
         raise NotImplementedError

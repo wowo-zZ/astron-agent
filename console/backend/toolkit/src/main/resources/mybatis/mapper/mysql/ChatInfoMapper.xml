@@ -100,10 +100,12 @@
         FROM chat_info
         <where>
             and sub = 'spark-link'
-            and
-            <foreach collection="toolIds" item="toolId" open="(" separator="or" close=")">
-                instr(flow_id, #{toolId})
-            </foreach>
+            <if test="toolIds != null and toolIds.size() > 0">
+                and
+                <foreach collection="toolIds" item="toolId" open="(" separator="or" close=")">
+                    instr(flow_id, #{toolId})
+                </foreach>
+            </if>
         </where>
         group by flow_id
     </select>

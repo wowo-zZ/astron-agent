@@ -44,8 +44,7 @@ async def task_monitoring(
         f"exec_position:{exec_position}, params:{params}"
     )
     span, node_trace = setup_span_and_trace(req=req, sid=sid)
-    if not sid:
-        sid = span.sid
+    sid = sid if sid else span.sid
 
     with span.start(func_name="task_monitoring") as span_context:
         node_trace.sid = span_context.sid
@@ -62,8 +61,20 @@ async def task_monitoring(
                 exec_position=exec_position,
                 params=params,
             )  # Create task
+        except InvalidConfigException as e:
+            logger.error(f"error: {e}")
+            code = ErrorCode.CREATE_URL_INVALID.code
+            msg = f"{ErrorCode.CREATE_URL_INVALID.message}, detail: {e}"
+            error = RPAExecutionResponse(code=code, message=msg, sid=sid)
+            yield error.model_dump_json()
+            otlp_handle(
+                meter=meter,
+                node_trace=node_trace,
+                code=ErrorCode.CREATE_URL_INVALID.code,
+                message=msg,
+            )
+            return
         except (
-            InvalidConfigException,
             HTTPException,
             httpx.HTTPStatusError,
             httpx.RequestError,
@@ -92,32 +103,65 @@ async def task_monitoring(
                 int(os.getenv(const.XIAOWU_RPA_TASK_QUERY_INTERVAL_KEY, "10"))
             )
 
-            if (time.time() - start_time) > ttl:
-                break
-
             span_context.add_info_events(attributes={"query start": str(time.time())})
-            result = await query_task_status(access_token, task_id)  # Query task
-            span_context.add_info_events(attributes={"query finish": str(result)})
-            if result:
-                code, msg, data = result
-                if code == ErrorCode.SUCCESS.code:
-                    success = RPAExecutionResponse(
-                        code=code, message=msg, data=data, sid=sid
-                    )
-                    yield success.model_dump_json()
-                    otlp_handle(
-                        meter=meter,
-                        node_trace=node_trace,
-                        code=ErrorCode.SUCCESS.code,
-                        message=ErrorCode.SUCCESS.message,
-                    )
-                elif code == ErrorCode.QUERY_TASK_ERROR.code:
-                    error = RPAExecutionResponse(code=code, message=msg, sid=sid)
-                    yield error.model_dump_json()
-                    otlp_handle(
-                        meter=meter, node_trace=node_trace, code=code, message=msg
-                    )
+            result = None
+            try:
+                result = await query_task_status(access_token, task_id)  # Query task
+            except InvalidConfigException as e:
+                logger.error(f"error: {e}")
+                code = ErrorCode.QUERY_URL_INVALID.code
+                msg = f"{ErrorCode.QUERY_URL_INVALID.message}, detail: {e}"
+                error = RPAExecutionResponse(code=code, message=msg, sid=sid)
+                yield error.model_dump_json()
+                otlp_handle(
+                    meter=meter,
+                    node_trace=node_trace,
+                    code=ErrorCode.QUERY_URL_INVALID.code,
+                    message=msg,
+                )
                 return
+            except (
+                HTTPException,
+                httpx.HTTPStatusError,
+                httpx.RequestError,
+                AssertionError,
+                KeyError,
+                AttributeError,
+            ) as e:
+                logger.error(f"error: {e}")
+                code = ErrorCode.CREATE_TASK_ERROR.code
+                msg = f"{ErrorCode.CREATE_TASK_ERROR.message}, detail: {e}"
+                error = RPAExecutionResponse(code=code, message=msg, sid=sid)
+                yield error.model_dump_json()
+                otlp_handle(
+                    meter=meter,
+                    node_trace=node_trace,
+                    code=ErrorCode.CREATE_TASK_ERROR.code,
+                    message=msg,
+                )
+                return
+            span_context.add_info_events(attributes={"query finish": str(result)})
+            if not result:
+                continue
+
+            code, msg, data = result
+            if code == ErrorCode.SUCCESS.code:
+                success = RPAExecutionResponse(
+                    code=code, message=msg, data=data, sid=sid
+                )
+                yield success.model_dump_json()
+                otlp_handle(
+                    meter=meter,
+                    node_trace=node_trace,
+                    code=ErrorCode.SUCCESS.code,
+                    message=ErrorCode.SUCCESS.message,
+                )
+                return
+
+            error = RPAExecutionResponse(code=code, message=msg, sid=sid)
+            yield error.model_dump_json()
+            otlp_handle(meter=meter, node_trace=node_trace, code=code, message=msg)
+            return
 
         timeout = RPAExecutionResponse(
             code=ErrorCode.TIMEOUT_ERROR.code,

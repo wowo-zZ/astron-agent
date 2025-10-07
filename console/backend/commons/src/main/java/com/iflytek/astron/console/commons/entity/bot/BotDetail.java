@@ -33,7 +33,7 @@ public class BotDetail {
     private String vcnCn;
     private String vcnEn;
     private Integer vcnSpeed;
-    private String version;
+    private Integer version;
     private String openedTool;
     private Integer hotNum;
     private String marketBotId;

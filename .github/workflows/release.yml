@@ -1,4 +1,4 @@
-name: Release Multi-Language CI/CD Tools
+name: Release Astron Agent
 
 on:
   push:
@@ -40,10 +40,9 @@ jobs:
     outputs:
       version: ${{ steps.meta.outputs.version }}
       is-prerelease: ${{ steps.meta.outputs.is-prerelease }}
-      has-go: ${{ steps.detect.outputs.has-go }}
-      has-java: ${{ steps.detect.outputs.has-java }}
-      has-python: ${{ steps.detect.outputs.has-python }}
-      has-typescript: ${{ steps.detect.outputs.has-typescript }}
+      has-core-services: ${{ steps.detect.outputs.has-core-services }}
+      has-console-hub: ${{ steps.detect.outputs.has-console-hub }}
+      has-console-frontend: ${{ steps.detect.outputs.has-console-frontend }}
       changelog: ${{ steps.changelog.outputs.changelog }}
     steps:
       - name: Checkout code
@@ -83,37 +82,43 @@ jobs:
       - name: 智能项目检测
         id: detect
         run: |
-          echo "🔍 检测项目组件..."
-          
-          HAS_GO="false"
-          HAS_JAVA="false" 
-          HAS_PYTHON="false"
-          HAS_TS="false"
-          
-          if [[ -f "backend-go/go.mod" && -d "backend-go/cmd" && -f "backend-go/Dockerfile" ]]; then
-            HAS_GO="true"
-            echo "✅ Go项目: backend-go/ (可构建Docker镜像)"
+          echo "🔍 检测 Astron Agent 组件..."
+
+          HAS_CORE_SERVICES="false"
+          HAS_CONSOLE_HUB="false"
+          HAS_CONSOLE_FRONTEND="false"
+
+          # 检测Core服务组件 (基于build-push.yml的结构)
+          CORE_COMPONENTS=("tenant" "memory/database" "plugin/rpa" "plugin/link" "plugin/aitools" "agent" "knowledge" "workflow")
+          CORE_COUNT=0
+
+          for component in "${CORE_COMPONENTS[@]}"; do
+            if [[ -f "core/${component}/Dockerfile" ]]; then
+              CORE_COUNT=$((CORE_COUNT + 1))
+              echo "✅ Core组件: core/${component}/"
+            fi
+          done
+
+          if [[ $CORE_COUNT -gt 0 ]]; then
+            HAS_CORE_SERVICES="true"
+            echo "✅ 检测到 $CORE_COUNT 个Core服务组件"
           fi
-          
-          if [[ -f "backend-java/pom.xml" && -f "backend-java/Dockerfile" ]]; then
-            HAS_JAVA="true"
-            echo "✅ Java项目: backend-java/ (可构建Docker镜像)"
+
+          # 检测Console Hub (Java)
+          if [[ -f "console/backend/hub/pom.xml" && -f "console/backend/hub/Dockerfile" ]]; then
+            HAS_CONSOLE_HUB="true"
+            echo "✅ Console Hub: console/backend/hub/ (Java Spring Boot)"
           fi
-          
-          if [[ -f "backend-python/main.py" && -f "backend-python/requirements.txt" && -f "backend-python/Dockerfile" ]]; then
-            HAS_PYTHON="true"
-            echo "✅ Python项目: backend-python/ (可构建Docker镜像)"
+
+          # 检测Console Frontend (React)
+          if [[ -f "console/frontend/package.json" && -f "console/frontend/Dockerfile" ]]; then
+            HAS_CONSOLE_FRONTEND="true"
+            echo "✅ Console Frontend: console/frontend/ (React)"
           fi
-          
-          if [[ -f "frontend-ts/package.json" && -f "frontend-ts/tsconfig.json" && -f "frontend-ts/Dockerfile" ]]; then
-            HAS_TS="true"
-            echo "✅ TypeScript项目: frontend-ts/ (可构建Docker镜像)"
-          fi
-          
-          echo "has-go=$HAS_GO" >> $GITHUB_OUTPUT
-          echo "has-java=$HAS_JAVA" >> $GITHUB_OUTPUT
-          echo "has-python=$HAS_PYTHON" >> $GITHUB_OUTPUT
-          echo "has-typescript=$HAS_TS" >> $GITHUB_OUTPUT
+
+          echo "has-core-services=$HAS_CORE_SERVICES" >> $GITHUB_OUTPUT
+          echo "has-console-hub=$HAS_CONSOLE_HUB" >> $GITHUB_OUTPUT
+          echo "has-console-frontend=$HAS_CONSOLE_FRONTEND" >> $GITHUB_OUTPUT
 
       - name: 生成变更日志
         id: changelog
@@ -167,31 +172,52 @@ jobs:
           echo "" >> "$CHANGELOG_FILE"
           echo "## 📦 Docker镜像" >> "$CHANGELOG_FILE"
           echo "" >> "$CHANGELOG_FILE"
-          
-          if [[ "${{ steps.detect.outputs.has-go }}" == "true" ]]; then
-            echo "- 🐹 Go服务: ghcr.io/${{ github.repository }}-go:$CURRENT_TAG" >> "$CHANGELOG_FILE"
+
+          if [[ "${{ steps.detect.outputs.has-core-services }}" == "true" ]]; then
+            echo "### 🏗️ Core服务组件" >> "$CHANGELOG_FILE"
+            echo "- 🏢 Core Tenant: ghcr.io/${{ github.repository }}/core-tenant:$CURRENT_TAG" >> "$CHANGELOG_FILE"
+            echo "- 🧠 Core Memory: ghcr.io/${{ github.repository }}/core-memory:$CURRENT_TAG" >> "$CHANGELOG_FILE"
+            echo "- 🤖 Core RPA: ghcr.io/${{ github.repository }}/core-rpa:$CURRENT_TAG" >> "$CHANGELOG_FILE"
+            echo "- 🔗 Core Link: ghcr.io/${{ github.repository }}/core-link:$CURRENT_TAG" >> "$CHANGELOG_FILE"
+            echo "- 🛠️ Core AI Tools: ghcr.io/${{ github.repository }}/core-aitools:$CURRENT_TAG" >> "$CHANGELOG_FILE"
+            echo "- 🤖 Core Agent: ghcr.io/${{ github.repository }}/core-agent:$CURRENT_TAG" >> "$CHANGELOG_FILE"
+            echo "- 📚 Core Knowledge: ghcr.io/${{ github.repository }}/core-knowledge:$CURRENT_TAG" >> "$CHANGELOG_FILE"
+            echo "- ⚡ Core Workflow: ghcr.io/${{ github.repository }}/core-workflow:$CURRENT_TAG" >> "$CHANGELOG_FILE"
+            echo "" >> "$CHANGELOG_FILE"
           fi
-          if [[ "${{ steps.detect.outputs.has-java }}" == "true" ]]; then
-            echo "- ☕ Java服务: ghcr.io/${{ github.repository }}-java:$CURRENT_TAG" >> "$CHANGELOG_FILE"
+
+          if [[ "${{ steps.detect.outputs.has-console-hub }}" == "true" ]]; then
+            echo "### 🎯 Console服务" >> "$CHANGELOG_FILE"
+            echo "- ☕ Console Hub: ghcr.io/${{ github.repository }}/console-hub:$CURRENT_TAG" >> "$CHANGELOG_FILE"
+            echo "" >> "$CHANGELOG_FILE"
           fi
-          if [[ "${{ steps.detect.outputs.has-python }}" == "true" ]]; then
-            echo "- 🐍 Python服务: ghcr.io/${{ github.repository }}-python:$CURRENT_TAG" >> "$CHANGELOG_FILE"
+
+          if [[ "${{ steps.detect.outputs.has-console-frontend }}" == "true" ]]; then
+            echo "### 🌐 前端应用" >> "$CHANGELOG_FILE"
+            echo "- 🟦 Console Frontend: ghcr.io/${{ github.repository }}/console-frontend:$CURRENT_TAG" >> "$CHANGELOG_FILE"
+            echo "" >> "$CHANGELOG_FILE"
           fi
-          if [[ "${{ steps.detect.outputs.has-typescript }}" == "true" ]]; then
-            echo "- 🟦 TypeScript前端: ghcr.io/${{ github.repository }}-frontend:$CURRENT_TAG" >> "$CHANGELOG_FILE"
-          fi
-          
-          # 添加使用说明  
-          echo "" >> "$CHANGELOG_FILE"
+
+          # 添加使用说明
           echo "## 📋 使用说明" >> "$CHANGELOG_FILE"
           echo "" >> "$CHANGELOG_FILE"
           echo "### 快速开始" >> "$CHANGELOG_FILE"
           echo '```bash' >> "$CHANGELOG_FILE"
+          echo "# 克隆项目" >> "$CHANGELOG_FILE"
           echo "git clone https://github.com/${{ github.repository }}.git" >> "$CHANGELOG_FILE"
-          echo "cd remote-ci" >> "$CHANGELOG_FILE"
+          echo "cd astron-agent" >> "$CHANGELOG_FILE"
           echo "git checkout $CURRENT_TAG" >> "$CHANGELOG_FILE"
-          echo "make setup  # 初始化环境" >> "$CHANGELOG_FILE"
-          echo "make ci     # 完整CI流程" >> "$CHANGELOG_FILE"
+          echo "" >> "$CHANGELOG_FILE"
+          echo "# 使用Docker Compose运行" >> "$CHANGELOG_FILE"
+          echo "docker-compose up -d" >> "$CHANGELOG_FILE"
+          echo "" >> "$CHANGELOG_FILE"
+          echo "# 或者单独拉取镜像" >> "$CHANGELOG_FILE"
+          if [[ "${{ steps.detect.outputs.has-console-frontend }}" == "true" ]]; then
+            echo "docker pull ghcr.io/${{ github.repository }}/console-frontend:$CURRENT_TAG" >> "$CHANGELOG_FILE"
+          fi
+          if [[ "${{ steps.detect.outputs.has-console-hub }}" == "true" ]]; then
+            echo "docker pull ghcr.io/${{ github.repository }}/console-hub:$CURRENT_TAG" >> "$CHANGELOG_FILE"
+          fi
           echo '```' >> "$CHANGELOG_FILE"
           
           # 输出到GitHub Output
@@ -206,11 +232,22 @@ jobs:
   # ============================================================================
   # Stage 2: 构建Docker镜像 (复用build-push的逻辑)
   # ============================================================================
-  build-go:
-    name: 🐹 构建Go服务
+  build-core-services:
+    name: 🏗️ 构建Core服务
     runs-on: ubuntu-latest
     needs: prepare-release
-    if: needs.prepare-release.outputs.has-go == 'true'
+    if: needs.prepare-release.outputs.has-core-services == 'true'
+    strategy:
+      matrix:
+        service:
+          - { name: "tenant", path: "core/tenant", emoji: "🏢" }
+          - { name: "memory", path: "core/memory/database", emoji: "🧠" }
+          - { name: "rpa", path: "core/plugin/rpa", emoji: "🤖" }
+          - { name: "link", path: "core/plugin/link", emoji: "🔗" }
+          - { name: "aitools", path: "core/plugin/aitools", emoji: "🛠️" }
+          - { name: "agent", path: "core/agent", emoji: "🤖" }
+          - { name: "knowledge", path: "core/knowledge", emoji: "📚" }
+          - { name: "workflow", path: "core/workflow", emoji: "⚡" }
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -233,17 +270,18 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.REGISTRY_GHCR }}/${{ github.repository }}-go
+            ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/core-${{ matrix.service.name }}
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
             type=raw,value=${{ needs.prepare-release.outputs.version }}
 
-      - name: Build and push Go image
+      - name: Build and push ${{ matrix.service.emoji }} ${{ matrix.service.name }} image
         uses: docker/build-push-action@v5
         with:
-          context: backend-go
+          context: .
+          file: ./${{ matrix.service.path }}/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
@@ -255,20 +293,34 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  build-java:
-    name: ☕ 构建Java服务
+  build-console-hub:
+    name: ☕ 构建Console Hub
     runs-on: ubuntu-latest
     needs: prepare-release
-    if: needs.prepare-release.outputs.has-java == 'true'
+    if: needs.prepare-release.outputs.has-console-hub == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      # 添加Maven依赖缓存 - 仅用于console-hub
+      - name: Cache Maven dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-hub-${{ hashFiles('console/backend/hub/pom.xml', 'console/backend/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-hub-
+            ${{ runner.os }}-maven-
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: |
+            network=host
+            image=moby/buildkit:master
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -282,17 +334,18 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.REGISTRY_GHCR }}/${{ github.repository }}-java
+            ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/console-hub
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
             type=raw,value=${{ needs.prepare-release.outputs.version }}
 
-      - name: Build and push Java image
+      - name: Build and push Console Hub image
         uses: docker/build-push-action@v5
         with:
-          context: backend-java
+          context: .
+          file: ./console/backend/hub/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
@@ -301,14 +354,21 @@ jobs:
             VERSION=${{ needs.prepare-release.outputs.version }}
             GIT_COMMIT=${{ github.sha }}
             BUILD_TIME=${{ github.run_id }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: |
+            type=gha,scope=console-hub
+            type=gha,scope=console-hub-build
+            type=registry,ref=${{ env.REGISTRY_GHCR }}/${{ github.repository }}/console-hub:buildcache
+          cache-to: |
+            type=gha,scope=console-hub,mode=max
+            type=registry,ref=${{ env.REGISTRY_GHCR }}/${{ github.repository }}/console-hub:buildcache,mode=max
+          provenance: false
+          sbom: false
 
-  build-python:
-    name: 🐍 构建Python服务
+  build-console-frontend:
+    name: 🌐 构建Console Frontend
     runs-on: ubuntu-latest
     needs: prepare-release
-    if: needs.prepare-release.outputs.has-python == 'true'
+    if: needs.prepare-release.outputs.has-console-frontend == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -331,66 +391,18 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.REGISTRY_GHCR }}/${{ github.repository }}-python
+            ${{ env.REGISTRY_GHCR }}/${{ github.repository }}/console-frontend
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
             type=raw,value=${{ needs.prepare-release.outputs.version }}
 
-      - name: Build and push Python image
+      - name: Build and push Console Frontend image
         uses: docker/build-push-action@v5
         with:
-          context: backend-python
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            VERSION=${{ needs.prepare-release.outputs.version }}
-            GIT_COMMIT=${{ github.sha }}
-            BUILD_TIME=${{ github.run_id }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  build-typescript:
-    name: 🟦 构建TypeScript前端
-    runs-on: ubuntu-latest
-    needs: prepare-release
-    if: needs.prepare-release.outputs.has-typescript == 'true'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY_GHCR }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: |
-            ${{ env.REGISTRY_GHCR }}/${{ github.repository }}-frontend
-          tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            type=raw,value=${{ needs.prepare-release.outputs.version }}
-
-      - name: Build and push TypeScript image
-        uses: docker/build-push-action@v5
-        with:
-          context: frontend-ts
+          context: .
+          file: ./console/frontend/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
@@ -423,7 +435,7 @@ jobs:
           
           # 打包源代码 (排除不必要的文件)
           echo "📁 打包源代码..."
-          tar -czf release-artifacts/remote-ci-${VERSION}-source.tar.gz \
+          tar -czf release-artifacts/astron-agent-${VERSION}-source.tar.gz \
             --exclude='.git' \
             --exclude='node_modules' \
             --exclude='target' \
@@ -431,44 +443,44 @@ jobs:
             --exclude='.DS_Store' \
             --exclude='release-artifacts' \
             .
-          
-          # 打包Makefile工具链
-          echo "🛠️ 打包Makefile工具链..."
-          tar -czf release-artifacts/remote-ci-${VERSION}-makefiles.tar.gz \
-            Makefile \
-            makefiles/ \
-            README.md \
-            Makefile-readme.md
-          
+
+          # 打包Docker Compose配置
+          echo "🐳 打包Docker Compose配置..."
+          if [[ -f "docker-compose.yml" ]]; then
+            tar -czf release-artifacts/astron-agent-${VERSION}-docker.tar.gz \
+              docker-compose*.yml \
+              .env.example \
+              README*.md
+          fi
+
           # 生成安装脚本
           echo "📝 生成安装脚本..."
           cat > release-artifacts/install.sh << 'INSTALL_EOF'
           #!/bin/bash
           set -e
-          
+
           VERSION="${{ needs.prepare-release.outputs.version }}"
           REPO="${{ github.repository }}"
-          
-          echo "🚀 安装 Remote CI/CD 工具链 $VERSION"
+
+          echo "🚀 安装 Astron Agent $VERSION"
           echo ""
-          
+
           # 检查必要工具
           command -v git >/dev/null 2>&1 || { echo "❌ Git 未安装"; exit 1; }
-          command -v make >/dev/null 2>&1 || { echo "❌ Make 未安装"; exit 1; }
-          
+          command -v docker >/dev/null 2>&1 || { echo "❌ Docker 未安装"; exit 1; }
+          command -v docker-compose >/dev/null 2>&1 || { echo "❌ Docker Compose 未安装"; exit 1; }
+
           # 下载并解压
-          echo "📥 下载工具链..."
-          curl -L "https://github.com/$REPO/releases/download/$VERSION/remote-ci-$VERSION-makefiles.tar.gz" | tar -xz
-          
+          echo "📥 下载项目..."
+          curl -L "https://github.com/$REPO/releases/download/$VERSION/astron-agent-$VERSION-source.tar.gz" | tar -xz
+
           echo "✅ 安装完成!"
           echo ""
           echo "🎯 快速开始:"
-          echo "  make setup    # 初始化环境"
-          echo "  make status   # 查看项目状态"
-          echo "  make format   # 格式化代码"
-          echo "  make check    # 质量检查"
-          echo "  make test     # 运行测试"
-          echo "  make build    # 构建项目"
+          echo "  docker-compose up -d    # 启动所有服务"
+          echo "  docker-compose ps       # 查看服务状态"
+          echo "  docker-compose logs     # 查看日志"
+          echo "  docker-compose down     # 停止服务"
           INSTALL_EOF
           
           chmod +x release-artifacts/install.sh
@@ -494,12 +506,11 @@ jobs:
   create-release:
     name: 🎉 创建GitHub Release
     runs-on: ubuntu-latest
-    needs: 
+    needs:
       - prepare-release
-      - build-go
-      - build-java
-      - build-python
-      - build-typescript
+      - build-core-services
+      - build-console-hub
+      - build-console-frontend
       - create-artifacts
     if: always() && needs.prepare-release.result == 'success' && needs.create-artifacts.result == 'success'
     steps:
@@ -513,7 +524,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ needs.prepare-release.outputs.version }}
-          name: "Remote CI/CD 工具链 ${{ needs.prepare-release.outputs.version }}"
+          name: "Astron Agent ${{ needs.prepare-release.outputs.version }}"
           body: ${{ needs.prepare-release.outputs.changelog }}
           prerelease: ${{ needs.prepare-release.outputs.is-prerelease }}
           files: |
@@ -522,26 +533,25 @@ jobs:
 
       - name: 发布总结
         run: |
-          echo "=== 🎉 发布总结 ==="
+          echo "=== 🎉 Astron Agent 发布总结 ==="
           echo ""
           echo "🏷️ 版本: ${{ needs.prepare-release.outputs.version }}"
           echo "🔖 预发布: ${{ needs.prepare-release.outputs.is-prerelease }}"
           echo "📦 发布页面: https://github.com/${{ github.repository }}/releases/tag/${{ needs.prepare-release.outputs.version }}"
           echo ""
-          
+
           echo "🐳 Docker镜像构建状态:"
-          echo "  🐹 Go服务: ${{ needs.build-go.result }}"
-          echo "  ☕ Java服务: ${{ needs.build-java.result }}"
-          echo "  🐍 Python服务: ${{ needs.build-python.result }}"
-          echo "  🟦 TypeScript前端: ${{ needs.build-typescript.result }}"
+          echo "  🏗️ Core服务: ${{ needs.build-core-services.result }}"
+          echo "  ☕ Console Hub: ${{ needs.build-console-hub.result }}"
+          echo "  🌐 Console Frontend: ${{ needs.build-console-frontend.result }}"
           echo ""
-          
+
           echo "📦 发布产物:"
           ls -la ./artifacts/
           echo ""
-          
+
           echo "🎯 快速安装:"
           echo "curl -sSL https://github.com/${{ github.repository }}/releases/download/${{ needs.prepare-release.outputs.version }}/install.sh | bash"
           echo ""
-          
-          echo "✅ 🚀 发布完成!"
+
+          echo "✅ 🚀 Astron Agent 发布完成!"

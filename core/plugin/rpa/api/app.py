@@ -24,6 +24,7 @@ class RPAServer:
 
     def start(self) -> None:
         """Start the RPA service."""
+        self.load_polaris()
         self.setup_server()
         self.check_env()
         self.set_config()
@@ -55,7 +56,7 @@ class RPAServer:
         base_url = os.getenv("POLARIS_URL")
         project_name = os.getenv("PROJECT_NAME", "hy-spark-agent-builder")
         cluster_group = os.getenv("POLARIS_CLUSTER", "")
-        service_name = os.getenv("SERVICE_NAME", "rpa-server")
+        service_name = os.getenv("SERVICE_NAME", "rpa")
         version = os.getenv("VERSION", "1.0.0")
         config_file = os.getenv("CONFIG_FILE", "config.env")
         config_filter = ConfigFilter(
