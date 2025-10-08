@@ -10,6 +10,7 @@ export default defineConfig(({ mode }) => {
   const isDev = mode === 'development';
 
   return {
+    envPrefix: ['CONSOLE_', 'VITE_'],
     build: {
       rollupOptions: {
         maxParallelFileOps: 1, // 限制并行文件操作数为1

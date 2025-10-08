@@ -487,6 +487,8 @@ services:
   console-frontend:
     image: ghcr.io/lyj715824/astron-agent/console-frontend:latest
     container_name: astron-agent-console-frontend
+    environment:
+      CONSOLE_API_URL: "${CONSOLE_API_URL:-}"
     ports:
       - "${CONSOLE_FRONTEND_PORT:-1881}:1881"
     networks:

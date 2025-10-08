@@ -4,6 +4,8 @@ interface ImportMetaEnv {
   readonly MODE: string;
   // 可以添加其他自定义环境变量
   readonly VITE_APP_ENV?: string;
+  readonly CONSOLE_API_URL?: string
+  readonly VITE_BASE_URL?: string
 }
 
 interface ImportMeta {
