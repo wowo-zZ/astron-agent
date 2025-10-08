@@ -169,7 +169,7 @@ public class MaasUtil {
     }
 
     public JSONObject synchronizeWorkFlow(UserLangChainInfo userLangChainInfo, BotCreateForm botCreateForm,
-            HttpServletRequest request, Long spaceId) {
+                                          HttpServletRequest request, Long spaceId) {
         AdvancedConfig advancedConfig = new AdvancedConfig(botCreateForm.getPrologue(), botCreateForm.getInputExample(), botCreateForm.getAppBackground());
         JSONObject param = new JSONObject();
         param.put("avatarIcon", botCreateForm.getAvatar());
@@ -359,76 +359,108 @@ public class MaasUtil {
         }
     }
 
+    /**
+     * Create API (without version)
+     *
+     * @param flowId Workflow ID
+     * @param appid  Application ID
+     * @return JSONObject response result
+     */
     public JSONObject createApi(String flowId, String appid) {
+        return createApiInternal(flowId, appid, null, null);
+    }
+
+    public void createApi(String flowId, String appid, String version) {
+        createApiInternal(flowId, appid, version, null);
+    }
+
+    /**
+     * Create API (with version)
+     *
+     * @param flowId  Workflow ID
+     * @param appid   Application ID
+     * @param version Version number
+     * @return JSONObject response result
+     */
+    public JSONObject createApi(String flowId, String appid, String version, JSONObject data) {
+        return createApiInternal(flowId, appid, version, data);
+    }
+
+    /**
+     * Internal generic method for creating API
+     *
+     * @param flowId  Workflow ID
+     * @param appid   Application ID
+     * @param version Version number (can be null)
+     * @return JSONObject response result
+     */
+    private JSONObject createApiInternal(String flowId, String appid, String version, JSONObject data) {
         log.info("----- Publishing mass workflow flowId: {}", flowId);
-        MaasApi maasApi = new MaasApi(flowId, appid);
-        Map<String, String> pubAuth = AuthStringUtil.authMap(publishApi, "POST", consumerKey, consumerSecret, JSONObject.toJSONString(maasApi));
-        // Build request body
-        RequestBody requestBody = RequestBody.create(
-                JSONObject.toJSONString(pubAuth),
-                MediaType.parse("application/json; charset=utf-8"));
-        Request pubRequest = new Request.Builder()
-                .url(publishApi)
-                .post(requestBody)
-                .addHeader("X-Consumer-Username", consumerId)
-                .addHeader("Lang-Code", I18nUtil.getLanguage())
-                .headers(Headers.of(pubAuth))
-                .addHeader(X_AUTH_SOURCE_HEADER, X_AUTH_SOURCE_VALUE)
-                .build();
+        MaasApi maasApi = new MaasApi(flowId, appid, version, data);
 
-        String response;
-        try (Response httpResponse = HTTP_CLIENT.newCall(pubRequest).execute()) {
-            ResponseBody responseBody = httpResponse.body();
-            if (responseBody != null) {
-                response = responseBody.string();
-            } else {
-                log.error("Delete mass workflow request response is empty");
-                return new JSONObject();
-            }
-        } catch (IOException e) {
-            throw new BusinessException(ResponseEnum.CREATE_BOT_FAILED);
-        }
-        log.info("----- Publish maas api response: {}", response);
-        JSONObject res = JSONObject.parseObject(response);
-        if (res.getInteger("code") != 0) {
-            log.info("------ Failed to publish maas api, massId: {},appid: {}, reason: {}", flowId, appid, response);
-            throw new BusinessException(ResponseEnum.CREATE_BOT_FAILED);
-        }
+        // Execute publish request
+        String publishResponse = executeRequest(publishApi, maasApi);
+        validateResponse(publishResponse, "publish", flowId, appid);
 
-        Map<String, String> authMap = AuthStringUtil.authMap(authApi, "POST", consumerKey, consumerSecret, JSONObject.toJSONString(maasApi));
-        // Build request body
-        requestBody = RequestBody.create(
-                JSONObject.toJSONString(authMap),
-                MediaType.parse("application/json; charset=utf-8"));
-        Request authRequest = new Request.Builder()
-                .url(authApi)
-                .post(requestBody)
-                .addHeader("X-Consumer-Username", consumerId)
-                .addHeader("Lang-Code", I18nUtil.getLanguage())
-                .headers(Headers.of(pubAuth))
-                .addHeader(X_AUTH_SOURCE_HEADER, X_AUTH_SOURCE_VALUE)
-                .build();
+        // Execute authentication request
+        String authResponse = executeRequest(authApi, maasApi);
+        validateResponse(authResponse, "bind", flowId, appid);
 
-        String authResponse = "";
-        try (Response httpResponse = HTTP_CLIENT.newCall(authRequest).execute()) {
-            ResponseBody responseBody = httpResponse.body();
-            if (responseBody != null) {
-                authResponse = responseBody.string();
-            } else {
-                log.error("Delete mass workflow request response is empty");
-                return new JSONObject();
-            }
-        } catch (IOException e) {
-            throw new BusinessException(ResponseEnum.CREATE_BOT_FAILED);
-        }
-        log.info("----- Bind maas api response: {}", authResponse);
-        JSONObject authResJson = JSONObject.parseObject(authResponse);
-        if (authResJson.getInteger("code") != 0) {
-            log.info("------ Failed to bind maas api, massId: {},appid: {}, reason: {}", flowId, appid, authResJson);
-            throw new BusinessException(ResponseEnum.CREATE_BOT_FAILED);
-        }
         return new JSONObject();
     }
+
+    /**
+     * Execute HTTP POST request and return response string
+     *
+     * @param url      Request URL
+     * @param bodyData Request body data object
+     * @return String representation of response content
+     */
+    private String executeRequest(String url, MaasApi bodyData) {
+        Map<String, String> authMap = AuthStringUtil.authMap(url, "POST", consumerKey, consumerSecret, JSONObject.toJSONString(bodyData));
+        RequestBody requestBody = RequestBody.create(
+                JSONObject.toJSONString(authMap),
+                MediaType.parse("application/json; charset=utf-8"));
+
+        Request request = new Request.Builder()
+                .url(url)
+                .post(requestBody)
+                .addHeader("X-Consumer-Username", consumerId)
+                .addHeader("Lang-Code", I18nUtil.getLanguage())
+                .headers(Headers.of(authMap))
+                .addHeader(X_AUTH_SOURCE_HEADER, X_AUTH_SOURCE_VALUE)
+                .build();
+
+        try (Response httpResponse = HTTP_CLIENT.newCall(request).execute()) {
+            ResponseBody responseBody = httpResponse.body();
+            if (responseBody != null) {
+                return responseBody.string();
+            } else {
+                log.error("Request to {} returned empty response", url);
+                return "{}"; // Return empty JSON object string to avoid parsing errors
+            }
+        } catch (IOException e) {
+            throw new BusinessException(ResponseEnum.BOT_API_CREATE_ERROR, e);
+        }
+    }
+
+    /**
+     * Validate whether the response is successful
+     *
+     * @param responseStr Response content string representation
+     * @param action      Description of current operation being performed (e.g., "publish", "bind")
+     * @param flowId      Workflow ID
+     * @param appid       Application ID
+     */
+    private void validateResponse(String responseStr, String action, String flowId, String appid) {
+        log.info("----- {} maas api response: {}", action, responseStr);
+        JSONObject res = JSONObject.parseObject(responseStr);
+        if (res.getInteger("code") != 0) {
+            log.error("------ Failed to {} maas api, massId: {}, appid: {}, reason: {}", action, flowId, appid, responseStr);
+            throw new BusinessException(ResponseEnum.BOT_API_CREATE_ERROR);
+        }
+    }
+
 
     public JSONObject copyWorkFlow(Long maasId, String uid) {
         log.info("----- Copying maas workflow id: {}", maasId);
@@ -450,7 +482,7 @@ public class MaasUtil {
                 .addHeader(X_AUTH_SOURCE_HEADER, X_AUTH_SOURCE_VALUE)
                 .get()
                 .build();
-        String responseBody = "";
+        String responseBody;
         try (Response response = client.newCall(httpRequest).execute()) {
             if (!response.isSuccessful()) {
                 throw new IOException("Unexpected code " + response);
