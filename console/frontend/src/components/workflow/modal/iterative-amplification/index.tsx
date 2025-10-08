@@ -129,7 +129,7 @@ const useKeyboardHandlers = ({ lastSelection }): void => {
           );
           message.success('复制成功');
         } catch (err) {
-          console.error('[Clipboard] 复制失败', err);
+          message.error('[Clipboard] 复制失败', err);
         }
       } else if (
         (event.ctrlKey || event.metaKey) &&

@@ -40,7 +40,7 @@ async def create_task(
             response.raise_for_status()
 
             response_data = response.json()
-            print(f"create task response_data:\n {response_data}\n\n")
+            logger.debug(f"create task response_data:\n {response_data}\n\n")
 
             code = response_data.get("code", "-1")
             msg = response_data.get("msg", None)
@@ -97,7 +97,7 @@ async def query_task_status(
             response.raise_for_status()
 
             response_data = response.json()
-            print(f"query task response_data:\n {response_data}\n\n")
+            logger.debug(f"query task response_data:\n {response_data}\n\n")
 
             code = response_data.get("code", "-1")
             msg = response_data.get("msg", None)

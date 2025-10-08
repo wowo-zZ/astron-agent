@@ -62,7 +62,12 @@ const KnowledgeProParameter = (): React.ReactElement => {
     <>
       {knowledgeProParameterModalInfo?.open
         ? createPortal(
-            <div className="mask">
+            <div
+              className="mask"
+              style={{
+                zIndex: 1002,
+              }}
+            >
               <div className="modalContent w-[454px]">
                 <p className="text-second font-medium">
                   {t('workflow.nodes.knowledgeProNode.parameterModal.topK')}

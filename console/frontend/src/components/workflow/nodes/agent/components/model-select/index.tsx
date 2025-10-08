@@ -90,7 +90,7 @@ function index({ id, data }): React.ReactElement {
                       <span className="text-xs">{model.name}</span>
                     </div>
                     <div className="text-sm flex items-center gap-2">
-                      {model?.tag.slice(0, 2).map((item, index) => (
+                      {model?.tag?.slice(0, 2).map((item, index) => (
                         <span
                           key={index}
                           className="rounded text-xss bg-[#ecefff] px-2 max-w-[80px] text-overflow"
@@ -99,11 +99,11 @@ function index({ id, data }): React.ReactElement {
                           {item}
                         </span>
                       ))}
-                      {model?.tag.length > 2 && (
+                      {model?.tag?.length > 2 && (
                         <Tooltip
                           title={
                             <div className="flex flex-wrap">
-                              {model?.tag.map((item, index) => (
+                              {model?.tag?.map((item, index) => (
                                 <span
                                   key={index}
                                   className="rounded text-xss bg-[#ecefff] mb-1 mr-1 px-2 py-1"

@@ -57,9 +57,6 @@ RagFlow 是一个开源的RAG（检索增强生成）引擎，使用深度文档
 # 进入 RagFlow 目录
 cd docker/ragflow
 
-# 复制环境变量配置（如果存在）
-cp .env.example .env
-
 # 启动 RagFlow 服务（包含所有依赖）
 docker-compose up -d
 
@@ -83,7 +80,7 @@ docker-compose logs -f ragflow
 - MinIO控制台：http://localhost:9001
 
 **重要配置说明：**
-- 默认使用 Elasticsearch，如需使用 OpenSearch，请修改 docker-compose.yml 中的 profiles 配置
+- 默认使用 Elasticsearch，如需使用 opensearch、infinity，请修改 .env 中的 DOC_ENGINE 配置
 - 支持GPU加速，使用 `docker-compose-gpu.yml` 启动
 
 ### 第三步：配置 astronAgent 核心服务

@@ -66,7 +66,7 @@ export default defineConfig(({ mode }) => {
           // target: 'http://10.1.203.40:8080', // 彭颖
           // target: 'http://10.1.200.151:8080', // 超睿
           target: 'http://172.29.202.54:8080', // 联调服务器地址
-          // target: 'http://172.29.201.92:8080', // 测试服务器地址
+          //  target: 'http://172.29.201.92:8080', // 测试服务器地址
           changeOrigin: true,
           headers: {
             Connection: 'keep-alive',

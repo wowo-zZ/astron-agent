@@ -472,6 +472,8 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+        with:
+          install: true
 
       - name: Login to GitHub Container Registry
         if: needs.detect-and-prepare.outputs.should-push == 'true'
@@ -503,8 +505,8 @@ jobs:
             VERSION=${{ needs.detect-and-prepare.outputs.version }}
             GIT_COMMIT=${{ github.sha }}
             BUILD_TIME=${{ github.run_id }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=console-frontend
+          cache-to: type=gha,mode=max,scope=console-frontend
 
   build-console-hub:
     name: 🎯 Build Console Hub
@@ -514,11 +516,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # 添加Maven依赖缓存 - 仅用于console-hub
+      - name: Cache Maven dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-hub-${{ hashFiles('console/backend/hub/pom.xml', 'console/backend/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-hub-
+            ${{ runner.os }}-maven-
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: |
+            network=host
+            image=moby/buildkit:master
 
       - name: Login to GitHub Container Registry
         if: needs.detect-and-prepare.outputs.should-push == 'true'
@@ -550,9 +566,15 @@ jobs:
             VERSION=${{ needs.detect-and-prepare.outputs.version }}
             GIT_COMMIT=${{ github.sha }}
             BUILD_TIME=${{ github.run_id }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
+          cache-from: |
+            type=gha,scope=console-hub
+            type=gha,scope=console-hub-build
+            type=registry,ref=${{ env.REGISTRY_GHCR }}/${{ github.repository }}/console-hub:buildcache
+          cache-to: |
+            type=gha,scope=console-hub,mode=max
+            type=registry,ref=${{ env.REGISTRY_GHCR }}/${{ github.repository }}/console-hub:buildcache,mode=max
+          provenance: false
+          sbom: false
 
   # ============================================================================
   # Stage 3: Summary and Notifications

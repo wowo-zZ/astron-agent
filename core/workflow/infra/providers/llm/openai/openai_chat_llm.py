@@ -58,7 +58,7 @@ class OpenAIChatAI(ChatAI):
         :raises CustomException: If the URL is empty or invalid
         """
         model_url = self.model_url.rsplit("/", 2)[0]
-        if model_url:
+        if not model_url:
             raise CustomException(
                 err_code=CodeEnum.OPEN_AI_REQUEST_ERROR,
                 err_msg="Request URL is empty",

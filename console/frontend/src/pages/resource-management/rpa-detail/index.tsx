@@ -1,4 +1,4 @@
-import { memo, useRef, useState } from 'react';
+import { memo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import back from '@/assets/imgs/common/back.png';
 import { useNavigate } from 'react-router-dom';
@@ -20,6 +20,22 @@ export const RpaDetail = () => {
     {
       title: t('rpa.robotName'),
       dataIndex: 'name',
+      width: 200,
+      ellipsis: true,
+      render: (_, record) => {
+        return (
+          <div className="flex items-center">
+            <img
+              src={record.icon}
+              className="w-[28px] h-[28px] rounded-lg"
+              alt=""
+            />
+            <div className="flex-1 pl-[6px] truncate max-w-[166px]">
+              {record.name}
+            </div>
+          </div>
+        );
+      },
     },
     {
       title: t('rpa.description'),
@@ -52,7 +68,11 @@ export const RpaDetail = () => {
         <div className="flex flex-col mx-6 flex-1  my-[24px] bg-[#fff] rounded-2xl px-[24px] py-[24px]">
           <div className="w-full flex justify-between items-center">
             <div className="flex">
-              <img className="w-[62px] h-[62px]" src="" alt="rpa" />
+              <img
+                className="w-[62px] h-[62px]"
+                src={rpaDetail?.icon}
+                alt="rpa"
+              />
               <div className="pl-[24px]">
                 <div className="text-2xl font-medium">
                   {rpaDetail?.assistantName}
@@ -64,7 +84,7 @@ export const RpaDetail = () => {
             </div>
             <div className="text-sm text-[#7F7F7F] pb-[16px]">
               {t('rpa.updateTime')}
-              {dayjs(rpaDetail?.createTime).format('YYYY-MM-DD HH:mm:ss')}
+              {dayjs(rpaDetail?.updateTime).format('YYYY-MM-DD HH:mm:ss')}
             </div>
           </div>
           <div className="w-full text-[#7F7F7F]  pt-[12px] ">

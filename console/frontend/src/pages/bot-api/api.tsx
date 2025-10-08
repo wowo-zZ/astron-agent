@@ -1,83 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Form, message, Modal, Input } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-// import config from '@/config';
 import {
   getApiList,
   getApiInfo,
   getApiUsage,
   createApi,
-  getApiHistory,
-  getOrderList,
-  getHasEditor,
+  createApp,
 } from '@/services/spark-common';
 import { Select } from 'antd';
-
-import backIcon from '@/assets/imgs/bot-center/back_createbot.svg';
-
+import backIcon from '@/assets/svgs/back-create-bot.svg';
 import styles from './api.module.scss';
 
-// 获取过去七天的日期，返回数组，格式为：2023-09-01
-const getSevenDay = () => {
-  const date = new Date();
-  const arr: any[] = [];
-  for (let i = 0; i < 7; i++) {
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate() - i;
-    arr.push(`${year}-${month}-${day}`);
-  }
-  return arr.reverse();
-};
-const OptionsDefault = {
-  tooltip: {
-    show: true,
-  },
-  grid: {
-    top: 30,
-    bottom: 30,
-    left: 50,
-    right: 40,
-  },
-  xAxis: {
-    boundaryGap: false,
-    data: getSevenDay(),
-    type: 'category',
-    axisLine: {
-      show: false,
-    },
-    axisTick: {
-      show: false,
-    },
-  },
-  yAxis: {
-    type: 'value',
-    splitLine: {
-      lineStyle: {
-        type: 'dashed',
-      },
-    },
-  },
-  series: [
-    {
-      type: 'line',
-      smooth: true,
-      data: [0, 0, 0, 0, 0, 0, 0],
-      lineStyle: {
-        color: '#405DF9',
-      },
-      areaStyle: {
-        color: '#405DF9',
-        opacity: 0.25,
-      },
-      itemStyle: {
-        color: '#405DF9',
-      },
-    },
-  ],
-};
 const Divider = () => {
   return (
     <div className={styles.divider}>
@@ -88,133 +24,71 @@ const Divider = () => {
   );
 };
 
-export default function BotApi({ isOpenapi = false }: { isOpenapi?: any }) {
+export default function BotApi({
+  _isOpenapi = false,
+}: {
+  _isOpenapi?: boolean;
+}) {
   const { t } = useTranslation();
   const [createAppForm] = Form.useForm(); //创建应用表单
+  const navigate = useNavigate();
   // 新增状态，标记是否已经获取过 API 列表
   const [hasFetchedApiList, setHasFetchedApiList] = useState<boolean>(false);
   const [searchParams] = useSearchParams();
   const [botId, setBotId]: any = useState('');
-  // const [version, setVersion]:any = useState('');
-  const navigate = useNavigate();
-  const [apiList, setApiList] = useState<any[]>([]);
-  const [apiId, setApiId] = useState<any>(''); //appid
+  const [appList, setAppList] = useState<any[]>([]);
+  const [appId, setAppId] = useState<any>(''); //appId
   const [apiInfo, setApiInfo] = useState<any>(null);
   const [apiUsage, setApiUsage] = useState<any>({});
-  const [newsOption, setNewsOption] = useState<any>(OptionsDefault);
-  const [apiHistoryType, setApiHistoryType] = useState<number>(1);
   const [freshCount, setFreshCount] = useState<number>(0); // 刷新页面数据
   const [loading, setLoading] = useState(false);
-  const [listModalOpen, setListModalOpen] = useState(false);
-  const [listModalData, setListModalData] = useState<any[]>([]); //订单列表
-  const [publishBindId, setPublishBindId] = useState<any>(); // 发布绑定id
-  const [publishBindIdLoading, setPublishBindIdLoading] = useState(false);
-  const [SkipBindLoading, setSkipBindLoading] = useState(false);
-  const [selectError, setSelectError] = useState(false); // Select 错误状态
-  const [isShowCeateAppModal, setIsShowCeateAppModal] =
+  const [isShowCreateAppModal, setIsShowCreateAppModal] =
     useState<boolean>(false); // 是否显示创建应用弹框
   const [docUrl, setDocUrl] = useState<string>(); // 文档地址
 
-  const createApiFn = async (publishBindId?: any, appId?: any) => {
+  const createApiFn = async (publishBindId?: any, appIdParam?: any) => {
     try {
-      await createApi({ botId, appId: appId || apiId, publishBindId });
+      await createApi({ botId, appId: appIdParam || appId, publishBindId });
       setFreshCount(freshCount + 1);
       message.success('绑定成功');
-      setListModalOpen(false);
-      setPublishBindId(null);
-      setSelectError(false); // 重置错误状态
     } catch (e: any) {
       message.error(e?.msg);
-      setPublishBindIdLoading(false);
-      setSkipBindLoading(false);
-    } finally {
-      setPublishBindIdLoading(false);
-      setSkipBindLoading(false);
-    }
-  };
-  const handleSkipBind = async () => {
-    setSkipBindLoading(true);
-    createApiFn();
-  };
-  const operateApi = async (appId?: any) => {
-    try {
-      setLoading(true);
-      const res = await getOrderList();
-      const data = res.map((item: any) => {
-        return {
-          value: item.id,
-          label: item.name || item.appId,
-        };
-      });
-      if (data.length > 0 && searchParams.get('version') !== '1') {
-        setListModalData(data);
-        setListModalOpen(true);
-      } else {
-        createApiFn(null, appId);
-      }
-    } catch (error: any) {
-      message.error(error?.msg);
-      setLoading(false);
     } finally {
       setLoading(false);
     }
   };
-
   //更新 or 绑定
-  const handleBandApi = async () => {
-    if (!apiId) return message.warning('请先绑定您的应用');
-    //获取是否有未绑定的套餐
-    operateApi(apiId);
-  };
-  //确认绑定
-  const handleConfirmBandApi = async () => {
-    if (!publishBindId) {
-      setSelectError(true); // 设置错误状态
+  const handleBindApi = () => {
+    if (!appId) {
+      message.warning('请先绑定您的应用');
       return;
     }
-    setSelectError(false); // 清除错误状态
-    setPublishBindIdLoading(true);
-    createApiFn(publishBindId);
+    createApiFn(null, appId);
   };
 
-  //取消
-  const handleCancel = () => {
-    setListModalOpen(false);
-    setLoading(false);
-    setPublishBindId(null);
-    setSelectError(false); // 重置错误状态
-  };
-  const updateApiFn = async (botId: any, appId: any) => {
-    setApiId(appId);
+  /**
+   * update api info
+   * @param botId botId
+   * @param appId appId
+   */
+  const updateApiInfo = async (botId: any, appId: any) => {
+    setAppId(appId);
     setBotId(botId);
-    operateApi(appId);
+    createApiFn(null, appId);
   };
-  const getApiHistoryFn = async (botId: any, type: number) => {
-    const res = await getApiHistory(botId, type);
-    if (res?.x?.length === 0) setNewsOption(OptionsDefault);
-    else
-      setNewsOption((pre: any) => {
-        return {
-          ...pre,
-          xAxis: {
-            ...pre.xAxis,
-            data: res?.x || [],
-          },
-          series: [
-            {
-              ...pre.series[0],
-              data: res?.y || [],
-            },
-          ],
-        };
-      });
-  };
-  const getApiUsageFn = async (id: any) => {
+  /**
+   * load api usage data
+   * @param id botId
+   */
+  const loadApiUsageData = async (id: any) => {
     const res = await getApiUsage(id);
     setApiUsage(res);
   };
 
-  const getApiListFn = async () => {
+  /**
+   * load list of app
+   */
+  const loadAppList = async () => {
     const res = await getApiList();
     const data = res.map((item: any) => {
       return {
@@ -222,14 +96,32 @@ export default function BotApi({ isOpenapi = false }: { isOpenapi?: any }) {
         label: item.appName || item.appId,
       };
     });
-    setApiList(data);
+    setAppList(data);
   };
-  const getAPiInfoFn = async (id: any) => {
+
+  /**
+   * load api info
+   * @param id botId
+   */
+  const loadAPiInfo = async (id: any) => {
     const res = await getApiInfo(id);
     setApiInfo(res);
   };
-  // 是否认证
-  useEffect(() => {}, []);
+
+  const handleSubmitCreateApp = () => {
+    createAppForm.validateFields().then(values => {
+      createApp(values)
+        .then(() => {
+          message.success('创建应用成功');
+          setIsShowCreateAppModal(false);
+          createAppForm.resetFields();
+          loadAppList();
+        })
+        .catch(err => {
+          message.error(err?.message || '创建应用失败');
+        });
+    });
+  };
 
   useEffect(() => {
     if (searchParams.get('id')) {
@@ -245,19 +137,14 @@ export default function BotApi({ isOpenapi = false }: { isOpenapi?: any }) {
   }, [searchParams]);
 
   useEffect(() => {
-    if (apiList?.length) {
-      getAPiInfoFn(botId);
-      getApiUsageFn(botId);
+    if (appList?.length) {
+      loadAPiInfo(botId);
+      loadApiUsageData(botId);
     } else if (!hasFetchedApiList) {
-      getApiListFn();
+      loadAppList();
       setHasFetchedApiList(true);
     }
-  }, [apiList, freshCount, hasFetchedApiList]);
-  useEffect(() => {
-    if (apiInfo) {
-      getApiHistoryFn(botId, apiHistoryType);
-    }
-  }, [apiInfo, apiHistoryType, freshCount]);
+  }, [appList, freshCount, hasFetchedApiList]);
 
   return (
     <section className={styles.api_swap}>
@@ -267,7 +154,6 @@ export default function BotApi({ isOpenapi = false }: { isOpenapi?: any }) {
             src={backIcon}
             alt=""
             style={{ marginRight: '10px', cursor: 'pointer' }}
-            // onClick={() => navigate('/botcenter/createbot', { replace: true })}
             onClick={() => navigate(-1)}
           />
           <span className={styles.api_header_title}>{t('botApi.botApi')}</span>
@@ -276,30 +162,6 @@ export default function BotApi({ isOpenapi = false }: { isOpenapi?: any }) {
           </span>
         </div>
         <div className={styles.api_step}>
-          {/* <div className={styles.step}>
-            <img
-              src="https://aixfyun-cn-bj.xfyun.cn/bbs/75713.75546409925/cir.svg"
-              alt=""
-              className={styles.step_index}
-            />
-            <div className={styles.step_detail}>
-              <span className={styles.title}>{t('botApi.botApiCert')}</span>
-              <span className={styles.subtitle}>
-                {t('botApi.botApiCertDesc')}
-              </span>
-              <span
-                className={styles.fun}
-                onClick={() => {
-                  window.open('https://console.xfyun.cn/user/authentication');
-                }}
-              >
-                {isApiCertInfo
-                  ? t('botApi.botApiCertSuccess')
-                  : t('botApi.botApiCertBtn')}
-              </span>
-            </div>
-          </div>
-          <Divider /> */}
           <div className={styles.step}>
             <img
               src="https://aixfyun-cn-bj.xfyun.cn/bbs/75713.75546409925/cir.svg"
@@ -312,8 +174,7 @@ export default function BotApi({ isOpenapi = false }: { isOpenapi?: any }) {
               <span
                 className={styles.fun}
                 onClick={() => {
-                  //TODO:打开创建弹框
-                  setIsShowCeateAppModal(true);
+                  setIsShowCreateAppModal(true);
                 }}
               >
                 {t('botApi.createApi')} {' >'}
@@ -394,7 +255,7 @@ export default function BotApi({ isOpenapi = false }: { isOpenapi?: any }) {
                           lineHeight: '30px',
                           fontSize: '12px',
                         }}
-                        onClick={() => updateApiFn(botId, apiInfo.appId)}
+                        onClick={() => updateApiInfo(botId, apiInfo.appId)}
                       >
                         {t('botApi.updateBind')}
                       </Button>
@@ -408,9 +269,9 @@ export default function BotApi({ isOpenapi = false }: { isOpenapi?: any }) {
                       style={{ width: 192 }}
                       placeholder={t('botApi.selectApp')}
                       onChange={e => {
-                        setApiId(e);
+                        setAppId(e);
                       }}
-                      options={apiList}
+                      options={appList}
                       filterOption={(input, option) =>
                         (option?.label ?? '').includes(input)
                       }
@@ -432,7 +293,7 @@ export default function BotApi({ isOpenapi = false }: { isOpenapi?: any }) {
                         lineHeight: '30px',
                         fontSize: '12px',
                       }}
-                      onClick={() => handleBandApi()}
+                      onClick={() => handleBindApi()}
                     >
                       {t('botApi.bindAppBtn')}
                     </Button>
@@ -508,8 +369,8 @@ export default function BotApi({ isOpenapi = false }: { isOpenapi?: any }) {
                   className={styles.data_img}
                 />
                 <div className={styles.data_used_num}>
-                  {'_ _'}
-                  {/* {apiInfo ? apiUsage?.usedCount : '_ _'} */}
+                  {/* {'_ _'} */}
+                  {apiInfo ? apiUsage?.usedCount : '_ _'}
                 </div>
                 <div className={styles.data_title}>
                   {t('botApi.todayUsedTokenNum')}
@@ -523,8 +384,8 @@ export default function BotApi({ isOpenapi = false }: { isOpenapi?: any }) {
                   className={styles.data_img}
                 />
                 <div className={styles.data_used_num}>
-                  {'_ _'}
-                  {/* {apiInfo ? apiUsage?.left : '_ _'} */}
+                  {/* {'_ _'} */}
+                  {apiInfo ? apiUsage?.left : '_ _'}
                 </div>
                 <div className={styles.data_title}>
                   {t('botApi.remainTokenNum')}
@@ -538,8 +399,8 @@ export default function BotApi({ isOpenapi = false }: { isOpenapi?: any }) {
                   className={styles.data_img}
                 />
                 <div className={styles.data_used_num}>
-                  {'_ _'}
-                  {/* {apiInfo ? apiUsage?.conc : '_ _'} */}
+                  {/* {'_ _'} */}
+                  {apiInfo ? apiUsage?.conc : '_ _'}
                 </div>
                 <div className={styles.data_title}>QPS</div>
               </div>
@@ -549,87 +410,30 @@ export default function BotApi({ isOpenapi = false }: { isOpenapi?: any }) {
                 {t('botApi.warmTips')}
               </div>
               <ul className={styles.statistic_tips_lists}>
-                {/* <li>
-                  每个智能体API有1000万token的调用量，如需更多调用量或扩容QPS，请
-                  <img
-                    src="https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16914170178415047%2F1.png"
-                    alt=""
-                  />
-                  <span>购买增量套餐包</span>{' '}
-                  <span
-                    onClick={() => {
-                      window.open(
-                        'https://console.xfyun.cn/workorder/commit?category=6f96f0b975df464d87bdf1529848b779&tid=7f5fd4f0d0884f8398f73a7fd9fb1b48&title=%E6%98%9F%E7%81%AB%E5%8A%A9%E6%89%8BAPI-%E5%90%88%E4%BD%9C%E5%92%A8%E8%AF%A2&categoryName=%E6%98%9F%E7%81%AB%E5%8A%A9%E6%89%8BAPI&tname=%E5%90%88%E4%BD%9C%E5%92%A8%E8%AF%A2&id=Spark'
-                      );
-                    }}
-                  >
-                    点击填写工单
-                  </span>
-                </li> */}
                 <li>{t('botApi.apiKeyWarn')}</li>
               </ul>
             </div>
           </div>
         </div>
-        <Modal
-          open={listModalOpen}
-          onCancel={() => {
-            handleCancel();
-          }}
-          title={t('botApi.modal.title')}
-          width={500}
-          centered
-          footer={
-            <>
-              <Button
-                onClick={() => handleSkipBind()}
-                color="default"
-                disabled={publishBindIdLoading}
-                loading={SkipBindLoading}
-              >
-                {t('botApi.modal.skip')}
-              </Button>
-              <Button
-                type="primary"
-                onClick={() => handleConfirmBandApi()}
-                disabled={publishBindIdLoading}
-                loading={publishBindIdLoading}
-              >
-                {t('botApi.modal.confirm')}
-              </Button>
-            </>
-          }
-        >
-          <div className={styles.modal_tips}>{t('botApi.modal.tips')}</div>
-          <Select
-            options={listModalData}
-            style={{
-              width: '100%',
-              marginBottom: 12,
-            }}
-            className={selectError ? 'my-select-error' : ''}
-            onChange={e => {
-              setPublishBindId(e);
-              setSelectError(false); // 选择后清除错误状态
-            }}
-            value={publishBindId}
-            placeholder={t('botApi.modal.selectOrder')}
-            status={selectError ? 'error' : undefined}
-          ></Select>
-        </Modal>
       </section>
       <Modal
-        open={isShowCeateAppModal}
-        onCancel={() => setIsShowCeateAppModal(false)}
+        open={isShowCreateAppModal}
+        onCancel={() => setIsShowCreateAppModal(false)}
         title={t('botApi.createApp')}
         width={500}
         centered
         closable={false}
         footer={[
-          <Button onClick={() => setIsShowCeateAppModal(false)}>
+          <Button onClick={() => setIsShowCreateAppModal(false)}>
             {t('btnCancel')}
           </Button>,
-          <Button type="primary" loading={loading} onClick={() => {}}>
+          <Button
+            type="primary"
+            loading={loading}
+            onClick={() => {
+              handleSubmitCreateApp();
+            }}
+          >
             {t('btnOk')}
           </Button>,
         ]}
@@ -639,14 +443,11 @@ export default function BotApi({ isOpenapi = false }: { isOpenapi?: any }) {
             form={createAppForm}
             name="promptForm"
             initialValues={{ remember: true }}
-            // onFinish={handleFormFinish}
-            // onFinishFailed={onFinishFailed}
-            // onValuesChange={handleFormValuesChange} // 监听表单值变化
             autoComplete="off"
           >
             <Form.Item
               label={t('botApi.createAppName')}
-              name="name"
+              name="appName"
               rules={[
                 { required: true, message: t('botApi.createAppNameRequired') },
               ]}
@@ -658,7 +459,7 @@ export default function BotApi({ isOpenapi = false }: { isOpenapi?: any }) {
             </Form.Item>
             <Form.Item
               label={t('botApi.createAppDesc')}
-              name="desc"
+              name="appDescribe"
               rules={[
                 { required: true, message: t('botApi.createAppDescRequired') },
               ]}

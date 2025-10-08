@@ -14,7 +14,6 @@ function DeleteModal({
     setLoading(true);
     deleteTool(currentTool.id)
       .then(data => {
-        console.log(data);
         setDeleteModal(false);
         getPersonTools();
       })

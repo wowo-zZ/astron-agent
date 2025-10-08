@@ -74,10 +74,8 @@ const WorkflowNodeOptions: React.FC<WorkflowNodeOptionsProps> = ({
               key={option?.id}
               className={clsx(
                 // 基础样式
-                'max-w-sm w-full min-w-48 h-auto rounded-lg border',
-                'leading-10 px-3 font-sans text-sm text-gray-800 font-normal',
-                'overflow-hidden text-ellipsis whitespace-nowrap mb-2',
-                'transition-all duration-200 ease-in-out',
+                'max-w-sm w-full min-w-48 h-auto rounded-lg border leading-10 px-3 mb-2',
+                'font-sans text-sm text-gray-800 font-normal',
                 {
                   'border-blue-200 bg-blue-50': isSelected,
                   'border-blue-100': !isSelected,
@@ -87,7 +85,6 @@ const WorkflowNodeOptions: React.FC<WorkflowNodeOptionsProps> = ({
                   'cursor-not-allowed': !isOptionClickable,
                 }
               )}
-              title={option?.text}
               onClick={() => {
                 if (isOptionClickable && message?.id) {
                   onOptionClick(option, message.id);

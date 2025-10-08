@@ -1,13 +1,10 @@
 SELECT 'astron_console DATABASE initialization started' AS '';
-CREATE
-DATABASE IF NOT EXISTS astron_console;
+CREATE DATABASE IF NOT EXISTS astron_console;
 
-USE
-astron_console;
+USE astron_console;
 
 SET NAMES utf8mb4;
-SET
-FOREIGN_KEY_CHECKS = 0;
+SET FOREIGN_KEY_CHECKS = 0;
 
 -- ----------------------------
 -- Table structure for agent_apply_record
@@ -846,6 +843,8 @@ INSERT INTO `agent_space_permission` (`id`, `module`, `point`, `description`, `p
                                       `member`, `available_expired`, `create_time`, `update_time`)
 VALUES (281, 'Agent Details', '', '', 'ChatBotController_botDetail_POST', 1, 1, 1, 0, '2025-01-01 00:00:00',
         '2025-01-01 00:00:00');
+INSERT INTO `astron_console`.`agent_space_permission` (`id`, `module`, `point`, `description`, `permission_key`, `owner`, `admin`, `member`, `available_expired`, `create_time`, `update_time`) VALUES (282, '创建工作流智能体', NULL, NULL, 'BotCreateController_create_POST', 1, 1, 1, 0, '2025-01-01 00:00:00', '2025-01-01 00:00:00');
+INSERT INTO `astron_console`.`agent_space_permission` (`id`, `module`, `point`, `description`, `permission_key`, `owner`, `admin`, `member`, `available_expired`, `create_time`, `update_time`) VALUES (283, '更新工作流智能体', NULL, NULL, 'BotCreateController_update_POST', 1, 1, 1, 0, '2025-01-01 00:00:00', '2025-01-01 00:00:00');
 COMMIT;
 
 -- ----------------------------
@@ -3884,6 +3883,7 @@ CREATE TABLE `user_info`
     `nickname`       varchar(255)                                                  DEFAULT NULL COMMENT 'User nickname',
     `mobile`         varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT 'Mobile number',
     `account_status` tinyint                                                       DEFAULT '0' COMMENT 'Activation status: 0 inactive, 1 active, 2 frozen',
+    `enterprise_service_type` int                                                  DEFAULT '0' COMMENT 'Enterprise service type: 0 none, 1 team, 2 enterprise',
     `user_agreement` tinyint                                                       DEFAULT '0' COMMENT 'Whether agreed to user agreement: 0 not agreed, 1 agreed',
     `deleted`        tinyint                                                       DEFAULT '0' COMMENT 'Logical deletion flag: 0 not deleted, 1 deleted',
     `create_time`    datetime                                                      DEFAULT CURRENT_TIMESTAMP COMMENT 'Creation time',
@@ -4206,7 +4206,6 @@ DROP TABLE IF EXISTS `xingchen_official_prompt`;
 CREATE TABLE `xingchen_official_prompt`
 (
     `id`             bigint       NOT NULL AUTO_INCREMENT COMMENT 'Primary key ID',
-    `mongodb_id`     varchar(50)  NOT NULL COMMENT 'MongoDB original _id',
     `name`           varchar(255) NOT NULL COMMENT 'Prompt name',
     `prompt_key`     varchar(255) NOT NULL COMMENT 'Prompt unique identifier key',
     `uid`            varchar(128) NOT NULL DEFAULT '0' COMMENT 'User ID',
@@ -4221,7 +4220,6 @@ CREATE TABLE `xingchen_official_prompt`
     `create_time`    datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Creation time',
     `update_time`    datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_mongodb_id` (`mongodb_id`),
     UNIQUE KEY `uk_prompt_key` (`prompt_key`),
     KEY              `idx_uid` (`uid`),
     KEY              `idx_type` (`type`),
@@ -4236,7 +4234,6 @@ DROP TABLE IF EXISTS `xingchen_prompt_manage`;
 CREATE TABLE `xingchen_prompt_manage`
 (
     `id`              bigint       NOT NULL AUTO_INCREMENT COMMENT 'Primary key ID',
-    `mongodb_id`      varchar(50)  NOT NULL COMMENT 'MongoDB original _id',
     `name`            varchar(500) NOT NULL COMMENT 'Prompt name',
     `prompt_key`      varchar(255) NOT NULL COMMENT 'Prompt unique identifier key',
     `uid`             varchar(128) NOT NULL COMMENT 'User ID',
@@ -4252,7 +4249,6 @@ CREATE TABLE `xingchen_prompt_manage`
     `create_time`     datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Creation time',
     `update_time`     datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_mongodb_id` (`mongodb_id`),
     UNIQUE KEY `uk_prompt_key_uid` (`prompt_key`,`uid`),
     KEY               `idx_uid` (`uid`),
     KEY               `idx_type` (`type`),
@@ -4268,7 +4264,6 @@ DROP TABLE IF EXISTS `xingchen_prompt_version`;
 CREATE TABLE `xingchen_prompt_version`
 (
     `id`           bigint       NOT NULL AUTO_INCREMENT COMMENT 'Primary key ID',
-    `mongodb_id`   varchar(50)  NOT NULL COMMENT 'MongoDB original _id',
     `prompt_id`    varchar(50)  NOT NULL COMMENT 'Associated Prompt ID',
     `uid`          varchar(128) NOT NULL COMMENT 'User ID',
     `version`      varchar(50)  NOT NULL COMMENT 'Version number',
@@ -4282,7 +4277,6 @@ CREATE TABLE `xingchen_prompt_version`
     `create_time`  datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Creation time',
     `update_time`  datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_mongodb_id` (`mongodb_id`),
     KEY            `idx_prompt_id` (`prompt_id`),
     KEY            `idx_uid` (`uid`),
     KEY            `idx_version` (`version`),
@@ -4338,3 +4332,129 @@ SET
 FOREIGN_KEY_CHECKS = 1;
 
 SELECT 'astron_console DATABASE initialization completed' AS '';
+
+ALTER TABLE astron_console.rpa_user_assistant ADD user_name varchar(100) NULL COMMENT '用户名';
+
+ALTER TABLE astron_console.rpa_info ADD `path` varchar(100) NULL COMMENT '平台官网地址';
+
+INSERT INTO prompt_template_en (id,uid,name,description,deleted,prompt,created_time,updated_time,node_category,adaptation_model,max_loop_count) VALUES
+	 (3,-1,'Commemorative card content creation','You are a birthday commemorative card content creation assistant capable of generating background images based on the user''s input name.',0,'{
+  "characterSettings": "You are a birthday commemorative card content creation assistant capable of generating personalized birthday card content based on the user''s input name and the generated background image in the following format.\\n\\nFormat:\\nTitle: ''Happy Birthday'' or ''Happy Birthday!'' (optionally with the birthday person''s name, e.g., ''[Name]:'')\\nCover Image: ![example_text](https://example.com/example.png)\\nBlessing: Generated blessing message content.",
+  "thinkStep": "You are a birthday commemorative card content creation assistant capable of generating background images based on the user''s input name.",
+  "userQuery": "{{to_name}}"
+}','2025-07-07 17:36:41','2025-07-23 15:54:35',1,'{"name": "deepseek_v3_moe","serviceId": "xdeepseekv3","serverId": "lmbXtIcNp","domain": "xdeepseekv3","patchId": "0","type": 1,"source": 2,"url": "wss://maas-api.cn-huabei-1.xf-yun.com/v1.1/chat","appId": null,"licChannel": null,"llmSource": 1,"llmId": 216,"status": 1,"info": "{\\"conc\\":2,\\"domain\\":\\"generalv3.5\\",\\"expireTs\\":\\"2025-05-31\\",\\"qps\\":2,\\"tokensPreDay\\":1000,\\"tokensTotal\\":1000,\\"llmServiceId\\":\\"bm3.5\\"}","icon": "https://oss-beijing-m8.openstorage.cn/aicloud/llm/logo/03ee07dc3b7a16136ec925ca4ed0278e.png","color": null,"desc": "DeepSeek-V3，深度求索公司发布的AI大模型"}',1),
+	 (5,-1,'Podcast Creation Assistant','You are a podcast assistant capable of generating hyper-realistic synthesized voice audio based on the story text provided by the user.',0,'{
+  "characterSettings": "You are a podcast assistant. You need to present audio data in the following format:\\n\\nFormat:\\n## Title\\n\\nMP3 HTML player\\n\\nStory content",
+  "thinkStep": "You are a podcast assistant capable of generating hyper-realistic synthesized voice audio based on the story text provided by the user.",
+  "userQuery": "{{story}}"
+}','2025-07-07 17:36:41','2025-07-23 15:55:10',1,'{"name": "deepseek_v3_moe","serviceId": "xdeepseekv3","serverId": "lmbXtIcNp","domain": "xdeepseekv3","patchId": "0","type": 1,"source": 2,"url": "wss://maas-api.cn-huabei-1.xf-yun.com/v1.1/chat","appId": null,"licChannel": null,"llmSource": 1,"llmId": 216,"status": 1,"info": "{\\"conc\\":2,\\"domain\\":\\"generalv3.5\\",\\"expireTs\\":\\"2025-05-31\\",\\"qps\\":2,\\"tokensPreDay\\":1000,\\"tokensTotal\\":1000,\\"llmServiceId\\":\\"bm3.5\\"}","icon": "https://oss-beijing-m8.openstorage.cn/aicloud/llm/logo/03ee07dc3b7a16136ec925ca4ed0278e.png","color": null,"desc": "DeepSeek-V3，深度求索公司发布的AI大模型"}',1),
+	 (7,-1,'Defect Analysis','You are a line chart drawing expert. Based on the input JSON list of issues, you need to generate a line chart showing the trend of online issue closures.',0,'{
+  "characterSettings": "",
+  "thinkStep": "You are a line chart drawing expert. Based on the input JSON list of issues, you need to generate a line chart showing the trend of online issue closures. The chart should cover the period from the current date to six days prior, including the following daily metrics: total number of online issues (cumulative up to the day), number of closed issues (cumulative up to the day), number of unresolved issues (total issues up to the day minus closed issues up to the day), and number of pending fix issues (cumulative pending fix issues up to the day).",
+  "userQuery": "{{data_json}}"
+}','2025-07-07 17:36:41','2025-07-23 15:55:46',1,'{"name": "deepseek_v3_moe","serviceId": "xdeepseekv3","serverId": "lmbXtIcNp","domain": "xdeepseekv3","patchId": "0","type": 1,"source": 2,"url": "wss://maas-api.cn-huabei-1.xf-yun.com/v1.1/chat","appId": null,"licChannel": null,"llmSource": 1,"llmId": 216,"status": 1,"info": "{\\"conc\\":2,\\"domain\\":\\"generalv3.5\\",\\"expireTs\\":\\"2025-05-31\\",\\"qps\\":2,\\"tokensPreDay\\":1000,\\"tokensTotal\\":1000,\\"llmServiceId\\":\\"bm3.5\\"}","icon": "https://oss-beijing-m8.openstorage.cn/aicloud/llm/logo/03ee07dc3b7a16136ec925ca4ed0278e.png","color": null,"desc": "DeepSeek-V3，深度求索公司发布的AI大模型"}',1);
+
+INSERT INTO prompt_template (id,uid,name,description,deleted,prompt,created_time,updated_time,node_category,adaptation_model,max_loop_count) VALUES
+	 (13,-1,'纪念卡素材创作','你是一个生日纪念卡素材创作生成助手，能够基于用户输入的姓名生成背景图片。',0,'{"characterSettings": "你是一个生日纪念卡素材创作生成助手，能够基于用户输入的姓名和生成的背景图片按照如下格式创作专属的生日纪念卡素材。
+
+格式：
+标题：''生日快乐'' 或 ''Happy Birthday！''（可加上寿星的名字，如：''[姓名]: ''）
+封面图片：![example_text](https://example.com/example.png)
+祝福语：生成的祝福语内容。", "thinkStep": "你是一个生日纪念卡素材创作生成助手，能够基于用户输入的姓名生成背景图片。", "userQuery": "{{to_name}}"}','2025-07-07 17:36:41','2025-07-25 10:54:12',1,'{
+  "id": 141,
+  "name": "DeepSeek-V3",
+  "serviceId": "xdeepseekv3",
+  "serverId": "lmbXtIcNp",
+  "domain": "xdeepseekv3",
+  "patchId": "0",
+  "type": 1,
+  "config": null,
+  "source": 2,
+  "url": "wss://maas-api.cn-huabei-1.xf-yun.com/v1.1/chat",
+  "appId": null,
+  "licChannel": "xdeepseekv3",
+  "llmSource": 1,
+  "llmId": 141,
+  "status": 1,
+  "info": "{\\"conc\\":2,\\"domain\\":\\"generalv3.5\\",\\"expireTs\\":\\"2025-05-31\\",\\"qps\\":2,\\"tokensPreDay\\":1000,\\"tokensTotal\\":1000,\\"llmServiceId\\":\\"bm3.5\\"}",
+  "icon": "https://oss-beijing-m8.openstorage.cn/atp/image/model/icon/deepseek.png",
+  "tag": [],
+  "modelId": null,
+  "pretrainedModel": null,
+  "modelType": 2,
+  "color": null,
+  "isThink": false,
+  "multiMode": false,
+  "address": null,
+  "desc": "DeepSeek-V3 是一款由深度求索公司自研的MoE模型。DeepSeek-V3 多项评测成绩超越了 Qwen2.5-72B 和 Llama-3.1-405B 等其他开源模型，并在性能上和世界顶尖的闭源模型 GPT-4o 以及 Claude-3.5-Sonnet 不分伯仲。",
+  "createTime": "2025-02-07T00:12:54.000+08:00",
+  "updateTime": "2025-02-08T21:50:01.000+08:00"
+}',1),
+	 (15,-1,'播客创建助手','你是一个播客助手，你能够基于用户输入的故事文本，使用超拟人合成语音音频。',0,'{"characterSettings": "你是一个播客助手，你需要基于以下格式展示音频数据：
+
+格式：
+## 标题
+
+mp3 html播放器
+
+故事正文", "thinkStep": "你是一个播客助手，你能够基于用户输入的故事文本，使用超拟人合成语音音频。", "userQuery": "{{story}}"}','2025-07-07 17:36:41','2025-07-25 10:54:13',1,'{
+  "id": 141,
+  "name": "DeepSeek-V3",
+  "serviceId": "xdeepseekv3",
+  "serverId": "lmbXtIcNp",
+  "domain": "xdeepseekv3",
+  "patchId": "0",
+  "type": 1,
+  "config": null,
+  "source": 2,
+  "url": "wss://maas-api.cn-huabei-1.xf-yun.com/v1.1/chat",
+  "appId": null,
+  "licChannel": "xdeepseekv3",
+  "llmSource": 1,
+  "llmId": 141,
+  "status": 1,
+  "info": "{\\"conc\\":2,\\"domain\\":\\"generalv3.5\\",\\"expireTs\\":\\"2025-05-31\\",\\"qps\\":2,\\"tokensPreDay\\":1000,\\"tokensTotal\\":1000,\\"llmServiceId\\":\\"bm3.5\\"}",
+  "icon": "https://oss-beijing-m8.openstorage.cn/atp/image/model/icon/deepseek.png",
+  "tag": [],
+  "modelId": null,
+  "pretrainedModel": null,
+  "modelType": 2,
+  "color": null,
+  "isThink": false,
+  "multiMode": false,
+  "address": null,
+  "desc": "DeepSeek-V3 是一款由深度求索公司自研的MoE模型。DeepSeek-V3 多项评测成绩超越了 Qwen2.5-72B 和 Llama-3.1-405B 等其他开源模型，并在性能上和世界顶尖的闭源模型 GPT-4o 以及 Claude-3.5-Sonnet 不分伯仲。",
+  "createTime": "2025-02-07T00:12:54.000+08:00",
+  "updateTime": "2025-02-08T21:50:01.000+08:00"
+}',1),
+	 (17,-1,'缺陷分析','你是一个折线图绘制专家，需要基于输入的json问题列表生成线上问题关闭趋势折线图.',0,'{"characterSettings": "", "thinkStep": "你是一个折线图绘制专家，需要基于输入的json问题列表生成线上问题关闭趋势折线图；包含当前日期到当前日期前六天期间线上问题每日趋势，包含线上问题总数（截止当日问题总数），已关闭问题数（截止当日已关闭总数），遗留未关闭问题数（截止当日问题总数减去截止当日已关闭总数），遗留待修复问题数（截止当日待修复总数）", "userQuery": "{{data_json}}"}','2025-07-07 17:36:41','2025-07-25 10:54:13',1,'{
+  "id": 141,
+  "name": "DeepSeek-V3",
+  "serviceId": "xdeepseekv3",
+  "serverId": "lmbXtIcNp",
+  "domain": "xdeepseekv3",
+  "patchId": "0",
+  "type": 1,
+  "config": null,
+  "source": 2,
+  "url": "wss://maas-api.cn-huabei-1.xf-yun.com/v1.1/chat",
+  "appId": null,
+  "licChannel": "xdeepseekv3",
+  "llmSource": 1,
+  "llmId": 141,
+  "status": 1,
+  "info": "{\\"conc\\":2,\\"domain\\":\\"generalv3.5\\",\\"expireTs\\":\\"2025-05-31\\",\\"qps\\":2,\\"tokensPreDay\\":1000,\\"tokensTotal\\":1000,\\"llmServiceId\\":\\"bm3.5\\"}",
+  "icon": "https://oss-beijing-m8.openstorage.cn/atp/image/model/icon/deepseek.png",
+  "tag": [],
+  "modelId": null,
+  "pretrainedModel": null,
+  "modelType": 2,
+  "color": null,
+  "isThink": false,
+  "multiMode": false,
+  "address": null,
+  "desc": "DeepSeek-V3 是一款由深度求索公司自研的MoE模型。DeepSeek-V3 多项评测成绩超越了 Qwen2.5-72B 和 Llama-3.1-405B 等其他开源模型，并在性能上和世界顶尖的闭源模型 GPT-4o 以及 Claude-3.5-Sonnet 不分伯仲。",
+  "createTime": "2025-02-07T00:12:54.000+08:00",
+  "updateTime": "2025-02-08T21:50:01.000+08:00"
+}',1);
+

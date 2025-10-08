@@ -82,7 +82,7 @@ const ProcessingCompletion: FC<{
     };
     getStatusAPI(params).then(data => {
       const doneList = data.filter(
-        item => item.status === 4 || item.status === 5 || item.status === 4
+        item => item.status === 4 || item.status === 5
       );
       const failedList = data.filter(item => item.status === 4);
       setProgress((doneList.length * 100) / fileIds.length);

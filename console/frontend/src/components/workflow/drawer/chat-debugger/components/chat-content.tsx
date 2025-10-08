@@ -8,7 +8,6 @@ import JSONPretty from 'react-json-view';
 import copy from 'copy-to-clipboard';
 import { useSearchParams } from 'react-router-dom';
 import { useMemoizedFn } from 'ahooks';
-import ChatFeedback from '@/components/modal/chat-feedback';
 import { typeList } from '@/constants';
 import FeedbackDialog from '@/components/workflow/modal/feedback-dialog';
 
@@ -220,8 +219,6 @@ const MessageActions = ({
   setSid,
   setVisible,
   copyData,
-  goodFeedback,
-  badFeedback,
   advancedConfig,
 }): React.ReactElement => {
   return (
@@ -253,36 +250,6 @@ const MessageActions = ({
                 copyData(chat as ChatListItemExtended);
               }}
             />
-            {advancedConfig?.feedback?.enabled &&
-              (chat as ChatListItemExtended).sid && (
-                <img
-                  src={
-                    (chat as ChatListItemExtended).good
-                      ? icons.chatLiked
-                      : icons.chatLike
-                  }
-                  className="w-4 h-4 cursor-pointer"
-                  alt=""
-                  onClick={() =>
-                    goodFeedback(chat.id, (chat as ChatListItemExtended).sid)
-                  }
-                />
-              )}
-            {advancedConfig?.feedback?.enabled &&
-              (chat as ChatListItemExtended).sid && (
-                <img
-                  src={
-                    (chat as ChatListItemExtended).bad
-                      ? icons.chatDisliked
-                      : icons.chatDislike
-                  }
-                  className="w-4 h-4 cursor-pointer"
-                  alt=""
-                  onClick={() =>
-                    badFeedback(chat.id, (chat as ChatListItemExtended).sid)
-                  }
-                />
-              )}
           </div>
         </div>
       )}
@@ -433,8 +400,6 @@ const MessageReply = ({
   t,
   advancedConfig,
   copyData,
-  goodFeedback,
-  badFeedback,
   suggestLoading,
   suggestProblem,
   resetNodesAndEdges,
@@ -508,8 +473,6 @@ const MessageReply = ({
               setSid={setSid}
               setVisible={setVisible}
               copyData={copyData}
-              goodFeedback={goodFeedback}
-              badFeedback={badFeedback}
               advancedConfig={advancedConfig}
             />
           </div>
@@ -551,8 +514,6 @@ const useChatContent = ({ chatList, setChatList }): UseChatContentProps => {
   let optionId = useRef<string | undefined>('');
   const currentFlow = useFlowsManager(state => state.currentFlow);
   const [sid, setSid] = useState<string | undefined>('');
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [modalType, setModalType] = useState<'good' | 'bad'>('good');
   const advancedConfig = useMemo<ChatContentAdvancedConfig>(() => {
     if (currentFlow?.advancedConfig && isJSON(currentFlow.advancedConfig)) {
       const parsedConfig = JSON.parse(currentFlow.advancedConfig);
@@ -615,39 +576,6 @@ const useChatContent = ({ chatList, setChatList }): UseChatContentProps => {
     }
   });
 
-  const goodFeedback = useMemoizedFn(
-    (id: string | undefined, sid: string): void => {
-      optionId = id;
-      setSid(sid);
-      setModalType('good');
-      setModalVisible(true);
-    }
-  );
-
-  const badFeedback = useMemoizedFn(
-    (id: string | undefined, sid: string): void => {
-      optionId = id;
-      setSid(sid);
-      setModalType('bad');
-      setModalVisible(true);
-    }
-  );
-
-  const handleActiveStyle = useMemoizedFn((): void => {
-    const newDialog = chatList as ChatListItemExtended[];
-    (chatList as ChatListItemExtended[]).forEach(item => {
-      if (item.id === optionId) {
-        (item as unknown)[modalType] = true;
-        if (modalType === 'good') {
-          item.bad = false;
-        } else {
-          item.good = false;
-        }
-      }
-    });
-    setChatList([...newDialog]);
-  });
-
   const renderInputElement = useMemoizedFn(
     (chat: ChatListItemExtended, input: StartNodeType): React.ReactElement => {
       const inputName = chat?.inputs?.length && chat.inputs.length > 1 && (
@@ -655,7 +583,7 @@ const useChatContent = ({ chatList, setChatList }): UseChatContentProps => {
           {input?.name}
         </div>
       );
-      if (input?.allowedFileType === 'image' && input?.type === 'string') {
+      if (input?.fileType === 'image' && input?.type === 'string') {
         return (
           <div>
             {inputName}
@@ -671,7 +599,7 @@ const useChatContent = ({ chatList, setChatList }): UseChatContentProps => {
           </div>
         );
       }
-      if (input?.allowedFileType) {
+      if (input?.fileType) {
         return (
           <div>
             {inputName}
@@ -712,13 +640,7 @@ const useChatContent = ({ chatList, setChatList }): UseChatContentProps => {
   );
   return {
     advancedConfig,
-    goodFeedback,
-    badFeedback,
-    modalVisible,
     sid,
-    modalType,
-    setModalVisible,
-    handleActiveStyle,
     renderInputElement,
     setSid,
     copyData,
@@ -749,22 +671,11 @@ function ChatContent({
   const [visible, setVisible] = useState<boolean>(false);
   const [searchParams] = useSearchParams();
   const botId = searchParams.get('botId');
-  const {
-    advancedConfig,
-    goodFeedback,
-    badFeedback,
-    modalVisible,
-    sid,
-    modalType,
-    setModalVisible,
-    handleActiveStyle,
-    renderInputElement,
-    setSid,
-    copyData,
-  } = useChatContent({
-    chatList,
-    setChatList,
-  });
+  const { advancedConfig, sid, renderInputElement, setSid, copyData } =
+    useChatContent({
+      chatList,
+      setChatList,
+    });
 
   useEffect(() => {
     if (open) {
@@ -802,17 +713,6 @@ function ChatContent({
         backgroundSize: 'cover',
       }}
     >
-      {modalVisible && (
-        <ChatFeedback
-          isFlow={true}
-          sid={sid}
-          botId={currentFlow?.flowId}
-          appid={currentFlow?.appId}
-          modalType={modalType}
-          setModalVisible={setModalVisible}
-          handleActiveStyle={handleActiveStyle}
-        />
-      )}
       <Prologue
         advancedConfig={advancedConfig}
         currentFlow={currentFlow}
@@ -840,8 +740,6 @@ function ChatContent({
             t={t}
             advancedConfig={advancedConfig}
             copyData={copyData}
-            goodFeedback={goodFeedback}
-            badFeedback={badFeedback}
             suggestLoading={suggestLoading}
             suggestProblem={suggestProblem}
             resetNodesAndEdges={resetNodesAndEdges}

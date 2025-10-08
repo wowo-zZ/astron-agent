@@ -2,7 +2,12 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Table, message, Popover, Modal, Select } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { getAgentList } from '@/services/agent';
+import {
+  getAgentList,
+  type GetAgentListParams,
+  type GetAgentListResponse,
+  type BotData,
+} from '@/services/agent';
 import {
   getAgentDetail,
   handleAgentStatus,
@@ -10,6 +15,7 @@ import {
   getAgentInputParams,
   getAgentTimeSeriesData,
   getAgentSummaryData,
+  type AgentInputParam,
 } from '@/services/release-management';
 import {
   getBotInfo,
@@ -41,28 +47,32 @@ interface AgentListProps {
 const AgentList: React.FC<AgentListProps> = ({ AgentType }) => {
   const botInfo = useBotStateStore(state => state.botDetailInfo);
   const setBotDetailInfo = useBotStateStore(state => state.setBotDetailInfo);
-  const [botMultiFileParam, setBotMultiFileParam] = useState<any>(false);
+  const [botMultiFileParam, setBotMultiFileParam] = useState<boolean>(false);
   const [moreParams, setMoreParams] = useState(false);
   const [editV2Visible, { setLeft: hide, setRight: show }] = useToggle();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [isOpenapi, setIsOpenapi]: any = useState(false);
-  const [fabuFlag, setFabuFlag]: any = useState(false);
+  const [searchParams] = useSearchParams();
+  const [setIsOpenapi] = useState<boolean>(false);
+  const [fabuFlag, setFabuFlag] = useState<boolean>(false);
   const [openWxmol, setOpenWxmol] = useState(false);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [botList, setBotList] = useState([]);
+  const [botList, setBotList] = useState<(BotData & { action: BotData })[]>([]);
   const { t } = useTranslation();
 
   const [total, setTotal] = useState<number>();
-  const reasonRef = useRef<any>(null);
-  const [pageInfo, setPageInfo] = useState({
+  const reasonRef = useRef<string | undefined>(undefined);
+  const [pageInfo, setPageInfo] = useState<{
+    pageIndex: number;
+    pageSize: number;
+    botStatus: number;
+  }>({
     pageIndex: 1,
     pageSize: 10,
     botStatus: 0,
   });
   type MsgType = {
     version: string | number;
-    searchValue: string | number;
+    searchValue: string;
   };
   const [msg, setMsg] = useState<MsgType>({
     version: AgentType === 'agent' ? '1' : '3',
@@ -92,7 +102,10 @@ const AgentList: React.FC<AgentListProps> = ({ AgentType }) => {
     }));
   }, [AgentType]);
 
-  const cancelUploadBot = (botId?: number, releaseType?: any) => {
+  const cancelUploadBot = (
+    botId?: number,
+    releaseType?: number[] | number
+  ): void => {
     Modal.info({
       wrapClassName: 'bot-center-confirm-modal set_bot-center-confirm-modal',
       title: t('releaseManagement.applyTakeDownAgent'),
@@ -111,13 +124,17 @@ const AgentList: React.FC<AgentListProps> = ({ AgentType }) => {
         </div>
       ),
       okText: t('releaseManagement.submitApplication'),
-      onCancel: (close: any) => {
+      onCancel: (close: () => void) => {
         reasonRef.current = undefined;
         close && close();
       },
-      onOk: (close: any) => {
+      onOk: (close: () => void) => {
         if (releaseType == 1 && botId) {
-          handleAgentStatus(botId!, { action: 'OFFLINE', reason: '' })
+          handleAgentStatus(botId, {
+            action: 'OFFLINE',
+            reason: '维护更新',
+            publishType: 'MARKET',
+          })
             .then(() => {
               reasonRef.current = undefined;
               close && close();
@@ -125,15 +142,14 @@ const AgentList: React.FC<AgentListProps> = ({ AgentType }) => {
               setPageInfo(pre => ({ ...pre, pageIndex: 1 }));
             })
             .catch(err => {
-              console.error(err);
               err?.msg && message.error(err.msg);
             });
         } else {
           if (botInfo?.botId) {
             cancelBindWx({ appid: botInfo?.wechatAppid, botId: botInfo.botId })
               .then(res => {
-                getBotInfo({ botId: botInfo.botId }).then((res: any) => {
-                  setBotDetailInfo(res);
+                getBotInfo({ botId: botInfo.botId }).then(res => {
+                  setBotDetailInfo(res.data);
                   message.success('解绑成功');
                 });
               })
@@ -147,22 +163,22 @@ const AgentList: React.FC<AgentListProps> = ({ AgentType }) => {
   };
 
   //记录状态
-  const localBotTab = () => {
+  const localBotTab = (): void => {
     // 如果当前是发布中状态(1)，则存储为已发布状态(2) -09.01改动
     const statusToSave = pageInfo.botStatus === 1 ? 2 : pageInfo.botStatus;
     localStorage.setItem('selectedTab', statusToSave.toString());
   };
 
   /** ## 前往详情页 */
-  const handleRowClick = (record: any) => {
-    navigate(`/management/release/detail/${record.botId}`, {
+  const handleRowClick = (record: { botId?: string }): void => {
+    navigate(`/management/release/detail/${record?.botId}`, {
       state: { record },
     });
     localBotTab();
   };
 
   /** ## 查看智能体 */
-  const checkAgent = (bot: any) => {
+  const checkAgent = (bot: { botId?: string; maasId?: string }): void => {
     if (AgentType === 'agent') {
       navigate(`/space/config/overview?botId=${bot.botId}&flag=true`);
     } else {
@@ -172,7 +188,7 @@ const AgentList: React.FC<AgentListProps> = ({ AgentType }) => {
   };
 
   /** ## 编辑智能体 */
-  const updateAgent = (bot: any) => {
+  const updateAgent = (bot: { botId?: string; maasId?: string }): void => {
     if (AgentType === 'agent') {
       navigate(`/space/config/base?botId=${bot?.botId}`);
       // 记录选择状态
@@ -184,13 +200,23 @@ const AgentList: React.FC<AgentListProps> = ({ AgentType }) => {
 
   // 创建统一的动态columns
   const unifiedColumns = useMemo(() => {
-    const cols: any = [
+    const cols: {
+      dataIndex: string;
+      title: string;
+      width?: number;
+      ellipsis?: boolean;
+      render?: (value: any, record: any, index?: number) => React.ReactNode;
+      sorter?: boolean | ((a: unknown, b: unknown) => number);
+      sortOrder?: 'ascend' | 'descend' | null;
+      fixed?: 'left' | 'right';
+      align?: 'left' | 'center' | 'right';
+    }[] = [
       {
         dataIndex: 'botId',
         title: t('releaseManagement.agentId'),
         align: 'left',
         width: 120,
-        render: (text: string) => {
+        render: (text: string): React.ReactNode => {
           return <div style={{ marginLeft: '8px' }}>{text}</div>;
         },
       },
@@ -222,7 +248,7 @@ const AgentList: React.FC<AgentListProps> = ({ AgentType }) => {
         dataIndex: 'releaseType',
         title: t('releaseManagement.platform'),
         align: 'center',
-        render: (data: number | number[]) => {
+        render: (data: number | number[]): React.ReactNode => {
           if (typeof data === 'number') {
             data = [data];
           }
@@ -314,7 +340,14 @@ const AgentList: React.FC<AgentListProps> = ({ AgentType }) => {
       dataIndex: 'action',
       title: t('releaseManagement.operation'),
       align: 'center',
-      render: (bot: any) => (
+      render: (bot: {
+        version: number;
+        botId: string | undefined;
+        botName: string;
+        botDesc: string;
+        botStatus?: number;
+        releaseType?: number[];
+      }) => (
         <span className={styles.historyAct}>
           {/* 发布按钮 - 未发布状态显示 */}
           {(pageInfo.botStatus === 0 || pageInfo.botStatus === -9) && (
@@ -322,22 +355,27 @@ const AgentList: React.FC<AgentListProps> = ({ AgentType }) => {
               onClick={() => {
                 /* 工作流：input -- chain 即工作流详情（获取多参数） -- 发布 -- baseInfo 即详情 
                 TODO: 工作流智能体的返回数据不满足，等后端完成
+                getAgentInputParams -- 能否发布为mcp
+                botMultiFileParam -- 能否发布到星火
                 */
                 if (bot.version === 3) {
-                  console.log(bot, 'bot---------');
-                  getAgentInputParams(bot.botId).then((res: any) => {
-                    if (
-                      (res.length === 2 &&
-                        res[1].fileType === 'file' &&
-                        res[1].schema.type === 'array-string') ||
-                      (res.length === 2 && res[1].fileType !== 'file') ||
-                      res.length > 2
-                    ) {
-                      setMoreParams(true);
-                    } else {
-                      setMoreParams(false);
+                  // console.log(bot, 'bot---------');
+                  getAgentInputParams(bot.botId as unknown as number).then(
+                    (res: AgentInputParam[]) => {
+                      // console.log('🚀 ~ index.tsx:329 ~ res:', res);
+                      if (
+                        (res.length === 2 &&
+                          res[1]?.fileType === 'file' &&
+                          res[1]?.schema?.type === 'array-string') ||
+                        (res.length === 2 && res[1]?.fileType !== 'file') ||
+                        res.length > 2
+                      ) {
+                        setMoreParams(true);
+                      } else {
+                        setMoreParams(false);
+                      }
                     }
-                  });
+                  );
 
                   /** ## 获取工作流智能体信息 */
                   getChainInfo(bot?.botId).then(res => {
@@ -356,7 +394,6 @@ const AgentList: React.FC<AgentListProps> = ({ AgentType }) => {
                         setOpenWxmol(true);
                       })
                       .catch(err => {
-                        console.log(err, 'err');
                         message.error(err?.msg);
                       });
                   });
@@ -392,11 +429,17 @@ const AgentList: React.FC<AgentListProps> = ({ AgentType }) => {
 
           {/* 下架按钮 - 已发布状态显示 */}
           {bot.botStatus === 2 &&
+            Array.isArray(bot?.releaseType) &&
             !bot.releaseType.includes(2) &&
             !bot.releaseType.includes(4) && (
               <span
                 style={{ marginRight: '10px' }}
-                onClick={() => cancelUploadBot(bot?.botId, bot?.releaseType)}
+                onClick={() =>
+                  cancelUploadBot(
+                    bot?.botId as unknown as number,
+                    bot?.releaseType as unknown as number[]
+                  )
+                }
               >
                 {t('releaseManagement.takeDown')}
               </span>
@@ -419,13 +462,20 @@ const AgentList: React.FC<AgentListProps> = ({ AgentType }) => {
     pageIndex: number;
     pageSize: number;
     botStatus?: number;
-  }) => {
+  }): void => {
     setLoading(true);
-    const params: any = {
-      ...msg,
+    const params: GetAgentListParams = {
       pageIndex: info.pageIndex,
       pageSize: info.pageSize,
+      botStatus: null,
+      sort: '',
+      searchValue: msg.searchValue,
+      version:
+        typeof msg.version === 'string'
+          ? parseInt(msg.version, 10)
+          : msg.version,
     };
+
     if (
       info?.botStatus === -9 ||
       info?.botStatus === 1 ||
@@ -435,23 +485,23 @@ const AgentList: React.FC<AgentListProps> = ({ AgentType }) => {
       // 已发布包含发布中状态-- 09.01改动
       params.botStatus = info?.botStatus === 2 ? [1, 2, 4] : [info?.botStatus];
     }
+
     getAgentList(params)
-      .then((data: any) => {
-        const dataNow = data?.pageData?.map((itm: any) => ({
+      .then((data: GetAgentListResponse) => {
+        const dataNow = data?.pageData?.map(itm => ({
           ...itm,
           action: itm,
         }));
-        console.log(
-          '🚀 ~ updateBotList ~ dataNow:',
-          dataNow,
-          'data-------',
-          data
-        );
+        // console.log(
+        //   '🚀 ~ updateBotList ~ dataNow:',
+        //   dataNow,
+        //   'data-------',
+        //   data
+        // );
         setBotList(dataNow ?? []);
-        setTotal(data?.total ?? 0);
+        setTotal(data?.totalCount ?? 0);
       })
       .catch(err => {
-        console.error(err);
         err?.msg && message.error(err.msg);
       })
       .finally(() => {
@@ -475,22 +525,21 @@ const AgentList: React.FC<AgentListProps> = ({ AgentType }) => {
   ]);
 
   // 获取助手基本信息
-  const getBotBaseInfo = (newBotId?: any) => {
+  const getBotBaseInfo = (newBotId?: string | number): void => {
     const botId = newBotId || searchParams.get('botId');
-    getAgentDetail(botId)
-      .then((data: any) => {
+    getAgentDetail(botId as unknown as number)
+      .then(data => {
         setBotDetailInfo({
           ...data,
           name: data?.botName,
         });
       })
       .catch(err => {
-        console.error(err);
         return err?.msg && message.error(err.msg);
       });
   };
 
-  const onChangeTypeSelect = (e: number | null) => {
+  const onChangeTypeSelect = (e: number | null): void => {
     setPageInfo(pre => ({
       ...pre,
       botStatus: e === null ? 0 : e,
@@ -511,14 +560,14 @@ const AgentList: React.FC<AgentListProps> = ({ AgentType }) => {
     []
   );
 
-  const getRobotsDebounce = (e: { target: { value: any } }) => {
+  const getRobotsDebounce = (e: { target: { value: string } }): void => {
     const value = e.target.value;
     setSearchInput(value);
     debouncedSearch(value);
   };
 
   useEffect(() => {
-    return () => {
+    return (): void => {
       debouncedSearch.cancel();
     };
   }, [debouncedSearch]);
@@ -583,7 +632,7 @@ const AgentList: React.FC<AgentListProps> = ({ AgentType }) => {
           loading={loading}
           dataSource={botList}
           columns={unifiedColumns}
-          rowKey={(record: { createTime: number }) => record.createTime}
+          rowKey={(record: { createTime: string }) => record.createTime}
           pagination={{
             position: ['bottomCenter'],
             total: total,

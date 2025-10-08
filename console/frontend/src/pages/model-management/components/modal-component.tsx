@@ -506,7 +506,13 @@ const SelectLocalModel = ({
           <span className="text-[#F74E43] mr-1">*</span>
           {t('model.selectModel')}：
           <span className="text-[#7f7f7f]">{t('model.selectModelTips')}</span>
-          <a className="text-[#275EFF]" href="https://baidu.com">
+          <a
+            className="text-[#275EFF]"
+            href="#"
+            onClick={() => {
+              message.info(t('model.noDocument'));
+            }}
+          >
             {t('model.referenceDocument')}
           </a>
         </div>
@@ -552,9 +558,15 @@ const PerformanceConfiguration = ({
     <div className="flex flex-col gap-2 font-normal text-sm">
       <div className="flex items-center">
         <span className="text-[#F74E43] mr-1">*</span>
-        {t('model.performanceConfiguration')}：
-        <img src={tipsSvg} alt="tips" className="w-4 h-4 ml-1" />
-        {t('model.acceleratorNumber')}
+        {t('model.acceleratorCount')}：
+        <img
+          src={tipsSvg}
+          alt="tips"
+          className="w-4 h-4 ml-1 cursor-pointer"
+          onClick={() => {
+            message.info(t('model.noDocument'));
+          }}
+        />
       </div>
       <ConfigProvider
         theme={{

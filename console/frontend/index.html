@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/agent-icon.ico" />
@@ -34,11 +34,14 @@
         // 缓存破坏：追加时间戳参数，避免再次请求旧 chunk
         const url = new URL(window.location.href);
         url.searchParams.set('v', String(now));
+      }
 
-        // 下一帧替换刷新，避免产生历史记录并尽量减少闪烁
-        requestAnimationFrame(() => {
-          window.location.replace(url.toString());
-        });
+      function suppressAndReload(e) {
+        console.log('suppressAndReload error:', e);
+        e?.preventDefault?.();
+        e?.stopPropagation?.();
+        e?.stopImmediatePropagation?.();
+        safeReload();
       }
 
       function suppressAndReload(e) {
@@ -76,6 +79,5 @@
       });
     </script>
     <script type="module" src="/src/main.tsx"></script>
-
   </body>
 </html>

@@ -456,6 +456,9 @@ const AuthTypeSelector: React.FC<{
   );
 };
 
+type OneOf<T> = {
+  [K in keyof T]: { [P in K]: T[P] };
+}[keyof T];
 // 基本信息表单组件
 const BasicInfoForm: React.FC<{
   baseForm: FormInstance<BaseFormData>;
@@ -468,6 +471,7 @@ const BasicInfoForm: React.FC<{
   setName: (name: string) => void;
   desc: string;
   setDesc: (desc: string) => void;
+  onValuesChange: (value: OneOf<BaseFormData>, values: BaseFormData) => void;
 }> = ({
   baseForm,
   authType,
@@ -479,10 +483,16 @@ const BasicInfoForm: React.FC<{
   setName,
   desc,
   setDesc,
+  onValuesChange,
 }) => {
   const { t } = useTranslation();
   return (
-    <Form form={baseForm} layout="vertical" className="tool-create-form">
+    <Form
+      form={baseForm}
+      layout="vertical"
+      className="tool-create-form"
+      onValuesChange={onValuesChange}
+    >
       <PluginBasicFields
         botIcon={botIcon}
         botColor={botColor}
@@ -528,6 +538,7 @@ const BasicInfoForm: React.FC<{
       {authType === 2 && <AuthorizationFields />}
       <Form.Item
         name="method"
+        className="mb-0"
         label={
           <div className="flex items-center gap-1">
             <span className="text-sm font-medium">
@@ -821,6 +832,7 @@ export const CreateTool = forwardRef<
       outputParamsData,
       avatarColor,
       avatarIcon,
+      setBaseFormData,
     } = useCreateTool({
       currentToolInfo,
       handleCreateToolDone,
@@ -878,9 +890,9 @@ export const CreateTool = forwardRef<
             {showHeader && <StepIndicator step={step} setStep={setStep} />}
             {/* <div className='w-full h-[2px] bg-[#E5E5EC] my-[18px]'>
       </div> */}
-            <div className="w-full h-full p-6 bg-[#fff] rounded-2xl overflow-auto">
+            <div className="w-full h-full  bg-[#fff] rounded-2xl p-6 overflow-auto">
               <div
-                className="w-full h-full"
+                className="w-full"
                 style={{
                   pointerEvents:
                     selectedCard?.id && step !== 3 ? 'none' : 'auto',
@@ -888,6 +900,9 @@ export const CreateTool = forwardRef<
               >
                 {step === 1 && (
                   <BasicInfoForm
+                    onValuesChange={(_, values) => {
+                      setBaseFormData({ ...values });
+                    }}
                     baseForm={baseForm}
                     authType={authType}
                     setAuthType={setAuthType}

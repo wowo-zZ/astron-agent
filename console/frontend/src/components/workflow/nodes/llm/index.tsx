@@ -17,22 +17,9 @@ import {
 import { isJSON } from '@/utils';
 import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
 import { ModelSection } from '@/components/workflow/nodes/node-common';
-import { EnabledChatHistory } from '@/components/workflow/nodes/components/single-input';
 
 import promptOptimizationIcon from '@/assets/imgs/workflow/prompt-optimization-icon.png';
 import promptLibraryIcon from '@/assets/imgs/workflow/prompt-library-icon.svg';
-
-const InputSection = ({ id, data }): React.ReactElement => {
-  const { t } = useTranslation();
-  return (
-    <Inputs id={id} data={data}>
-      <div className="flex-1 flex items-center justify-between text-base font-medium">
-        <div>{t('common.input')}</div>
-        <EnabledChatHistory id={id} data={data} />
-      </div>
-    </Inputs>
-  );
-};
 
 const PromptSection = ({
   id,
@@ -282,11 +269,7 @@ export const LargeModelDetail = memo(({ id, data }): React.ReactElement => {
     <div className="p-[14px] pb-[6px]">
       <div className="bg-[#fff] rounded-lg w-full flex flex-col gap-2.5">
         <ModelSection id={id} data={data} />
-        <InputSection
-          id={id}
-          data={data}
-          handleChangeNodeParam={handleChangeNodeParam}
-        />
+        <Inputs id={id} data={data} />
         <PromptSection
           id={id}
           data={data}

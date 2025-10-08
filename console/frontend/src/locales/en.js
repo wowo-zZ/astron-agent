@@ -160,17 +160,13 @@ export const en = {
   feedback: 'Report',
   notice: 'system notice',
   pubilcImage: 'pubilc image',
-  chooseVoice: 'Select a speaker and BGM',
+  chooseVoice: 'Select a speaker',
+  mySpeaker: 'My Speaker',
+  createSpeaker: 'Create Speaker',
   Chinese: 'Chinese',
   voiceTry: 'Start',
   English: 'English',
-  voiceAdjust: 'Adjust speech speed',
-  slowVoice: 'Slow',
-  defaultVoice: 'Default',
-  fastVoice: 'Fast',
-  bgMusicVoice: 'BGM',
-  bgMusicChoose: 'Please select BGM',
-  softMusic: 'Gentle and soothing',
+  playing: 'Playing',
   chatBeforeNew: 'Please enter a topic to start a chat',
   emptyBotTip:
     "You haven't created any assistants yet. Go to the Creation Center and creat one.",
@@ -349,6 +345,7 @@ export const en = {
     releaseManagement: 'Release Management',
     modelManagement: 'Model Management',
     resourceManagement: 'Resource Management',
+    appManagement: 'App Management',
 
     // Order type translations
     orderTypes: {

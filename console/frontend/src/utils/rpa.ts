@@ -9,7 +9,7 @@ export const transRpaParameters = (parameters: RpaParameter[]): unknown[] => {
     required: false,
     description: item.varDescribe,
     schema: {
-      type: item.varType,
+      type: item.type,
       value: {
         type: 'ref',
         content: {},

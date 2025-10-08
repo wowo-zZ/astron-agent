@@ -10,9 +10,10 @@ const { Option } = Select;
 
 interface SelectedUser {
   uid: string;
-  username: string;
+  username?: string;
   avatar?: string;
   role: string;
+  nickname?: string;
 }
 
 interface SelectedUserItemProps {
@@ -24,7 +25,6 @@ interface SelectedUserItemProps {
 const SelectedUserItem: React.FC<SelectedUserItemProps> = React.memo(
   ({ user, handleRoleChange, handleRemoveUser }) => {
     const { memberRoleOptions } = useSpaceI18n();
-
     const handleRoleChangeCallback = useCallback(
       (value: string) => {
         handleRoleChange(user.uid, value);

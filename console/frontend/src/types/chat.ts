@@ -118,7 +118,7 @@ export interface BotInfoType {
   creatorNickname: string;
   prologue: string;
   mine: boolean;
-  botTitle: string;
+  botName: string;
   avatar: string;
   botDesc: string;
   version: number;
@@ -158,7 +158,8 @@ export interface MessageListType {
   traceSource?: string;
   sourceType?: 'search' | 'web_search' | string;
   chatFileList?: UploadFileInfo[] | null;
-  reqId?: number | string;
+  reqId?: number;
+  reqType?: string;
   sid?: string;
   tools?: string[];
   updateTime?: string;
@@ -263,7 +264,7 @@ export interface ChatActions {
   addMessage: (message: MessageListType) => void; //添加消息
   startStreamingMessage: (message: MessageListType) => void; //开始流式消息
   updateStreamingMessage: (content: string) => void; //更新流式消息内容
-  finishStreamingMessage: (sid?: string, id?: number) => void; //完成流式消息
+  finishStreamingMessage: (sid?: string, reqId?: number) => void; //完成流式消息
   clearStreamingMessage: () => void; //清除流式消息
   setStreamId: (streamId: string) => void; //设置对话流id
   setAnswerPercent: (answerPercent: number) => void; //设置回答进度

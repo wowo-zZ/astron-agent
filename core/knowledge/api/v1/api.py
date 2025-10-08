@@ -6,14 +6,14 @@ including document splitting, knowledge chunk saving, updating, deleting, queryi
 """
 
 import json
-from typing import Any, Callable, Tuple, Union, cast
+from typing import Any, Callable, Optional, Tuple, Union, cast
 
 from common.otlp.metrics.meter import Meter
 from common.otlp.trace.span import Span
 from common.service import get_otlp_metric_service, get_otlp_span_service
 from common.service.otlp.metric.metric_service import OtlpMetricService
 from common.service.otlp.span.span_service import OtlpSpanService
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, File, Form, Request, UploadFile
 from loguru import logger
 
 from knowledge.consts.error_code import CodeEnum
@@ -24,6 +24,7 @@ from knowledge.domain.entity.chunk_dto import (
     ChunkUpdateReq,
     FileSplitReq,
     QueryDocReq,
+    RAGType,
 )
 from knowledge.domain.response import ErrorResponse, SuccessDataResponse
 from knowledge.exceptions.exception import (
@@ -170,13 +171,66 @@ async def file_split(
             span_context=span_context,
             metric=metric,
             operation_callable=strategy.split,
-            file=split_request.file,
+            fileUrl=split_request.file,
             resourceType=split_request.resourceType,
             lengthRange=split_request.lengthRange,
             overlap=split_request.overlap,
             separator=split_request.separator,
             titleSplit=split_request.titleSplit,
             cutOff=split_request.cutOff,
+        )
+
+
+@rag_router.post("/document/upload")
+async def file_upload(
+    file: UploadFile = File(),
+    ragType: RAGType = Form(),
+    lengthRange: Optional[str] = Form(None),
+    separator: Optional[str] = Form(None),
+    app_id: str = Depends(get_app_id),
+) -> Union[SuccessDataResponse, ErrorResponse]:
+    """
+    Parse file content and perform chunking.
+
+    2. Form-data mode: Upload file or provide URL with form parameters
+
+    Args:
+        file: Uploaded file (form-data mode)
+        rag_type: RAG type (form-data mode)
+        length_range: Split length range as JSON string (form-data mode)
+        separator: Separator list as JSON string (form-data mode)
+        app_id: Application identifier
+
+    Returns:
+        Result of the splitting operation
+    """
+    span, metric = get_span_and_metric(app_id=app_id, function_name="file_upload")
+
+    with span.start(func_name="file_upload") as span_context:
+        # Record and validate
+        span_context.add_info_events(
+            {
+                "usr_input": json.dumps(
+                    {
+                        "file": file.filename,
+                        "rag_type": ragType,
+                        "length_range": lengthRange,
+                        "separator": separator,
+                    },
+                    ensure_ascii=False,
+                )
+            }
+        )
+        strategy = RAGStrategyFactory.get_strategy(ragType)
+
+        # Use helper function to handle core operations and exceptions
+        return await handle_rag_operation(
+            span_context=span_context,
+            metric=metric,
+            operation_callable=strategy.split,
+            file=file,
+            lengthRange=lengthRange,
+            separator=separator,
         )
 
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { Button, Upload, Slider, Input, message, Spin } from 'antd';
 import { avatarImageGenerate } from '@/services/common';
+import { getFixedUrl, getAuthorization } from '@/components/workflow/utils';
 
 import { avatarGenerationMethods } from '@/constants';
 import uploadAct from '@/assets/imgs/knowledge/icon_zhishi_upload_act.png';
@@ -169,9 +170,9 @@ function index(props): React.ReactElement {
 
   const uploadProps = {
     name: 'file',
-    action: 'http://172.29.201.92:8080/image/upload',
+    action: getFixedUrl('/image/upload'),
     headers: {
-      Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      Authorization: getAuthorization(),
     },
     showUploadList: false,
     accept: '.png,.jpg,.jpeg,.gif,.webp,.bmp,.tiff',

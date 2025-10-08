@@ -873,7 +873,6 @@ export function findItemById(dataArray: unknown[], id: string): unknown | null {
 }
 
 export function renderType(params): string {
-  console.log('params@@', params);
   if (params.fileType && params?.type === 'array-string') {
     return `Array<${
       (params?.fileType?.slice(0, 1).toUpperCase() || '') +
@@ -881,7 +880,10 @@ export function renderType(params): string {
     }>`;
   }
   if (params.fileType && params?.type === 'string') {
-    return params?.fileType;
+    return (
+      (params?.fileType?.slice(0, 1).toUpperCase() || '') +
+      (params?.fileType?.slice(1) || '')
+    );
   }
   const type = params?.type || params?.schema?.type || '';
   if (type?.includes('array')) {
@@ -1545,6 +1547,67 @@ type EdgeType = {
   target: string;
 };
 
+function buildSchemaReferences(
+  schema: any,
+  parent: { originId: string; prefix?: string; parentType?: string } = {
+    originId: '',
+  }
+): unknown[] {
+  if (!schema) return [];
+
+  const baseValue = parent.prefix
+    ? `${parent.prefix}.${schema.name}`
+    : schema.name;
+
+  // 基础类型
+  if (!['object', 'array-object'].includes(schema.type)) {
+    return [
+      {
+        originId: parent.originId,
+        id: schema.id,
+        label: schema.name,
+        value: baseValue,
+        type: schema.type || 'string',
+        parentType: parent.parentType,
+        fileType: schema.allowedFileType?.[0] || '',
+      },
+    ];
+  }
+
+  // object 节点（自身保留 + children）
+  if (Array.isArray(schema.properties)) {
+    return [
+      {
+        originId: parent.originId,
+        id: schema.id,
+        label: schema.name,
+        value: baseValue,
+        type: schema?.type,
+        parentType: parent.parentType,
+        fileType: schema.allowedFileType?.[0] || '',
+        children: schema.properties.flatMap((prop: any) =>
+          buildSchemaReferences(
+            {
+              ...prop,
+              ...prop.schema,
+              name: prop.name,
+              id: prop.id,
+              allowedFileType: prop.allowedFileType,
+            },
+            {
+              originId: parent.originId,
+              prefix: baseValue,
+              parentType: 'object',
+            }
+          )
+        ),
+      },
+    ];
+  }
+
+  return [];
+}
+
 function buildOwnReferences(
   sourceNode: NodeType,
   targetNode: NodeType
@@ -1557,31 +1620,27 @@ function buildOwnReferences(
 
   const outputs =
     targetNode?.nodeType === 'iteration'
-      ? sourceNode?.data?.outputs?.filter((output: unknown) =>
+      ? sourceNode?.data?.outputs?.filter((output: any) =>
           output?.schema?.type?.includes('array')
         )
       : [...(sourceNode?.data?.outputs || []), ...errorOutputs];
 
   return (
-    outputs?.map((output: unknown) => ({
-      originId: sourceNode.id,
-      id: output.id,
-      label: output.name,
-      type: output.schema?.type || 'string',
-      value: output.name,
-      fileType: output.allowedFileType?.[0] || '',
-    })) || []
+    outputs?.flatMap((output: any) =>
+      buildSchemaReferences(
+        {
+          ...output,
+          ...output.schema,
+          name: output.name,
+          id: output.id,
+          allowedFileType: output.allowedFileType,
+        },
+        { originId: sourceNode.id }
+      )
+    ) || []
   );
 }
 
-/**
- * generateReferences(nodes, edges, id)
- * - nodes: 所有节点
- * - edges: 所有边
- * - id: 目标节点 id（我们要找到所有指向这个节点的上游节点）
- *
- * 返回值：数组，每个元素为 { label, value, parentNode: true, children: [{ label:'', value:'', references: [...] }] }
- */
 export function generateReferences(
   nodes: NodeType[],
   edges: EdgeType[],
@@ -1590,14 +1649,12 @@ export function generateReferences(
   const targetNode = nodes.find(n => n.id === id);
   if (!targetNode) return [];
 
-  // BFS/DFS 向上（沿 incoming edges）找所有上游节点（包含间接上游）
   const visited = new Set<string>();
   const queue: string[] = [id];
   const ancestorIds = new Set<string>();
 
   while (queue.length > 0) {
     const current = queue.shift();
-    // 找到所有指向 current 的边（incoming）
     const incoming = edges.filter(e => e.target === current);
     for (const e of incoming) {
       const src = e.source;
@@ -1608,12 +1665,10 @@ export function generateReferences(
     }
   }
 
-  // 把每个上游节点做成两层结构：顶层节点 -> children -> references（由 buildOwnReferences 产生）
   const result = Array.from(ancestorIds)
     .map(srcId => {
       const srcNode = nodes.find(n => n.id === srcId);
       if (!srcNode) return null;
-      // 调用你已有的构造引用函数（传入 targetNode，以便 buildOwnReferences 能知道引用目标）
       const references = buildOwnReferences(srcNode, targetNode) || [];
       return {
         label: srcNode.data?.label ?? '',
@@ -1629,25 +1684,6 @@ export function generateReferences(
       };
     })
     .filter(Boolean) as unknown[];
-
-  // 如果没有任何上游节点，返回目标节点自身的一条两层结构（保持结果格式统一）
-  if (result.length === 0) {
-    const references = buildOwnReferences(targetNode, targetNode) || [];
-    return [
-      {
-        label: targetNode.data?.label ?? '',
-        value: targetNode.id,
-        parentNode: true,
-        children: [
-          {
-            label: '',
-            value: '',
-            references,
-          },
-        ],
-      },
-    ];
-  }
 
   return result;
 }

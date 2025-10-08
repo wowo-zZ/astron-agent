@@ -31,7 +31,7 @@ import {
   PluginTabType,
   ToolOperateType,
   ToolNode,
-  useAddPluginType,
+  useAddAgentPluginType,
 } from '@/components/workflow/types';
 import { Icons } from '@/components/workflow/icons';
 import { useMemoizedFn } from 'ahooks';
@@ -438,7 +438,7 @@ const PluginList = ({
   );
 };
 
-const useAddPlugin = (): useAddPluginType => {
+const useAddPlugin = (): useAddAgentPluginType => {
   const { handleAddToolNode } = useFlowCommon();
   const loader = useRef<null | HTMLDivElement>(null);
   const loadingRef = useRef<boolean>(false);
@@ -779,6 +779,7 @@ const AddPlugin = (): React.ReactElement => {
                         <ToolDetail
                           currentToolInfo={currentToolInfo}
                           handleClearData={handleClearData}
+                          handleToolDebugger={() => setToolOperate('test')}
                         />
                       )}
                     </>

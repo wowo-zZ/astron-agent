@@ -397,6 +397,11 @@ class TestXinghuoRag:
         mock_response.text.return_value = (
             '{"code": 0, "flag": true, "data": {"result": "success"}}'
         )
+        mock_span = MagicMock()
+        mock_span_context = MagicMock()
+        mock_span.__enter__ = MagicMock(return_value=mock_span_context)
+        mock_span.__exit__ = MagicMock(return_value=None)
+
         mock_response.json.return_value = {
             "code": 0,
             "flag": True,
@@ -411,7 +416,10 @@ class TestXinghuoRag:
                 new=AsyncMock(return_value={"appId": "test"}),
             ):
                 result = await async_form_request(
-                    {"test": "data"}, "https://test-api.xinghuo.com/test", "POST"
+                    {"test": "data"},
+                    "https://test-api.xinghuo.com/test",
+                    "POST",
+                    span=mock_span,
                 )
 
                 assert result == {"result": "success"}

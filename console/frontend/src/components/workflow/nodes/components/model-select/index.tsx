@@ -25,10 +25,10 @@ import inputErrorMsg from '@/assets/imgs/plugin/input_error_msg.svg';
 
 // 模型标签
 const ModelTags = ({ tags = [] }): React.ReactElement => {
-  if (!tags.length) return null;
+  if (!tags?.length) return null;
   return (
     <div className="text-sm flex items-center gap-2">
-      {tags.slice(0, 2).map((item, index) => (
+      {tags?.slice(0, 2).map((item, index) => (
         <span
           key={index}
           className="rounded text-xss bg-[#ecefff] px-2 max-w-[80px] text-overflow"
@@ -37,11 +37,11 @@ const ModelTags = ({ tags = [] }): React.ReactElement => {
           {item}
         </span>
       ))}
-      {tags.length > 2 && (
+      {tags?.length > 2 && (
         <Tooltip
           title={
             <div className="flex flex-wrap">
-              {tags.map((item, index) => (
+              {tags?.map((item, index) => (
                 <span
                   key={index}
                   className="rounded text-xss bg-[#ecefff] mb-1 mr-1 px-2 py-1"
@@ -55,7 +55,7 @@ const ModelTags = ({ tags = [] }): React.ReactElement => {
           overlayClassName="white-tooltip"
         >
           <span className="rounded text-xss bg-[#ecefff] px-2 text-[333] text-sm">
-            +{tags.length - 2}
+            +{tags?.length - 2}
           </span>
         </Tooltip>
       )}
@@ -313,7 +313,7 @@ const useModelSelect = (
         }),
       };
     });
-    handleResetModelParams(data);
+    handleResetModelParams(currentModel);
   });
 
   return {

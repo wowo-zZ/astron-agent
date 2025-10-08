@@ -2,11 +2,13 @@ import useChatStore from '@/store/chat-store';
 import { getLanguageCode } from '@/utils/http';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 import { useRef } from 'react';
-import type { BotInfoType, Option } from '@/types/chat';
+import type { Option } from '@/types/chat';
 import { useNavigate } from 'react-router-dom';
+import { baseURL } from '@/utils/http';
 
 // SSE 数据类型定义
 interface SSEData {
+  code?: number;
   sseId?: string;
   type?: string;
   choices?: Array<{
@@ -29,15 +31,21 @@ interface SSEData {
   ignore?: boolean;
   error?: string | boolean;
   message?: string;
+  reqId?: number;
 }
 
 interface SSEEvent {
   data: string;
 }
+const ERROR_CODE = [10013, 10014, 10019];
+const ERROR_TEXT =
+  '抱歉,您这个问题我暂时无法回答,我抓紧学习一下,争取下次给您满意的答复。';
 
 const useChat = () => {
   const controllerRef = useRef<AbortController>(new AbortController()); //sse请求控制器
   const sidRef = useRef<string>(''); //sid
+  const reqIdRef = useRef<number>(0); //reqId
+  const messageList = useChatStore(state => state.messageList); //消息列表
   const currentChatId = useChatStore(state => state.currentChatId); //当前聊天id
   const chatFileListNoReq = useChatStore(state => state.chatFileListNoReq); //文件列表
   const setStreamId = useChatStore(state => state.setStreamId); //对话流id
@@ -72,7 +80,11 @@ const useChat = () => {
    * @param form 表单数据
    * @param token 极验token
    */
-  const fetchSSE = async (url: string, form: FormData): Promise<void> => {
+  const fetchSSE = async (
+    url: string,
+    form: FormData,
+    isnewchat: boolean = true
+  ): Promise<void> => {
     let ans: string = '';
     let nodeChat: boolean = false;
     let nodeChatContent: string = '';
@@ -83,26 +95,36 @@ const useChat = () => {
       'Lang-Code': getLanguageCode(),
       authorization: `Bearer ${localStorage.getItem('accessToken')}`,
     };
-    addMessage({
-      id: Date.now(),
-      message: (() => {
-        try {
-          const textValue = form.get('text')?.toString() || '{}';
-          const parsed = JSON.parse(textValue);
-          return parsed?.id || textValue;
-        } catch {
-          return form.get('text')?.toString() || '';
-        }
-      })(),
-      updateTime: new Date().toISOString(),
-      reqId: 'USER',
-      chatFileList: chatFileListNoReq,
-    });
+    if (isnewchat) {
+      addMessage({
+        id: Date.now(),
+        message: (() => {
+          try {
+            const textValue = form.get('text')?.toString() || '{}';
+            const parsed = JSON.parse(textValue);
+            return parsed?.id || textValue;
+          } catch {
+            return form.get('text')?.toString() || '';
+          }
+        })(),
+        updateTime: new Date().toISOString(),
+        reqType: 'USER',
+        chatFileList: chatFileListNoReq,
+      });
+    } else if (!isnewchat) {
+      //删除最后一条回答
+      const lastMessage = messageList[messageList.length - 1];
+      if (lastMessage?.reqType === 'BOT') {
+        messageList.pop();
+      }
+    }
+
     // 开始流式消息
     startStreamingMessage({
       id: Date.now() + 1, // 临时ID，完成后会被替换
       message: '',
-      reqId: 'BOT',
+      reqType: 'BOT',
+      reqId: 0,
       updateTime: new Date().toISOString(),
     });
     fetchEventSource(url, {
@@ -119,6 +141,7 @@ const useChat = () => {
       onmessage(event: SSEEvent): void {
         const deCodedData: SSEData = JSON.parse(event.data);
         const {
+          code,
           sseId,
           type,
           choices,
@@ -130,14 +153,14 @@ const useChat = () => {
           abort,
           ignore,
           error,
-          message,
+          reqId,
         } = deCodedData;
         sseId && setStreamId(sseId);
         id && (sidRef.current = id.toString());
+        reqId && (reqIdRef.current = reqId);
         if (type === 'start') {
           return;
         }
-
         setIsLoading(false);
         //工具  模型返回溯源结果
         if (
@@ -184,10 +207,10 @@ const useChat = () => {
             content: nodeChatContent,
           });
         }
-        if (!error) {
+        if (!error && !ERROR_CODE.includes(code || 0)) {
           if (end) {
             // 完成流式消息，添加sid和id
-            finishStreamingMessage(sidRef.current, id);
+            finishStreamingMessage(sidRef.current, reqIdRef.current);
             controller.abort('结束');
             return;
           }
@@ -195,8 +218,9 @@ const useChat = () => {
           ans = `${ans}${choices?.[0]?.delta?.content || ''}`;
           updateStreamingMessage(ans);
         } else {
-          const errorMsg = message || '发生未知错误';
-          updateStreamingMessage(errorMsg);
+          //统一的报错处理
+          updateStreamingMessage(ERROR_TEXT);
+          finishStreamingMessage(sidRef.current, reqIdRef.current);
           controller.abort('错误结束');
           return;
         }
@@ -224,20 +248,7 @@ const useChat = () => {
     setIsWorkflowOption(false);
     setWorkflowOption({ option: [], content: '' });
     const { msg, workflowOperation, version, fileUrl, onSendCallback } = params;
-    let esURL = `/chat-message/chat`;
-    if (
-      typeof window !== 'undefined' &&
-      window.location.hostname === 'localhost'
-    ) {
-      esURL = `/xingchen-api/chat-message/chat`;
-    } else {
-      const mode = import.meta.env.VITE_MODE;
-      if (mode === 'development') {
-        esURL = `http://172.29.202.54:8080/chat-message/chat`;
-      } else {
-        esURL = `http://172.29.201.92:8080/chat-message/chat`;
-      }
-    }
+    const esURL = `${baseURL}chat-message/chat`;
     const form = new FormData();
     form.append('text', msg || '');
     form.append('chatId', `${currentChatId}`);
@@ -249,6 +260,16 @@ const useChat = () => {
     fetchSSE(esURL, form);
   };
 
+  //重新回答
+  const handleReAnswer = async (params: { requestId: number }) => {
+    const { requestId } = params;
+    const esURL = `${baseURL}chat-message/re-answer`;
+    const form = new FormData();
+    form.append('requestId', requestId.toString());
+    form.append('chatId', `${currentChatId}`);
+    fetchSSE(esURL, form, false);
+  };
+
   //去对话页面
   const handleToChat = (botId: number) => {
     navigate(`/chat/${botId}`);
@@ -258,6 +279,7 @@ const useChat = () => {
     onSendMsg,
     handleToChat,
     fetchSSE,
+    handleReAnswer,
   };
 };
 

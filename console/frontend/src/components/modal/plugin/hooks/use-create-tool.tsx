@@ -36,7 +36,7 @@ const useFormManagement = (): {
   baseForm: FormInstance<BaseFormData>;
   paramsForm: FormInstance<ParamsFormData>;
   baseFormData: BaseFormData;
-  setBaseFormData: (data: BaseFormData) => void;
+  setBaseFormData: React.Dispatch<React.SetStateAction<BaseFormData>>;
   resetBaseForms: () => void;
 } => {
   const [baseForm] = Form.useForm();
@@ -984,6 +984,7 @@ const useCreateToolReturn = ({
   paramsForm: FormInstance<ParamsFormData>;
   avatarColor: AvatarType[];
   avatarIcon: AvatarType[];
+  setBaseFormData: React.Dispatch<React.SetStateAction<BaseFormData>>;
 } => {
   return {
     // 步骤管理
@@ -1041,6 +1042,7 @@ const useCreateToolReturn = ({
 
     avatarColor: initialization.avatarColor,
     avatarIcon: initialization.avatarIcon,
+    setBaseFormData: formManagement.setBaseFormData,
   };
 };
 
@@ -1118,6 +1120,7 @@ export const useCreateTool = ({
   outputParamsData: InputParamsData[];
   avatarColor: AvatarType[];
   avatarIcon: AvatarType[];
+  setBaseFormData: React.Dispatch<React.SetStateAction<BaseFormData>>;
 } => {
   const currentToolId = currentToolInfo?.id;
 

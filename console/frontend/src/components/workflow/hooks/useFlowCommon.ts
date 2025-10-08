@@ -183,6 +183,7 @@ export const useFlowCommon = (): UseFlowCommonReturn => {
     willAddNode.data.nodeParam.projectId = rpaParam.project_id;
     willAddNode.data.nodeParam.source = rpaParam.platform;
     willAddNode.data.nodeParam.header = rpaParam.fields;
+    willAddNode.data.nodeParam.appId = currentFlow?.appId || '';
     willAddNode.data.inputs = transRpaParameters(
       rpaParam.parameters?.filter(item => item.varDirection === 0) || []
     );
@@ -235,7 +236,7 @@ export const useFlowCommon = (): UseFlowCommonReturn => {
         return null;
       } else {
         const currentTypeList = nodes.filter(
-          node => node.type === addNode?.data?.nodeMeta?.aliasName
+          node => node?.nodeType === nodeType
         );
         addNode.data.nodeParam.appId = currentFlow?.appId;
         addNode.data.nodeParam.uid = user?.uid?.toString();

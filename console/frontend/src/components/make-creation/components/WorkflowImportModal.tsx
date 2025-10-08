@@ -115,6 +115,9 @@ function WorkflowImportModal({
         setWorkflowImportModalVisible(false);
         navigate(`/work_flow/${res.flowId}/arrange`);
       })
+      .catch((err: { message?: string }) => {
+        message.error(err?.message ?? '导入失败');
+      })
       .finally(() => {
         setLoading(false);
       });
