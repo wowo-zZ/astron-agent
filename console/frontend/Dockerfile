@@ -73,3 +73,8 @@ EXPOSE ${NGINX_PORT}
 
 # 只复制一次构建出的静态资源
 COPY --from=builder /app/dist /var/www
+
+COPY console/frontend/docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
