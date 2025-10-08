@@ -94,7 +94,8 @@ public class AgentSquareServiceImpl implements AgentSquareService {
                             market.getPrompt(),
                             market.getBotDesc(),
                             finalFavoriteIds.contains(market.getBotId()),
-                            creatorName);
+                            creatorName,
+                            market.getVersion());
                 })
                 .collect(Collectors.toList());
         return new BotListPageDto(
