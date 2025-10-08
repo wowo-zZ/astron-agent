@@ -133,8 +133,8 @@ maas:
   consumerId: ${MAAS_CONSUMER_ID:your-maas-consumer-id}
   consumerSecret: ${MAAS_CONSUMER_SECRET:your-maas-consumer-secret}
   consumerKey: ${MAAS_CONSUMER_KEY:your-maas-consumer-key}
-  publishApi: http://10.1.87.65:7880/v1/publish
-  authApi: http://10.1.87.65:7880/v1/auth
+  publishApi: http://10.1.87.65:7880/workflow/v1/publish
+  authApi: http://10.1.87.65:7880/workflow/v1/auth
   mcpHost: https://xingchen-api.xf-yun.com/mcp/xingchen/flow/%s/sse
   mcpRegister: http://127.0.0.1:8080/workflow/release
   workflowConfig: http://127.0.0.1:8080/workflow/get-flow-advanced-config
