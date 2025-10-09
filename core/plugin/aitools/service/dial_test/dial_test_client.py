@@ -1,16 +1,29 @@
 import json
 import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import Any, Dict, List, Optional, TypedDict, Union
 
 import requests
-
 from common.http_request import HttpRequest
+
+
+class ErrorResponse(TypedDict):
+    code: int
+    message: str
+    data: Dict[str, str]
 
 
 class APIConfiguration:
     def __init__(
-        self, target_url, method, headers, params, payload, success_code, call_frequency
-    ):
+        self,
+        target_url: str,
+        method: str,
+        headers: Dict[str, str],
+        params: Dict[str, Any],
+        payload: Dict[str, Any],
+        success_code: int,
+        call_frequency: int,
+    ) -> None:
         self.url = target_url
         self.method = method
         self.headers = headers
@@ -31,8 +44,10 @@ class APIConfiguration:
 
 
 class APITester:
-    def execute_request(self, config):
-        ex_res = {
+    def execute_request(
+        self, config: APIConfiguration
+    ) -> Union[ErrorResponse, Dict[str, Any]]:
+        ex_res: ErrorResponse = {
             "code": -1,
             "message": "failed",
             "data": {"url": config.url, "msg": "error"},
@@ -62,7 +77,7 @@ class APITester:
 
 
 class MainRunner:
-    def __init__(self, max_workers=None):
+    def __init__(self, max_workers: Optional[int] = None) -> None:
         # load_dotenv('../../../dialtest.env')
         self.api_configs = self.load_api_configs()
         self.tester = APITester()
@@ -71,21 +86,24 @@ class MainRunner:
         )  # Default to a reasonable number of workers
 
     # 接口列表
-    def interface_list(self):
+    def interface_list(self) -> List[str]:
         # int_list = ["TTS", "SMARTTS", "ONE_SENTENCE_REPRODUCTION"]
 
         # print('("INTERFACE_LIST_STR"):',os.getenv("INTERFACE_LIST_STR"))
         int_list_str = os.getenv("INTERFACE_LIST_STR")
-        int_list = int_list_str.split(",")
+        if int_list_str:
+            int_list = int_list_str.split(",")
+        else:
+            int_list = []
         return int_list
 
-    def load_api_configs(self):
+    def load_api_configs(self) -> List[APIConfiguration]:
         configs = []
         for prefix in self.interface_list():
             configs.append(
                 APIConfiguration(
-                    target_url=os.getenv(f"{prefix}_URL"),
-                    method=os.getenv(f"{prefix}_METHOD"),
+                    target_url=os.getenv(f"{prefix}_URL", ""),
+                    method=os.getenv(f"{prefix}_METHOD", "GET"),
                     headers=json.loads(os.getenv(f"{prefix}_HEADERS", "{}")),
                     params=json.loads(os.getenv(f"{prefix}_PARAMS", "{}")),
                     payload=json.loads(os.getenv(f"{prefix}_PAYLOAD", "{}")),
@@ -96,13 +114,13 @@ class MainRunner:
 
         return configs
 
-    def run_tests(self):
+    def run_tests(self) -> Dict[str, Any]:
         with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
             futures = {
                 executor.submit(self.tester.execute_request, config): config
                 for config in self.api_configs
             }
-            results = {}
+            results: Dict[str, Any] = {}
             for future in as_completed(futures):
                 config = futures[future]
                 try:

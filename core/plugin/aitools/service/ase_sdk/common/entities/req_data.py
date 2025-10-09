@@ -1,3 +1,5 @@
+from typing import Optional
+
 from plugin.aitools.service.ase_sdk.__base.entities.req_data import (
     BaseReqSourceData,
     ReqData,
@@ -13,5 +15,5 @@ class Credentials(BaseModel):
 
 
 class CommonReqSourceData(BaseReqSourceData):
-    credentials: Credentials = None
-    req_data: ReqData = None
+    credentials: Optional[Credentials] = None
+    req_data: Optional[ReqData] = None
