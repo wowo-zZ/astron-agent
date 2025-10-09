@@ -119,7 +119,7 @@ class BotChatServiceImplUnitTest {
         when(chatBotDataService.findMarketBotByBotId(anyInt())).thenReturn(chatBotMarket);
         when(chatDataService.createRequest(any())).thenReturn(createdRecord);
         when(knowledgeService.getChuncksByBotId(anyInt(), anyString(), anyInt())).thenReturn(knowledgeList);
-        when(chatHistoryService.getSystemBotHistory(anyString(), anyLong())).thenReturn(historyMessages);
+        when(chatHistoryService.getSystemBotHistory(anyString(), anyLong(), anyBoolean())).thenReturn(historyMessages);
         when(reqKnowledgeRecordsDataService.create(any())).thenReturn(null);
         doNothing().when(sparkChatService).chatStream(any(), any(), any(), any(), anyBoolean(), anyBoolean());
 
@@ -151,7 +151,7 @@ class BotChatServiceImplUnitTest {
         when(chatBotDataService.findMarketBotByBotId(anyInt())).thenReturn(chatBotMarket);
         when(chatDataService.createRequest(any())).thenReturn(createdRecord);
         when(knowledgeService.getChuncksByBotId(anyInt(), anyString(), anyInt())).thenReturn(knowledgeList);
-        when(chatHistoryService.getSystemBotHistory(anyString(), anyLong())).thenReturn(historyMessages);
+        when(chatHistoryService.getSystemBotHistory(anyString(), anyLong(), anyBoolean())).thenReturn(historyMessages);
         when(modelService.getDetail(anyInt(), anyLong(), any())).thenReturn(new ApiResult<>(0, "success", llmInfoVo, 1L));
         when(reqKnowledgeRecordsDataService.create(any())).thenReturn(null);
         doNothing().when(promptChatService).chatStream(any(), any(), any(), any(), anyBoolean(), anyBoolean());
@@ -182,7 +182,7 @@ class BotChatServiceImplUnitTest {
         when(chatBotDataService.findMarketBotByBotId(anyInt())).thenReturn(chatBotMarket);
         when(chatDataService.createRequest(any())).thenReturn(createdRecord);
         lenient().when(knowledgeService.getChuncksByBotId(anyInt(), anyString(), anyInt())).thenReturn(knowledgeList);
-        lenient().when(chatHistoryService.getSystemBotHistory(anyString(), anyLong())).thenReturn(historyMessages);
+        lenient().when(chatHistoryService.getSystemBotHistory(anyString(), anyLong(), anyBoolean())).thenReturn(historyMessages);
         when(modelService.getDetail(anyInt(), anyLong(), any())).thenReturn(new ApiResult<>(0, "success", null, 1L));
         lenient().when(reqKnowledgeRecordsDataService.create(any())).thenReturn(null);
 
@@ -210,7 +210,7 @@ class BotChatServiceImplUnitTest {
         when(chatBotDataService.findById(anyInt())).thenReturn(Optional.of(chatBotBase));
         when(chatDataService.createRequest(any())).thenReturn(createdRecord);
         when(knowledgeService.getChuncksByBotId(anyInt(), anyString(), anyInt())).thenReturn(knowledgeList);
-        when(chatHistoryService.getSystemBotHistory(anyString(), anyLong())).thenReturn(historyMessages);
+        when(chatHistoryService.getSystemBotHistory(anyString(), anyLong(), anyBoolean())).thenReturn(historyMessages);
         when(reqKnowledgeRecordsDataService.create(any())).thenReturn(null);
         doNothing().when(sparkChatService).chatStream(any(), any(), any(), any(), anyBoolean(), anyBoolean());
 
@@ -251,7 +251,7 @@ class BotChatServiceImplUnitTest {
 
         when(chatDataService.findRequestById(requestId)).thenReturn(chatReqRecords);
         when(chatBotDataService.findMarketBotByBotId(botId)).thenReturn(chatBotMarket);
-        when(chatHistoryService.getSystemBotHistory(anyString(), anyLong())).thenReturn(historyMessages);
+        when(chatHistoryService.getSystemBotHistory(anyString(), anyLong(), anyBoolean())).thenReturn(historyMessages);
         when(knowledgeService.getChuncksByBotId(anyInt(), anyString(), anyInt())).thenReturn(Arrays.asList("knowledge"));
         when(reqKnowledgeRecordsDataService.create(any())).thenReturn(null);
         doNothing().when(sparkChatService).chatStream(any(), any(), any(), any(), anyBoolean(), anyBoolean());
