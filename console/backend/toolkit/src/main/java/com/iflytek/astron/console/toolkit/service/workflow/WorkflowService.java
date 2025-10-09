@@ -158,11 +158,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class WorkflowService extends ServiceImpl<WorkflowMapper, Workflow> {
 
-    public static final String PROTOCOL_ADD_PATH = "/sparkflow/v1/protocol/add";
-    public static final String PROTOCOL_UPDATE_PATH = "/sparkflow/v1/protocol/update/";
-    public static final String PROTOCOL_DELETE_PATH = "/sparkflow/v1/protocol/delete";
-    public static final String NODE_DEBUG_PATH = "/sparkflow/v1/node/debug/";
-    public static final String PROTOCOL_BUILD_PATH = "/sparkflow/v1/protocol/build/";
+    public static final String PROTOCOL_ADD_PATH = "/workflow/v1/protocol/add";
+    public static final String PROTOCOL_UPDATE_PATH = "/workflow/v1/protocol/update/";
+    public static final String PROTOCOL_DELETE_PATH = "/workflow/v1/protocol/delete";
+    public static final String NODE_DEBUG_PATH = "/workflow/v1/node/debug/";
+    public static final String PROTOCOL_BUILD_PATH = "/workflow/v1/protocol/build/";
     public static final String CODE_RUN_PATH = "/workflow/v1/run";
     public static final String CLONED_SUFFIX_PATTERN = "[(]\\d+[)]$";
 
@@ -1064,21 +1064,28 @@ public class WorkflowService extends ServiceImpl<WorkflowMapper, Workflow> {
         // Fill app/ak/sk
         String appId = bizNodeData.getNodeParam().getString("appId");
         AkSk aksk = appService.remoteCallAkSk(appId);
+        ConfigInfo configInfo = configInfoMapper.getByCategoryAndCode("NODE_API_K_S", "NODE");
+        List<String> configs = new ArrayList<>();
+        if (configInfo != null) {
+            configs = Arrays.asList(configInfo.getValue().split(","));
+        }
         try {
-            bizNodeData.getNodeParam().put("apiKey", aksk.getApiKey());
-            bizNodeData.getNodeParam().put("apiSecret", aksk.getApiSecret());
+            if (!configs.contains(prefix)) {
+                bizNodeData.getNodeParam().put("apiKey", aksk.getApiKey());
+                bizNodeData.getNodeParam().put("apiSecret", aksk.getApiSecret());
 
-            if (!node.getId().startsWith(WorkflowConst.NodeType.FLOW)
-                    && CommonConst.FIXED_APPID_ENV.contains(env)) {
-                buidKeyInfo(bizNodeData);
-            }
-            String source = bizNodeData.getNodeParam().getString("source");
-            if ("openai".equals(source)) {
-                Long modelId = bizNodeData.getNodeParam().getLong("modelId");
-                if (modelId != null) {
-                    Model model = modelService.getById(modelId);
-                    bizNodeData.getNodeParam().put("apiKey", model.getApiKey());
-                    bizNodeData.getNodeParam().put("apiSecret", StringUtils.EMPTY);
+                if (!node.getId().startsWith(WorkflowConst.NodeType.FLOW)
+                        && CommonConst.FIXED_APPID_ENV.contains(env)) {
+                    buidKeyInfo(bizNodeData);
+                }
+                String source = bizNodeData.getNodeParam().getString("source");
+                if ("openai".equals(source)) {
+                    Long modelId = bizNodeData.getNodeParam().getLong("modelId");
+                    if (modelId != null) {
+                        Model model = modelService.getById(modelId);
+                        bizNodeData.getNodeParam().put("apiKey", model.getApiKey());
+                        bizNodeData.getNodeParam().put("apiSecret", StringUtils.EMPTY);
+                    }
                 }
             }
             if (SpaceInfoUtil.getSpaceId() != null && "database".equals(prefix)) {
@@ -1111,7 +1118,12 @@ public class WorkflowService extends ServiceImpl<WorkflowMapper, Workflow> {
         String response = OkHttpUtil.post(url, body);
         log.info("node debug, response = {}", response);
 
-        NodeDebugResponse nodeDebugResponse = JSON.parseObject(response, NodeDebugResponse.class);
+        NodeDebugResponse nodeDebugResponse = null;
+        try {
+            nodeDebugResponse = JSON.parseObject(response, NodeDebugResponse.class);
+        } catch (Exception e) {
+            throw new BusinessException(ResponseEnum.RESPONSE_FAILED, response);
+        }
         if (nodeDebugResponse.getCode() != 0) {
             throw new BusinessException(ResponseEnum.RESPONSE_FAILED, nodeDebugResponse.getMessage());
         }
@@ -1831,28 +1843,38 @@ public class WorkflowService extends ServiceImpl<WorkflowMapper, Workflow> {
             protocol = new FlowProtocol();
             // Fill app elements
             List<BizWorkflowNode> nodes = bizWorkflowData.getNodes();
+            ConfigInfo configInfo = configInfoMapper.getByCategoryAndCode("NODE_API_K_S", "NODE");
+            List<String> configs = new ArrayList<>();
+            if (configInfo != null) {
+                configs = Arrays.asList(configInfo.getValue().split(","));
+            }
             for (BizWorkflowNode node : nodes) {
                 boolean notFlowNode = !node.getId().startsWith(WorkflowConst.NodeType.FLOW);
                 BizNodeData bizNodeData = node.getData();
+                String prefix = node.getId().split("::")[0];
                 String type = node.getType();
                 try {
                     if (notFlowNode && fixedAppEnv) {
                         buidKeyInfo(bizNodeData);
                     } else {
-                        bizNodeData.getNodeParam().put("appId", appId);
-                        bizNodeData.getNodeParam().put("apiKey", apiKey);
-                        bizNodeData.getNodeParam().put("apiSecret", apiSecret);
+                        if (!configs.contains(prefix)) {
+                            bizNodeData.getNodeParam().put("appId", appId);
+                            bizNodeData.getNodeParam().put("apiKey", apiKey);
+                            bizNodeData.getNodeParam().put("apiSecret", apiSecret);
+                        }
+
                     }
                     String source = bizNodeData.getNodeParam().getString("source");
                     if ("openai".equals(source)) {
                         Long modelId = bizNodeData.getNodeParam().getLong("modelId");
                         if (modelId != null) {
                             Model model = modelService.getById(modelId);
-                            bizNodeData.getNodeParam().put("apiKey", model.getApiKey());
-                            bizNodeData.getNodeParam().put("apiSecret", StringUtils.EMPTY);
+                            if (!configs.contains(prefix)) {
+                                bizNodeData.getNodeParam().put("apiKey", model.getApiKey());
+                                bizNodeData.getNodeParam().put("apiSecret", StringUtils.EMPTY);
+                            }
                         }
                     }
-                    String prefix = node.getId().split("::")[0];
                     // Agent node changes
                     checkAndEditData(bizNodeData, prefix);
                     // Knowledge base node new parameter passing logic
