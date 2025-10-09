@@ -451,6 +451,7 @@ public class BotServiceImpl implements BotService {
                 .prologue(bot.getPrologue())
                 .botDesc(bot.getBotDesc())
                 .botTemplate(bot.getBotTemplate())
+                .version(BotTypeEnum.SYSTEM_BOT.getType())
                 .supportContext(bot.getSupportContext())
                 .supportSystem(bot.getSupportSystem())
                 .supportDocument(bot.getSupportDocument())
