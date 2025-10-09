@@ -2,6 +2,7 @@
 
 import _thread as thread
 import base64
+import binascii
 import datetime
 import hashlib
 import hmac
@@ -9,6 +10,7 @@ import json
 import os
 import ssl
 from time import mktime
+from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import urlencode
 from wsgiref.handlers import format_date_time
 
@@ -21,7 +23,15 @@ STATUS_LAST_FRAME = 2  # 最后一帧的标识
 
 class Ws_Param:
     # 初始化
-    def __init__(self, APPID, APIKey, APISecret, Text, res_id, speed):
+    def __init__(
+        self,
+        APPID: str,
+        APIKey: str,
+        APISecret: str,
+        Text: str,
+        res_id: str,
+        speed: int,
+    ) -> None:
         """Initialize WebSocket parameters for TTS synthesis.
 
         All 6 parameters are essential for TTS authentication and configuration:
@@ -115,7 +125,15 @@ class TTSClient:
     from authentication through configuration to data collection and output.
     """
 
-    def __init__(self, app_id, api_key, api_secret, text, res_id, speed):
+    def __init__(
+        self,
+        app_id: str,
+        api_key: str,
+        api_secret: str,
+        text: str,
+        res_id: str,
+        speed: int,
+    ) -> None:
         """Initialize TTS client with authentication and synthesis parameters.
 
         All 6 parameters are required for complete TTS functionality:
@@ -150,35 +168,37 @@ class TTSClient:
             self.speed,
         )
 
-        self.messages = []  # 存储所有消息
+        self.messages: List[Dict[str, Any]] = []  # 存储所有消息
         self.audio_data = bytearray()  # 用于存储所有音频数据
 
-    def synthesize(self):
-        def on_message(ws, message):
+    def synthesize(self) -> Tuple[List[Dict[str, Any]], bytearray]:
+        def on_message(ws: websocket.WebSocket, message: str) -> None:
             try:
-                message = json.loads(message)
-                self.messages.append(message)  # 存储消息
-                code = message["header"]["code"]
-                # sid = message["header"]["sid"]
-                if "payload" in message:
-                    self._process_audio_data(ws, message, code)
-            except (json.JSONDecodeError, KeyError, base64.binascii.Error):
+                message_dict = json.loads(message)
+                self.messages.append(message_dict)  # 存储消息
+                code = message_dict["header"]["code"]
+                # sid = message_dict["header"]["sid"]
+                if "payload" in message_dict:
+                    self._process_audio_data(ws, message_dict, code)
+            except (json.JSONDecodeError, KeyError, binascii.Error):
                 pass
 
-        def on_error(_ws, _error):
+        def on_error(_ws: websocket.WebSocket, _error: Exception) -> None:
             pass
 
-        def on_close(_ws, _ts, _end):
+        def on_close(
+            _ws: websocket.WebSocket, _ts: Optional[int], _end: Optional[str]
+        ) -> None:
             pass
 
-        def on_open(ws):
-            def run(*_args):
-                d = {
+        def on_open(ws: websocket.WebSocket) -> None:
+            def run(*_args: Any) -> None:
+                d_dict = {
                     "header": self.wsParam.CommonArgs,
                     "parameter": self.wsParam.BusinessArgs,
                     "payload": self.wsParam.Data,
                 }
-                d = json.dumps(d)
+                d = json.dumps(d_dict)
                 # print("------>开始发送文本数据")
                 ws.send(d)
                 if os.path.exists("./demo.mp3"):
@@ -197,7 +217,7 @@ class TTSClient:
 
         return self.messages, self.audio_data  # 返回消息和文件路径
 
-    def _process_audio_data(self, ws, message, code):
+    def _process_audio_data(self, ws: Any, message: Dict[str, Any], code: int) -> None:
         """处理音频数据"""
         audio = message["payload"]["audio"]["audio"]
         audio = base64.b64decode(audio)
@@ -211,18 +231,20 @@ class TTSClient:
             with open("./demo.mp3", "ab") as f:
                 f.write(audio)
         # else:
-            # errMsg = message["message"]
-            # print("sid:%s call error:%s code is:%s" % (sid, errMsg, code))
+        # errMsg = message["message"]
+        # print("sid:%s call error:%s code is:%s" % (sid, errMsg, code))
 
     @staticmethod
-    def assemble_ws_auth_url(requset_url, method="GET", api_key="", api_secret=""):
+    def assemble_ws_auth_url(
+        requset_url: str, method: str = "GET", api_key: str = "", api_secret: str = ""
+    ) -> str:
         class Url:
-            def __init__(self, host, path, schema):
+            def __init__(self, host: str, path: str, schema: str) -> None:
                 self.host = host
                 self.path = path
                 self.schema = schema
 
-        def parse_url(requset_url):
+        def parse_url(requset_url: str) -> "Url":
             stidx = requset_url.index("://")
             host = requset_url[stidx + 3 :]
             schema = requset_url[: stidx + 3]
@@ -233,7 +255,7 @@ class TTSClient:
             host = host[:edidx]
             return Url(host, path, schema)
 
-        def sha256base64(data):
+        def sha256base64(data: bytes) -> str:
             sha256 = hashlib.sha256()
             sha256.update(data)
             digest = base64.b64encode(sha256.digest()).decode(encoding="utf-8")
@@ -245,12 +267,14 @@ class TTSClient:
         now = datetime.datetime.now()
         date = format_date_time(mktime(now.timetuple()))
         signature_origin = f"host: {host}\ndate: {date}\n{method} {path} HTTP/1.1"
-        signature_sha = hmac.new(
+        signature_sha_bytes: bytes = hmac.new(
             api_secret.encode("utf-8"),
             signature_origin.encode("utf-8"),
             digestmod=hashlib.sha256,
         ).digest()
-        signature_sha = base64.b64encode(signature_sha).decode(encoding="utf-8")
+        signature_sha: str = base64.b64encode(signature_sha_bytes).decode(
+            encoding="utf-8"
+        )
         authorization_origin = (
             f'api_key="{api_key}", algorithm="hmac-sha256", '
             f'headers="host date request-line", signature="{signature_sha}"'

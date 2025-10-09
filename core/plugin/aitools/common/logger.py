@@ -20,7 +20,7 @@ logger.add(
 )
 
 
-def init_uvicorn_logger():
+def init_uvicorn_logger() -> None:
     logger_names = ("uvicorn.asgi", "uvicorn.access", "uvicorn")
 
     # change handler for default uvicorn logger

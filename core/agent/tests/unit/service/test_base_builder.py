@@ -535,9 +535,13 @@ class TestBaseApiBuilder:
             # Assert
             assert isinstance(result, BaseLLMModel)
             assert result.name == "gpt-3.5-turbo"
-            mock_openai.assert_called_once_with(
-                api_key="provided_key", base_url="https://api.openai.com/v1"
-            )
+            # Verify AsyncOpenAI was called with correct parameters
+            call_kwargs = mock_openai.call_args.kwargs
+            assert call_kwargs["api_key"] == "provided_key"
+            assert call_kwargs["base_url"] == "https://api.openai.com/v1"
+            assert call_kwargs["timeout"] == 300.0
+            assert call_kwargs["max_retries"] == 2
+            assert "http_client" in call_kwargs
 
     @pytest.mark.unit
     @pytest.mark.asyncio
@@ -567,9 +571,13 @@ class TestBaseApiBuilder:
             # Assert
             assert isinstance(result, BaseLLMModel)
             mock_query_sk.assert_called_once_with("test_app", "gpt-3.5-turbo")
-            mock_openai.assert_called_once_with(
-                api_key="maas_generated_key", base_url="https://api.openai.com/v1"
-            )
+            # Verify AsyncOpenAI was called with correct parameters
+            call_kwargs = mock_openai.call_args.kwargs
+            assert call_kwargs["api_key"] == "maas_generated_key"
+            assert call_kwargs["base_url"] == "https://api.openai.com/v1"
+            assert call_kwargs["timeout"] == 300.0
+            assert call_kwargs["max_retries"] == 2
+            assert "http_client" in call_kwargs
 
     @pytest.mark.unit
     @pytest.mark.asyncio

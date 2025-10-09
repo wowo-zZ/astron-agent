@@ -1,6 +1,7 @@
 import logging
 import os
 from concurrent.futures import ThreadPoolExecutor
+from typing import Generator, List, Union
 
 from plugin.aitools.service.ase_sdk.__base.power import Power
 from plugin.aitools.service.ase_sdk.util.pdf_convert import pdf_convert_png
@@ -33,12 +34,12 @@ class OcrLLMClientMultithreading(Power):
         method: str = "GET",
     ):
         super().__init__(url, method)
-        self.ocr_llm_clients = []
+        self.ocr_llm_clients: List[Union[OcrLLMClient, List[OcrLLMClient]]] = []
         self.executor = ThreadPoolExecutor(
             max_workers=int(os.getenv("OCR_LLM_THREAD_WORKS", 3))
         )
 
-    async def invoke(self, req_source_data: OcrLLMReqSourceDataMultithreading):
+    async def invoke(self, req_source_data: OcrLLMReqSourceDataMultithreading) -> None:
         """
         能力执行
 
@@ -49,8 +50,8 @@ class OcrLLMClientMultithreading(Power):
 
         """
         try:
-            all_image = []
-            all_clients = []
+            all_image: List[bytes] = []
+            all_clients: List[OcrLLMClient] = []
 
             # 初始化 ocr client
             for data_byte in req_source_data.body.payload.data:
@@ -96,7 +97,7 @@ class OcrLLMClientMultithreading(Power):
         except Exception as e:
             raise e
 
-    def _subscribe(self):
+    def _subscribe(self) -> "Generator[OcrResultMStream, None, None]":
         """
         订阅处理
         Returns:

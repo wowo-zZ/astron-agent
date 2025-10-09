@@ -55,6 +55,41 @@ class BaseLLMModel(BaseModel):
             sp.add_info_events({"converted-message": str(error)})
         llm_plugin_error("-1", str(error))
 
+    def _get_error_message_for_exception(self, error: Exception) -> str:
+        """Generate appropriate error message based on exception type"""
+        error_type = type(error).__name__
+        error_msg = str(error)
+        error_msg_lower = error_msg.lower()
+
+        if "ssl" in error_msg_lower or "certificate" in error_msg_lower:
+            return (
+                f"SSL certificate error: {error_msg}. "
+                "Try setting SKIP_SSL_VERIFY=true for testing."
+            )
+        elif "connection" in error_msg_lower or "connect" in error_msg_lower:
+            return (
+                f"Connection error: {error_msg}. "
+                "Please check network connectivity and API endpoint."
+            )
+        elif "timeout" in error_msg_lower:
+            return (
+                f"Request timeout: {error_msg}. "
+                "The server took too long to respond."
+            )
+        else:
+            return f"{error_type}: {error_msg}"
+
+    def _handle_exception(self, error: Exception, sp: Span | None) -> None:
+        """Handle general exceptions including SSL and connection errors"""
+        error_type = type(error).__name__
+        error_msg = str(error)
+
+        if sp is not None:
+            sp.add_error_event(f"LLM request failed: {error_type}: {error_msg}")
+
+        error_message = self._get_error_message_for_exception(error)
+        llm_plugin_error("-1", error_message)
+
     async def stream(
         self, messages: list, stream: bool, span: Span | None = None
     ) -> AsyncIterator[ChatCompletionChunk]:
@@ -74,7 +109,9 @@ class BaseLLMModel(BaseModel):
                     sp.add_info_events({"llm-chunk": chunk.model_dump_json()})
 
                 if chunk_dict.get("code", 0) != 0:
-                    llm_plugin_error(chunk_dict.get("code"), chunk_dict.get("message"))
+                    llm_plugin_error(
+                        chunk_dict.get("code"), chunk_dict.get("message")
+                    )
 
                 yield chunk
 
@@ -82,5 +119,5 @@ class BaseLLMModel(BaseModel):
             self._handle_api_timeout_error(e)
         except APIError as error:
             self._handle_api_error(error, sp)
-        except (ValueError, TypeError, KeyError) as e:
-            self._handle_general_error(e, sp)
+        except Exception as e:
+            self._handle_exception(e, sp)

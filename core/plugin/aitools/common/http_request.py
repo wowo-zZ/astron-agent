@@ -1,12 +1,16 @@
 """
 HTTP request utility module providing HTTP client request functionality.
+
+TODO: refactor input config type validation with Pydantic
 """
+
+from typing import Any, Dict
 
 import requests
 
 
 class HttpRequest:
-    def __init__(self, config: dict):
+    def __init__(self, config: Dict[str, Any]) -> None:
         """
         初始化时传入配置字典 config，配置字典可以包含以下字段：
         - 'method': 请求方法（如 'GET', 'POST' 等）
@@ -18,10 +22,10 @@ class HttpRequest:
         """
         self.config = config
 
-    def send(self):
+    def send(self) -> requests.Response:
         # 提取方法、URL 和其他配置项
         method = self.config.get("method", "GET").upper()
-        url = self.config.get("url")
+        url = self.config.get("url", "")
         headers = self.config.get("headers", {})
         params = self.config.get("params", {})
         payload = self.config.get("payload", {})
