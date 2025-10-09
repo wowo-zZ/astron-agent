@@ -489,6 +489,10 @@ services:
     container_name: astron-agent-console-frontend
     environment:
       CONSOLE_API_URL: "${CONSOLE_API_URL:-}"
+      CONSOLE_CASDOOR_URL: "${CONSOLE_CASDOOR_URL:-}"
+      CONSOLE_CASDOOR_ID: "${CONSOLE_CASDOOR_ID:-}"
+      CONSOLE_CASDOOR_APP: "${CONSOLE_CASDOOR_APP:-}"
+      CONSOLE_CASDOOR_ORG: "${CONSOLE_CASDOOR_ORG:-}"
     ports:
       - "${CONSOLE_FRONTEND_PORT:-1881}:1881"
     networks:
