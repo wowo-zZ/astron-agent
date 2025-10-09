@@ -180,4 +180,6 @@ public interface ChatBotDataService {
     List<Integer> getReleaseChannel(String uid, Integer botId);
 
     ChatBotBase findOne(String uid, Long botId);
+
+    void updateChatBotMarket(ChatBotBase chatBotBase);
 }

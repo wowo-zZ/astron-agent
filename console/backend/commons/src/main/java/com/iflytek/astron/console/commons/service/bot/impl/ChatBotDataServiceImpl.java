@@ -628,4 +628,30 @@ public class ChatBotDataServiceImpl implements ChatBotDataService {
         }
         return chatBotBaseMapper.selectOne(botSearch);
     }
+
+    @Override
+    public void updateChatBotMarket(ChatBotBase chatBotBase) {
+        UpdateWrapper<ChatBotMarket> wrapper = new UpdateWrapper<>();
+        wrapper.eq("uid", chatBotBase.getUid());
+        wrapper.eq("bot_id", chatBotBase.getId());
+        wrapper.set("bot_name", chatBotBase.getBotName());
+        wrapper.set("avatar", chatBotBase.getAvatar());
+        wrapper.set("bot_type", chatBotBase.getBotType());
+        wrapper.set("bot_desc", chatBotBase.getBotDesc());
+        wrapper.set("pc_background", chatBotBase.getPcBackground());
+        wrapper.set("app_background", chatBotBase.getAppBackground());
+        wrapper.set("background_color", chatBotBase.getBackgroundColor());
+        wrapper.set("prompt", chatBotBase.getPrompt());
+        wrapper.set("prologue", chatBotBase.getPrologue());
+        wrapper.set("support_context", chatBotBase.getSupportContext());
+        wrapper.set("version", chatBotBase.getVersion());
+        wrapper.set("model", chatBotBase.getModel());
+        wrapper.set("opened_tool", chatBotBase.getOpenedTool());
+        wrapper.set("client_hide", chatBotBase.getClientHide());
+        wrapper.set("model_id", chatBotBase.getModelId());
+        wrapper.set("support_document", chatBotBase.getSupportDocument());
+        wrapper.set("update_time", LocalDateTime.now());
+        chatBotMarketMapper.update(null, wrapper);
+        log.debug("Updated chat bot market uid={}, botId={}", chatBotBase.getUid(), chatBotBase.getId());
+    }
 }

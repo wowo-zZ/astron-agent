@@ -431,6 +431,7 @@ public class BotServiceImpl implements BotService {
 
             chatBotDataService.updateBot(botBase);
             chatListDataService.updateChatBotList(botBase);
+            chatBotDataService.updateChatBotMarket(botBase);
         } catch (Exception e) {
             log.error("uid update bot basic info error, uid: {}", uid, e);
             throw new BusinessException(ResponseEnum.UPDATE_BOT_FAILED);
