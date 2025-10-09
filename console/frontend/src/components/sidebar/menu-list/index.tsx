@@ -4,7 +4,7 @@ import { Popover, Modal, message } from 'antd';
 import { menuList } from '@/constants';
 import useUserStore from '@/store/user-store';
 import eventBus from '@/utils/event-bus';
-import { jumpTologin } from '@/utils/http';
+import { jumpToLogin } from '@/utils/http';
 import { checkUserInfo } from '@/services/spark-common';
 import useChat from '@/hooks/use-chat';
 import { useEnterprise } from '@/hooks/use-enterprise';
@@ -25,7 +25,7 @@ import enterpriseShareCreate from '@/assets/imgs/space/enterpriseShareCreate.png
 import enterpriseSpaceJoin from '@/assets/imgs/space/enterpriseSpaceJoin.png';
 import arrowRight from '@/assets/imgs/space/arrowRight.png';
 import { deleteChatList } from '@/services/chat';
-import { PostChatItem, FavoriteEntry } from '@/types/chat';
+import { PostChatItem } from '@/types/chat';
 
 // Constants
 const getAllMessage = async (params: any) => {
@@ -271,56 +271,26 @@ const RecentList: FC<RecentListProps> = ({
 };
 
 interface MenuListProps {
+  isCollapsed: boolean;
   mixedChatList: PostChatItem[];
-  favoriteBotList: FavoriteEntry[];
   onRefreshData?: () => void;
 }
 
-const MenuList: FC<MenuListProps> = ({
-  mixedChatList,
-  favoriteBotList,
-  onRefreshData,
-}) => {
-  const { t, i18n } = useTranslation();
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  // User store
-  const user = useUserStore((state: any) => state.user);
-  const setMobile = useUserStore((state: any) => state.setMobile);
-
-  // Space store
-  const {
-    isShowSpacePopover,
-    spaceName,
-    spaceType,
-    spaceId,
-    enterpriseId,
-    spaceAvatar,
-    setSpaceType,
-    setEnterpriseId,
-    setEnterpriseName,
-    setIsShowSpacePopover,
-  } = useSpaceStore();
-
-  // Enterprise hooks
-  const { joinedEnterpriseList, checkNeedCreateTeamFn, isTeamSpaceEmpty } =
-    useEnterprise();
-
-  // Local state - using local state instead of recoil
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [hoverTab, setHoverTab] = useState('');
-  const [menuActiveKey, setMenuActiveKey] = useState('');
-  const [showRecent, setShowRecent] = useState(true);
-  const [chatListId, setChatListId] = useState('');
-  const [deleteOpen, setDeleteOpen] = useState(false);
-
-  // Refs
-  const spaceButtonRef = useRef<HTMLDivElement | null>(null);
-
-  // Custom hooks
-  const { handleToChat } = useChat();
-
+// Helper functions for MenuList component
+const useMenuListHelpers = (
+  t: any,
+  user: any,
+  setMobile: any,
+  checkNeedCreateTeamFn: any,
+  setMenuActiveKey: any,
+  setIsShowSpacePopover: any,
+  spaceButtonRef: any,
+  handleToChat: any,
+  setChatListId: any,
+  setDeleteOpen: any,
+  chatListId: string,
+  onRefreshData?: () => void
+) => {
   // 动态设置 Popover 的最大高度
   const updatePopoverMaxHeight = () => {
     if (spaceButtonRef.current) {
@@ -335,7 +305,7 @@ const MenuList: FC<MenuListProps> = ({
 
   const handleShowSpacePopover = () => {
     updatePopoverMaxHeight(); // 更新 CSS 变量
-    setIsShowSpacePopover(!isShowSpacePopover);
+    setIsShowSpacePopover((prev: boolean) => !prev);
   };
 
   // Chat and favorites management
@@ -351,7 +321,7 @@ const MenuList: FC<MenuListProps> = ({
 
   const handleDeleteChatConfirm = () => {
     deleteChatList({
-      chatListId: chatListId,
+      chatListId: Number(chatListId),
     })
       .then((res: any) => {
         setDeleteOpen(false);
@@ -389,8 +359,8 @@ const MenuList: FC<MenuListProps> = ({
     getUserAuth();
   };
 
-  // Effects
-  useEffect(() => {
+  // Effects handlers
+  const initializeActiveMenu = (location: any) => {
     const path = window.location.pathname.replace(
       '/application-development',
       ''
@@ -402,15 +372,32 @@ const MenuList: FC<MenuListProps> = ({
         }
       });
     });
-  }, [location]);
+  };
 
-  useEffect(() => {
+  const initializeApp = () => {
     checkLogin();
     getMessages('0');
-  }, []);
+  };
 
-  // 根据 spaceStore 状态动态生成 menuList
-  const getDynamicMenuList = useMemo(() => {
+  return {
+    handleShowSpacePopover,
+    handleNavigateToChat,
+    handleDeleteChat,
+    handleDeleteChatConfirm,
+    initializeActiveMenu,
+    initializeApp,
+  };
+};
+
+// Helper function for dynamic menu list generation
+const useDynamicMenuList = (
+  isTeamSpaceEmpty: boolean,
+  spaceType: any,
+  spaceId: any,
+  spaceName: any,
+  t: any
+) => {
+  return useMemo(() => {
     // 无团队空间展示 智能体广场及插件广场
     if (isTeamSpaceEmpty) {
       return menuList.slice(0, 1);
@@ -433,7 +420,254 @@ const MenuList: FC<MenuListProps> = ({
         return tab;
       }),
     }));
-  }, [spaceType, spaceId, spaceName, isTeamSpaceEmpty]);
+  }, [spaceType, spaceId, spaceName, isTeamSpaceEmpty, t]);
+};
+
+// Space Button Component
+const SpaceButton: FC<{
+  isCollapsed: boolean;
+  spaceName: string;
+  spaceType: string;
+  spaceAvatar: string;
+  spaceButtonRef: React.RefObject<HTMLDivElement>;
+  isShowSpacePopover: boolean;
+  handleShowSpacePopover: () => void;
+  setIsShowSpacePopover: (show: boolean) => void;
+  t: any;
+}> = ({
+  isCollapsed,
+  spaceName,
+  spaceType,
+  spaceAvatar,
+  spaceButtonRef,
+  isShowSpacePopover,
+  handleShowSpacePopover,
+  setIsShowSpacePopover,
+  t,
+}) => (
+  <Popover
+    content={PersonSpace}
+    title={null}
+    trigger="click"
+    open={isShowSpacePopover}
+    placement="rightTop"
+    overlayClassName="[&_.ant-popover-inner]:ml-0 [&_.ant-popover-inner]:p-4 [&_.ant-popover-inner]:rounded-2xl [&_.ant-popover-inner]:max-h-[calc(100vh-var(--popover-top,100px)-20px)] [&_.ant-popover-inner-content]:max-h-[calc(100vh-var(--popover-top,100px)-44px)] [&_.ant-input-affix-wrapper]:py-1.5 [&_.ant-input-affix-wrapper]:px-[7px]"
+    arrow={false}
+    getPopupContainer={triggerNode =>
+      triggerNode.parentElement || document.body
+    }
+    autoAdjustOverflow={false}
+    onOpenChange={visible => {
+      if (!visible) {
+        setIsShowSpacePopover(false);
+      }
+    }}
+  >
+    <div
+      className="text-center whitespace-nowrap text-xs py-2.5 px-3 flex cursor-pointer justify-between text-[#1f1f1f] rounded-lg relative before:content-[''] before:absolute before:-top-3.5 before:left-0 before:w-full before:h-px before:bg-[rgba(226,232,255,0.5)] hover:text-[#275eff] hover:bg-[#f5f8ff] group"
+      ref={spaceButtonRef}
+      onClick={handleShowSpacePopover}
+    >
+      <div className="w-full flex items-center justify-between gap-2 text-base font-normal leading-5">
+        <div className="flex">
+          <img
+            src={
+              spaceAvatar || require('@/assets/imgs/space/contacts-fill.svg')
+            }
+            alt="space"
+            className="w-[18px] h-[18px] rounded-[2px] mr-2"
+          />
+          {!isCollapsed && (
+            <div className="min-w-[110px] max-w-[120px] overflow-hidden text-ellipsis whitespace-nowrap">
+              {spaceName ||
+                (spaceType === 'personal'
+                  ? t('sidebar.personalSpace')
+                  : t('sidebar.teamSpace'))}
+            </div>
+          )}
+        </div>
+
+        {!isCollapsed && (
+          <img src={spaceMore} alt="more" className="w-[18px] h-[18px]" />
+        )}
+        {isCollapsed && (
+          <div className="w-auto rounded-lg bg-white shadow-[0px_0px_20px_0px_rgba(0,18,70,0.08)] text-[#333333] whitespace-nowrap py-3 px-5 absolute -top-1.5 left-[54px] z-[3] hidden group-hover:block">
+            {spaceName ||
+              (spaceType === 'personal'
+                ? t('sidebar.personalSpace')
+                : t('sidebar.teamSpace'))}
+          </div>
+        )}
+      </div>
+    </div>
+  </Popover>
+);
+
+// Menu Tab Component
+const MenuTab: FC<{
+  tab: any;
+  isCollapsed: boolean;
+  menuActiveKey: string;
+  hoverTab: string;
+  setMenuActiveKey: (key: string) => void;
+  setHoverTab: (key: string) => void;
+  navigate: any;
+}> = ({
+  tab,
+  isCollapsed,
+  menuActiveKey,
+  hoverTab,
+  setMenuActiveKey,
+  setHoverTab,
+  navigate,
+}) => (
+  <div
+    key={`${tab?.subTitle}`}
+    className={`group relative flex items-center px-3 py-3 gap-2 cursor-pointer rounded-[10px] hover:bg-[#F8FAFF] hover:text-[#275EFF] ${
+      [menuActiveKey, hoverTab].includes(tab.activeTab)
+        ? 'bg-[#F8FAFF] text-[#275EFF]'
+        : 'text-[#7F7F7F]'
+    } ${
+      tab.subTitle === '插件广场' || tab.subTitle === '智能体广场'
+        ? ''
+        : !isCollapsed && 'ml-6'
+    }`}
+    onClick={() => {
+      setMenuActiveKey(tab.activeTab);
+      navigate(tab.path);
+    }}
+    onMouseEnter={() => setHoverTab(tab.activeTab)}
+    onMouseLeave={() => setHoverTab('')}
+  >
+    <img
+      src={
+        [menuActiveKey, hoverTab].includes(tab.activeTab)
+          ? tab.iconAct
+          : tab.icon
+      }
+      className="w-[18px] h-[18px] flex-shrink-0"
+      alt=""
+    />
+    {!isCollapsed && <span className="relative text-sm">{tab.subTitle}</span>}
+    {isCollapsed && (
+      <div
+        className={`rounded-lg bg-white shadow-[0px_0px_20px_0px_rgba(0,18,70,0.08)] text-[#333333] whitespace-nowrap py-3 px-5 absolute -top-1.5 left-[54px] z-[3] ${
+          hoverTab === tab.activeTab ? 'block' : 'hidden'
+        }`}
+      >
+        {tab.subTitle}
+      </div>
+    )}
+  </div>
+);
+
+// Delete Modal Component
+const DeleteModal: FC<{
+  deleteOpen: boolean;
+  setDeleteOpen: (open: boolean) => void;
+  handleDeleteChatConfirm: () => void;
+  t: any;
+}> = ({ deleteOpen, setDeleteOpen, handleDeleteChatConfirm, t }) => (
+  <Modal
+    open={deleteOpen}
+    onCancel={() => setDeleteOpen(false)}
+    closeIcon={null}
+    className="[&_.ant-modal-content]:!py-8 [&_.ant-modal-content]:!px-8 [&_.ant-modal-content]:!pb-6 [&_.ant-btn]:mt-3 [&_.ant-btn]:w-[63px] [&_.ant-btn]:h-8"
+    centered
+    width={352}
+    maskClosable={false}
+    onOk={handleDeleteChatConfirm}
+  >
+    <div className="text-black/85 flex items-center gap-2.5 text-base font-medium leading-[1.4] overflow-hidden">
+      <img
+        src={require('@/assets/imgs/sidebar/warning.svg')}
+        alt=""
+        className="w-[22px] h-[22px]"
+      />
+      <span>{t('sidebar.confirmRemove')}</span>
+    </div>
+  </Modal>
+);
+
+const MenuList: FC<MenuListProps> = ({
+  isCollapsed,
+  mixedChatList,
+  onRefreshData,
+}) => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // User store
+  const user = useUserStore((state: any) => state.user);
+  const setMobile = useUserStore((state: any) => state.setMobile);
+
+  // Space store
+  const {
+    isShowSpacePopover,
+    spaceName,
+    spaceType,
+    spaceId,
+    spaceAvatar,
+    setIsShowSpacePopover,
+  } = useSpaceStore();
+
+  // Enterprise hooks
+  const { checkNeedCreateTeamFn, isTeamSpaceEmpty } = useEnterprise();
+
+  // Local state - using local state instead of recoil
+  const [hoverTab, setHoverTab] = useState('');
+  const [menuActiveKey, setMenuActiveKey] = useState('');
+  const [showRecent, setShowRecent] = useState(true);
+  const [chatListId, setChatListId] = useState('');
+  const [deleteOpen, setDeleteOpen] = useState(false);
+
+  // Refs
+  const spaceButtonRef = useRef<HTMLDivElement | null>(null);
+
+  // Custom hooks
+  const { handleToChat } = useChat();
+
+  // Helper functions
+  const {
+    handleShowSpacePopover,
+    handleNavigateToChat,
+    handleDeleteChat,
+    handleDeleteChatConfirm,
+    initializeActiveMenu,
+    initializeApp,
+  } = useMenuListHelpers(
+    t,
+    user,
+    setMobile,
+    checkNeedCreateTeamFn,
+    setMenuActiveKey,
+    setIsShowSpacePopover,
+    spaceButtonRef,
+    handleToChat,
+    setChatListId,
+    setDeleteOpen,
+    chatListId,
+    onRefreshData
+  );
+
+  // Dynamic menu list
+  const getDynamicMenuList = useDynamicMenuList(
+    isTeamSpaceEmpty,
+    spaceType,
+    spaceId,
+    spaceName,
+    t
+  );
+
+  // Effects
+  useEffect(() => {
+    initializeActiveMenu(location);
+  }, [location]);
+
+  useEffect(() => {
+    initializeApp();
+  }, []);
 
   return (
     <div
@@ -447,111 +681,29 @@ const MenuList: FC<MenuListProps> = ({
           className="text-gray-500 font-medium"
         >
           {item.title && (
-            <Popover
-              content={PersonSpace}
-              title={null}
-              trigger="click"
-              open={isShowSpacePopover}
-              placement="rightTop"
-              overlayClassName="[&_.ant-popover-inner]:ml-0 [&_.ant-popover-inner]:p-4 [&_.ant-popover-inner]:rounded-2xl [&_.ant-popover-inner]:max-h-[calc(100vh-var(--popover-top,100px)-20px)] [&_.ant-popover-inner-content]:max-h-[calc(100vh-var(--popover-top,100px)-44px)] [&_.ant-input-affix-wrapper]:py-1.5 [&_.ant-input-affix-wrapper]:px-[7px]"
-              arrow={false}
-              getPopupContainer={triggerNode =>
-                triggerNode.parentElement || document.body
-              }
-              autoAdjustOverflow={false}
-              onOpenChange={visible => {
-                if (!visible) {
-                  setIsShowSpacePopover(false);
-                }
-              }}
-            >
-              <div
-                className="text-center whitespace-nowrap text-xs py-2.5 px-3 flex cursor-pointer justify-between text-[#1f1f1f] rounded-lg relative before:content-[''] before:absolute before:-top-3.5 before:left-0 before:w-full before:h-px before:bg-[rgba(226,232,255,0.5)] hover:text-[#275eff] hover:bg-[#f5f8ff] group"
-                ref={spaceButtonRef}
-                onClick={() => {
-                  handleShowSpacePopover();
-                }}
-              >
-                <div className="w-full flex items-center justify-between gap-2 text-base font-normal leading-5">
-                  <div className="flex">
-                    <img
-                      src={
-                        spaceAvatar ||
-                        require('@/assets/imgs/space/contacts-fill.svg')
-                      }
-                      alt="space"
-                      className="w-[18px] h-[18px] rounded-[2px] mr-2"
-                    />
-                    {!isCollapsed && (
-                      <div className="min-w-[110px] max-w-[120px] overflow-hidden text-ellipsis whitespace-nowrap">
-                        {spaceName ||
-                          (spaceType === 'personal'
-                            ? t('sidebar.personalSpace')
-                            : t('sidebar.teamSpace'))}
-                      </div>
-                    )}
-                  </div>
-
-                  {!isCollapsed && (
-                    <img
-                      src={spaceMore}
-                      alt="more"
-                      className="w-[18px] h-[18px]"
-                    />
-                  )}
-                  {isCollapsed && (
-                    <div className="w-auto rounded-lg bg-white shadow-[0px_0px_20px_0px_rgba(0,18,70,0.08)] text-[#333333] whitespace-nowrap py-3 px-5 absolute -top-1.5 left-[54px] z-[3] hidden group-hover:block">
-                      {spaceName ||
-                        (spaceType === 'personal'
-                          ? t('sidebar.personalSpace')
-                          : t('sidebar.teamSpace'))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </Popover>
+            <SpaceButton
+              isCollapsed={isCollapsed}
+              spaceName={spaceName}
+              spaceType={spaceType}
+              spaceAvatar={spaceAvatar}
+              spaceButtonRef={spaceButtonRef}
+              isShowSpacePopover={isShowSpacePopover}
+              handleShowSpacePopover={handleShowSpacePopover}
+              setIsShowSpacePopover={setIsShowSpacePopover}
+              t={t}
+            />
           )}
           {item.tabs.map((tab: any, i) => (
-            <div
+            <MenuTab
               key={`${i}-${tab?.subTitle}`}
-              className={`group relative flex items-center px-3 py-3 gap-2 cursor-pointer rounded-[10px] hover:bg-[#F8FAFF] hover:text-[#275EFF] ${
-                [menuActiveKey, hoverTab].includes(tab.activeTab)
-                  ? 'bg-[#F8FAFF] text-[#275EFF]'
-                  : 'text-[#7F7F7F]'
-              } ${
-                tab.subTitle === '插件广场' || tab.subTitle === '智能体广场'
-                  ? ''
-                  : !isCollapsed && 'ml-6'
-              }`}
-              onClick={() => {
-                setMenuActiveKey(tab.activeTab);
-                navigate(tab.path);
-              }}
-              onMouseEnter={() => setHoverTab(tab.activeTab)}
-              onMouseLeave={() => setHoverTab('')}
-            >
-              <img
-                src={
-                  [menuActiveKey, hoverTab].includes(tab.activeTab)
-                    ? tab.iconAct
-                    : tab.icon
-                }
-                className="w-[18px] h-[18px] flex-shrink-0"
-                alt=""
-              />
-              {!isCollapsed && (
-                <span className="relative text-sm">{tab.subTitle}</span>
-              )}
-              {isCollapsed && (
-                <div
-                  className={`rounded-lg bg-white shadow-[0px_0px_20px_0px_rgba(0,18,70,0.08)] text-[#333333] whitespace-nowrap py-3 px-5 absolute -top-1.5 left-[54px] z-[3] ${
-                    hoverTab === tab.activeTab ? 'block' : 'hidden'
-                  }`}
-                >
-                  {tab.subTitle}
-                </div>
-              )}
-            </div>
+              tab={tab}
+              isCollapsed={isCollapsed}
+              menuActiveKey={menuActiveKey}
+              hoverTab={hoverTab}
+              setMenuActiveKey={setMenuActiveKey}
+              setHoverTab={setHoverTab}
+              navigate={navigate}
+            />
           ))}
         </div>
       ))}
@@ -570,26 +722,12 @@ const MenuList: FC<MenuListProps> = ({
         handleDeleteChat={handleDeleteChat}
       />
 
-      {/* Delete confirmation modal */}
-      <Modal
-        open={deleteOpen}
-        onCancel={() => setDeleteOpen(false)}
-        closeIcon={null}
-        className="[&_.ant-modal-content]:!py-8 [&_.ant-modal-content]:!px-8 [&_.ant-modal-content]:!pb-6 [&_.ant-btn]:mt-3 [&_.ant-btn]:w-[63px] [&_.ant-btn]:h-8"
-        centered
-        width={352}
-        maskClosable={false}
-        onOk={handleDeleteChatConfirm}
-      >
-        <div className="text-black/85 flex items-center gap-2.5 text-base font-medium leading-[1.4] overflow-hidden">
-          <img
-            src={require('@/assets/imgs/sidebar/warning.svg')}
-            alt=""
-            className="w-[22px] h-[22px]"
-          />
-          <span>{t('sidebar.confirmRemove')}</span>
-        </div>
-      </Modal>
+      <DeleteModal
+        deleteOpen={deleteOpen}
+        setDeleteOpen={setDeleteOpen}
+        handleDeleteChatConfirm={handleDeleteChatConfirm}
+        t={t}
+      />
     </div>
   );
 };

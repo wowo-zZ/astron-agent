@@ -538,14 +538,14 @@ const formatHistoryToMessages = (chatHistoryList: ChatHistoryResponse[]) => {
       history.historyList.forEach((msg: any) => {
         const formattedMessage = {
           ...msg,
-          reqId: msg.reqId ? 'BOT' : 'USER',
+          reqType: msg.reqId ? 'BOT' : 'USER',
         };
         formattedMessages.push(formattedMessage);
       });
       if (index < chatHistoryList.length - 1) {
         formattedMessages.push({
           id: new Date().getTime(),
-          reqId: 'START',
+          reqType: 'START',
           message: '全新的开始',
         });
       }

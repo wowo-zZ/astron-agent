@@ -27,7 +27,7 @@ import UseToolsInfo from './use-tools-info';
 import WorkflowNodeOptions from './workflow-node-options';
 import { formatFileSize, getFileIcon } from '@/utils';
 import FilePreview from './file-preview';
-
+import ResqBottomButtons from './resq-bottom-buttons';
 //渲染全新开始
 const renderRestart = (): ReactElement => {
   return (
@@ -213,6 +213,7 @@ const MessageList = (props: {
     const showLoading = !item.sid && (isLoading || !!answerPercent);
     const workflowContent = item?.workflowEventData?.content;
     const messageContent = workflowContent ? workflowContent : item.message;
+    const isLastMessage = messageIndex === messageList.length - 1; //是否是最后一条消息
     return (
       <div
         className="mt-[14px] w-[inherit] max-w-full"
@@ -263,7 +264,7 @@ const MessageList = (props: {
             />
             <WorkflowNodeOptions
               message={item}
-              isLastMessage={messageIndex === messageList.length - 1}
+              isLastMessage={isLastMessage}
               workflowOperation={workflowOperation}
               selectedOptionId={selectedOptionId}
               onOptionClick={handleNodeClick}
@@ -271,6 +272,9 @@ const MessageList = (props: {
           </div>
         </div>
         {item?.sid && <SourceInfoBox traceSource={item?.traceSource} />}
+        {item?.sid && (
+          <ResqBottomButtons message={item} isLastMessage={isLastMessage} />
+        )}
       </div>
     );
   };
@@ -289,9 +293,9 @@ const MessageList = (props: {
               const actualIndex = messageList.length - 1 - index; // 计算真实的消息索引
               return (
                 <div className="w-[inherit]" key={actualIndex}>
-                  {item?.reqId === 'USER' && renderReq(item)}
-                  {item?.reqId === 'BOT' && renderResp(item, actualIndex)}
-                  {item?.reqId === 'START' && renderRestart()}
+                  {item?.reqType === 'USER' && renderReq(item)}
+                  {item?.reqType === 'BOT' && renderResp(item, actualIndex)}
+                  {item?.reqType === 'START' && renderRestart()}
                 </div>
               );
             })}

@@ -6,7 +6,6 @@ import { NodeCommonProps } from '../../types';
 
 export const RpaDetail = memo((props: NodeCommonProps) => {
   const { id, data } = props;
-  console.log(data, 99999, id);
 
   return (
     <div className="p-[14px] pb-[6px]">

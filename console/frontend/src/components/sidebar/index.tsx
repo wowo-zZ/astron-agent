@@ -12,6 +12,7 @@ import { postChatList } from '@/services/chat';
 import { getFavoriteList } from '@/services/agent-square';
 import { PostChatItem, FavoriteEntry } from '@/types/chat';
 import eventBus from '@/utils/event-bus';
+import CreateApplicationModal from '@/components/create-application-modal';
 
 interface User {
   nickname?: string;
@@ -56,7 +57,6 @@ interface SidebarProps {
       isRead: number;
     }>;
   };
-  onDocumentClick?: () => void;
 }
 
 const Sidebar = ({
@@ -75,14 +75,12 @@ const Sidebar = ({
   // Bottom login props
   user,
   OrderTypeComponent,
-
-  // Icon entry props
-  myMessage,
-  onDocumentClick,
 }: SidebarProps): ReactElement => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isPersonCenterOpen, setIsPersonCenterOpen] = useState(false);
   const [noticeModalVisible, setNoticeModalVisible] = useState(false);
+  const [ApplicationModalVisible, setCreateModalVisible] =
+    useState<boolean>(false); //创建应用
 
   // Shared chat data state
   const [mixedChatList, setMixedChatList] = useState<PostChatItem[]>([]);
@@ -119,6 +117,11 @@ const Sidebar = ({
     }
   };
 
+  // Create bot
+  const createBot = () => {
+    setCreateModalVisible(true);
+  };
+
   // Effect to fetch data on mount and setup event listeners
   useEffect(() => {
     getChatList();
@@ -127,8 +130,10 @@ const Sidebar = ({
     // Setup event bus listeners for data changes
     eventBus.on('chatListChange', getChatList);
     eventBus.on('favoriteChange', getFavoriteBotListLocal);
+    eventBus.on('createBot', createBot);
 
     return () => {
+      eventBus.off('createBot', createBot);
       eventBus.off('chatListChange', getChatList);
       eventBus.off('favoriteChange', getFavoriteBotListLocal);
     };
@@ -189,6 +194,7 @@ const Sidebar = ({
         />
 
         <MenuList
+          isCollapsed={isCollapsed}
           mixedChatList={mixedChatList}
           favoriteBotList={favoriteBotList}
           onRefreshData={() => {
@@ -199,8 +205,6 @@ const Sidebar = ({
 
         {/* Icon Entry */}
         <IconEntry
-          myMessage={myMessage}
-          onDocumentClick={onDocumentClick}
           onMessageClick={() => {
             setNoticeModalVisible(true);
           }}
@@ -236,6 +240,12 @@ const Sidebar = ({
           open={noticeModalVisible}
           onClose={() => {
             setNoticeModalVisible(false);
+          }}
+        />
+        <CreateApplicationModal
+          visible={ApplicationModalVisible}
+          onCancel={() => {
+            setCreateModalVisible(false);
           }}
         />
       </div>

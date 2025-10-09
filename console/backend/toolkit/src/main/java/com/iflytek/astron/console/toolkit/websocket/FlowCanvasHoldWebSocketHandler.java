@@ -16,18 +16,20 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * WebSocket handler for maintaining flow canvas real-time connections.
  * <p>
- * This handler keeps track of active WebSocket sessions associated with workflow canvases.
- * Each session corresponds to a specific flowId and sends periodic heartbeat messages
- * to Redis to indicate the connection's liveness.
+ * This handler keeps track of active WebSocket sessions associated with workflow canvases. Each
+ * session corresponds to a specific flowId and sends periodic heartbeat messages to Redis to
+ * indicate the connection's liveness.
  * </p>
  *
- * <p><b>Key responsibilities:</b></p>
+ * <p>
+ * <b>Key responsibilities:</b>
+ * </p>
  * <ul>
- *     <li>Track session-to-flowId mapping.</li>
- *     <li>Record heartbeat timestamps in Redis for each session.</li>
- *     <li>Respond to ping messages with "pong".</li>
- *     <li>Count and return the number of alive sessions for each flow.</li>
- *     <li>Automatically clean up expired heartbeats every 10 seconds.</li>
+ * <li>Track session-to-flowId mapping.</li>
+ * <li>Record heartbeat timestamps in Redis for each session.</li>
+ * <li>Respond to ping messages with "pong".</li>
+ * <li>Count and return the number of alive sessions for each flow.</li>
+ * <li>Automatically clean up expired heartbeats every 10 seconds.</li>
  * </ul>
  *
  * @author
@@ -51,8 +53,8 @@ public class FlowCanvasHoldWebSocketHandler extends TextWebSocketHandler {
     /**
      * Called when a new WebSocket connection is established.
      * <p>
-     * Retrieves the flowId from query parameters, validates it, and records
-     * the session heartbeat timestamp in Redis. Returns the number of alive sessions.
+     * Retrieves the flowId from query parameters, validates it, and records the session heartbeat
+     * timestamp in Redis. Returns the number of alive sessions.
      * </p>
      *
      * @param session the {@link WebSocketSession} that has been established
@@ -81,8 +83,8 @@ public class FlowCanvasHoldWebSocketHandler extends TextWebSocketHandler {
     /**
      * Handles text messages received from the WebSocket client.
      * <p>
-     * If the message is a "ping", updates the heartbeat timestamp and replies with "pong".
-     * Otherwise, calculates and sends the number of alive sessions.
+     * If the message is a "ping", updates the heartbeat timestamp and replies with "pong". Otherwise,
+     * calculates and sends the number of alive sessions.
      * </p>
      *
      * @param session the {@link WebSocketSession} associated with this message
@@ -92,7 +94,8 @@ public class FlowCanvasHoldWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void handleTextMessage(@NotNull WebSocketSession session, @NotNull TextMessage message) throws IOException {
         String flowId = flowIdMap.get(session.getId());
-        if (flowId == null) return;
+        if (flowId == null)
+            return;
 
         String redisKey = REDIS_HEARTBEAT_PREFIX + flowId;
         long now = System.currentTimeMillis();
@@ -113,7 +116,7 @@ public class FlowCanvasHoldWebSocketHandler extends TextWebSocketHandler {
      * Logs the error, notifies the client, and closes the session if necessary.
      * </p>
      *
-     * @param session   the {@link WebSocketSession} where the error occurred
+     * @param session the {@link WebSocketSession} where the error occurred
      * @param exception the {@link Throwable} representing the error
      * @throws IOException if sending message or closing session fails
      */
@@ -133,12 +136,13 @@ public class FlowCanvasHoldWebSocketHandler extends TextWebSocketHandler {
      * </p>
      *
      * @param session the {@link WebSocketSession} that was closed
-     * @param status  the {@link CloseStatus} indicating reason and code
+     * @param status the {@link CloseStatus} indicating reason and code
      */
     @Override
     public void afterConnectionClosed(@NotNull WebSocketSession session, @NotNull CloseStatus status) {
         String flowId = flowIdMap.remove(session.getId());
-        if (flowId == null) return;
+        if (flowId == null)
+            return;
 
         String redisKey = REDIS_HEARTBEAT_PREFIX + flowId;
         redisUtil.hdel(redisKey, session.getId());
@@ -147,12 +151,12 @@ public class FlowCanvasHoldWebSocketHandler extends TextWebSocketHandler {
     /**
      * Counts the number of active (non-expired) heartbeat sessions.
      * <p>
-     * Iterates through all heartbeat timestamps in Redis and counts
-     * sessions whose heartbeat time is within the expiration window.
+     * Iterates through all heartbeat timestamps in Redis and counts sessions whose heartbeat time is
+     * within the expiration window.
      * </p>
      *
      * @param redisKey the Redis hash key storing heartbeat data
-     * @param now      the current timestamp in milliseconds
+     * @param now the current timestamp in milliseconds
      * @return the number of alive sessions
      */
     private int countAliveSessions(String redisKey, long now) {
@@ -174,8 +178,8 @@ public class FlowCanvasHoldWebSocketHandler extends TextWebSocketHandler {
     /**
      * Periodically clears expired session heartbeats.
      * <p>
-     * This method runs every 10 seconds and removes entries older than
-     * {@link #HEARTBEAT_EXPIRE_MS} from Redis.
+     * This method runs every 10 seconds and removes entries older than {@link #HEARTBEAT_EXPIRE_MS}
+     * from Redis.
      * </p>
      *
      * @implNote The scheduling interval is defined via {@code @Scheduled(fixedDelay = 10000)}.

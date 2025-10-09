@@ -9,7 +9,7 @@ from typing import Any, Dict, Iterator, Optional
 
 from loguru import logger
 from opentelemetry import trace
-from opentelemetry.trace import Status, StatusCode
+from opentelemetry.trace import NonRecordingSpan, Status, StatusCode
 from opentelemetry.util import types
 
 import workflow.extensions.otlp.sid.sid_generator2 as sid_gen
@@ -49,14 +49,21 @@ class Span:
         self.uid = uid
         self.chat_id = chat_id
 
-        # Generate session ID if generator is available
-        if sid_gen.sid_generator2 is not None:
+        # Get session ID
+        # If the current span is not a recording span, get the sid from the attributes
+        # Otherwise, generate a new session ID
+        current_span = self.get_otlp_span()
+        if not isinstance(current_span, NonRecordingSpan) and hasattr(
+            current_span, "attributes"
+        ):
+            self.sid = current_span.attributes.get("sid", "")
+        elif sid_gen.sid_generator2 is not None:
             self.sid = sid_gen.sid_generator2.gen()
         else:
             self.sid = ""
 
         # Initialize OpenTelemetry tracer
-        self.tracer = trace.get_tracer(os.getenv("OTLP_TRACE_NAME", "spark_flow_trace"))
+        self.tracer = trace.get_tracer(os.getenv("OTLP_TRACE_NAME", "workflow_trace"))
 
     @contextmanager
     def start(

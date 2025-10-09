@@ -326,7 +326,7 @@ const MakeCreateModal: React.FC<MakeCreateModalProps> = ({
                                     width: '100%',
                                   }}
                                 >
-                                  {item.core_abilities.description}
+                                  {item?.coreAbilities?.description}
                                 </div>
                               )}
                             </div>

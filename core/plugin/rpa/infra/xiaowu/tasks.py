@@ -67,7 +67,7 @@ async def create_task(
                 status_code=e.response.status_code,
                 detail=f"Task creation failed: {e.response.text}",
             ) from e
-        except httpx.RequestError as e:
+        except Exception as e:
             logger.error(f"Task creation failed: {e}")
             raise HTTPException(
                 status_code=500, detail=f"Task creation failed: {e}"
@@ -136,7 +136,7 @@ async def query_task_status(
                 status_code=500, detail=f"Unknown task status: {status}"
             )
 
-        except httpx.RequestError as e:
+        except Exception as e:
             logger.error(f"Task status query failed: {e}")
             raise HTTPException(
                 status_code=500, detail=f"Task status query failed: {e}"

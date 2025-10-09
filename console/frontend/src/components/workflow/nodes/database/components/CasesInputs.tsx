@@ -18,6 +18,7 @@ import {
   FLowCollapse,
 } from '@/components/workflow/ui';
 import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
 
 import inputAddIcon from '@/assets/imgs/workflow/input-add-icon.png';
 import remove from '@/assets/imgs/workflow/input-remove-icon.png';
@@ -27,46 +28,333 @@ import arrowDownIcon from '@/assets/imgs/workflow/arrow-down-icon.png';
 import { conditions } from '@/constants';
 
 const ModalContext = createContext<string | null>(null);
-function index({ id, data, allFields = [], children }): React.ReactElement {
+const CaseTitle = ({ item, mode }) => {
   const { t } = useTranslation();
-  const getCurrentStore = useFlowsManager(state => state.getCurrentStore);
-  const currentStore = getCurrentStore();
-  const canPublishSetNot = useFlowsManager(state => state.canPublishSetNot);
-  const canvasesDisabled = useFlowsManager(state => state.canvasesDisabled);
-  const autoSaveCurrentFlow = useFlowsManager(
-    state => state.autoSaveCurrentFlow
+  return (
+    <div className="flex items-center mt-2">
+      {item?.conditions.length > 1 && <div className="w-[50px] mr-4"></div>}
+      <div className="flex-1 flex items-center text-desc gap-2.5">
+        <h4 className="w-1/4">{t('workflow.nodes.databaseNode.tableField')}</h4>
+        <h4 className="flex-1">
+          {t('workflow.nodes.databaseNode.selectCondition')}
+        </h4>
+        <h4 className="flex-1">
+          {t('workflow.nodes.databaseNode.compareType')}
+        </h4>
+        <h4 className="w-1/4">
+          {t('workflow.nodes.databaseNode.compareValue')}
+        </h4>
+        {(item?.conditions?.length > 1 || mode === 3) && (
+          <span className="w-4"></span>
+        )}
+      </div>
+    </div>
   );
-  const setNode = currentStore(state => state.setNode);
-  const checkNode = currentStore(state => state.checkNode);
-  const delayCheckNode = currentStore(state => state.delayCheckNode);
-  const takeSnapshot = currentStore(state => state.takeSnapshot);
-  const [showParams, setShowParams] = useState(true);
-  const historyVersion = useFlowsManager(state => state.historyVersion);
+};
 
-  const operatorRef = useRef<HTMLDivElement | null>(null);
-  const [operatorId, setOperatorId] = useState('');
-  //   CASES ADD
-
-  const handleRemoveLine = useCallback(
-    (currentCondition): void => {
-      takeSnapshot();
-      setNode(id, old => {
-        old.data.inputs = old.data.inputs?.filter(
-          input => input.id !== currentCondition.varIndex
-        );
-        const currentCase = old?.data?.nodeParam?.cases[0];
-        currentCase.conditions = currentCase.conditions.filter(
-          condition => condition.varIndex !== currentCondition.varIndex
-        );
-        return {
-          ...cloneDeep(old),
-        };
-      });
-      canPublishSetNot();
-    },
-    [takeSnapshot]
+const OperatorSelect = ({
+  item,
+  setOperatorId,
+  operatorRef,
+  operatorId,
+  handleOperatorChange,
+}) => {
+  const { t } = useTranslation();
+  return (
+    <div className="flex-shrink-0 w-[50px] mr-4 my-4">
+      <div className="flex flex-col h-full">
+        <div className="relative flex-1">
+          <div className="absolute left-1/2 right-0 top-0 bottom-0 rounded-tl-lg border-solid border-0 border-t border-l border-[#C4C4C4]"></div>
+        </div>
+        <div
+          className="w-full flex justify-center items-center gap-0.5 text-xs text-[#275EFF] font-medium relative hover:bg-[#dfdfe0] cursor-pointer rounded-md py-1.5"
+          onClick={(e): void => {
+            e.stopPropagation();
+            setOperatorId(item?.id);
+          }}
+          ref={operatorRef}
+        >
+          <span>
+            {item.logicalOperator === 'and'
+              ? t('workflow.nodes.databaseNode.and')
+              : t('workflow.nodes.databaseNode.or')}
+          </span>
+          <img src={arrowDownIcon} className="w-[7px] h-[5px]" alt="" />
+          {operatorId === item?.id && (
+            <div
+              className="w-[68px] text-center rounded-md absolute left-0 top-[30px] py-1.5 px-1 shadow-sm bg-[#fff]"
+              style={{
+                zIndex: 99999,
+              }}
+            >
+              <div
+                className="w-full py-1 text-desc font-medium hover:bg-[#E6F4FF] cursor-pointer flex items-center justify-center rounded-sm"
+                onClick={(e): void => {
+                  e.stopPropagation();
+                  setOperatorId('');
+                  handleOperatorChange(item.id, 'and');
+                }}
+                style={{
+                  display: item.logicalOperator === 'and' ? 'none' : 'flex',
+                }}
+              >
+                {t('workflow.nodes.databaseNode.and')}
+              </div>
+              <div
+                className="w-full py-1 text-desc font-medium hover:bg-[#E6F4FF] cursor-pointer flex items-center justify-center rounded-sm"
+                onClick={e => {
+                  e.stopPropagation();
+                  setOperatorId('');
+                  handleOperatorChange(item.id, 'or');
+                }}
+                style={{
+                  display: item.logicalOperator === 'or' ? 'none' : 'flex',
+                }}
+              >
+                {t('workflow.nodes.databaseNode.or')}
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="relative flex-1">
+          <div className="absolute left-1/2 right-0 top-0 bottom-0 rounded-bl-lg border-solid border-0 border-b border-l border-[#C4C4C4]"></div>
+        </div>
+      </div>
+    </div>
   );
+};
 
+const ConditionRow = ({
+  condition,
+  handleFieldChange,
+  handleConditionChange,
+  checkNode,
+  id,
+  getFieldOptions,
+  getConditionOptions,
+  handleChangeInputParam,
+  references,
+  item,
+  mode,
+  curentInput,
+  handleNotInClick,
+  getTextArray,
+  handleRemoveLine,
+}) => {
+  const { t } = useTranslation();
+  return (
+    <div>
+      <div className="flex flex-col mt-2.5 overflow-hidden">
+        <div className="flex-1 flex items-center text-desc gap-2.5">
+          <div className="w-1/4">
+            <FlowSelect
+              value={condition.fieldName}
+              onChange={value => handleFieldChange(value, condition)}
+              options={getFieldOptions(condition.selectCondition)}
+              onBlur={() => checkNode(id)}
+            />
+          </div>
+          <div className="flex-1">
+            <FlowSelect
+              value={condition.selectCondition}
+              onChange={value => handleConditionChange(value, condition)}
+              options={getConditionOptions(condition.fieldType)}
+              onBlur={() => {
+                checkNode(id);
+              }}
+              virtual={false}
+            />
+          </div>
+          <div className="flex-1">
+            <FlowSelect
+              disabled={['not null', 'null'].includes(
+                condition.selectCondition
+              )}
+              value={curentInput(condition)?.schema?.value?.type}
+              options={[
+                {
+                  label: t('workflow.nodes.databaseNode.literal'),
+                  value: 'literal',
+                },
+                {
+                  label: t('workflow.nodes.databaseNode.reference'),
+                  value: 'ref',
+                },
+              ]}
+              onChange={value =>
+                handleChangeInputParam(
+                  condition.varIndex,
+                  (data, value) => {
+                    data.schema.value.type = value;
+                    if (value === 'literal') {
+                      data.schema.value.content = '';
+                    } else {
+                      data.schema.value.content = {};
+                    }
+                  },
+                  value
+                )
+              }
+            />
+          </div>
+          <div className="w-1/4">
+            {curentInput(condition)?.schema?.value?.type === 'literal' ? (
+              ['in', 'not in'].includes(condition.selectCondition) ? (
+                <label
+                  onClick={() => handleNotInClick(condition)}
+                  className="cursor-pointer"
+                >
+                  <Input
+                    value={getTextArray(condition)}
+                    style={{ pointerEvents: 'none' }}
+                    placeholder={t('workflow.nodes.databaseNode.pleaseEnter')}
+                    className="!border-[#e4eaff] h-[30px] !bg-[#fff]"
+                    disabled
+                  />
+                </label>
+              ) : (
+                <FlowNodeInput
+                  nodeId={id}
+                  key={condition.selectCondition}
+                  disabled={['not null', 'null'].includes(
+                    condition.selectCondition
+                  )}
+                  value={curentInput(condition)?.schema?.value?.content}
+                  onChange={value =>
+                    handleChangeInputParam(
+                      condition.varIndex,
+                      (data, value) => {
+                        data.schema.value.content = value;
+                      },
+                      value
+                    )
+                  }
+                />
+              )
+            ) : (
+              <FlowCascader
+                value={
+                  curentInput(condition)?.schema?.value?.content?.nodeId
+                    ? [
+                        curentInput(condition)?.schema?.value?.content?.nodeId,
+                        curentInput(condition)?.schema?.value?.content?.name,
+                      ]
+                    : []
+                }
+                options={references}
+                handleTreeSelect={node => {
+                  handleChangeInputParam(
+                    condition.varIndex,
+                    (data, value) => {
+                      data.schema.value.content = value.content;
+                      // data.schema.type = value.type;
+                    },
+                    {
+                      content: {
+                        id: node.id,
+                        nodeId: node.originId,
+                        name: node.value,
+                      },
+                      type: node.type,
+                    }
+                  );
+                }}
+                onBlur={() => checkNode(id)}
+              />
+            )}
+          </div>
+          {(item?.conditions?.length > 1 || mode === 3) && (
+            <img
+              src={remove}
+              className="w-[16px] h-[17px] cursor-pointer"
+              alt=""
+              onClick={() => handleRemoveLine(condition)}
+            />
+          )}
+        </div>
+        <div className="flex-1 flex items-center gap-2.5 text-xs overflow-hidden text-[#F74E43]">
+          <div className="flex flex-col w-1/4">{condition.fieldErrMsg}</div>
+          <div className="flex flex-col flex-1">
+            {condition.compareOperatorErrMsg}
+          </div>
+          <div className="flex flex-col flex-1"></div>
+          <div className="flex flex-col w-1/4">
+            {curentInput(condition)?.schema?.value?.contentErrMsg}
+          </div>
+          {(item?.conditions?.length > 1 || mode === 3) && (
+            <span className="flex-shrink-0 w-4"></span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ConditionList = ({
+  item,
+  setOperatorId,
+  operatorRef,
+  operatorId,
+  handleOperatorChange,
+  handleFieldChange,
+  handleConditionChange,
+  checkNode,
+  id,
+  getFieldOptions,
+  getConditionOptions,
+  handleChangeInputParam,
+  references,
+  mode,
+  curentInput,
+  handleNotInClick,
+  getTextArray,
+  handleRemoveLine,
+}) => {
+  return (
+    <div className="flex w-full">
+      {item?.conditions.length > 1 && (
+        <OperatorSelect
+          item={item}
+          setOperatorId={setOperatorId}
+          operatorRef={operatorRef}
+          operatorId={operatorId}
+          handleOperatorChange={handleOperatorChange}
+        />
+      )}
+      <div className="flex-1 overflow-hidden">
+        {item?.conditions?.map(condition => (
+          <ConditionRow
+            key={condition.id}
+            condition={condition}
+            handleFieldChange={handleFieldChange}
+            handleConditionChange={handleConditionChange}
+            checkNode={checkNode}
+            id={id}
+            getFieldOptions={getFieldOptions}
+            getConditionOptions={getConditionOptions}
+            handleChangeInputParam={handleChangeInputParam}
+            references={references}
+            item={item}
+            mode={mode}
+            curentInput={curentInput}
+            handleNotInClick={handleNotInClick}
+            getTextArray={getTextArray}
+            handleRemoveLine={handleRemoveLine}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const useConditionActions = ({
+  id,
+  setNode,
+  takeSnapshot,
+  autoSaveCurrentFlow,
+  canPublishSetNot,
+  fieldOptions,
+}) => {
   const handleAddLine = useCallback(() => {
     takeSnapshot();
     setNode(id, old => {
@@ -104,7 +392,25 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
     autoSaveCurrentFlow();
     canPublishSetNot();
   }, [takeSnapshot]);
-
+  const handleRemoveLine = useCallback(
+    (currentCondition): void => {
+      takeSnapshot();
+      setNode(id, old => {
+        old.data.inputs = old.data.inputs?.filter(
+          input => input.id !== currentCondition.varIndex
+        );
+        const currentCase = old?.data?.nodeParam?.cases[0];
+        currentCase.conditions = currentCase.conditions.filter(
+          condition => condition.varIndex !== currentCondition.varIndex
+        );
+        return {
+          ...cloneDeep(old),
+        };
+      });
+      canPublishSetNot();
+    },
+    [takeSnapshot]
+  );
   const handleOperatorChange = useCallback(
     (caseId, value): void => {
       setNode(id, old => {
@@ -119,22 +425,6 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
     },
     [setNode, autoSaveCurrentFlow]
   );
-
-  const handleChangeParam = useCallback(
-    (inputId, fn, value): void => {
-      setNode(id, old => {
-        const currentInput = old.data.inputs.find(i => i.id === inputId);
-        fn(currentInput, value);
-        return {
-          ...cloneDeep(old),
-        };
-      });
-      autoSaveCurrentFlow();
-      canPublishSetNot();
-    },
-    [setNode, canPublishSetNot, autoSaveCurrentFlow]
-  );
-
   const handleConditionChange = useCallback(
     (value, currentCondition): void => {
       setNode(id, old => {
@@ -160,17 +450,6 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
     },
     [setNode, canPublishSetNot, autoSaveCurrentFlow]
   );
-
-  const fieldOptions = useMemo(() => {
-    return allFields.map((it: unknown) => {
-      return {
-        ...it,
-        label: it.name,
-        value: it.name,
-      };
-    });
-  }, [allFields]);
-
   const handleFieldChange = useCallback(
     (value, currentCondition): void => {
       setNode(id, old => {
@@ -193,84 +472,45 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
     },
     [setNode, canPublishSetNot, autoSaveCurrentFlow, fieldOptions]
   );
+  return {
+    handleAddLine,
+    handleConditionChange,
+    handleFieldChange,
+    handleRemoveLine,
+    handleOperatorChange,
+  };
+};
 
-  const mode = useMemo(() => {
-    return data?.nodeParam?.mode;
-  }, [data]);
-
-  const cases = useMemo(() => {
-    return data?.nodeParam?.cases || [];
-  }, [data]);
-
-  // 默认值
-  useEffect(() => {
-    if (!data?.nodeParam?.cases?.length && !historyVersion) {
-      // 默认值
-      const uid = uuid();
-      const initCase = [
-        {
-          id: uuid(),
-          logicalOperator: 'and',
-          conditions: [
-            {
-              id: uuid(),
-              fieldName: null,
-              varIndex: uid,
-              selectCondition: null,
-              fieldType: null,
-            },
-          ],
-        },
-      ];
-      const initInput = [
-        {
-          id: uid,
-          name: uid,
-          type: 'range',
-          schema: {
-            type: 'string',
-            value: {
-              type: 'ref',
-              content: {
-                nodeId: '',
-                name: '',
-              },
-            },
-          },
-        },
-      ];
-      setNode(id, old => {
-        old.data.nodeParam.cases = initCase;
-        old.data.inputs = initInput;
-        return {
-          ...cloneDeep(old),
-        };
-      });
-      autoSaveCurrentFlow();
-      canPublishSetNot();
+const useInputHelpers = ({ inputs }) => {
+  const curentInput = useCallback(
+    (activeCondition): unknown => {
+      return inputs?.find(input => input.id === activeCondition.varIndex);
+    },
+    [inputs]
+  );
+  const getTextArray = (activeCondition): unknown => {
+    const content = inputs?.find(input => input.id === activeCondition.varIndex)
+      ?.schema?.value?.content;
+    if (!Array.isArray(content) || !content.length) {
+      return '';
     }
-  }, [cases]);
+    return JSON.stringify(content);
+  };
+  return {
+    curentInput,
+    getTextArray,
+  };
+};
 
-  const references = useMemo(() => {
-    return data?.references || [];
-  }, [data]);
-
-  const inputs = useMemo(() => {
-    return data?.inputs || [];
-  }, [data]);
-
-  useEffect((): void | (() => void) => {
-    function clickOutside(event: MouseEvent): void {
-      if (operatorRef.current && !operatorRef.current.contains(event.target)) {
-        setOperatorId('');
-      }
-    }
-    document.body.addEventListener('click', clickOutside);
-    return (): void => {
-      document.body.removeEventListener('click', clickOutside);
-    };
-  }, []);
-
+const useNotInModal = ({
+  inputs,
+  setValidateMsg,
+  handleChangeInputParam,
+  id,
+  delayCheckNode,
+  modal,
+}) => {
+  const { t } = useTranslation();
   const checkArrayElementsType = (arr, type): boolean => {
     if (!arr || arr.length === 0) return true;
     const validators = {
@@ -285,9 +525,6 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
     const validate = validators[type];
     return arr.every(validate);
   };
-
-  const [modal, contextHolder] = Modal.useModal();
-  const [validateMsg, setValidateMsg] = useState('');
   const handleNotInClick = async (activeCondition): Promise<void> => {
     setValidateMsg('');
     const { fieldType } = activeCondition;
@@ -350,7 +587,7 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
         </>
       ),
       centered: true,
-      onOk(): void {
+      onOk(): Promise<void> {
         try {
           const parsed =
             typeof inputValue === 'string'
@@ -366,7 +603,7 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
                 throw new Error();
               }
             }
-            handleChangeParam(
+            handleChangeInputParam(
               activeCondition.varIndex,
               (data, value) => {
                 data.schema.value.content = value;
@@ -388,6 +625,138 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
     });
     window.removeEventListener('keydown', handleDocumentPaste, true);
   };
+  return {
+    handleNotInClick,
+  };
+};
+
+function index({ id, data, allFields = [], children }): React.ReactElement {
+  const { t } = useTranslation();
+  const { handleChangeInputParam, references, inputs } = useNodeCommon({
+    id,
+    data,
+  });
+  const getCurrentStore = useFlowsManager(state => state.getCurrentStore);
+  const currentStore = getCurrentStore();
+  const canPublishSetNot = useFlowsManager(state => state.canPublishSetNot);
+  const canvasesDisabled = useFlowsManager(state => state.canvasesDisabled);
+  const autoSaveCurrentFlow = useFlowsManager(
+    state => state.autoSaveCurrentFlow
+  );
+  const setNode = currentStore(state => state.setNode);
+  const checkNode = currentStore(state => state.checkNode);
+  const delayCheckNode = currentStore(state => state.delayCheckNode);
+  const takeSnapshot = currentStore(state => state.takeSnapshot);
+  const [showParams, setShowParams] = useState(true);
+  const historyVersion = useFlowsManager(state => state.historyVersion);
+  const operatorRef = useRef<HTMLDivElement | null>(null);
+  const [operatorId, setOperatorId] = useState('');
+  const fieldOptions = useMemo(() => {
+    return allFields.map((it: unknown) => {
+      return {
+        ...it,
+        label: it.name,
+        value: it.name,
+      };
+    });
+  }, [allFields]);
+
+  const mode = useMemo(() => {
+    return data?.nodeParam?.mode;
+  }, [data]);
+
+  const cases = useMemo(() => {
+    return data?.nodeParam?.cases || [];
+  }, [data]);
+
+  // 默认值
+  useEffect(() => {
+    if (!data?.nodeParam?.cases?.length && !historyVersion) {
+      // 默认值
+      const uid = uuid();
+      const initCase = [
+        {
+          id: uuid(),
+          logicalOperator: 'and',
+          conditions: [
+            {
+              id: uuid(),
+              fieldName: null,
+              varIndex: uid,
+              selectCondition: null,
+              fieldType: null,
+            },
+          ],
+        },
+      ];
+      const initInput = [
+        {
+          id: uid,
+          name: uid,
+          type: 'range',
+          schema: {
+            type: 'string',
+            value: {
+              type: 'ref',
+              content: {
+                nodeId: '',
+                name: '',
+              },
+            },
+          },
+        },
+      ];
+      setNode(id, old => {
+        old.data.nodeParam.cases = initCase;
+        old.data.inputs = initInput;
+        return {
+          ...cloneDeep(old),
+        };
+      });
+      autoSaveCurrentFlow();
+      canPublishSetNot();
+    }
+  }, [cases]);
+
+  useEffect((): void | (() => void) => {
+    function clickOutside(event: MouseEvent): void {
+      if (operatorRef.current && !operatorRef.current.contains(event.target)) {
+        setOperatorId('');
+      }
+    }
+    document.body.addEventListener('click', clickOutside);
+    return (): void => {
+      document.body.removeEventListener('click', clickOutside);
+    };
+  }, []);
+
+  const [modal, contextHolder] = Modal.useModal();
+  const [validateMsg, setValidateMsg] = useState('');
+  const {
+    handleAddLine,
+    handleConditionChange,
+    handleFieldChange,
+    handleRemoveLine,
+    handleOperatorChange,
+  } = useConditionActions({
+    id,
+    setNode,
+    takeSnapshot,
+    autoSaveCurrentFlow,
+    canPublishSetNot,
+    fieldOptions,
+  });
+
+  const { curentInput, getTextArray } = useInputHelpers({ inputs });
+
+  const { handleNotInClick } = useNotInModal({
+    inputs,
+    setValidateMsg,
+    handleChangeInputParam,
+    id,
+    delayCheckNode,
+    modal,
+  });
 
   const getConditionOptions = (type): unknown => {
     if (type === 'time' || type === 'boolean') {
@@ -403,22 +772,6 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
       );
     }
     return fieldOptions;
-  };
-
-  const curentInput = useCallback(
-    (activeCondition): unknown => {
-      return inputs?.find(input => input.id === activeCondition.varIndex);
-    },
-    [inputs]
-  );
-
-  const getTextArray = (activeCondition): unknown => {
-    const content = inputs?.find(input => input.id === activeCondition.varIndex)
-      ?.schema?.value?.content;
-    if (!Array.isArray(content) || !content.length) {
-      return '';
-    }
-    return JSON.stringify(content);
   };
 
   return (
@@ -437,285 +790,27 @@ function index({ id, data, allFields = [], children }): React.ReactElement {
             {cases?.map((item, caseIndex) => (
               <div className="relative" key={caseIndex}>
                 <div className="bg-[#F8FAFF] rounded-md p-4">
-                  <div className="flex items-center mt-2">
-                    {item?.conditions.length > 1 && (
-                      <div className="w-[50px] mr-4"></div>
-                    )}
-                    <div className="flex-1 flex items-center text-desc gap-2.5">
-                      <h4 className="w-1/4">
-                        {t('workflow.nodes.databaseNode.tableField')}
-                      </h4>
-                      <h4 className="flex-1">
-                        {t('workflow.nodes.databaseNode.selectCondition')}
-                      </h4>
-                      <h4 className="flex-1">
-                        {t('workflow.nodes.databaseNode.compareType')}
-                      </h4>
-                      <h4 className="w-1/4">
-                        {t('workflow.nodes.databaseNode.compareValue')}
-                      </h4>
-                      {(item?.conditions?.length > 1 || mode === 3) && (
-                        <span className="w-4"></span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex w-full">
-                    {item?.conditions.length > 1 && (
-                      <div className="flex-shrink-0 w-[50px] mr-4 my-4">
-                        <div className="flex flex-col h-full">
-                          <div className="relative flex-1">
-                            <div className="absolute left-1/2 right-0 top-0 bottom-0 rounded-tl-lg border-solid border-0 border-t border-l border-[#C4C4C4]"></div>
-                          </div>
-                          <div
-                            className="w-full flex justify-center items-center gap-0.5 text-xs text-[#275EFF] font-medium relative hover:bg-[#dfdfe0] cursor-pointer rounded-md py-1.5"
-                            onClick={(e): void => {
-                              e.stopPropagation();
-                              setOperatorId(item?.id);
-                            }}
-                            ref={operatorRef}
-                          >
-                            <span>
-                              {item.logicalOperator === 'and'
-                                ? t('workflow.nodes.databaseNode.and')
-                                : t('workflow.nodes.databaseNode.or')}
-                            </span>
-                            <img
-                              src={arrowDownIcon}
-                              className="w-[7px] h-[5px]"
-                              alt=""
-                            />
-                            {operatorId === item?.id && (
-                              <div
-                                className="w-[68px] text-center rounded-md absolute left-0 top-[30px] py-1.5 px-1 shadow-sm bg-[#fff]"
-                                style={{
-                                  zIndex: 99999,
-                                }}
-                              >
-                                <div
-                                  className="w-full py-1 text-desc font-medium hover:bg-[#E6F4FF] cursor-pointer flex items-center justify-center rounded-sm"
-                                  onClick={(e): void => {
-                                    e.stopPropagation();
-                                    setOperatorId('');
-                                    handleOperatorChange(item.id, 'and');
-                                  }}
-                                  style={{
-                                    display:
-                                      item.logicalOperator === 'and'
-                                        ? 'none'
-                                        : 'flex',
-                                  }}
-                                >
-                                  {t('workflow.nodes.databaseNode.and')}
-                                </div>
-                                <div
-                                  className="w-full py-1 text-desc font-medium hover:bg-[#E6F4FF] cursor-pointer flex items-center justify-center rounded-sm"
-                                  onClick={e => {
-                                    e.stopPropagation();
-                                    setOperatorId('');
-                                    handleOperatorChange(item.id, 'or');
-                                  }}
-                                  style={{
-                                    display:
-                                      item.logicalOperator === 'or'
-                                        ? 'none'
-                                        : 'flex',
-                                  }}
-                                >
-                                  {t('workflow.nodes.databaseNode.or')}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                          <div className="relative flex-1">
-                            <div className="absolute left-1/2 right-0 top-0 bottom-0 rounded-bl-lg border-solid border-0 border-b border-l border-[#C4C4C4]"></div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    <div className="flex-1 overflow-hidden">
-                      {item?.conditions?.map(condition => (
-                        <div key={condition.id}>
-                          <div className="flex flex-col mt-2.5 overflow-hidden">
-                            <div className="flex-1 flex items-center text-desc gap-2.5">
-                              <div className="w-1/4">
-                                <FlowSelect
-                                  value={condition.fieldName}
-                                  onChange={value =>
-                                    handleFieldChange(value, condition)
-                                  }
-                                  // key={condition.selectCondition}
-                                  options={getFieldOptions(
-                                    condition.selectCondition
-                                  )}
-                                  onBlur={() => checkNode(id)}
-                                />
-                              </div>
-                              <div className="flex-1">
-                                <FlowSelect
-                                  value={condition.selectCondition}
-                                  // key={condition.fieldName}
-                                  onChange={value =>
-                                    handleConditionChange(value, condition)
-                                  }
-                                  options={getConditionOptions(
-                                    condition.fieldType
-                                  )}
-                                  onBlur={() => {
-                                    checkNode(id);
-                                  }}
-                                  virtual={false}
-                                />
-                              </div>
-                              <div className="flex-1">
-                                <FlowSelect
-                                  disabled={['not null', 'null'].includes(
-                                    condition.selectCondition
-                                  )}
-                                  value={
-                                    curentInput(condition)?.schema?.value?.type
-                                  }
-                                  options={[
-                                    {
-                                      label: t(
-                                        'workflow.nodes.databaseNode.literal'
-                                      ),
-                                      value: 'literal',
-                                    },
-                                    {
-                                      label: t(
-                                        'workflow.nodes.databaseNode.reference'
-                                      ),
-                                      value: 'ref',
-                                    },
-                                  ]}
-                                  onChange={value =>
-                                    handleChangeParam(
-                                      condition.varIndex,
-                                      (data, value) => {
-                                        data.schema.value.type = value;
-                                        if (value === 'literal') {
-                                          data.schema.value.content = '';
-                                        } else {
-                                          data.schema.value.content = {};
-                                        }
-                                      },
-                                      value
-                                    )
-                                  }
-                                />
-                              </div>
-                              <div className="w-1/4">
-                                {curentInput(condition)?.schema?.value?.type ===
-                                'literal' ? (
-                                  ['in', 'not in'].includes(
-                                    condition.selectCondition
-                                  ) ? (
-                                    <label
-                                      onClick={() =>
-                                        handleNotInClick(condition)
-                                      }
-                                      className="cursor-pointer"
-                                    >
-                                      <Input
-                                        value={getTextArray(condition)}
-                                        style={{ pointerEvents: 'none' }}
-                                        placeholder={t(
-                                          'workflow.nodes.databaseNode.pleaseEnter'
-                                        )}
-                                        className="!border-[#e4eaff] h-[30px] !bg-[#fff]"
-                                        disabled
-                                      />
-                                    </label>
-                                  ) : (
-                                    <FlowNodeInput
-                                      nodeId={id}
-                                      key={condition.selectCondition}
-                                      disabled={['not null', 'null'].includes(
-                                        condition.selectCondition
-                                      )}
-                                      value={
-                                        curentInput(condition)?.schema?.value
-                                          ?.content
-                                      }
-                                      onChange={value =>
-                                        handleChangeParam(
-                                          condition.varIndex,
-                                          (data, value) => {
-                                            data.schema.value.content = value;
-                                          },
-                                          value
-                                        )
-                                      }
-                                    />
-                                  )
-                                ) : (
-                                  <FlowCascader
-                                    value={
-                                      curentInput(condition)?.schema?.value
-                                        ?.content?.nodeId
-                                        ? [
-                                            curentInput(condition)?.schema
-                                              ?.value?.content?.nodeId,
-                                            curentInput(condition)?.schema
-                                              ?.value?.content?.name,
-                                          ]
-                                        : []
-                                    }
-                                    options={references}
-                                    handleTreeSelect={node => {
-                                      handleChangeParam(
-                                        condition.varIndex,
-                                        (data, value) => {
-                                          data.schema.value.content =
-                                            value.content;
-                                          // data.schema.type = value.type;
-                                        },
-                                        {
-                                          content: {
-                                            id: node.id,
-                                            nodeId: node.originId,
-                                            name: node.value,
-                                          },
-                                          type: node.type,
-                                        }
-                                      );
-                                    }}
-                                    onBlur={() => checkNode(id)}
-                                  />
-                                )}
-                              </div>
-                              {(item?.conditions?.length > 1 || mode === 3) && (
-                                <img
-                                  src={remove}
-                                  className="w-[16px] h-[17px] cursor-pointer"
-                                  alt=""
-                                  onClick={() => handleRemoveLine(condition)}
-                                />
-                              )}
-                            </div>
-                            <div className="flex-1 flex items-center gap-2.5 text-xs overflow-hidden text-[#F74E43]">
-                              <div className="flex flex-col w-1/4">
-                                {condition.fieldErrMsg}
-                              </div>
-                              <div className="flex flex-col flex-1">
-                                {condition.compareOperatorErrMsg}
-                              </div>
-                              <div className="flex flex-col flex-1"></div>
-                              <div className="flex flex-col w-1/4">
-                                {
-                                  curentInput(condition)?.schema?.value
-                                    ?.contentErrMsg
-                                }
-                              </div>
-                              {(item?.conditions?.length > 1 || mode === 3) && (
-                                <span className="flex-shrink-0 w-4"></span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  <CaseTitle item={item} mode={mode} />
+                  <ConditionList
+                    item={item}
+                    setOperatorId={setOperatorId}
+                    operatorRef={operatorRef}
+                    operatorId={operatorId}
+                    handleOperatorChange={handleOperatorChange}
+                    handleFieldChange={handleFieldChange}
+                    handleConditionChange={handleConditionChange}
+                    checkNode={checkNode}
+                    id={id}
+                    getFieldOptions={getFieldOptions}
+                    getConditionOptions={getConditionOptions}
+                    handleChangeInputParam={handleChangeInputParam}
+                    references={references}
+                    mode={mode}
+                    curentInput={curentInput}
+                    handleNotInClick={handleNotInClick}
+                    getTextArray={getTextArray}
+                    handleRemoveLine={handleRemoveLine}
+                  />
                 </div>
               </div>
             ))}

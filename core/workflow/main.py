@@ -20,12 +20,12 @@ from fastapi.routing import APIRoute
 from loguru import logger
 from starlette.middleware.cors import CORSMiddleware
 
-from workflow.api.v1.flow.publish_auth import publish_auth_router
-from workflow.api.v1.router import sparkflow_router, workflow_router
+from workflow.api.v1.router import old_auth_router, sparkflow_router, workflow_router
 from workflow.cache.event_registry import EventRegistry
 from workflow.consts.runtime_env import RuntimeEnv
 from workflow.extensions.fastapi.handler.validation import validation_exception_handler
 from workflow.extensions.fastapi.middleware.auth import AuthMiddleware
+from workflow.extensions.fastapi.middleware.otlp import OtlpMiddleware
 from workflow.extensions.graceful_shutdown.graceful_shutdown import GracefulShutdown
 from workflow.extensions.middleware.initialize import initialize_services
 
@@ -49,20 +49,20 @@ def create_app() -> FastAPI:
     # Configure CORS middleware to allow cross-origin requests
     origins = ["*"]
     app.add_middleware(
-        CORSMiddleware,
+        CORSMiddleware,  # type: ignore[arg-type]
         allow_origins=origins,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
 
+    app.add_middleware(OtlpMiddleware)  # type: ignore[arg-type]
     app.add_middleware(AuthMiddleware)  # type: ignore[arg-type]
 
     # Include API routers for different endpoints
-    # app.include_router(openapi_router)  # Commented out - not currently used
-    app.include_router(publish_auth_router)
     app.include_router(sparkflow_router)
     app.include_router(workflow_router)
+    app.include_router(old_auth_router)
 
     # Add global exception handler for request validation errors
     app.add_exception_handler(

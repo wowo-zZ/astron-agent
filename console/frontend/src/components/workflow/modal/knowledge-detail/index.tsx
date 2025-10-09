@@ -370,7 +370,6 @@ function KnowledgeDetail({
           ...item,
           type: fileType(item),
           size: item.fileInfoV2?.size,
-          tagDtoList: item.tagDtoList,
         }));
         setDataResource(files);
         setPagination(prevPagination => ({
@@ -609,36 +608,11 @@ function EditChunk({
   fileInfo,
 }: EditChunkProps): React.ReactElement {
   const { t } = useTranslation();
-  const [folderTags, setFolderTags] = useState<string[]>([]);
-  const [othersTag, setOtherTags] = useState([]);
-  const [tagValue, setTagValue] = useState('');
   const [checked, setChecked] = useState(false);
-  const [moreTags, setMoreTags] = useState(false);
 
   useEffect(() => {
-    const currentTags = currentChunk.tagDtoList
-      .filter(item => item.type === 4)
-      .map(item => item.tagName);
-    const remainTags = currentChunk.tagDtoList.filter(item => item.type !== 4);
-    setTagValue(currentTags.join('，'));
-    setOtherTags(remainTags);
     setChecked(currentChunk.enabled ? true : false);
   }, []);
-
-  useEffect(() => {
-    if (tagValue) {
-      const tagArr = tagValue.split(/[,，]/).filter(item => item);
-      setFolderTags([...tagArr]);
-
-      if (tagArr.length + othersTag.length > 5) {
-        setMoreTags(false);
-      } else {
-        setMoreTags(true);
-      }
-    } else {
-      setFolderTags([]);
-    }
-  }, [tagValue]);
 
   return (
     <div
@@ -724,41 +698,6 @@ function EditChunk({
           />
         </div>
         <div className="mt-3 border-t border-[#e8e8e8] pt-2 pb-1 flex items-start justify-between">
-          <div className="list-tag flex items-center flex-1 flex-wrap">
-            {currentChunk.tagDtoList.map((item: unknown, index) => {
-              if (index < 5) {
-                return (
-                  <Tag key={index} className={tagTypeClass.get(item.type)}>
-                    <span
-                      className="max-w-[100px] text-overflow"
-                      title={item.tagName}
-                    >
-                      {item.tagName}
-                    </span>
-                  </Tag>
-                );
-              } else {
-                return moreTags ? (
-                  <Tag key={index} className={tagTypeClass.get(item.type)}>
-                    <span
-                      className="max-w-[100px] text-overflow"
-                      title={item.tagName}
-                    >
-                      {item.tagName}
-                    </span>
-                  </Tag>
-                ) : null;
-              }
-            })}
-            {!moreTags && folderTags.length + othersTag.length > 5 && (
-              <span
-                className="rounded-md inline-block bg-[#F0F3F9] px-2 py-1 h-6 text-desc mb-1 cursor-pointer"
-                onClick={() => setMoreTags(true)}
-              >
-                +{folderTags.length + othersTag.length - 5}
-              </span>
-            )}
-          </div>
           <div className="flex items-center gap-2.5">
             <div
               className="rounded-md border border-[#D7DFE9] px-4 py-1 text-second text-sm cursor-pointer"
@@ -1169,67 +1108,6 @@ function FileDetail({
                         content={item.markdownContent}
                         isSending={false}
                       />
-                    </div>
-                    <div className="justify-between items-start mt-2 hidden group-hover:flex w-full">
-                      {['block', 'review'].includes(item.auditSuggest) ? (
-                        <div className="flex-1 flex overflow-hidden">
-                          <span
-                            className="flex-1 text-overflow font-semibold text-sm"
-                            title={item.auditDetail}
-                          >
-                            {t('knowledge.violationReason', {
-                              reason: item.auditDetail,
-                            })}
-                          </span>
-                        </div>
-                      ) : (
-                        <div className="list-tag flex flex-1 items-center flex-wrap">
-                          {item.tagDtoList.map((t: unknown, index) => {
-                            if (index < 5) {
-                              return (
-                                <Tag
-                                  key={index}
-                                  className={tagTypeClass.get(t.type)}
-                                >
-                                  <span
-                                    className="max-w-[100px] text-overflow"
-                                    title={t.tagName}
-                                  >
-                                    {t.tagName}
-                                  </span>
-                                </Tag>
-                              );
-                            } else {
-                              return moreTagsId.includes(item.id) ? (
-                                <Tag
-                                  key={index}
-                                  className={tagTypeClass.get(t.type)}
-                                >
-                                  <span
-                                    className="max-w-[100px] text-overflow"
-                                    title={t.tagName}
-                                  >
-                                    {t.tagName}
-                                  </span>
-                                </Tag>
-                              ) : null;
-                            }
-                          })}
-                          {item.tagDtoList.length > 5 &&
-                            !moreTagsId.includes(item.id) && (
-                              <span
-                                className="rounded-md inline-block bg-[#F0F3F9] px-2 py-1 h-6 text-desc mb-1 cursor-pointer"
-                                onClick={e => {
-                                  e.stopPropagation();
-                                  moreTagsId.push(item.id);
-                                  setMoreTagsId([...moreTagsId]);
-                                }}
-                              >
-                                +{item.tagDtoList.length - 5}
-                              </span>
-                            )}
-                        </div>
-                      )}
                     </div>
                   </div>
                 ))}

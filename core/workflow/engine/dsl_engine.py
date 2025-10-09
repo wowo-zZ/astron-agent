@@ -872,7 +872,7 @@ class WorkflowEngine(BaseModel):
         # Wait for all tasks to complete
         await self._wait_all_tasks_completion(span)
 
-        return self.engine_ctx.responses[0]
+        return self.engine_ctx.responses[-1]
 
     async def _handle_node_start_callback(
         self,

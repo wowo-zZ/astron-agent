@@ -1,11 +1,11 @@
-import React, { FC } from "react";
-import { ErrorBoundary } from "react-error-boundary";
-import { Outlet, useLocation } from "react-router-dom";
-import CrashErrorComponent from "@/components/crash-error-component";
-import Sidebar from "@/components/sidebar";
-import Header from "@/components/header";
+import React, { FC } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import { Outlet, useLocation } from 'react-router-dom';
+import CrashErrorComponent from '@/components/crash-error-component';
+import Sidebar from '@/components/sidebar';
+import Header from '@/components/header';
 
-const hasHeaderList = ["knowledge", "plugin", "database", "rpa"];
+const hasHeaderList = ['knowledge', 'plugin', 'database', 'rpa'];
 
 interface BasicLayoutProps {
   showHeader?: boolean;
@@ -18,12 +18,12 @@ const BasicLayout: FC<BasicLayoutProps> = ({ showHeader }) => {
   const shouldShowHeader =
     showHeader !== undefined
       ? showHeader
-      : hasHeaderList.includes(location?.pathname?.split("/")?.pop() as string);
+      : hasHeaderList.includes(location?.pathname?.split('/')?.pop() as string);
 
   return (
     <ErrorBoundary
       onReset={() => {
-        window.location.href = "/";
+        window.location.href = '/';
       }}
       FallbackComponent={CrashErrorComponent}
     >

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Tooltip, Popover } from 'antd';
 import { useTranslation } from 'react-i18next';
 import documentationCenter from '@/assets/imgs/sidebar/documentation_center.svg';
@@ -7,33 +7,30 @@ import weChatShare from '@/assets/imgs/sidebar/we_chat_share.svg';
 import joinChatGroup from '@/assets/imgs/sidebar/join-chat-group.png';
 import styles from './index.module.scss';
 import useUserStore from '@/store/user-store';
+import { getMessageCountApi } from '@/services/notification';
 
 interface IconEntryProps {
-  myMessage?: {
-    messages?: Array<{ isRead: number }>;
-  };
-  onDocumentClick?: () => void;
   onMessageClick?: () => void;
   onNotLogin?: () => void;
 }
 
 const IconEntry: React.FC<IconEntryProps> = ({
-  myMessage,
-  onDocumentClick,
   onMessageClick,
   onNotLogin,
 }) => {
   const { t } = useTranslation();
   const isLogin = useUserStore(state => state.getIsLogin());
+  const [unreadCount, setUnreadCount] = useState<number>(0);
+
+  const getMessageCount = async () => {
+    const res = await getMessageCountApi();
+    setUnreadCount(res);
+  };
 
   const handleDocumentClick = () => {
-    if (onDocumentClick) {
-      onDocumentClick();
-    } else {
-      window.open(
-        'https://www.xfyun.cn/doc/spark/Agent01-%E5%B9%B3%E5%8F%B0%E4%BB%8B%E7%BB%8D.html'
-      );
-    }
+    window.open(
+      'https://www.xfyun.cn/doc/spark/Agent01-%E5%B9%B3%E5%8F%B0%E4%BB%8B%E7%BB%8D.html'
+    );
   };
 
   const handleMessageClick = () => {
@@ -44,14 +41,15 @@ const IconEntry: React.FC<IconEntryProps> = ({
     }
   };
 
-  const weChatPopoverContent = (
-    <div style={{ textAlign: 'center' }}>
-      <img src={joinChatGroup} style={{ width: '110px' }} alt="" />
-    </div>
-  );
+  // const weChatPopoverContent = (
+  //   <div style={{ textAlign: 'center' }}>
+  //     <img src={joinChatGroup} style={{ width: '110px' }} alt="" />
+  //   </div>
+  // );
 
-  const unreadCount =
-    myMessage?.messages?.filter(msg => msg.isRead !== 1).length || 0;
+  useEffect(() => {
+    getMessageCount();
+  }, []);
 
   return (
     <div

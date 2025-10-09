@@ -24,7 +24,7 @@ class _StreamResponse(BaseModel):
     code: int
     message: str
     sid: str = ""
-    data: Dict[str, Any]
+    data: Dict[str, Any] = Field(default_factory=dict)
 
 
 class RPANode(BaseNode):

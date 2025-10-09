@@ -35,7 +35,8 @@ class ConfigInfoServiceTest {
     void wireBaseMapper() throws NoSuchFieldException, IllegalAccessException {
         Field f = ServiceImpl.class.getDeclaredField("baseMapper");
         f.setAccessible(true);
-        f.set(service, configInfoMapper);    }
+        f.set(service, configInfoMapper);
+    }
 
     // ---------- Helpers ----------
 
@@ -156,8 +157,12 @@ class ConfigInfoServiceTest {
         @DisplayName("getTags(tool_v2 & prod) - 不修改id，直接返回Mapper结果")
         void getTags_toolV2_prod_shouldNotRewriteId() throws Exception {
             setEnv("prod");
-            ConfigInfo a = new ConfigInfo(); a.setId(1L); a.setRemarks("2");
-            ConfigInfo b = new ConfigInfo(); b.setId(3L); b.setRemarks("");
+            ConfigInfo a = new ConfigInfo();
+            a.setId(1L);
+            a.setRemarks("2");
+            ConfigInfo b = new ConfigInfo();
+            b.setId(3L);
+            b.setRemarks("");
             List<ConfigInfo> rows = Arrays.asList(a, b);
             when(configInfoMapper.getTags("TAG", "TOOL_TAGS_V2")).thenReturn(rows);
 
@@ -173,8 +178,12 @@ class ConfigInfoServiceTest {
         @DisplayName("getTags(tool_v2 & dev/test) - 非空remarks应覆盖为新id；空remarks保持原值")
         void getTags_toolV2_dev_shouldRewriteIdFromRemarks() throws Exception {
             setEnv("dev"); // 或 test
-            ConfigInfo a = new ConfigInfo(); a.setId(1L); a.setRemarks("2");
-            ConfigInfo b = new ConfigInfo(); b.setId(3L); b.setRemarks("");
+            ConfigInfo a = new ConfigInfo();
+            a.setId(1L);
+            a.setRemarks("2");
+            ConfigInfo b = new ConfigInfo();
+            b.setId(3L);
+            b.setRemarks("");
             List<ConfigInfo> rows = Arrays.asList(a, b);
             when(configInfoMapper.getTags("TAG", "TOOL_TAGS_V2")).thenReturn(rows);
 
@@ -190,7 +199,9 @@ class ConfigInfoServiceTest {
         @DisplayName("getTags(tool_v2 & dev) - remarks 非数字应抛 NumberFormatException")
         void getTags_toolV2_dev_shouldThrowOnInvalidRemarks() throws Exception {
             setEnv("dev");
-            ConfigInfo a = new ConfigInfo(); a.setId(1L); a.setRemarks("abc"); // 非数字
+            ConfigInfo a = new ConfigInfo();
+            a.setId(1L);
+            a.setRemarks("abc"); // 非数字
             when(configInfoMapper.getTags("TAG", "TOOL_TAGS_V2")).thenReturn(Collections.singletonList(a));
 
             assertThatThrownBy(() -> service.getTags("tool_v2"))

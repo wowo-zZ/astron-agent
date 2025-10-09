@@ -2,6 +2,7 @@ import React from 'react';
 import { Upload, message } from 'antd';
 import useFlowsManager from '@/components/workflow/store/useFlowsManager';
 import { v4 as uuid } from 'uuid';
+import { getFixedUrl, getAuthorization } from '@/components/workflow/utils';
 
 const { Dragger } = Upload;
 import uploadAct from '@/assets/imgs/knowledge/icon_zhishi_upload_act.png';
@@ -41,12 +42,13 @@ const FlowUpload: React.FC<FlowUploadProps> = ({
   const fileUpload = (event: unknown): void => {
     const file = event.file as File;
     const fileId = uuid();
-    const url = '/xingchen-api/workflow/uploadFile';
+    const url = getFixedUrl('/workflow/upload-file');
     const form = new FormData();
     form.append('files', file);
     form.append('flowId', currentFlow?.flowId || '');
     const xhr = new XMLHttpRequest();
     xhr.open('post', url);
+    xhr.setRequestHeader('Authorization', getAuthorization());
     xhr.onload = (event: ProgressEvent<EventTarget>): void => {
       uploadComplete(event, fileId);
     };

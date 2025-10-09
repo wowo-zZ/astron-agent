@@ -11,80 +11,17 @@ import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
 import inputAddIcon from '@/assets/imgs/workflow/input-add-icon.png';
 import remove from '@/assets/imgs/workflow/input-remove-icon.png';
 
-function index({ id, data, allFields, from, children }): React.ReactElement {
-  const { handleChangeNodeParam } = useNodeCommon({ id, data });
-  const { t } = useTranslation();
-  const historyVersion = useFlowsManager(state => state.historyVersion);
-  const [showParams, setShowParams] = useState(true);
-  const [addDataOptions, setAddDataOptions] = useState<unknown[]>([]);
-  const [fieldList, setFieldList] = useState([]);
-
-  const originOptions = useMemo(() => {
-    return allFields.map(field => {
-      return {
-        value: uuid(),
-        name: field.name,
-        required: field.isRequired,
-        type: field.type,
-        label: `${field.name}(${field.type})`,
-      };
-    });
-  }, [allFields]);
-
-  useEffect(() => {
-    setAddDataOptions(originOptions);
-  }, [originOptions]);
-
-  const assignList = useMemo(() => {
-    return data?.nodeParam?.assignmentList || [];
-  }, [data]);
-
-  const orderList = useMemo(() => {
-    return data?.nodeParam?.orderData || [];
-  }, [data?.nodeParam?.orderData]);
-
-  useEffect(() => {
-    if (!originOptions.length) return;
-    if (from === 'query') {
-      const list = assignList
-        .map(item => {
-          const current = originOptions.find(i => i.name === item);
-          if (!current) return null;
-          return {
-            id: uuid(),
-            name: current.name,
-            type: current.type,
-            order: 'asc',
-          };
-        })
-        .filter(Boolean);
-      setFieldList(list);
-      updateOptions(list);
-      if (list.length !== assignList.length) {
-        updateFieldList(list);
-      }
-    }
-    if (from === 'sort') {
-      const list = orderList
-        .map(item => {
-          const current = originOptions.find(i => i.name === item.fieldName);
-          if (!current) return null;
-          return {
-            id: uuid(),
-            name: item.fieldName,
-            type: current.type,
-            order: item.order,
-          };
-        })
-        .filter(Boolean);
-      setFieldList(list);
-      updateOptions(list);
-      if (list.length !== orderList.length) {
-        updateFieldList(list);
-      }
-    }
-  }, [assignList, orderList, originOptions]);
-
+const useQueryField = ({
+  fieldList,
+  setFieldList,
+  addDataOptions,
+  setAddDataOptions,
+  handleChangeNodeParam,
+  historyVersion,
+  from,
+  data,
+  allFields,
+}) => {
   const handleRemoveLine = (id): void => {
     const newList = fieldList.filter(it => it.id != id);
     setFieldList(newList);
@@ -141,6 +78,112 @@ function index({ id, data, allFields, from, children }): React.ReactElement {
     }
     setAddDataOptions(addOpts);
   };
+
+  const assignList = useMemo(() => {
+    return data?.nodeParam?.assignmentList || [];
+  }, [data]);
+
+  const orderList = useMemo(() => {
+    return data?.nodeParam?.orderData || [];
+  }, [data?.nodeParam?.orderData]);
+  const originOptions = useMemo(() => {
+    return allFields.map(field => {
+      return {
+        value: uuid(),
+        name: field.name,
+        required: field.isRequired,
+        type: field.type,
+        label: `${field.name}(${field.type})`,
+      };
+    });
+  }, [allFields]);
+
+  return {
+    originOptions,
+    assignList,
+    updateOptions,
+    updateFieldList,
+    orderList,
+    handleAddSelect,
+    sortChange,
+    handleRemoveLine,
+  };
+};
+
+function index({ id, data, allFields, from, children }): React.ReactElement {
+  const { handleChangeNodeParam } = useNodeCommon({ id, data });
+  const { t } = useTranslation();
+  const historyVersion = useFlowsManager(state => state.historyVersion);
+  const [showParams, setShowParams] = useState(true);
+  const [addDataOptions, setAddDataOptions] = useState<unknown[]>([]);
+  const [fieldList, setFieldList] = useState([]);
+
+  const {
+    originOptions,
+    assignList,
+    updateOptions,
+    updateFieldList,
+    orderList,
+    handleAddSelect,
+    sortChange,
+    handleRemoveLine,
+  } = useQueryField({
+    fieldList,
+    setFieldList,
+    addDataOptions,
+    setAddDataOptions,
+    handleChangeNodeParam,
+    historyVersion,
+    from,
+    data,
+    allFields,
+  });
+
+  useEffect(() => {
+    setAddDataOptions(originOptions);
+  }, [originOptions]);
+
+  useEffect(() => {
+    if (!originOptions.length) return;
+    if (from === 'query') {
+      const list = assignList
+        .map(item => {
+          const current = originOptions.find(i => i.name === item);
+          if (!current) return null;
+          return {
+            id: uuid(),
+            name: current.name,
+            type: current.type,
+            order: 'asc',
+          };
+        })
+        .filter(Boolean);
+      setFieldList(list);
+      updateOptions(list);
+      if (list.length !== assignList.length) {
+        updateFieldList(list);
+      }
+    }
+    if (from === 'sort') {
+      const list = orderList
+        .map(item => {
+          const current = originOptions.find(i => i.name === item.fieldName);
+          if (!current) return null;
+          return {
+            id: uuid(),
+            name: item.fieldName,
+            type: current.type,
+            order: item.order,
+          };
+        })
+        .filter(Boolean);
+      setFieldList(list);
+      updateOptions(list);
+      if (list.length !== orderList.length) {
+        updateFieldList(list);
+      }
+    }
+  }, [assignList, orderList, originOptions]);
 
   return (
     <FLowCollapse
@@ -226,7 +269,6 @@ function index({ id, data, allFields, from, children }): React.ReactElement {
               );
             })}
           </div>
-
           <Select
             disabled={!addDataOptions.length}
             className={cn('flow-select nodrag w-1/3')}

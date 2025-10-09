@@ -61,8 +61,7 @@ const useFlowStore = create<FlowStoreType>((set, get) => ({
   ): void => updateNodeNameStatus(nodeId, labelInputId, get),
   reNameNode: (nodeId: string, value: string): void =>
     reNameNode(nodeId, value, get),
-  paste: (selection: { nodes: Node[]; edges: Edge[] }): void =>
-    paste(selection, get),
+  paste: (): Promise<void> => paste(get),
   updateNodeRef: (id: string): void => updateNodeRef(id, get),
   delayUpdateNodeRef: (id: string): void => delayUpdateNodeRef(id, get),
   removeNodeRef: (

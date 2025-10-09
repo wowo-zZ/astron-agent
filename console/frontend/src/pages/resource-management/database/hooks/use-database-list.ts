@@ -9,8 +9,10 @@ import {
 import { pageList, create } from '@/services/database';
 import { DatabaseItem, CreateDbParams } from '@/types/database';
 import { useInfiniteScroll } from './use-infinite-scroll';
+import { message } from 'antd';
+import { ResponseBusinessError } from '@/types/global';
 
-type createDatabaseOk = (createParams: CreateDbParams) => Promise<void>;
+type createDatabaseOk = (createParams: CreateDbParams) => void;
 
 interface UseDatabaseListReturn {
   // 状态
@@ -85,14 +87,22 @@ export const useDatabaseList = (): UseDatabaseListReturn => {
       })
       .finally(() => {
         loadingRef.current = false;
+      })
+      .catch((e: ResponseBusinessError) => {
+        message.error(e?.message);
       });
   }, [pagination, searchValue, loadingRef]);
 
   // 创建数据库
   const createDatabaseOk = useCallback(
-    async (createParams: CreateDbParams): Promise<void> => {
-      await create(createParams);
-      getList();
+    (createParams: CreateDbParams): void => {
+      create(createParams)
+        .then(() => {
+          getList();
+        })
+        .catch((error: ResponseBusinessError) => {
+          message.error(error?.message);
+        });
     },
     [getList]
   );

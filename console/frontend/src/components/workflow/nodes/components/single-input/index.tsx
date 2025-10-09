@@ -20,7 +20,7 @@ export const EnabledChatHistory = ({ id, data }): React.ReactElement | null => {
   const canvasesDisabled = useFlowsManagerStore(
     state => state.canvasesDisabled
   );
-  if (!['decision-making', 'flow', 'spark-llm'].includes(nodeType)) {
+  if (!['decision-making', 'flow', 'spark-llm', 'agent'].includes(nodeType)) {
     return null;
   }
   return (

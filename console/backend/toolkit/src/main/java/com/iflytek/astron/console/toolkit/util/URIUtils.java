@@ -10,19 +10,24 @@ import java.util.Map;
 /**
  * Utility class for handling URI-related operations.
  * <p>
- * This class provides a helper method to extract query parameters from a given {@link URI}.
- * The parameters are decoded using UTF-8 encoding.
+ * This class provides a helper method to extract query parameters from a given {@link URI}. The
+ * parameters are decoded using UTF-8 encoding.
  * </p>
  *
- * <p><b>Usage example:</b></p>
+ * <p>
+ * <b>Usage example:</b>
+ * </p>
+ *
  * <pre>
  * URI uri = new URI("https://example.com/api?name=Tom&age=20");
  * Map&lt;String, String&gt; params = URIUtils.getQueryParameters(uri);
  * // params.get("name") -> "Tom"
- * // params.get("age")  -> "20"
+ * // params.get("age") -> "20"
  * </pre>
  *
- * <p>All exceptions are logged without interruption of the main process.</p>
+ * <p>
+ * All exceptions are logged without interruption of the main process.
+ * </p>
  *
  * @author
  * @since 2025/10/09
@@ -33,13 +38,13 @@ public class URIUtils {
     /**
      * Parses the query string from a given {@link URI} and returns a map of decoded parameters.
      * <p>
-     * The method safely handles invalid encodings and malformed queries by catching exceptions
-     * and logging the error without throwing further.
+     * The method safely handles invalid encodings and malformed queries by catching exceptions and
+     * logging the error without throwing further.
      * </p>
      *
      * @param uri the {@link URI} object containing the query string; must not be {@code null}
-     * @return a {@link Map} containing decoded query parameters (key-value pairs);
-     *         if no query parameters are present or an error occurs, an empty map is returned
+     * @return a {@link Map} containing decoded query parameters (key-value pairs); if no query
+     *         parameters are present or an error occurs, an empty map is returned
      * @throws None this method catches and logs all exceptions internally
      */
     public static Map<String, String> getQueryParameters(URI uri) {

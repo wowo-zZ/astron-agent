@@ -227,7 +227,7 @@ const McpAddressSection = ({
           {addressList?.length < 3 && (
             <div
               className="text-[#275EFF] text-xs font-medium mt-1 inline-flex items-center cursor-pointer gap-1.5 pl-6"
-              onClick={() => handleAddAddress()}
+              onClick={handleAddAddress}
             >
               <img src={Icons.agent.inputAddIcon} className="w-3 h-3" alt="" />
               <span>{t('workflow.nodes.agentNode.addAddress')}</span>
@@ -255,7 +255,7 @@ const McpAddressSection = ({
                   />
                 )}
               </div>
-              {!isValidURL(item?.value) && (
+              {item?.value?.trim() && !isValidURL(item?.value) && (
                 <div className="text-[#FF4D4F] text-xs font-medium">
                   {t('workflow.nodes.agentNode.invalidUrl')}
                 </div>
@@ -480,7 +480,17 @@ const useAgent = ({
     handleChangeNodeParam(
       (data: unknown, value: unknown) =>
         (data.nodeParam.plugin.mcpServerUrls = value),
-      addressList?.map(item => item?.value)?.filter(item => item)
+      addressList?.map(item => item?.value)
+    );
+  });
+
+  const handleAddAddress = useMemoizedFn(e => {
+    e.stopPropagation();
+    const newAddressList = [...addressList, { id: uuid(), value: '' }];
+    handleChangeNodeParam(
+      (data: unknown, value: unknown) =>
+        (data.nodeParam.plugin.mcpServerUrls = value),
+      newAddressList?.map(item => item?.value)
     );
   });
 
@@ -489,7 +499,7 @@ const useAgent = ({
     handleChangeNodeParam(
       (data: unknown, value: unknown) =>
         (data.nodeParam.plugin.mcpServerUrls = value),
-      newAddressList?.map(item => item?.value)?.filter(item => item)
+      newAddressList?.map(item => item?.value)
     );
   });
 
@@ -615,6 +625,7 @@ const useAgent = ({
     handleUpdateTool,
     handleChangeAddress,
     handleRemoveAddress,
+    handleAddAddress,
   };
 };
 
@@ -651,6 +662,7 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
     handleUpdateTool,
     handleChangeAddress,
     handleRemoveAddress,
+    handleAddAddress,
   } = useAgent({
     addressList,
     id,
@@ -699,6 +711,7 @@ export const AgentDetail = memo((props: AgentDetailProps) => {
             addressList={addressList}
             handleChangeAddress={handleChangeAddress}
             handleRemoveAddress={handleRemoveAddress}
+            handleAddAddress={handleAddAddress}
           />
           <PromptSection
             id={id}

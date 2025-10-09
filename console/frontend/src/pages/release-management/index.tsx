@@ -1,4 +1,4 @@
-import React, { Suspense, memo } from 'react';
+import React, { Suspense, ReactElement } from 'react';
 import { Spin } from 'antd';
 import { Routes, Route } from 'react-router-dom';
 import styles from './index.module.scss';
@@ -12,7 +12,7 @@ const DetailListPage = React.lazy(() => import('./detail-list-page'));
 const DetailOverview = React.lazy(() => import('./detail-overview'));
 const TracePage = React.lazy(() => import('./trace-logs'));
 
-export default function Index() {
+export default function Index(): ReactElement {
   return (
     <div
       className={styles.PublicContent}
