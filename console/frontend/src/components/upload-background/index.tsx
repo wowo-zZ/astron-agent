@@ -1,8 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { Modal, message } from 'antd';
 import Cropper from 'react-easy-crop';
-import { uploadBotImg } from '@/services/spark-common';
+import { uploadFile } from '@/utils/utils';
 import { useSparkCommonStore } from '@/store/spark-store/spark-common';
+import { CroppedAreaPixels } from '@/hooks/use-image-crop-upload';
 
 import styles from './index.module.scss';
 
@@ -15,14 +16,14 @@ const UploadBackgroundModal: React.FC<UploadBackgroundModalProps> = ({
   visible,
   onCancel,
 }) => {
-  const inputRef = useRef<any>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const setCoverUrlPC = useSparkCommonStore(state => state.setBackgroundImg);
   const setCoverUrlApp = useSparkCommonStore(
     state => state.setBackgroundImgApp
   );
 
-  const [formData, setFormData] = useState<FormData>();
-  const [formDataPC, setFormDataPc] = useState<FormData>();
+  const [croppedBlobApp, setCroppedBlobApp] = useState<Blob | null>(null);
+  const [croppedBlobPC, setCroppedBlobPC] = useState<Blob | null>(null);
   const [horizontalZoom, setHorizontalZoom] = useState(1);
   const [verticalZoom, setVerticalZoom] = useState(1);
   const [horizontalCrop, setHorizontalCrop] = useState({ x: 0, y: 0 });
@@ -30,12 +31,19 @@ const UploadBackgroundModal: React.FC<UploadBackgroundModalProps> = ({
   const [uploadedSrc, setUploadedSrc] = useState('');
   const [loading, setLoading] = useState(false);
   const createCroppedImage = (
-    croppedAreaPixels: any,
-    setFormDataCallback: (data: FormData) => void
-  ) => {
-    const image = new Image();
+    croppedAreaPixels: CroppedAreaPixels,
+    setBlobCallback: (blob: Blob) => void
+  ): void => {
+    let image: HTMLImageElement;
+    if (typeof window !== 'undefined' && window.Image) {
+      image = new window.Image();
+    } else {
+      // 兼容 SSR 或非浏览器环境，抛出错误或处理
+      message.error('Image 构造函数在当前环境不可用');
+      return;
+    }
     image.src = uploadedSrc || '';
-    image.onload = () => {
+    image.onload = (): void => {
       const canvas = document.createElement('canvas');
       canvas.width = croppedAreaPixels.width;
       canvas.height = croppedAreaPixels.height;
@@ -56,9 +64,9 @@ const UploadBackgroundModal: React.FC<UploadBackgroundModalProps> = ({
 
       canvas.toBlob(
         blob => {
-          const res = new FormData();
-          blob && res.append('file', blob, 'cropped-image.jpeg');
-          setFormDataCallback(res);
+          if (blob) {
+            setBlobCallback(blob);
+          }
         },
         'image/jpeg',
         1
@@ -67,20 +75,20 @@ const UploadBackgroundModal: React.FC<UploadBackgroundModalProps> = ({
   };
 
   const onHorizontalCropComplete = (
-    _croppedArea: any,
-    croppedAreaPixels: any
-  ) => {
-    createCroppedImage(croppedAreaPixels, setFormDataPc);
+    _croppedArea: unknown,
+    croppedAreaPixels: CroppedAreaPixels
+  ): void => {
+    createCroppedImage(croppedAreaPixels, setCroppedBlobPC);
   };
 
   const onVerticalCropComplete = (
-    _croppedArea: any,
-    croppedAreaPixels: any
-  ) => {
-    createCroppedImage(croppedAreaPixels, setFormData);
+    _croppedArea: unknown,
+    croppedAreaPixels: CroppedAreaPixels
+  ): void => {
+    createCroppedImage(croppedAreaPixels, setCroppedBlobApp);
   };
 
-  const processFile = (file: File) => {
+  const processFile = (file: File): void => {
     const supportedTypes = ['image/png', 'image/jpg', 'image/jpeg'];
 
     if (!supportedTypes.includes(file.type)) {
@@ -101,7 +109,7 @@ const UploadBackgroundModal: React.FC<UploadBackgroundModalProps> = ({
     reader.readAsDataURL(file);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
       if (file) {
@@ -110,7 +118,7 @@ const UploadBackgroundModal: React.FC<UploadBackgroundModalProps> = ({
     }
   };
 
-  const handleDrop = (event: React.DragEvent) => {
+  const handleDrop = (event: React.DragEvent): void => {
     event.preventDefault();
     if (event.dataTransfer && event.dataTransfer.items) {
       for (let i = 0; i < event.dataTransfer.items.length; i++) {
@@ -225,19 +233,34 @@ const UploadBackgroundModal: React.FC<UploadBackgroundModalProps> = ({
                 : styles.disabledButton
             }
             onClick={async () => {
-              if (!uploadedSrc || !formData || !formDataPC || loading) return;
+              if (!uploadedSrc || !croppedBlobApp || !croppedBlobPC || loading)
+                return;
               setLoading(true);
               try {
-                const res = await uploadBotImg(formData as FormData);
-                setTimeout(async () => {
-                  const resp = await uploadBotImg(formDataPC as FormData);
-                  setCoverUrlPC(resp);
-                  setCoverUrlApp(res);
-                  onCancel();
-                  setLoading(false);
-                }, 300);
+                // 创建File对象用于上传
+                const appFile = new File(
+                  [croppedBlobApp],
+                  'background-app.jpeg',
+                  { type: 'image/jpeg' }
+                );
+                const pcFile = new File([croppedBlobPC], 'background-pc.jpeg', {
+                  type: 'image/jpeg',
+                });
+
+                // 使用uploadFile函数上传
+                const appResult = await uploadFile(appFile, 'background');
+                const pcResult = await uploadFile(pcFile, 'background');
+
+                // 设置上传后的URL
+                setCoverUrlApp(appResult.url);
+                setCoverUrlPC(pcResult.url);
+
+                message.success('上传成功');
+                onCancel();
+                setLoading(false);
               } catch (error) {
                 message.error('上传失败，请重试');
+                setLoading(false);
               }
             }}
           >

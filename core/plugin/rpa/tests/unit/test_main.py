@@ -126,10 +126,10 @@ class TestSetupPythonPath:
 class TestLoadEnvFile:
     """Test class for load_env_file function."""
 
+    @patch("plugin.rpa.main.print")
     @patch("plugin.rpa.main.os.path.exists")
-    @patch("builtins.print")
     def test_load_env_file_not_exists(
-        self, mock_print: MagicMock, mock_exists: MagicMock
+        self, mock_exists: MagicMock, mock_print: MagicMock
     ) -> None:
         """Test load_env_file when file doesn't exist."""
         # Arrange
@@ -144,20 +144,20 @@ class TestLoadEnvFile:
             f"❌ Configuration file {test_file} does not exist"
         )
 
-    @patch("plugin.rpa.main.os.path.exists")
+    @patch("plugin.rpa.main.print")
+    @patch("plugin.rpa.main.os.environ.get")
     @patch(
         "builtins.open",
         new_callable=mock_open,
         read_data="KEY1=value1\n# comment\nKEY2=value2\n\ninvalid_line\n",
     )
-    @patch("plugin.rpa.main.os.environ.get")
-    @patch("builtins.print")
+    @patch("plugin.rpa.main.os.path.exists")
     def test_load_env_file_success(
         self,
-        mock_print: MagicMock,
-        mock_env_get: MagicMock,
-        mock_file: MagicMock,
         mock_exists: MagicMock,
+        mock_file: MagicMock,
+        mock_env_get: MagicMock,
+        mock_print: MagicMock,
     ) -> None:
         """Test successful loading of environment file."""
         # Arrange
@@ -176,18 +176,18 @@ class TestLoadEnvFile:
             mock_print.assert_any_call("CFG  ✅ KEY2=value2")
             mock_print.assert_any_call("  ⚠️  Line 5 format error: invalid_line")
 
-    @patch("plugin.rpa.main.os.path.exists")
+    @patch("plugin.rpa.main.print")
+    @patch("plugin.rpa.main.os.environ.get")
     @patch(
         "builtins.open", new_callable=mock_open, read_data="EXISTING_KEY=new_value\n"
     )
-    @patch("plugin.rpa.main.os.environ.get")
-    @patch("builtins.print")
+    @patch("plugin.rpa.main.os.path.exists")
     def test_load_env_file_existing_env_var(
         self,
-        mock_print: MagicMock,
-        mock_env_get: MagicMock,
-        mock_file: MagicMock,
         mock_exists: MagicMock,
+        mock_file: MagicMock,
+        mock_env_get: MagicMock,
+        mock_print: MagicMock,
     ) -> None:
         """Test loading when environment variable already exists."""
         # Arrange
@@ -209,12 +209,12 @@ class TestLoadEnvFile:
 class TestStartService:
     """Test class for start_service function."""
 
-    @patch("plugin.rpa.main.subprocess.run")
-    @patch("plugin.rpa.main.Path")
+    @patch("plugin.rpa.main.print")
     @patch("plugin.rpa.main.sys.executable", "/usr/bin/python")
-    @patch("builtins.print")
+    @patch("plugin.rpa.main.Path")
+    @patch("plugin.rpa.main.subprocess.run")
     def test_start_service_success(
-        self, mock_print: MagicMock, mock_path: MagicMock, mock_run: MagicMock
+        self, mock_run: MagicMock, mock_path: MagicMock, mock_print: MagicMock
     ) -> None:
         """Test successful service startup."""
         # Arrange
@@ -338,18 +338,18 @@ class TestStartService:
 class TestMain:
     """Test class for main function."""
 
-    @patch("plugin.rpa.main.start_service")
+    @patch("plugin.rpa.main.print")
+    @patch("plugin.rpa.main.Path")
     @patch("plugin.rpa.main.load_env_file")
     @patch("plugin.rpa.main.setup_python_path")
-    @patch("plugin.rpa.main.Path")
-    @patch("builtins.print")
+    @patch("plugin.rpa.main.start_service")
     def test_main_function(
         self,
-        mock_print: MagicMock,
-        mock_path: MagicMock,
+        mock_start_service: MagicMock,
         mock_setup_path: MagicMock,
         mock_load_env: MagicMock,
-        mock_start_service: MagicMock,
+        mock_path: MagicMock,
+        mock_print: MagicMock,
     ) -> None:
         """Test the main function execution flow."""
         # Arrange

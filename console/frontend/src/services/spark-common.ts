@@ -15,19 +15,29 @@ export const uploadUserProfile = (formData: FormData): Promise<any> =>
     timeout: 20000,
   });
 
+export const updateUserInfo = ({
+  nickname,
+  avatar,
+}: {
+  nickname: string;
+  avatar: string;
+}): Promise<any> => {
+  return http.post(`/user-info/update`, { nickname, avatar });
+};
+
 // 拒绝邀请
 export const refuseInvite = (params: any): Promise<any> => {
-  return http.post(`/inviteRecord/refuseInvite?inviteId=${params.inviteId}`);
+  return http.post(`/invite-record/refuse-invite?inviteId=${params.inviteId}`);
 };
 
 // 接受邀请
 export const acceptInvite = (params: any): Promise<any> => {
-  return http.post(`/inviteRecord/acceptInvite?inviteId=${params.inviteId}`);
+  return http.post(`/invite-record/accept-invite?inviteId=${params.inviteId}`);
 };
 
 // 邀请记录信息
 export const getInviteByParam = (params: any): Promise<any> => {
-  return http.get(`/inviteRecord/getInviteByParam?param=${params}`);
+  return http.get(`/invite-record/get-invite-by-param?param=${params}`);
 };
 
 // b编辑个人中心用户名
@@ -38,6 +48,18 @@ export const modifyNickname = (params: any): Promise<any> => {
 // ai生成助手封面图
 export const aiGenerateCover = (params: any): Promise<any> => {
   return http.post(`/bot/ai-avatar-gen `, params);
+};
+
+export interface ModelListData {
+  isCustom: boolean;
+  modelDomain: string;
+  modelName: string;
+  modeId: string;
+  modelIcon: string;
+}
+// 获取模型列表
+export const getModelList = (): Promise<ModelListData[]> => {
+  return http.get(`/bot/bot-model`);
 };
 
 // 上传图片
@@ -182,11 +204,6 @@ export const removeBotApplyRecord = (params: any) => {
   return http.post(`/bot/remove-bot`, params);
 };
 
-//申请下架助手 -- NOTE: 发布模块原有逻辑, 用新接口后应该删去
-export const applyCancelUpload = (params: any) => {
-  return http.post(`/bot/take-off-bot`, params);
-};
-
 //提交助手审核
 export const sendApplyBot = (params: any): Promise<{ botId: number }> => {
   return http.request({
@@ -269,7 +286,7 @@ export const getApiCertInfo = (): Promise<boolean> => {
 
 // 获取api列表
 export const getApiList = (): Promise<any[]> => {
-  return http.get(`/bot/api/appList`);
+  return http.get(`/publish-api/app-list`);
 };
 
 // 获取订单列表
@@ -284,12 +301,17 @@ export const getApiInfo = (botId: any) => {
 
 // 获取api 实时用量
 export const getApiUsage = (botId: any) => {
-  return http.post(`/bot/api/usage?botId=${botId}`);
+  return http.post(`/publish-api/usage-real-time?botId=${botId}`);
 };
 
 // 创建助手api
 export const createApi = (params: any) => {
-  return http.post(`/bot/api/create`, params);
+  return http.post(`/publish-api/create-bot-api`, params);
+};
+
+// create app of user
+export const createApp = (params: any) => {
+  return http.post(`/publish-api/create-user-app`, params);
 };
 
 // 获取api 历史用量
@@ -357,7 +379,7 @@ export const getDataSource = () => {
 // 生成输入示例
 export const generateInputExample = (params: any) => {
   return http({
-    url: `/bot/generateInputExample`,
+    url: `/bot/generate-input-example`,
     method: 'POST',
     data: params,
     headers: {
@@ -366,39 +388,12 @@ export const generateInputExample = (params: any) => {
   });
   // return http.post(`/login/check-account`, params);
 };
-/**
- * @description 获取V2一户话自训练发音人列表
- */
-export const getV2CustomVCNList = (params?: any): Promise<any> => {
-  return http.post(`/customVCN/v2/getVcnList`, params);
-};
-
-/**
- * @description 删除自训练发音人
- */
-export const deleteCustomVCN = (params: any): Promise<any> => {
-  return http.post(`/customVCN/deleteCustomVCN`, params);
-};
 
 /**
  * @description 获取任务状态
  */
 export const updateCustomVCN = (params: any): Promise<any> => {
   return http.post(`/customVCN/updateCustomVCN`, params);
-};
-
-/**
- * @description 创建一句话复刻任务
- */
-export const createOnceTrainTask = (params: any): Promise<any> => {
-  return http({
-    url: `/customVCN/v2/create?sex=${params.sex}&index=${params.sampleIndex}`,
-    method: 'POST',
-    data: params.formData,
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-  });
 };
 
 // 新增bot

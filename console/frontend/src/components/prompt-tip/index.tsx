@@ -459,7 +459,7 @@ const PromptTry = ({
       signal: controller.signal,
       onopen(res: any) {
         // if (res.status === 401) {
-        //   jumpTologin();
+        //   jumpToLogin();
         // }
         setAnswerLoading(false);
         scrollDialogToBottom();

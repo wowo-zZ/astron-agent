@@ -682,6 +682,84 @@ input[type='number']::-webkit-outer-spin-button {
   background: #f5f5f5 !important;
 }
 
+// Universal antd table expand icon and content inline alignment
+.ant-table-cell:first-child {
+  // Keep normal table cell behavior but ensure inline layout
+  white-space: nowrap; // Prevent line breaks
+
+  .ant-table-row-expand-icon {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 8px;
+    flex-shrink: 0; // Prevent icon from shrinking
+  }
+
+  // Custom expand icon styles (for cases using img instead of standard expand icon)
+  > img {
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 10px; // Fixed distance from top instead of center
+    margin-right: 8px;
+    flex-shrink: 0; // Prevent icon from shrinking
+  }
+
+  // Default content container - no expand icon (leaf nodes)
+  > div {
+    display: inline-flex;
+    vertical-align: middle;
+    white-space: normal; // Allow text wrapping inside content
+    width: 100%; // Full width for rows without expand icon
+    max-width: 100%;
+  }
+
+  // When expand icon exists, adjust content width
+  &:has(.ant-table-row-expand-icon) > div,
+  &:has(> img) > div {
+    width: calc(
+      100% - 24px
+    ); // Reserve space for expand icon (16px) + margin (8px)
+    max-width: calc(100% - 24px);
+  }
+}
+
+// Universal solution for all levels (1-20)
+// Generate using SCSS loop for maintainability and consistency
+@for $level from 1 through 20 {
+  $indent: $level * 15px;
+  $total-with-icon: $indent + 24px;
+
+  // Leaf nodes without expand icons
+  .ant-table-row-level-#{$level} .ant-table-cell:first-child > div {
+    width: calc(100% - #{$indent});
+    max-width: calc(100% - #{$indent});
+  }
+
+  // Rows with expand icons (override above)
+  .ant-table-row-level-#{$level}
+    .ant-table-cell:first-child:has(.ant-table-row-expand-icon)
+    > div,
+  .ant-table-row-level-#{$level} .ant-table-cell:first-child:has(> img) > div {
+    width: calc(100% - #{$total-with-icon});
+    max-width: calc(100% - #{$total-with-icon});
+  }
+}
+
+// Alternative: JavaScript-based dynamic solution (if needed for levels > 20)
+// Add this to your component to handle unlimited levels:
+/*
+  React solution for unlimited levels:
+  
+  const getIndentStyle = (level, hasExpandIcon) => {
+    const indent = level * 15;
+    const iconSpace = hasExpandIcon ? 24 : 0;
+    const totalOffset = indent + iconSpace;
+    return {
+      width: `calc(100% - ${totalOffset}px)`,
+      maxWidth: `calc(100% - ${totalOffset}px)`
+    };
+  };
+*/
+
 .global-monaco-editor-json {
   flex: 1;
   background: #fff;
@@ -865,12 +943,6 @@ input[type='number']::-webkit-outer-spin-button {
 .tool-params-table {
   .ant-table {
     background: transparent !important;
-  }
-
-  .ant-table-cell-with-append {
-    width: 100% !important;
-    display: inline-flex !important;
-    align-items: center;
   }
 
   .ant-table-cell {
@@ -1572,11 +1644,11 @@ input[type='number']::-webkit-outer-spin-button {
   position: relative;
 
   .ant-input-data-count {
-    bottom: 2px !important; // 距离底部边框2px
-    right: 6px !important; // 稍微调整右侧距离
+    bottom: 2px !important; // Distance from bottom border: 2px
+    right: 6px !important; // Slightly adjust right distance
     padding: 2px 4px;
     font-size: 12px;
-    pointer-events: none; // 避免影响文本输入
+    pointer-events: none; // Avoid affecting text input
   }
 }
 
@@ -1618,6 +1690,40 @@ input[type='number']::-webkit-outer-spin-button {
 
       p {
         color: #275eff;
+      }
+    }
+  }
+}
+
+.dropdown {
+  width: max-content;
+  .ant-dropdown-menu {
+    .ant-dropdown-menu-item {
+      padding: 4px;
+    }
+    .ant-dropdown-menu-item[data-type='delete'] {
+      .delete-icon {
+        background-image: url('@/assets/imgs/workflow/delete.svg');
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-size: auto;
+      }
+      .delete-text {
+        color: #99a1b6;
+      }
+      &:hover {
+        background-color: #feedec;
+        .delete-icon {
+          background-image: url('@/assets/imgs/workflow/delete_hover.svg');
+        }
+        .delete-text {
+          color: #f74e43;
+        }
+      }
+    }
+    .ant-dropdown-menu-item:not([data-type='delete']) {
+      &:hover {
+        background-color: #f2f5fe;
       }
     }
   }

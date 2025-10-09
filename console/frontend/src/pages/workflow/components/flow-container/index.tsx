@@ -1,4 +1,10 @@
-import React, { useCallback, useState, useRef, useMemo } from 'react';
+import React, {
+  useCallback,
+  useState,
+  useRef,
+  useMemo,
+  useEffect,
+} from 'react';
 import ReactFlow, {
   Background,
   Connection,
@@ -8,12 +14,14 @@ import ReactFlow, {
   ReactFlowInstance,
   updateEdge,
 } from 'reactflow';
+import { message } from 'antd';
 import { useFlowCommon } from '@/components/workflow/hooks/useFlowCommon';
 import ConnectionLineComponent from '@/components/workflow/nodes/components/connection-line';
 import FlowPanel from '@/components/workflow/panel';
 import useFlowsManager from '@/components/workflow/store/useFlowsManager';
 import useFlowStore from '@/components/workflow/store/useFlowStore';
 import SelectNode from '@/components/workflow/tips/select-node';
+import { cloneDeep } from 'lodash';
 
 import CustomNode from '@/components/workflow/nodes';
 import CustomEdge from '@/components/workflow/edges';
@@ -25,6 +33,102 @@ interface IndexProps {
   zoom: number;
   setZoom: (zoom: number) => void;
 }
+
+const useFlowContainerEffect = ({ lastSelection }) => {
+  const undo = useFlowStore(state => state.undo);
+  const paste = useFlowStore(state => state.paste);
+  const takeSnapshot = useFlowStore(state => state.takeSnapshot);
+  const removeNodeRef = useFlowStore(state => state.removeNodeRef);
+  const deleteNode = useFlowStore(state => state.deleteNode);
+  const setEdges = useFlowStore(state => state.setEdges);
+  const edges = useFlowStore(state => state.edges);
+  const canPublishSetNot = useFlowsManager(state => state.canPublishSetNot);
+  const showToolModal = useFlowsManager(state => state.toolModalInfo)?.open;
+  const knowledgeModalInfoOpen = useFlowsManager(
+    state => state.knowledgeModalInfo
+  )?.open;
+  const lastCopiedSelection = useFlowStore(state => state.lastCopiedSelection);
+  const showIterativeModal = useFlowsManager(state => state.showIterativeModal);
+  const position = useRef({ x: 0, y: 0 });
+  const handleDelete = useCallback(() => {
+    takeSnapshot();
+    lastSelection.nodes = lastSelection?.nodes?.filter(
+      node => node.type !== '开始节点' && node.type !== '结束节点'
+    );
+    const edgeIds = lastSelection?.edges?.map(edge => edge?.id);
+    const leftEdges = edges.filter(edge => !edgeIds?.includes(edge?.id));
+    lastSelection?.edges?.forEach(edge => {
+      if (
+        leftEdges?.filter(
+          item => item?.source === edge?.source && item?.target === edge?.target
+        )?.length === 0
+      ) {
+        removeNodeRef(edge.source, edge.target);
+      }
+    });
+    lastSelection?.nodes?.map(node => deleteNode(node?.id));
+    setEdges(edges => edges.filter(edge => !edgeIds?.includes(edge?.id)));
+    canPublishSetNot();
+  }, [lastSelection, edges]);
+
+  useEffect(() => {
+    const handleKeyDown = async event => {
+      if ((event.ctrlKey || event.metaKey) && event.key === 'z') {
+        undo();
+      } else if (
+        (event.ctrlKey || event.metaKey) &&
+        event.key === 'c' &&
+        lastSelection
+      ) {
+        const cloneLastSelection = cloneDeep(lastSelection);
+        cloneLastSelection.nodes = cloneLastSelection.nodes?.filter(node => {
+          if (node?.data?.parentId) {
+            return true;
+          }
+          return node.nodeType !== 'node-start' && node.nodeType !== 'node-end';
+        });
+        try {
+          await navigator.clipboard.writeText(
+            JSON.stringify(cloneLastSelection)
+          );
+          message.success('复制成功');
+        } catch {
+          message.error('[Clipboard] 复制失败');
+        }
+      } else if ((event.ctrlKey || event.metaKey) && event.key === 'v') {
+        event.preventDefault();
+        paste();
+      } else if (
+        ['Backspace', 'Delete']?.includes(event.key) &&
+        lastSelection
+      ) {
+        handleDelete();
+      }
+    };
+
+    const handleMouseMove = event => {
+      position.current = { x: event.clientX, y: event.clientY };
+    };
+
+    !showToolModal &&
+      !showIterativeModal &&
+      !knowledgeModalInfoOpen &&
+      window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [
+    lastSelection,
+    lastCopiedSelection,
+    showToolModal,
+    showIterativeModal,
+    knowledgeModalInfoOpen,
+    edges,
+  ]);
+};
 
 function Index({ zoom, setZoom }: IndexProps): React.ReactElement {
   // hooks
@@ -51,6 +155,8 @@ function Index({ zoom, setZoom }: IndexProps): React.ReactElement {
   const canvasesDisabled = useFlowsManager(state => state.canvasesDisabled);
   const controlMode = useFlowsManager(state => state.controlMode);
   const willAddNode = useFlowsManager(state => state.willAddNode);
+
+  useFlowContainerEffect({ lastSelection });
 
   // =========================
   // 拆分函数：初始化 ReactFlow
@@ -147,6 +253,7 @@ function Index({ zoom, setZoom }: IndexProps): React.ReactElement {
         <SelectNode lastSelection={lastSelection} />
       ) : null}
       <ReactFlow
+        nodeDragThreshold={10}
         nodes={nodes?.filter(node => !node.hidden)}
         edges={edges}
         onInit={handleFlowInit}
@@ -168,7 +275,6 @@ function Index({ zoom, setZoom }: IndexProps): React.ReactElement {
         multiSelectionKeyCode="Shift"
         panOnScroll={controlMode === 'touch'}
         connectionLineComponent={ConnectionLineComponent}
-        onlyRenderVisibleElements
       >
         <Background />
         <FlowPanel

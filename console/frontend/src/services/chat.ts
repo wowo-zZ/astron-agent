@@ -8,6 +8,7 @@ import {
   S3PresignResponse,
 } from '@/types/chat';
 import http from '@/utils/http';
+import { TtsSignResponse } from '@/utils/tts';
 import axios, { type AxiosResponse } from 'axios';
 
 /**
@@ -97,9 +98,15 @@ export async function postCreateChat(
   return http.post('/chat-list/v1/create-chat-list', { botId });
 }
 
-export const deleteChatList = (params: any) => {
+/**
+ * 删除聊天记录
+ * @param chatListId 聊天列表Id
+ * @returns
+ */
+export const deleteChatList = (params: { chatListId: number }) => {
   return http.post(`/chat-list/v1/del-chat-list`, params);
 };
+
 /**
  * 获取语音识别token
  * @returns
@@ -232,4 +239,18 @@ export const unBindChatFile = (params: {
   fileId: string;
 }): Promise<{ id: number }> => {
   return http.post('/chat-enhance/unbind-file', params);
+};
+
+/**
+ * 获取合成websocket签名
+ * text 文本
+ * tts 发音人
+ * @returns
+ */
+export const getTtsSign = (params: FormData): Promise<TtsSignResponse> => {
+  return http.post(`/iflygpt/api/tts_sign`, params, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
 };

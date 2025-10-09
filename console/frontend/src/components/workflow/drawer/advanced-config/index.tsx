@@ -221,52 +221,6 @@ const SuggestedQuestions = ({
   );
 };
 
-const FeedbackSwitch = ({
-  advancedConfig,
-  handleAdvancedConfigChange,
-  updateAdvancedConfigParams,
-  t,
-}): React.ReactElement => {
-  return (
-    <div
-      className="bg-[#F7F7FA] rounded-lg"
-      style={{
-        padding: '10px 17px 16px 17px',
-      }}
-    >
-      <div className="w-full flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <img
-            src={icons.likeAndDislike}
-            className="w-[22px] h-[22px]"
-            alt=""
-          />
-          <div className="font-medium">
-            {t('workflow.advancedConfiguration.likeAndDislike')}
-          </div>
-        </div>
-        <Switch
-          className="list-switch config-switch"
-          checked={advancedConfig?.feedback?.enabled}
-          onChange={value => {
-            handleAdvancedConfigChange(
-              () => (advancedConfig.feedback.enabled = value)
-            );
-            updateAdvancedConfigParams({
-              feedback: {
-                enabled: value,
-              },
-            });
-          }}
-        />
-      </div>
-      <div className="text-xs font-medium text-[#666] mt-1 max-w-[274px] whitespace-pre-wrap">
-        {t('workflow.advancedConfiguration.likeAndDislikeDescription')}
-      </div>
-    </div>
-  );
-};
-
 const ChatBackground = ({
   advancedConfig,
   handleAdvancedConfigChange,
@@ -642,12 +596,6 @@ function AdvancedConfiguration(): React.ReactElement {
             t={t}
           />
           <SuggestedQuestions
-            advancedConfig={advancedConfig}
-            handleAdvancedConfigChange={handleAdvancedConfigChange}
-            updateAdvancedConfigParams={updateAdvancedConfigParams}
-            t={t}
-          />
-          <FeedbackSwitch
             advancedConfig={advancedConfig}
             handleAdvancedConfigChange={handleAdvancedConfigChange}
             updateAdvancedConfigParams={updateAdvancedConfigParams}

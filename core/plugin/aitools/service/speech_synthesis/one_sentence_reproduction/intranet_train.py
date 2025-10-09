@@ -9,6 +9,7 @@ import json
 import uuid
 from datetime import datetime
 from time import mktime
+from typing import Any, Dict, Tuple, Union
 from urllib.parse import urlparse
 from wsgiref.handlers import format_date_time
 
@@ -16,22 +17,24 @@ import requests
 
 
 class VoiceCloneClient:
-    def __init__(self, app_id, api_key, api_secret):
+    def __init__(self, app_id: str, api_key: str, api_secret: str) -> None:
         self.app_id = app_id
         self.api_key = api_key
         self.api_secret = api_secret
         self.requrl = "http://evo-dx.xf-yun.com/individuation/sgen/reg"
 
     @staticmethod
-    def sha256base64(data):
+    def sha256base64(data: bytes) -> str:
         sha256 = hashlib.sha256()
         sha256.update(data)
         digest = base64.b64encode(sha256.digest()).decode(encoding="utf-8")
         return digest
 
-    def assemble_auth_header(self, method="POST", body=""):
+    def assemble_auth_header(
+        self, method: str = "POST", body: str = ""
+    ) -> Dict[str, str]:
         u = urlparse(self.requrl)
-        host = u.hostname
+        host = u.hostname or ""
         path = u.path
         now = datetime.now()
         date = format_date_time(mktime(now.timetuple()))
@@ -39,12 +42,14 @@ class VoiceCloneClient:
         signature_origin = (
             f"host: {host}\ndate: {date}\n{method} {path} HTTP/1.1\ndigest: {digest}"
         )
-        signature_sha = hmac.new(
+        signature_sha_bytes: bytes = hmac.new(
             self.api_secret.encode("utf-8"),
             signature_origin.encode("utf-8"),
             digestmod=hashlib.sha256,
         ).digest()
-        signature_sha = base64.b64encode(signature_sha).decode(encoding="utf-8")
+        signature_sha: str = base64.b64encode(signature_sha_bytes).decode(
+            encoding="utf-8"
+        )
         authorization = f'api_key="{self.api_key}", algorithm="hmac-sha256", \
         headers="host date request-line digest", signature="{signature_sha}"'
         headers = {
@@ -57,7 +62,7 @@ class VoiceCloneClient:
         return headers
 
     @staticmethod
-    def get_data(audio_url):
+    def get_data(audio_url: str) -> Union[str, Tuple[int, str]]:
         try:
             response = requests.get(audio_url, timeout=30)
             response.raise_for_status()  # 这会抛出HTTPError如果请求失败
@@ -73,7 +78,9 @@ class VoiceCloneClient:
             # print(f"下载失败：{error_code},{error_message}")
             return (error_code, error_message)
 
-    def train(self, res_id, audio_url):
+    def train(
+        self, res_id: str, audio_url: str
+    ) -> Tuple[str, Union[dict[str, Any], Tuple[int, str]]]:
         audio_data = self.get_data(audio_url)
         if isinstance(audio_data, tuple):
             # 如果下载音频时出错，直接返回错误信息

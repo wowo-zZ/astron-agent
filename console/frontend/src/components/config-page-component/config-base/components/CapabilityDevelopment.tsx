@@ -258,13 +258,13 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
         ) : (
           <>
             <img
-              className={styles.choose_icon}
+              className={'w-[14px] h-3 mt-1.5 mr-1.5'}
               src={
                 'https://openres.xfyun.cn/xfyundoc/2024-05-13/6c7b581a-e2f1-43fc-a73f-f63307df8150/1715581373857/1123213.png'
               }
               alt=""
             />
-            {t('configBase.selectPronouncer')}
+            {t('configBase.CapabilityDevelopment.selectPronouncer')}
           </>
         )}
       </>
@@ -1001,7 +1001,7 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
                       onChange={(
                         event: React.ChangeEvent<HTMLInputElement>
                       ) => {
-                        inputExample[0] = event.target.value.trim();
+                        inputExample[0] = event.target.value;
                         setInputExample([...inputExample]);
                       }}
                     />
@@ -1018,7 +1018,7 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
                       onChange={(
                         event: React.ChangeEvent<HTMLInputElement>
                       ) => {
-                        inputExample[1] = event.target.value.trim();
+                        inputExample[1] = event.target.value;
                         setInputExample([...inputExample]);
                       }}
                     />
@@ -1033,7 +1033,7 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
                       onChange={(
                         event: React.ChangeEvent<HTMLInputElement>
                       ) => {
-                        inputExample[2] = event.target.value.trim();
+                        inputExample[2] = event.target.value;
                         setInputExample([...inputExample]);
                       }}
                     />

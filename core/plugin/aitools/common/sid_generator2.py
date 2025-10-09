@@ -7,6 +7,8 @@ from __future__ import annotations
 import os
 import socket
 import time
+from functools import cache
+from typing import Optional
 
 from plugin.aitools.const.const import (
     SERVICE_LOCATION_KEY,
@@ -14,10 +16,8 @@ from plugin.aitools.const.const import (
     SERVICE_SUB_KEY,
 )
 
-sid_generator2: SidGenerator2 = None
 
-
-def new_sid():
+def new_sid() -> str:
     """
     description: 生成sid
     :return:
@@ -25,22 +25,20 @@ def new_sid():
     return get_sid_generate().gen()
 
 
+@cache
 def get_sid_generate() -> SidGenerator2:
-    if not sid_generator2:
-        service_sub = os.getenv(SERVICE_SUB_KEY)
-        service_location = os.getenv(SERVICE_LOCATION_KEY)
-        service_port = os.getenv(SERVICE_PORT_KEY)
-
-        service_ip = get_host_ip()
-        init_sid(service_sub, service_location, service_ip, service_port)
-    return sid_generator2
+    service_sub = os.getenv(SERVICE_SUB_KEY) or "default"
+    service_location = os.getenv(SERVICE_LOCATION_KEY) or "default"
+    service_port = os.getenv(SERVICE_PORT_KEY) or "18668"
+    service_ip = get_host_ip()
+    return SidGenerator2(service_sub, service_location, service_ip, service_port)
 
 
-def get_host_ip():
+def get_host_ip() -> str:
     """
     description:查询本机ip
     """
-    s = None
+    s: Optional[socket.socket] = None
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.settimeout(3)
@@ -49,22 +47,19 @@ def get_host_ip():
     except Exception as err:
         raise Exception(f"failed to get local ip, err reason {str(err)}") from err
     finally:
-        if not s:
+        if s is not None:
             s.close()
 
     return ip
-
-
-def init_sid(sub: str, location: str, local_ip: str, local_port: str):
-    global sid_generator2
-    sid_generator2 = SidGenerator2(sub, location, local_ip, local_port)
 
 
 class SidGenerator2:
     # 2.0架构专用后缀
     sid2 = 2
 
-    def __init__(self, service_sub, service_location, host_ip, service_port):
+    def __init__(
+        self, service_sub: str, service_location: str, host_ip: str, service_port: str
+    ) -> None:
         self.index = 0
         ip = socket.inet_aton(host_ip)
         if ip:
@@ -81,7 +76,7 @@ class SidGenerator2:
         self.location = service_location
         self.sub = service_sub
 
-    def gen(self):
+    def gen(self) -> str:
         if len(self.sub) == 0:
             self.sub = "src"
         pid = os.getpid() & 0xFF

@@ -74,8 +74,7 @@ const FeedbackDialog: React.FC<FeedbackModalProps> = props => {
                 .join(',')
             : '',
       };
-      const res = await createFeedback(params);
-      message.success(res.message);
+      await createFeedback(params);
       setLoading(false);
       handleCancel();
     } catch (error) {

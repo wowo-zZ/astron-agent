@@ -1,4 +1,5 @@
 import base64
+import binascii
 import hashlib
 import hmac
 import json
@@ -6,6 +7,7 @@ import ssl
 import threading
 import time
 from datetime import datetime
+from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import urlencode
 from wsgiref.handlers import format_date_time
 
@@ -46,7 +48,15 @@ class TTSWebSocketClient:
     through WebSocket communication to audio data collection and output.
     """
 
-    def __init__(self, app_id, api_key, api_secret, text, vcn, speed):
+    def __init__(
+        self,
+        app_id: str,
+        api_key: str,
+        api_secret: str,
+        text: str,
+        vcn: str,
+        speed: int,
+    ):
         """Initialize TTS WebSocket client with complete configuration parameters.
 
         All 6 parameters are required for proper TTS WebSocket functionality:
@@ -105,10 +115,10 @@ class TTSWebSocketClient:
         self.ws.on_open = self.on_open
 
         self.nowtime = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-        self.messages = []  # 存储所有消息
+        self.messages: List[Dict[str, Any]] = []  # 存储所有消息
         self.audio_data = bytearray()  # 用于存储所有音频数据
 
-    def create_url(self):
+    def create_url(self) -> str:
         url = "wss://tts-api.xfyun.cn/v2/tts"
         now = datetime.now()
         date = format_date_time(time.mktime(now.timetuple()))
@@ -117,12 +127,14 @@ class TTSWebSocketClient:
         signature_origin += "date: " + date + "\n"
         signature_origin += "GET " + "/v2/tts " + "HTTP/1.1"
 
-        signature_sha = hmac.new(
+        signature_sha_bytes: bytes = hmac.new(
             self.api_secret.encode("utf-8"),
             signature_origin.encode("utf-8"),
             digestmod=hashlib.sha256,
         ).digest()
-        signature_sha = base64.b64encode(signature_sha).decode(encoding="utf-8")
+        signature_sha: str = base64.b64encode(signature_sha_bytes).decode(
+            encoding="utf-8"
+        )
 
         authorization_origin = (
             f'api_key="{self.api_key}", algorithm="hmac-sha256", '
@@ -138,14 +150,14 @@ class TTSWebSocketClient:
         # print('websocket url :', url)
         return url
 
-    def on_message(self, ws, message):
+    def on_message(self, ws: websocket.WebSocket, message: str) -> None:
         try:
-            message = json.loads(message)
-            self.messages.append(message)  # 存储消息
-            code = message["code"]
-            audio = message["data"]["audio"]
+            message_dict = json.loads(message)
+            self.messages.append(message_dict)  # 存储消息
+            code = message_dict["code"]
+            audio = message_dict["data"]["audio"]
             audio = base64.b64decode(audio)
-            status = message["data"]["status"]
+            status = message_dict["data"]["status"]
             # print(111,message)
             if status == 2:
                 # print("ws is closed")
@@ -154,23 +166,28 @@ class TTSWebSocketClient:
                 # errMsg = message["message"]
                 # print("sid:%s call error:%s code is:%s" % (sid, errMsg, code))
                 self.audio_data.extend(audio)  # 将音频数据追加到bytearray中
-        except (json.JSONDecodeError, KeyError, base64.binascii.Error):
+        except (json.JSONDecodeError, KeyError, binascii.Error):
             pass
 
-    def on_error(self, ws, error):
+    def on_error(self, ws: websocket.WebSocket, error: Exception) -> None:
         pass
 
-    def on_close(self, ws, close_status_code=None, close_msg=None):
+    def on_close(
+        self,
+        ws: websocket.WebSocket,
+        close_status_code: Optional[int] = None,
+        close_msg: Optional[str] = None,
+    ) -> None:
         pass
 
-    def on_open(self, ws):
-        def run(*_args):
-            d = {
+    def on_open(self, ws: websocket.WebSocket) -> None:
+        def run(*_args: Any) -> None:
+            d_dict = {
                 "common": self.common_args,
                 "business": self.business_args,
                 "data": self.data,
             }
-            d = json.dumps(d)
+            d = json.dumps(d_dict)
             # print("------>开始发送文本数据")
             ws.send(d)
             # 删除之前的录音
@@ -179,6 +196,6 @@ class TTSWebSocketClient:
 
         threading.Thread(target=run).start()
 
-    def run(self):
+    def run(self) -> Tuple[List[Dict[str, Any]], bytearray]:
         self.ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
         return self.messages, self.audio_data  # 返回消息和文件路径

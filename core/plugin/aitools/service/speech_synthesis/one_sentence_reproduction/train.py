@@ -2,12 +2,13 @@ import hashlib
 import json
 import logging
 import time
+from typing import Any, Dict, List, Tuple
 
 import requests
 
 
 class VoiceTrainer:
-    def __init__(self, app_id, api_key, audio_url):
+    def __init__(self, app_id: str, api_key: str, audio_url: str) -> None:
         self.app_id = app_id
         self.api_key = api_key
         self.audio_url = audio_url
@@ -15,9 +16,9 @@ class VoiceTrainer:
         self.task_id = ""
         self.text_id = 5001  # 通用的训练文本集ID
         self.text_seg_id = 1  # 文本段ID，这里以1为例
-        self.create_task_message = []  # 收集创建任务失败的信息
+        self.create_task_message: List[Dict[str, Any]] = []  # 收集创建任务失败的信息
 
-    def _get_authorization(self, data):
+    def _get_authorization(self, data: Dict[str, Any]) -> str:
         timestamp = int(time.time() * 1000)
         body = json.dumps(data)
         key_sign = hashlib.md5(
@@ -26,7 +27,7 @@ class VoiceTrainer:
         sign = hashlib.md5((key_sign + body).encode("utf-8")).hexdigest()
         return sign
 
-    def _get_token(self):
+    def _get_token(self) -> str:
         timestamp = int(time.time() * 1000)
         body = {
             "base": {
@@ -52,7 +53,7 @@ class VoiceTrainer:
         else:
             raise Exception(f"Failed to get token: {resp}")
 
-    def _get_sign(self, body):
+    def _get_sign(self, body: Any) -> str:
         timestamp = int(time.time() * 1000)
         key_sign = hashlib.md5(str(body).encode("utf-8")).hexdigest()
         sign = hashlib.md5(
@@ -60,7 +61,7 @@ class VoiceTrainer:
         ).hexdigest()
         return sign
 
-    def _get_header(self, sign):
+    def _get_header(self, sign: str) -> Dict[str, str]:
         return {
             "X-Sign": sign,
             "X-Token": self.token,
@@ -68,7 +69,7 @@ class VoiceTrainer:
             "X-Time": str(int(time.time() * 1000)),
         }
 
-    def get_training_text(self):
+    def get_training_text(self) -> List[Any]:
         body = {"textId": self.text_id}
         sign = self._get_sign(body)
         headers = self._get_header(sign)
@@ -80,7 +81,7 @@ class VoiceTrainer:
         ).json()
         return response["data"]["textSegs"]
 
-    def create_task(self):
+    def create_task(self) -> str:
         body = {
             "taskName": "test23",  # 任务名称，可自定义
             "sex": 1,  # 训练音色性别   1：男     2 ：女
@@ -103,7 +104,7 @@ class VoiceTrainer:
         self.task_id = response["data"]
         return self.task_id
 
-    def add_audio(self):
+    def add_audio(self) -> Dict[str, Any]:
         if not self.task_id:
             self.create_task()
         body = {
@@ -122,7 +123,7 @@ class VoiceTrainer:
         ).json()
         return response
 
-    def submit_task(self):
+    def submit_task(self) -> Dict[str, Any]:
         body = {"taskId": self.task_id}
         sign = self._get_sign(body)
         headers = self._get_header(sign)
@@ -134,7 +135,7 @@ class VoiceTrainer:
         ).json()
         return response
 
-    def get_process(self):
+    def get_process(self) -> Dict[str, Any]:
         body = {"taskId": self.task_id}
         sign = self._get_sign(body)
         headers = self._get_header(sign)
@@ -146,7 +147,7 @@ class VoiceTrainer:
         ).json()
         return response
 
-    def train(self):
+    def train(self) -> Tuple[str, List[Any]]:
         # 获取训练文本
         texts = self.get_training_text()
         # print("Training texts:", texts)

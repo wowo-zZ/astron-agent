@@ -9,6 +9,7 @@ import json
 from datetime import datetime
 from io import BytesIO
 from time import mktime
+from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import urlencode
 from wsgiref.handlers import format_date_time
 
@@ -17,25 +18,25 @@ from PIL import Image
 
 
 class AssembleHeaderException(Exception):
-    def __init__(self, msg):
+    def __init__(self, msg: str):
         super().__init__(msg)
 
 
 class Url:
-    def __init__(self, host, path, schema):
+    def __init__(self, host: str, path: str, schema: str):
         self.host = host
         self.path = path
         self.schema = schema
 
 
-def sha256base64(data):
+def sha256base64(data: bytes) -> str:
     sha256 = hashlib.sha256()
     sha256.update(data)
     digest = base64.b64encode(sha256.digest()).decode(encoding="utf-8")
     return digest
 
 
-def parse_url(request_url):
+def parse_url(request_url: str) -> Url:
     stidx = request_url.index("://")
     host = request_url[stidx + 3 :]
     schema = request_url[: stidx + 3]
@@ -48,19 +49,21 @@ def parse_url(request_url):
     return u
 
 
-def assemble_ws_auth_url(request_url, method="GET", api_key="", api_secret=""):
+def assemble_ws_auth_url(
+    request_url: str, method: str = "GET", api_key: str = "", api_secret: str = ""
+) -> str:
     u = parse_url(request_url)
     host = u.host
     path = u.path
     now = datetime.now()
     date = format_date_time(mktime(now.timetuple()))
     signature_origin = f"host: {host}\ndate: {date}\n{method} {path} HTTP/1.1"
-    signature_sha = hmac.new(
+    signature_sha_bytes: bytes = hmac.new(
         api_secret.encode("utf-8"),
         signature_origin.encode("utf-8"),
         digestmod=hashlib.sha256,
     ).digest()
-    signature_sha = base64.b64encode(signature_sha).decode(encoding="utf-8")
+    signature_sha: str = base64.b64encode(signature_sha_bytes).decode(encoding="utf-8")
     authorization_origin = (
         f'api_key="{api_key}", algorithm="hmac-sha256", '
         f'headers="host date request-line", signature="{signature_sha}"'
@@ -73,7 +76,7 @@ def assemble_ws_auth_url(request_url, method="GET", api_key="", api_secret=""):
     return request_url + "?" + urlencode(values)
 
 
-def get_body(app_id, text):
+def get_body(app_id: str, text: str) -> Dict[str, Any]:
     body = {
         "header": {"app_id": app_id, "uid": "123456789", "patch_id": ["0"]},
         "parameter": {
@@ -96,18 +99,18 @@ def get_body(app_id, text):
 
 
 class ImageGenerator:
-    def __init__(self, app_id, api_key, api_secret, description):
+    def __init__(self, app_id: str, api_key: str, api_secret: str, description: str):
         self.app_id = app_id
         self.api_key = api_key
         self.api_secret = api_secret
         self.description = description
         self.base_url = "https://xingchen-api.cn-huabei-1.xf-yun.com/v2.1/tti"
 
-        self.image_base64 = None
-        self.sid = ""
-        self.error_message = []
+        self.image_base64: Optional[str] = None
+        self.sid: str = ""
+        self.error_message: List[Dict[str, Any]] = []
 
-    def generate_image(self):
+    def generate_image(self) -> Tuple[Optional[str], str, List[Dict[str, Any]]]:
         url = assemble_ws_auth_url(
             self.base_url,
             method="POST",
@@ -122,7 +125,7 @@ class ImageGenerator:
 
         return self.image_base64, self.sid, self.error_message
 
-    def _parse_message(self, message):
+    def _parse_message(self, message: str) -> None:
         data = json.loads(message)
         code = data["header"]["code"]
         msg = data["header"]["message"]
@@ -144,7 +147,9 @@ class ImageGenerator:
             self.image_base64 = image_base
             # self._save_image(image_base)
 
-    def _save_image(self, base64_data, save_path="generated_image.jpg"):
+    def _save_image(
+        self, base64_data: str, save_path: str = "generated_image.jpg"
+    ) -> None:
         img_data = base64.b64decode(base64_data)
         img = Image.open(BytesIO(img_data))
         img.save(save_path)

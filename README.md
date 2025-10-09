@@ -34,15 +34,15 @@ Astron Agent is an enterprise-grade Agent development platform designed for AI d
 It not only provides end-to-end capabilities covering model hosting, application development, performance optimization, and access control, but also innovatively integrates intelligent RPA. This allows Agents not only to “think,” but also to truly “act,” completing complex task chains across digital systems and desktop environments.
 
 ### Why Choose Astron Agent?
-- **Consistent and Reliable:** Shares the same core technology with iFLYTEK Starchen Agent platform, inheriting its proven enterprise-grade stability.  
+- **Consistent and Reliable:** Shares the same core technology with [iFLYTEK Astron Agent Platform](https://agent.xfyun.cn), inheriting its proven enterprise-grade stability.  
 - **Closed Loop of Thinking + Acting:** Deep integration of intelligent RPA enables Agents to move from “generating answers” to “automatically completing tasks.”  
 - **Dual Value for Developers and Enterprises:** Developers can quickly get started and expand, while SMEs can efficiently implement digital workflows.  
 
 ### Key Features
 - **Enterprise-Grade High Availability:** Full-stack capabilities for development, building, optimization, and management. Supports one-click deployment with strong reliability.  
 - **Intelligent RPA Integration:** Enables cross-system process automation, empowering Agents with controllable execution to achieve a complete loop “from decision to action.”  
-- **Ready-to-Use Tool Ecosystem:** Integrated with the rich capabilities of the iFLYTEK Open Platform, validated by millions of developers, supporting plug-and-play access without extra development.  
-- **Flexible Model Support:** Multiple integration options, adaptable to use cases ranging from personal testing to large-scale on-premise enterprise clusters.  
+- **Ready-to-Use Tool Ecosystem:** Integrates massive AI capabilities and tools from the [iFLYTEK Open Platform](https://www.xfyun.cn), validated by millions of developers, supporting plug-and-play access without extra development.  
+- **Flexible Model Support:** Offers diverse access methods, from rapid API-based model validation to one-click deployment of enterprise-level MaaS (Model as a Service) local clusters, meeting needs of all scales.  
 
 ### Developer Support
 - **Multi-language Backend:** Supports mainstream languages such as Java, Go, and Python; frontend adapted to TypeScript + React stack.  

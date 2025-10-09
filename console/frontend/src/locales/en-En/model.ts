@@ -138,6 +138,7 @@ const translation = {
   republishSuccess: 'Republish Success',
   republishFailed: 'Republish Failed',
   localUploadModel: 'Local Upload Model',
+  noDocument: 'No document, coming soon',
 };
 
 export default translation;

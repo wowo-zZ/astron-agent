@@ -12,8 +12,13 @@ import logging
 import os
 import time
 import uuid
+from typing import Union
 
 import requests
+from common.otlp.log_trace.node_trace_log import NodeTraceLog, Status
+from common.otlp.metrics.meter import Meter
+from common.otlp.trace.span import Span
+from common.service import get_kafka_producer_service, get_oss_service
 from fastapi import APIRouter, Request
 from plugin.aitools.api.schema.types import (
     OCRLLM,
@@ -41,17 +46,12 @@ from plugin.aitools.service.ocr_llm.entities.req_data_multithreading import (
     PayloadM,
 )
 
-from common.otlp.log_trace.node_trace_log import NodeTraceLog, Status
-from common.otlp.metrics.meter import Meter
-from common.otlp.trace.span import Span
-from common.service import get_kafka_producer_service, get_oss_service
-
 app = APIRouter(prefix="/aitools/v1")
 
 
 # 拨测接口
 @app.get("/dial_test")
-def dial_test(request: Request):
+def dial_test(request: Request) -> Union[SuccessDataResponse, ErrorResponse]:
     from plugin.aitools.service.dial_test.dial_test import dial_test_main
 
     # Simple default values to pass pylint - function may be deprecated
@@ -67,7 +67,9 @@ def dial_test(request: Request):
 
 # 图片理解 - 开放平台
 @app.post("/image_understanding")
-def image_understanding(params: ImageUnderstandingInput, request: Request):
+def image_understanding(
+    params: ImageUnderstandingInput, request: Request
+) -> Union[SuccessDataResponse, ErrorResponse]:
     from plugin.aitools.service.route_service import image_understanding_main
 
     return image_understanding_main(
@@ -76,7 +78,9 @@ def image_understanding(params: ImageUnderstandingInput, request: Request):
 
 
 @app.post("/ocr")
-def req_ase_ability_ocr(ase_ocr_llm_vo: OCRLLM):
+def req_ase_ability_ocr(
+    ase_ocr_llm_vo: OCRLLM,
+) -> Union[SuccessDataResponse, ErrorResponse]:
     app_id = os.getenv("AI_APP_ID")
     uid = str(uuid.uuid1())
     caller = ""
@@ -167,7 +171,9 @@ def req_ase_ability_ocr(ase_ocr_llm_vo: OCRLLM):
 
 
 @app.post("/image_generate")
-def req_ase_ability_image_generate(image_generate_vo: ImageGenerate):
+def req_ase_ability_image_generate(
+    image_generate_vo: ImageGenerate,
+) -> Union[SuccessDataResponse, ErrorResponse]:
     app_id = os.getenv("AI_APP_ID")
     uid = str(uuid.uuid1())
     caller = ""
@@ -293,7 +299,9 @@ def req_ase_ability_image_generate(image_generate_vo: ImageGenerate):
 
 # 超拟人合成
 @app.post("/smarttts")
-def smarttts(params: SmartTTSInput, request: Request):
+def smarttts(
+    params: SmartTTSInput, request: Request
+) -> Union[SuccessDataResponse, ErrorResponse]:
     from plugin.aitools.service.speech_synthesis.voice_main import smarttts_main
 
     return smarttts_main(
@@ -303,7 +311,9 @@ def smarttts(params: SmartTTSInput, request: Request):
 
 # 智能语音评测 - ISE
 @app.post("/ise")
-async def ise_evaluate(params: ISEInput, request: Request):
+async def ise_evaluate(
+    params: ISEInput, request: Request
+) -> Union[SuccessDataResponse, ErrorResponse]:
     from plugin.aitools.service.route_service import ise_evaluate_main
 
     return await ise_evaluate_main(
@@ -318,7 +328,9 @@ async def ise_evaluate(params: ISEInput, request: Request):
 
 # Text Translation API
 @app.post("/translation")
-async def translation_api(params: TranslationInput, request: Request):
+async def translation_api(
+    params: TranslationInput, request: Request
+) -> Union[SuccessDataResponse, ErrorResponse]:
     """
     Text translation service endpoint
 

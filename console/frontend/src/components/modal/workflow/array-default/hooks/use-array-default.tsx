@@ -166,22 +166,37 @@ const useDataTransform = (): {
         node.id = parentId ? `${parentId}-${uuid()}` : uuid();
         if (node.type === 'object') {
           (node.children || []).forEach(child => {
-            recurse(
-              child,
-              defaultVal ? defaultVal[child.name] : undefined,
-              node.id
-            );
+            const childDefaultValue =
+              defaultVal && typeof defaultVal === 'object'
+                ? defaultVal[child.name]
+                : undefined;
+            recurse(child, childDefaultValue, node.id);
           });
         } else if (node.type === 'array') {
           const arrayDefault = Array.isArray(defaultVal) ? defaultVal : [];
-          node.children =
-            node.children?.map((node, index) => {
-              node.default = arrayDefault[index];
-              recurse(node, arrayDefault[index], node.id);
-              return node;
-            }) || [];
+
+          if (arrayDefault.length > 0) {
+            // If there are saved default values, create children based on saved data
+            const template = node.children?.[0] || node.subChild;
+            if (template) {
+              node.children = arrayDefault.map((savedValue, index) => {
+                const newChild = cloneDeep(template);
+                newChild.id = `${node.id}-${uuid()}`; // Ensure unique ID
+                newChild.default = savedValue;
+                recurse(newChild, savedValue, node.id);
+                return newChild;
+              });
+            }
+          } else if (node.children) {
+            // If no saved values but has template children, keep original logic
+            node.children = node.children.map((childNode, index) => {
+              childNode.default = arrayDefault[index];
+              recurse(childNode, arrayDefault[index], node.id);
+              return childNode;
+            });
+          }
         } else {
-          // 对于基本类型，直接设置默认值
+          // For basic types, directly set default value
           node.default = defaultVal !== undefined ? defaultVal : node.default;
         }
       }
@@ -454,10 +469,17 @@ export const useArrayDefault = ({
   useEffect(() => {
     if (currentArrayDefaultId) {
       const currentNode = findNodeById(inputParamsData, currentArrayDefaultId);
+
+      if (!currentNode) {
+        console.warn(`Node with ID ${currentArrayDefaultId} not found`);
+        return;
+      }
+
       const copyCurrentNode = cloneDeep([currentNode]) as InputParamsData[];
       addTestProperty(copyCurrentNode);
       const defaultParamsData =
         transformInputDataToDefaultParamsData(copyCurrentNode);
+
       setDefaultParamsData(defaultParamsData);
       const allKeys: string[] = [];
       defaultParamsData[0]?.children?.forEach(item => {

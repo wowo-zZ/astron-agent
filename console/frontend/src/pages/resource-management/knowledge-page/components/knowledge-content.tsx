@@ -4,7 +4,7 @@ import RetractableInput from '@/components/ui/global/retract-table-input';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import useUserStore from '@/store/user-store';
-import { jumpTologin } from '@/utils/http';
+import { jumpToLogin } from '@/utils/http';
 
 export const KnowledgeContent: FC<{
   knowledgeRef: React.RefObject<HTMLDivElement>;
@@ -71,7 +71,7 @@ export const KnowledgeContent: FC<{
               }}
               onClick={() => {
                 if (!user?.login && !user?.uid) {
-                  return jumpTologin();
+                  return jumpToLogin();
                 }
                 setCreateModal(true);
               }}

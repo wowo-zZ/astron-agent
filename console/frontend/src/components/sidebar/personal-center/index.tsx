@@ -12,9 +12,13 @@ import act from '@/assets/imgs/personal-center/act.png';
 import fire from '@/assets/imgs/personal-center/fire.png';
 import empty from '@/assets/imgs/common/empty-gray.png';
 import { copyText } from '@/utils/spark-utils';
-import { uploadUserProfile } from '@/services/spark-common';
 import UploadAvatar from '@/components/upload-avatar';
 import { PostChatItem, FavoriteEntry } from '@/types/chat';
+import { updateUserInfo } from '@/services/spark-common';
+import { useNavigate } from 'react-router-dom';
+import { cancelFavorite } from '@/services/agent-square';
+import { deleteChatList } from '@/services/chat';
+import { useTranslation } from 'react-i18next';
 
 interface PersonalCenterProps {
   open: boolean;
@@ -201,10 +205,28 @@ const PersonalCenterHeader: FC<{
 }> = ({ showInput, setShowInput }) => {
   const userInfo = useUserStore((state: any) => state.user);
   const [infoName, setInfoName] = useState(userInfo.nickname || userInfo.login);
+
   return (
     <div className={styles.header}>
       <div>
-        <UploadAvatar coverUrl={userInfo.avatar} flag={true} />
+        <UploadAvatar
+          coverUrl={userInfo.avatar}
+          setCoverUrl={url => {
+            updateUserInfo({
+              nickname: infoName,
+              avatar: url,
+            }).then(res => {
+              message.success('修改成功');
+              useUserStore.setState({
+                user: {
+                  ...userInfo,
+                  avatar: url,
+                },
+              });
+            });
+          }}
+          flag={true}
+        />
       </div>
       <div>
         <div className={styles.flexTitle}>
@@ -229,13 +251,10 @@ const PersonalCenterHeader: FC<{
               />
               <img
                 onClick={() => {
-                  const formData = new FormData();
-                  formData.append('nickname', infoName);
-                  uploadUserProfile(formData)
-                    // uploadUserProfile({
-                    //   nickname: infoName,
-                    //   avatar: userInfo.avatar,
-                    // })
+                  updateUserInfo({
+                    nickname: infoName,
+                    avatar: userInfo.avatar,
+                  })
                     .then(res => {
                       message.success('修改成功');
                       // 更新用户信息
@@ -308,30 +327,71 @@ const PersonalCenter: FC<PersonalCenterProps> = ({
   const [showInput, setShowInput] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [itemIdToDelete, setItemIdToDelete] = useState<number | null>(null);
+  const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
 
-  // 事件处理函数
   const handleToChat = useCallback((item: any) => {
-    // TODO: 实现跳转到聊天的逻辑
-    console.log('Navigate to chat with:', item);
+    navigate(`/chat/${item.botId}`);
   }, []);
 
-  const handleDeleteChat = useCallback(
+  const handleDeleteFavorite = useCallback((botId: number) => {
+    cancelFavorite({
+      botId,
+    }).then(res => {
+      message.success('删除成功');
+    });
+  }, []);
+
+  const handleDeleteChat = useCallback((chatListId: number) => {
+    deleteChatList({
+      chatListId,
+    })
+      .then((res: any) => {
+        setDeleteOpen(false);
+        message.success(t('commonModal.agentDelete.success'));
+        // Refresh data after successful deletion
+        if (onRefreshData) {
+          onRefreshData();
+        }
+      })
+      .catch((err: any) => {
+        console.log(err);
+        setDeleteOpen(false);
+        message.error(t('commonModal.agentDelete.failed'));
+      });
+  }, []);
+
+  const handleDelete = useCallback(
     (item: any, e: React.MouseEvent, isRecentTab: boolean) => {
       e.stopPropagation();
+      console.log('item', item);
+      // Extract ID based on tab type
+      const itemId = isRecentTab ? item?.id : item?.bot?.botId;
+      setItemIdToDelete(itemId);
       setDeleteOpen(true);
-      // TODO: 实现删除逻辑
-      console.log('Delete item:', item, 'isRecentTab:', isRecentTab);
     },
     []
   );
 
   const handleDeleteChatConfirm = useCallback(() => {
-    // TODO: 实现确认删除的逻辑
-    console.log('Confirm delete');
+    if (!itemIdToDelete) return;
+
+    if (activeIndex === 0) {
+      handleDeleteChat(itemIdToDelete);
+    } else {
+      handleDeleteFavorite(itemIdToDelete);
+    }
     setDeleteOpen(false);
-    // Refresh data after deletion
+    setItemIdToDelete(null);
     onRefreshData();
-  }, [onRefreshData]);
+  }, [
+    activeIndex,
+    itemIdToDelete,
+    handleDeleteChat,
+    handleDeleteFavorite,
+    onRefreshData,
+  ]);
 
   const handleTabChange = useCallback(
     (index: number) => {
@@ -373,7 +433,10 @@ const PersonalCenter: FC<PersonalCenterProps> = ({
           <div className={styles.contentBox}>
             <Modal
               open={deleteOpen}
-              onCancel={() => setDeleteOpen(false)}
+              onCancel={() => {
+                setDeleteOpen(false);
+                setItemIdToDelete(null);
+              }}
               closeIcon={null}
               wrapClassName={styles.delete_mode}
               centered
@@ -397,14 +460,14 @@ const PersonalCenter: FC<PersonalCenterProps> = ({
               <RecentUsedList
                 recentList={mixedChatList}
                 onItemClick={handleToChat}
-                onDeleteClick={handleDeleteChat}
+                onDeleteClick={handleDelete}
               />
             )}
             {activeIndex === 1 && (
               <FavoritesList
                 collectList={favoriteBotList}
                 onItemClick={handleToChat}
-                onDeleteClick={handleDeleteChat}
+                onDeleteClick={handleDelete}
               />
             )}
           </div>

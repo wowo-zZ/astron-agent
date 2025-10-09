@@ -84,7 +84,7 @@ services:
       - astron-agent-network
     restart: always
     healthcheck:
-      test: ["CMD-SHELL", "nc -z localhost 9200 || exit 1"]
+      test: ["CMD", "curl", "-f", "http://localhost:9200/_cluster/health"]
       interval: ${HEALTH_CHECK_INTERVAL:-30s}
       timeout: ${HEALTH_CHECK_TIMEOUT:-10s}
       retries: ${HEALTH_CHECK_RETRIES:-60}
@@ -100,7 +100,7 @@ services:
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,CONTROLLER://0.0.0.0:29093,PLAINTEXT_HOST://0.0.0.0:${EXPOSE_KAFKA_PORT:-9092}
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:29093
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:29093
       KAFKA_PROCESS_ROLES: broker,controller
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: ${KAFKA_REPLICATION_FACTOR:-1}
@@ -136,7 +136,7 @@ services:
     restart: always
     command: server /data --console-address ":9001"
     healthcheck:
-      test: ["CMD-SHELL", "nc -z localhost 9000 || exit 1"]
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: ${HEALTH_CHECK_INTERVAL:-30s}
       timeout: ${HEALTH_CHECK_TIMEOUT:-10s}
       retries: ${HEALTH_CHECK_RETRIES:-60}
@@ -147,7 +147,7 @@ services:
 
   # Tenant Service
   core-tenant:
-    image: ghcr.io/lyj715824/astron-agent/core-tenant:latest
+    image: ghcr.io/iflytek/astron-agent/core-tenant:latest
     container_name: astron-agent-core-tenant
     environment:
       SERVICE_PORT: "${CORE_TENANT_PORT:-5052}"
@@ -185,7 +185,7 @@ services:
   # Memory Database Service
 
   core-memory:
-    image: ghcr.io/lyj715824/astron-agent/core-memory:latest
+    image: ghcr.io/iflytek/astron-agent/core-memory:latest
     container_name: astron-agent-core-memory
     environment:
       SERVICE_PORT: "${CORE_MEMORY_PORT:-7990}"
@@ -219,7 +219,7 @@ services:
 
   # RPA Plugin Service
 #  core-rpa:
-#    image: ghcr.io/lyj715824/astron-agent/astron-agent-core-rpa:latest
+#    image: ghcr.io/iflytek/astron-agent/astron-agent-core-rpa:latest
 #    container_name: astron-agent-core-rpa
 #    ports:
 #      - "${CORE_RPA_PORT:-8003}:8000"
@@ -242,7 +242,7 @@ services:
 
   # Link Plugin Service
   core-link:
-    image: ghcr.io/lyj715824/astron-agent/core-link:latest
+    image: ghcr.io/iflytek/astron-agent/core-link:latest
     container_name: astron-agent-core-link
     environment:
       MYSQL_HOST: "${MYSQL_HOST:-mysql}"
@@ -280,7 +280,7 @@ services:
 
   # AI Tools Plugin Service
   core-aitools:
-    image: ghcr.io/lyj715824/astron-agent/core-aitools:latest
+    image: ghcr.io/iflytek/astron-agent/core-aitools:latest
     container_name: astron-agent-core-aitools
     environment:
       SERVICE_PORT: "${CORE_AITOOLS_PORT:-18668}"
@@ -317,7 +317,7 @@ services:
 
   # Agent Service
   core-agent:
-    image: ghcr.io/lyj715824/astron-agent/core-agent:latest
+    image: ghcr.io/iflytek/astron-agent/core-agent:latest
     container_name: astron-agent-core-agent
     environment:
       PYTHONUNBUFFERED: "${PYTHONUNBUFFERED:-1}"
@@ -392,7 +392,7 @@ services:
 
   # Knowledge Base Service
   core-knowledge:
-    image: ghcr.io/lyj715824/astron-agent/core-knowledge:latest
+    image: ghcr.io/iflytek/astron-agent/core-knowledge:latest
     container_name: astron-agent-core-knowledge
     environment:
       SERVICE_PORT: "${CORE_KNOWLEDGE_PORT:-20010}"
@@ -424,7 +424,7 @@ services:
 
   # Workflow Service
   core-workflow:
-    image: ghcr.io/lyj715824/astron-agent/core-workflow:latest
+    image: ghcr.io/iflytek/astron-agent/core-workflow:latest
     container_name: astron-agent-core-workflow
     environment:
       RUNTIME_ENV: "${RUNTIME_ENV:-dev}"
@@ -485,8 +485,14 @@ services:
 
   # Console Frontend
   console-frontend:
-    image: ghcr.io/lyj715824/astron-agent/console-frontend:latest
+    image: ghcr.io/iflytek/astron-agent/console-frontend:latest
     container_name: astron-agent-console-frontend
+    environment:
+      CONSOLE_API_URL: "${CONSOLE_API_URL:-http://console-hub:8080/}"
+      CONSOLE_CASDOOR_URL: "${CONSOLE_CASDOOR_URL:-}"
+      CONSOLE_CASDOOR_ID: "${CONSOLE_CASDOOR_ID:-}"
+      CONSOLE_CASDOOR_APP: "${CONSOLE_CASDOOR_APP:-}"
+      CONSOLE_CASDOOR_ORG: "${CONSOLE_CASDOOR_ORG:-}"
     ports:
       - "${CONSOLE_FRONTEND_PORT:-1881}:1881"
     networks:
@@ -495,7 +501,7 @@ services:
 
 #   Console Hub Service
   console-hub:
-    image: ghcr.io/lyj715824/astron-agent/console-hub:latest
+    image: ghcr.io/iflytek/astron-agent/console-hub:latest
     container_name: astron-agent-console-hub
     environment:
       ASTRON_DOMAIN: "${ASTRON_DOMAIN:-https://your.deployment.domain}"

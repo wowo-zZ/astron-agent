@@ -93,11 +93,11 @@ class ThirdApiCodeEnum(Enum):
     )
 
     @property
-    def code(self):
+    def code(self) -> int:
         """获取状态码"""
         return self.value[0]
 
     @property
-    def msg(self):
+    def msg(self) -> str:
         """获取状态码信息"""
         return self.value[1]

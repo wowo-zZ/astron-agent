@@ -72,7 +72,7 @@ const ChatHeader = (props: {
 
   //分享智能体
   const handleShareAgent = async (): Promise<void> => {
-    await handleShare(botInfo.botTitle, botInfo.botId, t);
+    await handleShare(botInfo.botName, botInfo.botId, t);
   };
 
   //收藏icon
@@ -135,12 +135,12 @@ const ChatHeader = (props: {
       <>
         <img
           src={botInfo.avatar}
-          alt={botInfo.botTitle}
+          alt={botInfo.botName}
           className="w-12 h-12 mr-4 rounded-xl object-cover"
         />
         <div className="flex flex-col">
           <div className="text-base font-medium text-black mb-1">
-            {botInfo.botTitle}
+            {botInfo.botName}
           </div>
           <div className="flex items-center">
             <img src={authorIcon} alt="" className="w-3.5 h-3.5 mr-2" />

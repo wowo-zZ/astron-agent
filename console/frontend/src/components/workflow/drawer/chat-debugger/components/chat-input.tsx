@@ -195,17 +195,7 @@ function ChatInput({
                   {params.required && <span className="text-[#F74E43]">*</span>}
                 </div>
                 <div className="bg-[#F0F0F0] px-2.5 py-1 rounded text-xs">
-                  {renderType(
-                    (params as unknown).fileType &&
-                      params.type === 'array-string'
-                      ? `Array<${
-                          (params as unknown).allowedFileType
-                            ?.slice(0, 1)
-                            .toUpperCase() +
-                          (params as unknown).allowedFileType?.slice(1)
-                        }>`
-                      : (params as unknown).allowedFileType || params.type
-                  )}
+                  {renderType(params)}
                 </div>
               </div>
               {renderParamInput(params, index, {

@@ -43,7 +43,7 @@ export const useColumns = ({
           title={record?.description}
           overlayClassName="black-tooltip config-secret"
         >
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 h-[40px]">
             <span>{name}</span>
             {record?.required && (
               <span className="text-[#F74E43] flex-shrink-0">*</span>
@@ -61,7 +61,7 @@ export const useColumns = ({
       key: 'default',
       width: '40%',
       render: (_, record) => (
-        <div className="w-full">
+        <div className="w-full pb-[8px]">
           {record?.type === 'object' || record?.type === 'array' ? null : (
             <Input
               placeholder="请输入参数值"

@@ -3,6 +3,32 @@ from starlette.responses import JSONResponse
 from workflow.domain.entities.response import Resp
 from workflow.exception.errors.err_code import CodeEnum
 
+"""
+The paths that need to be authenticated
+"""
+AUTH_OPEN_API_PATHS = [
+    "/v1/publish",
+    "/v1/auth",
+    "/workflow/v1/publish",
+    "/workflow/v1/auth",
+]
+
+"""
+The paths that need to be authenticated for chat
+"""
+CHAT_OPEN_API_PATHS = [
+    "/workflow/v1/chat/completions",
+    "/workflow/v1/resume",
+]
+
+"""
+The paths that not need to be authenticated for chat debug
+"""
+CHAT_DEBUG_API_PATHS = [
+    "/workflow/v1/debug/chat/completions",
+    "/workflow/v1/debug/resume",
+]
+
 
 class JSONResponseBase:
     """
@@ -26,12 +52,7 @@ class JSONResponseBase:
         """
 
         # Handle chat endpoints with SSE response format for real-time communication
-        if url_path in [
-            "/workflow/v1/debug/chat/completions",
-            "/workflow/v1/chat/completions",
-            "/workflow/v1/debug/resume",
-            "/workflow/v1/resume",
-        ]:
+        if url_path in CHAT_OPEN_API_PATHS or url_path in CHAT_DEBUG_API_PATHS:
             return Resp.error_sse(code, error_message, sid)
 
         # Handle other endpoints with standard JSON response format

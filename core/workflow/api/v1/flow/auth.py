@@ -21,10 +21,10 @@ from workflow.extensions.otlp.metric.meter import Meter
 from workflow.extensions.otlp.trace.span import Span
 from workflow.service import auth_service, publish_service
 
-publish_auth_router = APIRouter(prefix="/v1", tags=["Flows"])
+router = APIRouter(tags=["Flows"])
 
 
-@publish_auth_router.post("/publish")
+@router.post("/publish")
 def publish(
     x_consumer_username: Annotated[str, Header()],
     publish_input: PublishInput,
@@ -74,7 +74,7 @@ def publish(
         return Resp.success(sid=span_context.sid)
 
 
-@publish_auth_router.post("/auth")
+@router.post("/auth")
 def auth(
     x_consumer_username: Annotated[str, Header()],
     auth_input: AuthInput,

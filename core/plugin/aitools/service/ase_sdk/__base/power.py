@@ -4,6 +4,7 @@ import queue
 import threading
 from abc import ABC, abstractmethod
 from urllib.parse import urlencode
+from typing import Any, Generator, Union
 
 import requests
 from plugin.aitools.service.ase_sdk.__base.entities.req_data import (
@@ -20,14 +21,14 @@ class Power(ABC):
     抽象基类，定义不同请求类型的执行框架
     """
 
-    def __init__(self, url: str, method: str = "GET", stream=False):
+    def __init__(self, url: str, method: str = "GET", stream: bool = False) -> None:
         self.queue: queue.Queue = queue.Queue()
         self.url = url
         self.method = method
         self.stream = stream
 
     @abstractmethod
-    def invoke(self, req_source_data: BaseReqSourceData):
+    def invoke(self, req_source_data: BaseReqSourceData) -> None:
         """
         能力执行
 
@@ -39,10 +40,10 @@ class Power(ABC):
         """
         # convert BaseReqSourceData to ReqData
         req_data = ReqData()
-        return self._invoke(req_data)
+        self._invoke(req_data)
 
     @abstractmethod
-    def _subscribe(self):
+    def _subscribe(self) -> Generator[Any, None, None]:
         """
         订阅能力执行结果，支持流式处理
 
@@ -51,7 +52,7 @@ class Power(ABC):
         """
         raise NotImplementedError
 
-    def handle_generate_response(self):
+    def handle_generate_response(self) -> str:
         result = []
         for index, content in enumerate(self._subscribe()):
             if content:
@@ -62,10 +63,10 @@ class Power(ABC):
                     result.append(content)
         return json.dumps(result, ensure_ascii=False)
 
-    def handle_generate_stream_response(self):
+    def handle_generate_stream_response(self) -> Generator[Any, None, None]:
         return self._subscribe()
 
-    def _invoke(self, req_data: ReqData):
+    def _invoke(self, req_data: ReqData) -> None:
         """
         内部方法，根据请求类型执行不同的请求
 
@@ -83,20 +84,18 @@ class Power(ABC):
                 )
                 thread.start()
                 thread.join()
-                return None
             elif self.url.startswith("http"):
-                return self._invoke_http(req_data)
+                self._invoke_http(req_data)
             else:
                 raise ValueError("Unsupported protocol, only support ws and http.")
         except Exception as e:
             self.queue.put(e)
-            return None
 
-    async def _invoke_ws(self, req_data: ReqData):
+    async def _invoke_ws(self, req_data: ReqData) -> None:
         url = (
             self.url + "?" + urlencode(req_data.params) if req_data.params else self.url
         )
-        result_arr: list[str] = []
+        result_arr: list[Union[str, bytes]] = []
         wb_handler = None
         try:
             async with connect(
@@ -130,7 +129,7 @@ class Power(ABC):
             if wb_handler and not wb_handler.closed:
                 await wb_handler.close()
 
-    def _invoke_http(self, req_data: ReqData):
+    def _invoke_http(self, req_data: ReqData) -> None:
         kwargs = {
             "headers": req_data.headers,
             "params": req_data.params,

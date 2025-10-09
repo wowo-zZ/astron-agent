@@ -13,7 +13,7 @@ import ssl
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from time import mktime
-from typing import Any, Dict, Tuple
+from typing import Any, Callable, Dict, Optional, Tuple
 from urllib.parse import urlencode
 from wsgiref.handlers import format_date_time
 
@@ -215,7 +215,7 @@ class ISEResultParser:
             }
 
     @staticmethod
-    def _find_evaluation_node(root, xml_string):
+    def _find_evaluation_node(root: Any, xml_string: str) -> Any:
         """查找包含评分数据的评测节点"""
         rec_paper = root.find(".//rec_paper")
         if rec_paper is None:
@@ -238,7 +238,7 @@ class ISEResultParser:
         }
 
     @staticmethod
-    def _process_exception_info(task_node, result):
+    def _process_exception_info(task_node: Any, result: Dict[str, Any]) -> None:
         """处理except_info异常情况"""
         except_info = task_node.get("except_info", "0")
         if except_info == "0":
@@ -262,7 +262,7 @@ class ISEResultParser:
             result["warnings"].append(f"引擎返回未知异常代码: {except_code}")
 
     @staticmethod
-    def _process_rejection_status(task_node, result):
+    def _process_rejection_status(task_node: Any, result: Dict[str, Any]) -> None:
         """处理is_rejected字段"""
         is_rejected = task_node.get("is_rejected", "false")
         if is_rejected == "true":
@@ -270,7 +270,7 @@ class ISEResultParser:
             result["warnings"].append("评测结果被拒：引擎检测到乱读，分值不能作为参考")
 
     @staticmethod
-    def _extract_score_fields(task_node):
+    def _extract_score_fields(task_node: Any) -> Dict[str, Any]:
         """提取任务层级的所有评分指标"""
         task_scores = {}
         score_fields = [
@@ -376,12 +376,14 @@ class ISEParam:
 class ISEClient:
     """讯飞星辰智能语音评测(ISE)客户端"""
 
-    def __init__(self, app_id: str, api_key: str, api_secret: str):
+    def __init__(self, app_id: str, api_key: str, api_secret: str) -> None:
         self.app_id = app_id
         self.api_key = api_key
         self.api_secret = api_secret
         self.base_url = os.getenv("ISE_URL")
         self.evaluation_complete = False
+        self.error_msg: Optional[str] = None
+        self.result: Optional[Dict[str, Any]] = None
 
     async def evaluate_audio(
         self,
@@ -485,9 +487,9 @@ class ISEClient:
         except Exception as e:
             return False, f"评测过程中发生错误: {str(e)}", {}
 
-    def _sync_evaluate(self, ise_param: ISEParam, auth_url: str):
+    def _sync_evaluate(self, ise_param: ISEParam, auth_url: str) -> None:
         """同步评测方法 - 采用官方分帧传输模式"""
-        self.result: Dict[str, Any] | None = None
+        self.result = None
         self.error_msg = None
         self.evaluation_complete = False
 
@@ -503,10 +505,10 @@ class ISEClient:
 
         ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
 
-    def _create_message_handler(self, ise_param: ISEParam):
+    def _create_message_handler(self, ise_param: ISEParam) -> Callable:
         """创建WebSocket消息处理器"""
 
-        def on_message(ws, message):
+        def on_message(ws: Any, message: str) -> None:
             try:
                 print(f"Received message: {message}")
                 data = json.loads(message)
@@ -529,7 +531,9 @@ class ISEClient:
 
         return on_message
 
-    def _handle_evaluation_response(self, data_info, ise_param: ISEParam, ws):
+    def _handle_evaluation_response(
+        self, data_info: Dict[str, Any], ise_param: ISEParam, ws: Any
+    ) -> None:
         """处理评测响应数据"""
         status = data_info.get("status", 0)
 
@@ -552,27 +556,27 @@ class ISEClient:
             self.evaluation_complete = True
             ws.close()
 
-    def _create_error_handler(self):
+    def _create_error_handler(self) -> Callable:
         """创建WebSocket错误处理器"""
 
-        def on_error(_ws, error):
+        def on_error(_ws: Any, error: Exception) -> None:
             self.error_msg = f"WebSocket连接错误: {str(error)}"
 
         return on_error
 
-    def _create_close_handler(self):
+    def _create_close_handler(self) -> Callable:
         """创建WebSocket关闭处理器"""
 
-        def on_close(_ws, _close_status_code, _close_msg):
+        def on_close(_ws: Any, _close_status_code: Any, _close_msg: Any) -> None:
             pass
 
         return on_close
 
-    def _create_open_handler(self, ise_param: ISEParam):
+    def _create_open_handler(self, ise_param: ISEParam) -> Callable:
         """创建WebSocket连接开启处理器"""
 
-        def on_open(ws):
-            def run():
+        def on_open(ws: Any) -> None:
+            def run() -> None:
                 try:
                     self._send_initial_frame(ws, ise_param)
                     self._send_audio_frames(ws, ise_param)
@@ -584,7 +588,7 @@ class ISEClient:
 
         return on_open
 
-    def _send_initial_frame(self, ws, ise_param: ISEParam):
+    def _send_initial_frame(self, ws: Any, ise_param: ISEParam) -> None:
         """发送首帧数据"""
         first_frame = {
             "common": ise_param.common_args,
@@ -594,7 +598,7 @@ class ISEClient:
         ws.send(json.dumps(first_frame))
         print("发送首帧完成")
 
-    def _send_audio_frames(self, ws, ise_param: ISEParam):
+    def _send_audio_frames(self, ws: Any, ise_param: ISEParam) -> None:
         """分帧发送音频数据"""
         audio_data = ise_param.audio_data
         frame_size = 1280  # 每帧1280字节，与官方示例保持一致
@@ -609,7 +613,7 @@ class ISEClient:
             else:
                 self._send_middle_frame(ws, chunk)
 
-    def _send_final_frame(self, ws, chunk: bytes):
+    def _send_final_frame(self, ws: Any, chunk: bytes) -> None:
         """发送最后一帧数据"""
         frame_data = {
             "business": {"cmd": "auw", "aus": 4},
@@ -621,7 +625,7 @@ class ISEClient:
         ws.send(json.dumps(frame_data))
         print("发送最后一帧")
 
-    def _send_middle_frame(self, ws, chunk: bytes):
+    def _send_middle_frame(self, ws: Any, chunk: bytes) -> None:
         """发送中间帧数据"""
         frame_data = {
             "business": {"cmd": "auw", "aus": 1},

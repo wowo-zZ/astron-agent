@@ -109,9 +109,15 @@ const useNodeInfo = ({ id, data }): UseNodeInfoReturn => {
     return nodeType === 'ifly-code';
   }, [nodeType]);
 
+  const isDataBaseNode = useMemo(() => {
+    return nodeType === 'database';
+  }, [nodeType]);
+
   const showInputs = useMemo(() => {
     return (
-      data?.inputs?.length > 0 && !isIfElseNode && data?.nodeParam?.mode !== 1
+      data?.inputs?.length > 0 &&
+      !isIfElseNode &&
+      (data?.nodeParam?.mode === 0 || data?.nodeParam?.mode === undefined)
     );
   }, [data, isIfElseNode]);
 
@@ -194,6 +200,7 @@ const useNodeInfo = ({ id, data }): UseNodeInfoReturn => {
     isAgentNode,
     isStartOrEndNode,
     isCodeNode,
+    isDataBaseNode,
     showInputs,
     showOutputs,
     showExceptionFlow,
@@ -278,7 +285,6 @@ const useNodeFunc = ({ id, data }): UseNodeFuncReturn => {
         };
       });
       updateNodeRef(id);
-      autoSaveCurrentFlow();
       canPublishSetNot();
     }
   );
@@ -705,16 +711,14 @@ const RemoveButton = ({
   output,
   handleRemove,
 }): React.ReactElement | null => {
-  const { outputs } = useNodeInfo({ id, data });
+  const { outputs, isDataBaseNode } = useNodeInfo({ id, data });
   const canvasesDisabled = useFlowsManager(state => state.canvasesDisabled);
 
-  const canRemove =
-    !canvasesDisabled &&
-    (outputs?.filter(item => item.customParameterType !== 'deepseekr1')
-      ?.length > 1 ||
-      output?.isChild);
+  if (canvasesDisabled) return null;
 
-  if (!canRemove) return null;
+  if (isDataBaseNode && !output?.isChild) return null;
+
+  if (outputs?.length <= 1) return null;
 
   const disabled =
     output?.deleteDisabled || output?.customParameterType === 'deepseekr1';

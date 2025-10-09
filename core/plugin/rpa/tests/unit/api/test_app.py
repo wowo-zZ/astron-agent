@@ -60,10 +60,10 @@ class TestRPAServer:
         # Assert
         mock_initialize.assert_called_once_with(services=expected_services)
 
+    @patch("plugin.rpa.api.app.print")
     @patch("plugin.rpa.api.app.os.getenv")
-    @patch("builtins.print")
     def test_load_polaris_disabled(
-        self, mock_print: MagicMock, mock_getenv: MagicMock
+        self, mock_getenv: MagicMock, mock_print: MagicMock
     ) -> None:
         """Test load_polaris when USE_POLARIS is false."""
         # Arrange
@@ -144,16 +144,16 @@ class TestRPAServer:
         # Assert - should return early without creating Polaris instance
         mock_polaris.assert_not_called()
 
+    @patch("plugin.rpa.api.app.print")
     @patch("plugin.rpa.api.app.Polaris")
     @patch("plugin.rpa.api.app.ConfigFilter")
     @patch("plugin.rpa.api.app.os.getenv")
-    @patch("builtins.print")
     def test_load_polaris_connection_error(
         self,
-        mock_print: MagicMock,
         mock_getenv: MagicMock,
         mock_config_filter: MagicMock,
         mock_polaris: MagicMock,
+        mock_print: MagicMock,
     ) -> None:
         """Test polaris loading with connection error."""
         # Arrange
@@ -178,11 +178,11 @@ class TestRPAServer:
             "continuing with local configuration: Connection failed"
         )
 
+    @patch("plugin.rpa.api.app.print")
     @patch("plugin.rpa.api.app.const")
     @patch("plugin.rpa.api.app.os.getenv")
-    @patch("builtins.print")
     def test_check_env_success(
-        self, mock_print: MagicMock, mock_getenv: MagicMock, mock_const: MagicMock
+        self, mock_getenv: MagicMock, mock_const: MagicMock, mock_print: MagicMock
     ) -> None:
         """Test successful environment variable checking."""
         # Arrange
@@ -200,7 +200,7 @@ class TestRPAServer:
         RPAServer.check_env()
 
         # Assert
-        mock_print.assert_called_with(
+        mock_print.assert_any_call(
             "\033[94mAll required environment variables are set.\033[0m"
         )
 
@@ -226,11 +226,11 @@ class TestRPAServer:
         with pytest.raises(EnvNotFoundException):
             RPAServer.check_env()
 
+    @patch("plugin.rpa.api.app.print")
     @patch("plugin.rpa.api.app.const")
     @patch("plugin.rpa.api.app.os.getenv")
-    @patch("builtins.print")
     def test_check_env_with_otlp_enabled(
-        self, mock_print: MagicMock, mock_getenv: MagicMock, mock_const: MagicMock
+        self, mock_getenv: MagicMock, mock_const: MagicMock, mock_print: MagicMock
     ) -> None:
         """Test environment checking with OTLP enabled."""
         # Arrange
@@ -248,7 +248,7 @@ class TestRPAServer:
         RPAServer.check_env()
 
         # Assert
-        mock_print.assert_called_with(
+        mock_print.assert_any_call(
             "\033[94mAll required environment variables are set.\033[0m"
         )
 

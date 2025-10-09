@@ -1,7 +1,7 @@
 import { getRpaList } from '@/services/rpa';
 import { RpaInfo } from '@/types/rpa';
 import { useRequest, useDebounceFn } from 'ahooks';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 export const useRpaPage = (): {
   handleSearchRpas: (e: React.ChangeEvent<HTMLInputElement>) => void;

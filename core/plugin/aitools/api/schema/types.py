@@ -5,6 +5,8 @@ API data type definitions module containing request and response data structures
 import base64
 import re
 
+from typing import Any, Optional
+
 from fastapi import HTTPException
 from plugin.aitools.const.translation_constants import (
     CHINESE_LANGUAGE_CODE,
@@ -37,9 +39,11 @@ class SuccessDataResponse:
 
     code: int
     message: str
-    data: object
+    data: Any
 
-    def __init__(self, data, message="success", sid=None):
+    def __init__(
+        self, data: Any, message: str = "success", sid: Optional[str] = None
+    ) -> None:
         """
 
         :param data: json
@@ -67,7 +71,9 @@ class ErrorResponse:
     code: int
     message: str
 
-    def __init__(self, code_enum, sid=None, message=None):
+    def __init__(
+        self, code_enum: Any, sid: Optional[str] = None, message: Optional[str] = None
+    ) -> None:
         self.code = code_enum.code
         self.message = code_enum.msg
         if message:
@@ -91,9 +97,11 @@ class ErrorCResponse:
     """
 
     code: int
-    message: str
+    message: Optional[str]
 
-    def __init__(self, code, sid=None, message=None):
+    def __init__(
+        self, code: int, sid: Optional[str] = None, message: Optional[str] = None
+    ) -> None:
         self.code = code
         self.message = message
         if sid is not None:
@@ -143,7 +151,7 @@ class ArXivInput(BaseModel):
 
     @validator("search_query")
     @classmethod
-    def check_english(cls, v):
+    def check_english(cls, v: str) -> str:
         return validate_english(v)
 
 
@@ -160,7 +168,7 @@ class ISEInput(BaseModel):
 
     @field_validator("group")
     @classmethod
-    def validate_group(cls, value):
+    def validate_group(cls, value: str) -> str:
         valid_groups = ["pupil", "youth", "adult"]
         if value not in valid_groups:
             raise ValueError(f"Invalid group: {value}. Valid options: {valid_groups}")
@@ -168,7 +176,7 @@ class ISEInput(BaseModel):
 
     @field_validator("audio_data")
     @classmethod
-    def validate_audio_data(cls, value):
+    def validate_audio_data(cls, value: str) -> str:
         if not value:
             raise ValueError("audio_data cannot be empty")
         try:
@@ -185,7 +193,7 @@ class TranslationInput(BaseModel):
 
     @field_validator("text")
     @classmethod
-    def validate_text(cls, value):
+    def validate_text(cls, value: str) -> str:
         if not value or not value.strip():
             raise ValueError("Translation text cannot be empty")
         if len(value) > 5000:
@@ -194,7 +202,7 @@ class TranslationInput(BaseModel):
 
     @field_validator("target_language")
     @classmethod
-    def validate_target_language(cls, value):
+    def validate_target_language(cls, value: str) -> str:
         if value not in VALID_LANGUAGE_CODES:
             raise ValueError(
                 f"Invalid target language: {value}.\n"
@@ -204,7 +212,7 @@ class TranslationInput(BaseModel):
 
     @field_validator("source_language")
     @classmethod
-    def validate_source_language(cls, value):
+    def validate_source_language(cls, value: str) -> str:
         if value not in VALID_LANGUAGE_CODES:
             raise ValueError(
                 f"Invalid source language: {value}.\n"
@@ -213,7 +221,7 @@ class TranslationInput(BaseModel):
         return value
 
     @model_validator(mode="after")
-    def validate_language_combination(self):
+    def validate_language_combination(self) -> "TranslationInput":
         """Validate that at least one language is Chinese (cn)"""
         if not is_valid_language_pair(self.source_language, self.target_language):
             raise ValueError(

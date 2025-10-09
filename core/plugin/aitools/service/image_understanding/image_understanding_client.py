@@ -11,6 +11,7 @@ import json
 import ssl
 from datetime import datetime
 from time import mktime
+from typing import Any, Dict, List, Tuple, Union
 from urllib.parse import urlencode, urlparse
 from wsgiref.handlers import format_date_time
 
@@ -20,14 +21,16 @@ from plugin.aitools.const.err_code.code import CodeEnum
 
 
 class ImageUnderstandingClient:
-    def __init__(self, app_id, api_key, api_secret, imageunderstanding_url):
+    def __init__(
+        self, app_id: str, api_key: str, api_secret: str, imageunderstanding_url: str
+    ) -> None:
         self.app_id = app_id
         self.api_key = api_key
         self.api_secret = api_secret
         self.imageunderstanding_url = imageunderstanding_url
-        self.error_message = []
+        self.error_message: List[Union[str, Dict[str, Any]]] = []
 
-    def create_url(self):
+    def create_url(self) -> str:
         now = datetime.now()
         date = format_date_time(mktime(now.timetuple()))
         signature_origin = (
@@ -55,18 +58,18 @@ class ImageUnderstandingClient:
         # print('url:',url)
         return url
 
-    def on_error(self, _ws, error):
+    def on_error(self, _ws: websocket.WebSocket, error: Exception) -> None:
         # print("### error:", error,type(error))
         # appid未授权可能出现该报错
         self.error_message.append(str(error))
 
-    def on_close(self, ws, one, two):
+    def on_close(self, ws: websocket.WebSocket, one: Any, two: Any) -> None:
         pass
 
-    def on_open(self, ws):
+    def on_open(self, ws: websocket.WebSocket) -> None:
         thread.start_new_thread(self.run, (ws,))
 
-    def run(self, ws, *_args):
+    def run(self, ws: websocket.WebSocket, *_args: Any) -> None:
         try:
             data = json.dumps(
                 self.gen_params(question=self.question, image_url=self.image_url)
@@ -78,7 +81,7 @@ class ImageUnderstandingClient:
             )
             ws.close()
 
-    def on_message(self, ws, message):
+    def on_message(self, ws: websocket.WebSocket, message: str) -> None:
         data = json.loads(message)
         # print('data:',data)
         code = data["header"]["code"]
@@ -103,7 +106,7 @@ class ImageUnderstandingClient:
             if status == 2:
                 ws.close()
 
-    def gen_params(self, question, image_url):
+    def gen_params(self, question: str, image_url: str) -> Dict[str, Any]:
         response = requests.get(image_url, timeout=30)
         imagedata = base64.b64encode(response.content).decode("utf-8")
         return {
@@ -127,7 +130,7 @@ class ImageUnderstandingClient:
             },
         }
 
-    def get_answer(self, question, image_url):
+    def get_answer(self, question: str, image_url: str) -> Tuple[str, str, List[Any]]:
         self.question = question
         self.image_url = image_url
         self.answer = ""

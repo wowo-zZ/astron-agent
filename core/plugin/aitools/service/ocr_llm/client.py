@@ -8,7 +8,7 @@ import logging
 import os
 import queue
 import time
-from typing import Dict, List
+from typing import Any, Dict, Generator, List, Optional
 
 from plugin.aitools.service.ase_sdk.__base.entities.req_data import ReqData
 from plugin.aitools.service.ase_sdk.__base.entities.result import Result
@@ -37,7 +37,7 @@ class OcrLLMClient(Power):
     ):
         super().__init__(url, method)
 
-    def invoke(self, req_source_data: OcrLLMReqSourceData):
+    def invoke(self, req_source_data: OcrLLMReqSourceData) -> Any:
         """
         能力执行
 
@@ -89,7 +89,7 @@ class OcrLLMClient(Power):
         logging.info("invoke ocr_llm")
         return self._invoke(req_data)
 
-    def _subscribe(self):
+    def _subscribe(self) -> Generator[Any, None, None]:
         try:
             while True:
                 one = self.queue.get(timeout=60)
@@ -109,7 +109,7 @@ class OcrLLMClient(Power):
         except Exception as e:
             raise e
 
-    def _process_result_data(self, result_item):
+    def _process_result_data(self, result_item: Result) -> Optional[OcrResult]:
         """处理Result类型数据并返回OcrResult或None"""
         data = json.loads(result_item.data)
         payload = data.get("payload")
@@ -174,7 +174,7 @@ class OcrRespParse:
         return "\n".join(result)
 
     @staticmethod
-    def _deal_table_data(cells: List[Dict[str, int]]):
+    def _deal_table_data(cells: List[Dict[str, Any]]) -> str:
         max_row = max(item["row"] for item in cells)
         table = "<table border='1'>\n"
 
@@ -184,7 +184,9 @@ class OcrRespParse:
                 if item["row"] == r:
 
                     # 单独加一层list，可复用 _deal_one 函数
-                    root_content = [item.get("content", [{}])]
+                    root_content: List[List[Dict[str, Any]]] = [
+                        item.get("content", [{}])
+                    ]
                     c = {"content": root_content}
                     # 处理结果
                     text_arr = OcrRespParse._deal_one(c)
@@ -243,15 +245,14 @@ class OcrRespParse:
                 # 递归获取子内容
                 else:
                     results = OcrRespParse._process_other_content_types(
-                        child_content2,
-                        content_type
+                        child_content2, content_type
                     )
                     child_ocr_texts.extend(results)
 
         return child_ocr_texts
 
     @staticmethod
-    def _process_text_attribute_mode(child_content2):
+    def _process_text_attribute_mode(child_content2: Dict[str, Any]) -> List[str]:
         """处理文本属性模式"""
         content_type = child_content2.get("type", "")
         if content_type == "text_unit":
@@ -261,7 +262,7 @@ class OcrRespParse:
             return OcrRespParse._deal_one(child_content2, True)
 
     @staticmethod
-    def _process_paragraph_content(child_content2):
+    def _process_paragraph_content(child_content2: Dict[str, Any]) -> str:
         """处理段落内容"""
         text_arr = child_content2.get("text", [])
         text_str = "\n".join(text_arr).replace("\n", "<br>")
@@ -272,7 +273,7 @@ class OcrRespParse:
         return text_str
 
     @staticmethod
-    def _process_table_content(child_content2):
+    def _process_table_content(child_content2: Dict[str, Any]) -> List[str]:
         """处理表格内容"""
         results = []
         # 处理表头
@@ -286,7 +287,9 @@ class OcrRespParse:
         return results
 
     @staticmethod
-    def _process_other_content_types(child_content2, content_type):
+    def _process_other_content_types(
+        child_content2: Dict[str, Any], content_type: str
+    ) -> List[str]:
         """处理其他内容类型（代码、标题、列表等）"""
         results = []
         if child_content2:
