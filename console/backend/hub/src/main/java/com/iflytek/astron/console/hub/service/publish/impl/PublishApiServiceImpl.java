@@ -105,7 +105,7 @@ public class PublishApiServiceImpl implements PublishApiService {
         return appMstService.getAppListByUid(uid)
                 .stream()
                 .map(appMst -> new AppListDTO(appMst.getAppId(), appMst.getAppName(), appMst.getAppDescribe(),
-                        appMst.getAppKey(), appMst.getAppSecret()))
+                        appMst.getAppKey(), appMst.getAppSecret(), appMst.getCreateTime()))
                 .collect(Collectors.toList());
     }
 
