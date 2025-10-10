@@ -3,8 +3,8 @@ package com.iflytek.astron.console.hub.strategy.publish;
 import com.iflytek.astron.console.commons.response.ApiResult;
 
 /**
- * Publish strategy interface for different publish types
- * Each publish type (MARKET, MCP, WECHAT, API, FEISHU) should implement this interface
+ * Publish strategy interface for different publish types Each publish type (MARKET, MCP, WECHAT,
+ * API, FEISHU) should implement this interface
  */
 public interface PublishStrategy {
 
@@ -15,7 +15,8 @@ public interface PublishStrategy {
      * @param publishData Publish data specific to the channel
      * @param currentUid Current user ID
      * @param spaceId Space ID
-     * @return Publish result with specific data for the channel (e.g., WechatAuthUrlResponseDto for WeChat, null for others)
+     * @return Publish result with specific data for the channel (e.g., WechatAuthUrlResponseDto for
+     *         WeChat, null for others)
      */
     ApiResult<Object> publish(Integer botId, Object publishData, String currentUid, Long spaceId);
 

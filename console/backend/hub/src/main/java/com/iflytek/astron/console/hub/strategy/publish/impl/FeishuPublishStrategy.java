@@ -8,8 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * Feishu publish strategy implementation
- * Handles bot publishing to Feishu channel
+ * Feishu publish strategy implementation Handles bot publishing to Feishu channel
  */
 @Slf4j
 @Component
@@ -19,7 +18,7 @@ public class FeishuPublishStrategy implements PublishStrategy {
     @Override
     public ApiResult<Object> publish(Integer botId, Object publishData, String currentUid, Long spaceId) {
         log.info("Publishing bot to Feishu: botId={}, currentUid={}, spaceId={}", botId, currentUid, spaceId);
-        
+
         // TODO: Implement Feishu publish logic
         // 1. Validate Feishu publish data
         // 2. Check bot permissions and Feishu authorization
@@ -27,14 +26,14 @@ public class FeishuPublishStrategy implements PublishStrategy {
         // 4. Update bot-Feishu binding
         // 5. Update publish status
         // 6. Send publish event
-        
+
         return ApiResult.success(null); // No specific data needed for Feishu publish
     }
 
     @Override
     public ApiResult<Object> offline(Integer botId, Object publishData, String currentUid, Long spaceId) {
         log.info("Offlining bot from Feishu: botId={}, currentUid={}, spaceId={}", botId, currentUid, spaceId);
-        
+
         // TODO: Implement Feishu offline logic
         // 1. Validate offline request
         // 2. Check bot permissions
@@ -42,7 +41,7 @@ public class FeishuPublishStrategy implements PublishStrategy {
         // 4. Update bot-Feishu binding status
         // 5. Update publish status
         // 6. Send offline event
-        
+
         return ApiResult.success(null); // No specific data needed for Feishu offline
     }
 

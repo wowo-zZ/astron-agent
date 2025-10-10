@@ -85,8 +85,7 @@ class SpaceUserServiceImplTest {
 
         mockSpaceUserList = Arrays.asList(
                 mockSpaceUser,
-                createMockSpaceUser(2L, 100L, "test-uid-2", "Test User 2", SpaceRoleEnum.ADMIN.getCode())
-        );
+                createMockSpaceUser(2L, 100L, "test-uid-2", "Test User 2", SpaceRoleEnum.ADMIN.getCode()));
     }
 
     /**
@@ -202,8 +201,7 @@ class SpaceUserServiceImplTest {
         Long spaceId = 100L;
         List<SpaceUser> membersOnly = Arrays.asList(
                 createMockSpaceUser(1L, spaceId, "member1", "Member 1", SpaceRoleEnum.MEMBER.getCode()),
-                createMockSpaceUser(2L, spaceId, "admin1", "Admin 1", SpaceRoleEnum.ADMIN.getCode())
-        );
+                createMockSpaceUser(2L, spaceId, "admin1", "Admin 1", SpaceRoleEnum.ADMIN.getCode()));
 
         try (MockedStatic<SpaceInfoUtil> mockedStatic = mockStatic(SpaceInfoUtil.class)) {
             mockedStatic.when(SpaceInfoUtil::getSpaceId).thenReturn(spaceId);

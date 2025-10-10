@@ -111,6 +111,7 @@ class BotChatServiceImplUnitTest {
         ChatBotMarket chatBotMarket = createChatBotMarket();
         chatBotMarket.setModelId(null);
         chatBotMarket.setVersion(1);
+        chatBotMarket.setSupportDocument(1);  // Enable knowledge base support
 
         ChatReqRecords createdRecord = createChatReqRecords();
         List<String> knowledgeList = Arrays.asList("knowledge1", "knowledge2");
@@ -150,10 +151,10 @@ class BotChatServiceImplUnitTest {
 
         when(chatBotDataService.findMarketBotByBotId(anyInt())).thenReturn(chatBotMarket);
         when(chatDataService.createRequest(any())).thenReturn(createdRecord);
-        when(knowledgeService.getChuncksByBotId(anyInt(), anyString(), anyInt())).thenReturn(knowledgeList);
-        when(chatHistoryService.getSystemBotHistory(anyString(), anyLong(), anyBoolean())).thenReturn(historyMessages);
+        lenient().when(knowledgeService.getChuncksByBotId(anyInt(), anyString(), anyInt())).thenReturn(knowledgeList);
+        lenient().when(chatHistoryService.getSystemBotHistory(anyString(), anyLong(), anyBoolean())).thenReturn(historyMessages);
         when(modelService.getDetail(anyInt(), anyLong(), any())).thenReturn(new ApiResult<>(0, "success", llmInfoVo, 1L));
-        when(reqKnowledgeRecordsDataService.create(any())).thenReturn(null);
+        lenient().when(reqKnowledgeRecordsDataService.create(any())).thenReturn(null);
         doNothing().when(promptChatService).chatStream(any(), any(), any(), any(), anyBoolean(), anyBoolean());
 
         // When
@@ -209,9 +210,9 @@ class BotChatServiceImplUnitTest {
         when(chatBotDataService.findMarketBotByBotId(anyInt())).thenReturn(null);
         when(chatBotDataService.findById(anyInt())).thenReturn(Optional.of(chatBotBase));
         when(chatDataService.createRequest(any())).thenReturn(createdRecord);
-        when(knowledgeService.getChuncksByBotId(anyInt(), anyString(), anyInt())).thenReturn(knowledgeList);
-        when(chatHistoryService.getSystemBotHistory(anyString(), anyLong(), anyBoolean())).thenReturn(historyMessages);
-        when(reqKnowledgeRecordsDataService.create(any())).thenReturn(null);
+        lenient().when(knowledgeService.getChuncksByBotId(anyInt(), anyString(), anyInt())).thenReturn(knowledgeList);
+        lenient().when(chatHistoryService.getSystemBotHistory(anyString(), anyLong(), anyBoolean())).thenReturn(historyMessages);
+        lenient().when(reqKnowledgeRecordsDataService.create(any())).thenReturn(null);
         doNothing().when(sparkChatService).chatStream(any(), any(), any(), any(), anyBoolean(), anyBoolean());
 
         // When
@@ -251,9 +252,9 @@ class BotChatServiceImplUnitTest {
 
         when(chatDataService.findRequestById(requestId)).thenReturn(chatReqRecords);
         when(chatBotDataService.findMarketBotByBotId(botId)).thenReturn(chatBotMarket);
-        when(chatHistoryService.getSystemBotHistory(anyString(), anyLong(), anyBoolean())).thenReturn(historyMessages);
-        when(knowledgeService.getChuncksByBotId(anyInt(), anyString(), anyInt())).thenReturn(Arrays.asList("knowledge"));
-        when(reqKnowledgeRecordsDataService.create(any())).thenReturn(null);
+        lenient().when(chatHistoryService.getSystemBotHistory(anyString(), anyLong(), anyBoolean())).thenReturn(historyMessages);
+        lenient().when(knowledgeService.getChuncksByBotId(anyInt(), anyString(), anyInt())).thenReturn(Arrays.asList("knowledge"));
+        lenient().when(reqKnowledgeRecordsDataService.create(any())).thenReturn(null);
         doNothing().when(sparkChatService).chatStream(any(), any(), any(), any(), anyBoolean(), anyBoolean());
 
         // When
@@ -442,6 +443,7 @@ class BotChatServiceImplUnitTest {
         market.setOpenedTool("ifly_search");
         market.setVersion(1);
         market.setModelId(null);
+        market.setSupportDocument(0);
         return market;
     }
 
@@ -456,6 +458,7 @@ class BotChatServiceImplUnitTest {
                 .openedTool("ifly_search")
                 .version(1)
                 .modelId(null)
+                .supportDocument(0)
                 .build();
     }
 

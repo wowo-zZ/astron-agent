@@ -27,7 +27,7 @@ public class AssistantInfo {
 
     @JsonProperty("description")
     private String description;
-    
+
     @JsonProperty("history")
     private Boolean history;
 
@@ -42,4 +42,3 @@ public class AssistantInfo {
     private Date updateTime;
 
 }
-

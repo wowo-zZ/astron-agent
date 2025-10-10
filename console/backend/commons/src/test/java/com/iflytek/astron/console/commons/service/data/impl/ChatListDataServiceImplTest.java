@@ -1,10 +1,8 @@
 package com.iflytek.astron.console.commons.service.data.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.iflytek.astron.console.commons.entity.bot.ChatBotBase;
-import com.iflytek.astron.console.commons.entity.bot.ChatBotList;
 import com.iflytek.astron.console.commons.entity.chat.ChatBotListDto;
 import com.iflytek.astron.console.commons.entity.chat.ChatList;
 import com.iflytek.astron.console.commons.entity.chat.ChatTreeIndex;

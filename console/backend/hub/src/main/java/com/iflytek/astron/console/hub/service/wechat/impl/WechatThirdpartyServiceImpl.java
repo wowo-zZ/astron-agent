@@ -172,7 +172,7 @@ public class WechatThirdpartyServiceImpl implements WechatThirdpartyService {
             // Parse the decrypted XML to extract ComponentVerifyTicket
             Map<String, String> ticketMsg = com.iflytek.astron.console.hub.util.wechat.WXBizMsgParse.parseTicketMsg(decryptedXml);
             String ticket = ticketMsg.get("ComponentVerifyTicket");
-            
+
             if (!StringUtils.hasText(ticket)) {
                 log.error("Refresh WeChat component_verify_ticket failed: ticket is empty!");
                 return;

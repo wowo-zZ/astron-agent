@@ -13,5 +13,5 @@ public interface ChatBotApiService {
     Long selectCount(Integer botId);
 
     void insert(String uid, Integer botId, String assistantId, String appId, String appSecret, String appKey,
-                String prompt, String pluginIds, String embeddingIds, String apiPath, String description);
+            String prompt, String pluginIds, String embeddingIds, String apiPath, String description);
 }

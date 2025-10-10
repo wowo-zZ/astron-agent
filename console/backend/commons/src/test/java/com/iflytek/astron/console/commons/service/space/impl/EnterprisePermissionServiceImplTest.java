@@ -79,8 +79,7 @@ class EnterprisePermissionServiceImplTest {
                         .availableExpired(true)
                         .createTime(LocalDateTime.now())
                         .updateTime(LocalDateTime.now())
-                        .build()
-        );
+                        .build());
     }
 
     @Test
@@ -320,11 +319,11 @@ class EnterprisePermissionServiceImplTest {
     void testServiceBehaviorWithVariousInputs() {
         // Test with different types of keys
         String[] testKeys = {
-            "NORMAL_KEY",
-            "key_with_underscores",
-            "Key-With-Dashes",
-            "KeyWithNumbers123",
-            "VERY_LONG_PERMISSION_KEY_WITH_MULTIPLE_WORDS_AND_UNDERSCORES"
+                "NORMAL_KEY",
+                "key_with_underscores",
+                "Key-With-Dashes",
+                "KeyWithNumbers123",
+                "VERY_LONG_PERMISSION_KEY_WITH_MULTIPLE_WORDS_AND_UNDERSCORES"
         };
 
         when(enterprisePermissionMapper.selectOne(any(LambdaQueryWrapper.class), eq(true)))
