@@ -430,7 +430,7 @@ public class MaasUtil {
                 .headers(buildHeaders(authMap))
                 .addHeader(X_AUTH_SOURCE_HEADER, X_AUTH_SOURCE_VALUE)
                 .build();
-        log.info("MaasUtil executeRequest url: {} request: {}, header: {}", request.url(), request, request.headers());
+        log.info("MaasUtil executeRequest  request: {}, body:{}", request, bodyData);
         try (Response httpResponse = HTTP_CLIENT.newCall(request).execute()) {
             ResponseBody responseBody = httpResponse.body();
             if (responseBody != null) {
