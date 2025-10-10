@@ -427,7 +427,7 @@ public class MaasUtil {
                 .post(requestBody)
                 .addHeader("X-Consumer-Username", consumerId)
                 .addHeader("Lang-Code", I18nUtil.getLanguage())
-                .headers(Headers.of(authMap))
+                .headers(buildHeaders(authMap))
                 .addHeader(X_AUTH_SOURCE_HEADER, X_AUTH_SOURCE_VALUE)
                 .build();
         log.info("MaasUtil executeRequest url: {} request: {}, header: {}", request.url(), JSONObject.toJSONString(authMap), request.headers());
@@ -709,5 +709,17 @@ public class MaasUtil {
         }
 
         return result;
+    }
+
+    public static Headers buildHeaders(Map<String, String> headerMap) {
+        Headers.Builder headerBuilder = new Headers.Builder();
+        if (headerMap != null) {
+            for (Map.Entry<String, String> entry : headerMap.entrySet()) {
+                if (entry.getKey() != null && entry.getValue() != null) {
+                    headerBuilder.add(entry.getKey(), entry.getValue());
+                }
+            }
+        }
+        return headerBuilder.build();
     }
 }

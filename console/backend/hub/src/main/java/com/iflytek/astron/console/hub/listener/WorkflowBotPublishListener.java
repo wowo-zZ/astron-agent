@@ -11,6 +11,7 @@ import com.iflytek.astron.console.hub.event.BotPublishStatusChangedEvent;
 import com.iflytek.astron.console.hub.service.workflow.WorkflowReleaseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 /**
@@ -30,8 +31,7 @@ public class WorkflowBotPublishListener {
      * Handle bot publish status change event Execute workflow-specific logic if it's a workflow bot
      * being published to market
      */
-    // @Async
-    // @EventListener
+    @EventListener
     public void handleBotPublishStatusChanged(BotPublishStatusChangedEvent event) {
         // Only handle publish to market operations
         if (!ShelfStatusEnum.isPublishAction(event.getAction())) {
@@ -54,14 +54,14 @@ public class WorkflowBotPublishListener {
                 return;
             }
 
-            // 3. Get flowId
+            log.info("Starting workflow bot publish handling: botId={}, version={}", event.getBotId(), botBase.getVersion());
+
+            // 3. Get flowId for workflow-specific operations
             String flowId = userLangChainDataService.findFlowIdByBotId(event.getBotId());
             if (flowId == null || flowId.trim().isEmpty()) {
-                log.warn("Workflow bot missing flowId, skipping workflow publish handling: botId={}", event.getBotId());
+                log.warn("Workflow bot missing flowId, skipping workflow version creation: botId={}", event.getBotId());
                 return;
             }
-
-            log.info("Starting workflow bot publish handling: botId={}, flowId={}", event.getBotId(), flowId);
 
             // 4. Execute workflow publish logic (including version creation and API sync)
             WorkflowReleaseResponseDto response = workflowReleaseService.publishWorkflow(
@@ -79,7 +79,7 @@ public class WorkflowBotPublishListener {
             }
 
         } catch (Exception e) {
-            // Workflow publish failure should not affect main process, just log the error
+            // Workflow publish failure should not affect the main process, just log the error
             log.error("Exception occurred while handling workflow bot publish: botId={}, uid={}, spaceId={}",
                     event.getBotId(), event.getUid(), event.getSpaceId(), e);
         }

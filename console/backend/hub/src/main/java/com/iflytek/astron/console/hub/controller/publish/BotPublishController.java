@@ -9,7 +9,6 @@ import com.iflytek.astron.console.hub.dto.PageResponse;
 import com.iflytek.astron.console.commons.dto.bot.BotListRequestDto;
 import com.iflytek.astron.console.hub.dto.publish.BotPublishInfoDto;
 import com.iflytek.astron.console.hub.dto.publish.BotDetailResponseDto;
-import com.iflytek.astron.console.hub.dto.publish.PublishStatusUpdateDto;
 import com.iflytek.astron.console.hub.dto.publish.BotSummaryStatsVO;
 import com.iflytek.astron.console.hub.dto.publish.BotTimeSeriesResponseDto;
 import com.iflytek.astron.console.hub.dto.publish.BotVersionVO;
@@ -177,31 +176,6 @@ public class BotPublishController {
                     botId, request.getPublishType(), request.getAction(), e);
             return ApiResult.error(ResponseEnum.OPERATION_FAILED, e.getMessage());
         }
-    }
-
-    /**
-     * Update bot publishing status (publish to market or unpublish)
-     */
-    @Operation(
-            summary = "Update bot publishing status",
-            description = "Publish bot to marketplace or remove from marketplace with status management")
-    @RateLimit(limit = 10, window = 60, dimension = "USER")
-    @PostMapping("/bots/{botId}/status")
-    public ApiResult<Void> updatePublishStatus(
-            @Parameter(description = "Unique bot identifier", required = true)
-            @PathVariable Integer botId,
-            @Valid @RequestBody PublishStatusUpdateDto updateDto) {
-
-        String currentUid = RequestContextUtil.getUID();
-        Long spaceId = SpaceInfoUtil.getSpaceId();
-
-        log.info("Updating bot publish status: botId={}, action={}, uid={}, spaceId={}",
-                botId, updateDto.getAction(), currentUid, spaceId);
-
-        botPublishService.updatePublishStatus(botId, updateDto, currentUid, spaceId);
-
-        log.info("Bot publish status updated successfully: botId={}, action={}", botId, updateDto.getAction());
-        return ApiResult.success();
     }
 
     /**

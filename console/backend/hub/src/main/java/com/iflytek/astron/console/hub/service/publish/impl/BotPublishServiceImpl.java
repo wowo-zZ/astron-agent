@@ -5,7 +5,6 @@ import com.iflytek.astron.console.hub.dto.PageResponse;
 import com.iflytek.astron.console.commons.dto.bot.BotListRequestDto;
 import com.iflytek.astron.console.hub.dto.publish.BotPublishInfoDto;
 import com.iflytek.astron.console.hub.dto.publish.BotDetailResponseDto;
-import com.iflytek.astron.console.hub.dto.publish.PublishStatusUpdateDto;
 import com.iflytek.astron.console.hub.dto.publish.BotVersionVO;
 import com.iflytek.astron.console.hub.dto.publish.BotSummaryStatsVO;
 import com.iflytek.astron.console.hub.dto.publish.BotTimeSeriesResponseDto;
@@ -25,13 +24,11 @@ import com.iflytek.astron.console.commons.enums.ShelfStatusEnum;
 import com.iflytek.astron.console.commons.mapper.bot.ChatBotMarketMapper;
 import com.iflytek.astron.console.hub.mapper.BotConversationStatsMapper;
 import com.iflytek.astron.console.commons.mapper.bot.ChatBotBaseMapper;
-import com.iflytek.astron.console.commons.entity.bot.ChatBotBase;
 import com.iflytek.astron.console.hub.converter.BotPublishConverter;
 import com.iflytek.astron.console.hub.converter.WorkflowVersionConverter;
 import com.iflytek.astron.console.hub.service.publish.PublishChannelService;
 import com.iflytek.astron.console.hub.service.wechat.WechatThirdpartyService;
 import com.iflytek.astron.console.commons.entity.bot.BotPublishQueryResult;
-import com.iflytek.astron.console.commons.entity.bot.ChatBotMarket;
 import com.iflytek.astron.console.hub.entity.BotConversationStats;
 import com.iflytek.astron.console.hub.service.publish.BotPublishService;
 import com.iflytek.astron.console.commons.exception.BusinessException;
@@ -46,7 +43,6 @@ import com.iflytek.astron.console.commons.dto.bot.BotQueryCondition;
 import com.iflytek.astron.console.hub.event.BotPublishStatusChangedEvent;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -142,77 +138,6 @@ public class BotPublishServiceImpl implements BotPublishService {
         return detailDto;
     }
 
-    @Override
-    public void updatePublishStatus(Integer botId, PublishStatusUpdateDto updateDto, String currentUid, Long spaceId) {
-        log.info("Update bot publish status: botId={}, action={}, uid={}, spaceId={}",
-                botId, updateDto.getAction(), currentUid, spaceId);
-
-        // 1. First validate bot permission
-        int hasPermission = chatBotBaseMapper.checkBotPermission(botId, currentUid, spaceId);
-        if (hasPermission == 0) {
-            throw new BusinessException(ResponseEnum.BOT_NOT_EXISTS);
-        }
-
-        // 2. Query current publish status (maybe null for never published bots)
-        BotPublishQueryResult queryResult = chatBotMarketMapper.selectBotDetail(botId, currentUid, spaceId);
-        Integer currentStatus = queryResult != null ? queryResult.getBotStatus() : null;
-        String currentChannels = queryResult != null ? queryResult.getPublishChannels() : null;
-
-        // 2. Calculate new status and channel based on operation type
-        Integer newStatus;
-        String newChannels;
-
-        if (ShelfStatusEnum.isPublishAction(updateDto.getAction())) {
-            // Publish to market
-            // null status means never published, treat as off-shelf, can be published
-            Integer effectiveStatus = currentStatus != null ? currentStatus : ShelfStatusEnum.OFF_SHELF.getCode();
-
-            if (ShelfStatusEnum.isOnShelf(effectiveStatus)) {
-                log.warn("Bot already published, no need to repeat operation: botId={}", botId);
-                return;
-            }
-
-            // Only offline status (including never published) can be published to market
-            if (!ShelfStatusEnum.isOffShelf(effectiveStatus)) {
-                throw new BusinessException(ResponseEnum.BOT_STATUS_NOT_ALLOW_PUBLISH);
-            }
-
-            newStatus = ShelfStatusEnum.ON_SHELF.getCode();
-            newChannels = publishChannelService.updatePublishChannels(currentChannels, PublishChannelEnum.MARKET.getCode(), true);
-
-        } else if (ShelfStatusEnum.isOfflineAction(updateDto.getAction())) {
-            // Take offline from market
-            if (currentStatus == null || !ShelfStatusEnum.isOnShelf(currentStatus)) {
-                throw new BusinessException(ResponseEnum.BOT_STATUS_NOT_ALLOW_OFFLINE);
-            }
-
-            newStatus = ShelfStatusEnum.OFF_SHELF.getCode();
-            newChannels = publishChannelService.updatePublishChannels(currentChannels, PublishChannelEnum.MARKET.getCode(), false);
-
-        } else {
-            throw new BusinessException(ResponseEnum.PARAMS_ERROR);
-        }
-
-        // 3. Update database (if first time publishing, need to insert record first)
-        if (currentStatus == null) {
-            // First time publishing, need to insert new record
-            insertChatBotMarketRecord(botId, currentUid, spaceId, newStatus, newChannels);
-        } else {
-            // Update existing record
-            int updateCount = chatBotMarketMapper.updatePublishStatus(botId, currentUid, spaceId, newStatus, newChannels);
-            if (updateCount == 0) {
-                throw new BusinessException(ResponseEnum.BOT_UPDATE_FAILED);
-            }
-        }
-
-        log.info("Bot publish status updated successfully: botId={}, {} -> {}, channels: {} -> {}",
-                botId, currentStatus, newStatus, currentChannels, newChannels);
-
-        // Publish status change event (workflow logic will be handled by WorkflowBotPublishListener)
-        eventPublisher.publishEvent(new BotPublishStatusChangedEvent(
-                this, botId, currentUid, spaceId, updateDto.getAction(),
-                currentStatus, newStatus, newChannels));
-    }
 
 
     // ==================== Version Management ====================
@@ -342,38 +267,6 @@ public class BotPublishServiceImpl implements BotPublishService {
         }
     }
 
-    /**
-     * Insert bot market record (used for first time publishing)
-     */
-    private void insertChatBotMarketRecord(Integer botId, String uid, Long spaceId, Integer status, String channels) {
-        // First query bot basic information
-        ChatBotBase botBase = chatBotBaseMapper.selectById(botId);
-        if (botBase == null) {
-            throw new BusinessException(ResponseEnum.BOT_NOT_EXISTS);
-        }
-
-        // Create market record
-        ChatBotMarket marketRecord = new ChatBotMarket();
-        marketRecord.setBotId(botId);
-        marketRecord.setUid(uid);
-        marketRecord.setBotName(botBase.getBotName());
-        marketRecord.setBotType(botBase.getBotType());
-        marketRecord.setAvatar(botBase.getAvatar());
-        marketRecord.setBotDesc(botBase.getBotDesc());
-        marketRecord.setBotStatus(status);
-        marketRecord.setPublishChannels(channels);
-        marketRecord.setIsDelete(0);
-        marketRecord.setCreateTime(LocalDateTime.now());
-        marketRecord.setUpdateTime(LocalDateTime.now());
-
-        // Insert record
-        int insertCount = chatBotMarketMapper.insert(marketRecord);
-        if (insertCount == 0) {
-            throw new BusinessException(ResponseEnum.BOT_UPDATE_FAILED);
-        }
-
-        log.info("Create bot market record successfully: botId={}, status={}, channels={}", botId, status, channels);
-    }
 
     /**
      * Get current publish channel
@@ -390,11 +283,14 @@ public class BotPublishServiceImpl implements BotPublishService {
 
     /**
      * Create market record (for publish channel)
+     * Note: This method now delegates to event-driven architecture
      */
     private void createMarketRecordForChannel(Integer botId, String uid, Long spaceId, String channels) {
-        // Call existing create market record method
-        insertChatBotMarketRecord(botId, uid, spaceId, ShelfStatusEnum.OFF_SHELF.getCode(), channels);
-        log.info("Create market record for publish channel: botId={}, uid={}, spaceId={}, channels={}",
+        // Publish event to create market record - handled by InstructionalBotPublishListener
+        eventPublisher.publishEvent(new BotPublishStatusChangedEvent(
+                this, botId, uid, spaceId, "PUBLISH",
+                null, ShelfStatusEnum.OFF_SHELF.getCode(), channels));
+        log.info("Create market record event published: botId={}, uid={}, spaceId={}, channels={}",
                 botId, uid, spaceId, channels);
     }
 

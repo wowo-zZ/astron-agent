@@ -7,8 +7,8 @@ import java.util.List;
 
 /**
  * MCP publish prepare data DTO
- *
- * @author Assistant
+ * 
+ * @author Omuigix
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

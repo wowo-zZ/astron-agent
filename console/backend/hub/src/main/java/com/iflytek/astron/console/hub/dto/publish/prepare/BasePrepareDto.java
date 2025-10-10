@@ -4,8 +4,8 @@ import lombok.Data;
 
 /**
  * Base prepare data DTO
- *
- * @author Assistant
+ * 
+ * @author Omuigix
  */
 @Data
 public abstract class BasePrepareDto {

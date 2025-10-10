@@ -4,7 +4,6 @@ import com.iflytek.astron.console.hub.dto.PageResponse;
 import com.iflytek.astron.console.commons.dto.bot.BotListRequestDto;
 import com.iflytek.astron.console.hub.dto.publish.BotPublishInfoDto;
 import com.iflytek.astron.console.hub.dto.publish.BotDetailResponseDto;
-import com.iflytek.astron.console.hub.dto.publish.PublishStatusUpdateDto;
 import com.iflytek.astron.console.hub.dto.publish.BotVersionVO;
 import com.iflytek.astron.console.hub.dto.publish.BotSummaryStatsVO;
 import com.iflytek.astron.console.hub.dto.publish.BotTimeSeriesResponseDto;
@@ -49,16 +48,6 @@ public interface BotPublishService {
      */
     BotDetailResponseDto getBotDetail(Integer botId, String currentUid, Long spaceId);
 
-    /**
-     * Update bot publish status - unified handling of publish and offline logic, using ShelfStatusEnum
-     * (0=offline, 1=published)
-     *
-     * @param botId Bot ID
-     * @param updateDto Status update request
-     * @param currentUid Current user ID
-     * @param spaceId Space ID (optional)
-     */
-    void updatePublishStatus(Integer botId, PublishStatusUpdateDto updateDto, String currentUid, Long spaceId);
 
     // ==================== Version Management ====================
 
