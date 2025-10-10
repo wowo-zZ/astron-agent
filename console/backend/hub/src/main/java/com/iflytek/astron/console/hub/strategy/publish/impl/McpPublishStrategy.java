@@ -57,7 +57,7 @@ public class McpPublishStrategy implements PublishStrategy {
             .build();
 
     private static final MediaType JSON_MEDIA_TYPE = MediaType.get("application/json; charset=utf-8");
-    private static final String GET_VERSION_NAME_URL = "/getVersionName";
+    private static final String GET_VERSION_NAME_URL = "/get-version-name";
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -161,7 +161,7 @@ public class McpPublishStrategy implements PublishStrategy {
     /**
      * Get version name for MCP publishing Corresponds to
      * releaseManageClientService.getVersionNameByBotId -> getVersionName in original project Sends HTTP
-     * request to BASE_URL + GET_VERSION_NAME_URL (/getVersionName)
+     * request to BASE_URL + GET_VERSION_NAME_URL (/get-version-name)
      */
     private String getVersionName(Integer botId, String currentUid, Long spaceId) {
         try {

@@ -44,8 +44,8 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
 
     // API endpoints for workflow version management
     private static final String ADD_VERSION_URL = ""; // Create new version
-    private static final String UPDATE_RESULT_URL = "/update_channel_result"; // Update audit result
-    private static final String GET_VERSION_NAME_URL = "/getVersionName"; // Get next version name
+    private static final String UPDATE_RESULT_URL = "/update-channel-result"; // Update audit result
+    private static final String GET_VERSION_NAME_URL = "/get-version-name"; // Get next version name
 
     // Release status constants (reserved for future use)
     @SuppressWarnings("unused")
