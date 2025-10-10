@@ -421,13 +421,13 @@ public class MaasUtil {
         RequestBody requestBody = RequestBody.create(
                 JSONObject.toJSONString(bodyData),
                 MediaType.parse("application/json; charset=utf-8"));
-
         Request request = new Request.Builder()
                 .url(url)
                 .post(requestBody)
                 .addHeader("X-Consumer-Username", consumerId)
                 .addHeader("Lang-Code", I18nUtil.getLanguage())
-                .headers(buildHeaders(authMap))
+//                .headers(buildHeaders(authMap))
+                .addHeader("Authorization", "Bearer %s:%s".formatted(consumerKey, consumerSecret))
                 .addHeader(X_AUTH_SOURCE_HEADER, X_AUTH_SOURCE_VALUE)
                 .build();
         log.info("MaasUtil executeRequest  request: {}, body:{}", request, bodyData);
