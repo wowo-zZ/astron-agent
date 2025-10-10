@@ -95,8 +95,7 @@ class EnterpriseUserServiceImplTest {
                         .role(EnterpriseRoleEnum.GOVERNOR.getCode())
                         .createTime(LocalDateTime.now())
                         .updateTime(LocalDateTime.now())
-                        .build()
-        );
+                        .build());
 
         mockVOPage = new Page<>();
         mockVOPage.setRecords(Arrays.asList(mockEnterpriseUserVO));

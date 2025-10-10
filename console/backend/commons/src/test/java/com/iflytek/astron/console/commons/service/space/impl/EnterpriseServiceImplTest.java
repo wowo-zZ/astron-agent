@@ -1,7 +1,6 @@
 package com.iflytek.astron.console.commons.service.space.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.iflytek.astron.console.commons.data.UserInfoDataService;
 import com.iflytek.astron.console.commons.dto.space.EnterpriseVO;
 import com.iflytek.astron.console.commons.entity.space.Enterprise;
@@ -366,7 +365,7 @@ class EnterpriseServiceImplTest {
         Long enterpriseId = 1L;
 
         try (MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class);
-             MockedStatic<EnterpriseInfoUtil> mockedEnterpriseInfo = mockStatic(EnterpriseInfoUtil.class)) {
+                MockedStatic<EnterpriseInfoUtil> mockedEnterpriseInfo = mockStatic(EnterpriseInfoUtil.class)) {
 
             mockedRequestContext.when(RequestContextUtil::getUID).thenReturn(uid);
             mockedEnterpriseInfo.when(EnterpriseInfoUtil::getEnterpriseId).thenReturn(enterpriseId);
@@ -393,7 +392,7 @@ class EnterpriseServiceImplTest {
     void detail_WithNullEnterpriseId_ShouldReturnNull() {
         // Given
         try (MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class);
-             MockedStatic<EnterpriseInfoUtil> mockedEnterpriseInfo = mockStatic(EnterpriseInfoUtil.class)) {
+                MockedStatic<EnterpriseInfoUtil> mockedEnterpriseInfo = mockStatic(EnterpriseInfoUtil.class)) {
 
             mockedRequestContext.when(RequestContextUtil::getUID).thenReturn("test-uid");
             mockedEnterpriseInfo.when(EnterpriseInfoUtil::getEnterpriseId).thenReturn(null);
@@ -414,7 +413,7 @@ class EnterpriseServiceImplTest {
         Long enterpriseId = 999L;
 
         try (MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class);
-             MockedStatic<EnterpriseInfoUtil> mockedEnterpriseInfo = mockStatic(EnterpriseInfoUtil.class)) {
+                MockedStatic<EnterpriseInfoUtil> mockedEnterpriseInfo = mockStatic(EnterpriseInfoUtil.class)) {
 
             mockedRequestContext.when(RequestContextUtil::getUID).thenReturn(uid);
             mockedEnterpriseInfo.when(EnterpriseInfoUtil::getEnterpriseId).thenReturn(enterpriseId);

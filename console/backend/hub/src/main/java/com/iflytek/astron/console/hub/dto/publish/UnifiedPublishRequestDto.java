@@ -6,8 +6,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 /**
- * Unified publish request DTO for all publish types
- * Supports MARKET, MCP, WECHAT, API, FEISHU publishing
+ * Unified publish request DTO for all publish types Supports MARKET, MCP, WECHAT, API, FEISHU
+ * publishing
  */
 @Data
 @Schema(description = "Unified publish request")

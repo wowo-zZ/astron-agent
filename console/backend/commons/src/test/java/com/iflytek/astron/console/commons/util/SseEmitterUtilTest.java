@@ -7,15 +7,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -343,9 +339,7 @@ class SseEmitterUtilTest {
         SseEmitter emitter = new SseEmitter(10000L);
         String streamId = "test-stream";
 
-        assertDoesNotThrow(() ->
-            SseEmitterUtil.sendStream(emitter, null, streamId, null, null)
-        );
+        assertDoesNotThrow(() -> SseEmitterUtil.sendStream(emitter, null, streamId, null, null));
     }
 
     @Test
@@ -354,9 +348,7 @@ class SseEmitterUtilTest {
         String streamId = "test-stream";
         Stream<String> dataStream = Stream.of("data1", "data2", "data3");
 
-        assertDoesNotThrow(() ->
-            SseEmitterUtil.sendStream(emitter, dataStream, streamId, null, null)
-        );
+        assertDoesNotThrow(() -> SseEmitterUtil.sendStream(emitter, dataStream, streamId, null, null));
     }
 
     @Test
@@ -367,15 +359,14 @@ class SseEmitterUtilTest {
         AtomicInteger callCount = new AtomicInteger(0);
 
         SseEmitterUtil.sendStream(
-            emitter,
-            dataStream,
-            streamId,
-            i -> {
-                callCount.incrementAndGet();
-                return "Number: " + i;
-            },
-            null
-        );
+                emitter,
+                dataStream,
+                streamId,
+                i -> {
+                    callCount.incrementAndGet();
+                    return "Number: " + i;
+                },
+                null);
 
         assertEquals(3, callCount.get());
     }
@@ -389,20 +380,19 @@ class SseEmitterUtilTest {
         CountDownLatch latch = new CountDownLatch(1);
 
         SseEmitterUtil.sendStream(
-            emitter,
-            dataStream,
-            streamId,
-            data -> {
-                if ("data2".equals(data)) {
-                    throw new RuntimeException("Test error");
-                }
-                return data;
-            },
-            e -> {
-                errorHandled.set(true);
-                latch.countDown();
-            }
-        );
+                emitter,
+                dataStream,
+                streamId,
+                data -> {
+                    if ("data2".equals(data)) {
+                        throw new RuntimeException("Test error");
+                    }
+                    return data;
+                },
+                e -> {
+                    errorHandled.set(true);
+                    latch.countDown();
+                });
 
         latch.await(2, TimeUnit.SECONDS);
         assertTrue(errorHandled.get());
@@ -417,18 +407,17 @@ class SseEmitterUtilTest {
 
         // Stop after 2 items
         SseEmitterUtil.sendStream(
-            emitter,
-            dataStream,
-            streamId,
-            data -> {
-                int count = processedCount.incrementAndGet();
-                if (count == 2) {
-                    SseEmitterUtil.stopStream(streamId);
-                }
-                return data;
-            },
-            null
-        );
+                emitter,
+                dataStream,
+                streamId,
+                data -> {
+                    int count = processedCount.incrementAndGet();
+                    if (count == 2) {
+                        SseEmitterUtil.stopStream(streamId);
+                    }
+                    return data;
+                },
+                null);
 
         // Should process 2 items before stopping
         assertTrue(processedCount.get() >= 2 && processedCount.get() <= 3);
@@ -442,15 +431,14 @@ class SseEmitterUtilTest {
         AtomicInteger callCount = new AtomicInteger(0);
 
         SseEmitterUtil.sendStream(
-            emitter,
-            dataStream,
-            streamId,
-            data -> {
-                callCount.incrementAndGet();
-                return data;
-            },
-            null
-        );
+                emitter,
+                dataStream,
+                streamId,
+                data -> {
+                    callCount.incrementAndGet();
+                    return data;
+                },
+                null);
 
         // Should only process non-null items
         assertEquals(2, callCount.get());
@@ -464,12 +452,11 @@ class SseEmitterUtilTest {
         CountDownLatch latch = new CountDownLatch(1);
 
         SseEmitterUtil.asyncSendStreamAndClose(
-            emitter,
-            dataStream,
-            streamId,
-            data -> data,
-            null
-        );
+                emitter,
+                dataStream,
+                streamId,
+                data -> data,
+                null);
 
         // Wait a bit for async processing
         Thread.sleep(500);
@@ -480,9 +467,7 @@ class SseEmitterUtilTest {
         SseEmitter emitter = new SseEmitter(10000L);
         String streamId = "test-buffered";
 
-        assertDoesNotThrow(() ->
-            SseEmitterUtil.sendBufferedStream(emitter, null, streamId, 10, null)
-        );
+        assertDoesNotThrow(() -> SseEmitterUtil.sendBufferedStream(emitter, null, streamId, 10, null));
     }
 
     @Test
@@ -493,12 +478,11 @@ class SseEmitterUtilTest {
         AtomicInteger bufferReadyCount = new AtomicInteger(0);
 
         SseEmitterUtil.sendBufferedStream(
-            emitter,
-            dataStream,
-            streamId,
-            3,
-            content -> bufferReadyCount.incrementAndGet()
-        );
+                emitter,
+                dataStream,
+                streamId,
+                3,
+                content -> bufferReadyCount.incrementAndGet());
 
         // Should flush buffer at least once
         assertTrue(bufferReadyCount.get() >= 1);
@@ -511,12 +495,11 @@ class SseEmitterUtilTest {
         AtomicBoolean afterCalled = new AtomicBoolean(false);
 
         SseEmitterUtil.sendWithCallback(
-            emitter,
-            () -> "test data",
-            data -> beforeCalled.set(true),
-            data -> afterCalled.set(true),
-            null
-        );
+                emitter,
+                () -> "test data",
+                data -> beforeCalled.set(true),
+                data -> afterCalled.set(true),
+                null);
 
         assertTrue(beforeCalled.get());
         assertTrue(afterCalled.get());
@@ -528,14 +511,13 @@ class SseEmitterUtilTest {
         AtomicBoolean errorHandled = new AtomicBoolean(false);
 
         SseEmitterUtil.sendWithCallback(
-            emitter,
-            () -> {
-                throw new RuntimeException("Test error");
-            },
-            null,
-            null,
-            e -> errorHandled.set(true)
-        );
+                emitter,
+                () -> {
+                    throw new RuntimeException("Test error");
+                },
+                null,
+                null,
+                e -> errorHandled.set(true));
 
         assertTrue(errorHandled.get());
     }
@@ -548,7 +530,7 @@ class SseEmitterUtilTest {
         String streamId = "test-processor";
 
         SseEmitterUtil.StreamProcessor<String> processor =
-            new SseEmitterUtil.StreamProcessor<>(emitter, streamId);
+                new SseEmitterUtil.StreamProcessor<>(emitter, streamId);
 
         assertNotNull(processor);
     }
@@ -608,7 +590,7 @@ class SseEmitterUtilTest {
         Stream<String> dataStream = Stream.of("data1", "data2", "data3");
 
         SseEmitterUtil.StreamProcessor<String> processor =
-            new SseEmitterUtil.StreamProcessor<>(emitter, streamId);
+                new SseEmitterUtil.StreamProcessor<>(emitter, streamId);
 
         assertDoesNotThrow(() -> processor.processStream(dataStream));
 
@@ -638,9 +620,12 @@ class SseEmitterUtilTest {
 
         var processor = new SseEmitterUtil.StreamProcessor<Integer>(emitter, streamId)
                 .withDataMapper(i -> "Value: " + i)
-                .withErrorHandler(e -> {})
-                .withBeforeProcess(data -> {})
-                .withAfterProcess(data -> {})
+                .withErrorHandler(e -> {
+                })
+                .withBeforeProcess(data -> {
+                })
+                .withAfterProcess(data -> {
+                })
                 .withBuffer(5);
 
         assertNotNull(processor);

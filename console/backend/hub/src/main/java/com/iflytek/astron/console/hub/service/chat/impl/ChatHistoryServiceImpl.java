@@ -71,7 +71,8 @@ public class ChatHistoryServiceImpl implements ChatHistoryService {
         Map<Long, ReqKnowledgeRecords> knowledgeRecordsMap = reqKnowledgeRecordsDataService.findByReqIds(reqIds);
 
         // Merge conversation history in chronological order of questions
-        for (ChatReqModelDto reqDto : chatReqModelDtos) {
+        for (int i = chatReqModelDtos.size() - 1; i >= 0; i--) {
+            ChatReqModelDto reqDto = chatReqModelDtos.get(i);
             // Add user message with knowledge enhancement
             SparkChatRequest.MessageDto userMessage = new SparkChatRequest.MessageDto();
             userMessage.setRole("user");

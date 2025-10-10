@@ -11,8 +11,6 @@ import com.iflytek.astron.console.hub.event.BotPublishStatusChangedEvent;
 import com.iflytek.astron.console.hub.service.workflow.WorkflowReleaseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,8 +30,8 @@ public class WorkflowBotPublishListener {
      * Handle bot publish status change event Execute workflow-specific logic if it's a workflow bot
      * being published to market
      */
-//    @Async
-//    @EventListener
+    // @Async
+    // @EventListener
     public void handleBotPublishStatusChanged(BotPublishStatusChangedEvent event) {
         // Only handle publish to market operations
         if (!ShelfStatusEnum.isPublishAction(event.getAction())) {

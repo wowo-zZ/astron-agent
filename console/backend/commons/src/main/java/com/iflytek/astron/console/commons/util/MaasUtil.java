@@ -169,7 +169,7 @@ public class MaasUtil {
     }
 
     public JSONObject synchronizeWorkFlow(UserLangChainInfo userLangChainInfo, BotCreateForm botCreateForm,
-                                          HttpServletRequest request, Long spaceId) {
+            HttpServletRequest request, Long spaceId) {
         AdvancedConfig advancedConfig = new AdvancedConfig(botCreateForm.getPrologue(), botCreateForm.getInputExample(), botCreateForm.getAppBackground());
         JSONObject param = new JSONObject();
         param.put("avatarIcon", botCreateForm.getAvatar());
@@ -363,7 +363,7 @@ public class MaasUtil {
      * Create API (without version)
      *
      * @param flowId Workflow ID
-     * @param appid  Application ID
+     * @param appid Application ID
      * @return JSONObject response result
      */
     public JSONObject createApi(String flowId, String appid) {
@@ -377,8 +377,8 @@ public class MaasUtil {
     /**
      * Create API (with version)
      *
-     * @param flowId  Workflow ID
-     * @param appid   Application ID
+     * @param flowId Workflow ID
+     * @param appid Application ID
      * @param version Version number
      * @return JSONObject response result
      */
@@ -389,8 +389,8 @@ public class MaasUtil {
     /**
      * Internal generic method for creating API
      *
-     * @param flowId  Workflow ID
-     * @param appid   Application ID
+     * @param flowId Workflow ID
+     * @param appid Application ID
      * @param version Version number (can be null)
      * @return JSONObject response result
      */
@@ -412,7 +412,7 @@ public class MaasUtil {
     /**
      * Execute HTTP POST request and return response string
      *
-     * @param url      Request URL
+     * @param url Request URL
      * @param bodyData Request body data object
      * @return String representation of response content
      */
@@ -448,9 +448,9 @@ public class MaasUtil {
      * Validate whether the response is successful
      *
      * @param responseStr Response content string representation
-     * @param action      Description of current operation being performed (e.g., "publish", "bind")
-     * @param flowId      Workflow ID
-     * @param appid       Application ID
+     * @param action Description of current operation being performed (e.g., "publish", "bind")
+     * @param flowId Workflow ID
+     * @param appid Application ID
      */
     private void validateResponse(String responseStr, String action, String flowId, String appid) {
         log.info("----- {} maas api response: {}", action, responseStr);
@@ -635,9 +635,8 @@ public class MaasUtil {
     }
 
     /**
-     * Register MCP server (mock implementation)
-     * Corresponds to massUtil.registerMcp in original project
-     * 
+     * Register MCP server (mock implementation) Corresponds to massUtil.registerMcp in original project
+     *
      * @param cookie HTTP cookies from request
      * @param chainInfo workflow chain information
      * @param mcpRequest MCP publish request data
@@ -646,10 +645,10 @@ public class MaasUtil {
      */
     public static JSONObject registerMcp(String cookie, Object chainInfo, Object mcpRequest, String versionName) {
         log.info("Registering MCP server: versionName={}", versionName);
-        
+
         // Mock implementation - return structured data similar to original project
         JSONObject result = new JSONObject();
-        
+
         try {
             // Extract data from mcpRequest (using reflection to avoid direct dependency)
             if (mcpRequest != null) {
@@ -661,7 +660,7 @@ public class MaasUtil {
                     java.lang.reflect.Method getIcon = mcpRequest.getClass().getMethod("getIcon");
                     java.lang.reflect.Method getArgs = mcpRequest.getClass().getMethod("getArgs");
                     java.lang.reflect.Method getBotId = mcpRequest.getClass().getMethod("getBotId");
-                    
+
                     result.put("serverName", getServerName.invoke(mcpRequest));
                     result.put("description", getDescription.invoke(mcpRequest));
                     result.put("content", getContent.invoke(mcpRequest));
@@ -672,7 +671,7 @@ public class MaasUtil {
                     log.warn("Failed to extract data from mcpRequest using reflection: {}", reflectionException.getMessage());
                 }
             }
-            
+
             // Extract flowId from chainInfo (using reflection to avoid direct dependency)
             String flowId = null;
             if (chainInfo != null) {
@@ -683,32 +682,32 @@ public class MaasUtil {
                     log.warn("Failed to extract flowId from chainInfo using reflection: {}", reflectionException.getMessage());
                 }
             }
-            
+
             // Generate server URL (similar to original project)
             if (flowId != null && !flowId.trim().isEmpty()) {
                 result.put("serverUrl", String.format("https://xingchen-api.xf-yun.com/mcp/xingchen/flow/%s/sse", flowId));
             } else {
                 result.put("serverUrl", "https://xingchen-api.xf-yun.com/mcp/xingchen/flow/default/sse");
             }
-            
+
             // Add version information
             result.put("versionName", versionName);
             result.put("flowId", flowId);
-            
+
             // Add mock success indicators
             result.put("code", 0);
             result.put("message", "MCP server registered successfully");
             result.put("success", true);
-            
+
             log.info("MCP server registration completed: serverUrl={}", result.getString("serverUrl"));
-            
+
         } catch (Exception e) {
             log.error("Failed to register MCP server: versionName={}", versionName, e);
             result.put("code", -1);
             result.put("message", "Failed to register MCP server: " + e.getMessage());
             result.put("success", false);
         }
-        
+
         return result;
     }
 }

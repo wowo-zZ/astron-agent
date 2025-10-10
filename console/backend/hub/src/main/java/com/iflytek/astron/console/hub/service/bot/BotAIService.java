@@ -39,7 +39,7 @@ public interface BotAIService {
      *
      * @param botName bot name
      * @param botDesc bot description
-     * @param prompt  bot prompt/instruction
+     * @param prompt bot prompt/instruction
      * @return up to 3 input examples (may be empty on failure)
      */
     java.util.List<String> generateInputExample(String botName, String botDesc, String prompt);

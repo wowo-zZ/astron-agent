@@ -12,8 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * XMLParse class
- * Provides interfaces for extracting encrypted messages from message formats and generating reply message formats.
+ * XMLParse class Provides interfaces for extracting encrypted messages from message formats and
+ * generating reply message formats.
  */
 public class XMLParse {
 
@@ -21,7 +21,7 @@ public class XMLParse {
      * Extract encrypted message from XML data package
      *
      * @param xmltext XML string to extract from
-     * @param keys    Keys to extract
+     * @param keys Keys to extract
      * @return Extracted encrypted message string
      * @throws AesException
      */
@@ -50,16 +50,16 @@ public class XMLParse {
     /**
      * Generate XML message
      *
-     * @param encrypt   Encrypted message ciphertext
+     * @param encrypt Encrypted message ciphertext
      * @param signature Security signature
      * @param timestamp Timestamp
-     * @param nonce     Random string
+     * @param nonce Random string
      * @return Generated XML string
      */
     public static String generate(String encrypt, String signature, String timestamp, String nonce) {
         String format = "<xml>\n" + "<Encrypt><![CDATA[%1$s]]></Encrypt>\n"
-            + "<MsgSignature><![CDATA[%2$s]]></MsgSignature>\n"
-            + "<TimeStamp>%3$s</TimeStamp>\n" + "<Nonce><![CDATA[%4$s]]></Nonce>\n" + "</xml>";
+                + "<MsgSignature><![CDATA[%2$s]]></MsgSignature>\n"
+                + "<TimeStamp>%3$s</TimeStamp>\n" + "<Nonce><![CDATA[%4$s]]></Nonce>\n" + "</xml>";
         return String.format(format, encrypt, signature, timestamp, nonce);
     }
 }

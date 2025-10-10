@@ -4,22 +4,22 @@ import lombok.Data;
 
 /**
  * Base prepare data DTO
- * 
+ *
  * @author Assistant
  */
 @Data
 public abstract class BasePrepareDto {
-    
+
     /**
      * Publish type (market, mcp, feishu, api)
      */
     private String publishType;
-    
+
     /**
      * Success flag
      */
     private Boolean success = true;
-    
+
     /**
      * Error message if any
      */
