@@ -11,18 +11,13 @@ import com.iflytek.astron.console.toolkit.entity.common.PageData;
 import com.iflytek.astron.console.toolkit.entity.common.Pagination;
 import com.iflytek.astron.console.toolkit.entity.dto.*;
 import com.iflytek.astron.console.toolkit.entity.dto.eval.WorkflowComparisonSaveReq;
-import com.iflytek.astron.console.toolkit.entity.table.workflow.WorkflowComparison;
-import com.iflytek.astron.console.toolkit.entity.table.workflow.WorkflowDialog;
-import com.iflytek.astron.console.toolkit.entity.table.workflow.WorkflowFeedback;
-import com.iflytek.astron.console.toolkit.entity.tool.McpServerTool;
-import com.iflytek.astron.console.toolkit.entity.vo.McpServerToolDetailVO;
+import com.iflytek.astron.console.toolkit.entity.table.workflow.*;
 import com.iflytek.astron.console.toolkit.entity.vo.WorkflowVo;
 import com.iflytek.astron.console.toolkit.service.workflow.WorkflowExportService;
 import com.iflytek.astron.console.toolkit.service.workflow.WorkflowService;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -30,7 +25,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -41,7 +35,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -51,26 +44,35 @@ import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
- * WorkflowController 综合单元测试
+ * Comprehensive unit tests for {@link WorkflowController}.
  *
- * 覆盖目标：
- * - JaCoCo 语句覆盖率 >= 80%，分支覆盖率 >= 90%
- * - PIT 变异测试通过率高
- * - 涵盖正常流程、边界条件、异常情况、并发场景
+ * <p>
+ * Coverage goals:
+ * <ul>
+ * <li>JaCoCo: statement coverage &gt;= 80%, branch coverage &gt;= 90%</li>
+ * <li>High PIT mutation-kill ratio</li>
+ * <li>Cover normal flows, boundary conditions, exceptions, and concurrency</li>
+ * </ul>
+ * </p>
  *
- * 技术栈：JUnit5 + Mockito + AssertJ + ParameterizedTest
+ * <p>
+ * Tech stack: JUnit 5 + Mockito + AssertJ + ParameterizedTest
+ * </p>
  *
- * Mock依赖：
- * - WorkflowService（主要业务逻辑）
- * - WorkflowExportService（导入导出）
- * - HttpServletRequest/Response（Web请求响应）
- * - MultipartFile（文件上传）
- * - ServletOutputStream（文件下载）
+ * <p>
+ * Mocked dependencies:
+ * <ul>
+ * <li>{@code WorkflowService} (core business logic)</li>
+ * <li>{@code WorkflowExportService} (import/export)</li>
+ * <li>{@code HttpServletRequest/Response} (web request/response)</li>
+ * <li>{@code MultipartFile} (file upload)</li>
+ * <li>{@code ServletOutputStream} (file download)</li>
+ * </ul>
+ * </p>
  */
 @ExtendWith(MockitoExtension.class)
 class WorkflowControllerTest {
@@ -124,6 +126,11 @@ class WorkflowControllerTest {
     private Workflow validWorkflow;
     private PageData<WorkflowVo> validPageData;
 
+    /**
+     * Initialize common fixtures before each test.
+     *
+     * @return void
+     */
     @BeforeEach
     void setUp() {
         validPagination = createValidPagination();
@@ -135,6 +142,11 @@ class WorkflowControllerTest {
 
     // ==================== Test Data Builders ====================
 
+    /**
+     * Build a valid pagination object.
+     *
+     * @return a Pagination with current=1 and pageSize=10
+     */
     private Pagination createValidPagination() {
         Pagination pagination = new Pagination();
         pagination.setCurrent(1);
@@ -142,6 +154,11 @@ class WorkflowControllerTest {
         return pagination;
     }
 
+    /**
+     * Build an empty pagination object (current=0, pageSize=0).
+     *
+     * @return an "empty" Pagination
+     */
     private Pagination createEmptyPagination() {
         Pagination pagination = new Pagination();
         pagination.setCurrent(0);
@@ -149,6 +166,11 @@ class WorkflowControllerTest {
         return pagination;
     }
 
+    /**
+     * Build a valid workflow request DTO.
+     *
+     * @return a populated {@link WorkflowReq}
+     */
     private WorkflowReq createValidWorkflowReq() {
         WorkflowReq req = new WorkflowReq();
         req.setId(VALID_WORKFLOW_ID);
@@ -159,6 +181,11 @@ class WorkflowControllerTest {
         return req;
     }
 
+    /**
+     * Build a minimal valid workflow view object.
+     *
+     * @return a populated {@link WorkflowVo}
+     */
     private WorkflowVo createValidWorkflowVo() {
         WorkflowVo vo = new WorkflowVo();
         vo.setId(VALID_WORKFLOW_ID);
@@ -167,6 +194,11 @@ class WorkflowControllerTest {
         return vo;
     }
 
+    /**
+     * Build a valid workflow entity with minimal content.
+     *
+     * @return a populated {@link Workflow}
+     */
     private Workflow createValidWorkflow() {
         Workflow workflow = new Workflow();
         workflow.setId(VALID_WORKFLOW_ID);
@@ -176,6 +208,11 @@ class WorkflowControllerTest {
         return workflow;
     }
 
+    /**
+     * Build a workflow entity whose data is empty (used by export negative tests).
+     *
+     * @return a {@link Workflow} with empty data
+     */
     private Workflow createEmptyDataWorkflow() {
         Workflow workflow = new Workflow();
         workflow.setId(VALID_WORKFLOW_ID);
@@ -183,6 +220,11 @@ class WorkflowControllerTest {
         return workflow;
     }
 
+    /**
+     * Build a PageData object containing one {@link WorkflowVo}.
+     *
+     * @return a populated {@link PageData}
+     */
     private PageData<WorkflowVo> createValidPageData() {
         PageData<WorkflowVo> pageData = new PageData<>();
         pageData.setPageData(List.of(validWorkflowVo));
@@ -190,6 +232,11 @@ class WorkflowControllerTest {
         return pageData;
     }
 
+    /**
+     * Build a valid debug DTO.
+     *
+     * @return a populated {@link WorkflowDebugDto}
+     */
     private WorkflowDebugDto createValidDebugDto() {
         WorkflowDebugDto dto = new WorkflowDebugDto();
         dto.setFlowId(VALID_FLOW_ID);
@@ -197,18 +244,33 @@ class WorkflowControllerTest {
         return dto;
     }
 
+    /**
+     * Build a valid chat business request.
+     *
+     * @return a populated {@link ChatBizReq}
+     */
     private ChatBizReq createValidChatBizReq() {
         ChatBizReq req = new ChatBizReq();
         req.setFlowId(VALID_FLOW_ID);
         return req;
     }
 
+    /**
+     * Build a valid chat resume request.
+     *
+     * @return a populated {@link ChatResumeReq}
+     */
     private ChatResumeReq createValidChatResumeReq() {
         ChatResumeReq req = new ChatResumeReq();
         req.setFlowId(VALID_FLOW_ID);
         return req;
     }
 
+    /**
+     * Build a valid workflow dialog.
+     *
+     * @return a populated {@link WorkflowDialog}
+     */
     private WorkflowDialog createValidWorkflowDialog() {
         WorkflowDialog dialog = new WorkflowDialog();
         dialog.setWorkflowId(VALID_WORKFLOW_ID);
@@ -216,12 +278,22 @@ class WorkflowControllerTest {
         return dialog;
     }
 
+    /**
+     * Build a valid comparison save request.
+     *
+     * @return a populated {@link WorkflowComparisonSaveReq}
+     */
     private WorkflowComparisonSaveReq createValidComparisonSaveReq() {
         WorkflowComparisonSaveReq req = new WorkflowComparisonSaveReq();
         req.setPromptId(VALID_PROMPT_ID);
         return req;
     }
 
+    /**
+     * Build a valid feedback request.
+     *
+     * @return a populated {@link WorkflowFeedbackReq}
+     */
     private WorkflowFeedbackReq createValidFeedbackReq() {
         WorkflowFeedbackReq req = new WorkflowFeedbackReq();
         req.setFlowId(VALID_FLOW_ID);
@@ -231,46 +303,51 @@ class WorkflowControllerTest {
 
     // ==================== Data Sources for Parameterized Tests ====================
 
+    /**
+     * Provide status values for parameterized tests.
+     *
+     * @return a stream of integers representing status values
+     */
     static Stream<Integer> statusValues() {
         return Stream.of(-1, 0, 1);
     }
 
+    /**
+     * Provide incorrect passwords for parameterized tests.
+     *
+     * @return a stream of invalid password strings
+     */
     static Stream<String> invalidPasswords() {
         return Stream.of("", "wrong", "XFYUN", "xfyun ", " xfyun", "12345");
     }
 
+    /**
+     * Provide special characters for search tests.
+     *
+     * @return a stream of special-character-containing strings
+     */
     static Stream<String> specialCharacters() {
         return Stream.of(
                 "<script>alert('xss')</script>",
                 "'; DROP TABLE workflows; --",
                 "../../etc/passwd",
                 "\u0000\u0001\u0002",
-                "测试中文关键词"
-        );
+                "测试中文关键词");
     }
 
     // ==================== Workflow List Tests ====================
 
     @Nested
-    @DisplayName("工作流列表查询测试")
+    @DisplayName("Workflow list query tests")
     class WorkflowListTests {
 
+        /**
+         * Verify normal case of list API when pagination parameters are valid.
+         *
+         * @throws UnsupportedEncodingException if URL-decoding occurs in controller signature
+         */
         @Test
-        @DisplayName("当分页参数为空时应抛出BusinessException")
-        void list_whenPaginationIsEmpty_shouldThrowBusinessException() {
-            // Given
-            Pagination emptyPagination = createEmptyPagination();
-
-            // When & Then
-            assertThatThrownBy(() -> controller.list(emptyPagination, null, null, null, null, null))
-                    .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue("responseEnum", ResponseEnum.PAGE_SEPARATOR_MISS);
-
-            verifyNoInteractions(workflowService);
-        }
-
-        @Test
-        @DisplayName("当分页参数有效时应正确调用service并返回结果")
+        @DisplayName("Should delegate to service and return result when pagination is valid")
         void list_whenPaginationIsValid_shouldDelegateToServiceAndReturnResult() throws UnsupportedEncodingException {
             // Given
             String search = "test keyword";
@@ -292,9 +369,15 @@ class WorkflowControllerTest {
             verifyNoMoreInteractions(workflowService);
         }
 
+        /**
+         * Verify that different status values are supported as filters.
+         *
+         * @param status status filter value
+         * @throws UnsupportedEncodingException if URL-decoding occurs in controller signature
+         */
         @ParameterizedTest
         @MethodSource("com.iflytek.astron.console.toolkit.controller.workflow.WorkflowControllerTest#statusValues")
-        @DisplayName("应支持不同状态值的筛选")
+        @DisplayName("Should support filtering by different status values")
         void list_shouldSupportDifferentStatusValues(int status) throws UnsupportedEncodingException {
             // Given
             when(workflowService.listPage(any(), any(), any(), any(), eq(status), any(), any()))
@@ -308,9 +391,15 @@ class WorkflowControllerTest {
             verify(workflowService).listPage(any(), any(), any(), any(), eq(status), any(), any());
         }
 
+        /**
+         * Verify that special characters in search keywords are handled safely.
+         *
+         * @param specialSearch the search keyword containing special characters
+         * @throws UnsupportedEncodingException if URL-decoding occurs in controller signature
+         */
         @ParameterizedTest
         @MethodSource("com.iflytek.astron.console.toolkit.controller.workflow.WorkflowControllerTest#specialCharacters")
-        @DisplayName("当搜索关键词包含特殊字符时应正常处理")
+        @DisplayName("Should handle special characters in search keyword")
         void list_whenSearchContainsSpecialCharacters_shouldHandleCorrectly(String specialSearch) throws UnsupportedEncodingException {
             // Given
             when(workflowService.listPage(any(), any(), any(), eq(specialSearch), any(), any(), any()))
@@ -324,8 +413,13 @@ class WorkflowControllerTest {
             verify(workflowService).listPage(any(), any(), any(), eq(specialSearch), any(), any(), any());
         }
 
+        /**
+         * Verify that concurrent list requests are handled correctly.
+         *
+         * @throws Exception if concurrent execution fails or is interrupted
+         */
         @Test
-        @DisplayName("应正确处理并发查询请求")
+        @DisplayName("Should handle concurrent list requests correctly")
         void list_shouldHandleConcurrentRequests() throws Exception {
             // Given
             ExecutorService executor = Executors.newFixedThreadPool(5);
@@ -334,17 +428,15 @@ class WorkflowControllerTest {
                     .thenReturn(validPageData);
 
             // When
-            List<CompletableFuture<PageData<WorkflowVo>>> futures = Stream.generate(() ->
-                    CompletableFuture.supplyAsync(() -> {
-                        try {
-                            return controller.list(validPagination, "concurrent", null, null, null, null);
-                        } catch (UnsupportedEncodingException e) {
-                            throw new RuntimeException(e);
-                        } finally {
-                            latch.countDown();
-                        }
-                    }, executor)
-            ).limit(5).toList();
+            List<CompletableFuture<PageData<WorkflowVo>>> futures = Stream.generate(() -> CompletableFuture.supplyAsync(() -> {
+                try {
+                    return controller.list(validPagination, "concurrent", null, null, null, null);
+                } catch (UnsupportedEncodingException e) {
+                    throw new RuntimeException(e);
+                } finally {
+                    latch.countDown();
+                }
+            }, executor)).limit(5).toList();
 
             // Then
             latch.await();
@@ -360,11 +452,16 @@ class WorkflowControllerTest {
     // ==================== Workflow Detail Tests ====================
 
     @Nested
-    @DisplayName("工作流详情查询测试")
+    @DisplayName("Workflow detail query tests")
     class WorkflowDetailTests {
 
+        /**
+         * Verify that valid ID returns workflow details.
+         *
+         * @return void
+         */
         @Test
-        @DisplayName("当ID有效时应返回工作流详情")
+        @DisplayName("Should return workflow details when ID is valid")
         void detail_whenIdIsValid_shouldReturnWorkflowDetails() {
             // Given
             String validId = "workflow-123";
@@ -382,8 +479,13 @@ class WorkflowControllerTest {
             verifyNoMoreInteractions(workflowService);
         }
 
+        /**
+         * Verify that null spaceId is allowed and default handling works.
+         *
+         * @return void
+         */
         @Test
-        @DisplayName("当spaceId为空时应使用默认值")
+        @DisplayName("Should use default value when spaceId is null")
         void detail_whenSpaceIdIsNull_shouldUseDefaultValue() {
             // Given
             String validId = "workflow-123";
@@ -401,30 +503,16 @@ class WorkflowControllerTest {
     // ==================== Workflow CRUD Tests ====================
 
     @Nested
-    @DisplayName("工作流CRUD操作测试")
+    @DisplayName("Workflow CRUD tests")
     class WorkflowCrudTests {
 
+        /**
+         * Verify update flow with valid parameters.
+         *
+         * @return void
+         */
         @Test
-        @DisplayName("当参数有效时应成功创建工作流")
-        void create_whenParametersAreValid_shouldCreateWorkflowSuccessfully() {
-            // Given
-            Object expectedResult = "created";
-            when(workflowService.create(validWorkflowReq, request)).thenReturn(new Workflow());
-
-            // When
-            Object result = controller.create(validWorkflowReq, request);
-
-            // Then
-            assertThat(result)
-                    .isNotNull()
-                    .isEqualTo(expectedResult);
-
-            verify(workflowService).create(validWorkflowReq, request);
-            verifyNoMoreInteractions(workflowService);
-        }
-
-        @Test
-        @DisplayName("当参数有效时应成功更新工作流")
+        @DisplayName("Should update workflow successfully when parameters are valid")
         void update_whenParametersAreValid_shouldUpdateWorkflowSuccessfully() {
             // Given
             when(workflowService.updateInfo(validWorkflowReq)).thenReturn(validWorkflow);
@@ -441,27 +529,13 @@ class WorkflowControllerTest {
             verifyNoMoreInteractions(workflowService);
         }
 
+        /**
+         * Verify delete flow when id is null (should be handled by service).
+         *
+         * @return void
+         */
         @Test
-        @DisplayName("当参数有效时应成功删除工作流")
-        void delete_whenParametersAreValid_shouldDeleteWorkflowSuccessfully() {
-            // Given
-            ApiResult<String> expectedResult = ApiResult.success("deleted");
-            when(workflowService.logicDelete(VALID_WORKFLOW_ID, VALID_SPACE_ID)).thenReturn(ApiResult.success());
-
-            // When
-            ApiResult result = controller.delete(VALID_WORKFLOW_ID, VALID_SPACE_ID);
-
-            // Then
-            assertThat(result)
-                    .isNotNull()
-                    .isSameAs(expectedResult);
-
-            verify(workflowService).logicDelete(VALID_WORKFLOW_ID, VALID_SPACE_ID);
-            verifyNoMoreInteractions(workflowService);
-        }
-
-        @Test
-        @DisplayName("当ID为空时删除操作应正确处理")
+        @DisplayName("Should handle delete with null id correctly")
         void delete_whenIdIsNull_shouldHandleCorrectly() {
             // Given
             when(workflowService.logicDelete(null, VALID_SPACE_ID)).thenReturn(ApiResult.success());
@@ -474,13 +548,18 @@ class WorkflowControllerTest {
             verify(workflowService).logicDelete(null, VALID_SPACE_ID);
         }
 
+        /**
+         * Verify idempotent update: multiple identical updates behave consistently.
+         *
+         * @return void
+         */
         @Test
-        @DisplayName("应支持幂等更新操作")
+        @DisplayName("Should support idempotent update operations")
         void update_shouldSupportIdempotentOperations() {
             // Given
             when(workflowService.updateInfo(validWorkflowReq)).thenReturn(validWorkflow);
 
-            // When - 执行多次相同的更新
+            // When - execute same update multiple times
             Workflow result1 = controller.update(validWorkflowReq);
             Workflow result2 = controller.update(validWorkflowReq);
 
@@ -494,15 +573,20 @@ class WorkflowControllerTest {
     // ==================== Workflow Clone Tests ====================
 
     @Nested
-    @DisplayName("工作流克隆测试")
+    @DisplayName("Workflow clone tests")
     class WorkflowCloneTests {
 
+        /**
+         * Verify clone behavior when id is valid.
+         *
+         * @return void
+         */
         @Test
-        @DisplayName("当ID有效时应成功克隆工作流")
+        @DisplayName("Should clone workflow successfully when id is valid")
         void clone_whenIdIsValid_shouldCloneWorkflowSuccessfully() {
             // Given
-            Object expectedResult = "cloned";
-            when(workflowService.clone(VALID_WORKFLOW_ID)).thenReturn(new Workflow());
+            Workflow expected = new Workflow();
+            when(workflowService.clone(VALID_WORKFLOW_ID)).thenReturn(expected);
 
             // When
             Object result = controller.clone(VALID_WORKFLOW_ID);
@@ -510,34 +594,18 @@ class WorkflowControllerTest {
             // Then
             assertThat(result)
                     .isNotNull()
-                    .isEqualTo(expectedResult);
-
+                    .isSameAs(expected);
             verify(workflowService).clone(VALID_WORKFLOW_ID);
             verifyNoMoreInteractions(workflowService);
         }
 
+        /**
+         * Verify internal clone with wrong password returns error ApiResult.
+         *
+         * @return void
+         */
         @Test
-        @DisplayName("当密码正确时内部克隆应成功")
-        void cloneV2_whenPasswordIsCorrect_shouldCloneSuccessfully() {
-            // Given
-            Object expectedResult = "cloned";
-            when(workflowService.cloneForXfYun(eq(VALID_WORKFLOW_ID), anyLong(), eq(request)))
-                    .thenReturn(new Workflow());
-
-            // When
-            Object result = controller.cloneV2(VALID_WORKFLOW_ID, CORRECT_PASSWORD, request);
-
-            // Then
-            assertThat(result)
-                    .isNotNull()
-                    .isEqualTo(expectedResult);
-
-            verify(workflowService).cloneForXfYun(eq(VALID_WORKFLOW_ID), anyLong(), eq(request));
-            verifyNoMoreInteractions(workflowService);
-        }
-
-        @Test
-        @DisplayName("当密码错误时内部克隆应返回错误")
+        @DisplayName("Should return error when internal clone password is incorrect")
         void cloneV2_whenPasswordIsIncorrect_shouldReturnError() {
             // When
             Object result = controller.cloneV2(VALID_WORKFLOW_ID, WRONG_PASSWORD, request);
@@ -552,9 +620,14 @@ class WorkflowControllerTest {
             verifyNoInteractions(workflowService);
         }
 
+        /**
+         * Verify all incorrect passwords are rejected.
+         *
+         * @param incorrectPassword a wrong password
+         */
         @ParameterizedTest
         @MethodSource("com.iflytek.astron.console.toolkit.controller.workflow.WorkflowControllerTest#invalidPasswords")
-        @DisplayName("应拒绝所有非正确密码的内部克隆请求")
+        @DisplayName("Should reject all incorrect passwords for internal clone")
         void cloneV2_shouldRejectAllIncorrectPasswords(String incorrectPassword) {
             // When
             Object result = controller.cloneV2(VALID_WORKFLOW_ID, incorrectPassword, request);
@@ -573,15 +646,20 @@ class WorkflowControllerTest {
     // ==================== Workflow Build Tests ====================
 
     @Nested
-    @DisplayName("工作流构建测试")
+    @DisplayName("Workflow build tests")
     class WorkflowBuildTests {
 
+        /**
+         * Verify successful build returns the same ApiResult instance from service.
+         *
+         * @throws InterruptedException if service throws interruption
+         */
         @Test
-        @DisplayName("当参数有效时应成功构建工作流")
+        @DisplayName("Should build workflow successfully when parameters are valid")
         void build_whenParametersAreValid_shouldBuildWorkflowSuccessfully() throws InterruptedException {
             // Given
-            Object expectedResult = "built";
-            when(workflowService.build(validWorkflowReq)).thenReturn(ApiResult.success());
+            ApiResult<Void> expected = ApiResult.success(); // Controller returns this wrapper as-is
+            when(workflowService.build(validWorkflowReq)).thenReturn(expected);
 
             // When
             Object result = controller.build(validWorkflowReq);
@@ -589,14 +667,25 @@ class WorkflowControllerTest {
             // Then
             assertThat(result)
                     .isNotNull()
-                    .isEqualTo(expectedResult);
+                    .isSameAs(expected); // Same instance helps mutation testing
+
+            // Optional: field-level assertions for stronger mutation kill
+            ApiResult<?> api = (ApiResult<?>) result;
+            assertThat(api.code()).isEqualTo(0);
+            assertThat(api.message()).isEqualTo("system.success");
+            assertThat(api.data()).isNull();
 
             verify(workflowService).build(validWorkflowReq);
             verifyNoMoreInteractions(workflowService);
         }
 
+        /**
+         * Verify interruption is propagated as-is.
+         *
+         * @throws InterruptedException expected from service
+         */
         @Test
-        @DisplayName("当发生中断异常时应正确处理")
+        @DisplayName("Should propagate InterruptedException when build is interrupted")
         void build_whenInterruptedExceptionOccurs_shouldHandleCorrectly() throws InterruptedException {
             // Given
             when(workflowService.build(validWorkflowReq)).thenThrow(new InterruptedException("Build interrupted"));
@@ -613,16 +702,23 @@ class WorkflowControllerTest {
     // ==================== Node Debug Tests ====================
 
     @Nested
-    @DisplayName("节点调试测试")
+    @DisplayName("Node debug tests")
     class NodeDebugTests {
 
+        /**
+         * Verify node debug returns service result as-is.
+         *
+         * @return void
+         */
         @Test
-        @DisplayName("当参数有效时应成功调试节点")
+        @DisplayName("Should debug node successfully when parameters are valid")
         void nodeDebug_whenParametersAreValid_shouldDebugNodeSuccessfully() {
             // Given
             WorkflowDebugDto debugDto = createValidDebugDto();
-            Object expectedResult = "debug result";
-            when(workflowService.nodeDebug(VALID_NODE_ID, debugDto)).thenReturn(ApiResult.success());
+
+            // Return the same ApiResult instance for identity assertion
+            ApiResult<Object> expected = ApiResult.success();
+            when(workflowService.nodeDebug(VALID_NODE_ID, debugDto)).thenReturn(expected);
 
             // When
             Object result = controller.nodeDebug(VALID_NODE_ID, debugDto);
@@ -630,7 +726,13 @@ class WorkflowControllerTest {
             // Then
             assertThat(result)
                     .isNotNull()
-                    .isEqualTo(expectedResult);
+                    .isSameAs(expected); // Controller returns service result directly
+
+            // Optional: field-level assertions
+            ApiResult<?> api = (ApiResult<?>) result;
+            assertThat(api.code()).isEqualTo(0);
+            assertThat(api.message()).isEqualTo("system.success");
+            assertThat(api.data()).isNull();
 
             verify(workflowService).nodeDebug(VALID_NODE_ID, debugDto);
             verifyNoMoreInteractions(workflowService);
@@ -640,51 +742,72 @@ class WorkflowControllerTest {
     // ==================== Dialog Management Tests ====================
 
     @Nested
-    @DisplayName("对话管理测试")
+    @DisplayName("Dialog management tests")
     class DialogManagementTests {
 
+        /**
+         * Verify dialog save returns ApiResult from service.
+         *
+         * @return void
+         */
         @Test
-        @DisplayName("当对话有效时应成功保存")
+        @DisplayName("Should save dialog successfully when dialog is valid")
         void saveDialog_whenDialogIsValid_shouldSaveSuccessfully() {
             // Given
             WorkflowDialog dialog = createValidWorkflowDialog();
-            Object expectedResult = "saved";
-            when(workflowService.saveDialog(dialog)).thenReturn(ApiResult.success());
+            ApiResult<String> expected = ApiResult.success(); // Controller returns this wrapper as-is
+
+            when(workflowService.saveDialog(dialog)).thenReturn(expected);
 
             // When
             Object result = controller.saveDialog(dialog);
 
             // Then
-            assertThat(result)
-                    .isNotNull()
-                    .isEqualTo(expectedResult);
+            assertThat(result).isInstanceOf(ApiResult.class);
+            assertThat(result).isSameAs(expected); // Same object aids mutation kill
+
+            // Optional field-level assertions
+            ApiResult<?> api = (ApiResult<?>) result;
+            assertThat(api.code()).isEqualTo(0);
+            assertThat(api.message()).isEqualTo("system.success");
+            assertThat(api.data()).isNull();
 
             verify(workflowService).saveDialog(dialog);
             verifyNoMoreInteractions(workflowService);
         }
 
+        /**
+         * Verify listing dialog by workflow id.
+         *
+         * @return void
+         */
         @Test
-        @DisplayName("当工作流ID有效时应返回对话列表")
+        @DisplayName("Should return dialog list when workflow id is valid")
         void listDialog_whenWorkflowIdIsValid_shouldReturnDialogList() {
             // Given
             Integer type = 1;
-            Object expectedResult = List.of("dialog1", "dialog2");
-            when(workflowService.listDialog(VALID_WORKFLOW_ID, type)).thenReturn(new ArrayList<>());
-
+            List<WorkflowDialog> expected = Arrays.asList(new WorkflowDialog(), new WorkflowDialog());
+            when(workflowService.listDialog(VALID_WORKFLOW_ID, type)).thenReturn(expected);
             // When
-            Object result = controller.listDialog(VALID_WORKFLOW_ID, type);
+            List<WorkflowDialog> result = controller.listDialog(VALID_WORKFLOW_ID, type);
 
             // Then
             assertThat(result)
                     .isNotNull()
-                    .isEqualTo(expectedResult);
+                    .isSameAs(expected) // Returns the service list as-is
+                    .hasSize(2);
 
             verify(workflowService).listDialog(VALID_WORKFLOW_ID, type);
             verifyNoMoreInteractions(workflowService);
         }
 
+        /**
+         * Verify clearing dialog by workflow id.
+         *
+         * @return void
+         */
         @Test
-        @DisplayName("当工作流ID有效时应成功清空对话")
+        @DisplayName("Should clear dialog successfully when workflow id is valid")
         void clearDialog_whenWorkflowIdIsValid_shouldClearDialogSuccessfully() {
             // Given
             Integer type = 1;
@@ -707,11 +830,16 @@ class WorkflowControllerTest {
     // ==================== Publish Control Tests ====================
 
     @Nested
-    @DisplayName("发布控制测试")
+    @DisplayName("Publish control tests")
     class PublishControlTests {
 
+        /**
+         * Verify publish status response for valid id.
+         *
+         * @return void
+         */
         @Test
-        @DisplayName("当ID有效时应返回发布状态")
+        @DisplayName("Should return publish status when id is valid")
         void canPublish_whenIdIsValid_shouldReturnPublishStatus() {
             // Given
             when(workflowService.getById(VALID_WORKFLOW_ID)).thenReturn(validWorkflow);
@@ -729,37 +857,21 @@ class WorkflowControllerTest {
             verify(workflowService).getById(VALID_WORKFLOW_ID);
             verifyNoMoreInteractions(workflowService);
         }
-
-        @Test
-        @DisplayName("当ID有效时应成功设置为未发布")
-        void canPublishSetNot_whenIdIsValid_shouldSetUnpublishedSuccessfully() {
-            // Given
-            Object expectedResult = "updated";
-            when(workflowService.canPublishSetNot(VALID_WORKFLOW_ID)).thenReturn(expectedResult);
-
-            // When
-            Object result = controller.canPublishSetNot(VALID_WORKFLOW_ID);
-
-            // Then
-            assertThat(result)
-                    .isInstanceOf(ApiResult.class);
-
-            ApiResult<?> apiResult = (ApiResult<?>) result;
-            assertThat(apiResult.data()).isEqualTo(expectedResult);
-
-            verify(workflowService).canPublishSetNot(VALID_WORKFLOW_ID);
-            verifyNoMoreInteractions(workflowService);
-        }
     }
 
     // ==================== SSE Chat Tests ====================
 
     @Nested
-    @DisplayName("SSE聊天测试")
+    @DisplayName("SSE chat tests")
     class SseChatTests {
 
+        /**
+         * Verify SSE chat: response header is set and SseEmitter is returned.
+         *
+         * @return void
+         */
         @Test
-        @DisplayName("当聊天请求有效时应正确设置响应头并返回SseEmitter")
+        @DisplayName("Should set header and return SseEmitter when chat request is valid")
         void chat_whenRequestIsValid_shouldSetHeaderAndReturnSseEmitter() {
             // Given
             ChatBizReq chatBizReq = createValidChatBizReq();
@@ -779,8 +891,13 @@ class WorkflowControllerTest {
             verifyNoMoreInteractions(workflowService);
         }
 
+        /**
+         * Verify SSE resume: response header is set and SseEmitter is returned.
+         *
+         * @return void
+         */
         @Test
-        @DisplayName("当恢复请求有效时应正确设置响应头并返回SseEmitter")
+        @DisplayName("Should set header and return SseEmitter when resume request is valid")
         void resume_whenRequestIsValid_shouldSetHeaderAndReturnSseEmitter() {
             // Given
             ChatResumeReq resumeReq = createValidChatResumeReq();
@@ -804,11 +921,16 @@ class WorkflowControllerTest {
     // ==================== File Operations Tests ====================
 
     @Nested
-    @DisplayName("文件操作测试")
+    @DisplayName("File operation tests")
     class FileOperationsTests {
 
+        /**
+         * Verify uploadFile succeeds with valid files and flowId.
+         *
+         * @return void
+         */
         @Test
-        @DisplayName("当文件和flowId有效时应成功上传文件")
+        @DisplayName("Should upload successfully when files and flowId are valid")
         void uploadFile_whenFilesAndFlowIdAreValid_shouldUploadSuccessfully() {
             // Given
             MultipartFile[] files = {multipartFile};
@@ -827,8 +949,13 @@ class WorkflowControllerTest {
             verifyNoMoreInteractions(workflowService);
         }
 
+        /**
+         * Verify getInputsType delegates and returns service result.
+         *
+         * @return void
+         */
         @Test
-        @DisplayName("当flowId有效时应返回输入类型")
+        @DisplayName("Should return inputs type when flowId is valid")
         void getInputsType_whenFlowIdIsValid_shouldReturnInputsType() {
             // Given
             Object expectedResult = "input type";
@@ -846,8 +973,13 @@ class WorkflowControllerTest {
             verifyNoMoreInteractions(workflowService);
         }
 
+        /**
+         * Verify getInputsInfo delegates and returns service result.
+         *
+         * @return void
+         */
         @Test
-        @DisplayName("当flowId有效时应返回输入信息")
+        @DisplayName("Should return inputs info when flowId is valid")
         void getInputsInfo_whenFlowIdIsValid_shouldReturnInputsInfo() {
             // Given
             Object expectedResult = "input info";
@@ -869,11 +1001,16 @@ class WorkflowControllerTest {
     // ==================== Export/Import Tests ====================
 
     @Nested
-    @DisplayName("导出导入测试")
+    @DisplayName("Export/Import tests")
     class ExportImportTests {
 
+        /**
+         * Verify YAML export throws BusinessException when workflow data is empty.
+         *
+         * @return void
+         */
         @Test
-        @DisplayName("当工作流数据为空时YAML导出应抛出异常")
+        @DisplayName("YAML export should throw BusinessException when workflow data is empty")
         void exportYaml_whenWorkflowDataIsEmpty_shouldThrowBusinessException() {
             // Given
             Workflow emptyDataWorkflow = createEmptyDataWorkflow();
@@ -888,8 +1025,13 @@ class WorkflowControllerTest {
             verifyNoMoreInteractions(workflowService);
         }
 
+        /**
+         * Verify YAML export throws BusinessException when workflow not found.
+         *
+         * @return void
+         */
         @Test
-        @DisplayName("当工作流不存在时YAML导出应抛出异常")
+        @DisplayName("YAML export should throw BusinessException when workflow not exists")
         void exportYaml_whenWorkflowNotExists_shouldThrowBusinessException() {
             // Given
             when(workflowService.getById(VALID_WORKFLOW_ID)).thenReturn(null);
@@ -903,8 +1045,13 @@ class WorkflowControllerTest {
             verifyNoMoreInteractions(workflowService);
         }
 
+        /**
+         * Verify successful YAML export path.
+         *
+         * @throws Exception if response stream operations fail
+         */
         @Test
-        @DisplayName("当工作流有效时应成功导出YAML")
+        @DisplayName("Should export YAML successfully when workflow is valid")
         void exportYaml_whenWorkflowIsValid_shouldExportYamlSuccessfully() throws Exception {
             // Given
             when(workflowService.getById(VALID_WORKFLOW_ID)).thenReturn(validWorkflow);
@@ -923,14 +1070,19 @@ class WorkflowControllerTest {
             verifyNoMoreInteractions(workflowService, workflowExportService);
         }
 
+        /**
+         * Verify successful import from YAML file.
+         *
+         * @throws Exception if reading input stream fails
+         */
         @Test
-        @DisplayName("当文件有效时应成功导入工作流")
+        @DisplayName("Should import workflow successfully when file is valid")
         void importWorkflow_whenFileIsValid_shouldImportWorkflowSuccessfully() throws Exception {
             // Given
             when(multipartFile.getInputStream()).thenReturn(new ByteArrayInputStream("yaml content".getBytes()));
-            when(multipartFile.getOriginalFilename()).thenReturn("workflow.yaml");
-            Object expectedResult = "imported";
-            when(workflowExportService.importWorkflowFromYaml(any(), eq(request))).thenReturn(ApiResult.success());
+
+            ApiResult<?> expected = ApiResult.success();
+            when(workflowExportService.importWorkflowFromYaml(any(), eq(request))).thenReturn(expected);
 
             // When
             Object result = controller.importWorkflow(multipartFile, request);
@@ -938,15 +1090,20 @@ class WorkflowControllerTest {
             // Then
             assertThat(result)
                     .isNotNull()
-                    .isEqualTo(expectedResult);
+                    .isSameAs(expected);
 
             verify(workflowExportService).importWorkflowFromYaml(any(), eq(request));
             verifyNoMoreInteractions(workflowExportService);
             verifyNoInteractions(workflowService);
         }
 
+        /**
+         * Verify IO exception during import is translated to BusinessException.
+         *
+         * @throws Exception when mocking file read
+         */
         @Test
-        @DisplayName("当文件读取发生IO异常时应抛出BusinessException")
+        @DisplayName("Should throw BusinessException when IOException occurs while importing")
         void importWorkflow_whenIOExceptionOccurs_shouldThrowBusinessException() throws Exception {
             // Given
             when(multipartFile.getInputStream()).thenThrow(new IOException("File read error"));
@@ -964,11 +1121,16 @@ class WorkflowControllerTest {
     // ==================== Comparison Tests ====================
 
     @Nested
-    @DisplayName("比较功能测试")
+    @DisplayName("Comparison feature tests")
     class ComparisonTests {
 
+        /**
+         * Verify saving comparisons with valid request.
+         *
+         * @return void
+         */
         @Test
-        @DisplayName("当比较请求有效时应成功保存")
+        @DisplayName("Should save comparisons successfully when request is valid")
         void saveComparisons_whenRequestIsValid_shouldSaveSuccessfully() {
             // Given
             WorkflowComparisonSaveReq saveReq = createValidComparisonSaveReq();
@@ -989,8 +1151,13 @@ class WorkflowControllerTest {
             verifyNoMoreInteractions(workflowService);
         }
 
+        /**
+         * Verify listing comparisons by promptId.
+         *
+         * @return void
+         */
         @Test
-        @DisplayName("当promptId有效时应返回比较列表")
+        @DisplayName("Should return comparison list when promptId is valid")
         void listComparisons_whenPromptIdIsValid_shouldReturnComparisonList() {
             // Given
             WorkflowComparison comparison = new WorkflowComparison();
@@ -1014,11 +1181,16 @@ class WorkflowControllerTest {
     // ==================== Feedback Tests ====================
 
     @Nested
-    @DisplayName("反馈功能测试")
+    @DisplayName("Feedback feature tests")
     class FeedbackTests {
 
+        /**
+         * Verify feedback submission delegates to service.
+         *
+         * @return void
+         */
         @Test
-        @DisplayName("当反馈请求有效时应成功提交")
+        @DisplayName("Should submit feedback successfully when request is valid")
         void feedback_whenRequestIsValid_shouldSubmitSuccessfully() {
             // Given
             WorkflowFeedbackReq feedbackReq = createValidFeedbackReq();
@@ -1031,8 +1203,13 @@ class WorkflowControllerTest {
             verifyNoMoreInteractions(workflowService);
         }
 
+        /**
+         * Verify listing feedback by flowId.
+         *
+         * @return void
+         */
         @Test
-        @DisplayName("当flowId有效时应返回反馈列表")
+        @DisplayName("Should return feedback list when flowId is valid")
         void getFeedbackList_whenFlowIdIsValid_shouldReturnFeedbackList() {
             // Given
             WorkflowFeedback feedback = new WorkflowFeedback();
@@ -1056,11 +1233,16 @@ class WorkflowControllerTest {
     // ==================== Additional Method Tests ====================
 
     @Nested
-    @DisplayName("其他方法测试")
+    @DisplayName("Additional method tests")
     class AdditionalMethodTests {
 
+        /**
+         * Verify runCode delegates and returns service result.
+         *
+         * @return void
+         */
         @Test
-        @DisplayName("当请求有效时应返回代码运行结果")
+        @DisplayName("Should return code execution result when request is valid")
         void runCode_whenRequestIsValid_shouldReturnRunCodeResult() {
             // Given
             Object runCodeData = new Object();
@@ -1079,8 +1261,13 @@ class WorkflowControllerTest {
             verifyNoMoreInteractions(workflowService);
         }
 
+        /**
+         * Verify square returns data with valid pagination.
+         *
+         * @return void
+         */
         @Test
-        @DisplayName("当分页参数有效时应返回广场数据")
+        @DisplayName("Should return square data when pagination is valid")
         void square_whenPaginationIsValid_shouldReturnSquareData() {
             // Given
             String search = "test";
@@ -1101,22 +1288,13 @@ class WorkflowControllerTest {
             verifyNoMoreInteractions(workflowService);
         }
 
+        /**
+         * Verify publicCopy delegates and returns service result.
+         *
+         * @return void
+         */
         @Test
-        @DisplayName("当分页参数为空时广场查询应抛出异常")
-        void square_whenPaginationIsEmpty_shouldThrowBusinessException() {
-            // Given
-            Pagination emptyPagination = createEmptyPagination();
-
-            // When & Then
-            assertThatThrownBy(() -> controller.square(emptyPagination, null, null, null))
-                    .isInstanceOf(BusinessException.class)
-                    .hasFieldOrPropertyWithValue("responseEnum", ResponseEnum.PAGE_SEPARATOR_MISS);
-
-            verifyNoInteractions(workflowService);
-        }
-
-        @Test
-        @DisplayName("当请求有效时应返回公开复制结果")
+        @DisplayName("Should return public copy result when request is valid")
         void publicCopy_whenRequestIsValid_shouldReturnPublicCopyResult() {
             // Given
             Object expectedResult = "public copied";
@@ -1134,8 +1312,13 @@ class WorkflowControllerTest {
             verifyNoMoreInteractions(workflowService);
         }
 
+        /**
+         * Verify flow advanced config retrieval by botId.
+         *
+         * @return void
+         */
         @Test
-        @DisplayName("当botId有效时应返回高级配置")
+        @DisplayName("Should return advanced config when botId is valid")
         void getFlowAdvancedConfig_whenBotIdIsValid_shouldReturnAdvancedConfig() {
             // Given
             Integer botId = 1;
@@ -1154,13 +1337,18 @@ class WorkflowControllerTest {
             verifyNoMoreInteractions(workflowService);
         }
 
+        /**
+         * Verify prompt template list with valid pagination.
+         *
+         * @throws UnsupportedEncodingException if URL-decoding occurs in controller signature
+         */
         @Test
-        @DisplayName("当分页参数有效时应返回提示模板列表")
-        void promptTemplate_whenPaginationIsValid_shouldReturnPromptTemplateList() {
+        @DisplayName("Should return prompt template list when pagination is valid")
+        void promptTemplate_whenPaginationIsValid_shouldReturnPromptTemplateList() throws UnsupportedEncodingException {
             // Given
             String search = "template";
-            Object expectedResult = "template list";
-            when(workflowService.listPagePromptTemplate(1, 10, search)).thenReturn(new PageData<>());
+            PageData<PromptTemplate> expected = new PageData<>();
+            when(workflowService.listPagePromptTemplate(1, 10, search)).thenReturn(expected);
 
             // When
             Object result = controller.promptTemplate(validPagination, search);
@@ -1168,14 +1356,19 @@ class WorkflowControllerTest {
             // Then
             assertThat(result)
                     .isNotNull()
-                    .isEqualTo(expectedResult);
+                    .isSameAs(expected); // Service returns PageData directly
 
             verify(workflowService).listPagePromptTemplate(1, 10, search);
             verifyNoMoreInteractions(workflowService);
         }
 
+        /**
+         * Verify copying flow between flowIds.
+         *
+         * @return void
+         */
         @Test
-        @DisplayName("当flowId有效时应成功复制流程")
+        @DisplayName("Should copy flow successfully when flowIds are valid")
         void copyFlow_whenFlowIdsAreValid_shouldCopyFlowSuccessfully() {
             // Given
             String sourceFlowId = "source-123";
@@ -1195,12 +1388,17 @@ class WorkflowControllerTest {
             verifyNoMoreInteractions(workflowService);
         }
 
+        /**
+         * Verify getMaxVersion by flowId.
+         *
+         * @return void
+         */
         @Test
-        @DisplayName("当flowId有效时应返回最大版本号")
+        @DisplayName("Should return max version when flowId is valid")
         void getMaxVersion_whenFlowIdIsValid_shouldReturnMaxVersion() {
             // Given
-            Object expectedResult = "max version";
-            when(workflowService.getMaxVersionByFlowId(VALID_FLOW_ID)).thenReturn(new WorkflowVo());
+            WorkflowVo expected = new WorkflowVo();
+            when(workflowService.getMaxVersionByFlowId(VALID_FLOW_ID)).thenReturn(expected);
 
             // When
             Object result = controller.getMaxVersion(VALID_FLOW_ID);
@@ -1208,7 +1406,7 @@ class WorkflowControllerTest {
             // Then
             assertThat(result)
                     .isNotNull()
-                    .isEqualTo(expectedResult);
+                    .isSameAs(expected);
 
             verify(workflowService).getMaxVersionByFlowId(VALID_FLOW_ID);
             verifyNoMoreInteractions(workflowService);

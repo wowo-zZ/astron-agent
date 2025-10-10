@@ -205,7 +205,7 @@ public class WorkflowController {
     }
 
     @GetMapping("/dialog/list")
-    public Object listDialog(@RequestParam @NotNull Long workflowId, @RequestParam(required = false) Integer type) {
+    public List<WorkflowDialog> listDialog(@RequestParam @NotNull Long workflowId, @RequestParam(required = false) Integer type) {
         return workflowService.listDialog(workflowId, type);
     }
 

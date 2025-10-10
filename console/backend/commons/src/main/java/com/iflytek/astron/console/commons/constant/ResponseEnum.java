@@ -262,6 +262,7 @@ public enum ResponseEnum {
     FAILED_MCP_GET_DETAIL(8325, "toolbox.mcp.get.detail.failed"),
     FAILED_AUTH(8326, "toolbox.auth.failed"),
     FAILED_GENERATE_SERVER_URL(8327, "toolbox.generate.server.url.failed"),
+    RPA_IS_USAGE(8328, "rpa.is.usage"),
 
     // Database 8500 - 8700
     DATABASE_NAME_NOT_EMPTY(8500, "database.name.not.empty"),
