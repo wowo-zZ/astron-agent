@@ -19,7 +19,7 @@ public interface ChatHistoryService {
      * @param chatId Chat ID
      * @return Message list
      */
-    List<SparkChatRequest.MessageDto> getSystemBotHistory(String uid, Long chatId);
+    List<SparkChatRequest.MessageDto> getSystemBotHistory(String uid, Long chatId, Boolean supportDocument);
 
     /**
      * Get chat history records

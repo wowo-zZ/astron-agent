@@ -244,8 +244,8 @@ class TestBaseLLMModel:
         # verify span records error information
         assert mock_span.add_info_events.call_count >= 3
 
-        # verify error handler is called
-        mock_error_handler.assert_called_once_with("-1", "Invalid value")
+        # verify error handler is called with error type prefix
+        mock_error_handler.assert_called_once_with("-1", "ValueError: Invalid value")
 
     @pytest.mark.asyncio
     @patch("domain.models.base.BaseLLMModel.create_completion", new_callable=AsyncMock)

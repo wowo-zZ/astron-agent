@@ -74,6 +74,7 @@ export interface RpaDetailInfo {
   userName?: string;
   remarks?: string;
   platform?: string;
+  updateTime: string;
 }
 
 export interface RpaDetailFormInfo {

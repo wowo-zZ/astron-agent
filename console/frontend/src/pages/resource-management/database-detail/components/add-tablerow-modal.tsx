@@ -63,7 +63,7 @@ const generateFieldValidationRules = (field: TableField): Rule[] => {
     {
       required: field.isRequired,
       message: i18n.t('database.fieldCannotBeEmpty', {
-        field: field.description,
+        field: field.name,
       }),
     },
   ];

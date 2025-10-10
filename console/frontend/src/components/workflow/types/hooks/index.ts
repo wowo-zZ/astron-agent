@@ -46,6 +46,7 @@ export interface UseNodeInfoReturn {
   isAgentNode: boolean;
   isStartOrEndNode: boolean;
   isCodeNode: boolean;
+  isDataBaseNode: boolean;
   showInputs: boolean;
   showOutputs: boolean;
   showExceptionFlow: boolean;
@@ -242,7 +243,7 @@ export interface UseNodeCommonReturn {
   isIteratorChildNode: boolean;
   isAgentNode: boolean;
   isStartOrEndNode: boolean;
-  isRpaNode: boolean;
+  isRpaNode?: boolean;
   isCodeNode: boolean;
   showInputs: boolean;
   showOutputs: boolean;

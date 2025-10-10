@@ -293,7 +293,6 @@ export function MCPDetail({
         }));
         setCurrentMcp(data);
         if (data?.mcpType !== 'flow') {
-          // handleAddEnvKey(data);
         }
       });
     }

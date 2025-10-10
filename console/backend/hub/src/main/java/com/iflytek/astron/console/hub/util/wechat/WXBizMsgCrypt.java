@@ -12,10 +12,12 @@ import java.util.Arrays;
 import java.util.Random;
 
 /**
- * Provides interfaces for receiving and pushing encrypted/decrypted messages to/from WeChat platform (UTF8 encoded strings).
+ * Provides interfaces for receiving and pushing encrypted/decrypted messages to/from WeChat
+ * platform (UTF8 encoded strings).
  * <ol>
- * 	<li>Third-party replies encrypted messages to WeChat platform</li>
- * 	<li>Third-party receives messages from WeChat platform, verifies message security, and decrypts messages.</li>
+ * <li>Third-party replies encrypted messages to WeChat platform</li>
+ * <li>Third-party receives messages from WeChat platform, verifies message security, and decrypts
+ * messages.</li>
  * </ol>
  */
 public class WXBizMsgCrypt {
@@ -28,10 +30,11 @@ public class WXBizMsgCrypt {
     /**
      * Constructor
      *
-     * @param token          Token set by developer on WeChat platform
+     * @param token Token set by developer on WeChat platform
      * @param encodingAesKey EncodingAESKey set by developer on WeChat platform
-     * @param appId          WeChat platform appid
-     * @throws AesException Execution failed, please check the error code and specific error message of this exception
+     * @param appId WeChat platform appid
+     * @throws AesException Execution failed, please check the error code and specific error message of
+     *         this exception
      */
     public WXBizMsgCrypt(String token, String encodingAesKey, String appId) throws AesException {
         if (encodingAesKey.length() != 43) {
@@ -160,7 +163,7 @@ public class WXBizMsgCrypt {
 
             xmlContent = new String(Arrays.copyOfRange(bytes, 20, 20 + xmlLength), CHARSET);
             from_appid = new String(Arrays.copyOfRange(bytes, 20 + xmlLength, bytes.length),
-                CHARSET);
+                    CHARSET);
         } catch (Exception e) {
             e.printStackTrace();
             throw new AesException(AesException.IllegalBuffer);
@@ -176,15 +179,17 @@ public class WXBizMsgCrypt {
 
     /**
      * Verify URL
+     *
      * @param msgSignature Signature string
      * @param timeStamp Timestamp
      * @param nonce Random number
      * @param echoStr Random string
      * @return Decrypted echostr
-     * @throws AesException Execution failed, please check the error code and specific error message of this exception
+     * @throws AesException Execution failed, please check the error code and specific error message of
+     *         this exception
      */
     public String verifyUrl(String msgSignature, String timeStamp, String nonce, String echoStr)
-        throws AesException {
+            throws AesException {
         String signature = getSHA1(token, timeStamp, nonce, echoStr);
 
         if (!signature.equals(msgSignature)) {
@@ -197,18 +202,20 @@ public class WXBizMsgCrypt {
 
     /**
      * Decrypt message
+     *
      * @param msgSignature Signature string
      * @param timeStamp Timestamp
      * @param nonce Random number
      * @param postData Encrypted XML
      * @return Decrypted XML
-     * @throws AesException Execution failed, please check the error code and specific error message of this exception
+     * @throws AesException Execution failed, please check the error code and specific error message of
+     *         this exception
      */
     public String decryptMsg(String msgSignature, String timeStamp, String nonce, String postData)
-        throws AesException {
+            throws AesException {
 
         // Extract encrypted message
-        Object[] encrypt = XMLParse.extract(postData, new String[]{"Encrypt"}).values().toArray();
+        Object[] encrypt = XMLParse.extract(postData, new String[] {"Encrypt"}).values().toArray();
 
         String signature = getSHA1(token, timeStamp, nonce, encrypt[0].toString());
 
@@ -224,11 +231,13 @@ public class WXBizMsgCrypt {
 
     /**
      * Encrypt message
+     *
      * @param replyMsg Message to be encrypted
      * @param timeStamp Timestamp
      * @param nonce Random string
      * @return Encrypted XML
-     * @throws AesException Execution failed, please check the error code and specific error message of this exception
+     * @throws AesException Execution failed, please check the error code and specific error message of
+     *         this exception
      */
     public String encryptMsg(String replyMsg, String timeStamp, String nonce) throws AesException {
         // Encrypt
@@ -247,7 +256,7 @@ public class WXBizMsgCrypt {
      */
     public String getSHA1(String token, String timestamp, String nonce, String encrypt) throws AesException {
         try {
-            String[] array = new String[] { token, timestamp, nonce, encrypt };
+            String[] array = new String[] {token, timestamp, nonce, encrypt};
             StringBuilder sb = new StringBuilder();
             // String sorting
             Arrays.sort(array);
@@ -309,6 +318,7 @@ public class WXBizMsgCrypt {
 
         /**
          * Get padding array
+         *
          * @param count Number of bytes to pad
          * @return Padding array
          */
@@ -329,6 +339,7 @@ public class WXBizMsgCrypt {
 
         /**
          * Remove padding characters
+         *
          * @param decrypted Decrypted byte array
          * @return Byte array after removing padding
          */
@@ -342,6 +353,7 @@ public class WXBizMsgCrypt {
 
         /**
          * Convert number to character
+         *
          * @param a Number to convert
          * @return Character
          */

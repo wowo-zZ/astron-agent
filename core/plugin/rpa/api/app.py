@@ -3,6 +3,7 @@ This module defines the main entry point of the FastAPI application and includes
 environment variable loading, configuration checking, logging setup, and Uvicorn
 server startup logic."""
 
+import functools
 import os
 
 import uvicorn
@@ -14,6 +15,8 @@ from plugin.rpa.consts import const
 from plugin.rpa.exceptions.config_exceptions import EnvNotFoundException
 from plugin.rpa.utils.log.logger import set_log
 
+print = functools.partial(print, flush=True)
+
 
 class RPAServer:
     """Main class for RPA service.
@@ -24,6 +27,7 @@ class RPAServer:
 
     def start(self) -> None:
         """Start the RPA service."""
+        self.load_polaris()
         self.setup_server()
         self.check_env()
         self.set_config()
@@ -55,7 +59,7 @@ class RPAServer:
         base_url = os.getenv("POLARIS_URL")
         project_name = os.getenv("PROJECT_NAME", "hy-spark-agent-builder")
         cluster_group = os.getenv("POLARIS_CLUSTER", "")
-        service_name = os.getenv("SERVICE_NAME", "rpa-server")
+        service_name = os.getenv("SERVICE_NAME", "rpa")
         version = os.getenv("VERSION", "1.0.0")
         config_file = os.getenv("CONFIG_FILE", "config.env")
         config_filter = ConfigFilter(
@@ -110,6 +114,10 @@ class RPAServer:
             raise EnvNotFoundException(str(missing_keys))
 
         print("\033[94mAll required environment variables are set.\033[0m")
+        max_key_length = max(len(key) for key in required_keys)
+        for key in required_keys:
+            value = os.getenv(key, "")
+            print(f"\033[94m{key.ljust(max_key_length)} = {value}\033[0m")
 
     @staticmethod
     def set_config() -> None:

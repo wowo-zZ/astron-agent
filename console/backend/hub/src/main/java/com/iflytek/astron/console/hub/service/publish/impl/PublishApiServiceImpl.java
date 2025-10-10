@@ -21,8 +21,10 @@ import com.iflytek.astron.console.hub.dto.user.TenantAuth;
 import com.iflytek.astron.console.hub.enums.BotVersionEnum;
 import com.iflytek.astron.console.hub.service.chat.ChatBotApiService;
 import com.iflytek.astron.console.hub.service.publish.PublishApiService;
+import com.iflytek.astron.console.hub.service.publish.ReleaseManageClientService;
 import com.iflytek.astron.console.hub.service.publish.TenantService;
 import com.iflytek.astron.console.toolkit.util.RedisUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -67,6 +69,9 @@ public class PublishApiServiceImpl implements PublishApiService {
     @Autowired
     private MaasUtil maasUtil;
 
+    @Autowired
+    private ReleaseManageClientService releaseManageClientService;
+
     private static final String PUBLISH_API = "publish_api";
 
     private static final String BOT_API_CBM_BASE_URL = "ws(s)://spark-openapi.cn-huabei-1.xf-yun.com";
@@ -100,32 +105,22 @@ public class PublishApiServiceImpl implements PublishApiService {
         return appMstService.getAppListByUid(uid)
                 .stream()
                 .map(appMst -> new AppListDTO(appMst.getAppId(), appMst.getAppName(), appMst.getAppDescribe(),
-                        appMst.getAppKey(), appMst.getAppSecret()))
+                        appMst.getAppKey(), appMst.getAppSecret(), appMst.getCreateTime()))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public BotApiInfoDTO createBotApi(CreateBotApiVo createBotApiVo) {
+    public BotApiInfoDTO createBotApi(CreateBotApiVo createBotApiVo, HttpServletRequest request) {
         String uid = RequestContextUtil.getUID();
         String uuid = UUID.randomUUID().toString();
-        String teamCreateUid = SpaceInfoUtil.getUidByCurrentSpaceId();
         // Only the space creator can publish APIs
-        if (!uid.equals(teamCreateUid)) {
+        if (!uid.equals(SpaceInfoUtil.getUidByCurrentSpaceId())) {
             throw new BusinessException(ResponseEnum.USER_NO_APPROVEL);
         }
 
         ChatBotBase botBase = chatBotDataService.findOne(uid, createBotApiVo.getBotId());
-        if (botBase == null) {
-            throw new BusinessException(ResponseEnum.BOT_NOT_EXISTS);
-        }
-
-        boolean existsFlag = chatBotApiService.exists(createBotApiVo.getBotId());
-        if (existsFlag && !botBase.getVersion().equals(BotVersionEnum.WORKFLOW.getVersion())) {
-            throw new BusinessException(ResponseEnum.BOT_API_CREATE_REPEAT);
-        }
-
         AppMst appMst = appMstService.getByAppId(uid, createBotApiVo.getAppId());
-        if (appMst == null) {
+        if (botBase == null || appMst == null) {
             throw new BusinessException(ResponseEnum.USER_APP_ID_NOT_EXISTE);
         }
 
@@ -136,15 +131,10 @@ public class PublishApiServiceImpl implements PublishApiService {
             if (botBase.getVersion().equals(BotVersionEnum.BASE_BOT.getVersion())) {
                 return createBaseBotApi(uid, appMst, botBase);
             } else if (botBase.getVersion().equals(BotVersionEnum.WORKFLOW.getVersion())) {
-                if (!existsFlag) {
-                    return createMaasApi(uid, appMst, botBase);
-                } else {
-                    return updateMaasApi(uid, appMst, botBase);
-                }
+                return createMaasApi(uid, appMst, botBase, request);
             } else {
                 throw new BusinessException(ResponseEnum.BOT_TYPE_NOT_EXISTS);
             }
-
         } catch (Exception e) {
             log.error("PublishApiServiceImpl.createBotApi : create Bot api error, request: {}", createBotApiVo, e);
             throw new BusinessException(ResponseEnum.BOT_API_CREATE_ERROR);
@@ -154,22 +144,37 @@ public class PublishApiServiceImpl implements PublishApiService {
 
     }
 
-    private BotApiInfoDTO createMaasApi(String uid, AppMst appMst, ChatBotBase botBase) {
+    private BotApiInfoDTO createMaasApi(String uid, AppMst appMst, ChatBotBase botBase, HttpServletRequest request) {
+        Long spaceId = SpaceInfoUtil.getSpaceId();
         Integer botId = botBase.getId();
         List<UserLangChainInfo> userLangChainInfoList = userLangChainDataService.findListByBotId(botId);
         if (Objects.isNull(userLangChainInfoList) || userLangChainInfoList.isEmpty()) {
-            log.error("----- 未找到助手协议, uid: {}, botId: {}", uid, botId);
+            log.error("----- No assistant protocol found, uid: {}, botId: {}", uid, botId);
             throw new BusinessException(ResponseEnum.BOT_API_CREATE_ERROR);
         }
 
         UserLangChainInfo userLangChainInfo = userLangChainInfoList.get(0);
         String flowId = userLangChainInfo.getFlowId();
+        // Synchronize with Maas service
+        String versionName = releaseManageClientService.getVersionNameByBotId(Long.valueOf(botId), spaceId, request);
+        maasUtil.createApi(flowId, appMst.getAppId(), versionName);
 
-        return null;
-    }
+        releaseManageClientService.releaseBotApi(botId, flowId, versionName, spaceId, request);
 
-    private BotApiInfoDTO updateMaasApi(String uid, AppMst appMst, ChatBotBase botBase) {
-        return null;
+        chatBotApiService.insert(uid, botId, flowId, appMst.getAppId(),
+                appMst.getAppSecret(), appMst.getAppKey(), "", "", "",
+                "/workflow/v1/chat/completions", botBase.getBotName());
+
+        return BotApiInfoDTO.builder()
+                .botId(botId)
+                .botName(botBase.getBotName())
+                .appName(appMst.getAppName())
+                .appId(appMst.getAppId())
+                .appKey(appMst.getAppKey())
+                .appSecret(appMst.getAppSecret())
+                .serviceUrl(BOT_API_MASS_BASE_URL + "/workflow/v1/chat/completions")
+                .flowId(flowId)
+                .build();
     }
 
     private BotApiInfoDTO createBaseBotApi(String uid, AppMst appMst, ChatBotBase botBase) throws IOException {
@@ -190,11 +195,15 @@ public class PublishApiServiceImpl implements PublishApiService {
 
         // TODO: capability authorization
 
-        String serviceUrlHost = botBase.getVersion() == 1 ? BOT_API_CBM_BASE_URL : BOT_API_MASS_BASE_URL;
         return BotApiInfoDTO.builder()
-                .botId(botId).botName(botBase.getBotName()).appName(appMst.getAppName())
-                .appId(appMst.getAppId()).appKey(appMst.getAppKey())
-                .appSecret(appMst.getAppSecret()).serviceUrl(serviceUrlHost)
-                .flowId(null).build();
+                .botId(botId)
+                .botName(botBase.getBotName())
+                .appName(appMst.getAppName())
+                .appId(appMst.getAppId())
+                .appKey(appMst.getAppKey())
+                .appSecret(appMst.getAppSecret())
+                .serviceUrl(BOT_API_CBM_BASE_URL)
+                .flowId(null)
+                .build();
     }
 }

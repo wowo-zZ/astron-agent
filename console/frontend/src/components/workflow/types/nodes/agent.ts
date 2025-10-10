@@ -1,5 +1,5 @@
 // Agent Node 相关类型定义
-
+import React from 'react';
 export interface AgentProps {
   data: AgentNodeData;
 }
@@ -86,4 +86,10 @@ export interface UseAgentReturn {
   handleUpdateTool: (tool: ToolItem) => void;
   handleChangeAddress: (id: string, value: string) => void;
   handleRemoveAddress: (id: string) => void;
+}
+
+export interface useAddAgentPluginType {
+  handleInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  renderParamsTooltip: (params: string) => React.ReactNode;
+  handleCheckTool: (tool: ToolItem) => void;
 }

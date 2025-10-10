@@ -5,12 +5,12 @@ import {
   handleAgentStatus,
   getMCPServiceDetail,
   getAgentInputParams,
+  type AgentInputParam,
 } from '@/services/release-management';
 import {
   cancelBindWx,
   getBotInfo,
   getWechatAuthUrl,
-  sendApplyBot,
   publishMCP,
   getMcpContent,
   getChainInfo,
@@ -46,6 +46,7 @@ interface MultiModeCpnProps {
   setPageInfo?: any;
   agentType?: any;
   moreParams?: any;
+  workflowId?: number;
 }
 
 const WxModal: React.FC<MultiModeCpnProps> = ({
@@ -65,6 +66,7 @@ const WxModal: React.FC<MultiModeCpnProps> = ({
   setPageInfo,
   agentType,
   moreParams,
+  workflowId,
 }) => {
   let i = 0;
   let flag = false;
@@ -91,17 +93,17 @@ const WxModal: React.FC<MultiModeCpnProps> = ({
   /**
    * 校验
    */
-  const validate = async () => {
+  const validate = async (): Promise<boolean> => {
     try {
       const values = await form.validateFields();
       return values;
     } catch (err) {
-      console.log(err);
       message.warning(t('releaseModal.mcpServerParamsDescEmpty'));
       return false;
     }
   };
-  const handleBind = () => {
+
+  const handleBind = (): void => {
     if (!appid.length) {
       message.warning(t('releaseModal.appidEmpty'));
       return;
@@ -128,7 +130,7 @@ const WxModal: React.FC<MultiModeCpnProps> = ({
   };
 
   //解绑
-  const handleEndBind = () => {
+  const handleEndBind = (): void => {
     setSpinning(true);
     if (!botInfo) {
       setSpinning(false);
@@ -148,18 +150,26 @@ const WxModal: React.FC<MultiModeCpnProps> = ({
       .finally(() => setSpinning(false));
   };
 
-  const handleMcpOk = async () => {
+  const handleMcpOk = async (): Promise<void> => {
     const values = await validate();
     if (!values) {
       return;
     }
     const obj = form.getFieldsValue();
-    const parmas: any = {};
-    parmas.serverName = obj.botName;
-    parmas.description = obj.botDesc;
-    parmas.botId = botInfo?.botId;
-    parmas.content = obj.content;
-    parmas.icon = botInfo?.avatar;
+    const parmas: {
+      serverName: string;
+      description: string;
+      botId?: string;
+      content?: string;
+      icon?: string;
+      args?: AgentInputParam[];
+    } = {
+      serverName: obj.botName as string,
+      description: obj.botDesc as string,
+    };
+    parmas.botId = botInfo?.botId as string;
+    parmas.content = obj.content as string;
+    parmas.icon = botInfo?.avatar as string;
     if (flag) {
       args[i].schema.default = obj.default;
     } else {
@@ -185,14 +195,15 @@ const WxModal: React.FC<MultiModeCpnProps> = ({
       });
   };
 
-  const handleMcpCancel = () => {
+  const handleMcpCancel = (): void => {
     setIsMcpOpen(false);
   };
 
   //发布 or 更新发布 -- 至星火
-  const handlePublish = async () => {
+  const handlePublish = async (): Promise<void> => {
     if (promptbot) {
-      return eventBus.emit('releaseFn');
+      eventBus.emit('releaseFn');
+      return;
     }
     if (botMultiFileParam) {
       return;
@@ -202,15 +213,13 @@ const WxModal: React.FC<MultiModeCpnProps> = ({
       setQufabuFlag(true);
     }
 
-    //先下架助手 -- NOTE: 用新接口后应该不需要先下架的操作了，会有报错
-    // await handleAgentStatus(botInfo?.botId as number, {
-    //   action: 'OFFLINE',
-    //   reason: '',
-    // });
+    // console.log('handlePublish---------', botInfo);
+
     // 提交审核
-    handleAgentStatus(botInfo?.botId as number, {
+    handleAgentStatus((botInfo?.botId as number) || (workflowId as number), {
       action: 'PUBLISH',
       reason: '',
+      publishType: 'MARKET',
     })
       .then(() => {
         // onCancel();
@@ -225,15 +234,14 @@ const WxModal: React.FC<MultiModeCpnProps> = ({
         }
       })
       .catch(err => {
-        console.error(err);
-        err?.msg && message.error(err.msg);
+        err?.message && message.error(err.message);
       });
 
     return;
   };
 
   /** ## 发布为mcp 逻辑 */
-  const handleMcpPublish = async () => {
+  const handleMcpPublish = async (): Promise<void> => {
     if (moreParams) {
       return;
     }
@@ -242,40 +250,41 @@ const WxModal: React.FC<MultiModeCpnProps> = ({
       setReleased(resp?.released);
 
       // MARK: 这里外部已经调用了一次吧? 怎么又调用了
-      getAgentInputParams(botInfo?.botId as number).then((res: any) => {
-        // console.log('getAgentInputParams--------', res);
-        const arr: any = [...res];
-        arr.forEach((item: unknown, index: number) => {
-          if (Object.prototype.hasOwnProperty.call(item, 'allowedFileType')) {
-            i = index;
-            return (flag = true);
+      getAgentInputParams(botInfo?.botId as number).then(
+        (res: AgentInputParam[]) => {
+          const arr: AgentInputParam[] = [...res];
+          arr.forEach((item: AgentInputParam, index: number) => {
+            if (Object.prototype.hasOwnProperty.call(item, 'allowedFileType')) {
+              i = index;
+              return (flag = true);
+            }
+            return;
+          });
+          if (flag) {
+            setArgs(arr);
+            setEditData({
+              botName: resp ? resp.serverName : botInfo?.botName,
+              botDesc: resp ? resp.description : botInfo?.botDesc,
+              name: arr?.[i]?.name ?? '',
+              type: arr?.[i]?.allowedFileType?.[0] ?? '',
+              default: arr?.[i]?.schema?.default ?? '',
+              content: resp?.content,
+            });
+          } else {
+            setArgs(arr);
+            setEditData({
+              botName: resp ? resp.serverName : botInfo?.botName,
+              botDesc: resp ? resp.description : botInfo?.botDesc,
+              name: arr?.[0]?.name ?? '',
+              type: arr?.[0]?.allowedFileType?.[0] ?? '',
+              default: arr?.[0]?.schema?.default ?? '',
+              content: resp?.content,
+            });
           }
-          return;
-        });
-        if (flag) {
-          setArgs(arr);
-          setEditData({
-            botName: resp ? resp.serverName : botInfo?.botName,
-            botDesc: resp ? resp.description : botInfo?.botDesc,
-            name: arr[i].name,
-            type: arr[i].allowedFileType[0],
-            default: arr[i].schema.default ? arr[i].schema.default : '',
-            content: resp?.content,
-          });
-        } else {
-          setArgs(arr);
-          setEditData({
-            botName: resp ? resp.serverName : botInfo?.botName,
-            botDesc: resp ? resp.description : botInfo?.botDesc,
-            name: arr[0].name,
-            type: arr[0].schema.type,
-            default: arr[0].schema.default,
-            content: resp?.content,
-          });
+          setIsMcpOpen(true);
+          // onCancel();
         }
-        setIsMcpOpen(true);
-        // onCancel();
-      });
+      );
     });
   };
 

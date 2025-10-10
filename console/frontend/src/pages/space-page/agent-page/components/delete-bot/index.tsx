@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { Button, message } from 'antd';
 import { deleteBotAPI, deleteAgent } from '@/services/agent';
 import dialogDel from '@/assets/imgs/main/icon_dialog_del.png';
-import { applyCancelUpload } from '@/services/spark-common';
 import { handleAgentStatus } from '@/services/release-management';
 import eventBus from '@/utils/event-bus';
 
@@ -35,9 +34,11 @@ function index({
     // 从智能体Tab传入Bot的删除 -- 调用星火方面接口
     setLoading(true);
     if (botDetail?.botStatus === 2) {
-      await applyCancelUpload({ botId: botDetail.botId, reason: '' });
-      // await handleAgentStatus(botDetail.botId as number, { action: 'OFFLINE', reason: '' })
-      // TODO: 更新接口, 以及删除接口看要不要换
+      await handleAgentStatus(botDetail.botId as number, {
+        action: 'OFFLINE',
+        reason: '维护更新',
+        publishType: 'MARKET',
+      });
     }
     if (type) {
       deleteAgent({ botId: botDetail.botId })

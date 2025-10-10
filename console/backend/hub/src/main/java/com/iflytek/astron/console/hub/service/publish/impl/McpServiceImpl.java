@@ -111,12 +111,13 @@ public class McpServiceImpl implements McpService {
         // 10. Update publish channel
         botPublishService.updatePublishChannel(botId, currentUid, spaceId, PublishChannelEnum.MCP, true);
 
-        log.info("MCP published successfully: botId={}, mcpId={}, versionName={}", 
+        log.info("MCP published successfully: botId={}, mcpId={}, versionName={}",
                 botId, mcpData.getId(), versionName);
     }
 
     /**
-     * Get version name for MCP publishing (corresponds to releaseManageClientService.getVersionNameByBotId)
+     * Get version name for MCP publishing (corresponds to
+     * releaseManageClientService.getVersionNameByBotId)
      */
     private String getVersionName(Integer botId, String currentUid, Long spaceId) {
         try {
@@ -129,16 +130,16 @@ public class McpServiceImpl implements McpService {
 
             // 2. For workflow bots, get version name from workflow release service
             log.info("Getting version name for MCP publish: botId={}, flowId={}", botId, flowId);
-            
+
             // Call the workflow release service to get next version name
             WorkflowReleaseResponseDto releaseResponse = workflowReleaseService.publishWorkflow(botId, currentUid, spaceId, "MCP");
-            
+
             if (releaseResponse.getSuccess() && releaseResponse.getWorkflowVersionName() != null) {
                 String versionName = releaseResponse.getWorkflowVersionName();
                 log.info("Successfully got version name for MCP: botId={}, versionName={}", botId, versionName);
                 return versionName;
             } else {
-                log.warn("Failed to get version name for MCP, using fallback: botId={}, error={}", 
+                log.warn("Failed to get version name for MCP, using fallback: botId={}, error={}",
                         botId, releaseResponse.getErrorMessage());
                 return generateDefaultVersion();
             }
@@ -156,18 +157,18 @@ public class McpServiceImpl implements McpService {
         // TODO: Implement MCP registration logic that calls workflow release service
         // This should correspond to the massUtil.registerMcp -> releaseService.mcpRelease flow
         // For now, return the provided server URL or generate a default one
-        
+
         if (request.getServerUrl() != null && !request.getServerUrl().trim().isEmpty()) {
             return request.getServerUrl();
         }
-        
+
         // Generate default MCP server URL using the mcpHost configuration
         String flowId = userLangChainDataService.findFlowIdByBotId(botId);
         if (flowId != null) {
             // Use the mcpHost pattern from configuration
             return String.format("https://xingchen-api.xf-yun.com/mcp/xingchen/flow/%s/sse", flowId);
         }
-        
+
         return "https://xingchen-api.xf-yun.com/mcp/xingchen/flow/" + botId + "/sse";
     }
 
@@ -179,11 +180,11 @@ public class McpServiceImpl implements McpService {
             // This corresponds to the releaseManageClientService.releaseMCP call in original project
             // It should create a workflow version record for MCP publishing
             log.info("Recording MCP release: botId={}, versionName={}", botId, versionName);
-            
+
             // The version management was already handled in getVersionName, so this is mainly for logging
             // In the original project, this would call the workflow release service
             log.info("MCP release recorded successfully: botId={}, versionName={}", botId, versionName);
-            
+
         } catch (Exception e) {
             log.error("Failed to record MCP release: botId={}, versionName={}", botId, versionName, e);
             // Don't throw exception here as the main MCP data has already been saved

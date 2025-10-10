@@ -134,6 +134,7 @@ const translation = {
   republishSuccess: '重新发布成功',
   republishFailed: '重新发布失败',
   localUploadModel: '本地上传模型',
+  noDocument: '暂无文档，待后续更新',
 };
 
 export default translation;

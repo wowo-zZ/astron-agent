@@ -16,7 +16,7 @@ import desciptionIcon from '@/assets/imgs/workflow/desciption-icon.png';
 
 function InputName({ item }: { item: unknown }): React.ReactElement {
   return (
-    <span className="relative flex items-center gap-1.5 max-w-[130px]">
+    <span className="relative flex items-center gap-1.5 max-w-[80px]">
       <span className="flex-1 text-overflow" title={item?.name}>
         {item.name}
       </span>

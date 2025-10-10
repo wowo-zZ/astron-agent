@@ -168,33 +168,40 @@ class CBGRAGStrategy(RAGStrategy):
 
     async def split(
         self,
-        file: str,
-        lengthRange: List[int],
-        overlap: int,
-        resourceType: int,
-        separator: List[str],
-        titleSplit: bool,
-        cutOff: List[str],
+        fileUrl: Optional[str] = None,
+        lengthRange: Optional[List[int]] = None,
+        overlap: int = 16,
+        resourceType: int = 0,
+        separator: Optional[List[str]] = None,
+        titleSplit: bool = False,
+        cutOff: Optional[List[str]] = None,
         **kwargs: Any
     ) -> List[Dict[str, Any]]:
         """
         Split file into multiple chunks
 
         Args:
-            file: File content
+            fileUrl: File URL
             lengthRange: Length range
             overlap: Overlap length
             resourceType: Resource type
             separator: Separator list
+            titleSplit: Whether to split by title
+            cutOff: Cutoff marker list
             **kwargs: Other parameters
 
         Returns:
             List of split chunks
         """
+        if fileUrl is None:
+            fileUrl = ""
+            if not kwargs.get("file"):
+                raise ProtocolParamException(msg="file is required")
+
         data = []
         wiki_split_extends: Dict[str, Any] = {}
 
-        if check_not_empty(separator):
+        if check_not_empty(separator) and separator is not None:
             split_chars = []
             for chars in separator:
                 split_chars.append(
@@ -204,7 +211,11 @@ class CBGRAGStrategy(RAGStrategy):
         else:
             wiki_split_extends["chunkSeparators"] = ["DQo="]
 
-        if check_not_empty(lengthRange) and len(lengthRange) > 1:
+        if (
+            check_not_empty(lengthRange)
+            and lengthRange is not None
+            and len(lengthRange) > 1
+        ):
             wiki_split_extends["chunkSize"] = lengthRange[1]
             wiki_split_extends["minChunkSize"] = lengthRange[0]
         else:
@@ -212,7 +223,7 @@ class CBGRAGStrategy(RAGStrategy):
             wiki_split_extends["minChunkSize"] = 256
 
         doc_upload_response_data = await xinghuo.upload(
-            file, wiki_split_extends, resourceType, **kwargs
+            fileUrl, wiki_split_extends, resourceType, **kwargs
         )
         fileId = doc_upload_response_data.get("fileId", "")
         doc_chunks_response_data = await xinghuo.get_chunks(file_id=fileId, **kwargs)

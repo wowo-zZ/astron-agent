@@ -35,7 +35,7 @@ public class CbmBody {
 
     @JsonProperty("options")
     private Options options;
-    
+
     @JsonProperty("history")
     private boolean history;
 

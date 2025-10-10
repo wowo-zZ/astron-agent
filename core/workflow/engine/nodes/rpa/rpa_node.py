@@ -22,9 +22,9 @@ class _StreamResponse(BaseModel):
     """SSE 流式返回的数据"""
 
     code: int
-    msg: str
+    message: str
     sid: str = ""
-    data: Dict[str, Any]
+    data: Dict[str, Any] = Field(default_factory=dict)
 
 
 class RPANode(BaseNode):
@@ -86,7 +86,7 @@ class RPANode(BaseNode):
                         if frame.code != 0:
                             raise CustomException(
                                 err_code=CodeEnum.RPA_REQUEST_ERROR,
-                                err_msg=frame.msg,
+                                err_msg=frame.message,
                             )
                         data = frame.data
             for output in self.output_identifier:

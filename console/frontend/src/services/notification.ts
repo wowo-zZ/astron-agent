@@ -1,20 +1,44 @@
 import http from '../utils/http';
 
-/**
- * 获取消息分类
- * @returns 消息类型
- */
-export const getAllMessageType = (): Promise<any> => {
-  return http.post(`/xingchen-api/messageCenter/allTypes`);
-};
+export interface Notification {
+  id: number;
+  type: string;
+  title: string;
+  body: string;
+  templateCode: string | null;
+  payload: string;
+  creatorUid: string;
+  createdAt: string;
+  expireAt: string | null;
+  meta: any | null;
+  isRead: boolean;
+  readAt: string | null;
+  receivedAt: string;
+}
+
+export interface NotificationResponse {
+  notifications: Notification[];
+  pageIndex: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+  unreadCount: number;
+  notificationsByType: Record<string, Notification[]>;
+}
 
 /**
  * 获取全部消息
  * @param params  消息分类
  * @returns
  */
-export const getAllMessage = (params: any): Promise<any> => {
-  return http.post(`/notification/list`, params);
+export const getAllMessage = (params: {
+  type: string;
+  unreadOnly: boolean;
+  pageIndex: number;
+  pageSize: number;
+  offset: number;
+}): Promise<NotificationResponse> => {
+  return http.get(`/notifications/list`, { params });
 };
 
 /**
@@ -22,17 +46,11 @@ export const getAllMessage = (params: any): Promise<any> => {
  * @param params  消息id
  * @returns
  */
-export const changeMessageStatus = (params: any): Promise<any> => {
+export const changeMessageStatus = (params: {
+  notificationIds: number[];
+  markAll: boolean;
+}): Promise<any> => {
   return http.post(`/notifications/mark-read`, params);
-};
-
-/**
- * 标记全部已读
- * @param params  消息分类
- * @returns
- */
-export const readAllMessage = (params: any): Promise<any> => {
-  return http.post(`/xingchen-api/messageCenter/clearUnread`, params);
 };
 
 /**
@@ -40,10 +58,10 @@ export const readAllMessage = (params: any): Promise<any> => {
  * @param params 消息分类
  * @returns
  */
-export const messageCount = (params: any): Promise<any> => {
-  return http.post(`/notifications/unread-count`, params);
+export const getMessageCountApi = (): Promise<number> => {
+  return http.get(`/notifications/unread-count`);
 };
 
-export const deleteMessage = (params: any): Promise<any> => {
-  return http.delete(`/notifications/${params.id}`);
+export const deleteMessage = (notificationId: number): Promise<any> => {
+  return http.delete(`/notifications/${notificationId}`);
 };

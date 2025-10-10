@@ -38,10 +38,6 @@ export async function addComparisons(params): Promise<unknown> {
   return http.post('/workflow/add-comparisons', params);
 }
 
-export async function nodeDebug(nodeId, params): Promise<unknown> {
-  return http.post(`/workflow/node/debug/${nodeId}`, params);
-}
-
 export async function saveDialogueAPI(params): Promise<unknown> {
   return http.post('/workflow/dialog', params);
 }
@@ -143,10 +139,6 @@ export async function getAgentStrategyAPI(): Promise<unknown> {
 
 export async function getKnowledgeProStrategyAPI(): Promise<unknown> {
   return http.get('/workflow/get-knowledge-pro-strategy');
-}
-
-export async function workflowCategories(): Promise<unknown> {
-  return http.post('/bot/get-list');
 }
 
 export async function getBotStatisticsInfoByBotld(botId): Promise<unknown> {

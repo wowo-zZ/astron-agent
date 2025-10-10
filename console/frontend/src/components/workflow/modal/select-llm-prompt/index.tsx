@@ -62,21 +62,6 @@ const SelectPromptToolbar = ({
             placeholder={t('workflow.nodes.selectPrompt.searchPlaceholder')}
           />
         </div>
-        <Button
-          type="primary"
-          className="flex items-center gap-2"
-          onClick={e => {
-            e.stopPropagation();
-            window.open(`${window.location.origin}/prompt`, '_blank');
-          }}
-        >
-          <img
-            className="w-3 h-3"
-            src={Icons.selectLlmPrompt.toolModalAdd}
-            alt=""
-          />
-          <span>{t('workflow.nodes.selectPrompt.createNewPrompt')}</span>
-        </Button>
       </div>
     </div>
   );

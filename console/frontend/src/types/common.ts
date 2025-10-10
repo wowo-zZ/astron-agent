@@ -9,3 +9,13 @@ export type AvatarType = {
   createTime: string;
   updateTime: string;
 };
+
+export type UserApp = {
+  appId: string;
+  appName: string;
+  appDescribe?: string;
+  appKey: string;
+  appSecret: string;
+  createTime?: string;
+  updateTime?: string;
+};

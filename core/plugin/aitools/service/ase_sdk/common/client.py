@@ -1,3 +1,5 @@
+from typing import Any, Generator
+
 from plugin.aitools.service.ase_sdk.__base.entities.req_data import ReqData
 from plugin.aitools.service.ase_sdk.__base.entities.result import Result
 from plugin.aitools.service.ase_sdk.__base.power import Power
@@ -10,10 +12,10 @@ from plugin.aitools.service.ase_sdk.util.hmac_auth import HMACAuth
 
 class CommonClient(Power):
 
-    def __init__(self, url: str, method: str = "GET", stream=False):
+    def __init__(self, url: str, method: str = "GET", stream: bool = False) -> None:
         super().__init__(url, method, stream)
 
-    def invoke(self, req_source_data: CommonReqSourceData):
+    def invoke(self, req_source_data: CommonReqSourceData) -> Any:
         """
         能力执行
 
@@ -39,7 +41,7 @@ class CommonClient(Power):
                 req_source_data.req_data.headers.update(params)
         return self._invoke(req_source_data.req_data)
 
-    def _subscribe(self):
+    def _subscribe(self) -> Generator[Any, None, None]:
         try:
             while True:
                 one = self.queue.get()

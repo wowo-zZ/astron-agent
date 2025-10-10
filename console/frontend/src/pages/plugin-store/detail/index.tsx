@@ -288,9 +288,8 @@ const PluginStoreDetail: React.FC = (): ReactElement => {
                       {t('common.storePlugin.references')}
                     </div>
                   </div>
-                  <div
+                  {/* <div
                     className="flex items-center gap-2"
-                    // onClick={handleFavoriteClick}
                   >
                     <img
                       src={toolInfo.isFavorite ? selectFavorite : favorite}
@@ -303,20 +302,13 @@ const PluginStoreDetail: React.FC = (): ReactElement => {
                       </span>{' '}
                       {t('common.storePlugin.favorites')}
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
-            {/* <div className='flex flex-col items-center gap-1'>
-              <span className='text-4xl font-medium'>{toolInfo?.botUsedCount}</span>
-              <p className='text-[#757575] text-sm'>Bot引用数</p>
-            </div> */}
           </div>
           <div className="flex items-start justify-between py-6 border-b border-[#E2E8FF]">
             <p>{toolInfo?.description}</p>
-            {/* <div className='border border-[#275EFF] px-2 py-0.5 rounded-md text-[#275EFF] text-sm flex-shrink-0'>
-              {toolInfo?.isFavorite ? '已收藏' : '未收藏'}
-            </div> */}
           </div>
           <div className="mt-8">
             <div className="flex items-center justify-between">

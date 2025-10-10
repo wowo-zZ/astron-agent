@@ -1,37 +1,37 @@
-import React, { FC } from "react";
-import { useNavigate } from "react-router-dom";
-import { Input, Button, Table, Pagination } from "antd";
+import React, { FC } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Input, Button, Table, Pagination } from 'antd';
 import {
   AddFolder,
   DeleteFile,
   TagsManage,
-} from "./components/modal-components";
-import { typeList } from "@/constants";
+} from './components/modal-components';
+import { typeList } from '@/constants';
 
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 
-import add from "@/assets/imgs/knowledge/icon_zhishi_add_white.png";
+import add from '@/assets/imgs/knowledge/icon_zhishi_add_white.png';
 // import more from "@/assets/imgs/common/icon_bot_setting_table_more.png";
 
-import eptfolder from "@/assets/imgs/knowledge/icon_zhishi_eptfolder.png";
-import upload from "@/assets/imgs/knowledge/pic_zhishi_bg.png";
-import addfolder from "@/assets/imgs/knowledge/icon_zhishi_addfolder.png";
+import eptfolder from '@/assets/imgs/knowledge/icon_zhishi_eptfolder.png';
+import upload from '@/assets/imgs/knowledge/pic_zhishi_bg.png';
+import addfolder from '@/assets/imgs/knowledge/icon_zhishi_addfolder.png';
 
-import search from "@/assets/imgs/file/icon_zhishi_search.png";
+import search from '@/assets/imgs/file/icon_zhishi_search.png';
 
-import { useDocumentPage } from "./hooks/use-document-page";
-import { useColumns } from "./hooks/use-columns";
-import { FileDirectoryTreeResponse, FileItem } from "@/types/resource";
-import { ColumnType } from "antd/es/table";
+import { useDocumentPage } from './hooks/use-document-page';
+import { useColumns } from './hooks/use-columns';
+import { FileDirectoryTreeResponse, FileItem } from '@/types/resource';
+import { ColumnType } from 'antd/es/table';
 
 const statusMap = {
-  "-1": "error",
-  "0": "processing",
-  "1": "error",
-  "2": "processing",
-  "3": "processing",
-  "4": "error",
-  "5": "success",
+  '-1': 'error',
+  '0': 'processing',
+  '1': 'error',
+  '2': 'processing',
+  '3': 'processing',
+  '4': 'error',
+  '5': 'success',
 };
 
 const DocumentPage: FC<{
@@ -127,10 +127,10 @@ const DocumentPage: FC<{
       )}
       <div className="w-full flex pb-5 border-b border-[#E2E8FF]">
         <h2 className="text-2xl font-semibold text-second">
-          {t("knowledge.documents")}
+          {t('knowledge.documents')}
         </h2>
         <p className="mt-2 ml-2 font-medium desc-color">
-          {t("knowledge.documentsDescription")}
+          {t('knowledge.documentsDescription')}
         </p>
       </div>
       {!loading && parentId === -1 && dataResource.length === 0 ? (
@@ -139,13 +139,13 @@ const DocumentPage: FC<{
             className="flex flex-col items-center py-8 w-[766px] min-h-[238px] rounded-3xl"
             style={{
               background: `url(${upload}) no-repeat center`,
-              backgroundSize: "cover",
-              border: "1px solid #E2E8FF",
+              backgroundSize: 'cover',
+              border: '1px solid #E2E8FF',
             }}
           >
             <img src={eptfolder} className="w-8 h-8" alt="" />
             <div className="mt-6 text-xl font-medium text-second">
-              {t("knowledge.noDocumentsInKnowledge")}
+              {t('knowledge.noDocumentsInKnowledge')}
             </div>
             <p className="mt-4 text-desc max-w-[500px] text-center">
               {allowUploadFileContent}
@@ -160,7 +160,7 @@ const DocumentPage: FC<{
               }}
             >
               <img src={add} className="w-4 h-4" alt="" />
-              <span className="ml-2">{t("knowledge.addDocument")}</span>
+              <span className="ml-2">{t('knowledge.addDocument')}</span>
             </Button>
           </div>
         </div>
@@ -233,7 +233,7 @@ export const DocumentPageContent: FC<{
           {directoryTree.length > 0 && (
             <div className="flex mr-4">
               <img
-                src={typeList.get("folder")}
+                src={typeList.get('folder')}
                 className="w-[22px] h-[22px] mr-2"
                 alt=""
               />
@@ -251,7 +251,7 @@ export const DocumentPageContent: FC<{
               ))}
               <span className="bg-[#F0F3F9] rounded-md py-1 px-2 text-desc ml-2">
                 {pagination.total}
-                {t("knowledge.items")}
+                {t('knowledge.items')}
               </span>
             </div>
           )}
@@ -263,7 +263,7 @@ export const DocumentPageContent: FC<{
             />
             <Input
               className="global-input w-[320px] pl-10"
-              placeholder={t("knowledge.pleaseEnter")}
+              placeholder={t('knowledge.pleaseEnter')}
               value={searchValue}
               onChange={handleInputChange}
             />
@@ -271,18 +271,18 @@ export const DocumentPageContent: FC<{
         </div>
 
         <div className="flex items-center">
-          {tag !== "SparkDesk-RAG" && (
+          {tag !== 'SparkDesk-RAG' && (
             <span
               className="border border-[#D7DFE9] bg-[#fff] flex items-center px-4 py-2 cursor-pointer h-10"
               style={{ borderRadius: 10 }}
               onClick={() => {
                 setAddFolderModal(true);
-                setModalType("create");
+                setModalType('create');
               }}
             >
               <img src={addfolder} className="w-4 h-4" alt="" />
               <span className="ml-2 text-sm text-second">
-                {t("knowledge.addFolder")}
+                {t('knowledge.addFolder')}
               </span>
             </span>
           )}
@@ -296,7 +296,7 @@ export const DocumentPageContent: FC<{
             }}
           >
             <img src={add} className="w-4 h-4" alt="" />
-            <span className="ml-2 text-sm">{t("knowledge.addDocument")}</span>
+            <span className="ml-2 text-sm">{t('knowledge.addDocument')}</span>
           </Button>
         </div>
       </div>
@@ -329,7 +329,7 @@ export const DocumentPageContent: FC<{
                 className="h-full document-table"
                 onRow={rowProps}
                 pagination={false}
-                rowKey={(record) => record.id}
+                rowKey={record => record.id}
                 loading={loading}
               />
             </div>
@@ -337,7 +337,7 @@ export const DocumentPageContent: FC<{
           {!searchValue && (
             <div className="flex items-center justify-center h-[80px] px-6 relative">
               <div className="text-[#979797] text-sm pt-4 absolute left-6">
-                {t("effectEvaluation.totalDataItems", {
+                {t('effectEvaluation.totalDataItems', {
                   count: pagination?.total,
                 })}
               </div>

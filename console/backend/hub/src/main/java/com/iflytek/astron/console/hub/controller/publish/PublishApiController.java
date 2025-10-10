@@ -6,6 +6,7 @@ import com.iflytek.astron.console.hub.dto.publish.*;
 import com.iflytek.astron.console.hub.service.publish.PublishApiService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,8 +46,8 @@ public class PublishApiController {
     @Operation(summary = "Create Bot Api", description = "create bot api with user app")
     @RateLimit(limit = 30, window = 60, dimension = "USER")
     @PostMapping("/create-bot-api")
-    public ApiResult<BotApiInfoDTO> createBotApi(@RequestBody CreateBotApiVo createBotApiVo) {
-        return ApiResult.success(publishApiService.createBotApi(createBotApiVo));
+    public ApiResult<BotApiInfoDTO> createBotApi(HttpServletRequest request, @RequestBody CreateBotApiVo createBotApiVo) {
+        return ApiResult.success(publishApiService.createBotApi(createBotApiVo, request));
     }
 
     @Operation(summary = "Get Api Usage", description = "User api real-time usage")

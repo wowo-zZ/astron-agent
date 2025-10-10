@@ -13,13 +13,13 @@ spring:
   datasource:
     url: ${MYSQL_URL:jdbc:mysql://db:3306/astron_console?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai&characterEncoding=utf8}
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: ${MYSQL_USERNAME:astron}
+    username: ${MYSQL_USER:astron}
     password: ${MYSQL_PASSWORD:astron-dev-env-db}
   data:
     redis:
       host: ${REDIS_HOST:redis}
       port: ${REDIS_PORT:6379}
-      database: ${REDIS_DATABASE:0}
+      database: ${REDIS_DATABASE_CONSOLE:0}
   security:
     oauth2:
       resourceserver:
@@ -67,11 +67,11 @@ mybatis-plus:
 
 # S3(MinIO) basic configuration
 s3:
-  endpoint: ${S3_ENDPOINT:http://minio:9000}
-  accessKey: ${S3_ACCESS_KEY:astron-uploader}
-  secretKey: ${S3_SECRET_KEY:astron-uploader-secret}
-  bucket: ${S3_BUCKET:astron-agent}
-  presignExpirySeconds: 600
+  endpoint: ${OSS_ENDPOINT:http://minio:9000}
+  accessKey: ${OSS_ACCESS_KEY_ID:astron-uploader}
+  secretKey: ${OSS_ACCESS_KEY_SECRET:astron-uploader-secret}
+  bucket: ${OSS_BUCKET_CONSOLE:astron-agent}
+  presignExpirySeconds: ${OSS_PRESIGN_EXPIRY_SECONDS_CONSOLE:600}
 
 # Spark LLM configuration
 spark:
@@ -124,7 +124,7 @@ maas:
   appId: ${MAAS_APP_ID:your-maas-app-id}
   apiKey: ${MAAS_API_KEY:your-maas-api-key}
   apiSecret: ${MAAS_API_SECRET:your-maas-api-secret}
-  workflowVersion: ${MAAS_WORKFLOW_VERSION:http://localhost:8080}
+  workflowVersion: ${MAAS_WORKFLOW_VERSION:http://127.0.0.1:8080/workflow/version}
   synchronizeWorkFlow: http://127.0.0.1:8080/workflow
   publish: http://127.0.0.1:8080/workflow/publish
   cloneWorkFlow: http://127.0.0.1:8080/workflow/internal-clone
@@ -133,15 +133,15 @@ maas:
   consumerId: ${MAAS_CONSUMER_ID:your-maas-consumer-id}
   consumerSecret: ${MAAS_CONSUMER_SECRET:your-maas-consumer-secret}
   consumerKey: ${MAAS_CONSUMER_KEY:your-maas-consumer-key}
-  publishApi: http://10.1.87.65:7880/v1/publish
-  authApi: http://10.1.87.65:7880/v1/auth
+  publishApi: http://10.1.87.65:7880/workflow/v1/publish
+  authApi: http://10.1.87.65:7880/workflow/v1/auth
   mcpHost: https://xingchen-api.xf-yun.com/mcp/xingchen/flow/%s/sse
   mcpRegister: http://127.0.0.1:8080/workflow/release
   workflowConfig: http://127.0.0.1:8080/workflow/get-flow-advanced-config
 
 bot:
   default:
-    avatar: ${WORKFLOW_FILE_UPLOAD_ENABLED:null}
+    avatar: ${BOT_DEFAULT_AVATAR:null}
 
 space:
   limit:
@@ -158,7 +158,7 @@ space:
       space-count: 10000
       user-count: 500
   invite-message-template:
-    url: https://${ASTRON_DOMAIN:localhost:3000}/sharepage?param=
+    url: https://${CONSOLE_DOMAIN:localhost:3000}/sharepage?param=
     space-title: Space Invitation Reminder
     space-content: >
       <h3>Space Invitation Reminder</h3>[%s] invited you to join space "%s",

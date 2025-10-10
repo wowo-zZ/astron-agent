@@ -7,6 +7,7 @@ import os
 import ssl
 from datetime import datetime
 from time import mktime
+from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import urlencode
 from wsgiref.handlers import format_date_time
 
@@ -43,7 +44,15 @@ class SmartTTSClient:
     authentication setup through synthesis processing to audio output collection.
     """
 
-    def __init__(self, app_id, api_key, api_secret, text, vcn, speed):
+    def __init__(
+        self,
+        app_id: str,
+        api_key: str,
+        api_secret: str,
+        text: str,
+        vcn: str,
+        speed: int,
+    ) -> None:
         """Initialize Smart TTS client with authentication and synthesis configuration.
 
         All 6 parameters are essential for TTS service operation:
@@ -67,23 +76,22 @@ class SmartTTSClient:
         self.api_key = api_key
         self.api_secret = api_secret
         self.text = text
-        self.request_url = os.getenv("TTS_URL")
-        self.ws_url = None
-        self.ws = None
-        self._prepare_ws_url()
-
-        self.vcn = vcn
-        self.speed = speed
-        self.nowtime = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-        self.messages = []  # 存储所有消息
-        self.audio_data = bytearray()  # 用于存储所有音频数据
-
-    def _prepare_ws_url(self):
+        self.ws: Optional[websocket.WebSocketApp] = None
+        if tts_url := os.getenv("TTS_URL"):
+            self.request_url = tts_url
+        else:
+            raise ValueError("Missing TTS_URL environment variable.")
         self.ws_url = self.assemble_ws_auth_url(
             self.request_url, "GET", self.api_key, self.api_secret
         )
 
-    def parse_url(self, request_url):
+        self.vcn = vcn
+        self.speed = speed
+        self.nowtime = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+        self.messages: List[Dict[str, Any]] = []  # 存储所有消息
+        self.audio_data = bytearray()  # 用于存储所有音频数据
+
+    def parse_url(self, request_url: str) -> Any:
         stidx = request_url.index("://")
         host = request_url[stidx + 3 :]
         schema = request_url[: stidx + 3]
@@ -94,19 +102,23 @@ class SmartTTSClient:
         host = host[:edidx]
         return type("Url", (object,), {"host": host, "path": path, "schema": schema})
 
-    def assemble_ws_auth_url(self, request_url, method, api_key, api_secret):
+    def assemble_ws_auth_url(
+        self, request_url: str, method: str, api_key: str, api_secret: str
+    ) -> str:
         u = self.parse_url(request_url)
         host = u.host
         path = u.path
         now = datetime.now()
         date = format_date_time(mktime(now.timetuple()))
         signature_origin = f"host: {host}\ndate: {date}\n{method} {path} HTTP/1.1"
-        signature_sha = hmac.new(
+        signature_sha_bytes: bytes = hmac.new(
             api_secret.encode("utf-8"),
             signature_origin.encode("utf-8"),
             digestmod=hashlib.sha256,
         ).digest()
-        signature_sha = base64.b64encode(signature_sha).decode(encoding="utf-8")
+        signature_sha: str = base64.b64encode(signature_sha_bytes).decode(
+            encoding="utf-8"
+        )
         authorization_origin = f'api_key="{api_key}", algorithm="hmac-sha256",\
               headers="host date request-line", signature="{signature_sha}"'
         authorization = base64.b64encode(authorization_origin.encode("utf-8")).decode(
@@ -115,15 +127,15 @@ class SmartTTSClient:
         values = {"host": host, "date": date, "authorization": authorization}
         return request_url + "?" + urlencode(values)
 
-    def on_message(self, ws, message):
+    def on_message(self, ws: websocket.WebSocket, message: str) -> None:
         try:
-            message = json.loads(message)
+            message_dict = json.loads(message)
             # print(111,message)
-            self.messages.append(message)  # 存储消息
-            code = message["header"]["code"]
-            if "payload" in message:
-                audio = base64.b64decode(message["payload"]["audio"]["audio"])
-                status = message["payload"]["audio"]["status"]
+            self.messages.append(message_dict)  # 存储消息
+            code = message_dict["header"]["code"]
+            if "payload" in message_dict:
+                audio = base64.b64decode(message_dict["payload"]["audio"]["audio"])
+                status = message_dict["payload"]["audio"]["status"]
                 if status == 2:
                     # print("Connection closed by server")
                     ws.close()
@@ -138,14 +150,19 @@ class SmartTTSClient:
         except Exception as e:
             raise e
 
-    def on_error(self, ws, error):
+    def on_error(self, ws: websocket.WebSocket, error: Exception) -> None:
         pass
 
-    def on_close(self, ws, close_status_code, close_msg):
+    def on_close(
+        self,
+        ws: websocket.WebSocket,
+        close_status_code: Optional[int],
+        close_msg: Optional[str],
+    ) -> None:
         pass
 
-    def on_open(self, ws):
-        def run(*_args):
+    def on_open(self, ws: websocket.WebSocket) -> None:
+        def run(*_args: Any) -> None:
             common_args = {"app_id": self.app_id, "status": 2}
             business_args = {
                 "tts": {
@@ -176,8 +193,12 @@ class SmartTTSClient:
                     "text": str(base64.b64encode(self.text.encode("utf-8")), "UTF8"),
                 }
             }
-            d = {"header": common_args, "parameter": business_args, "payload": data}
-            d = json.dumps(d)
+            d_dict = {
+                "header": common_args,
+                "parameter": business_args,
+                "payload": data,
+            }
+            d = json.dumps(d_dict)
             # print("Starting to send text data...")
             ws.send(d)
             if os.path.exists("./demo.mp3"):
@@ -185,15 +206,15 @@ class SmartTTSClient:
 
         thread.start_new_thread(run, ())
 
-    def start(self):
+    def start(self) -> Tuple[List[Dict[str, Any]], bytearray]:
         websocket.enableTrace(False)
         self.ws = websocket.WebSocketApp(
             self.ws_url,
             on_message=self.on_message,
             on_error=self.on_error,
             on_close=self.on_close,
+            on_open=self.on_open,
         )
-        self.ws.on_open = self.on_open
         self.ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
 
         return self.messages, self.audio_data  # 返回消息和文件路径

@@ -31,6 +31,9 @@ function index(): React.ReactElement {
     state => state.setNodeInfoEditDrawerlInfo
   ) as (info: NodeInfoEditDrawerlInfo) => void;
   const currentStore = useFlowsManager(state => state.getCurrentStore());
+  const setUpdateNodeInputData = useFlowsManager(
+    state => state.setUpdateNodeInputData
+  );
   const nodes = currentStore(state => state.nodes) as ReactFlowNode[];
   const [rootStyle, setRootStyle] = useState<RootStyle>({
     height: (window?.innerHeight ?? 0) - 80,
@@ -57,6 +60,10 @@ function index(): React.ReactElement {
       (item: ReactFlowNode) => item?.id === nodeInfoEditDrawerlInfo.nodeId
     );
   }, [nodes, nodeInfoEditDrawerlInfo.nodeId]);
+
+  useEffect(() => {
+    setUpdateNodeInputData(updateNodeInputData => !updateNodeInputData);
+  }, [nodeInfoEditDrawerlInfo.nodeId]);
 
   const {
     renderTypeOneClickUpdate,

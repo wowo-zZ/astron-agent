@@ -439,7 +439,8 @@ class PGSqlNode(BaseNode):
                         if case.varIndex in inputs:
                             case.varIndex = inputs[case.varIndex]
                 # Build update values from assignment list
-                update_values = {f: inputs[f] for f in self.assignmentList or []}
+                if self.mode == DBMode.UPDATE.value:
+                    update_values = {f: inputs[f] for f in self.assignmentList or []}
                 first_case = self.cases[0] if self.cases else None
                 # Generate SQL based on operation mode
                 compiled_sql = {

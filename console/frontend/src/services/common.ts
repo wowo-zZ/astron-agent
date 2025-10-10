@@ -80,7 +80,9 @@ export async function getCustomModelConfigDetail(
   id: string,
   llmSource: string
 ): Promise<unknown> {
-  return await http.get(`/llm/selfModelConfig?id=${id}&llmSource=${llmSource}`);
+  return await http.get(
+    `/llm/self-model-config?id=${id}&llmSource=${llmSource}`
+  );
 }
 
 export async function getTags(flag: string): Promise<unknown> {

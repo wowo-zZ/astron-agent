@@ -108,6 +108,29 @@ func (biz *AuthService) Query(appId string) ([]*models.Auth, error) {
 	return data, nil
 }
 
+func (biz *AuthService) QueryAppByAPIKey(apiKey string) (*models.App, error) {
+	data, err := biz.authDao.Select(biz.authDao.WithApiKey(apiKey), biz.authDao.WithIsDelete(false))
+	if err != nil {
+		log.Printf("query auth biz info by api key %s error: %v", apiKey, err)
+		return nil, NewBizErr(ErrCodeSystem, err.Error())
+	}
+	if len(data) == 0 {
+		return nil, NewBizErr(AppIdNotExist, "app id not exist")
+	}
+	if len(data[0].AppId) == 0 {
+		return nil, NewBizErr(AppIdNotExist, "app id not exist")
+	}
+	appList, err := biz.appDao.Select(biz.appDao.WithAppId(data[0].AppId), biz.appDao.WithIsDelete(false))
+	if err != nil {
+		log.Printf("query app  info by app id %s error: %v", data[0].AppId, err)
+		return nil, NewBizErr(ErrCodeSystem, err.Error())
+	}
+	if len(appList) == 0 || appList[0] == nil {
+		return nil, NewBizErr(AppIdNotExist, "app id not exist")
+	}
+	return appList[0], nil
+}
+
 func (biz *AuthService) rollback(tx *sql.Tx, err error) {
 	if r := recover(); r != nil {
 		if err := tx.Rollback(); err != nil {

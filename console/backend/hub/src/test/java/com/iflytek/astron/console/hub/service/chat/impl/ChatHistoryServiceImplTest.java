@@ -35,6 +35,7 @@ class ChatHistoryServiceImplTest {
 
     private String uid;
     private Long chatId;
+    private Boolean supportDocument;
     private List<ChatReqModelDto> reqModelDtos;
     private List<ChatRespModelDto> respModelDtos;
     private Map<Long, ReqKnowledgeRecords> knowledgeRecordsMap;
@@ -43,6 +44,7 @@ class ChatHistoryServiceImplTest {
     void setUp() {
         uid = "user123";
         chatId = 100L;
+        supportDocument = true;
 
         // Setup request DTOs
         ChatReqModelDto req1 = new ChatReqModelDto();
@@ -98,7 +100,7 @@ class ChatHistoryServiceImplTest {
         when(reqKnowledgeRecordsDataService.findByReqIds(reqIds)).thenReturn(knowledgeRecordsMap);
 
         // When
-        List<SparkChatRequest.MessageDto> result = chatHistoryService.getSystemBotHistory(uid, chatId);
+        List<SparkChatRequest.MessageDto> result = chatHistoryService.getSystemBotHistory(uid, chatId, supportDocument);
 
         // Then
         assertNotNull(result);
@@ -136,7 +138,7 @@ class ChatHistoryServiceImplTest {
         when(chatDataService.getReqModelBotHistoryByChatId(uid, chatId)).thenReturn(new ArrayList<>());
 
         // When
-        List<SparkChatRequest.MessageDto> result = chatHistoryService.getSystemBotHistory(uid, chatId);
+        List<SparkChatRequest.MessageDto> result = chatHistoryService.getSystemBotHistory(uid, chatId, supportDocument);
 
         // Then
         assertNotNull(result);
@@ -152,7 +154,7 @@ class ChatHistoryServiceImplTest {
         when(chatDataService.getReqModelBotHistoryByChatId(uid, chatId)).thenReturn(null);
 
         // When
-        List<SparkChatRequest.MessageDto> result = chatHistoryService.getSystemBotHistory(uid, chatId);
+        List<SparkChatRequest.MessageDto> result = chatHistoryService.getSystemBotHistory(uid, chatId, supportDocument);
 
         // Then
         assertNotNull(result);
@@ -170,7 +172,7 @@ class ChatHistoryServiceImplTest {
         when(reqKnowledgeRecordsDataService.findByReqIds(reqIds)).thenReturn(knowledgeRecordsMap);
 
         // When
-        List<SparkChatRequest.MessageDto> result = chatHistoryService.getSystemBotHistory(uid, chatId);
+        List<SparkChatRequest.MessageDto> result = chatHistoryService.getSystemBotHistory(uid, chatId, supportDocument);
 
         // Then
         assertNotNull(result);
@@ -196,7 +198,7 @@ class ChatHistoryServiceImplTest {
         when(reqKnowledgeRecordsDataService.findByReqIds(reqIds)).thenReturn(knowledgeRecordsMap);
 
         // When
-        List<SparkChatRequest.MessageDto> result = chatHistoryService.getSystemBotHistory(uid, chatId);
+        List<SparkChatRequest.MessageDto> result = chatHistoryService.getSystemBotHistory(uid, chatId, supportDocument);
 
         // Then
         assertNotNull(result);

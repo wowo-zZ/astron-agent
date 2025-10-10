@@ -54,11 +54,13 @@ def configure(log_level: Optional[str] = None, log_file: Optional[Path] = None):
     if not log_file:
         cache_dir = os.getenv(const.LOG_PATH_KEY)
         if cache_dir:
-            cache_dir = Path(cache_dir)
+            log_file_path = os.path.join(cache_dir, "link.log")
         else:
-            cache_dir = Path(appdirs.user_cache_dir("sparklink"))
-
-    log_file = log_file / "link.log"
+            cache_dir_path = appdirs.user_cache_dir("sparklink")
+            log_file_path = os.path.join(cache_dir_path, "link.log")
+        log_file = Path(log_file_path)
+    else:
+        log_file = log_file / "link.log"
     print(f"Log file: {log_file}, Log level: {log_level}")
 
     log_file = Path(log_file)

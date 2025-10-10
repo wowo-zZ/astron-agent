@@ -845,6 +845,8 @@ INSERT INTO `agent_space_permission` (`id`, `module`, `point`, `description`, `p
                                       `member`, `available_expired`, `create_time`, `update_time`)
 VALUES (281, 'Agent Details', '', '', 'ChatBotController_botDetail_POST', 1, 1, 1, 0, '2025-01-01 00:00:00',
         '2025-01-01 00:00:00');
+INSERT INTO `astron_console`.`agent_space_permission` (`id`, `module`, `point`, `description`, `permission_key`, `owner`, `admin`, `member`, `available_expired`, `create_time`, `update_time`) VALUES (282, '创建工作流智能体', NULL, NULL, 'BotCreateController_create_POST', 1, 1, 1, 0, '2025-01-01 00:00:00', '2025-01-01 00:00:00');
+INSERT INTO `astron_console`.`agent_space_permission` (`id`, `module`, `point`, `description`, `permission_key`, `owner`, `admin`, `member`, `available_expired`, `create_time`, `update_time`) VALUES (283, '更新工作流智能体', NULL, NULL, 'BotCreateController_update_POST', 1, 1, 1, 0, '2025-01-01 00:00:00', '2025-01-01 00:00:00');
 COMMIT;
 
 -- ----------------------------
@@ -1353,6 +1355,7 @@ CREATE TABLE `chat_bot_market`
     `opened_tool`      varchar(255)                                                 DEFAULT NULL COMMENT 'Enabled tools',
     `publish_channels` varchar(255)                                                 DEFAULT NULL COMMENT 'Publishing channels: MARKET,API,WECHAT,MCP comma separated',
     `model_id`         bigint                                                       DEFAULT NULL COMMENT 'Custom model ID',
+    `support_document` tinyint NOT NULL                                             DEFAULT '0' COMMENT 'Does it support the knowledge base? 0 - Not supported, 1 - Supported',
     PRIMARY KEY (`id`),
     KEY                `idx_bot_id` (`bot_id`),
     KEY                `idx_create_time3` (`create_time`),

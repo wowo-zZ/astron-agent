@@ -40,7 +40,7 @@ async def create_task(
             response.raise_for_status()
 
             response_data = response.json()
-            print(f"create task response_data:\n {response_data}\n\n")
+            logger.debug(f"create task response_data:\n {response_data}\n\n")
 
             code = response_data.get("code", "-1")
             msg = response_data.get("msg", None)
@@ -67,7 +67,7 @@ async def create_task(
                 status_code=e.response.status_code,
                 detail=f"Task creation failed: {e.response.text}",
             ) from e
-        except httpx.RequestError as e:
+        except Exception as e:
             logger.error(f"Task creation failed: {e}")
             raise HTTPException(
                 status_code=500, detail=f"Task creation failed: {e}"
@@ -97,7 +97,7 @@ async def query_task_status(
             response.raise_for_status()
 
             response_data = response.json()
-            print(f"query task response_data:\n {response_data}\n\n")
+            logger.debug(f"query task response_data:\n {response_data}\n\n")
 
             code = response_data.get("code", "-1")
             msg = response_data.get("msg", None)
@@ -136,7 +136,7 @@ async def query_task_status(
                 status_code=500, detail=f"Unknown task status: {status}"
             )
 
-        except httpx.RequestError as e:
+        except Exception as e:
             logger.error(f"Task status query failed: {e}")
             raise HTTPException(
                 status_code=500, detail=f"Task status query failed: {e}"

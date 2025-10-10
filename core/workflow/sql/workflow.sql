@@ -72,22 +72,6 @@ CREATE TABLE `flow` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Table structure for http_action_tool
--- ----------------------------
-DROP TABLE IF EXISTS `http_action_tool`;
-CREATE TABLE `http_action_tool` (
-  `id` bigint(20) NOT NULL,
-  `tool_id` varchar(32) DEFAULT NULL COMMENT '工具ID',
-  `name` varchar(128) DEFAULT NULL,
-  `open_api_schema` mediumtext COMMENT 'open api schema，json格式',
-  `plugin_schema` varchar(128) DEFAULT '' COMMENT '大模型插件协议',
-  `create_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `update_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `udx_action_tool_id` (`tool_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- ----------------------------
 -- Table structure for license
 -- ----------------------------
 DROP TABLE IF EXISTS `license`;
@@ -120,6 +104,6 @@ CREATE TABLE `workflow_node_history` (
   KEY `chat_id` (`chat_id`),
   KEY `node_id` (`node_id`),
   KEY `uid` (`uid`)
-) ENGINE=InnoDB AUTO_INCREMENT=302851 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 SET FOREIGN_KEY_CHECKS = 1;

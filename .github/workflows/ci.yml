@@ -2,9 +2,9 @@ name: 🚀 CI Pipeline
 
 on:
   push:
-    branches: [main, 'feature/**', 'bugfix/**', 'hotfix/**']
+    branches: [main, master, 'feature/**']
   pull_request:
-    branches: [main]
+    branches: [main, master, 'feature/**']
   workflow_dispatch:
 
 concurrency:

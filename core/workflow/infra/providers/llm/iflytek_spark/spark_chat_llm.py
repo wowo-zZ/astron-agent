@@ -21,7 +21,7 @@ from workflow.exception.errors.err_code import CodeEnum
 from workflow.extensions.otlp.log_trace.node_log import NodeLog
 from workflow.extensions.otlp.trace.span import Span
 from workflow.infra.providers.llm.chat_ai import ChatAI
-from workflow.infra.providers.llm.iflytek_spark.const import RETRY_CNT, spark_mapping
+from workflow.infra.providers.llm.iflytek_spark.const import RETRY_CNT
 from workflow.infra.providers.llm.iflytek_spark.spark_chat_auth import SparkChatHmacAuth
 
 
@@ -79,16 +79,6 @@ class SparkChatAi(ChatAI):
         :param span: Tracing span for logging
         :return: Authenticated WebSocket URL
         """
-        if not self.model_url:
-            spark_host = os.getenv("SPARK_HOST", "ws://spark-api.xf-yun.com")
-            spark_path = spark_mapping.get(self.model_name, None)
-            if not spark_path:
-                raise CustomException(
-                    err_code=CodeEnum.SPARK_REQUEST_ERROR,
-                    err_msg="Request URL is empty",
-                    cause_error="Request URL is empty",
-                )
-            self.model_url = f"{spark_host}/{spark_path}"
         url_auth = SparkChatHmacAuth(self.model_url, self.api_key, self.api_secret)
         span.add_info_events({"spark_url": self.model_url})
         url = url_auth.create_url()

@@ -48,7 +48,7 @@ public class ChatHistoryServiceImpl implements ChatHistoryService {
      * @return List of system bot message records
      */
     @Override
-    public List<SparkChatRequest.MessageDto> getSystemBotHistory(String uid, Long chatId) {
+    public List<SparkChatRequest.MessageDto> getSystemBotHistory(String uid, Long chatId, Boolean supportDocument) {
         // Get question history
         List<ChatReqModelDto> chatReqModelDtos = chatDataService.getReqModelBotHistoryByChatId(uid, chatId);
         List<SparkChatRequest.MessageDto> messages = new ArrayList<>();
@@ -71,14 +71,19 @@ public class ChatHistoryServiceImpl implements ChatHistoryService {
         Map<Long, ReqKnowledgeRecords> knowledgeRecordsMap = reqKnowledgeRecordsDataService.findByReqIds(reqIds);
 
         // Merge conversation history in chronological order of questions
-        for (ChatReqModelDto reqDto : chatReqModelDtos) {
+        for (int i = chatReqModelDtos.size() - 1; i >= 0; i--) {
+            ChatReqModelDto reqDto = chatReqModelDtos.get(i);
             // Add user message with knowledge enhancement
             SparkChatRequest.MessageDto userMessage = new SparkChatRequest.MessageDto();
             userMessage.setRole("user");
 
             // Enhance ask content with knowledge from reqKnowledgeRecords
-            String enhancedAsk = enhanceAskWithKnowledgeRecord(reqDto.getMessage(), knowledgeRecordsMap.get(reqDto.getId()));
-            userMessage.setContent(enhancedAsk);
+            if (supportDocument) {
+                String enhancedAsk = enhanceAskWithKnowledgeRecord(reqDto.getMessage(), knowledgeRecordsMap.get(reqDto.getId()));
+                userMessage.setContent(enhancedAsk);
+            } else {
+                userMessage.setContent(reqDto.getMessage());
+            }
             messages.add(userMessage);
 
             // Add corresponding assistant response

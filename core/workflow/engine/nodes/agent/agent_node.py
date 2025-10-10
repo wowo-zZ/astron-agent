@@ -388,11 +388,7 @@ class AgentNode(BaseNode):
         return {
             "model_config": {
                 "domain": self.modelConfig.domain,
-                "api": (
-                    self.modelConfig.api.rsplit("/", 2)[0]
-                    if self.source == ModelProviderEnum.OPENAI.value
-                    else self.modelConfig.api
-                ),
+                "api": self.modelConfig.api,
                 "api_key": (
                     f"{self.apiKey}:{self.apiSecret}"
                     if self.source == ModelProviderEnum.XINGHUO.value
