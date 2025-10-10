@@ -1,5 +1,7 @@
 package com.iflytek.astron.console.commons.service.bot;
 
+import com.iflytek.astron.console.commons.dto.bot.BotDetail;
+import com.iflytek.astron.console.commons.dto.bot.PromptBotDetail;
 import com.iflytek.astron.console.commons.entity.bot.*;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -145,8 +147,8 @@ public interface ChatBotDataService {
     /**
      * Check if user has duplicate assistant names within the specified space
      *
-     * @param uid     User ID
-     * @param botId   Assistant ID (passed in when editing, null when creating)
+     * @param uid User ID
+     * @param botId Assistant ID (passed in when editing, null when creating)
      * @param botName Assistant name
      * @param spaceId Space ID
      * @return Returns true if duplicate name exists, otherwise returns false

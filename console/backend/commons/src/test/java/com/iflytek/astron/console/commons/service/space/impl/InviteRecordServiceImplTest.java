@@ -1,7 +1,6 @@
 package com.iflytek.astron.console.commons.service.space.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.iflytek.astron.console.commons.dto.space.InviteRecordParam;
 import com.iflytek.astron.console.commons.dto.space.InviteRecordVO;
@@ -90,15 +89,14 @@ class InviteRecordServiceImplTest {
         mockInviteRecordList = Arrays.asList(
                 mockInviteRecord,
                 createMockInviteRecord(2L, "inviter-uid-2", "invitee-uid-2", 100L,
-                    InviteRecordTypeEnum.SPACE.getCode(), InviteRecordStatusEnum.INIT.getCode())
-        );
+                        InviteRecordTypeEnum.SPACE.getCode(), InviteRecordStatusEnum.INIT.getCode()));
     }
 
     /**
      * Helper method to create mock InviteRecord objects
      */
     private InviteRecord createMockInviteRecord(Long id, String inviterUid, String inviteeUid,
-                                               Long spaceId, Integer type, Integer status) {
+            Long spaceId, Integer type, Integer status) {
         InviteRecord record = new InviteRecord();
         record.setId(id);
         record.setInviterUid(inviterUid);
@@ -624,8 +622,7 @@ class InviteRecordServiceImplTest {
         InviteRecordTypeEnum type = InviteRecordTypeEnum.ENTERPRISE;
         List<InviteRecord> enterpriseRecords = Arrays.asList(
                 createMockInviteRecord(3L, "enterprise-inviter-1", "enterprise-uid-1", null,
-                    InviteRecordTypeEnum.ENTERPRISE.getCode(), InviteRecordStatusEnum.INIT.getCode())
-        );
+                        InviteRecordTypeEnum.ENTERPRISE.getCode(), InviteRecordStatusEnum.INIT.getCode()));
         enterpriseRecords.get(0).setEnterpriseId(enterpriseId);
 
         try (MockedStatic<EnterpriseInfoUtil> mockedStatic = mockStatic(EnterpriseInfoUtil.class)) {
@@ -799,7 +796,7 @@ class InviteRecordServiceImplTest {
 
             // Verify the cron expression
             org.springframework.scheduling.annotation.Scheduled scheduledAnnotation =
-                method.getAnnotation(org.springframework.scheduling.annotation.Scheduled.class);
+                    method.getAnnotation(org.springframework.scheduling.annotation.Scheduled.class);
             assertEquals("0 0 0 * * ?", scheduledAnnotation.cron(), "Cron expression should be daily at midnight");
         });
     }

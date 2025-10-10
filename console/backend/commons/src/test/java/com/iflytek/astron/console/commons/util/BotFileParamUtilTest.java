@@ -2,7 +2,6 @@ package com.iflytek.astron.console.commons.util;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.iflytek.astron.console.commons.entity.bot.UserLangChainInfo;
-import com.iflytek.astron.console.commons.enums.bot.BotUploadEnum;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 

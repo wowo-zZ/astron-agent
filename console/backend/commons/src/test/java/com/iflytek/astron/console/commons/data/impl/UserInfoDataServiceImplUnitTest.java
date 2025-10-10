@@ -1,9 +1,7 @@
 package com.iflytek.astron.console.commons.data.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.iflytek.astron.console.commons.entity.user.UserInfo;
-import com.iflytek.astron.console.commons.enums.space.EnterpriseServiceTypeEnum;
 import com.iflytek.astron.console.commons.event.UserNicknameUpdatedEvent;
 import com.iflytek.astron.console.commons.exception.BusinessException;
 import com.iflytek.astron.console.commons.mapper.user.UserInfoMapper;
@@ -415,7 +413,7 @@ class UserInfoDataServiceImplUnitTest {
         void updateCurrentUserBasicInfo() {
             // Given
             try (MockedStatic<RequestContextUtil> requestContextMocked =
-                         mockStatic(RequestContextUtil.class)) {
+                    mockStatic(RequestContextUtil.class)) {
                 requestContextMocked.when(RequestContextUtil::getUID).thenReturn(testUid);
                 when(userInfoMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(testUser);
                 when(userInfoMapper.updateById(any(UserInfo.class))).thenReturn(1);
@@ -541,7 +539,7 @@ class UserInfoDataServiceImplUnitTest {
         void getCurrentUserInfo() {
             // Given
             try (MockedStatic<RequestContextUtil> requestContextMocked =
-                         mockStatic(RequestContextUtil.class)) {
+                    mockStatic(RequestContextUtil.class)) {
                 requestContextMocked.when(RequestContextUtil::getUID).thenReturn(testUid);
                 when(userInfoMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(testUser);
 
@@ -558,7 +556,7 @@ class UserInfoDataServiceImplUnitTest {
         void getCurrentUserInfo_UserNotFound() {
             // Given
             try (MockedStatic<RequestContextUtil> requestContextMocked =
-                         mockStatic(RequestContextUtil.class)) {
+                    mockStatic(RequestContextUtil.class)) {
                 requestContextMocked.when(RequestContextUtil::getUID).thenReturn(testUid);
                 when(userInfoMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(null);
 

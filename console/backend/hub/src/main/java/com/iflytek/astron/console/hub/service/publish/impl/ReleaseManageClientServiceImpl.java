@@ -35,7 +35,7 @@ public class ReleaseManageClientServiceImpl implements ReleaseManageClientServic
 
     // Constant definition area
     // API path for getting version name
-    private static final String GET_VERSION_NAME_URL = "/getVersionName";
+    private static final String GET_VERSION_NAME_URL = "/get-version-name";
     // Success indicator for release
     private static final String RELEASE_SUCCESS = "SUCCESS";
     // API path for adding versions (currently empty)
@@ -114,11 +114,14 @@ public class ReleaseManageClientServiceImpl implements ReleaseManageClientServic
      */
     private String getVersionName(String flowId, Long spaceId, HttpServletRequest request) {
         try {
-            // Build form-type request body containing flowId parameter
-            FormBody formBody = new FormBody.Builder().add("flowId", flowId).build();
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("flowId", flowId);
+            MediaType jsonMediaType = MediaType.get("application/json; charset=utf-8");
+            RequestBody requestBody = RequestBody.create(JSON.toJSONString(jsonObject), jsonMediaType);
             // Create HTTP POST request
             Request versionRequest = buildRequest(GET_VERSION_NAME_URL, spaceId, request)
-                    .post(formBody)
+                    .addHeader("Content-Type", "application/json")
+                    .post(requestBody)
                     .build();
             // Execute request and parse version name
             return executeRequestForVersionName(versionRequest, flowId);
@@ -149,7 +152,8 @@ public class ReleaseManageClientServiceImpl implements ReleaseManageClientServic
     }
 
     /**
-     * Execute HTTP request for releasing robot versions and parse response into ReleaseBotRespDto object
+     * Execute HTTP request for releasing robot versions and parse response into ReleaseBotRespDto
+     * object
      *
      * @param request HTTP request object
      * @param flowId  Flow ID (for logging purposes)
@@ -206,5 +210,3 @@ public class ReleaseManageClientServiceImpl implements ReleaseManageClientServic
         }
     }
 }
-
-

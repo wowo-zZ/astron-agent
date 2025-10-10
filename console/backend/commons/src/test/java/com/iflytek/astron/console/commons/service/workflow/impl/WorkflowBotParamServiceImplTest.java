@@ -2,10 +2,10 @@ package com.iflytek.astron.console.commons.service.workflow.impl;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.iflytek.astron.console.commons.entity.bot.BotChatFileParam;
-import com.iflytek.astron.console.commons.entity.chat.ChatFileReq;
+import com.iflytek.astron.console.commons.dto.chat.ChatFileReq;
 import com.iflytek.astron.console.commons.entity.chat.ChatFileUser;
 import com.iflytek.astron.console.commons.entity.chat.ChatReqModel;
-import com.iflytek.astron.console.commons.entity.chat.ChatReqModelDto;
+import com.iflytek.astron.console.commons.dto.chat.ChatReqModelDto;
 import com.iflytek.astron.console.commons.service.data.ChatDataService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

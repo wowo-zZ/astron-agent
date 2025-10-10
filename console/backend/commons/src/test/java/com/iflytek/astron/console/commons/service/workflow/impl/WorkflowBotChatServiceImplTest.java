@@ -2,11 +2,15 @@ package com.iflytek.astron.console.commons.service.workflow.impl;
 
 import com.alibaba.fastjson2.JSON;
 import com.iflytek.astron.console.commons.constant.ResponseEnum;
+import com.iflytek.astron.console.commons.dto.chat.ChatModelMeta;
+import com.iflytek.astron.console.commons.dto.chat.ChatReqModelDto;
+import com.iflytek.astron.console.commons.dto.chat.ChatRequestDto;
+import com.iflytek.astron.console.commons.dto.chat.ChatRequestDtoList;
 import com.iflytek.astron.console.commons.entity.bot.ChatBotMarket;
-import com.iflytek.astron.console.commons.entity.bot.ChatBotReqDto;
+import com.iflytek.astron.console.commons.dto.bot.ChatBotReqDto;
 import com.iflytek.astron.console.commons.entity.bot.UserLangChainInfo;
 import com.iflytek.astron.console.commons.entity.chat.*;
-import com.iflytek.astron.console.commons.entity.workflow.WorkflowEventData;
+import com.iflytek.astron.console.commons.dto.workflow.WorkflowEventData;
 import com.iflytek.astron.console.commons.enums.ShelfStatusEnum;
 import com.iflytek.astron.console.commons.exception.BusinessException;
 import com.iflytek.astron.console.commons.service.WssListenerService;

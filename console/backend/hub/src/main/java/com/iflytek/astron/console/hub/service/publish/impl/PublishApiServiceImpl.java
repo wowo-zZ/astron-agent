@@ -166,10 +166,15 @@ public class PublishApiServiceImpl implements PublishApiService {
                 "/workflow/v1/chat/completions", botBase.getBotName());
 
         return BotApiInfoDTO.builder()
-                .botId(botId).botName(botBase.getBotName()).appName(appMst.getAppName())
-                .appId(appMst.getAppId()).appKey(appMst.getAppKey())
-                .appSecret(appMst.getAppSecret()).serviceUrl(BOT_API_MASS_BASE_URL + "/workflow/v1/chat/completions")
-                .flowId(flowId).build();
+                .botId(botId)
+                .botName(botBase.getBotName())
+                .appName(appMst.getAppName())
+                .appId(appMst.getAppId())
+                .appKey(appMst.getAppKey())
+                .appSecret(appMst.getAppSecret())
+                .serviceUrl(BOT_API_MASS_BASE_URL + "/workflow/v1/chat/completions")
+                .flowId(flowId)
+                .build();
     }
 
     private BotApiInfoDTO createBaseBotApi(String uid, AppMst appMst, ChatBotBase botBase) throws IOException {
@@ -191,9 +196,14 @@ public class PublishApiServiceImpl implements PublishApiService {
         // TODO: capability authorization
 
         return BotApiInfoDTO.builder()
-                .botId(botId).botName(botBase.getBotName()).appName(appMst.getAppName())
-                .appId(appMst.getAppId()).appKey(appMst.getAppKey())
-                .appSecret(appMst.getAppSecret()).serviceUrl(BOT_API_CBM_BASE_URL)
-                .flowId(null).build();
+                .botId(botId)
+                .botName(botBase.getBotName())
+                .appName(appMst.getAppName())
+                .appId(appMst.getAppId())
+                .appKey(appMst.getAppKey())
+                .appSecret(appMst.getAppSecret())
+                .serviceUrl(BOT_API_CBM_BASE_URL)
+                .flowId(null)
+                .build();
     }
 }

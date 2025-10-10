@@ -1,12 +1,10 @@
 package com.iflytek.astron.console.commons.util;
 
-import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
+import com.iflytek.astron.console.commons.dto.bot.BotTag;
 import com.iflytek.astron.console.commons.entity.bot.*;
 import com.iflytek.astron.console.commons.enums.bot.BotUploadEnum;
 import com.iflytek.astron.console.commons.mapper.bot.ChatBotBaseMapper;
@@ -137,7 +135,7 @@ class MaasUtilTest {
     void testGetRequestCookies_WithValidCookies() {
         Cookie cookie1 = new Cookie("session", "abc123");
         Cookie cookie2 = new Cookie("user", "john");
-        Cookie[] cookies = new Cookie[]{cookie1, cookie2};
+        Cookie[] cookies = new Cookie[] {cookie1, cookie2};
 
         when(request.getCookies()).thenReturn(cookies);
 
@@ -159,7 +157,7 @@ class MaasUtilTest {
 
     @Test
     void testGetRequestCookies_WithEmptyCookies() {
-        Cookie[] cookies = new Cookie[]{};
+        Cookie[] cookies = new Cookie[] {};
         when(request.getCookies()).thenReturn(cookies);
 
         String result = MaasUtil.getRequestCookies(request);

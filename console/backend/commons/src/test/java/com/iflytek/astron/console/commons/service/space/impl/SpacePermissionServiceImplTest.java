@@ -43,22 +43,21 @@ class SpacePermissionServiceImplTest {
 
         // Initialize test data
         mockSpacePermission = createMockSpacePermission(1L, "SPACE_MANAGE", "space_management",
-            "Space management permission", true, true, false);
+                "Space management permission", true, true, false);
 
         mockSpacePermissionList = Arrays.asList(
                 mockSpacePermission,
                 createMockSpacePermission(2L, "SPACE_VIEW", "space_management",
-                    "Space view permission", true, true, true),
+                        "Space view permission", true, true, true),
                 createMockSpacePermission(3L, "SPACE_DELETE", "space_management",
-                    "Space delete permission", true, false, false)
-        );
+                        "Space delete permission", true, false, false));
     }
 
     /**
      * Helper method to create mock SpacePermission objects
      */
     private SpacePermission createMockSpacePermission(Long id, String permissionKey, String module,
-                                                     String description, Boolean admin, Boolean owner, Boolean member) {
+            String description, Boolean admin, Boolean owner, Boolean member) {
         SpacePermission permission = new SpacePermission();
         permission.setId(id);
         permission.setPermissionKey(permissionKey);
@@ -153,7 +152,7 @@ class SpacePermissionServiceImplTest {
         // Given
         String specialKey = "SPACE_MANAGE@#$%^&*()_+-=[]{}|;':\\\",./<>?";
         SpacePermission specialPermission = createMockSpacePermission(1L, specialKey, "special_module",
-            "Special permission", true, true, false);
+                "Special permission", true, true, false);
 
         when(spacePermissionMapper.selectOne(any(LambdaQueryWrapper.class), eq(true)))
                 .thenReturn(specialPermission);
@@ -304,11 +303,11 @@ class SpacePermissionServiceImplTest {
     void testServiceBehaviorWithVariousInputs() {
         // Test with different types of keys
         String[] testKeys = {
-            "NORMAL_KEY",
-            "key_with_underscores",
-            "Key-With-Dashes",
-            "KeyWithNumbers123",
-            "VERY_LONG_PERMISSION_KEY_WITH_MULTIPLE_WORDS_AND_UNDERSCORES"
+                "NORMAL_KEY",
+                "key_with_underscores",
+                "Key-With-Dashes",
+                "KeyWithNumbers123",
+                "VERY_LONG_PERMISSION_KEY_WITH_MULTIPLE_WORDS_AND_UNDERSCORES"
         };
 
         when(spacePermissionMapper.selectOne(any(LambdaQueryWrapper.class), eq(true)))
@@ -467,14 +466,14 @@ class SpacePermissionServiceImplTest {
     void getSpacePermissionByKey_WithEdgeCases_ShouldHandleGracefully() {
         // Test with various edge case inputs
         String[] edgeCaseKeys = {
-            null,
-            "",
-            " ",
-            "   ",
-            "\t",
-            "\n",
-            "key with spaces",
-            "VERY_LONG_KEY_THAT_MIGHT_EXCEED_NORMAL_DATABASE_FIELD_LIMITS_BUT_SHOULD_STILL_BE_HANDLED_GRACEFULLY"
+                null,
+                "",
+                " ",
+                "   ",
+                "\t",
+                "\n",
+                "key with spaces",
+                "VERY_LONG_KEY_THAT_MIGHT_EXCEED_NORMAL_DATABASE_FIELD_LIMITS_BUT_SHOULD_STILL_BE_HANDLED_GRACEFULLY"
         };
 
         when(spacePermissionMapper.selectOne(any(LambdaQueryWrapper.class), eq(true)))
@@ -496,9 +495,8 @@ class SpacePermissionServiceImplTest {
     void testPerformanceWithMultiplePermissionKeys() {
         // Given
         List<String> multipleKeys = Arrays.asList(
-            "SPACE_CREATE", "SPACE_READ", "SPACE_UPDATE", "SPACE_DELETE",
-            "SPACE_MANAGE", "SPACE_VIEW", "SPACE_EXPORT", "SPACE_IMPORT"
-        );
+                "SPACE_CREATE", "SPACE_READ", "SPACE_UPDATE", "SPACE_DELETE",
+                "SPACE_MANAGE", "SPACE_VIEW", "SPACE_EXPORT", "SPACE_IMPORT");
 
         when(spacePermissionMapper.selectOne(any(LambdaQueryWrapper.class), eq(true)))
                 .thenReturn(mockSpacePermission);
@@ -536,8 +534,8 @@ class SpacePermissionServiceImplTest {
     void testConcurrentAccessSimulation() {
         // Given
         String[] concurrentKeys = {
-            "CONCURRENT_KEY_1", "CONCURRENT_KEY_2", "CONCURRENT_KEY_3",
-            "CONCURRENT_KEY_4", "CONCURRENT_KEY_5"
+                "CONCURRENT_KEY_1", "CONCURRENT_KEY_2", "CONCURRENT_KEY_3",
+                "CONCURRENT_KEY_4", "CONCURRENT_KEY_5"
         };
 
         when(spacePermissionMapper.selectOne(any(LambdaQueryWrapper.class), eq(true)))

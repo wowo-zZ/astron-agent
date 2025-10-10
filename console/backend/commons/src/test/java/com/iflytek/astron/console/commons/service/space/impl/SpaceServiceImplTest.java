@@ -1,6 +1,5 @@
 package com.iflytek.astron.console.commons.service.space.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.iflytek.astron.console.commons.data.UserInfoDataService;
 import com.iflytek.astron.console.commons.dto.space.EnterpriseSpaceCountVO;
@@ -91,13 +90,11 @@ class SpaceServiceImplTest {
 
         mockSpaceVOList = Arrays.asList(
                 mockSpaceVO,
-                createMockSpaceVO(2L, "Test Space 2", "test-uid-2", 100L, SpaceTypeEnum.PRO.getCode())
-        );
+                createMockSpaceVO(2L, "Test Space 2", "test-uid-2", 100L, SpaceTypeEnum.PRO.getCode()));
 
         mockSpaceUserList = Arrays.asList(
                 mockSpaceUser,
-                createMockSpaceUser(2L, 1L, "test-uid-2", "Test User 2", SpaceRoleEnum.MEMBER.getCode())
-        );
+                createMockSpaceUser(2L, 1L, "test-uid-2", "Test User 2", SpaceRoleEnum.MEMBER.getCode()));
 
         mockCountVO = new EnterpriseSpaceCountVO();
         mockCountVO.setTotal(10L);
@@ -158,7 +155,7 @@ class SpaceServiceImplTest {
         Long enterpriseId = 100L;
 
         try (MockedStatic<RequestContextUtil> requestMockedStatic = mockStatic(RequestContextUtil.class);
-             MockedStatic<EnterpriseInfoUtil> enterpriseMockedStatic = mockStatic(EnterpriseInfoUtil.class)) {
+                MockedStatic<EnterpriseInfoUtil> enterpriseMockedStatic = mockStatic(EnterpriseInfoUtil.class)) {
 
             requestMockedStatic.when(RequestContextUtil::getUID).thenReturn(uid);
             enterpriseMockedStatic.when(EnterpriseInfoUtil::getEnterpriseId).thenReturn(enterpriseId);
@@ -184,7 +181,7 @@ class SpaceServiceImplTest {
         List<Long> spaceIds = Arrays.asList(1L, 2L);
 
         try (MockedStatic<RequestContextUtil> requestMockedStatic = mockStatic(RequestContextUtil.class);
-             MockedStatic<EnterpriseInfoUtil> enterpriseMockedStatic = mockStatic(EnterpriseInfoUtil.class)) {
+                MockedStatic<EnterpriseInfoUtil> enterpriseMockedStatic = mockStatic(EnterpriseInfoUtil.class)) {
 
             requestMockedStatic.when(RequestContextUtil::getUID).thenReturn(uid);
             enterpriseMockedStatic.when(EnterpriseInfoUtil::getEnterpriseId).thenReturn(enterpriseId);
@@ -215,7 +212,7 @@ class SpaceServiceImplTest {
         List<Long> spaceIds = Arrays.asList(1L, 2L);
 
         try (MockedStatic<RequestContextUtil> requestMockedStatic = mockStatic(RequestContextUtil.class);
-             MockedStatic<EnterpriseInfoUtil> enterpriseMockedStatic = mockStatic(EnterpriseInfoUtil.class)) {
+                MockedStatic<EnterpriseInfoUtil> enterpriseMockedStatic = mockStatic(EnterpriseInfoUtil.class)) {
 
             requestMockedStatic.when(RequestContextUtil::getUID).thenReturn(uid);
             enterpriseMockedStatic.when(EnterpriseInfoUtil::getEnterpriseId).thenReturn(enterpriseId);
@@ -242,7 +239,7 @@ class SpaceServiceImplTest {
         String name = "Test";
 
         try (MockedStatic<RequestContextUtil> requestMockedStatic = mockStatic(RequestContextUtil.class);
-             MockedStatic<EnterpriseInfoUtil> enterpriseMockedStatic = mockStatic(EnterpriseInfoUtil.class)) {
+                MockedStatic<EnterpriseInfoUtil> enterpriseMockedStatic = mockStatic(EnterpriseInfoUtil.class)) {
 
             requestMockedStatic.when(RequestContextUtil::getUID).thenReturn(uid);
             enterpriseMockedStatic.when(EnterpriseInfoUtil::getEnterpriseId).thenReturn(enterpriseId);
@@ -269,7 +266,7 @@ class SpaceServiceImplTest {
         String name = "Test";
 
         try (MockedStatic<RequestContextUtil> requestMockedStatic = mockStatic(RequestContextUtil.class);
-             MockedStatic<EnterpriseInfoUtil> enterpriseMockedStatic = mockStatic(EnterpriseInfoUtil.class)) {
+                MockedStatic<EnterpriseInfoUtil> enterpriseMockedStatic = mockStatic(EnterpriseInfoUtil.class)) {
 
             requestMockedStatic.when(RequestContextUtil::getUID).thenReturn(uid);
             enterpriseMockedStatic.when(EnterpriseInfoUtil::getEnterpriseId).thenReturn(enterpriseId);
@@ -295,7 +292,7 @@ class SpaceServiceImplTest {
         Long enterpriseId = 100L;
 
         try (MockedStatic<RequestContextUtil> requestMockedStatic = mockStatic(RequestContextUtil.class);
-             MockedStatic<EnterpriseInfoUtil> enterpriseMockedStatic = mockStatic(EnterpriseInfoUtil.class)) {
+                MockedStatic<EnterpriseInfoUtil> enterpriseMockedStatic = mockStatic(EnterpriseInfoUtil.class)) {
 
             requestMockedStatic.when(RequestContextUtil::getUID).thenReturn(uid);
             enterpriseMockedStatic.when(EnterpriseInfoUtil::getEnterpriseId).thenReturn(enterpriseId);
@@ -320,7 +317,7 @@ class SpaceServiceImplTest {
         Long spaceId = 1L;
 
         try (MockedStatic<RequestContextUtil> requestMockedStatic = mockStatic(RequestContextUtil.class);
-             MockedStatic<SpaceInfoUtil> spaceMockedStatic = mockStatic(SpaceInfoUtil.class)) {
+                MockedStatic<SpaceInfoUtil> spaceMockedStatic = mockStatic(SpaceInfoUtil.class)) {
 
             requestMockedStatic.when(RequestContextUtil::getUID).thenReturn(uid);
             spaceMockedStatic.when(SpaceInfoUtil::getSpaceId).thenReturn(spaceId);
@@ -348,7 +345,7 @@ class SpaceServiceImplTest {
         Long spaceId = 999L;
 
         try (MockedStatic<RequestContextUtil> requestMockedStatic = mockStatic(RequestContextUtil.class);
-             MockedStatic<SpaceInfoUtil> spaceMockedStatic = mockStatic(SpaceInfoUtil.class)) {
+                MockedStatic<SpaceInfoUtil> spaceMockedStatic = mockStatic(SpaceInfoUtil.class)) {
 
             requestMockedStatic.when(RequestContextUtil::getUID).thenReturn(uid);
             spaceMockedStatic.when(SpaceInfoUtil::getSpaceId).thenReturn(spaceId);
@@ -392,7 +389,7 @@ class SpaceServiceImplTest {
         Long enterpriseId = 100L;
 
         try (MockedStatic<RequestContextUtil> requestMockedStatic = mockStatic(RequestContextUtil.class);
-             MockedStatic<EnterpriseInfoUtil> enterpriseMockedStatic = mockStatic(EnterpriseInfoUtil.class)) {
+                MockedStatic<EnterpriseInfoUtil> enterpriseMockedStatic = mockStatic(EnterpriseInfoUtil.class)) {
 
             requestMockedStatic.when(RequestContextUtil::getUID).thenReturn(uid);
             enterpriseMockedStatic.when(EnterpriseInfoUtil::getEnterpriseId).thenReturn(enterpriseId);
@@ -418,7 +415,7 @@ class SpaceServiceImplTest {
         Long enterpriseId = 100L;
 
         try (MockedStatic<RequestContextUtil> requestMockedStatic = mockStatic(RequestContextUtil.class);
-             MockedStatic<EnterpriseInfoUtil> enterpriseMockedStatic = mockStatic(EnterpriseInfoUtil.class)) {
+                MockedStatic<EnterpriseInfoUtil> enterpriseMockedStatic = mockStatic(EnterpriseInfoUtil.class)) {
 
             requestMockedStatic.when(RequestContextUtil::getUID).thenReturn(uid);
             enterpriseMockedStatic.when(EnterpriseInfoUtil::getEnterpriseId).thenReturn(enterpriseId);
@@ -442,7 +439,7 @@ class SpaceServiceImplTest {
         Long lastVisitEnterpriseId = 200L;
 
         try (MockedStatic<RequestContextUtil> requestMockedStatic = mockStatic(RequestContextUtil.class);
-             MockedStatic<EnterpriseInfoUtil> enterpriseMockedStatic = mockStatic(EnterpriseInfoUtil.class)) {
+                MockedStatic<EnterpriseInfoUtil> enterpriseMockedStatic = mockStatic(EnterpriseInfoUtil.class)) {
 
             requestMockedStatic.when(RequestContextUtil::getUID).thenReturn(uid);
             enterpriseMockedStatic.when(EnterpriseInfoUtil::getEnterpriseId).thenReturn(null);
@@ -578,7 +575,7 @@ class SpaceServiceImplTest {
         String uid = "test-uid";
 
         try (MockedStatic<EnterpriseInfoUtil> enterpriseMockedStatic = mockStatic(EnterpriseInfoUtil.class);
-             MockedStatic<RequestContextUtil> requestMockedStatic = mockStatic(RequestContextUtil.class)) {
+                MockedStatic<RequestContextUtil> requestMockedStatic = mockStatic(RequestContextUtil.class)) {
 
             enterpriseMockedStatic.when(EnterpriseInfoUtil::getEnterpriseId).thenReturn(null);
             requestMockedStatic.when(RequestContextUtil::getUID).thenReturn(uid);
@@ -849,7 +846,7 @@ class SpaceServiceImplTest {
         }
 
         try (MockedStatic<RequestContextUtil> requestMockedStatic = mockStatic(RequestContextUtil.class);
-             MockedStatic<EnterpriseInfoUtil> enterpriseMockedStatic = mockStatic(EnterpriseInfoUtil.class)) {
+                MockedStatic<EnterpriseInfoUtil> enterpriseMockedStatic = mockStatic(EnterpriseInfoUtil.class)) {
 
             requestMockedStatic.when(RequestContextUtil::getUID).thenReturn(uid);
             enterpriseMockedStatic.when(EnterpriseInfoUtil::getEnterpriseId).thenReturn(enterpriseId);

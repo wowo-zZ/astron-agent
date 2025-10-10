@@ -8,8 +8,13 @@ import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.iflytek.astron.console.commons.constant.ResponseEnum;
-import com.iflytek.astron.console.commons.entity.bot.*;
-import com.iflytek.astron.console.commons.entity.workflow.MaasApi;
+import com.iflytek.astron.console.commons.dto.bot.AdvancedConfig;
+import com.iflytek.astron.console.commons.dto.bot.BotCreateForm;
+import com.iflytek.astron.console.commons.dto.bot.BotTag;
+import com.iflytek.astron.console.commons.dto.workflow.MaasApi;
+import com.iflytek.astron.console.commons.entity.bot.ChatBotBase;
+import com.iflytek.astron.console.commons.entity.bot.ChatBotTag;
+import com.iflytek.astron.console.commons.entity.bot.UserLangChainInfo;
 import com.iflytek.astron.console.commons.enums.bot.BotUploadEnum;
 import com.iflytek.astron.console.commons.exception.BusinessException;
 import com.iflytek.astron.console.commons.mapper.bot.ChatBotBaseMapper;
@@ -419,18 +424,17 @@ public class MaasUtil {
     private String executeRequest(String url, MaasApi bodyData) {
         Map<String, String> authMap = AuthStringUtil.authMap(url, "POST", consumerKey, consumerSecret, JSONObject.toJSONString(bodyData));
         RequestBody requestBody = RequestBody.create(
-                JSONObject.toJSONString(authMap),
+                JSONObject.toJSONString(bodyData),
                 MediaType.parse("application/json; charset=utf-8"));
-
         Request request = new Request.Builder()
                 .url(url)
                 .post(requestBody)
                 .addHeader("X-Consumer-Username", consumerId)
                 .addHeader("Lang-Code", I18nUtil.getLanguage())
-                .headers(Headers.of(authMap))
+                .addHeader("Authorization", "Bearer %s:%s".formatted(consumerKey, consumerSecret))
                 .addHeader(X_AUTH_SOURCE_HEADER, X_AUTH_SOURCE_VALUE)
                 .build();
-
+        log.info("MaasUtil executeRequest  request: {}, body:{}", request, bodyData);
         try (Response httpResponse = HTTP_CLIENT.newCall(request).execute()) {
             ResponseBody responseBody = httpResponse.body();
             if (responseBody != null) {
@@ -635,21 +639,20 @@ public class MaasUtil {
     }
 
     /**
-     * Register MCP server (mock implementation)
-     * Corresponds to massUtil.registerMcp in original project
-     * 
-     * @param cookie HTTP cookies from request
-     * @param chainInfo workflow chain information
-     * @param mcpRequest MCP publish request data
+     * Register MCP server (mock implementation) Corresponds to massUtil.registerMcp in original project
+     *
+     * @param cookie      HTTP cookies from request
+     * @param chainInfo   workflow chain information
+     * @param mcpRequest  MCP publish request data
      * @param versionName workflow version name
      * @return JSONObject containing MCP registration result
      */
     public static JSONObject registerMcp(String cookie, Object chainInfo, Object mcpRequest, String versionName) {
         log.info("Registering MCP server: versionName={}", versionName);
-        
+
         // Mock implementation - return structured data similar to original project
         JSONObject result = new JSONObject();
-        
+
         try {
             // Extract data from mcpRequest (using reflection to avoid direct dependency)
             if (mcpRequest != null) {
@@ -661,7 +664,7 @@ public class MaasUtil {
                     java.lang.reflect.Method getIcon = mcpRequest.getClass().getMethod("getIcon");
                     java.lang.reflect.Method getArgs = mcpRequest.getClass().getMethod("getArgs");
                     java.lang.reflect.Method getBotId = mcpRequest.getClass().getMethod("getBotId");
-                    
+
                     result.put("serverName", getServerName.invoke(mcpRequest));
                     result.put("description", getDescription.invoke(mcpRequest));
                     result.put("content", getContent.invoke(mcpRequest));
@@ -672,7 +675,7 @@ public class MaasUtil {
                     log.warn("Failed to extract data from mcpRequest using reflection: {}", reflectionException.getMessage());
                 }
             }
-            
+
             // Extract flowId from chainInfo (using reflection to avoid direct dependency)
             String flowId = null;
             if (chainInfo != null) {
@@ -683,32 +686,44 @@ public class MaasUtil {
                     log.warn("Failed to extract flowId from chainInfo using reflection: {}", reflectionException.getMessage());
                 }
             }
-            
+
             // Generate server URL (similar to original project)
             if (flowId != null && !flowId.trim().isEmpty()) {
                 result.put("serverUrl", String.format("https://xingchen-api.xf-yun.com/mcp/xingchen/flow/%s/sse", flowId));
             } else {
                 result.put("serverUrl", "https://xingchen-api.xf-yun.com/mcp/xingchen/flow/default/sse");
             }
-            
+
             // Add version information
             result.put("versionName", versionName);
             result.put("flowId", flowId);
-            
+
             // Add mock success indicators
             result.put("code", 0);
             result.put("message", "MCP server registered successfully");
             result.put("success", true);
-            
+
             log.info("MCP server registration completed: serverUrl={}", result.getString("serverUrl"));
-            
+
         } catch (Exception e) {
             log.error("Failed to register MCP server: versionName={}", versionName, e);
             result.put("code", -1);
             result.put("message", "Failed to register MCP server: " + e.getMessage());
             result.put("success", false);
         }
-        
+
         return result;
+    }
+
+    public static Headers buildHeaders(Map<String, String> headerMap) {
+        Headers.Builder headerBuilder = new Headers.Builder();
+        if (headerMap != null) {
+            for (Map.Entry<String, String> entry : headerMap.entrySet()) {
+                if (entry.getKey() != null && entry.getValue() != null) {
+                    headerBuilder.add(entry.getKey(), entry.getValue());
+                }
+            }
+        }
+        return headerBuilder.build();
     }
 }
