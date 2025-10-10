@@ -264,13 +264,8 @@ public class BotCreateController {
             Boolean result = botService.updateBotBasicInfo(uid, bot, spaceId);
 
             // Handle dataset associations update
-            if (selfDocumentExist) {
-                botDatasetService.updateDatasetByBot(uid, bot.getBotId(), datasetList, supportDocument);
-            }
-
-            if (maasDocumentExist) {
-                botDatasetMaasService.updateDatasetByBot(uid, bot.getBotId(), maasDatasetList, supportDocument);
-            }
+            botDatasetService.updateDatasetByBot(uid, bot.getBotId(), datasetList, supportDocument);
+            botDatasetMaasService.updateDatasetByBot(uid, bot.getBotId(), maasDatasetList, supportDocument);
 
             return ApiResult.success(result);
         } catch (Exception e) {
