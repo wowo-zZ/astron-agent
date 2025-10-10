@@ -419,7 +419,7 @@ public class MaasUtil {
     private String executeRequest(String url, MaasApi bodyData) {
         Map<String, String> authMap = AuthStringUtil.authMap(url, "POST", consumerKey, consumerSecret, JSONObject.toJSONString(bodyData));
         RequestBody requestBody = RequestBody.create(
-                JSONObject.toJSONString(authMap),
+                JSONObject.toJSONString(bodyData),
                 MediaType.parse("application/json; charset=utf-8"));
 
         Request request = new Request.Builder()
