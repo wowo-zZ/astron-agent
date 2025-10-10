@@ -124,7 +124,7 @@ maas:
   appId: ${MAAS_APP_ID:your-maas-app-id}
   apiKey: ${MAAS_API_KEY:your-maas-api-key}
   apiSecret: ${MAAS_API_SECRET:your-maas-api-secret}
-  workflowVersion: ${MAAS_WORKFLOW_VERSION:http://localhost:8080}
+  workflowVersion: ${MAAS_WORKFLOW_VERSION:http://127.0.0.1:8080/workflow/version}
   synchronizeWorkFlow: http://127.0.0.1:8080/workflow
   publish: http://127.0.0.1:8080/workflow/publish
   cloneWorkFlow: http://127.0.0.1:8080/workflow/internal-clone
