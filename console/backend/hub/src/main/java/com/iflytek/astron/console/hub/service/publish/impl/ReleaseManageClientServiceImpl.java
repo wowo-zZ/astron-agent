@@ -114,12 +114,14 @@ public class ReleaseManageClientServiceImpl implements ReleaseManageClientServic
      */
     private String getVersionName(String flowId, Long spaceId, HttpServletRequest request) {
         try {
-            // Build form-type request body containing flowId parameter
-            FormBody formBody = new FormBody.Builder().add("flowId", flowId).build();
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("flowId", flowId);
+            MediaType jsonMediaType = MediaType.get("application/json; charset=utf-8");
+            RequestBody requestBody = RequestBody.create(JSON.toJSONString(jsonObject), jsonMediaType);
             // Create HTTP POST request
             Request versionRequest = buildRequest(GET_VERSION_NAME_URL, spaceId, request)
                     .addHeader("Content-Type", "application/json")
-                    .post(formBody)
+                    .post(requestBody)
                     .build();
             // Execute request and parse version name
             return executeRequestForVersionName(versionRequest, flowId);
