@@ -5,7 +5,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.iflytek.astron.console.commons.constant.RedisKeyConstant;
-import com.iflytek.astron.console.commons.entity.workflow.WorkflowEventData;
+import com.iflytek.astron.console.commons.dto.workflow.WorkflowEventData;
 import com.iflytek.astron.console.commons.entity.chat.ChatReqRecords;
 import com.iflytek.astron.console.commons.service.WssListenerService;
 import com.iflytek.astron.console.commons.util.SseEmitterUtil;

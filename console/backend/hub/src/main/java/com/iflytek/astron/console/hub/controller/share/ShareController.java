@@ -2,7 +2,7 @@ package com.iflytek.astron.console.hub.controller.share;
 
 import com.alibaba.fastjson2.JSON;
 import com.iflytek.astron.console.commons.constant.ResponseEnum;
-import com.iflytek.astron.console.commons.entity.chat.ChatListCreateResponse;
+import com.iflytek.astron.console.commons.dto.chat.ChatListCreateResponse;
 import com.iflytek.astron.console.commons.entity.space.AgentShareRecord;
 import com.iflytek.astron.console.hub.dto.share.ShareKey;
 import com.iflytek.astron.console.commons.annotation.space.SpacePreAuth;

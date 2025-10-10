@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
+import com.iflytek.astron.console.commons.dto.bot.BotTag;
 import com.iflytek.astron.console.commons.entity.bot.*;
 import com.iflytek.astron.console.commons.enums.bot.BotUploadEnum;
 import com.iflytek.astron.console.commons.mapper.bot.ChatBotBaseMapper;

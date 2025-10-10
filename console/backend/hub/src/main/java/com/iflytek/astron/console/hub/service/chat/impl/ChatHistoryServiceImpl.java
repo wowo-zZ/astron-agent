@@ -1,8 +1,8 @@
 package com.iflytek.astron.console.hub.service.chat.impl;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.iflytek.astron.console.commons.dto.chat.*;
 import com.iflytek.astron.console.commons.dto.llm.SparkChatRequest;
-import com.iflytek.astron.console.commons.entity.chat.*;
 import com.iflytek.astron.console.commons.service.data.ChatDataService;
 import com.iflytek.astron.console.commons.service.data.ChatHistoryService;
 import com.iflytek.astron.console.hub.data.ReqKnowledgeRecordsDataService;
@@ -115,24 +115,38 @@ public class ChatHistoryServiceImpl implements ChatHistoryService {
         List<ChatRespModelDto> respList = chatDataService.getChatRespModelBotHistoryByChatId(uid, chatId, reqIdList);
         ChatRequestDtoList chatRecordList = new ChatRequestDtoList();
         int tempLength = 0;
-        if (respList == null) {
-            respList = new ArrayList<>();
+
+        // Group answer history by reqId
+        Map<Long, ChatRespModelDto> respMap = new HashMap<>();
+        if (respList != null && !respList.isEmpty()) {
+            for (ChatRespModelDto respDto : respList) {
+                respMap.put(respDto.getReqId(), respDto);
+            }
         }
+
         // Flush historical sessions to cache, will automatically scroll update to maximum range
-        for (int i = 0; i < Math.min(reqList.size(), respList.size()); i++) {
+        /*** Add question ***/
+        for (ChatReqModelDto reqDto : reqList) {
+            ChatRespModelDto respDto = respMap.get(reqDto.getId());
+
+            // Skip if no response found for this request
+            if (respDto == null) {
+                continue;
+            }
+
             // Add answer, history records answer first then question
-            String answer = respList.get(i).getMessage();
+            String answer = respDto.getMessage();
             int answerLength = answer == null ? 0 : answer.length();
             // If there is data in multimodal content, it means this is a multimodal return, append history in
             // multimodal design format
-            if (StringUtils.isNotBlank(respList.get(i).getContent())) {
+            if (StringUtils.isNotBlank(respDto.getContent())) {
                 // Multimodal concatenation length defaults to 200
                 answerLength = 200;
-                String url = respList.get(i).getUrl();
-                String content = respList.get(i).getContent();
-                String type = respList.get(i).getType();
-                String dataId = respList.get(i).getDataId();
-                int needHis = respList.get(i).getNeedHis();
+                String url = respDto.getUrl();
+                String content = respDto.getContent();
+                String type = respDto.getType();
+                String dataId = respDto.getDataId();
+                int needHis = respDto.getNeedHis();
                 if (needHis == 0) {
                     ChatContentMeta contentMeta = new ChatContentMeta(null, content, true, dataId);
                     chatRecordList.getMessages().addFirst(new ChatRequestDto("assistant", url, type, contentMeta));
@@ -152,27 +166,25 @@ public class ChatHistoryServiceImpl implements ChatHistoryService {
                 return chatRecordList;
             }
             /*** Add question ***/
-            if (i < reqList.size()) {
-                String ask = reqList.get(i).getMessage();
-                int askLength = ask == null ? 0 : ask.length();
-                // If the question is an image, set length to 800 to prevent history from exceeding 10 images
-                if (StringUtils.isNotBlank(reqList.get(i).getUrl())) {
-                    askLength = 800;
-                }
-                tempLength = tempLength + askLength;
-                if (tempLength > MAX_HISTORY_NUMBERS) {
-                    return chatRecordList;
-                }
+            String ask = reqDto.getMessage();
+            int askLength = ask == null ? 0 : ask.length();
+            // If the question is an image, set length to 800 to prevent history from exceeding 10 images
+            if (StringUtils.isNotBlank(reqDto.getUrl())) {
+                askLength = 800;
+            }
+            tempLength = tempLength + askLength;
+            if (tempLength > MAX_HISTORY_NUMBERS) {
+                return chatRecordList;
+            }
 
-                // If there is data in multimodal content, it means this is multimodal input, append history in
-                // multimodal design QQA format
-                if (StringUtils.isNotBlank(reqList.get(i).getUrl())) {
-                    String url = reqList.get(i).getUrl();
-                    List<ChatModelMeta> metaList = urlToArray(url, ask);
-                    chatRecordList.getMessages().addFirst(new ChatRequestDto("user", metaList));
-                } else {
-                    chatRecordList.getMessages().addFirst(new ChatRequestDto("user", ask));
-                }
+            // If there is data in multimodal content, it means this is multimodal input, append history in
+            // multimodal design QQA format
+            if (StringUtils.isNotBlank(reqDto.getUrl())) {
+                String url = reqDto.getUrl();
+                List<ChatModelMeta> metaList = urlToArray(url, ask);
+                chatRecordList.getMessages().addFirst(new ChatRequestDto("user", metaList));
+            } else {
+                chatRecordList.getMessages().addFirst(new ChatRequestDto("user", ask));
             }
         }
         chatRecordList.setLength(tempLength);

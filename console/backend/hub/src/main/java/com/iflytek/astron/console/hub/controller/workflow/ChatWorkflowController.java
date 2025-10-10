@@ -8,7 +8,7 @@ import com.iflytek.astron.console.commons.response.ApiResult;
 import com.iflytek.astron.console.commons.util.space.SpaceInfoUtil;
 import com.iflytek.astron.console.commons.service.bot.ChatBotDataService;
 import com.iflytek.astron.console.commons.service.data.UserLangChainDataService;
-import com.iflytek.astron.console.commons.entity.workflow.WorkflowInfoDto;
+import com.iflytek.astron.console.commons.dto.workflow.WorkflowInfoDto;
 import com.iflytek.astron.console.commons.entity.bot.ChatBotBase;
 import com.iflytek.astron.console.commons.entity.bot.UserLangChainInfo;
 import com.iflytek.astron.console.toolkit.service.workflow.WorkflowService;
