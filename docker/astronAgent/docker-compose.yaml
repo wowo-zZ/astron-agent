@@ -84,7 +84,7 @@ services:
       - astron-agent-network
     restart: always
     healthcheck:
-      test: ["CMD-SHELL", "nc -z localhost 9200 || exit 1"]
+      test: ["CMD", "curl", "-f", "http://localhost:9200/_cluster/health"]
       interval: ${HEALTH_CHECK_INTERVAL:-30s}
       timeout: ${HEALTH_CHECK_TIMEOUT:-10s}
       retries: ${HEALTH_CHECK_RETRIES:-60}
@@ -100,7 +100,7 @@ services:
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,CONTROLLER://0.0.0.0:29093,PLAINTEXT_HOST://0.0.0.0:${EXPOSE_KAFKA_PORT:-9092}
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:29093
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:29093
       KAFKA_PROCESS_ROLES: broker,controller
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: ${KAFKA_REPLICATION_FACTOR:-1}
@@ -136,7 +136,7 @@ services:
     restart: always
     command: server /data --console-address ":9001"
     healthcheck:
-      test: ["CMD-SHELL", "nc -z localhost 9000 || exit 1"]
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: ${HEALTH_CHECK_INTERVAL:-30s}
       timeout: ${HEALTH_CHECK_TIMEOUT:-10s}
       retries: ${HEALTH_CHECK_RETRIES:-60}

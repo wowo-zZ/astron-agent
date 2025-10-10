@@ -77,7 +77,7 @@ class Meter:
     def in_error_count(
         self,
         code: int,
-        lables: Optional[dict] = None,
+        labels: Optional[dict] = None,
         count: int = 1,
         is_in_histogram: bool = True,
         span: Optional[Span] = None,
@@ -86,7 +86,7 @@ class Meter:
         Report error count metrics, with optional timing histogram.
 
         :param code: Error code to report
-        :param lables: Additional labels for the error metric
+        :param labels: Additional labels for the error metric
         :param count: Number of errors to report, defaults to 1
         :param is_in_histogram: Whether to report timing histogram, defaults to True
         :param span: Optional span for tracing correlation
@@ -94,41 +94,41 @@ class Meter:
         attr = self._get_default_labels()
         attr["ret"] = str(code)
 
-        if lables:
-            attr.update(lables)
+        if labels:
+            attr.update(labels)
 
         if metric.counter is not None:
             metric.counter.add(count, attr)
         if is_in_histogram:
-            self.in_histogram(lables)
+            self.in_histogram(labels)
             self.in_histogram_flag = True
         if span:
             span.set_code(code)
             if code != 0:
                 span.set_status(Status(StatusCode.ERROR))
 
-    def in_success_count(self, lables: Optional[dict] = None, count: int = 1) -> None:
+    def in_success_count(self, labels: Optional[dict] = None, count: int = 1) -> None:
         """
         Report success count metrics.
 
-        :param lables: Additional labels for the success metric
+        :param labels: Additional labels for the success metric
         :param count: Number of successes to report, defaults to 1
         """
-        self.in_error_count(0, lables, count)
+        self.in_error_count(0, labels, count)
 
-    def in_histogram(self, lables: Optional[dict] = None) -> None:
+    def in_histogram(self, labels: Optional[dict] = None) -> None:
         """
         Report execution time histogram.
 
-        :param lables: Additional labels for the timing metric
+        :param labels: Additional labels for the timing metric
         """
         if self.in_histogram_flag:
             return
 
         attr = self._get_default_labels()
 
-        if lables:
-            attr.update(lables)
+        if labels:
+            attr.update(labels)
 
         end_time = int(int(round(time.time() * 1000)))
         duration = end_time - self.start_time

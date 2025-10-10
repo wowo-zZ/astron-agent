@@ -689,10 +689,12 @@ async def _get_response_or_ping(
     getter: Callable[[], Awaitable[LLMGenerate]],
     timeout: float = 30.0,
 ) -> LLMGenerate:
+    response: LLMGenerate
     try:
-        return await asyncio.wait_for(getter(), timeout=timeout)
+        response = await asyncio.wait_for(getter(), timeout=timeout)
     except asyncio.TimeoutError:
-        return LLMGenerate._ping(sid=sid, node_info=node_info)
+        response = LLMGenerate._ping(sid=sid, node_info=node_info)
+    return response
 
 
 async def _get_response(
@@ -925,7 +927,15 @@ async def _chat_response_stream(
                 response = await _get_response(
                     app_audit_policy, audit_strategy, response_queue, last_response
                 )
-                last_response = response
+
+                node: Optional[NodeInfo] = (
+                    response.workflow_step.node if response.workflow_step else None
+                )
+                last_response = (
+                    response
+                    if node and node.id.startswith(NodeType.RPA.value)
+                    else last_response
+                )
 
                 response, should_return = _filter_response_frame(
                     response_frame=response,
@@ -1057,7 +1067,11 @@ async def _forward_queue_messages(
             response = await _get_response(
                 app_audit_policy, audit_strategy, response_queue, last_response
             )
-            last_response = response
+            node: Optional[NodeInfo] = (
+                response.workflow_step.node if response.workflow_step else None
+            )
+            if node and node.id.startswith(NodeType.RPA.value):
+                last_response = response
             event = EventRegistry().get_event(event_id=event_id)
             data = json.dumps(response.dict(), ensure_ascii=False)
             await EventRegistry().write_resume_data(

@@ -107,6 +107,31 @@ class CompletionBase(BaseModel, ABC):
             context.span.add_error_events({"traceback": context.error_log})
 
         stop_chunk = await self.create_stop(context.span, context.error)
+
+        # Attach usage from node_trace if available
+        if context.node_trace.trace:
+            from openai.types.completion_usage import CompletionUsage
+
+            total_usage = {
+                "completion_tokens": 0,
+                "prompt_tokens": 0,
+                "total_tokens": 0
+            }
+            for node in context.node_trace.trace:
+                if hasattr(node, "data") and hasattr(node.data, "usage"):
+                    total_usage["completion_tokens"] += (
+                        node.data.usage.completion_tokens
+                    )
+                    total_usage["prompt_tokens"] += (
+                        node.data.usage.prompt_tokens
+                    )
+                    total_usage["total_tokens"] += (
+                        node.data.usage.total_tokens
+                    )
+
+            if total_usage["total_tokens"] > 0:
+                stop_chunk.usage = CompletionUsage(**total_usage)
+
         context.chunk_logs.append(stop_chunk.model_dump_json())
 
         for chunk_log in context.chunk_logs:

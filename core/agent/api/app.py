@@ -33,11 +33,17 @@ async def validation_exception_handler(
     except (IndexError, AttributeError):
         err = exc.body or {}
     message = f"{err['type']}, {err['loc'][-1]}, {err['msg']}"
+
+    # Generate ID safely - fallback if sid_generator2 not initialized
+    request_id = (
+        sid_generator2.gen() if sid_generator2 is not None else "validation-error"
+    )
+
     rs = JSONResponse(
         content=ReasonChatCompletionChunk(
             code=40002,
             message=message,
-            id=sid_generator2.gen(),
+            id=request_id,
             choices=[],
             created=int(time.time()),
             model="",

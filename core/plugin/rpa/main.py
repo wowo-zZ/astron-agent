@@ -2,10 +2,13 @@
 This module initializes and starts the RPA server.
 """
 
+import functools
 import os
 import subprocess
 import sys
 from pathlib import Path
+
+print = functools.partial(print, flush=True)
 
 
 def setup_python_path() -> None:

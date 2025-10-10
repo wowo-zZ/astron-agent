@@ -25,6 +25,7 @@ from workflow.cache.event_registry import EventRegistry
 from workflow.consts.runtime_env import RuntimeEnv
 from workflow.extensions.fastapi.handler.validation import validation_exception_handler
 from workflow.extensions.fastapi.middleware.auth import AuthMiddleware
+from workflow.extensions.fastapi.middleware.otlp import OtlpMiddleware
 from workflow.extensions.graceful_shutdown.graceful_shutdown import GracefulShutdown
 from workflow.extensions.middleware.initialize import initialize_services
 
@@ -55,6 +56,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
+    app.add_middleware(OtlpMiddleware)  # type: ignore[arg-type]
     app.add_middleware(AuthMiddleware)  # type: ignore[arg-type]
 
     # Include API routers for different endpoints

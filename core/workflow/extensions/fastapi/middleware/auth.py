@@ -25,22 +25,40 @@ class AuthMiddleware(BaseHTTPMiddleware):
     """
 
     def __init__(self, app: ASGIApp):
+        """
+        Initialize the authentication middleware
+
+        :param app: The ASGI application
+        """
         super().__init__(app)
         self.need_auth_paths = CHAT_OPEN_API_PATHS + AUTH_OPEN_API_PATHS
         self.api_key = os.getenv("APP_MANAGE_PLAT_KEY", "")
         self.api_secret = os.getenv("APP_MANAGE_PLAT_SECRET", "")
 
     async def dispatch(self, request: Request, call_next: Any) -> Any:
+        """
+        Dispatch the request, if the path is in the exclude paths, skip the authentication,
+        if the x-consumer-username header is present, skip the authentication,
+        otherwise, get the authentication header, and get the app source detail with api key,
+        if the app source detail is not found, return the error response,
+        otherwise, add the authentication information to the request state,
+        and call the next function.
+
+        :param request: The request object
+        :param call_next: The next function to call
+        :return: The response object
+        """
+        # Check if the path is in the exclude paths
+        if request.url.path not in self.need_auth_paths:
+            return await call_next(request)
+
+        # Get the authentication header
+        x_consumer_username = request.headers.get("x-consumer-username")
+        if x_consumer_username:
+            return await call_next(request)
+
         span = Span()
         with span.start() as span_ctx:
-            # Check if the path is in the exclude paths
-            if request.url.path not in self.need_auth_paths:
-                return await call_next(request)
-
-            # Get the authentication header
-            x_consumer_username = request.headers.get("x-consumer-username")
-            if x_consumer_username:
-                return await call_next(request)
 
             authorization = request.headers.get("authorization")
             if not authorization:
@@ -70,7 +88,8 @@ class AuthMiddleware(BaseHTTPMiddleware):
             headers = list(request.scope["headers"])
             headers.append((b"x-consumer-username", x_consumer_username.encode()))
             request.scope["headers"] = headers
-            return await call_next(request)
+
+        return await call_next(request)
 
     def _gen_app_auth_header(self, url: str) -> dict[str, str]:
         """
@@ -96,6 +115,10 @@ class AuthMiddleware(BaseHTTPMiddleware):
     ) -> str:
         """
         Get the app source detail with api key
+
+        :param authorization: The authorization header
+        :param span: The span object
+        :return: The app source detail
         """
 
         url = os.getenv("APP_MANAGE_PLAT_APP_DETAILS_WITH_API_KEY")
@@ -156,6 +179,9 @@ class AuthMiddleware(BaseHTTPMiddleware):
     async def _get_app_id_with_cache(self, api_key: str) -> str:
         """
         Get the app id with cache
+
+        :param api_key: The api key
+        :return: The app id
         """
         cache_service = get_cache_service()
         app_id: str = cache_service[f"workflow:app:api_key:{api_key}"]
@@ -164,6 +190,9 @@ class AuthMiddleware(BaseHTTPMiddleware):
     async def _set_app_id_with_cache(self, api_key: str, app_id: str) -> None:
         """
         Set the app id with cache
+
+        :param api_key: The api key
+        :param app_id: The app id
         """
         cache_service = get_cache_service()
         cache_service[f"workflow:app:api_key:{api_key}"] = app_id

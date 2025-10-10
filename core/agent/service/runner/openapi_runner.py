@@ -75,6 +75,7 @@ class OpenAPIRunner(BaseModel):
             created=message.created,
             model=message.model,
             object="chat.completion.chunk",
+            usage=message.usage,
         )
 
         if message.typ == "reasoning_content":

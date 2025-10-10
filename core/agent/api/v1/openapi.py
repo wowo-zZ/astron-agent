@@ -12,6 +12,7 @@ from api.schemas.completion import (
     ReasonChoiceMessageToolCall,
     ReasonChoiceMessageToolCallFunction,
 )
+from openai.types.completion_usage import CompletionUsage
 from api.schemas.completion_chunk import ReasonChatCompletionChunk
 from api.schemas.openapi_inputs import CompletionInputs
 from api.v1.base_api import CompletionBase
@@ -137,6 +138,23 @@ class ChatCompletion(CompletionBase):
         if chunk.knowledge_metadata:
             response.knowledge_metadata = chunk.knowledge_metadata
 
+    def _update_usage(
+        self, response: ReasonChatCompletion, chunk: ReasonChatCompletionChunk
+    ) -> None:
+        """Update usage information by accumulating tokens from chunks"""
+        if not chunk.usage:
+            return
+
+        if response.usage is None:
+            response.usage = CompletionUsage(
+                completion_tokens=0, prompt_tokens=0, total_tokens=0
+            )
+
+        chunk_usage = chunk.usage
+        response.usage.completion_tokens += chunk_usage.completion_tokens or 0
+        response.usage.prompt_tokens += chunk_usage.prompt_tokens or 0
+        response.usage.total_tokens += chunk_usage.total_tokens or 0
+
     async def completion(self) -> dict[str, Any]:
         """Non-streaming"""
         response = self._initialize_response()
@@ -155,6 +173,7 @@ class ChatCompletion(CompletionBase):
             self._update_content(response, chunk)
             self._update_tool_calls(response, chunk)
             self._update_response_metadata(response, chunk)
+            self._update_usage(response, chunk)
 
         return response.model_dump()  # type: ignore[no-any-return]
 
