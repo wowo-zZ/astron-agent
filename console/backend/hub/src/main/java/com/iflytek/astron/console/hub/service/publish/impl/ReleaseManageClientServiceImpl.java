@@ -118,6 +118,7 @@ public class ReleaseManageClientServiceImpl implements ReleaseManageClientServic
             FormBody formBody = new FormBody.Builder().add("flowId", flowId).build();
             // Create HTTP POST request
             Request versionRequest = buildRequest(GET_VERSION_NAME_URL, spaceId, request)
+                    .addHeader("Content-Type", "application/json")
                     .post(formBody)
                     .build();
             // Execute request and parse version name
