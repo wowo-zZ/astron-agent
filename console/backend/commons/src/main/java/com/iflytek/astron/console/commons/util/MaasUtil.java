@@ -428,7 +428,6 @@ public class MaasUtil {
                 .addHeader("X-Consumer-Username", consumerId)
                 .addHeader("Lang-Code", I18nUtil.getLanguage())
                 .headers(buildHeaders(authMap))
-                .header("Authorization", "Bearer " + consumerKey + ":" + consumerSecret)
                 .addHeader(X_AUTH_SOURCE_HEADER, X_AUTH_SOURCE_VALUE)
                 .build();
         log.info("MaasUtil executeRequest url: {} request: {}, header: {}", request.url(), JSONObject.toJSONString(authMap), request.headers());
