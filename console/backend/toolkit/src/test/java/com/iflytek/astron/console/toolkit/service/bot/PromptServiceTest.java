@@ -20,7 +20,6 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
@@ -33,12 +32,17 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class PromptServiceTest {
 
-    @Mock private SparkApiTool sparkApiTool;
-    @Mock private ConfigInfoMapper configInfoMapper;
-    @Mock private SparkBotMapper sparkBotMapper;
-    @Mock private WorkflowMapper workflowMapper;
+    @Mock
+    private SparkApiTool sparkApiTool;
+    @Mock
+    private ConfigInfoMapper configInfoMapper;
+    @Mock
+    private SparkBotMapper sparkBotMapper;
+    @Mock
+    private WorkflowMapper workflowMapper;
 
-    @InjectMocks private PromptService service;
+    @InjectMocks
+    private PromptService service;
 
     // --------------------- enhance ---------------------
 
@@ -63,7 +67,7 @@ class PromptServiceTest {
 
     @Test
     @DisplayName("nextQuestionAdvice: Spark 返回有效 JSON 数组时应直接解析")
-    void nqa_shouldParseValidJsonArray() throws InterruptedException{
+    void nqa_shouldParseValidJsonArray() throws InterruptedException {
         ConfigInfo cfg = new ConfigInfo();
         cfg.setValue("Q: {q}");
         when(configInfoMapper.getByCategoryAndCode("TEMPLATE", "next-question-advice")).thenReturn(cfg);

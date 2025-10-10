@@ -4,12 +4,20 @@ Dial test service module providing health checks and service availability monito
 
 import json
 import os
+from typing import Any, Dict, Optional
 
 import requests
 from dotenv import load_dotenv
 
 
-def dial_test_main(method, url, headers, payload, _success_code, _call_frequency):
+def dial_test_main(
+    method: str,
+    url: str,
+    headers: Dict[str, str],
+    payload: Dict[str, Any],
+    _success_code: int,
+    _call_frequency: int,
+) -> Optional[Dict[str, Any]]:
     """Execute HTTP request with specified parameters for dial testing.
 
     This function performs HTTP requests with comprehensive error handling
@@ -77,10 +85,10 @@ if __name__ == "__main__":
     # call_frequency = int(os.getenv("SMARTTS_CALL_FREQUENCY", 1))  # 转换为整数，默认值为 1
 
     # 第三个接口
-    test_url = os.getenv("ONE_SENTENCE_REPRODUCTION_URL")
-    test_method = os.getenv("ONE_SENTENCE_REPRODUCTION_METHOD")
-    test_headers = json.loads(os.getenv("ONE_SENTENCE_REPRODUCTION_HEADERS"))
-    test_payload = json.loads(os.getenv("ONE_SENTENCE_REPRODUCTION_PAYLOAD"))
+    test_url = os.getenv("ONE_SENTENCE_REPRODUCTION_URL", "")
+    test_method = os.getenv("ONE_SENTENCE_REPRODUCTION_METHOD", "")
+    test_headers = json.loads(os.getenv("ONE_SENTENCE_REPRODUCTION_HEADERS", ""))
+    test_payload = json.loads(os.getenv("ONE_SENTENCE_REPRODUCTION_PAYLOAD", ""))
     test_success_code = int(
         os.getenv("ONE_SENTENCE_REPRODUCTION_SUCCESS_CODE", -1)
     )  # 转换为整数，默认值为 -1

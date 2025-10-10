@@ -17,16 +17,7 @@ import { ModuleType, OperationType } from '@/types/permission';
 import { getAllCorporateList, getJoinedCorporateList } from '@/services/space';
 import { useEnterprise } from '@/hooks/use-enterprise';
 
-interface SpaceItem {
-  id: string;
-  avatar?: string;
-  name: string;
-  description: string;
-  ownerName: string;
-  memberCount: number;
-  university: string;
-  status?: string;
-}
+import { SpaceItem } from '@/types/space';
 
 const SpaceManage: React.FC = () => {
   const navigate = useNavigate();
@@ -37,7 +28,7 @@ const SpaceManage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const { getJoinedEnterpriseList } = useEnterprise();
 
-  const queryFnMap = {
+  const queryFnMap: Record<string, (params?: any) => Promise<SpaceItem[]>> = {
     all: getAllCorporateList,
     my: getJoinedCorporateList,
   };
@@ -50,14 +41,14 @@ const SpaceManage: React.FC = () => {
   const querySpaceList = useCallback(async (name?: string) => {
     try {
       setLoading(true);
-      const res = await queryFnMap[
+      const res: SpaceItem[] | undefined = await queryFnMap[
         activeTabRef.current as keyof typeof queryFnMap
-      ]({ name });
+      ]?.({ name });
       console.log(
         res,
         `========== getSpaceList(${activeTabRef.current}) ==========`
       );
-      setSpaceList(res.data);
+      setSpaceList(res || []);
     } catch (err: any) {
       console.log(err, '========== getSpaceList error ==========');
       message.error(err?.msg || err?.desc || '查询失败');

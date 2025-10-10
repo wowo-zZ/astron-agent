@@ -25,16 +25,18 @@ import java.util.Map;
 /**
  * WebSocket handler for prompt enhancement feature.
  * <p>
- * This handler establishes a bridge between the client WebSocket and the Spark API WebSocket.
- * It manages connection creation, message forwarding, and error handling.
+ * This handler establishes a bridge between the client WebSocket and the Spark API WebSocket. It
+ * manages connection creation, message forwarding, and error handling.
  * </p>
  *
- * <p><b>Responsibilities:</b></p>
+ * <p>
+ * <b>Responsibilities:</b>
+ * </p>
  * <ul>
- *     <li>Authenticate and connect to Spark API via signed WebSocket URL.</li>
- *     <li>Forward user messages from the frontend to Spark API.</li>
- *     <li>Relay Spark API responses back to the client WebSocket session.</li>
- *     <li>Handle connection lifecycle events and clean up resources.</li>
+ * <li>Authenticate and connect to Spark API via signed WebSocket URL.</li>
+ * <li>Forward user messages from the frontend to Spark API.</li>
+ * <li>Relay Spark API responses back to the client WebSocket session.</li>
+ * <li>Handle connection lifecycle events and clean up resources.</li>
  * </ul>
  *
  * @author
@@ -58,7 +60,8 @@ public class PromptEnhanceWebSocketHandler extends TextWebSocketHandler {
     /**
      * Called when a new WebSocket connection is established.
      * <p>
-     * Creates a connection to the Spark API WebSocket with authentication and links it to the current session.
+     * Creates a connection to the Spark API WebSocket with authentication and links it to the current
+     * session.
      * </p>
      *
      * @param session the current {@link WebSocketSession}
@@ -139,7 +142,8 @@ public class PromptEnhanceWebSocketHandler extends TextWebSocketHandler {
     /**
      * Handles messages received from the frontend client WebSocket.
      * <p>
-     * Parses the received JSON, builds a Spark API message, and forwards it to the corresponding WebSocket.
+     * Parses the received JSON, builds a Spark API message, and forwards it to the corresponding
+     * WebSocket.
      * </p>
      *
      * @param session the current {@link WebSocketSession}
@@ -166,7 +170,7 @@ public class PromptEnhanceWebSocketHandler extends TextWebSocketHandler {
     /**
      * Handles transport-level errors during WebSocket communication.
      *
-     * @param session   the current {@link WebSocketSession}
+     * @param session the current {@link WebSocketSession}
      * @param exception the {@link Throwable} representing the transport error
      * @throws Exception if session closing fails
      */
@@ -183,7 +187,7 @@ public class PromptEnhanceWebSocketHandler extends TextWebSocketHandler {
      * Performs cleanup by closing the session and removing the connection mapping.
      * </p>
      *
-     * @param session     the current {@link WebSocketSession}
+     * @param session the current {@link WebSocketSession}
      * @param closeStatus the {@link CloseStatus} indicating reason and code
      * @throws IOException if session closing fails
      */

@@ -156,7 +156,7 @@ const SeparatorSection = ({
                             });
                           }}
                         >
-                          {t('workflow.nodes.common.delete')}
+                          {t('workflow.nodes.toolNode.delete')}
                         </span>
                       )}
                     </div>

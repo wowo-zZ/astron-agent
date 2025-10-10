@@ -147,7 +147,10 @@ class TestTaskMonitoring:
         # Assert
         assert len(results) == 1
         response_data = RPAExecutionResponse.model_validate_json(results[0])
-        assert response_data.code in {ErrorCode.CREATE_URL_INVALID.code, ErrorCode.CREATE_TASK_ERROR.code}
+        assert response_data.code in {
+            ErrorCode.CREATE_URL_INVALID.code,
+            ErrorCode.CREATE_TASK_ERROR.code,
+        }
         assert "Create task error" in response_data.message
 
     @pytest.mark.asyncio
@@ -180,7 +183,10 @@ class TestTaskMonitoring:
         # Assert
         assert len(results) == 1
         response_data = RPAExecutionResponse.model_validate_json(results[0])
-        assert response_data.code in {ErrorCode.QUERY_URL_INVALID.code, ErrorCode.QUERY_TASK_ERROR.code}
+        assert response_data.code in {
+            ErrorCode.QUERY_URL_INVALID.code,
+            ErrorCode.QUERY_TASK_ERROR.code,
+        }
 
     @pytest.mark.asyncio
     async def test_task_monitoring_timeout(
@@ -297,7 +303,10 @@ class TestTaskMonitoring:
             # Assert
             assert len(results) == 1
             response_data = RPAExecutionResponse.model_validate_json(results[0])
-            assert response_data.code in {ErrorCode.CREATE_URL_INVALID.code, ErrorCode.CREATE_TASK_ERROR.code}
+            assert response_data.code in {
+                ErrorCode.CREATE_URL_INVALID.code,
+                ErrorCode.CREATE_TASK_ERROR.code,
+            }
 
 
 class TestSetupSpanAndTrace:

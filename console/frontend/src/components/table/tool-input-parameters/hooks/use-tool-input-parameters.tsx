@@ -5,7 +5,7 @@ import {
   transformJsonToArray,
 } from '@/utils/utils';
 import { cloneDeep, uniq } from 'lodash';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { v4 as uuid } from 'uuid';
 import formSelect from '@/assets/imgs/workflow/icon_form_select.png';
 
@@ -155,6 +155,11 @@ const useParamsChanger = (
     (id: string, key: string, value: string | number | boolean) => {
       const currentNode =
         findNodeById(inputParamsData, id) || ({} as InputParamsData);
+
+      // Save previous value, don't update if no actual change
+      const oldValue = currentNode[key];
+      if (oldValue === value) return;
+
       currentNode[key] = value;
 
       if (key === 'type' && ['array', 'object'].includes(value as string)) {
@@ -232,7 +237,12 @@ const useParamsChanger = (
           topLevelNode.default = [];
         }
       }
-      setInputParamsData(cloneDeep(inputParamsData));
+
+      // Use functional update to avoid unnecessary re-renders
+      setInputParamsData(prevData => {
+        const newData = cloneDeep(prevData);
+        return newData;
+      });
     },
     [
       inputParamsData,
@@ -291,14 +301,41 @@ const useTreeExpansion = (
 } => {
   const [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]);
 
+  const collectExpandableKeysRef = useRef<Set<string>>(new Set());
+
   useEffect(() => {
-    const allKeys: string[] = [];
-    inputParamsData.forEach(item => {
-      if (item.children) {
-        allKeys.push(item.id);
-      }
-    });
-    setExpandedRowKeys(allKeys);
+    const collectExpandableKeys = (items: InputParamsData[]): string[] => {
+      const keys: string[] = [];
+      items.forEach(item => {
+        if (item.children && item.children.length > 0) {
+          keys.push(item.id);
+          // Recursively collect keys from nested items
+          keys.push(...collectExpandableKeys(item.children));
+        }
+      });
+      return keys;
+    };
+
+    const allKeys = collectExpandableKeys(inputParamsData);
+    const allKeysSet = new Set(allKeys);
+
+    // Check if structure has actually changed
+    const prevKeysSet = collectExpandableKeysRef.current;
+    const hasStructuralChange =
+      allKeysSet.size !== prevKeysSet.size ||
+      [...allKeysSet].some(key => !prevKeysSet.has(key)) ||
+      [...prevKeysSet].some(key => !allKeysSet.has(key));
+
+    if (hasStructuralChange) {
+      collectExpandableKeysRef.current = allKeysSet;
+
+      setExpandedRowKeys(prevKeys => {
+        // Keep expanded keys and add new expandable items
+        const validPrevKeys = prevKeys.filter(key => allKeys.includes(key));
+        const newKeys = [...new Set([...validPrevKeys, ...allKeys])];
+        return newKeys;
+      });
+    }
   }, [inputParamsData]);
 
   const handleExpand = useCallback((record: InputParamsData) => {
@@ -473,7 +510,7 @@ const useModalStates = (): {
   };
 };
 
-// JSON处理相关 Hook
+// JSON processing related Hook
 const useJsonProcessor = (
   setInputParamsData: React.Dispatch<React.SetStateAction<InputParamsData[]>>,
   setModalVisible: (value: boolean) => void,
@@ -623,7 +660,7 @@ export const useToolInputParameters = ({
   return {
     // 菜单项
     items: menuItems.items,
-    // JSON处理
+    // JSON processing
     handleJsonSubmit: jsonProcessor.handleJsonSubmit,
     // 输入渲染
     renderInput: inputRenderer.renderInput,

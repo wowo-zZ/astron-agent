@@ -1,6 +1,6 @@
 import useUserStore, { UserState } from '@/store/user-store';
 import { ReactElement } from 'react';
-import { jumpTologin } from '@/utils/http';
+import { jumpToLogin } from '@/utils/http';
 import { useLocation } from 'react-router-dom';
 
 import loginPopImg from '@/assets/imgs/login/login-pop-img.png';
@@ -22,7 +22,7 @@ const LoginPop = (): ReactElement => {
           <h2>立即登录/注册，开启智能体创造之旅！</h2>
           <p>来星辰，创建属于你的AI应用</p>
         </div>
-        <div className={styles.loginPopUse} onClick={() => jumpTologin()}>
+        <div className={styles.loginPopUse} onClick={() => jumpToLogin()}>
           开始使用
         </div>
       </div>

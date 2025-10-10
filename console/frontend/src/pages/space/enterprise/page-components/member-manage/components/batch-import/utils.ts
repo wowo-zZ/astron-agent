@@ -1,8 +1,8 @@
-import { batchImportEnterpriseUser } from '@/services/enterprise';
+import { batchImportEnterpriseUsername } from '@/services/enterprise';
 import { message } from 'antd';
 
 const templateUrl =
-  'https://openres.xfyun.cn/xfyundoc/2025-08-25/b3aa233a-de0c-4ef6-a178-457aa11c8ae9/1756089615004/%E5%AF%BC%E5%85%A5%E6%A8%A1%E6%9D%BF.xlsx';
+  'https://openres.xfyun.cn/xfyundoc/2025-09-30/c7044679-2817-4d22-b470-353012d55efd/1759213793509/%E5%AF%BC%E5%85%A5%E6%A8%A1%E6%9D%BF.xlsx';
 
 // 批量导入成员接口类型
 export interface BatchImportParams {
@@ -50,7 +50,7 @@ export async function batchImportMembers(
   signal?: AbortSignal
 ): Promise<BatchImportResult> {
   try {
-    const response: any = await batchImportEnterpriseUser(params, {
+    const response: any = await batchImportEnterpriseUsername(params, {
       signal, // 传递 AbortSignal
     });
     console.log(response, '======== batchImportMembers =======');

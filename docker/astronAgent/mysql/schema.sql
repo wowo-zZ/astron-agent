@@ -912,8 +912,8 @@ VALUES(4, 'prologue_generation', 'en', 'Please generate an intelligent agent pro
 INSERT INTO astron_console.ai_prompt_template
 (id, prompt_key, language_code, prompt_content, is_active, created_time, updated_time)
 VALUES(5, 'sentence_bot_generation', 'zh', '你是一个助手配置生成专家。请根据输入信息理解用户意图，合理准确处理用户输入，生成以下字段内容：助手名称、助手分类
-  、助手描述、角色设定、目标任务、需求描述、输入示例。其中输入示例字段需要提供三个具体示例，助手分类必须从【职场、学
-  习、创作、编程、生活、健康】中选择。返回结果必须严格按照以下格式：%n助手名称：xxxx%n助手分类：xx%n助手描述：xxxxx%
+  、助手描述(不超过100字)、角色设定、目标任务、需求描述、输入示例。其中输入示例字段需要提供三个具体示例，助手分类必须从【工作、学
+  习、写作、编程、生活、健康】中选择。返回结果必须严格按照以下格式：%n助手名称：xxxx%n助手分类：xx%n助手描述：xxxxx%
   n角色设定：xxxxx%n目标任务：xxxxxxxx%n需求描述：xxxxxx%n输入示例：xxxxxxx||xxxxxxx||xxxxxxx%n用户输入为：%s', 1, '2025-09-20 11:37:51', '2025-09-20 11:41:23');
 INSERT INTO astron_console.ai_prompt_template
 (id, prompt_key, language_code, prompt_content, is_active, created_time, updated_time)
@@ -1345,6 +1345,29 @@ CREATE TABLE `bot_type_list`
     `type_name_en` varchar(128) DEFAULT NULL COMMENT 'Assistant type English name',
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Bot type mapping table';
+BEGIN;
+INSERT INTO astron_console.bot_type_list
+(id, type_key, type_name, order_num, show_index, is_act, create_time, update_time, icon, type_name_en)
+VALUES(4, 10, '工作', 10, 1, 1, '2025-09-20 15:16:15', '2025-09-20 15:16:15', '', 'Workplace');
+INSERT INTO astron_console.bot_type_list
+(id, type_key, type_name, order_num, show_index, is_act, create_time, update_time, icon, type_name_en)
+VALUES(5, 13, '学习', 20, 1, 1, '2025-09-20 15:16:15', '2025-09-20 15:16:15', '', 'Learning');
+INSERT INTO astron_console.bot_type_list
+(id, type_key, type_name, order_num, show_index, is_act, create_time, update_time, icon, type_name_en)
+VALUES(6, 14, '写作', 30, 1, 1, '2025-09-20 15:16:15', '2025-09-20 15:16:15', '', 'Writing');
+INSERT INTO astron_console.bot_type_list
+(id, type_key, type_name, order_num, show_index, is_act, create_time, update_time, icon, type_name_en)
+VALUES(7, 15, '编程', 40, 1, 1, '2025-09-20 15:16:15', '2025-09-20 15:16:15', '', 'Programming');
+INSERT INTO astron_console.bot_type_list
+(id, type_key, type_name, order_num, show_index, is_act, create_time, update_time, icon, type_name_en)
+VALUES(8, 17, '生活', 50, 1, 1, '2025-09-20 15:16:15', '2025-09-20 15:16:15', '', 'Lifestyle');
+INSERT INTO astron_console.bot_type_list
+(id, type_key, type_name, order_num, show_index, is_act, create_time, update_time, icon, type_name_en)
+VALUES(9, 39, '健康', 60, 1, 1, '2025-09-20 15:16:15', '2025-09-20 15:16:15', '', 'Health');
+INSERT INTO astron_console.bot_type_list
+(id, type_key, type_name, order_num, show_index, is_act, create_time, update_time, icon, type_name_en)
+VALUES(10, 24, '其他', 100, 0, 1, '2025-09-20 15:16:15', '2025-09-20 15:16:15', '', 'Other');
+COMMIT;
 
 -- ----------------------------
 -- Table structure for call_log

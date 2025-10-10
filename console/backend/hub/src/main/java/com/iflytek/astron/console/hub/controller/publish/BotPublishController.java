@@ -13,10 +13,7 @@ import com.iflytek.astron.console.hub.dto.publish.PublishStatusUpdateDto;
 import com.iflytek.astron.console.hub.dto.publish.BotSummaryStatsVO;
 import com.iflytek.astron.console.hub.dto.publish.BotTimeSeriesResponseDto;
 import com.iflytek.astron.console.hub.dto.publish.BotVersionVO;
-import com.iflytek.astron.console.hub.dto.publish.WechatAuthUrlRequestDto;
-import com.iflytek.astron.console.hub.dto.publish.WechatAuthUrlResponseDto;
 import com.iflytek.astron.console.hub.dto.publish.BotTraceRequestDto;
-import com.iflytek.astron.console.hub.dto.publish.mcp.McpPublishRequestDto;
 import com.iflytek.astron.console.hub.dto.publish.UnifiedPrepareDto;
 import com.iflytek.astron.console.hub.dto.publish.UnifiedPublishRequestDto;
 import com.iflytek.astron.console.hub.service.publish.BotPublishService;
@@ -121,7 +118,7 @@ public class BotPublishController {
         String currentUid = RequestContextUtil.getUID();
         Long spaceId = SpaceInfoUtil.getSpaceId();
 
-        log.info("Getting publish prepare data: botId={}, type={}, uid={}, spaceId={}", 
+        log.info("Getting publish prepare data: botId={}, type={}, uid={}, spaceId={}",
                 botId, type, currentUid, spaceId);
 
         UnifiedPrepareDto prepareData = botPublishService.getPrepareData(botId, type, currentUid, spaceId);
@@ -129,37 +126,36 @@ public class BotPublishController {
     }
 
     /**
-     * Unified publish endpoint for all publish types
-     * Supports MARKET, MCP, WECHAT, API, FEISHU publishing with strategy pattern
+     * Unified publish endpoint for all publish types Supports MARKET, MCP, WECHAT, API, FEISHU
+     * publishing with strategy pattern
      */
     @Operation(
             summary = "Unified bot publish endpoint",
-            description = "Publish or offline bot to different channels using strategy pattern"
-    )
+            description = "Publish or offline bot to different channels using strategy pattern")
     @RateLimit(limit = 10, window = 60, dimension = "USER")
     @PostMapping("/bots/{botId}")
     public ApiResult<Object> unifiedPublish(
             @Parameter(description = "Bot ID", required = true)
             @PathVariable Integer botId,
             @Valid @RequestBody UnifiedPublishRequestDto request) {
-        
+
         String currentUid = RequestContextUtil.getUID();
         Long spaceId = SpaceInfoUtil.getSpaceId();
-        
-        log.info("Unified publish request: botId={}, publishType={}, action={}, currentUid={}, spaceId={}", 
+
+        log.info("Unified publish request: botId={}, publishType={}, action={}, currentUid={}, spaceId={}",
                 botId, request.getPublishType(), request.getAction(), currentUid, spaceId);
-        
+
         try {
             // Validate publish type
             if (!publishStrategyFactory.isSupported(request.getPublishType())) {
-                return ApiResult.error(ResponseEnum.PARAMETER_ERROR, 
-                        "Unsupported publish type: " + request.getPublishType() + 
-                        ". Supported types: " + publishStrategyFactory.getSupportedTypes());
+                return ApiResult.error(ResponseEnum.PARAMETER_ERROR,
+                        "Unsupported publish type: " + request.getPublishType() +
+                                ". Supported types: " + publishStrategyFactory.getSupportedTypes());
             }
-            
+
             // Get strategy and execute action
             PublishStrategy strategy = publishStrategyFactory.getStrategy(request.getPublishType());
-            
+
             ApiResult<Object> result;
             if ("PUBLISH".equalsIgnoreCase(request.getAction())) {
                 result = strategy.publish(botId, request.getPublishData(), currentUid, spaceId);
@@ -167,17 +163,17 @@ public class BotPublishController {
                 result = strategy.offline(botId, request.getPublishData(), currentUid, spaceId);
             } else {
                 return ApiResult.error(ResponseEnum.PARAMETER_ERROR,
-                        "Unsupported action: " + request.getAction() + 
-                        ". Supported actions: PUBLISH, OFFLINE");
+                        "Unsupported action: " + request.getAction() +
+                                ". Supported actions: PUBLISH, OFFLINE");
             }
-            
-            log.info("Unified publish completed: botId={}, publishType={}, action={}, success={}", 
+
+            log.info("Unified publish completed: botId={}, publishType={}, action={}, success={}",
                     botId, request.getPublishType(), request.getAction(), result.code() == 0);
-            
+
             return result;
-            
+
         } catch (Exception e) {
-            log.error("Unified publish failed: botId={}, publishType={}, action={}", 
+            log.error("Unified publish failed: botId={}, publishType={}, action={}",
                     botId, request.getPublishType(), request.getAction(), e);
             return ApiResult.error(ResponseEnum.OPERATION_FAILED, e.getMessage());
         }

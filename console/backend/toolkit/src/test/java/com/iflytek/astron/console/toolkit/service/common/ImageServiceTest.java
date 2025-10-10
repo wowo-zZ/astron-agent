@@ -3,7 +3,6 @@ package com.iflytek.astron.console.toolkit.service.common;
 import com.iflytek.astron.console.commons.exception.BusinessException;
 import com.iflytek.astron.console.toolkit.util.S3Util;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
@@ -21,8 +20,10 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class ImageServiceTest {
 
-    @Mock S3Util s3UtilClient;
-    @InjectMocks ImageService service;
+    @Mock
+    S3Util s3UtilClient;
+    @InjectMocks
+    ImageService service;
 
     private static final long FIVE_MB = 5L * 1024 * 1024;
 

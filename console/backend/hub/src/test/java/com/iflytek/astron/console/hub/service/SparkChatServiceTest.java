@@ -1,13 +1,9 @@
 package com.iflytek.astron.console.hub.service;
 
 import cn.xfyun.api.SparkChatClient;
-import cn.xfyun.config.SparkModel;
 import cn.xfyun.model.sparkmodel.SparkChatParam;
-import com.alibaba.fastjson2.JSONArray;
-import com.alibaba.fastjson2.JSONObject;
 import com.iflytek.astron.console.commons.dto.llm.SparkChatRequest;
 import com.iflytek.astron.console.commons.entity.chat.ChatReqRecords;
-import com.iflytek.astron.console.commons.entity.chat.ChatTraceSource;
 import com.iflytek.astron.console.commons.service.ChatRecordModelService;
 import com.iflytek.astron.console.commons.service.data.ChatDataService;
 import com.iflytek.astron.console.commons.util.SseEmitterUtil;
@@ -90,8 +86,8 @@ class SparkChatServiceTest {
     @Test
     void testChatStream_CreatesSseEmitter() {
         try (MockedStatic<SseEmitterUtil> sseUtilMock = mockStatic(SseEmitterUtil.class);
-             MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class,
-                     (mock, context) -> doNothing().when(mock).send(any(SparkChatParam.class), any(Callback.class)))) {
+                MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class,
+                        (mock, context) -> doNothing().when(mock).send(any(SparkChatParam.class), any(Callback.class)))) {
 
             SseEmitter mockEmitter = mock(SseEmitter.class);
             sseUtilMock.when(SseEmitterUtil::createSseEmitter).thenReturn(mockEmitter);
@@ -178,9 +174,10 @@ class SparkChatServiceTest {
     @Test
     void testChatStream_Exception_HandledGracefully() {
         try (MockedStatic<SseEmitterUtil> sseUtilMock = mockStatic(SseEmitterUtil.class);
-             MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class,
-                     (mock, context) -> doThrow(new RuntimeException("Client error"))
-                             .when(mock).send(any(SparkChatParam.class), any(Callback.class)))) {
+                MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class,
+                        (mock, context) -> doThrow(new RuntimeException("Client error"))
+                                .when(mock)
+                                .send(any(SparkChatParam.class), any(Callback.class)))) {
 
             sparkChatService.chatStream(sparkChatRequest, emitter, streamId, chatReqRecords, false, false);
 
@@ -229,7 +226,7 @@ class SparkChatServiceTest {
     @Test
     void testHttpCallback_OnFailure() throws Exception {
         try (MockedStatic<SseEmitterUtil> sseUtilMock = mockStatic(SseEmitterUtil.class);
-             MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
+                MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
 
             ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
 
@@ -248,7 +245,7 @@ class SparkChatServiceTest {
     @Test
     void testHttpCallback_OnResponse_Unsuccessful() throws Exception {
         try (MockedStatic<SseEmitterUtil> sseUtilMock = mockStatic(SseEmitterUtil.class);
-             MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
+                MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
 
             ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
 
@@ -270,7 +267,7 @@ class SparkChatServiceTest {
     @Test
     void testHttpCallback_OnResponse_NullBody() throws Exception {
         try (MockedStatic<SseEmitterUtil> sseUtilMock = mockStatic(SseEmitterUtil.class);
-             MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
+                MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
 
             ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
 
@@ -291,7 +288,7 @@ class SparkChatServiceTest {
     @Test
     void testHttpCallback_OnResponse_WithBody_ProcessesStream() throws Exception {
         try (MockedStatic<SseEmitterUtil> sseUtilMock = mockStatic(SseEmitterUtil.class);
-             MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
+                MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
 
             ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
 
@@ -320,7 +317,7 @@ class SparkChatServiceTest {
     @Test
     void testProcessSSEStream_ValidData() throws Exception {
         try (MockedStatic<SseEmitterUtil> sseUtilMock = mockStatic(SseEmitterUtil.class);
-             MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
+                MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
 
             ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
 
@@ -349,7 +346,7 @@ class SparkChatServiceTest {
     @Test
     void testProcessSSEStream_ErrorCode() throws Exception {
         try (MockedStatic<SseEmitterUtil> sseUtilMock = mockStatic(SseEmitterUtil.class);
-             MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
+                MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
 
             ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
 
@@ -378,7 +375,7 @@ class SparkChatServiceTest {
     @Test
     void testProcessSSEStream_ReplaceContentErrorCodes() throws Exception {
         try (MockedStatic<SseEmitterUtil> sseUtilMock = mockStatic(SseEmitterUtil.class);
-             MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
+                MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
 
             ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
 
@@ -408,7 +405,7 @@ class SparkChatServiceTest {
     @Test
     void testProcessSSEStream_WebSearchToolCall() throws Exception {
         try (MockedStatic<SseEmitterUtil> sseUtilMock = mockStatic(SseEmitterUtil.class);
-             MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
+                MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
 
             ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
 
@@ -437,7 +434,7 @@ class SparkChatServiceTest {
     @Test
     void testProcessSSEStream_TraceData() throws Exception {
         try (MockedStatic<SseEmitterUtil> sseUtilMock = mockStatic(SseEmitterUtil.class);
-             MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
+                MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
 
             ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
 
@@ -467,7 +464,7 @@ class SparkChatServiceTest {
     @Test
     void testProcessSSEStream_IOException_Handled() throws Exception {
         try (MockedStatic<SseEmitterUtil> sseUtilMock = mockStatic(SseEmitterUtil.class);
-             MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
+                MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
 
             ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
 
@@ -496,7 +493,7 @@ class SparkChatServiceTest {
     @Test
     void testGetFallbackMessage_Code10007() throws Exception {
         try (MockedStatic<SseEmitterUtil> sseUtilMock = mockStatic(SseEmitterUtil.class);
-             MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
+                MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
 
             ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
 
@@ -537,7 +534,7 @@ class SparkChatServiceTest {
     @Test
     void testSaveStreamResults_NotDebugMode() throws Exception {
         try (MockedStatic<SseEmitterUtil> sseUtilMock = mockStatic(SseEmitterUtil.class);
-             MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
+                MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
 
             ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
 
@@ -567,7 +564,7 @@ class SparkChatServiceTest {
     @Test
     void testSaveStreamResults_DebugMode_NoSave() throws Exception {
         try (MockedStatic<SseEmitterUtil> sseUtilMock = mockStatic(SseEmitterUtil.class);
-             MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
+                MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
 
             ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
 
@@ -595,7 +592,7 @@ class SparkChatServiceTest {
     @Test
     void testSaveTraceResult_EditMode_EmptyTrace() throws Exception {
         try (MockedStatic<SseEmitterUtil> sseUtilMock = mockStatic(SseEmitterUtil.class);
-             MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
+                MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
 
             ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
 
@@ -625,7 +622,7 @@ class SparkChatServiceTest {
     @Test
     void testSaveTraceResult_NewMode_WithTraceData() throws Exception {
         try (MockedStatic<SseEmitterUtil> sseUtilMock = mockStatic(SseEmitterUtil.class);
-             MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
+                MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
 
             ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
 
@@ -648,11 +645,9 @@ class SparkChatServiceTest {
             Callback callback = callbackCaptor.getValue();
             callback.onResponse(call, response);
 
-            verify(chatDataService).createTraceSource(argThat(trace ->
-                    "search".equals(trace.getType()) &&
-                            trace.getUid().equals("test-uid") &&
-                            trace.getChatId().equals(100L)
-            ));
+            verify(chatDataService).createTraceSource(argThat(trace -> "search".equals(trace.getType()) &&
+                    trace.getUid().equals("test-uid") &&
+                    trace.getChatId().equals(100L)));
         }
     }
 
@@ -661,7 +656,7 @@ class SparkChatServiceTest {
     @Test
     void testHandleStreamComplete_SendsCompleteEvent() throws Exception {
         try (MockedStatic<SseEmitterUtil> sseUtilMock = mockStatic(SseEmitterUtil.class);
-             MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
+                MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
 
             ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
 
@@ -691,7 +686,7 @@ class SparkChatServiceTest {
     @Test
     void testHandleStreamInterrupted_SendsInterruptedEvent() throws Exception {
         try (MockedStatic<SseEmitterUtil> sseUtilMock = mockStatic(SseEmitterUtil.class);
-             MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
+                MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
 
             ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
 
@@ -724,7 +719,7 @@ class SparkChatServiceTest {
     @Test
     void testTrySendCompleteAndEnd_ClientDisconnected() throws Exception {
         try (MockedStatic<SseEmitterUtil> sseUtilMock = mockStatic(SseEmitterUtil.class);
-             MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
+                MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
 
             ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
 
@@ -741,7 +736,8 @@ class SparkChatServiceTest {
 
             sseUtilMock.when(() -> SseEmitterUtil.isStreamStopped(streamId)).thenReturn(false);
             doThrow(new org.springframework.web.context.request.async.AsyncRequestNotUsableException("Disconnected"))
-                    .when(emitter).send(any(SseEmitter.SseEventBuilder.class));
+                    .when(emitter)
+                    .send(any(SseEmitter.SseEventBuilder.class));
 
             Callback callback = callbackCaptor.getValue();
             callback.onResponse(call, response);
@@ -753,7 +749,7 @@ class SparkChatServiceTest {
     @Test
     void testParseSSEContent_InvalidJson() throws Exception {
         try (MockedStatic<SseEmitterUtil> sseUtilMock = mockStatic(SseEmitterUtil.class);
-             MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
+                MockedConstruction<SparkChatClient> clientMock = mockConstruction(SparkChatClient.class)) {
 
             ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
 

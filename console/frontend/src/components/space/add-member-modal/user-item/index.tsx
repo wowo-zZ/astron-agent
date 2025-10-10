@@ -6,10 +6,11 @@ import styles from './index.module.scss';
 import defaultAvatar from '@/assets/imgs/space/creator.png';
 interface User {
   uid: string;
-  username: string;
+  username?: string;
   mobile: string;
   avatar?: string;
   status?: number;
+  nickname?: string;
 }
 interface UserItemProps {
   user: User;

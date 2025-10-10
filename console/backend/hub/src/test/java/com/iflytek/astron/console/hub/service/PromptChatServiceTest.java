@@ -2,7 +2,6 @@ package com.iflytek.astron.console.hub.service;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.iflytek.astron.console.commons.entity.chat.ChatReqRecords;
-import com.iflytek.astron.console.commons.entity.chat.ChatTraceSource;
 import com.iflytek.astron.console.commons.service.ChatRecordModelService;
 import com.iflytek.astron.console.commons.service.data.ChatDataService;
 import com.iflytek.astron.console.commons.util.SseEmitterUtil;
@@ -457,7 +456,8 @@ class PromptChatServiceTest {
 
             sseUtilMock.when(() -> SseEmitterUtil.isStreamStopped(streamId)).thenReturn(false);
             doThrow(new org.springframework.web.context.request.async.AsyncRequestNotUsableException("Client disconnected"))
-                    .when(emitter).send(any(SseEmitter.SseEventBuilder.class));
+                    .when(emitter)
+                    .send(any(SseEmitter.SseEventBuilder.class));
 
             Callback callback = callbackCaptor.getValue();
             callback.onResponse(call, response);
@@ -711,7 +711,8 @@ class PromptChatServiceTest {
 
             sseUtilMock.when(() -> SseEmitterUtil.isStreamStopped(streamId)).thenReturn(false);
             doThrow(new org.springframework.web.context.request.async.AsyncRequestNotUsableException("Disconnected"))
-                    .when(emitter).send(any(SseEmitter.SseEventBuilder.class));
+                    .when(emitter)
+                    .send(any(SseEmitter.SseEventBuilder.class));
 
             Callback callback = callbackCaptor.getValue();
             callback.onResponse(call, response);

@@ -626,6 +626,7 @@ function validateOutgoingEdges({
   stack,
   errNodes,
   cycleEdges,
+  dfs,
 }): void {
   if (outgoingEdges?.length === 0) {
     addErrNode({
@@ -640,7 +641,8 @@ function validateOutgoingEdges({
     const targetNode = nodes.find(node => node.id === edge.target);
     if (!targetNode) return false;
     if (!targetNode.data.label.trim()) return false;
-
+    console.log('targetNode', targetNode);
+    console.log('recStack', recStack);
     if (recStack.has(targetNode.id)) {
       cycleEdges.push(edge);
       addErrNode({
@@ -651,8 +653,12 @@ function validateOutgoingEdges({
       return;
     }
 
-    if (!visitedNodes.has(targetNode.id)) stack.push({ nodeId: targetNode.id });
+    if (!visitedNodes.has(targetNode.id)) {
+      stack.push({ nodeId: targetNode.id });
+      dfs();
+    }
   }
+  recStack.delete(currentCheckNode.id);
 }
 
 // ===== checkIteratorNode 重构 =====
@@ -728,10 +734,8 @@ function checkIteratorNode({ iteratorId, outerErrNodes, get }): void {
       stack,
       errNodes,
       cycleEdges,
+      dfs,
     });
-
-    while (stack.length > 0) dfs();
-    recStack.delete(nodeId);
   }
 
   dfs();
@@ -840,10 +844,8 @@ export function checkFlow(get): boolean {
       stack,
       errNodes,
       cycleEdges,
+      dfs,
     });
-
-    while (stack.length > 0) dfs();
-    recStack.delete(nodeId);
   }
 
   dfs();

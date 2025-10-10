@@ -1,5 +1,5 @@
 import { forwardRef, useImperativeHandle, useState } from 'react';
-import useAntModal, { CommonAntModalProps } from '@/hooks/use-ant-modal';
+import useAntModal from '@/hooks/use-ant-modal';
 import { createRpa, getRpaSourceList, updateRpa } from '@/services/rpa';
 import { RpaDetailFormInfo, RpaInfo } from '@/types/rpa';
 import { useRequest } from 'ahooks';
@@ -25,8 +25,8 @@ export const ModalForm = forwardRef<
   useImperativeHandle(ref, () => ({
     showModal: values => {
       if (values) {
-        form.setFieldsValue(values);
         setType('edit');
+        form.setFieldsValue(values);
       } else {
         setType('create');
       }
@@ -102,8 +102,9 @@ export const ModalForm = forwardRef<
                 value: item.id,
               }))}
               onChange={value => {
-                console.log(rpaSourceList?.find(item => item.id === value));
+                const values = form.getFieldsValue();
                 form.setFieldsValue({
+                  ...values,
                   assistantName: rpaSourceList?.find(item => item.id === value)
                     ?.name,
                   icon: rpaSourceList?.find(item => item.id === value)?.icon,
@@ -128,12 +129,10 @@ export const ModalForm = forwardRef<
                 required: boolean;
                 desc: string;
               }[];
-
               return fields?.map((item, index) => {
                 return (
                   <Form.Item
-                    key={item.name}
-                    name={item.name}
+                    key={`${platformId}-${item.name}`}
                     label={<div className="w-full">{item.key}</div>}
                     required={item.required}
                   >
@@ -147,9 +146,17 @@ export const ModalForm = forwardRef<
                           {t('rpa.noAccount', { platform: platformInfo?.name })}
                         </a>
                       )}
-                      <Input
-                        placeholder={`${t('rpa.pleaseEnter')} ${item.desc}`}
-                      />
+                      <Form.Item
+                        name={item.name}
+                        noStyle
+                        rules={[
+                          { required: item.required, message: item.desc },
+                        ]}
+                      >
+                        <Input
+                          placeholder={`${t('rpa.pleaseEnter')} ${item.desc}`}
+                        />
+                      </Form.Item>
                     </div>
                   </Form.Item>
                 );

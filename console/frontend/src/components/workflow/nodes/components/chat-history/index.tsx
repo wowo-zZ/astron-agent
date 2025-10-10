@@ -42,12 +42,11 @@ function index({ id, data }): React.ReactElement {
   );
 
   const titleRender = useCallback(nodeData => {
-    const type = nodeData?.schema?.type || nodeData?.type;
     return (
       <div className="flex items-center gap-2">
         <span>{nodeData.label}</span>
         <div className="bg-[#F0F0F0] px-2.5 py-0.5 rounded text-xs">
-          {renderType(type)}
+          {renderType(nodeData)}
         </div>
       </div>
     );

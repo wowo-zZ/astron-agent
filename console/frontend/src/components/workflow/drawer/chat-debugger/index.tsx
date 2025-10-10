@@ -35,6 +35,7 @@ import ChatContent from './components/chat-content';
 import ChatInput from './components/chat-input';
 // import useChat from '@/hooks/useChat';
 import { getPublicResult } from '@/services/common';
+import { getFixedUrl, getAuthorization } from '@/components/workflow/utils';
 
 // 类型导入
 import {
@@ -267,8 +268,7 @@ export function ChatDebuggerContent({
           return {
             name: input.name,
             type: input?.schema?.type,
-            allowedFileType: allowedFileType,
-            fileType: input?.fileType,
+            fileType: allowedFileType,
             default: allowedFileType
               ? []
               : input?.schema?.type === 'object'
@@ -523,8 +523,7 @@ export function ChatDebuggerContent({
       );
       pushAnswerToChatList();
       clearNodeStatus();
-      const url = 'http://172.29.201.92:8080/workflow/resume';
-      const latestAccessToken = localStorage.getItem('accessToken');
+      const url = getFixedUrl('/workflow/resume');
       const params = {
         flow_id: currentFlow?.flowId,
         eventId: interruptChat?.eventId,
@@ -539,7 +538,7 @@ export function ChatDebuggerContent({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + latestAccessToken,
+          Authorization: getAuthorization(),
         },
         body: JSON.stringify(params),
         signal: controllerRef?.current?.signal,
@@ -802,7 +801,7 @@ export function ChatDebuggerContent({
 
   const runDebugger = useCallback(
     (nodes, edges, enters?, regen = false): void => {
-      const url = 'http://172.29.201.92:8080/workflow/chat';
+      const url = getFixedUrl('/workflow/chat');
       controllerRef.current = new AbortController();
       const inputs = {};
       const enterlist = enters ?? startNodeParams;
@@ -828,7 +827,6 @@ export function ChatDebuggerContent({
         chatId: chatIdRef.current,
         regen,
       };
-      const latestAccessToken = localStorage.getItem('accessToken');
       if (historyVersion) {
         params.version = versionId.current;
         params.promptDebugger = true;
@@ -837,7 +835,7 @@ export function ChatDebuggerContent({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + latestAccessToken,
+          Authorization: getAuthorization(),
         },
         body: JSON.stringify(params),
         signal: controllerRef?.current?.signal,
@@ -1044,18 +1042,17 @@ export function ChatDebuggerContent({
   const handleStopConversation = useCallback((): void => {
     chatIdRef.current = uuid().replace(/-/g, '');
     if (interruptChat?.interrupt) {
-      const url = 'http://172.29.201.92:8080/workflow/resume';
+      const url = getFixedUrl('/workflow/resume');
       const params = {
         flow_id: currentFlow?.flowId,
         eventId: interruptChat?.eventId,
         eventType: 'abort',
       };
-      const latestAccessToken = localStorage.getItem('accessToken');
       fetchEventSource(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + latestAccessToken,
+          Authorization: getAuthorization(),
         },
         body: JSON.stringify(params),
         signal: controllerRef?.current?.signal,

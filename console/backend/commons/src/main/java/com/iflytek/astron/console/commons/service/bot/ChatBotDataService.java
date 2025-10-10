@@ -145,8 +145,8 @@ public interface ChatBotDataService {
     /**
      * Check if user has duplicate assistant names within the specified space
      *
-     * @param uid     User ID
-     * @param botId   Assistant ID (passed in when editing, null when creating)
+     * @param uid User ID
+     * @param botId Assistant ID (passed in when editing, null when creating)
      * @param botName Assistant name
      * @param spaceId Space ID
      * @return Returns true if duplicate name exists, otherwise returns false

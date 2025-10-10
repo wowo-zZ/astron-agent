@@ -16,7 +16,7 @@ from starlette.types import ASGIApp, Receive, Scope, Send
 
 from workflow.exception.e import CustomException
 from workflow.exception.errors.err_code import CodeEnum
-from workflow.extensions.fastapi.base import JSONResponseBase
+from workflow.extensions.fastapi.base import AUTH_OPEN_API_PATHS, JSONResponseBase
 from workflow.extensions.fastapi.middleware.auth import AuthMiddleware
 
 pytestmark = pytest.mark.asyncio
@@ -150,6 +150,7 @@ class TestAuthMiddleware:
     ) -> None:
         """Test dispatch returns error when authorization header is missing."""
         mock_request.headers = {}
+        mock_request.url.path = AUTH_OPEN_API_PATHS[0]
 
         with patch("workflow.extensions.otlp.trace.span.Span") as mock_span_class:
             mock_span, mock_span_ctx = create_mock_span_context()
@@ -164,7 +165,7 @@ class TestAuthMiddleware:
 
                 assert result == {"error": "authorization required"}
                 mock_error_response.assert_called_once_with(
-                    "/api/test", "authorization header is required", ""
+                    AUTH_OPEN_API_PATHS[0], "authorization header is required", ""
                 )
                 mock_call_next.assert_not_called()
 
@@ -176,6 +177,7 @@ class TestAuthMiddleware:
     ) -> None:
         """Test successful authentication flow."""
         mock_request.headers = {"authorization": "Bearer test_key:test_value"}
+        mock_request.url.path = AUTH_OPEN_API_PATHS[0]
 
         with patch("workflow.extensions.otlp.trace.span.Span") as mock_span_class:
             mock_span, mock_span_ctx = create_mock_span_context()
@@ -290,27 +292,27 @@ class TestAuthMiddleware:
             assert mock_cache["workflow:app:api_key:test_key"] == "test_app_id"
 
     @pytest.mark.parametrize(
-        "exclude_paths,request_path,should_skip",
+        "need_auth_paths,request_path,should_skip",
         [
-            (["/health", "/metrics"], "/health", True),
+            (["/health", "/metrics"], "/health", False),
             (["/health", "/metrics"], "/health/check", True),
-            (["/health", "/metrics"], "/metrics/prometheus", True),
-            (["/health", "/metrics"], "/api/test", False),
-            ([], "/health", False),
-            (["/api/v1"], "/api/v2/test", False),
+            (["/health", "/metrics"], "/metrics", False),
+            (["/health", "/metrics"], "/api/test", True),
+            ([], "/health", True),
+            (["/api/v1"], "/api/v2/test", True),
         ],
     )
-    async def test_dispatch_exclude_paths_parametrized(
+    async def test_dispatch_need_auth_paths_parametrized(
         self,
         auth_middleware: AuthMiddleware,
         mock_request: Mock,
         mock_call_next: AsyncMock,
-        exclude_paths: List[str],
+        need_auth_paths: List[str],
         request_path: str,
         should_skip: bool,
     ) -> None:
         """Test dispatch exclude paths with various scenarios."""
-        auth_middleware.exclude_paths = exclude_paths
+        auth_middleware.need_auth_paths = need_auth_paths
         mock_request.url.path = request_path
 
         with patch("workflow.extensions.otlp.trace.span.Span") as mock_span_class:
@@ -369,6 +371,7 @@ class TestAuthMiddleware:
     ) -> None:
         """Test dispatch with empty x-consumer-username header requires auth."""
         mock_request.headers = {"x-consumer-username": ""}
+        mock_request.url.path = AUTH_OPEN_API_PATHS[0]
 
         with patch("workflow.extensions.otlp.trace.span.Span") as mock_span_class:
             mock_span, mock_span_ctx = create_mock_span_context()
@@ -383,7 +386,7 @@ class TestAuthMiddleware:
 
                 assert result == {"error": "authorization required"}
                 mock_error_response.assert_called_once_with(
-                    "/api/test", "authorization header is required", ""
+                    AUTH_OPEN_API_PATHS[0], "authorization header is required", ""
                 )
                 mock_call_next.assert_not_called()
 
@@ -395,7 +398,7 @@ class TestAuthMiddleware:
     ) -> None:
         """Test dispatch handles CustomException from _get_app_source_detail_with_api_key."""
         mock_request.headers = {"authorization": "Bearer test_key:test_value"}
-
+        mock_request.url.path = AUTH_OPEN_API_PATHS[0]
         with patch("workflow.extensions.otlp.trace.span.Span") as mock_span_class:
             mock_span, mock_span_ctx = create_mock_span_context()
             mock_span_class.return_value = mock_span
@@ -420,7 +423,10 @@ class TestAuthMiddleware:
 
                     assert result == {"error": "custom error"}
                     mock_error_response.assert_called_once_with(
-                        "/api/test", custom_error.message, "", custom_error.code
+                        AUTH_OPEN_API_PATHS[0],
+                        custom_error.message,
+                        "",
+                        custom_error.code,
                     )
                     # Exception handling is working as shown by the error response
                     mock_call_next.assert_not_called()
@@ -433,6 +439,7 @@ class TestAuthMiddleware:
     ) -> None:
         """Test dispatch handles generic Exception from _get_app_source_detail_with_api_key."""
         mock_request.headers = {"authorization": "Bearer test_key:test_value"}
+        mock_request.url.path = AUTH_OPEN_API_PATHS[0]
 
         with patch("workflow.extensions.otlp.trace.span.Span") as mock_span_class:
             mock_span, mock_span_ctx = create_mock_span_context()
@@ -456,7 +463,7 @@ class TestAuthMiddleware:
 
                     assert result == {"error": "generic error"}
                     mock_error_response.assert_called_once_with(
-                        "/api/test",
+                        AUTH_OPEN_API_PATHS[0],
                         CodeEnum.APP_GET_WITH_REMOTE_FAILED_ERROR.msg,
                         "",
                         CodeEnum.APP_GET_WITH_REMOTE_FAILED_ERROR.code,

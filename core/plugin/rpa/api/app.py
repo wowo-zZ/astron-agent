@@ -3,6 +3,7 @@ This module defines the main entry point of the FastAPI application and includes
 environment variable loading, configuration checking, logging setup, and Uvicorn
 server startup logic."""
 
+import functools
 import os
 
 import uvicorn
@@ -13,6 +14,8 @@ from plugin.rpa.api.router import router
 from plugin.rpa.consts import const
 from plugin.rpa.exceptions.config_exceptions import EnvNotFoundException
 from plugin.rpa.utils.log.logger import set_log
+
+print = functools.partial(print, flush=True)
 
 
 class RPAServer:
@@ -111,6 +114,10 @@ class RPAServer:
             raise EnvNotFoundException(str(missing_keys))
 
         print("\033[94mAll required environment variables are set.\033[0m")
+        max_key_length = max(len(key) for key in required_keys)
+        for key in required_keys:
+            value = os.getenv(key, "")
+            print(f"\033[94m{key.ljust(max_key_length)} = {value}\033[0m")
 
     @staticmethod
     def set_config() -> None:

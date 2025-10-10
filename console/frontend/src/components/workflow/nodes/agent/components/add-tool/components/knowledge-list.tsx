@@ -72,7 +72,7 @@ const KnowledgeToolbar = ({
             );
           }}
           style={{
-            height: 32,
+            height: 40,
           }}
         >
           <img className="w-3 h-3" src={toolModalAdd} alt="" />
@@ -193,7 +193,7 @@ const KnowledgeList = ({
                           <div
                             className="border border-[#D3DBF8] bg-[#fff] py-1 px-6 rounded-lg"
                             style={{
-                              height: '32px',
+                              height: '40px',
                             }}
                           >
                             {t('workflow.nodes.relatedKnowledgeModal.remove')}
@@ -204,7 +204,7 @@ const KnowledgeList = ({
                             type="primary"
                             className="px-6"
                             style={{
-                              height: 32,
+                              height: 40,
                             }}
                           >
                             {t('workflow.nodes.toolNode.addTool')}

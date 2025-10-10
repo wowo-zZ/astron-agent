@@ -3,6 +3,7 @@ import { ReactSVG } from 'react-svg';
 import Lottie from 'lottie-react';
 import LoadingAnimate from '@/constants/lottie-react/voice.json';
 import VoiceIcon from '@/assets/imgs/chat/voice.svg';
+import PlayCircleIcon from '@/assets/imgs/chat/circle-play.svg';
 import clsx from 'clsx';
 
 // 组件Props类型定义
@@ -54,7 +55,7 @@ const AudioAnimate = ({ isPlaying }: AudioAnimateProps): ReactElement => {
               '[&>div>span]:w-4 [&>div>span]:h-4',
               '[&>div>svg]:w-4 [&>div>svg]:h-4'
             )}
-            src={VoiceIcon}
+            src={PlayCircleIcon}
           />
         )}
       </div>

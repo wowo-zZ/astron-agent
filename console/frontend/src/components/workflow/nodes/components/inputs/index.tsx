@@ -9,6 +9,7 @@ import {
 import ChatHistory from '@/components/workflow/nodes/components/chat-history';
 import useFlowsManager from '@/components/workflow/store/useFlowsManager';
 import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import { EnabledChatHistory } from '@/components/workflow/nodes/components/single-input';
 
 import inputAddIcon from '@/assets/imgs/workflow/input-add-icon.png';
 import remove from '@/assets/imgs/workflow/input-remove-icon.png';
@@ -196,7 +197,7 @@ export function ErrorMessages({ item }: unknown): React.ReactElement {
   );
 }
 
-function index({ id, data, children }): React.ReactElement {
+function index({ id, data }): React.ReactElement {
   const { inputs, isIteratorNode, handleAddInputLine, handleChangeInputParam } =
     useNodeCommon({ id, data });
   const { t } = useTranslation();
@@ -209,8 +210,11 @@ function index({ id, data, children }): React.ReactElement {
   return (
     <FLowCollapse
       label={
-        <div className="flex items-center w-full gap-2 cursor-pointer">
-          {children}
+        <div className="w-full flex items-center cursor-pointer gap-2">
+          <div className="flex items-center justify-between text-base font-medium flex-1">
+            <div>{t('common.input')}</div>
+            <EnabledChatHistory id={id} data={data} />
+          </div>
         </div>
       }
       content={

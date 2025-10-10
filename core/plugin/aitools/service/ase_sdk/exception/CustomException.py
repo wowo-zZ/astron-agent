@@ -11,5 +11,5 @@ class CustomException(Exception):
         self.code = code
         self.message = message
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.code}: {self.message}"

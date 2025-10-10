@@ -1,12 +1,8 @@
 import {
-  getEnterpriseSearchUser,
+  getEnterpriseSearchUsername,
   getEnterpriseUserLimit,
 } from '@/services/enterprise';
-import {
-  getSpaceSearchUser,
-  getSpaceSearchUsername,
-  getSpaceUserLimit,
-} from '@/services/space';
+import { getSpaceSearchUsername, getSpaceUserLimit } from '@/services/space';
 import { message } from 'antd';
 
 const DEFAULT_LIMIT = {
@@ -16,7 +12,7 @@ const DEFAULT_LIMIT = {
 
 const methodMap = {
   enterprise: {
-    search: getEnterpriseSearchUser,
+    search: getEnterpriseSearchUsername,
     limit: getEnterpriseUserLimit,
   },
   space: {

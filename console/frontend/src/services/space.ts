@@ -1,5 +1,6 @@
 import http from '../utils/http';
 import { objectToQueryString } from '@/utils';
+import { SpaceItem } from '@/types/space';
 
 //个人空间创建
 export const personalSpaceCreate = (params: any) => {
@@ -80,12 +81,12 @@ export const getSpaceMemberList = (params: {
  * 企业空间
  */
 // 获取全部企业空间 /space/corporateList
-export const getAllCorporateList = (params?: any) => {
+export const getAllCorporateList = (params?: any): Promise<SpaceItem[]> => {
   return http.get('/space/corporate-list', { params });
 };
 
 // 获取我加入的企业空间
-export const getJoinedCorporateList = (params?: any) => {
+export const getJoinedCorporateList = (params?: any): Promise<SpaceItem[]> => {
   return http.get('/space/corporate-join-list', { params });
 };
 

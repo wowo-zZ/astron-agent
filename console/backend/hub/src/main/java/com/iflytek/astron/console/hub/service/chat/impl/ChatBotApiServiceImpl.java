@@ -44,12 +44,20 @@ public class ChatBotApiServiceImpl implements ChatBotApiService {
 
     @Override
     public void insert(String uid, Integer botId, String assistantId, String appId, String appSecret, String appKey,
-                       String prompt, String pluginIds, String embeddingIds, String apiPath, String description) {
+            String prompt, String pluginIds, String embeddingIds, String apiPath, String description) {
         ChatBotApi chatBotApi = ChatBotApi.builder()
-                .uid(uid).botId(botId).assistantId(assistantId).appId(appId).apiSecret(appSecret)
-                .apiKey(appKey).prompt(prompt).pluginId(pluginIds)
-                .embeddingId(embeddingIds).apiPath(apiPath)
-                .description(description).createTime(LocalDateTime.now())
+                .uid(uid)
+                .botId(botId)
+                .assistantId(assistantId)
+                .appId(appId)
+                .apiSecret(appSecret)
+                .apiKey(appKey)
+                .prompt(prompt)
+                .pluginId(pluginIds)
+                .embeddingId(embeddingIds)
+                .apiPath(apiPath)
+                .description(description)
+                .createTime(LocalDateTime.now())
                 .build();
         chatBotApiMapper.insert(chatBotApi);
     }

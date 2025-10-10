@@ -9,8 +9,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Publish strategy factory
- * Manages and provides access to different publish strategies
+ * Publish strategy factory Manages and provides access to different publish strategies
  */
 @Slf4j
 @Component
@@ -22,9 +21,8 @@ public class PublishStrategyFactory {
         this.strategyMap = publishStrategies.stream()
                 .collect(Collectors.toMap(
                         PublishStrategy::getPublishType,
-                        Function.identity()
-                ));
-        
+                        Function.identity()));
+
         log.info("Initialized publish strategies: {}", strategyMap.keySet());
     }
 

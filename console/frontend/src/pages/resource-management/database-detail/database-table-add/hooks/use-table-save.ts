@@ -144,6 +144,7 @@ export const useTableSave = (
           }
         } catch (error) {
           actions.setSaveLoading(false);
+          message.error(t('database.saveFailed'));
         }
       })
       .catch(() => {

@@ -455,3 +455,38 @@ export async function uploadFile(
     throw new Error(errorMessage);
   }
 }
+
+/**
+ * 文本中间字符替换为星号（脱敏）
+ * @param text 原始文本（必填）
+ * @param options 配置项（可选）
+ * - prefixLen 前面保留的字符数，默认 1
+ * - suffixLen 后面保留的字符数，默认 1
+ * - starLen 星号长度，默认 2（文本较长时自动调整，避免星号过多）
+ * @returns 脱敏后的文本
+ */
+export const maskMiddleText = (
+  text: string,
+  options: { prefixLen?: number; suffixLen?: number; starLen?: number } = {}
+) => {
+  // 处理边界：文本为空、null/undefined 或非字符串，直接返回空
+  if (!text || typeof text !== 'string') return '';
+
+  // 默认配置
+  const { prefixLen = 2, suffixLen = 2, starLen = 2 } = options;
+  const textLen = text.length;
+
+  // 情况1：文本长度 ≤ 保留的前后字符总和 → 不脱敏（避免星号覆盖所有字符）
+  if (textLen <= prefixLen + suffixLen) {
+    return text;
+  }
+
+  // 情况2：文本较长 → 截取前后字符，中间加星
+  const prefix = text.slice(0, prefixLen); // 前面保留的字符
+  const suffix = text.slice(-suffixLen); // 后面保留的字符
+  // 动态调整星号长度：若文本过长，星号最多显示 6 个（避免视觉冗余）
+  const finalStarLen = Math.min(starLen, textLen - prefixLen - suffixLen, 6);
+  const stars = '*'.repeat(finalStarLen); // 生成对应长度的星号
+
+  return `${prefix}${stars}${suffix}`;
+};

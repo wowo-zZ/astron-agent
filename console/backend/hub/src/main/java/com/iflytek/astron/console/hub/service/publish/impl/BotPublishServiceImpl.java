@@ -609,7 +609,7 @@ public class BotPublishServiceImpl implements BotPublishService {
             return response;
 
         } catch (Exception e) {
-            log.error("Failed to get prepare data: botId={}, type={}, uid={}, spaceId={}", 
+            log.error("Failed to get prepare data: botId={}, type={}, uid={}, spaceId={}",
                     botId, type, currentUid, spaceId, e);
             return createErrorPrepareResponse("Failed to get prepare data: " + e.getMessage());
         }
@@ -670,7 +670,8 @@ public class BotPublishServiceImpl implements BotPublishService {
         try {
             WorkflowInputsResponseDto inputsResponse = getInputsType(botId, currentUid, spaceId);
             if (inputsResponse != null && inputsResponse.getParameters() != null) {
-                return inputsResponse.getParameters().stream()
+                return inputsResponse.getParameters()
+                        .stream()
                         .map(param -> {
                             McpPrepareDto.InputTypeDto inputType = new McpPrepareDto.InputTypeDto();
                             inputType.setName(param.getName());
@@ -701,7 +702,7 @@ public class BotPublishServiceImpl implements BotPublishService {
     private McpPrepareDto.McpContentInfo getMcpContentInfo(Integer botId, BotDetailResponseDto botDetail) {
         // Try to get existing MCP data from database
         McpPrepareDto.McpContentInfo contentInfo = loadExistingMcpContent(botId);
-        
+
         if (contentInfo != null) {
             log.info("Using existing MCP content: botId={}, released={}", botId, contentInfo.getReleased());
             return contentInfo;

@@ -21,7 +21,7 @@ export const useRenderInput = ({
       return (
         <Input
           disabled={!!record?.defalutDisabled}
-          placeholder={t('common.pleaseEnterDefaultValue')}
+          placeholder={t('common.pleaseEnterParameterValue')}
           className="global-input params-input"
           value={record?.default as string}
           onChange={e => {

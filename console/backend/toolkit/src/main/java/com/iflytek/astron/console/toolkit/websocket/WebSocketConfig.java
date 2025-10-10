@@ -8,12 +8,15 @@ import org.springframework.web.socket.config.annotation.*;
 /**
  * WebSocket configuration class.
  * <p>
- * This class is used to register WebSocket handlers and define related WebSocket endpoints.
- * It enables WebSocket support for the application.
+ * This class is used to register WebSocket handlers and define related WebSocket endpoints. It
+ * enables WebSocket support for the application.
  * </p>
  *
- * <p><b>Specification reference:</b> According to the "Java Development Manual (Huangshan Edition)",
- * all configuration classes should include clear Javadoc annotations describing parameters and functionality.</p>
+ * <p>
+ * <b>Specification reference:</b> According to the "Java Development Manual (Huangshan Edition)",
+ * all configuration classes should include clear Javadoc annotations describing parameters and
+ * functionality.
+ * </p>
  *
  * @author
  * @since 2025/10/09
@@ -27,8 +30,8 @@ public class WebSocketConfig implements WebSocketConfigurer {
      * <p>
      * Defines two WebSocket endpoints:
      * <ul>
-     *     <li><b>/prompt-enhance</b>: Used for prompt enhancement features.</li>
-     *     <li><b>/flow-canvas-hold</b>: Used to maintain flow canvas real-time interaction.</li>
+     * <li><b>/prompt-enhance</b>: Used for prompt enhancement features.</li>
+     * <li><b>/flow-canvas-hold</b>: Used to maintain flow canvas real-time interaction.</li>
      * </ul>
      * Both endpoints allow requests from all origins (CORS set to "*").
      * </p>
@@ -46,7 +49,8 @@ public class WebSocketConfig implements WebSocketConfigurer {
     /**
      * Creates and registers a WebSocket handler for the "/prompt-enhance" endpoint.
      *
-     * @return a {@link WebSocketHandler} instance responsible for handling prompt enhancement WebSocket messages
+     * @return a {@link WebSocketHandler} instance responsible for handling prompt enhancement WebSocket
+     *         messages
      * @throws Exception if handler instantiation fails
      */
     @Bean
@@ -57,7 +61,8 @@ public class WebSocketConfig implements WebSocketConfigurer {
     /**
      * Creates and registers a WebSocket handler for the "/flow-canvas-hold" endpoint.
      *
-     * @return a {@link WebSocketHandler} instance responsible for handling flow canvas WebSocket messages
+     * @return a {@link WebSocketHandler} instance responsible for handling flow canvas WebSocket
+     *         messages
      * @throws Exception if handler instantiation fails
      */
     @Bean

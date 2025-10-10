@@ -1,10 +1,9 @@
 import { ReactElement, useEffect, useRef, MutableRefObject } from 'react';
 import type { MessageListType, BotInfoType } from '@/types/chat';
 import errorIcon from '@/assets/imgs/sparkImg/errorIcon.svg';
+import userImg from '@/assets/svgs/user-logo.svg';
 import LoadingAnimate from '@/constants/lottie-react/chat-loading.json';
-import { Progress, Skeleton } from 'antd';
 import useUserStore from '@/store/user-store';
-import useChatStore from '@/store/chat-store';
 import { getLanguageCode } from '@/utils/http';
 import Lottie from 'lottie-react';
 import DeepThinkProgress from '@/pages/chat-page/components/deep-think-progress';
@@ -13,28 +12,28 @@ import useBindEvents from '@/hooks/search-event-bind';
 import SourceInfoBox from '@/pages/chat-page/components/source-info-box';
 import UseToolsInfo from '@/pages/chat-page/components/use-tools-info';
 import { useTranslation } from 'react-i18next';
+import eventBus from '@/utils/event-bus';
 
 const MessageList = (props: {
   messageList: MessageListType[];
   botInfo: BotInfoType;
   coverUrl: string;
   inputExample: string[];
-  handleSendMessage: (text?: string) => void;
+  isLoading: boolean;
+  isCompleted: boolean;
   stopAnswer: () => void;
 }): ReactElement => {
   const {
     messageList,
     botInfo,
-    handleSendMessage,
     coverUrl,
     inputExample,
+    isLoading,
+    isCompleted,
     stopAnswer,
   } = props;
   const languageCode = getLanguageCode();
   const scrollAnchorRef = useRef<HTMLDivElement>(null);
-  const answerPercent = useChatStore((state: any) => state.answerPercent); //回答进度条
-  const isLoading = useChatStore(state => state.isLoading); //是否正在加载
-  const streamId = useChatStore(state => state.streamId); //流式回复id
   const { user } = useUserStore();
   const lastClickedQA: MutableRefObject<MessageListType | null> =
     useRef<MessageListType | null>(null);
@@ -45,6 +44,10 @@ const MessageList = (props: {
     bindTagClickEvent();
     scrollAnchorRef.current?.scrollIntoView();
   }, [messageList.length]);
+  const handleSendMessage = (text?: string) => {
+    if (!text) return;
+    eventBus.emit('promptTry.inputExample', text);
+  };
 
   const renderHeaderAndRecommend = (): ReactElement => (
     <div className="w-full mx-auto flex text-[#43436b] mt-3">
@@ -70,7 +73,7 @@ const MessageList = (props: {
               {inputExample?.map((ex: string) => {
                 return ex ? (
                   <div
-                    className="bg-[#ffffff] rounded-10px border border-[#4671f5] p-2"
+                    className="bg-[#ffffff] rounded-10px border border-[#4671f5] p-2 cursor-pointer"
                     onClick={() => {
                       handleSendMessage(ex);
                     }}
@@ -94,7 +97,11 @@ const MessageList = (props: {
         key={item.id}
         className="text-white py-2.5 flex leading-[1.4] h-auto"
       >
-        <img src={user?.avatar} alt="" className="h-6 w-6 rounded-full mr-4" />
+        <img
+          src={user?.avatar || userImg}
+          alt=""
+          className="h-6 w-6 rounded-full mr-4"
+        />
         <div className="bg-[#257eff] rounded-[0px_18px_18px_18px] p-[14px_19px] relative max-w-full">
           <div className="text-base font-normal text-white leading-[25px] whitespace-pre-wrap w-auto break-words">
             {item.message}
@@ -106,7 +113,7 @@ const MessageList = (props: {
 
   //渲染回复
   const renderResp = (item: MessageListType): ReactElement => {
-    const showLoading = !item.sid && (isLoading || !!answerPercent);
+    const showLoading = !item.sid && isLoading;
     return (
       <div
         className="mt-[14px] w-[inherit] max-w-full"
@@ -114,7 +121,7 @@ const MessageList = (props: {
       >
         <div className="flex w-full mb-3">
           <img
-            src={botInfo.avatar}
+            src={botInfo.avatar || coverUrl}
             alt="avatar"
             className="w-6 h-6 rounded-full mr-4 object-cover"
           />
@@ -132,32 +139,21 @@ const MessageList = (props: {
                 <span className="text-sm text-gray-500">
                   {languageCode === 'zh' ? '正在回答中...' : 'Processing...'}
                 </span>
-                {!!answerPercent && (
-                  <Progress
-                    percent={answerPercent}
-                    size="small"
-                    strokeColor="#6178FF"
-                    className="ml-2 flex-1"
-                  />
-                )}
               </div>
             )}
 
             {/* 使用工具 */}
             <UseToolsInfo
               allToolsList={item?.tools || []}
-              loading={!isLoading && !!streamId}
+              loading={showLoading}
             />
             {/* 思考链 */}
             <DeepThinkProgress answerItem={item} />
             {/* 回答内容 */}
-            <MarkdownRender
-              content={item.message}
-              isSending={!!streamId && !item.sid}
-            />
+            <MarkdownRender content={item.message} isSending={showLoading} />
           </div>
         </div>
-        {!!streamId && !item.sid && (
+        {!isLoading && !isCompleted && !item.sid && (
           <div
             className="text-sm text-[#9194bf] bg-white cursor-pointer ml-10 hover:text-[#257eff]"
             onClick={() => {
@@ -185,8 +181,8 @@ const MessageList = (props: {
           .map((item: MessageListType, index: number) => {
             return (
               <div className="w-full" key={index}>
-                {item?.reqId === 'USER' && renderReq(item)}
-                {item?.reqId === 'BOT' && renderResp(item)}
+                {item?.reqType === 'USER' && renderReq(item)}
+                {item?.reqType === 'BOT' && renderResp(item)}
               </div>
             );
           })}

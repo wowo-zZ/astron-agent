@@ -13,6 +13,7 @@ import {
   generateReferences,
 } from '@/components/workflow/utils/reactflowUtils';
 import { v4 as uuid } from 'uuid';
+import { message } from 'antd';
 import { cloneDeep } from 'lodash';
 import useFlowsManager from './useFlowsManager';
 import {
@@ -236,9 +237,7 @@ const copyNode = (
   get()?.takeSnapshot();
   const currentNode = get().nodes.find(item => item.id === nodeId);
   const currentTypeList = get().nodes.filter(
-    node =>
-      node.data?.label?.split('_')?.[0] ===
-      currentNode.data?.label?.split('_')?.[0]
+    node => node.nodeType === currentNode.nodeType
   );
   currentNode.selected = false;
   const copyNode = cloneDeep(currentNode);
@@ -372,6 +371,7 @@ const deleteNode = (
 
   get().setEdges(newEdges);
 
+  useFlowsManager.getState().autoSaveCurrentFlow();
   useFlowsManager.getState().setNodeInfoEditDrawerlInfo({
     open: false,
     nodeId: '',
@@ -503,7 +503,8 @@ const paste = async (
         get().updateNodeRef(item.id);
       });
     }, 500);
-  } catch {
+  } catch (error) {
+    message.error('[Clipboard] 复制失败', error);
     return;
   }
 };

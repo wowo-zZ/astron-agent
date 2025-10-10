@@ -94,6 +94,7 @@ const translation = {
   },
   // ToolInputParameters component translations
   pleaseEnterDefaultValue: 'Please enter default value',
+  pleaseEnterParameterValue: 'Please enter parameter value',
   // Constant component translations
   gallerySelection: 'Gallery Selection',
   localUpload: 'Local Upload',

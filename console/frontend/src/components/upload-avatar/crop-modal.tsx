@@ -91,14 +91,9 @@ const CropModal: React.FC<CropModalProps> = ({
       const result = await uploadFile(file, flag ? 'avatar' : 'space');
 
       if (flag) {
-        // For user avatar upload
-        useUserStore.setState({
-          user: {
-            ...userInfo,
-            avatar: result.url,
-          },
-        });
-        message.success('修改成功');
+        if (setCoverUrl) {
+          setCoverUrl(result.url);
+        }
       } else {
         // For bot image upload
         if (setCoverUrl) {

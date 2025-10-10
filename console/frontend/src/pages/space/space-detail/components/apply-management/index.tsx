@@ -75,7 +75,10 @@ const useApplyData = (): UseApplyDataReturn => {
         nickname: searchValue,
         status,
       });
-      const res = response.data as { records: Invitation[]; total: number };
+      const res = response as unknown as {
+        records: Invitation[];
+        total: number;
+      };
 
       const { records, total } = res;
       return {

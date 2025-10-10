@@ -96,7 +96,7 @@ const useChatStore = create<ChatState & ChatActions>(set => ({
       return state;
     }),
 
-  finishStreamingMessage: (sid?: string, id?: number): void =>
+  finishStreamingMessage: (sid?: string, reqId?: number): void =>
     set(state => {
       if (state.messageList.length === 0) return state;
 
@@ -109,7 +109,7 @@ const useChatStore = create<ChatState & ChatActions>(set => ({
           ...lastMessage,
           message: lastMessage.message || '', // 确保message字段存在
           sid,
-          id: id || lastMessage.id,
+          reqId,
           workflowEventData: {
             workflowOperation: state.workflowOperation,
             option: state.workflowOption?.option,

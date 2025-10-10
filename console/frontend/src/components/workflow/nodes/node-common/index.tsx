@@ -438,7 +438,6 @@ export const NodeContent = memo<NodeContentProps>(({ id, data }) => {
     showInputs,
     showOutputs,
     showExceptionFlow,
-    isRpaNode,
   } = useNodeCommon({
     id,
     data,

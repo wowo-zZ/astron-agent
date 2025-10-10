@@ -406,9 +406,9 @@ public class ChatBotDataServiceImpl implements ChatBotDataService {
         }
         // Query botId based on spaceId
         List<Integer> spaceBotIdList = chatBotBaseMapper.selectList(Wrappers.lambdaQuery(ChatBotBase.class)
-                        .eq(ChatBotBase::getSpaceId, spaceId)
-                        .eq(ChatBotBase::getIsDelete, 0)
-                        .select(ChatBotBase::getId))
+                .eq(ChatBotBase::getSpaceId, spaceId)
+                .eq(ChatBotBase::getIsDelete, 0)
+                .select(ChatBotBase::getId))
                 .stream()
                 .map(ChatBotBase::getId)
                 .toList();

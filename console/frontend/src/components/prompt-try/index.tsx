@@ -1,203 +1,328 @@
-import { useState, memo, useEffect } from 'react';
+import {
+  useState,
+  memo,
+  useRef,
+  useEffect,
+  useImperativeHandle,
+  forwardRef,
+} from 'react';
 import { message } from 'antd';
-import { DeleteIcon } from '@/components/svg-icons';
 import { useTranslation } from 'react-i18next';
-
-import useChatStore from '@/store/chat-store';
-import useChat from '@/hooks/use-chat';
 import MessageList from './message-list';
 import { MessageListType } from '@/types/chat';
+import { getLanguageCode } from '@/utils/http';
+import { fetchEventSource } from '@microsoft/fetch-event-source';
+import eventBus from '@/utils/event-bus';
+import { baseURL } from '@/utils/http';
 
-const PromptTry = ({
-  newModel,
-  newPrompt,
-  baseinfo,
-  inputExample,
-  coverUrl,
-  selectSource,
-  prompt,
-  model,
-  supportContext,
-  choosedAlltool,
-  showModelPk,
-  showTipPk,
-}: {
-  newModel?: string;
-  newPrompt?: string;
-  baseinfo?: any;
-  inputExample?: string[];
-  coverUrl?: string;
-  selectSource?: any;
-  prompt?: string;
-  model?: string;
-  supportContext?: number;
-  promptText?: string;
-  choosedAlltool?: {
-    [key: string]: boolean;
-  };
-  showModelPk?: number;
-  showTipPk?: number;
-}) => {
-  const { t } = useTranslation();
-  const [askValue, setAskValue] = useState(''); // 输入框值
-  const isLoading = useChatStore(state => state.isLoading); //  是否正在加载
-  const streamId = useChatStore(state => state.streamId); // 流式回复id
-  const messageList = useChatStore(state => state.messageList); //  消息列表
-  const controllerRef = useChatStore(state => state.controllerRef); //sse请求ref
-  const setStreamId = useChatStore(state => state.setStreamId); // 设置流式回复id
-  const setIsLoading = useChatStore(state => state.setIsLoading); // 设置是否正在加载
-  const initChatStore = useChatStore(state => state.initChatStore); // 初始化聊天状态
-  const [isComposing, setIsComposing] = useState<boolean>(false); // 是否正在输入
+// PromptTry组件暴露的方法接口
+export interface PromptTryRef {
+  send: (text: string) => void;
+  clear: () => void;
+}
 
-  const { fetchSSE } = useChat();
+interface SSEData {
+  type?: string;
+  choices?: Array<{
+    delta?: {
+      content?: string;
+      reasoning_content?: string;
+      tool_calls?: Array<{
+        deskToolName: string;
+      }>;
+    };
+  }>;
+  end?: boolean;
+  id?: number;
+  content?: string;
+  error?: string | boolean;
+  message?: string;
+  code?: number;
+}
 
-  useEffect(() => {
-    stopAnswer();
-    removeAll();
-  }, []);
+const PromptTry = forwardRef<
+  PromptTryRef,
+  {
+    newModel?: string;
+    newPrompt?: string;
+    baseinfo?: any;
+    inputExample?: string[];
+    coverUrl?: string;
+    selectSource?: any;
+    prompt?: string;
+    model?: string;
+    supportContext?: number;
+    promptText?: string;
+    choosedAlltool?: {
+      [key: string]: boolean;
+    };
+  }
+>(
+  (
+    {
+      newModel,
+      newPrompt,
+      baseinfo,
+      inputExample,
+      coverUrl,
+      selectSource,
+      prompt,
+      model,
+      supportContext,
+      choosedAlltool,
+    },
+    ref
+  ) => {
+    const { t } = useTranslation();
+    const instanceId = useRef(Math.random().toString(36).substr(2, 9)); // 实例唯一标识符
+    const [isLoading, setIsLoading] = useState<boolean>(false); // 是否正在加载
+    const [isCompleted, setIsCompleted] = useState<boolean>(true); // 是否完成
+    const [messageList, setMessageList] = useState<MessageListType[]>([]); // 消息列表
+    const controllerRef = useRef<AbortController>(new AbortController()); //sse请求ref
+    const currentSid = useRef<string>(''); // 当前sid
 
-  //清除聊天记录
-  const removeAll = () => {
-    initChatStore();
-  };
+    // 使用useImperativeHandle暴露组件方法
+    useImperativeHandle(ref, () => ({
+      send: handleSendBtnClick,
+      clear: removeAll,
+    }));
 
-  // 按下回车键
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey && !isComposing) {
-      e.preventDefault();
-      handleSendBtnClick();
-    }
-  };
+    useEffect(() => {
+      // 监听清除所有消息的事件
+      const handleRemoveAll = () => {
+        removeAll();
+      };
 
-  // 点击发送按钮
-  const handleSendBtnClick = (text?: string) => {
-    if (isLoading || streamId) {
-      message.warning(t('configBase.promptTry.answerPleaseTryAgainLater'));
-      return;
-    }
+      eventBus.on('eventRemoveAll', handleRemoveAll);
 
-    if (!text && askValue.trim() === '') {
-      message.info(t('configBase.promptTry.pleaseEnterQuestion'));
-      return;
-    }
+      return () => {
+        eventBus.off('eventRemoveAll', handleRemoveAll);
+        // 组件卸载时清理loading状态
+        eventBus.emit('promptTry.loadingChange', {
+          instanceId: instanceId.current,
+          loading: false,
+        });
+      };
+    }, []);
 
-    getAnswer(text || askValue);
-    setAskValue('');
-  };
+    // 监听loading状态变化，通知config-base
+    useEffect(() => {
+      eventBus.emit('promptTry.loadingChange', {
+        instanceId: instanceId.current,
+        loading: isLoading,
+      });
+    }, [isLoading]);
 
-  // 获取答案
-  const getAnswer = (question: string) => {
-    let esURL = `/xingchen-api/chat-message/bot-debug`;
-    if (
-      typeof window !== 'undefined' &&
-      window.location.hostname === 'localhost'
-    ) {
-      esURL = `/xingchen-api/chat-message/bot-debug`;
-    } else {
-      const mode = import.meta.env.VITE_MODE;
-      if (mode === 'development') {
-        esURL = `http://172.29.202.54:8080/chat-message/bot-debug`;
-      } else {
-        esURL = `http://172.29.201.92:8080/chat-message/bot-debug`;
+    // 点击发送按钮
+    const handleSendBtnClick = (text?: string) => {
+      if (isLoading) {
+        message.warning(t('configBase.promptTry.answerPleaseTryAgainLater'));
+        return;
       }
-    }
-    const form = new FormData();
-    if (model) {
-      form.append('model', newModel ? newModel : model);
-    } else {
-      form.append('model', newModel ? newModel : 'spark');
-    }
 
-    form.append('text', question);
-    const datasetList: string[] = [];
-    (selectSource || []).forEach((item: any) => {
-      datasetList.push(item.id);
-    });
-    if (datasetList.join(',') !== '') {
-      if (selectSource[0]?.tag == 'SparkDesk-RAG') {
-        form.append('datasetList', JSON.stringify(datasetList.join(',')));
-      } else {
-        form.append('maasDatasetList', JSON.stringify(datasetList.join(',')));
+      if (!text || text.trim() === '') {
+        message.info(t('configBase.promptTry.pleaseEnterQuestion'));
+        return;
       }
-    }
-    form.append('prompt', newPrompt ? newPrompt : prompt || '');
-    form.append('multiTurn', `${supportContext}`); //是否开启多轮对话
-    const arr = messageList.map((item: MessageListType) => item.message);
-    if (supportContext === 1) form.append('arr', JSON.stringify(arr));
 
-    if (choosedAlltool) {
-      form.append(
-        'openedTool',
-        Object.keys(choosedAlltool)
-          .filter((key: string) => choosedAlltool[key])
-          .join(',')
-      );
-    }
-    fetchSSE(esURL, form);
-  };
+      getAnswer(text);
+    };
 
-  // 停止回答
-  const stopAnswer = () => {
-    controllerRef.abort();
-    setStreamId('');
-    setIsLoading(false);
-  };
+    //清除聊天记录
+    const removeAll = () => {
+      if (isLoading || !isCompleted) {
+        message.warning(t('configBase.promptTry.answerPleaseTryAgainLater'));
+        return;
+      }
+      setMessageList([]);
+    };
 
-  return (
-    <div className="w-full h-full">
-      <div className="w-full mx-auto flex flex-col flex-1 min-h-0 h-full overflow-hidden">
-        <MessageList
-          messageList={messageList}
-          botInfo={baseinfo}
-          coverUrl={coverUrl || ''}
-          inputExample={inputExample || []}
-          handleSendMessage={handleSendBtnClick}
-          stopAnswer={stopAnswer}
-        />
+    // 获取答案
+    const getAnswer = (question: string) => {
+      const esURL = `${baseURL}chat-message/bot-debug`;
+      const form = new FormData();
+      if (model) {
+        form.append('model', newModel ? newModel : model);
+      } else {
+        form.append('model', newModel ? newModel : 'spark');
+      }
 
-        {!showModelPk && !showTipPk && (
-          <div className="relative w-full rounded-md h-[95px] flex">
-            {!isLoading && !streamId && (
-              <div
-                className="w-[107px] h-[26px] absolute -top-[34px] left-0 bg-white border border-[#e4ebf9] rounded-[13px] flex items-center justify-center text-[12px] text-[#535875] z-[40] cursor-pointer hover:text-[#6b89ff]"
-                onClick={() => {
-                  removeAll();
-                }}
-              >
-                <DeleteIcon
-                  style={{ pointerEvents: 'none', marginRight: '6px' }}
-                />
-                {t('configBase.promptTry.clearHistory')}
-              </div>
-            )}
-            <textarea
-              className="rounded-[8px] absolute left-[2px] bottom-[2px] w-[calc(100%-4px)] leading-[25px] min-h-[95px] max-h-[180px] resize-none outline-none border border-[#d2dbe7] text-[14px] py-[10px] pr-[100px] pl-[16px] text-[#07133e] z-[32] placeholder:text-[#d0d0da]"
-              placeholder={t('chatPage.chatWindow.defaultPlaceholder')}
-              onKeyDown={handleKeyDown}
-              value={askValue}
-              onChange={e => {
-                setAskValue(e.target.value);
-              }}
-              onCompositionStart={() => setIsComposing(true)}
-              onCompositionEnd={() => setIsComposing(false)}
-            />
-            <div
-              className="absolute bottom-[10px] right-[10px] w-[70px] h-[38px] rounded-[8px] text-white text-center leading-[38px] text-[14px] cursor-pointer transition-all duration-300 z-[35] hover:bg-[#257eff] hover:opacity-100"
-              style={{
-                background: askValue ? '#257eff' : '#8aa5e6',
-                opacity: askValue ? 1 : 0.7,
-              }}
-              onClick={() => {
-                handleSendBtnClick();
-              }}
-            >
-              {t('configBase.promptTry.send')}
-            </div>
-          </div>
-        )}
+      form.append('text', question);
+      const datasetList: string[] = [];
+      (selectSource || []).forEach((item: any) => {
+        datasetList.push(item.id);
+      });
+      if (datasetList.join(',') !== '') {
+        if (selectSource[0]?.tag == 'SparkDesk-RAG') {
+          form.append('datasetList', JSON.stringify(datasetList.join(',')));
+        } else {
+          form.append('maasDatasetList', JSON.stringify(datasetList.join(',')));
+        }
+      }
+      form.append('prompt', newPrompt ? newPrompt : prompt || '');
+      form.append('multiTurn', `${supportContext}`); //是否开启多轮对话
+      const arr = messageList.map((item: MessageListType) => item.message);
+      if (supportContext === 1) form.append('arr', JSON.stringify(arr));
+
+      if (choosedAlltool) {
+        form.append(
+          'openedTool',
+          Object.keys(choosedAlltool)
+            .filter((key: string) => choosedAlltool[key])
+            .join(',')
+        );
+      }
+      handleFetchSSE(esURL, form);
+    };
+    const handleFetchSSE = (esURL: string, form: FormData) => {
+      let ans: string = '';
+      let reasoning: string = ''; //思考链内容
+      let toolsName: string = ''; //工具名称
+      const controller = new AbortController();
+      controllerRef.current = controller;
+      const headerConfig = {
+        'Lang-Code': getLanguageCode(),
+        authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      };
+      setIsLoading(true);
+      setIsCompleted(false);
+      // 先追加用户消息
+      setMessageList(prev => [
+        ...prev,
+        {
+          id: Date.now(),
+          message: form.get('text')?.toString() || '',
+          updateTime: new Date().toISOString(),
+          reqType: 'USER',
+        },
+      ]);
+      // 追加一个空的机器人消息，用于流式更新
+      setMessageList(prev => [
+        ...prev,
+        {
+          id: Date.now() + 1,
+          message: '',
+          reqType: 'BOT',
+          updateTime: new Date().toISOString(),
+        },
+      ]);
+
+      fetchEventSource(esURL, {
+        method: 'POST',
+        body: form,
+        headers: { ...headerConfig },
+        openWhenHidden: true,
+        signal: controller.signal,
+        onopen(): Promise<void> {
+          return Promise.resolve();
+        },
+        onmessage(event: { data: string }): void {
+          const data: SSEData = JSON.parse(event.data);
+          const { id, type, choices, end, content, message, code } = data;
+          id && (currentSid.current = id.toString());
+          if (type === 'start') return;
+          setIsLoading(false);
+          if (code) {
+            const errorMsg = (message as string) || '发生未知错误';
+            setMessageList(prev => {
+              const updated = [...prev];
+              const last = updated.length - 1;
+              updated[last] = { ...updated[last], message: errorMsg };
+              return updated;
+            });
+            setIsLoading(false);
+            setIsCompleted(true);
+            controller.abort('错误结束');
+            return;
+          }
+
+          if (end) {
+            setIsLoading(false);
+            setIsCompleted(true);
+            setMessageList(prev => {
+              const updated = [...prev];
+              const last = updated.length - 1;
+              updated[last] = {
+                ...updated[last],
+                sid: currentSid?.current?.toString() || '',
+                message: updated[last]?.message || '',
+              };
+              return updated;
+            });
+            controller.abort('结束');
+            return;
+          }
+          // 思考链
+          reasoning += choices?.[0]?.delta?.reasoning_content || '';
+          // 工具调用
+          toolsName = choices?.[1]?.delta?.tool_calls?.[0]?.deskToolName || '';
+          // 正常文本内容
+          ans = `${ans}${choices?.[0]?.delta?.content || content || ''}`;
+          setMessageList(prev => {
+            const updated = [...prev];
+            const last = updated.length - 1;
+            updated[last] = {
+              ...updated[last],
+              message: ans || '',
+              reasoning: reasoning,
+              tools: toolsName ? [toolsName] : [],
+              traceSource: choices?.[1]?.delta?.tool_calls
+                ? JSON.stringify(choices[1].delta.tool_calls)
+                : '',
+            };
+            return updated;
+          });
+        },
+        onerror(err: Error): void {
+          setIsLoading(false);
+          setIsCompleted(true);
+          controllerRef.current.abort('连接错误');
+          console.error('esError', err);
+        },
+      }).catch((err: Error) => {
+        setIsLoading(false);
+        setIsCompleted(true);
+        controllerRef.current.abort('请求失败');
+        console.error('fetchError', err);
+      });
+    };
+
+    // 停止回答
+    const stopAnswer = () => {
+      controllerRef?.current.abort();
+      setMessageList(prev => {
+        const updated = [...prev];
+        const last = updated.length - 1;
+        updated[last] = {
+          ...updated[last],
+          sid: currentSid?.current?.toString() || '',
+          message: updated[last]?.message || '',
+        };
+        return updated;
+      });
+      setIsLoading(false);
+      setIsCompleted(true);
+    };
+
+    return (
+      <div className="w-full h-full">
+        <div className="w-full mx-auto flex flex-col flex-1 min-h-0 h-full overflow-hidden">
+          <MessageList
+            messageList={messageList}
+            botInfo={baseinfo}
+            coverUrl={coverUrl || ''}
+            inputExample={inputExample || []}
+            isLoading={isLoading}
+            isCompleted={isCompleted}
+            stopAnswer={stopAnswer}
+          />
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  }
+);
+
+// 设置displayName以便调试
+PromptTry.displayName = 'PromptTry';
 
 export default memo(PromptTry);
