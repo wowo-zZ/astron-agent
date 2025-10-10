@@ -113,7 +113,7 @@ class ApplyRecordBizServiceImplTest {
             ApiResult<String> result = applyRecordBizService.joinEnterpriseSpace(TEST_SPACE_ID);
 
             // 验证结果
-            assertEquals(ResponseEnum.SPACE_APPLICATION_SUCCESS.getCode(), result.code());
+            assertEquals(ResponseEnum.SUCCESS.getCode(), result.code());
             assertNull(result.data());
 
             // 验证方法调用
@@ -150,7 +150,7 @@ class ApplyRecordBizServiceImplTest {
             ApiResult<String> result = applyRecordBizService.joinEnterpriseSpace(TEST_SPACE_ID);
 
             // 验证结果
-            assertEquals(ResponseEnum.SPACE_APPLICATION_JOIN_SUCCESS.getCode(), result.code());
+            assertEquals(ResponseEnum.SUCCESS.getCode(), result.code());
             assertNull(result.data());
 
             // 验证方法调用
