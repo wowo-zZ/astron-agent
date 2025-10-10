@@ -69,17 +69,7 @@ public class VersionService {
     }
 
     public Object list_botId_Page(Page<WorkflowVersion> page, String botId) {
-        Page<WorkflowVersion> newPage = new Page<>(page.getCurrent(), page.getSize());
-
-        LambdaQueryWrapper<WorkflowVersion> wrapper = new QueryWrapper<WorkflowVersion>()
-                .lambda()
-                .eq(WorkflowVersion::getBotId, botId)
-                .eq(WorkflowVersion::getDeleted, 1)
-                .eq(WorkflowVersion::getPublishResult, "Success")
-                .groupBy(WorkflowVersion::getName)
-                .orderByDesc(WorkflowVersion::getCreatedTime);
-
-        return workflowVersionMapper.selectPage(newPage, wrapper);
+        return workflowVersionMapper.selectPageLatestByName(page, botId);
     }
 
     /**
