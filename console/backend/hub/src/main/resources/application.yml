@@ -158,7 +158,7 @@ space:
       space-count: 10000
       user-count: 500
   invite-message-template:
-    url: https://${CONSOLE_DOMAIN:localhost:3000}/sharepage?param=
+    url: ${CONSOLE_DOMAIN:localhost:3000}/sharepage?param=
 
 # WeChat third-party platform configuration
 wechat:
