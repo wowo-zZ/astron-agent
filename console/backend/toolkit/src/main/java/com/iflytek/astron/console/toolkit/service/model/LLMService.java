@@ -252,7 +252,7 @@ public class LLMService {
                     obj.put("precision", convertPrecisionValue(precision));
                 }
             }
-            llmInfoVo.setConfig(config);
+            llmInfoVo.setConfig(JSON.toJSONString(config));
             personalList.add(llmInfoVo);
         }
     }
