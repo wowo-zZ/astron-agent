@@ -1,7 +1,7 @@
 package com.iflytek.astron.console.hub.service.share.impl;
 
 import com.iflytek.astron.console.commons.constant.ResponseEnum;
-import com.iflytek.astron.console.commons.entity.bot.BotDetail;
+import com.iflytek.astron.console.commons.dto.bot.BotDetail;
 import com.iflytek.astron.console.commons.entity.space.AgentShareRecord;
 import com.iflytek.astron.console.commons.exception.BusinessException;
 import com.iflytek.astron.console.commons.service.bot.ChatBotDataService;

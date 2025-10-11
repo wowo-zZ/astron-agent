@@ -56,7 +56,7 @@
     </sql>
 
     <!-- Paginated query for bot list -->
-    <select id="selectBotListByConditions" resultType="com.iflytek.astron.console.commons.entity.bot.BotPublishQueryResult">
+    <select id="selectBotListByConditions" resultType="com.iflytek.astron.console.commons.dto.bot.BotPublishQueryResult">
         SELECT
         a.uid,
         a.space_id AS spaceId,
@@ -93,7 +93,7 @@
     </select>
 
     <!-- Query bot details -->
-    <select id="selectBotDetail" resultType="com.iflytek.astron.console.commons.entity.bot.BotPublishQueryResult">
+    <select id="selectBotDetail" resultType="com.iflytek.astron.console.commons.dto.bot.BotPublishQueryResult">
         SELECT
             a.uid,
             a.space_id AS spaceId,

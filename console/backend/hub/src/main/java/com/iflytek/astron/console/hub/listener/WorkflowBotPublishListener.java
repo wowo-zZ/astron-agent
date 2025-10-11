@@ -2,7 +2,7 @@ package com.iflytek.astron.console.hub.listener;
 
 import com.iflytek.astron.console.commons.entity.bot.ChatBotBase;
 import com.iflytek.astron.console.commons.enums.ShelfStatusEnum;
-import com.iflytek.astron.console.commons.enums.bot.BotPublishTypeEnum;
+import com.iflytek.astron.console.commons.enums.bot.ReleaseTypeEnum;
 import com.iflytek.astron.console.commons.enums.bot.BotTypeEnum;
 import com.iflytek.astron.console.commons.mapper.bot.ChatBotBaseMapper;
 import com.iflytek.astron.console.commons.service.data.UserLangChainDataService;
@@ -68,7 +68,7 @@ public class WorkflowBotPublishListener {
                     event.getBotId(),
                     event.getUid(),
                     event.getSpaceId(),
-                    BotPublishTypeEnum.MARKET.getCode());
+                    ReleaseTypeEnum.MARKET.name());
 
             if (response.getSuccess()) {
                 log.info("Workflow bot publish and sync successful: botId={}, versionId={}, versionName={}",

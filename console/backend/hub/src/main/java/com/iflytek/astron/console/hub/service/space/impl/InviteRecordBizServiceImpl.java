@@ -58,6 +58,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -159,7 +160,7 @@ public class InviteRecordBizServiceImpl implements InviteRecordBizService {
                 request.setReceiverUids(List.of(record.getInviteeUid()));
                 request.setTitle(tempProperties.getSpaceTitle());
                 String outLink = tempProperties.getUrl() + AESUtil.encrypt(record.getId().toString(), AES_KEY);
-                request.setBody(String.format(tempProperties.getSpaceContent(), userInfo.getNickname(), space.getName(), outLink));
+                request.setBody(MessageFormat.format(tempProperties.getSpaceContent(), userInfo.getNickname(), space.getName(), outLink));
                 request.setPayload(JSONObject.of("outlink", outLink).toString());
                 notificationService.sendNotification(request);
             }
@@ -227,7 +228,7 @@ public class InviteRecordBizServiceImpl implements InviteRecordBizService {
                 request.setReceiverUids(List.of(record.getInviteeUid()));
                 request.setTitle(tempProperties.getEnterpriseTitle());
                 String outLink = tempProperties.getUrl() + AESUtil.encrypt(record.getId().toString(), AES_KEY);
-                request.setBody(String.format(tempProperties.getEnterpriseContent(), userInfo.getNickname(), enterprise.getName(), outLink));
+                request.setBody(MessageFormat.format(tempProperties.getEnterpriseContent(), userInfo.getNickname(), enterprise.getName(), outLink));
                 request.setPayload(JSONObject.of("outlink", outLink).toString());
                 notificationService.sendNotification(request);
             }

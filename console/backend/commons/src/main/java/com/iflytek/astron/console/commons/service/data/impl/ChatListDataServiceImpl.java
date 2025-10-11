@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.iflytek.astron.console.commons.entity.bot.ChatBotBase;
 import com.iflytek.astron.console.commons.entity.bot.ChatBotList;
-import com.iflytek.astron.console.commons.entity.chat.ChatBotListDto;
+import com.iflytek.astron.console.commons.dto.chat.ChatBotListDto;
 import com.iflytek.astron.console.commons.entity.chat.ChatList;
 import com.iflytek.astron.console.commons.entity.chat.ChatTreeIndex;
 import com.iflytek.astron.console.commons.mapper.bot.ChatBotListMapper;

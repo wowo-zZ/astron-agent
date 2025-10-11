@@ -1,6 +1,6 @@
 package com.iflytek.astron.console.hub.service.chat.impl;
 
-import com.iflytek.astron.console.commons.entity.chat.ChatRespModelDto;
+import com.iflytek.astron.console.commons.dto.chat.ChatRespModelDto;
 import com.iflytek.astron.console.commons.entity.chat.ChatTraceSource;
 import com.iflytek.astron.console.hub.service.chat.TraceToSourceService;
 import lombok.extern.slf4j.Slf4j;

@@ -1,7 +1,7 @@
 package com.iflytek.astron.console.hub.strategy.publish.impl;
 
 import com.iflytek.astron.console.commons.enums.PublishChannelEnum;
-import com.iflytek.astron.console.commons.enums.bot.BotPublishTypeEnum;
+import com.iflytek.astron.console.commons.enums.bot.ReleaseTypeEnum;
 import com.iflytek.astron.console.commons.response.ApiResult;
 import com.iflytek.astron.console.hub.dto.publish.WechatAuthUrlResponseDto;
 import com.iflytek.astron.console.hub.service.publish.BotPublishService;
@@ -71,7 +71,7 @@ public class WechatPublishStrategy implements PublishStrategy {
 
     @Override
     public String getPublishType() {
-        return BotPublishTypeEnum.WECHAT.getCode();
+        return ReleaseTypeEnum.WECHAT.name();
     }
 
     /**

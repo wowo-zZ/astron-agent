@@ -1,6 +1,6 @@
 package com.iflytek.astron.console.hub.strategy.publish.impl;
 
-import com.iflytek.astron.console.commons.enums.bot.BotPublishTypeEnum;
+import com.iflytek.astron.console.commons.enums.bot.ReleaseTypeEnum;
 import com.iflytek.astron.console.commons.enums.PublishChannelEnum;
 import com.iflytek.astron.console.commons.constant.ResponseEnum;
 import com.iflytek.astron.console.commons.exception.BusinessException;
@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import com.iflytek.astron.console.commons.util.MaasUtil;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -155,7 +156,7 @@ public class McpPublishStrategy implements PublishStrategy {
 
     @Override
     public String getPublishType() {
-        return BotPublishTypeEnum.MCP.getCode();
+        return ReleaseTypeEnum.MCP.name();
     }
 
     /**
@@ -181,10 +182,12 @@ public class McpPublishStrategy implements PublishStrategy {
             String jsonBody = requestBody.toJSONString();
 
             // Build HTTP request
+            String authHeader = getCurrentAuthorizationHeader();
             Request.Builder requestBuilder = new Request.Builder()
                     .url(baseUrl + GET_VERSION_NAME_URL)
                     .post(RequestBody.create(jsonBody, JSON_MEDIA_TYPE))
-                    .addHeader("Content-Type", "application/json");
+                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Authorization", authHeader);
 
             // Add spaceId to header (same as original project)
             if (spaceId != null) {
@@ -284,10 +287,12 @@ public class McpPublishStrategy implements PublishStrategy {
             String jsonParams = releaseBotDto.toJSONString();
 
             // Build HTTP request (same as original project)
+            String authHeader = getCurrentAuthorizationHeader();
             Request.Builder requestBuilder = new Request.Builder()
                     .url(baseUrl) // ADD_VERSION_URL is empty string, so just use baseUrl
                     .post(RequestBody.create(jsonParams, JSON_MEDIA_TYPE))
-                    .addHeader("Content-Type", "application/json");
+                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Authorization", authHeader);
 
             // Add spaceId to header (same as original project)
             if (spaceId != null) {
@@ -341,20 +346,39 @@ public class McpPublishStrategy implements PublishStrategy {
                 log.warn("No request context available, using empty cookies");
                 return "";
             }
-
+            
             HttpServletRequest request = attributes.getRequest();
             Cookie[] cookies = request.getCookies();
-
+            
             if (cookies == null || cookies.length == 0) {
                 return "";
             }
-
+            
             return Arrays.stream(cookies)
                     .map(cookie -> cookie.getName() + "=" + cookie.getValue())
                     .collect(Collectors.joining("; "));
-
+                    
         } catch (Exception e) {
             log.error("Failed to get request cookies", e);
+            return "";
+        }
+    }
+
+    /**
+     * Get Authorization header from current request context
+     */
+    private String getCurrentAuthorizationHeader() {
+        try {
+            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (attributes == null) {
+                log.warn("No request context available for Authorization header");
+                return "";
+            }
+            
+            HttpServletRequest request = attributes.getRequest();
+            return MaasUtil.getAuthorizationHeader(request);
+        } catch (Exception e) {
+            log.error("Failed to get Authorization header from request context", e);
             return "";
         }
     }

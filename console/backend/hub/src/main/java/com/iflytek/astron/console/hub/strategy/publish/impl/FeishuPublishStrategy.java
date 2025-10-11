@@ -1,6 +1,6 @@
 package com.iflytek.astron.console.hub.strategy.publish.impl;
 
-import com.iflytek.astron.console.commons.enums.bot.BotPublishTypeEnum;
+import com.iflytek.astron.console.commons.enums.bot.ReleaseTypeEnum;
 import com.iflytek.astron.console.commons.response.ApiResult;
 import com.iflytek.astron.console.hub.strategy.publish.PublishStrategy;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +47,6 @@ public class FeishuPublishStrategy implements PublishStrategy {
 
     @Override
     public String getPublishType() {
-        return BotPublishTypeEnum.FEISHU.getCode();
+        return ReleaseTypeEnum.FEISHU.name();
     }
 }

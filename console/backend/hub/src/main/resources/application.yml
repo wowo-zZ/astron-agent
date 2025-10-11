@@ -159,14 +159,6 @@ space:
       user-count: 500
   invite-message-template:
     url: https://${CONSOLE_DOMAIN:localhost:3000}/sharepage?param=
-    space-title: Space Invitation Reminder
-    space-content: >
-      <h3>Space Invitation Reminder</h3>[%s] invited you to join space "%s",
-      <a href="%s" target="_blank" style="color: blue;">Click to view</a>
-    enterprise-title: Team Invitation Reminder
-    enterprise-content: >
-      <h3>Team Invitation Reminder</h3>[%s] invited you to join team "%s",
-      <a href="%s" target="_blank" style="color: blue;">Click to view</a>
 
 # WeChat third-party platform configuration
 wechat:
