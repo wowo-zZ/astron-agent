@@ -11,9 +11,10 @@ import FlowContainer from './components/flow-container';
 import FlowModal from './components/flow-modal';
 import FlowDrawer from './components/flow-drawer';
 import CommunityQRCode from './components/community-qr-code';
+import { cloneDeep } from 'lodash';
 
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
-import useFlowStore from '@/components/workflow/store/useFlowStore';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
+import useFlowStore from '@/components/workflow/store/use-flow-store';
 
 import chatResultClose from '@/assets/imgs/workflow/chat-result-close.png';
 
@@ -44,8 +45,13 @@ const Index: React.FC<IndexProps> = ({ currentTab = 'arrange' }) => {
   const setEdgeType = useFlowsManager(state => state.setEdgeType);
   const loadingModels = useFlowsManager(state => state.loadingModels);
   const loadingNodesData = useFlowsManager(state => state.loadingNodesData);
+  const singleNodeDebuggingInfo = useFlowsManager(
+    state => state.singleNodeDebuggingInfo
+  );
+  const currentStore = useFlowsManager(state => state.getCurrentStore());
   const setHistorys = useFlowStore(state => state.setHistorys);
   const setNodes = useFlowStore(state => state.setNodes);
+  const setNode = currentStore(state => state.setNode);
   const setEdges = useFlowStore(state => state.setEdges);
   const zoom = useFlowStore(state => state.zoom);
   const setZoom = useFlowStore(state => state.setZoom);
@@ -111,6 +117,13 @@ const Index: React.FC<IndexProps> = ({ currentTab = 'arrange' }) => {
     });
     setShowNodeList(true);
     setCanvasesDisabled(false);
+    if (singleNodeDebuggingInfo?.controller) {
+      singleNodeDebuggingInfo?.controller?.abort();
+      setNode(singleNodeDebuggingInfo?.nodeId, old => {
+        old.data.status = '';
+        return cloneDeep(old);
+      });
+    }
   });
 
   return (

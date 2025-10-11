@@ -15,11 +15,11 @@ import ReactFlow, {
   updateEdge,
 } from 'reactflow';
 import { message } from 'antd';
-import { useFlowCommon } from '@/components/workflow/hooks/useFlowCommon';
+import { useFlowCommon } from '@/components/workflow/hooks/use-flow-common';
 import ConnectionLineComponent from '@/components/workflow/nodes/components/connection-line';
 import FlowPanel from '@/components/workflow/panel';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
-import useFlowStore from '@/components/workflow/store/useFlowStore';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
+import useFlowStore from '@/components/workflow/store/use-flow-store';
 import SelectNode from '@/components/workflow/tips/select-node';
 import { cloneDeep } from 'lodash';
 
@@ -253,6 +253,11 @@ function Index({ zoom, setZoom }: IndexProps): React.ReactElement {
         <SelectNode lastSelection={lastSelection} />
       ) : null}
       <ReactFlow
+        minZoom={0.1}
+        maxZoom={2}
+        onMove={(_, viewport) => {
+          setZoom(Math.round(viewport.zoom * 100));
+        }}
         nodeDragThreshold={10}
         nodes={nodes?.filter(node => !node.hidden)}
         edges={edges}
@@ -281,7 +286,6 @@ function Index({ zoom, setZoom }: IndexProps): React.ReactElement {
           reactFlowInstance={reactFlowInstance}
           zoom={zoom}
           setZoom={setZoom}
-          historys={[]}
         />
       </ReactFlow>
     </div>

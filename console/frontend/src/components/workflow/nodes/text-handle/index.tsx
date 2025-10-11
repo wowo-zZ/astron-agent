@@ -7,10 +7,10 @@ import {
 import { Button, Input, Select } from 'antd';
 import { cloneDeep } from 'lodash';
 import { v4 as uuid } from 'uuid';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import Inputs from '@/components/workflow/nodes/components/inputs';
 import { useTranslation } from 'react-i18next';
-import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import { useNodeCommon } from '@/components/workflow/hooks/use-node-common';
 
 import inputAddIcon from '@/assets/imgs/workflow/input-add-icon.png';
 import formSelect from '@/assets/imgs/main/icon_nav_dropdown.svg';

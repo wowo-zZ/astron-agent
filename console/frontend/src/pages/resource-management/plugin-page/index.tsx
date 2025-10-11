@@ -127,14 +127,12 @@ const PluginPage: FC = () => {
                       style={{
                         background: k.avatarColor
                           ? k.avatarColor
-                          : `url(${
-                              k.address + k.icon
-                            }) no-repeat center / cover`,
+                          : `url(${k.icon}) no-repeat center / cover`,
                       }}
                     >
                       {k.avatarColor && (
                         <img
-                          src={k.address + k.icon}
+                          src={k.icon || ''}
                           className="w-[28px] h-[28px]"
                           alt=""
                         />

@@ -38,7 +38,7 @@ install-tools-python: ## 🛠️ Install Python development tools
 			black==24.4.2 \
 			isort==5.13.2 \
 			flake8==7.0.0 \
-			mypy==1.9.0 \
+			mypy==1.18.2 \
 			pylint==3.1.0 \
 			pytest==8.0.0 \
 			pytest-cov==4.0.0; \

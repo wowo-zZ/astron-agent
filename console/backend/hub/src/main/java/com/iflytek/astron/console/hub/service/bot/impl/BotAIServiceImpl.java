@@ -608,7 +608,9 @@ public class BotAIServiceImpl implements BotAIService {
                         {2}
                         ```
                         Note:
-                        An assistant sends an instruction template together with the user's detailed input to a large language model to complete a specific task. The assistant description states what the assistant should accomplish and what the user needs to provide. The assistant instructions are the template sent to the model; the template plus the user's detailed input enable the model to complete the task.
+                        An assistant sends an instruction template together with the user's detailed input to a large language model to complete a specific task.
+                        The assistant description states what the assistant should accomplish and what the user needs to provide.
+                        The assistant instructions are the template sent to the model; the template plus the user's detailed input enable the model to complete the task.
 
                         Please follow these steps:
                         1. Carefully read the assistant name, description, and instructions to understand the intended task.

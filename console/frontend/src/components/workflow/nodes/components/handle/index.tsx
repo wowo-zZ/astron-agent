@@ -1,8 +1,8 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import { Handle, Position } from 'reactflow';
 import { Tooltip } from 'antd';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
-import { useFlowCommon } from '@/components/workflow/hooks/useFlowCommon';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
+import { useFlowCommon } from '@/components/workflow/hooks/use-flow-common';
 
 import nodeListAdd from '@/assets/imgs/workflow/node-list-add.png';
 

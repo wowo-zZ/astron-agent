@@ -2,8 +2,8 @@ import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import { message } from 'antd';
 
-export default function Select({ lastSelection }) {
-  const copyNodes = async () => {
+export default function Select({ lastSelection }): React.ReactElement {
+  const copyNodes = async (): Promise<void> => {
     const cloneLastSelection = cloneDeep(lastSelection);
     cloneLastSelection.nodes = cloneLastSelection.nodes?.filter(
       node => node.type !== '开始节点' && node.type !== '结束节点'
@@ -12,7 +12,7 @@ export default function Select({ lastSelection }) {
       await navigator.clipboard.writeText(JSON.stringify(cloneLastSelection));
       message.success('复制成功');
     } catch (err) {
-      console.error('[Clipboard] 复制失败', err);
+      message.error('[Clipboard] 复制失败', err);
     }
   };
 

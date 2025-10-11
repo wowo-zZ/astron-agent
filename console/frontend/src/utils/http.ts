@@ -428,6 +428,10 @@ axios.interceptors.response.use(
 const getBaseURL = (): string => {
   const mode = import.meta.env.MODE;
 
+  if (mode === 'production') {
+    return '/console-api';
+  }
+
   const runtimeBaseUrl = getRuntimeBaseURL();
   if (runtimeBaseUrl) {
     return runtimeBaseUrl;
@@ -461,7 +465,6 @@ const getBaseURL = (): string => {
 };
 
 export const baseURL = getBaseURL();
-
 
 axios.defaults.baseURL = baseURL;
 export default axios;

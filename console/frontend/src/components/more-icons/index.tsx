@@ -147,11 +147,7 @@ function GalleryTab({
                 setPreviewIcon(item);
               }}
             >
-              <img
-                src={(item.name || '') + (item.value || '')}
-                className="w-8 h-8"
-                alt=""
-              />
+              <img src={item.value || ''} className="w-8 h-8" alt="" />
             </div>
           ))}
       </div>
@@ -495,10 +491,10 @@ function index(props: IndexProps): React.JSX.Element {
       setBotIcon(previewIcon);
       setBotColor(previewColor);
     } else if (activeTab === 'upload') {
-      setBotIcon({ ...botIcon, value: uploadImageObject.s3Key });
+      setBotIcon({ ...botIcon, value: uploadImageObject.downloadLink });
       setBotColor('');
     } else {
-      setBotIcon({ ...botIcon, value: generateImageObject.s3Key });
+      setBotIcon({ ...botIcon, value: generateImageObject.downloadLink });
       setBotColor('');
     }
 

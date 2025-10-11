@@ -3,6 +3,7 @@ import { v4 as uuid } from 'uuid';
 import Ajv from 'ajv';
 import i18next from 'i18next';
 import { isJSON } from '@/utils';
+import { InputSchema, ToolArg } from '@/types/plugin-store';
 
 const errorOutputTemplate = [
   {
@@ -807,6 +808,30 @@ export function findParentNodes(
   return result;
 }
 
+/**
+ * 给数组的每一项（以及嵌套的 schema.properties）递归设置 id
+ * @param {Array} arr - 原始数组
+ * @returns {Array} 新数组（id 已填充）
+ */
+const assignUUIDs = (arr): unknown[] => {
+  return arr.map(item => {
+    const newItem = { ...item, id: uuid() };
+
+    // 如果 schema 内有 properties，递归处理
+    if (
+      newItem.schema?.properties &&
+      Array.isArray(newItem.schema.properties)
+    ) {
+      newItem.schema = {
+        ...newItem.schema,
+        properties: assignUUIDs(newItem.schema.properties),
+      };
+    }
+
+    return newItem;
+  });
+};
+
 export const copyNodeData = (data: unknown): unknown => {
   const newData = cloneDeep(data);
 
@@ -814,10 +839,7 @@ export const copyNodeData = (data: unknown): unknown => {
     ...item,
     id: uuid(),
   }));
-  newData.outputs = newData.outputs.map((item: unknown) => ({
-    ...item,
-    id: uuid(),
-  }));
+  newData.outputs = assignUUIDs(newData.outputs);
 
   if (newData?.nodeParam?.intentChains) {
     newData.nodeParam.intentChains = newData.nodeParam.intentChains.map(
@@ -1548,7 +1570,7 @@ type EdgeType = {
 };
 
 function buildSchemaReferences(
-  schema: any,
+  schema: unknown,
   parent: { originId: string; prefix?: string; parentType?: string } = {
     originId: '',
   }
@@ -1585,7 +1607,7 @@ function buildSchemaReferences(
         type: schema?.type,
         parentType: parent.parentType,
         fileType: schema.allowedFileType?.[0] || '',
-        children: schema.properties.flatMap((prop: any) =>
+        children: schema.properties.flatMap((prop: unknown) =>
           buildSchemaReferences(
             {
               ...prop,
@@ -1620,13 +1642,13 @@ function buildOwnReferences(
 
   const outputs =
     targetNode?.nodeType === 'iteration'
-      ? sourceNode?.data?.outputs?.filter((output: any) =>
+      ? sourceNode?.data?.outputs?.filter((output: unknown) =>
           output?.schema?.type?.includes('array')
         )
       : [...(sourceNode?.data?.outputs || []), ...errorOutputs];
 
   return (
-    outputs?.flatMap((output: any) =>
+    outputs?.flatMap((output: unknown) =>
       buildSchemaReferences(
         {
           ...output,
@@ -1668,7 +1690,7 @@ export function generateReferences(
   const result = Array.from(ancestorIds)
     .map(srcId => {
       const srcNode = nodes.find(n => n.id === srcId);
-      if (!srcNode) return null;
+      if (!srcNode || srcNode?.data?.outputs?.length === 0) return null;
       const references = buildOwnReferences(srcNode, targetNode) || [];
       return {
         label: srcNode.data?.label ?? '',
@@ -1696,4 +1718,34 @@ export const convertToKBMB = (bytes: number): string => {
   } else {
     return bytes + 'B';
   }
+};
+
+const generateDefaultInputValue = (type: string): unknown => {
+  if (type === 'string') {
+    return '';
+  } else if (type === 'number') {
+    return 0;
+  } else if (type === 'boolean') {
+    return false;
+  } else if (type === 'int' || type === 'integer') {
+    return 0;
+  } else if (type === 'array') {
+    return '[]';
+  } else if (type === 'object') {
+    return '{}';
+  }
+};
+
+export const transformSchemaToArray = (schema: InputSchema): ToolArg[] => {
+  const requiredFields = schema.required || [];
+  return Object.entries(schema.properties).map(([name, property]) => {
+    return {
+      name,
+      type: property.type,
+      description: property.description,
+      required: requiredFields.includes(name),
+      enum: property.enum,
+      value: property?.default || generateDefaultInputValue(property.type),
+    };
+  });
 };

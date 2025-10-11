@@ -2,7 +2,7 @@ import React, { useMemo, useCallback, memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { cloneDeep } from 'lodash';
 import { FLowCollapse } from '@/components/workflow/ui';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import ExceptionHandling from '@/components/workflow/nodes/components/exception-handling';
 import SingleInput from '../components/single-input';
 import FixedOutputs from '../components/fixed-outputs';

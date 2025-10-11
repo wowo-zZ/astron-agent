@@ -9,7 +9,6 @@ import com.iflytek.astron.console.hub.dto.publish.BotSummaryStatsVO;
 import com.iflytek.astron.console.hub.dto.publish.BotTimeSeriesResponseDto;
 import com.iflytek.astron.console.hub.dto.publish.WechatAuthUrlResponseDto;
 import com.iflytek.astron.console.hub.dto.publish.BotTraceRequestDto;
-import com.iflytek.astron.console.commons.dto.workflow.WorkflowInputsResponseDto;
 import com.iflytek.astron.console.commons.enums.PublishChannelEnum;
 import com.iflytek.astron.console.hub.dto.publish.UnifiedPrepareDto;
 
@@ -88,17 +87,17 @@ public interface BotPublishService {
             String currentUid, Long currentSpaceId);
 
     /**
-     * Record conversation statistics data
+     * Record bot dashboard count log data
      *
      * @param uid User ID
-     * @param spaceId Space ID
+     * @param spaceId Space ID (not used in bot_dashboard_count_log table)
      * @param botId Bot ID
      * @param chatId Chat ID
      * @param sid Session identifier
      * @param tokenConsumed Token consumption count
-     * @param messageRounds Message rounds
+     * @param messageRounds Message rounds (not used in bot_dashboard_count_log table)
      */
-    void recordConversationStats(String uid, Long spaceId, Integer botId, Long chatId,
+    void recordDashboardCountLog(String uid, Long spaceId, Integer botId, Long chatId,
             String sid, Integer tokenConsumed, Integer messageRounds);
 
     // ==================== Publish Channel Management ====================
@@ -141,18 +140,6 @@ public interface BotPublishService {
      * @return Paginated trace log results
      */
     PageResponse<Object> getBotTrace(String uid, Integer botId, BotTraceRequestDto requestDto, Long spaceId);
-
-    // ==================== Workflow Input Management ====================
-
-    /**
-     * Get workflow input parameters for bot
-     *
-     * @param botId Bot ID
-     * @param uid User ID
-     * @param spaceId Space ID (optional)
-     * @return Workflow input parameter definitions
-     */
-    WorkflowInputsResponseDto getInputsType(Integer botId, String uid, Long spaceId);
 
     // ==================== Publish Prepare Data Management ====================
 

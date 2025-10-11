@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect, memo } from 'react';
 import JSONPretty from 'react-json-view';
 import { cloneDeep } from 'lodash';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import { message } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import copy from 'copy-to-clipboard';

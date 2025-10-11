@@ -10,12 +10,12 @@ import {
   checkedNodeOutputData,
   generateOrUpdateObject,
 } from '@/components/workflow/utils/reactflowUtils';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import JsonMonacoEditor from '@/components/monaco-editor/JsonMonacoEditor';
 import { v4 as uuid } from 'uuid';
 import { isJSON } from '@/utils';
 import { useTranslation } from 'react-i18next';
-import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import { useNodeCommon } from '@/components/workflow/hooks/use-node-common';
 import { UseExceptionHandlingReturn } from '@/components/workflow/types';
 
 import questionMark from '@/assets/imgs/common/questionmark.png';

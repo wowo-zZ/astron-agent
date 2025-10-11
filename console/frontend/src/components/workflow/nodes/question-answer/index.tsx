@@ -6,13 +6,13 @@ import {
 } from '@/components/workflow/ui';
 import { Checkbox } from 'antd';
 import { v4 as uuid } from 'uuid';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import InputParams from '@/components/workflow/nodes/components/inputs';
 import OutputParams from './components/output-params';
 import FixedOptions from './components/fixed-options';
 import AnswerSettings from './components/answer-settings';
 import { useTranslation } from 'react-i18next';
-import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import { useNodeCommon } from '@/components/workflow/hooks/use-node-common';
 import { SourceHandle } from '@/components/workflow/nodes/components/handle';
 import { ModelSection } from '@/components/workflow/nodes/node-common';
 
@@ -29,6 +29,7 @@ const QuestionSection = memo(
         content={
           <div className="rounded-md px-[18px] pb-3 pointer-events-auto">
             <FlowTemplateEditor
+              id={id}
               data={data}
               onBlur={() => delayCheckNode(id)}
               value={data?.nodeParam?.question}
@@ -92,19 +93,31 @@ const AnswerModeSection = memo(
                     if (value === 'option') {
                       d.outputs = [
                         {
-                          schema: { default: '', type: 'string' },
+                          schema: {
+                            default: '',
+                            description: '该节点的提问内容',
+                            type: 'string',
+                          },
                           name: 'query',
                           id: uuid(),
                           required: true,
                         },
                         {
-                          schema: { default: '', type: 'string' },
+                          schema: {
+                            default: '',
+                            description: '用户回复的选项',
+                            type: 'string',
+                          },
                           name: 'id',
                           id: uuid(),
                           required: true,
                         },
                         {
-                          schema: { default: '', type: 'string' },
+                          schema: {
+                            default: '',
+                            description: '用户回复的选项内容',
+                            type: 'string',
+                          },
                           name: 'content',
                           id: uuid(),
                           required: true,
@@ -113,13 +126,21 @@ const AnswerModeSection = memo(
                     } else {
                       d.outputs = [
                         {
-                          schema: { default: '', type: 'string' },
+                          schema: {
+                            default: '',
+                            description: '该节点的提问内容',
+                            type: 'string',
+                          },
                           name: 'query',
                           id: uuid(),
                           required: true,
                         },
                         {
-                          schema: { default: '', type: 'string' },
+                          schema: {
+                            default: '',
+                            description: '用户回复的选项内容',
+                            type: 'string',
+                          },
                           name: 'content',
                           id: uuid(),
                           required: true,
@@ -284,7 +305,11 @@ const QuestionContent = ({ question }): React.ReactElement => {
   return (
     <>
       <div className="text-[#333] text-right">提问内容</div>
-      <span style={{ color: hasContent ? '' : '#B3B7C6' }}>
+      <span
+        className="max-w-[300px] text-overflow"
+        style={{ color: hasContent ? '' : '#B3B7C6' }}
+        title={hasContent ? question : '未配置提问内容'}
+      >
         {hasContent ? question : '未配置提问内容'}
       </span>
     </>
@@ -309,7 +334,12 @@ const OptionAnswers = ({ id, answers, isConnectable }): React.ReactElement => {
           {item?.name}
         </span>
         {item?.content ? (
-          <span className="text-[#353a4a]">{item?.content}</span>
+          <span
+            className="text-[#353a4a] max-w-[200px] text-overflow"
+            title={item?.content}
+          >
+            {item?.content}
+          </span>
         ) : (
           <span className="text-[#B3B7C6]">未配置内容</span>
         )}

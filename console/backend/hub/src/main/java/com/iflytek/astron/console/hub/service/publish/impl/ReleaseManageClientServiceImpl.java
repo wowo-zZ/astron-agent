@@ -77,18 +77,18 @@ public class ReleaseManageClientServiceImpl implements ReleaseManageClientServic
     /**
      * Core logic implementation for releasing robot versions
      *
-     * @param botId       Robot ID
-     * @param flowId      Flow ID
-     * @param channel     Channel type code
-     * @param result      Result status string
-     * @param desc        Description information
+     * @param botId Robot ID
+     * @param flowId Flow ID
+     * @param channel Channel type code
+     * @param result Result status string
+     * @param desc Description information
      * @param versionName Version name
-     * @param spaceId     Space ID
-     * @param request     HTTP request object, used to obtain authentication info etc.
+     * @param spaceId Space ID
+     * @param request HTTP request object, used to obtain authentication info etc.
      * @return Returns release result response object
      */
     private ReleaseBotRespDto releaseBot(String botId, String flowId, Integer channel, String result,
-                                         String desc, String versionName, Long spaceId, HttpServletRequest request) {
+            String desc, String versionName, Long spaceId, HttpServletRequest request) {
         try {
             // Build request data transfer object
             ReleaseBotReqDto releaseBotDto = new ReleaseBotReqDto(botId, flowId, channel, result, desc, versionName);
@@ -107,7 +107,7 @@ public class ReleaseManageClientServiceImpl implements ReleaseManageClientServic
     /**
      * Get version name for specified workflow
      *
-     * @param flowId  Flow ID
+     * @param flowId Flow ID
      * @param spaceId Space ID
      * @param request HTTP request object, used to obtain authentication info etc.
      * @return Returns version name string
@@ -134,7 +134,7 @@ public class ReleaseManageClientServiceImpl implements ReleaseManageClientServic
     /**
      * Build basic HTTP request builder
      *
-     * @param url     API relative path
+     * @param url API relative path
      * @param spaceId Space ID (optional)
      * @param request HTTP request object, used to obtain authentication info etc.
      * @return Returns configured Request.Builder instance
@@ -156,18 +156,24 @@ public class ReleaseManageClientServiceImpl implements ReleaseManageClientServic
      * object
      *
      * @param request HTTP request object
-     * @param flowId  Flow ID (for logging purposes)
+     * @param flowId Flow ID (for logging purposes)
      * @return Returns parsed response data object
      */
     private ReleaseBotRespDto executeRequestForReleaseBot(Request request, String flowId) {
         try (Response response = HTTP_CLIENT.newCall(request).execute()) {
             // Check if HTTP response was successful and has body content
-            if (!response.isSuccessful() || response.body() == null) {
+            ResponseBody body = response.body();
+            if (!response.isSuccessful() || body == null) {
                 log.error("HTTP request failed for flowId: {}, status: {}", flowId, response.code());
                 return null;
             }
             // Parse response JSON data
-            JSONObject responseJson = JSONObject.parseObject(response.body().string());
+            String responseBody = body.string();
+            if (responseBody == null) {
+                log.error("Response body string is null for flowId: {}", flowId);
+                return null;
+            }
+            JSONObject responseJson = JSONObject.parseObject(responseBody);
             // Ensure response contains required 'data' field
             if (!responseJson.containsKey("data")) {
                 log.error("Missing 'data' field in response for flowId: {}, response: {}", flowId, responseJson);
@@ -185,18 +191,24 @@ public class ReleaseManageClientServiceImpl implements ReleaseManageClientServic
      * Execute HTTP request for getting version name and parse workflowVersionName field from response
      *
      * @param request HTTP request object
-     * @param flowId  Flow ID (for logging purposes)
+     * @param flowId Flow ID (for logging purposes)
      * @return Returns parsed version name string
      */
     private String executeRequestForVersionName(Request request, String flowId) {
         try (Response response = HTTP_CLIENT.newCall(request).execute()) {
             // Check if HTTP response was successful and has body content
-            if (!response.isSuccessful() || response.body() == null) {
+            ResponseBody body = response.body();
+            if (!response.isSuccessful() || body == null) {
                 log.error("HTTP request failed for flowId: {}, status: {}", flowId, response.code());
                 return null;
             }
             // Parse response JSON data
-            JSONObject responseJson = JSONObject.parseObject(response.body().string());
+            String responseBody = body.string();
+            if (responseBody == null) {
+                log.error("Response body string is null for flowId: {}", flowId);
+                return null;
+            }
+            JSONObject responseJson = JSONObject.parseObject(responseBody);
             // Ensure response contains required 'data' and 'workflowVersionName' fields
             if (!responseJson.containsKey("data") || !responseJson.getJSONObject("data").containsKey("workflowVersionName")) {
                 log.error("Missing required fields in response for flowId: {}, response: {}", flowId, responseJson);

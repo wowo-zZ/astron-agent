@@ -287,7 +287,6 @@ const DetailOverview = () => {
         disjump={true}
         setIsOpenapi={setIsOpenapi}
         fabuFlag={fabuFlag}
-        isV1={false}
         show={openWxmol}
         onCancel={() => {
           setOpenWxmol(false);

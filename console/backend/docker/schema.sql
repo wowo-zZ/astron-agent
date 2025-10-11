@@ -957,29 +957,25 @@ CREATE TABLE `bot_chat_file_param`
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Bot chat file parameter info table';
 
 -- ----------------------------
--- Table structure for bot_conversation_stats
+-- Table structure for bot_dashboard_count_log
 -- ----------------------------
-DROP TABLE IF EXISTS `bot_conversation_stats`;
-CREATE TABLE `bot_conversation_stats`
+DROP TABLE IF EXISTS `bot_dashboard_count_log`;
+CREATE TABLE `bot_dashboard_count_log`
 (
-    `id`                bigint                                                        NOT NULL AUTO_INCREMENT COMMENT 'Primary key ID',
-    `uid`               varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'User ID',
-    `space_id`          bigint                                                                 DEFAULT NULL COMMENT 'Space ID, NULL for personal agents',
-    `bot_id`            int                                                           NOT NULL COMMENT 'Agent ID',
-    `chat_id`           bigint                                                        NOT NULL COMMENT 'Conversation ID',
-    `sid`               varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci          DEFAULT NULL COMMENT 'Session identifier',
-    `token_consumed`    int                                                           NOT NULL DEFAULT '0' COMMENT 'Token count consumed in this conversation',
-    `message_rounds`    int                                                           NOT NULL DEFAULT '1' COMMENT 'Message rounds in this conversation',
-    `conversation_date` date                                                          NOT NULL COMMENT 'Conversation date',
-    `create_time`       datetime                                                      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Creation time',
-    `is_delete`         tinyint                                                       NOT NULL DEFAULT '0' COMMENT 'Whether deleted: 0=not deleted, 1=deleted',
+    `id`          bigint(20) NOT NULL AUTO_INCREMENT,
+    `uid`         bigint(20) DEFAULT NULL COMMENT 'User UID',
+    `bot_id`      varchar(64) DEFAULT NULL COMMENT 'Bot ID (flowid/botId)',
+    `channel`     int(11) DEFAULT NULL COMMENT 'Client channel',
+    `chat_id`     bigint(20) DEFAULT NULL COMMENT 'Chat session ID',
+    `chat_time`   int(11) DEFAULT NULL COMMENT 'Chat duration in seconds',
+    `token`       int(11) DEFAULT NULL COMMENT 'Token consumed in this conversation',
+    `sid`         varchar(32) DEFAULT NULL COMMENT 'Session identifier',
+    `create_time` date DEFAULT NULL COMMENT 'Creation date',
     PRIMARY KEY (`id`),
-    KEY                 `idx_bot_id_date` (`bot_id`,`conversation_date`),
-    KEY                 `idx_uid_bot_id` (`uid`,`bot_id`),
-    KEY                 `idx_space_id_bot_id` (`space_id`,`bot_id`),
-    KEY                 `idx_chat_id` (`chat_id`),
-    KEY                 `idx_create_time` (`create_time`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Bot conversation statistics table';
+    KEY           `idx_bot_id` (`bot_id`),
+    KEY           `idx_chat_id` (`chat_id`),
+    KEY           `idx_create_time` (`create_time`)
+) ENGINE=InnoDB AUTO_INCREMENT=315776 DEFAULT CHARSET=utf8mb4 COMMENT='Bot conversation channel collection table';
 
 -- ----------------------------
 -- Table structure for bot_dataset

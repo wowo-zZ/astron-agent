@@ -66,7 +66,7 @@ const ChatInput = (props: {
     // 检查最后一条消息是否有未选择的选项
     const lastMessage = messageList[messageList.length - 1];
     if (
-      lastMessage?.reqId === 'BOT' &&
+      lastMessage?.reqType === 'BOT' &&
       lastMessage?.workflowEventData?.option &&
       lastMessage.workflowEventData.option.length > 0
     ) {
@@ -89,14 +89,14 @@ const ChatInput = (props: {
       message.warning(t('chatPage.chatWindow.answeringInProgress'));
       return;
     }
-    if (messageList.pop()?.reqId === 'START') {
+    if (messageList?.at(-1)?.reqType === 'START') {
       return;
     }
     try {
       await postNewChat(currentChatId);
       const startMessage: MessageListType = {
         id: new Date().getTime(),
-        reqId: 'START',
+        reqType: 'START',
         message: '全新的开始',
         updateTime: new Date().toISOString(),
       };

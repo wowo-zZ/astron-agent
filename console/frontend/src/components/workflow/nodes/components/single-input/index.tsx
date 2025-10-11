@@ -3,13 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { Checkbox } from 'antd';
 import { FLowCollapse } from '@/components/workflow/ui';
 import ChatHistory from '@/components/workflow/nodes/components/chat-history';
-import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import { useNodeCommon } from '@/components/workflow/hooks/use-node-common';
 import {
   TypeSelector,
   ValueField,
   ErrorMessages,
 } from '@/components/workflow/nodes/components/inputs';
-import useFlowsManagerStore from '@/components/workflow/store/useFlowsManager';
+import useFlowsManagerStore from '@/components/workflow/store/use-flows-manager';
 
 export const EnabledChatHistory = ({ id, data }): React.ReactElement | null => {
   const { handleChangeNodeParam, nodeType, nodeParam } = useNodeCommon({

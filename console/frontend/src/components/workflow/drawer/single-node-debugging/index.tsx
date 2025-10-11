@@ -4,7 +4,7 @@ import { cloneDeep } from 'lodash';
 import { isJSON } from '@/utils';
 import { useMemoizedFn } from 'ahooks';
 import { renderType } from '@/components/workflow/utils/reactflowUtils';
-import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import { useNodeCommon } from '@/components/workflow/hooks/use-node-common';
 import { renderParamInput } from '@/components/workflow/nodes/node-common';
 
 // 类型导入

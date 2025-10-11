@@ -63,7 +63,7 @@ export const useUploadPage = ({
   const navigate = useNavigate();
 
   const sliceConfig = useMemo(() => {
-    if (tag === 'CBG-RAG') {
+    if (tag === 'CBG-RAG' || tag === 'Ragflow-RAG') {
       return [
         'DEFAULT_SLICE_RULES_CBG',
         'CUSTOM_SLICE_RULES_CBG',

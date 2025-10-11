@@ -71,6 +71,7 @@ const translation = {
       add: '添加',
       noRobot: '暂无机器人',
       noRpaTool: '暂无RPA工具',
+      noMore: '没有更多了',
     },
     toolNode: {
       type: '工具',

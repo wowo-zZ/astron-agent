@@ -1,12 +1,12 @@
 import React, { useState, useMemo, memo } from 'react';
 import { cloneDeep } from 'lodash';
 import { message, Dropdown, Space, Tooltip } from 'antd';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import SingleNodeDebugging from '@/components/workflow/drawer/single-node-debugging';
 import { generateDefaultInput } from '@/components/workflow/utils/reactflowUtils';
 import { useTranslation } from 'react-i18next';
 import { useMemoizedFn } from 'ahooks';
-import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import { useNodeCommon } from '@/components/workflow/hooks/use-node-common';
 import { UseNodeDebuggerReturn } from '@/components/workflow/types/nodes';
 import { Icons } from '@/components/workflow/icons';
 import { getFixedUrl, getAuthorization } from '@/components/workflow/utils';
@@ -20,6 +20,9 @@ const useNodeDebugger = (id, data, labelInput): UseNodeDebuggerReturn => {
   );
   const currentStore = useFlowsManager(state => state.getCurrentStore());
   const currentFlow = useFlowsManager(state => state.currentFlow);
+  const setSingleNodeDebuggingInfo = useFlowsManager(
+    state => state.setSingleNodeDebuggingInfo
+  );
   const nodes = currentStore(state => state.nodes);
   const checkNode = currentStore(state => state.checkNode);
   const setNode = currentStore(state => state.setNode);
@@ -39,6 +42,9 @@ const useNodeDebugger = (id, data, labelInput): UseNodeDebuggerReturn => {
         edges: [],
       },
     };
+    const controller = new AbortController();
+    const { signal } = controller;
+    setSingleNodeDebuggingInfo({ nodeId: id, controller });
     //@ts-ignore
     fetch(getFixedUrl(`/workflow/node/debug/${id}`), {
       method: 'POST',
@@ -47,6 +53,7 @@ const useNodeDebugger = (id, data, labelInput): UseNodeDebuggerReturn => {
         'Content-Type': 'application/json',
         Authorization: getAuthorization(),
       },
+      signal,
     })
       .then(async response => {
         const res = await response.json();
@@ -67,7 +74,10 @@ const useNodeDebugger = (id, data, labelInput): UseNodeDebuggerReturn => {
         }
         setNode(id, cloneDeep(currentNode));
       })
-      .finally(() => setShowNodeList(true));
+      .finally(() => {
+        setShowNodeList(true);
+        setSingleNodeDebuggingInfo({ nodeId: '', controller: null });
+      });
   });
 
   const handleNodeDebug = useMemoizedFn(() => {

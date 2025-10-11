@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useMemoizedFn } from 'ahooks';
 import { cloneDeep } from 'lodash';
 import { Button } from 'antd';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import JsonMonacoEditor from '@/components/monaco-editor/JsonMonacoEditor';
 import Ajv from 'ajv';
 import { generateValidationSchema } from '@/components/workflow/utils/reactflowUtils';

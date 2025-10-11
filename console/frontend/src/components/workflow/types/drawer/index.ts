@@ -1,3 +1,4 @@
+import { FeedbackItem } from './chat-debugger';
 // Drawer 模块的类型定义统一导出
 
 // Advanced Configuration 相关类型
@@ -79,4 +80,19 @@ export type {
   PositionType,
   NewNodeType,
   IFlyCollectorType,
+  UseChatDebuggerContentProps,
 } from './chat-debugger';
+
+// Chat Debugger 相关类型
+export type { UseChatContentProps } from './chat-debugger';
+
+// Code IDEA 相关类型
+export type { useAICodeInputBoxProps } from './code-idea';
+
+export interface UseVersionManagementProps {
+  handleCardClick: (cardId: string) => void;
+  handleViewDetail: (detailItem: FeedbackItem) => void;
+  handlePublicResult: () => void;
+  handlegetRestoreVersion: () => void;
+  queryFeedbackList: (flowId: string) => void;
+}

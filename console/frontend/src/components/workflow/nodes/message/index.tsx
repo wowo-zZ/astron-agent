@@ -2,20 +2,18 @@ import React, { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Switch } from 'antd';
 import { FLowCollapse, FlowTemplateEditor } from '@/components/workflow/ui';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import Inputs from '@/components/workflow/nodes/components/inputs';
-import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import { useNodeCommon } from '@/components/workflow/hooks/use-node-common';
 
 export const MessageDetail = memo(props => {
   const { id, data } = props;
-  const { handleChangeInputParam, handleChangeNodeParam, nodeParam } =
-    useNodeCommon({ id, data });
+  const { handleChangeNodeParam, nodeParam } = useNodeCommon({ id, data });
   const { t } = useTranslation();
   const getCurrentStore = useFlowsManager(state => state.getCurrentStore);
   const currentStore = getCurrentStore();
   const canvasesDisabled = useFlowsManager(state => state.canvasesDisabled);
   const delayCheckNode = currentStore(state => state.delayCheckNode);
-
   return (
     <div id={id}>
       <div className="p-[14px] pb-[6px]">
@@ -41,13 +39,9 @@ export const MessageDetail = memo(props => {
                     className="list-switch"
                     checked={nodeParam?.streamOutput}
                     onChange={value =>
-                      handleChangeInputParam(
-                        id,
-                        (data, value) => {
-                          data.nodeParam.streamOutput = value;
-                        },
-                        value
-                      )
+                      handleChangeNodeParam((data, value) => {
+                        data.nodeParam.streamOutput = value;
+                      }, value)
                     }
                   />
                 </div>
@@ -56,6 +50,7 @@ export const MessageDetail = memo(props => {
             content={
               <div className="px-[18px] pb-3 pointer-events-auto">
                 <FlowTemplateEditor
+                  id={id}
                   data={data}
                   onBlur={() => delayCheckNode(id)}
                   value={nodeParam?.template}

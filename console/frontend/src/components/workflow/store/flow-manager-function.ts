@@ -15,8 +15,8 @@ import {
   canPublishSetNotAPI,
 } from '@/services/flow';
 import { getModelConfigDetail } from '@/services/common';
-import useFlowStore from './useFlowStore';
-import useIteratorFlowStore from './useIteratorFlowStore';
+import useFlowStore from './use-flow-store';
+import useIteratorFlowStore from './use-iterator-flow-store';
 import { FlowStoreType } from '../types/zustand/flow';
 import { UseBoundStore, StoreApi } from 'zustand';
 
@@ -129,6 +129,10 @@ export const initialStatus = {
   historyVersion: false,
   historyVersionData: {},
   controlMode: 'mouse',
+  singleNodeDebuggingInfo: {
+    nodeId: '',
+    controller: null,
+  },
 };
 
 export interface ModelConfig {
@@ -627,7 +631,7 @@ function validateOutgoingEdges({
   errNodes,
   cycleEdges,
   dfs,
-}): void {
+}): void | boolean {
   if (outgoingEdges?.length === 0) {
     addErrNode({
       errNodes,
@@ -641,8 +645,6 @@ function validateOutgoingEdges({
     const targetNode = nodes.find(node => node.id === edge.target);
     if (!targetNode) return false;
     if (!targetNode.data.label.trim()) return false;
-    console.log('targetNode', targetNode);
-    console.log('recStack', recStack);
     if (recStack.has(targetNode.id)) {
       cycleEdges.push(edge);
       addErrNode({

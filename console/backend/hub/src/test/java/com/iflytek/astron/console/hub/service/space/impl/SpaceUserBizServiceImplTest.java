@@ -33,8 +33,8 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for SpaceUserBizServiceImpl
- * Tests all public methods with comprehensive coverage of success and failure scenarios
+ * Unit tests for SpaceUserBizServiceImpl Tests all public methods with comprehensive coverage of
+ * success and failure scenarios
  */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SpaceUserBizServiceImpl Unit Tests")
@@ -470,7 +470,7 @@ class SpaceUserBizServiceImplTest {
     @DisplayName("quitSpace - Should successfully quit space")
     void quitSpace_Success_WhenNonOwnerUser() {
         try (MockedStatic<SpaceInfoUtil> mockedSpaceInfo = mockStatic(SpaceInfoUtil.class);
-             MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class)) {
+                MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class)) {
 
             // Arrange
             mockedSpaceInfo.when(SpaceInfoUtil::getSpaceId).thenReturn(TEST_SPACE_ID);
@@ -492,7 +492,7 @@ class SpaceUserBizServiceImplTest {
     @DisplayName("quitSpace - Should return error when owner tries to quit")
     void quitSpace_Error_WhenOwnerTriesToQuit() {
         try (MockedStatic<SpaceInfoUtil> mockedSpaceInfo = mockStatic(SpaceInfoUtil.class);
-             MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class)) {
+                MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class)) {
 
             // Arrange
             mockedSpaceInfo.when(SpaceInfoUtil::getSpaceId).thenReturn(TEST_SPACE_ID);
@@ -512,7 +512,7 @@ class SpaceUserBizServiceImplTest {
     @DisplayName("quitSpace - Should return error when remove fails")
     void quitSpace_Error_WhenRemoveFails() {
         try (MockedStatic<SpaceInfoUtil> mockedSpaceInfo = mockStatic(SpaceInfoUtil.class);
-             MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class)) {
+                MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class)) {
 
             // Arrange
             mockedSpaceInfo.when(SpaceInfoUtil::getSpaceId).thenReturn(TEST_SPACE_ID);
@@ -535,7 +535,7 @@ class SpaceUserBizServiceImplTest {
     @DisplayName("transferSpace - Should successfully transfer space ownership")
     void transferSpace_Success_WhenValidTransfer() {
         try (MockedStatic<SpaceInfoUtil> mockedSpaceInfo = mockStatic(SpaceInfoUtil.class);
-             MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class)) {
+                MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class)) {
 
             // Arrange
             SpaceUser targetUser = new SpaceUser();
@@ -584,7 +584,7 @@ class SpaceUserBizServiceImplTest {
     @DisplayName("transferSpace - Should return error when non-owner tries to transfer")
     void transferSpace_Error_WhenNonOwnerTriesToTransfer() {
         try (MockedStatic<SpaceInfoUtil> mockedSpaceInfo = mockStatic(SpaceInfoUtil.class);
-             MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class)) {
+                MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class)) {
 
             // Arrange
             mockedSpaceInfo.when(SpaceInfoUtil::getSpaceId).thenReturn(TEST_SPACE_ID);
@@ -605,7 +605,7 @@ class SpaceUserBizServiceImplTest {
     @DisplayName("transferSpace - Should return error when target user is not space member")
     void transferSpace_Error_WhenTargetUserIsNotSpaceMember() {
         try (MockedStatic<SpaceInfoUtil> mockedSpaceInfo = mockStatic(SpaceInfoUtil.class);
-             MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class)) {
+                MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class)) {
 
             // Arrange
             mockedSpaceInfo.when(SpaceInfoUtil::getSpaceId).thenReturn(TEST_SPACE_ID);
@@ -627,7 +627,7 @@ class SpaceUserBizServiceImplTest {
     @DisplayName("transferSpace - Should return error when update fails")
     void transferSpace_Error_WhenUpdateFails() {
         try (MockedStatic<SpaceInfoUtil> mockedSpaceInfo = mockStatic(SpaceInfoUtil.class);
-             MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class)) {
+                MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class)) {
 
             // Arrange
             SpaceUser targetUser = new SpaceUser();

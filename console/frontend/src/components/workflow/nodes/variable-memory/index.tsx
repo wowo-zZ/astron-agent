@@ -3,14 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { cloneDeep } from 'lodash';
 import { v4 as uuid } from 'uuid';
 import Inputs from './components/inputs';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
-import useFlowStore from '@/components/workflow/store/useFlowStore';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
+import useFlowStore from '@/components/workflow/store/use-flow-store';
 import { FlowSelect, FLowCollapse } from '@/components/workflow/ui';
 import {
   isRefKnowledgeBase,
   renderType,
 } from '@/components/workflow/utils/reactflowUtils';
-import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import { useNodeCommon } from '@/components/workflow/hooks/use-node-common';
 import { useMemoizedFn } from 'ahooks';
 
 import inputAddIcon from '@/assets/imgs/workflow/input-add-icon.png';

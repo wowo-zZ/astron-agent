@@ -2,7 +2,7 @@ import React, { useMemo, useCallback, memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { cloneDeep } from 'lodash';
 import { v4 as uuid } from 'uuid';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import {
   FlowNodeInput,
   FlowNodeTextArea,
@@ -13,7 +13,7 @@ import SingleInput from '../components/single-input';
 import { SourceHandle } from '@/components/workflow/nodes/components/handle';
 import ExceptionHandling from '@/components/workflow/nodes/components/exception-handling';
 import { ModelSection } from '@/components/workflow/nodes/node-common';
-import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import { useNodeCommon } from '@/components/workflow/hooks/use-node-common';
 import FixedOutputs from '@/components/workflow/nodes/components/fixed-outputs';
 
 import remove from '@/assets/imgs/workflow/input-remove-icon.png';
@@ -36,6 +36,7 @@ const AdvancedConfigSection = ({
       content={
         <div className="px-[18px] flex flex-col gap-3">
           <FlowTemplateEditor
+            id={id}
             data={data}
             onBlur={() => delayCheckNode(id)}
             value={data?.nodeParam?.promptPrefix}

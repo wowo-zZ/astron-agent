@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 
 /**
  * WeChat prepare data DTO
- * 
+ *
  * @author Omuigix
  */
 @Data

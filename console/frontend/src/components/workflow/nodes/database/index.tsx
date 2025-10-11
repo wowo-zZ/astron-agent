@@ -8,7 +8,7 @@ import { Cascader } from 'antd';
 import { v4 as uuid } from 'uuid';
 import cloneDeep from 'lodash/cloneDeep';
 import { useTranslation } from 'react-i18next';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import Inputs from '@/components/workflow/nodes/components/inputs';
 import AddDataInputs from './components/AddDataInputs';
 import QueryField from './components/QueryField';
@@ -16,7 +16,7 @@ import QueryLimit from './components/QueryLimit';
 import OutputDatabase from './components/OutputDatabase';
 import CasesInputs from './components/CasesInputs';
 import ExceptionHandling from '../components/exception-handling';
-import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import { useNodeCommon } from '@/components/workflow/hooks/use-node-common';
 import { useDatabaseDetailProps } from '@/components/workflow/types';
 
 import formSelect from '@/assets/imgs/main/icon_nav_dropdown.svg';
@@ -24,7 +24,128 @@ import formSelect from '@/assets/imgs/main/icon_nav_dropdown.svg';
 import styles from './index.module.scss';
 import { allTableList, fieldList } from '@/services/database';
 
-const DatabaseHeader = ({
+const CustomSQLMode = ({
+  id,
+  canvasesDisabled,
+  nodeParam,
+  delayCheckNode,
+  allTable,
+  handleDbChange,
+}): React.ReactElement => {
+  const { t } = useTranslation();
+  return (
+    <div
+      className="flex items-baseline gap-2"
+      onClick={e => e.stopPropagation()}
+      style={{
+        pointerEvents: canvasesDisabled ? 'none' : 'auto',
+      }}
+    >
+      <span>{t('workflow.nodes.databaseNode.selectDatabase')}</span>
+      <div className="flex-1 w-0">
+        <FlowSelect
+          value={nodeParam?.dbId}
+          onBlur={() => delayCheckNode(id)}
+          options={allTable}
+          popupClassName="overscroll-contain flow-model-select-dropdown"
+          onChange={handleDbChange}
+        />
+        <div className="text-xs text-[#F74E43]">{nodeParam.dbErrMsg}</div>
+      </div>
+    </div>
+  );
+};
+
+const FormDataMode = ({
+  id,
+  canvasesDisabled,
+  nodeParam,
+  delayCheckNode,
+  allTable,
+  handleSheetChange,
+  handleMode,
+  modeChange,
+}): React.ReactElement => {
+  const { t } = useTranslation();
+  return (
+    <>
+      <div
+        className="flex items-baseline gap-2 mb-[12px]"
+        onClick={e => e.stopPropagation()}
+        style={{
+          pointerEvents: canvasesDisabled ? 'none' : 'auto',
+        }}
+      >
+        <span>{t('workflow.nodes.databaseNode.selectDataTable')}</span>
+        <div className="flex-1 w-0">
+          <Cascader
+            value={
+              nodeParam?.dbId && nodeParam?.tableName
+                ? [nodeParam?.dbId, nodeParam?.tableName]
+                : []
+            }
+            options={allTable}
+            allowClear={false}
+            suffixIcon={<img src={formSelect} className="w-4 h-4" />}
+            placeholder={t('workflow.nodes.databaseNode.pleaseSelect')}
+            className={'flow-select nodrag w-full'}
+            onChange={handleSheetChange}
+            dropdownRender={menu => (
+              <div
+                onWheel={e => {
+                  e.stopPropagation();
+                }}
+              >
+                {menu}
+              </div>
+            )}
+            getPopupContainer={triggerNode => triggerNode.parentNode}
+            onBlur={() => delayCheckNode(id)}
+          />
+          <div className="text-xs text-[#F74E43]">
+            {nodeParam.tableNameErrMsg}
+          </div>
+        </div>
+      </div>
+      <div
+        className="flex items-center gap-2"
+        onClick={e => e.stopPropagation()}
+        style={{
+          pointerEvents: canvasesDisabled ? 'none' : 'auto',
+        }}
+      >
+        <span>{t('workflow.nodes.databaseNode.processingMode')}</span>
+        <div className="flex-1">
+          <FlowSelect
+            value={handleMode}
+            onBlur={() => delayCheckNode(id)}
+            options={[
+              {
+                label: t('workflow.nodes.databaseNode.addData'),
+                value: 1,
+              },
+              {
+                label: t('workflow.nodes.databaseNode.updateData'),
+                value: 2,
+              },
+              {
+                label: t('workflow.nodes.databaseNode.queryData'),
+                value: 3,
+              },
+              {
+                label: t('workflow.nodes.databaseNode.deleteData'),
+                value: 4,
+              },
+            ]}
+            onChange={modeChange}
+          />
+        </div>
+      </div>
+    </>
+  );
+};
+
+const SelectMode = ({
   setNode,
   id,
   autoSaveCurrentFlow,
@@ -42,7 +163,6 @@ const DatabaseHeader = ({
 }): React.ReactElement => {
   const { t } = useTranslation();
   const canvasesDisabled = useFlowsManager(state => state.canvasesDisabled);
-
   const handleSheetChange = (valArray): void => {
     setNode(id, old => {
       old.data.nodeParam.dbId = valArray[0];
@@ -95,133 +215,59 @@ const DatabaseHeader = ({
     getFields(allTable, valArray[0], valArray[1]);
   };
   return (
-    <div className="w-full">
-      <h2 className="text-base font-medium">选择数据库</h2>
-      <>
-        <div className="flex justify-between items-center gap-2 bg-[#E9EDF6] p-[3px] rounded-[8px] mt-[8px] mb-[12px]">
-          <div
-            className={`${styles.tabItem} ${
-              tab === 1 ? styles.activeItem : ''
-            }`}
-            style={{
-              pointerEvents: canvasesDisabled ? 'none' : 'auto',
-            }}
-            onClick={handleCustomSQL}
-          >
-            {t('workflow.nodes.databaseNode.customSQL')}
+    <FLowCollapse
+      label={<h2 className="text-base font-medium">选择数据库</h2>}
+      content={
+        <div className="px-[18px]">
+          <div className="flex justify-between items-center gap-2 bg-[#E9EDF6] p-[3px] rounded-[8px] mt-[8px] mb-[12px]">
+            <div
+              className={`${styles.tabItem} ${
+                tab === 1 ? styles.activeItem : ''
+              }`}
+              style={{
+                pointerEvents: canvasesDisabled ? 'none' : 'auto',
+              }}
+              onClick={handleCustomSQL}
+            >
+              {t('workflow.nodes.databaseNode.customSQL')}
+            </div>
+            <div
+              className={`${styles.tabItem} ${
+                tab === 2 ? styles.activeItem : ''
+              }`}
+              style={{
+                pointerEvents: canvasesDisabled ? 'none' : 'auto',
+              }}
+              onClick={handleformdata}
+            >
+              {t('workflow.nodes.databaseNode.formDataProcessing')}
+            </div>
           </div>
-          <div
-            className={`${styles.tabItem} ${
-              tab === 2 ? styles.activeItem : ''
-            }`}
-            style={{
-              pointerEvents: canvasesDisabled ? 'none' : 'auto',
-            }}
-            onClick={handleformdata}
-          >
-            {t('workflow.nodes.databaseNode.formDataProcessing')}
-          </div>
+          {tab == 1 && (
+            <CustomSQLMode
+              id={id}
+              canvasesDisabled={canvasesDisabled}
+              nodeParam={nodeParam}
+              delayCheckNode={delayCheckNode}
+              allTable={allTable}
+              handleDbChange={handleDbChange}
+            />
+          )}
+          {tab == 2 && (
+            <FormDataMode
+              id={id}
+              canvasesDisabled={canvasesDisabled}
+              nodeParam={nodeParam}
+              delayCheckNode={delayCheckNode}
+              allTable={allTable}
+              handleSheetChange={handleSheetChange}
+              handleMode={handleMode}
+              modeChange={modeChange}
+            />
+          )}
         </div>
-
-        {tab == 1 && (
-          <div
-            className="flex items-baseline gap-2"
-            onClick={e => e.stopPropagation()}
-            style={{
-              pointerEvents: canvasesDisabled ? 'none' : 'auto',
-            }}
-          >
-            <span>{t('workflow.nodes.databaseNode.selectDatabase')}</span>
-            <div className="flex-1 w-0">
-              <FlowSelect
-                value={nodeParam?.dbId}
-                onBlur={() => delayCheckNode(id)}
-                options={allTable}
-                popupClassName="overscroll-contain flow-model-select-dropdown"
-                onChange={handleDbChange}
-              />
-              <div className="text-xs text-[#F74E43]">{nodeParam.dbErrMsg}</div>
-            </div>
-          </div>
-        )}
-        {tab == 2 && (
-          <>
-            <div
-              className="flex items-baseline gap-2 mb-[12px]"
-              onClick={e => e.stopPropagation()}
-              style={{
-                pointerEvents: canvasesDisabled ? 'none' : 'auto',
-              }}
-            >
-              <span>{t('workflow.nodes.databaseNode.selectDataTable')}</span>
-              <div className="flex-1 w-0">
-                <Cascader
-                  value={
-                    nodeParam?.dbId && nodeParam?.tableName
-                      ? [nodeParam?.dbId, nodeParam?.tableName]
-                      : []
-                  }
-                  options={allTable}
-                  allowClear={false}
-                  suffixIcon={<img src={formSelect} className="w-4 h-4" />}
-                  placeholder={t('workflow.nodes.databaseNode.pleaseSelect')}
-                  className={'flow-select nodrag w-full'}
-                  onChange={handleSheetChange}
-                  dropdownRender={menu => (
-                    <div
-                      onWheel={e => {
-                        e.stopPropagation();
-                      }}
-                    >
-                      {menu}
-                    </div>
-                  )}
-                  getPopupContainer={triggerNode => triggerNode.parentNode}
-                  onBlur={() => delayCheckNode(id)}
-                />
-                <div className="text-xs text-[#F74E43]">
-                  {nodeParam.tableNameErrMsg}
-                </div>
-              </div>
-            </div>
-            <div
-              className="flex items-center gap-2"
-              onClick={e => e.stopPropagation()}
-              style={{
-                pointerEvents: canvasesDisabled ? 'none' : 'auto',
-              }}
-            >
-              <span>{t('workflow.nodes.databaseNode.processingMode')}</span>
-              <div className="flex-1">
-                <FlowSelect
-                  value={handleMode}
-                  onBlur={() => delayCheckNode(id)}
-                  options={[
-                    {
-                      label: t('workflow.nodes.databaseNode.addData'),
-                      value: 1,
-                    },
-                    {
-                      label: t('workflow.nodes.databaseNode.updateData'),
-                      value: 2,
-                    },
-                    {
-                      label: t('workflow.nodes.databaseNode.queryData'),
-                      value: 3,
-                    },
-                    {
-                      label: t('workflow.nodes.databaseNode.deleteData'),
-                      value: 4,
-                    },
-                  ]}
-                  onChange={modeChange}
-                />
-              </div>
-            </div>
-          </>
-        )}
-      </>
-    </div>
+      }
+    />
   );
 };
 
@@ -235,11 +281,7 @@ const DatabaseSQLPanel = ({
   const { t } = useTranslation();
   return (
     <>
-      <Inputs id={id} data={data}>
-        <div className="flex items-center justify-between flex-1 text-base font-medium">
-          <div>{t('workflow.nodes.databaseNode.input')}</div>
-        </div>
-      </Inputs>
+      <Inputs id={id} data={data} />
       <FLowCollapse
         label={
           <div className="flex items-center justify-between text-base font-medium">
@@ -249,6 +291,7 @@ const DatabaseSQLPanel = ({
         content={
           <div className="px-[18px]">
             <FlowTemplateEditor
+              id={id}
               data={data}
               onBlur={() => delayCheckNode(id)}
               value={nodeParam?.sql}
@@ -644,59 +687,50 @@ export const DatabaseDetail = memo((props): React.ReactElement => {
   return (
     <div className={styles.database}>
       <div className="p-[14px] pb-[6px]">
-        <FLowCollapse
+        <SelectMode
+          setNode={setNode}
           id={id}
-          activeKey={data?.shrink ? '' : '1'}
-          className="flow-collapse-node-container"
-          label={
-            <DatabaseHeader
-              setNode={setNode}
+          autoSaveCurrentFlow={autoSaveCurrentFlow}
+          canPublishSetNot={canPublishSetNot}
+          getFields={getFields}
+          allTable={allTable}
+          handleCustomSQL={handleCustomSQL}
+          tab={tab}
+          handleMode={handleMode}
+          modeChange={modeChange}
+          delayCheckNode={delayCheckNode}
+          nodeParam={nodeParam}
+          fields={fields}
+          allFields={allFields}
+          handleDbChange={handleDbChange}
+          handleformdata={handleformdata}
+        />
+        <div className="bg-[#fff] rounded-lg w-full flex flex-col gap-2.5">
+          {tab == 1 && (
+            <DatabaseSQLPanel
               id={id}
-              autoSaveCurrentFlow={autoSaveCurrentFlow}
-              canPublishSetNot={canPublishSetNot}
-              getFields={getFields}
-              allTable={allTable}
-              handleCustomSQL={handleCustomSQL}
-              tab={tab}
-              handleMode={handleMode}
-              modeChange={modeChange}
+              data={data}
               delayCheckNode={delayCheckNode}
               nodeParam={nodeParam}
+              handleChangeNodeParam={handleChangeNodeParam}
+            />
+          )}
+          {tab == 2 && (
+            <DatabaseFormPanel
+              handleMode={handleMode}
+              id={id}
+              data={data}
               fields={fields}
               allFields={allFields}
-              handleDbChange={handleDbChange}
-              handleformdata={handleformdata}
             />
-          }
-          content={
-            <div className="bg-[#fff] rounded-lg w-full flex flex-col gap-2.5">
-              {tab == 1 && (
-                <DatabaseSQLPanel
-                  id={id}
-                  data={data}
-                  delayCheckNode={delayCheckNode}
-                  nodeParam={nodeParam}
-                  handleChangeNodeParam={handleChangeNodeParam}
-                />
-              )}
-              {tab == 2 && (
-                <DatabaseFormPanel
-                  handleMode={handleMode}
-                  id={id}
-                  data={data}
-                  fields={fields}
-                  allFields={allFields}
-                />
-              )}
-              <OutputDatabase id={id} data={data} key={handleMode}>
-                <div className="text-base font-medium">
-                  {t('workflow.nodes.databaseNode.output')}
-                </div>
-              </OutputDatabase>
-              <ExceptionHandling id={id} data={data} />
+          )}
+          <OutputDatabase id={id} data={data} key={handleMode}>
+            <div className="text-base font-medium">
+              {t('workflow.nodes.databaseNode.output')}
             </div>
-          }
-        />
+          </OutputDatabase>
+          <ExceptionHandling id={id} data={data} />
+        </div>
       </div>
     </div>
   );

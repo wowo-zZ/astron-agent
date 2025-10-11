@@ -444,64 +444,79 @@ const SpaceButton: FC<{
   handleShowSpacePopover,
   setIsShowSpacePopover,
   t,
-}) => (
-  <Popover
-    content={PersonSpace}
-    title={null}
-    trigger="click"
-    open={isShowSpacePopover}
-    placement="rightTop"
-    overlayClassName="[&_.ant-popover-inner]:ml-0 [&_.ant-popover-inner]:p-4 [&_.ant-popover-inner]:rounded-2xl [&_.ant-popover-inner]:max-h-[calc(100vh-var(--popover-top,100px)-20px)] [&_.ant-popover-inner-content]:max-h-[calc(100vh-var(--popover-top,100px)-44px)] [&_.ant-input-affix-wrapper]:py-1.5 [&_.ant-input-affix-wrapper]:px-[7px]"
-    arrow={false}
-    getPopupContainer={triggerNode =>
-      triggerNode.parentElement || document.body
-    }
-    autoAdjustOverflow={false}
-    onOpenChange={visible => {
-      if (!visible) {
-        setIsShowSpacePopover(false);
-      }
-    }}
-  >
-    <div
-      className="text-center whitespace-nowrap text-xs py-2.5 px-3 flex cursor-pointer justify-between text-[#1f1f1f] rounded-lg relative before:content-[''] before:absolute before:-top-3.5 before:left-0 before:w-full before:h-px before:bg-[rgba(226,232,255,0.5)] hover:text-[#275eff] hover:bg-[#f5f8ff] group"
-      ref={spaceButtonRef}
-      onClick={handleShowSpacePopover}
-    >
-      <div className="w-full flex items-center justify-between gap-2 text-base font-normal leading-5">
-        <div className="flex">
-          <img
-            src={
-              spaceAvatar || require('@/assets/imgs/space/contacts-fill.svg')
-            }
-            alt="space"
-            className="w-[18px] h-[18px] rounded-[2px] mr-2"
-          />
-          {!isCollapsed && (
-            <div className="min-w-[110px] max-w-[120px] overflow-hidden text-ellipsis whitespace-nowrap">
-              {spaceName ||
-                (spaceType === 'personal'
-                  ? t('sidebar.personalSpace')
-                  : t('sidebar.teamSpace'))}
-            </div>
-          )}
-        </div>
+}) => {
+  const [isShowAddSpace, setIsShowAddSpace] = useState(false);
 
-        {!isCollapsed && (
-          <img src={spaceMore} alt="more" className="w-[18px] h-[18px]" />
-        )}
-        {isCollapsed && (
-          <div className="w-auto rounded-lg bg-white shadow-[0px_0px_20px_0px_rgba(0,18,70,0.08)] text-[#333333] whitespace-nowrap py-3 px-5 absolute -top-1.5 left-[54px] z-[3] hidden group-hover:block">
-            {spaceName ||
-              (spaceType === 'personal'
-                ? t('sidebar.personalSpace')
-                : t('sidebar.teamSpace'))}
+  return (
+    <>
+      <Popover
+        content={<PersonSpace setIsShowAddSpace={setIsShowAddSpace} />}
+        title={null}
+        trigger="click"
+        open={isShowSpacePopover}
+        placement="rightTop"
+        overlayClassName="[&_.ant-popover-inner]:ml-0 [&_.ant-popover-inner]:p-4 [&_.ant-popover-inner]:rounded-2xl [&_.ant-popover-inner]:max-h-[calc(100vh-var(--popover-top,100px)-20px)] [&_.ant-popover-inner-content]:max-h-[calc(100vh-var(--popover-top,100px)-44px)] [&_.ant-input-affix-wrapper]:py-1.5 [&_.ant-input-affix-wrapper]:px-[7px]"
+        arrow={false}
+        getPopupContainer={triggerNode =>
+          triggerNode.parentElement || document.body
+        }
+        autoAdjustOverflow={false}
+        onOpenChange={visible => {
+          if (!visible) {
+            setIsShowSpacePopover(false);
+          }
+        }}
+      >
+        <div
+          className="text-center whitespace-nowrap text-xs py-2.5 px-3 flex cursor-pointer justify-between text-[#1f1f1f] rounded-lg relative before:content-[''] before:absolute before:-top-3.5 before:left-0 before:w-full before:h-px before:bg-[rgba(226,232,255,0.5)] hover:text-[#275eff] hover:bg-[#f5f8ff] group"
+          ref={spaceButtonRef}
+          onClick={handleShowSpacePopover}
+        >
+          <div className="w-full flex items-center justify-between gap-2 text-base font-normal leading-5">
+            <div className="flex">
+              <img
+                src={
+                  spaceAvatar ||
+                  require('@/assets/imgs/space/contacts-fill.svg')
+                }
+                alt="space"
+                className="w-[18px] h-[18px] rounded-[2px] mr-2"
+              />
+              {!isCollapsed && (
+                <div className="min-w-[110px] max-w-[120px] overflow-hidden text-ellipsis whitespace-nowrap">
+                  {spaceName ||
+                    (spaceType === 'personal'
+                      ? t('sidebar.personalSpace')
+                      : t('sidebar.teamSpace'))}
+                </div>
+              )}
+            </div>
+
+            {!isCollapsed && (
+              <img src={spaceMore} alt="more" className="w-[18px] h-[18px]" />
+            )}
+            {isCollapsed && (
+              <div className="w-auto rounded-lg bg-white shadow-[0px_0px_20px_0px_rgba(0,18,70,0.08)] text-[#333333] whitespace-nowrap py-3 px-5 absolute -top-1.5 left-[54px] z-[3] hidden group-hover:block">
+                {spaceName ||
+                  (spaceType === 'personal'
+                    ? t('sidebar.personalSpace')
+                    : t('sidebar.teamSpace'))}
+              </div>
+            )}
           </div>
-        )}
-      </div>
-    </div>
-  </Popover>
-);
+        </div>
+      </Popover>
+      <SpaceModal
+        open={isShowAddSpace}
+        mode="create"
+        onClose={() => setIsShowAddSpace(false)}
+        onSuccess={() => {
+          eventBus.emit('spaceList');
+        }}
+      />
+    </>
+  );
+};
 
 // Menu Tab Component
 const MenuTab: FC<{

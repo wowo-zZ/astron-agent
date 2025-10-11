@@ -188,13 +188,21 @@ const AppListPage: React.FC<AppListProps> = () => {
       </div>
       <Modal
         open={isShowCreateAppModal}
-        onCancel={() => setIsShowCreateAppModal(false)}
+        onCancel={() => {
+          setIsShowCreateAppModal(false);
+          createAppForm.resetFields();
+        }}
         title={t('botApi.createApp')}
         width={500}
         centered
-        closable={false}
+        maskClosable={false}
         footer={[
-          <Button onClick={() => setIsShowCreateAppModal(false)}>
+          <Button
+            onClick={() => {
+              setIsShowCreateAppModal(false);
+              createAppForm.resetFields();
+            }}
+          >
             {t('btnCancel')}
           </Button>,
           <Button

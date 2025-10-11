@@ -928,8 +928,14 @@ async def _chat_response_stream(
                     app_audit_policy, audit_strategy, response_queue, last_response
                 )
 
-                node: Optional[NodeInfo] = response.workflow_step.node if response.workflow_step else None
-                last_response = response if node and node.id.startswith(NodeType.RPA.value) else last_response
+                node: Optional[NodeInfo] = (
+                    response.workflow_step.node if response.workflow_step else None
+                )
+                last_response = (
+                    response
+                    if node and node.id.startswith(NodeType.RPA.value)
+                    else last_response
+                )
 
                 response, should_return = _filter_response_frame(
                     response_frame=response,
@@ -1061,7 +1067,9 @@ async def _forward_queue_messages(
             response = await _get_response(
                 app_audit_policy, audit_strategy, response_queue, last_response
             )
-            node: Optional[NodeInfo] = response.workflow_step.node if response.workflow_step else None
+            node: Optional[NodeInfo] = (
+                response.workflow_step.node if response.workflow_step else None
+            )
             if node and node.id.startswith(NodeType.RPA.value):
                 last_response = response
             event = EventRegistry().get_event(event_id=event_id)

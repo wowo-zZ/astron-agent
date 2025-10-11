@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from 'react';
 import { Tooltip, Button } from 'antd';
 import { useMemoizedFn } from 'ahooks';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { useFlowCommon } from '@/components/workflow/hooks/useFlowCommon';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useFlowCommon } from '@/components/workflow/hooks/use-flow-common';
 import { downloadFileWithHeaders } from '@/utils/http';
 import { getFixedUrl } from '@/components/workflow/utils';
 import WxModal from '@/components/wx-modal';
@@ -155,6 +155,7 @@ const PublishHeader: React.FC<PublishHeaderProps> = ({
   const { t } = useTranslation();
   const { handleDebugger } = useFlowCommon();
   const navigate = useNavigate();
+  const { id: agentMassId } = useParams<{ id: string }>();
   // Flow store
   const currentFlow: FlowType = useFlowsManager(
     (state: unknown) => state.currentFlow
@@ -196,12 +197,14 @@ const PublishHeader: React.FC<PublishHeaderProps> = ({
         disjump={true}
         setIsOpenapi={() => {}}
         fabuFlag={fabuFlag}
-        isV1={false}
         show={openWxmol}
         onCancel={() => {
           setOpenWxmol(false);
         }}
-        workflowId={JSON.parse(currentFlow?.ext)?.botId}
+        workflowId={
+          currentFlow?.ext ? JSON.parse(currentFlow.ext)?.botId : null
+        }
+        agentMassId={agentMassId || null}
       />
       <Tooltip
         title={t('workflow.nodes.header.export')}

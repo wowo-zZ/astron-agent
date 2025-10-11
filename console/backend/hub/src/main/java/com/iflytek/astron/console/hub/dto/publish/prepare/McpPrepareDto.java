@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * MCP publish prepare data DTO
- * 
+ *
  * @author Omuigix
  */
 @Data

@@ -5,7 +5,7 @@ import lombok.Data;
 
 /**
  * Unified prepare response DTO for all publish types
- * 
+ *
  * @author Omuigix
  */
 @Data

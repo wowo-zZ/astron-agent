@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { Drawer, Switch, Input, Upload, message } from 'antd';
 import type { UploadProps, UploadFile } from 'antd';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import { saveFlowAPI } from '@/services/flow';
 import { debounce, cloneDeep } from 'lodash';
 import { isJSON } from '@/utils';

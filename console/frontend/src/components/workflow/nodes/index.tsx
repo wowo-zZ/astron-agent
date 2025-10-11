@@ -5,7 +5,7 @@ import {
   NodeContent,
   IteratorChildNode,
 } from '@/components/workflow/nodes/node-common';
-import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import { useNodeCommon } from '@/components/workflow/hooks/use-node-common';
 
 const BaseNode = memo(props => {
   const { id, data } = props;

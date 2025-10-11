@@ -114,18 +114,12 @@ const SettingPage: FC<{
                 style={{
                   background: botColor
                     ? botColor
-                    : `url(${
-                        botIcon.name || '' + botIcon.value || ''
-                      }) no-repeat center / cover`,
+                    : `url(${botIcon.value || ''}) no-repeat center / cover`,
                 }}
                 onClick={() => setShowModal(true)}
               >
                 {botColor && (
-                  <img
-                    src={botIcon.name || '' + botIcon.value || ''}
-                    className="w-6 h-6"
-                    alt=""
-                  />
+                  <img src={botIcon.value || ''} className="w-6 h-6" alt="" />
                 )}
               </span>
               <Input

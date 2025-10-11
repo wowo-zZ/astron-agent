@@ -109,24 +109,26 @@ const useChatInput = (
 
   const handleChangeParam = useMemoizedFn(
     (index: number, fn, value: string | number | boolean): void => {
-      const currentInput: StartNodeType | undefined = startNodeParams.find(
-        (_, i) => index === i
-      );
-      if (currentInput) {
-        fn(currentInput, value);
-        if (
-          currentInput?.type === 'object' ||
-          currentInput.type.includes('array')
-        ) {
-          if (currentInput?.validationSchema) {
-            currentInput.errorMsg = validateInputJSON(
-              value as string,
-              currentInput.validationSchema
-            );
+      setStartNodeParams(startNodeParams => {
+        const currentInput: StartNodeType | undefined = startNodeParams.find(
+          (_, i) => index === i
+        );
+        if (currentInput) {
+          fn(currentInput, value);
+          if (
+            currentInput?.type === 'object' ||
+            currentInput.type.includes('array')
+          ) {
+            if (currentInput?.validationSchema) {
+              currentInput.errorMsg = validateInputJSON(
+                value as string,
+                currentInput.validationSchema
+              );
+            }
           }
         }
-      }
-      setStartNodeParams([...startNodeParams]);
+        return cloneDeep(startNodeParams);
+      });
     }
   );
   return {
@@ -141,7 +143,8 @@ function ChatInput({
   interruptChat,
   startNodeParams,
   setStartNodeParams,
-  textareRef,
+  userInput,
+  setUserInput,
   handleEnterKey,
 }: ChatInputProps): React.ReactElement {
   const { t } = useTranslation();
@@ -165,7 +168,7 @@ function ChatInput({
           <textarea
             disabled={interruptChat?.type === 'option'}
             className="user-chat-input pr-3.5 w-full py-3"
-            ref={textareRef}
+            value={userInput}
             style={{
               resize: 'none',
             }}
@@ -176,6 +179,7 @@ function ChatInput({
                 startNodeParams[0].default = value;
                 setStartNodeParams([...startNodeParams]);
               }
+              setUserInput(value);
             }}
             onKeyDown={handleEnterKey}
             placeholder={

@@ -1,3 +1,5 @@
+import React from 'react';
+
 // 类型定义
 export interface KnowledgeDetailProps {
   setCurrentTab: (tab: string) => void;
@@ -75,4 +77,26 @@ export interface KnowledgeDetailModalInfo {
   nodeId: string;
   repoId: string;
   tag?: string;
+}
+
+export interface useKnowledgeDetailProps {
+  getDirectoryTree: () => void;
+  getFiles: () => void;
+  repoId: string;
+  tag: string;
+  isPro: boolean;
+  id: string;
+  handleInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  checkedIds: string[];
+  ragType: string;
+}
+
+export interface useFileDetailProps {
+  getFiles: () => void;
+  getFileInfo: () => void;
+  fetchData: (value?: string) => void;
+  enableChunk: (chunk: ChunkItem, checked: boolean) => void;
+  fetchDataDebounce: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleScroll: () => void;
+  otherFiles: KnowledgeFileItem[];
 }

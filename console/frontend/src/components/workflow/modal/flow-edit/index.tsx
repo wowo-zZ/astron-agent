@@ -6,7 +6,7 @@ import { saveFlowAPI } from '@/services/flow';
 import { getAgentType } from '@/services/agent-square';
 import MoreIcons from './more-icons';
 import globalStore from '@/store/global-store';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import copy from 'copy-to-clipboard';
 
 import formSelect from '@/assets/imgs/main/icon_nav_dropdown.svg';
@@ -14,6 +14,92 @@ import close from '@/assets/imgs/workflow/modal-close.png';
 import flowIdCopyIcon from '@/assets/imgs/workflow/flowId-copy-icon.svg';
 
 const { TextArea } = Input;
+
+const EditFlowForm = ({
+  typeList,
+  tempFlow,
+  setTempFlow,
+  setShowModal,
+}): React.ReactElement => {
+  const { t } = useTranslation();
+  return (
+    <div className="mt-6">
+      <div className="flex items-center gap-6">
+        <div className="flex flex-col flex-1">
+          <div className="text-second font-medium text-sm flex gap-0.5">
+            <span className="text-[#F74E43]">*</span>
+            <span>{t('workflow.nodes.flowModal.workflowName')}</span>
+          </div>
+          <div className="flex items-center mt-1.5">
+            <div
+              className={`w-10 h-10 flex justify-center items-center rounded-lg mr-3 cursor-pointer`}
+              style={{
+                background: `url(${tempFlow.avatarIcon}) no-repeat center / cover`,
+              }}
+              onClick={() => setShowModal(true)}
+            ></div>
+            <Input
+              value={tempFlow?.name}
+              maxLength={20}
+              showCount
+              onChange={e =>
+                setTempFlow({
+                  ...tempFlow,
+                  name: e.target.value,
+                })
+              }
+              placeholder={t('common.inputPlaceholder')}
+              className="global-input flex-1"
+            />
+          </div>
+        </div>
+        <div className="flex flex-col flex-1">
+          <div className="text-second font-medium text-sm flex gap-0.5">
+            <span>{t('workflow.nodes.flowModal.workflowCategory')}</span>
+          </div>
+          <Select
+            className="global-select w-full mt-1.5"
+            suffixIcon={<img src={formSelect} className="w-4 h-4 " />}
+            placeholder={t('common.pleaseSelect')}
+            options={typeList}
+            value={tempFlow?.category}
+            onChange={value =>
+              setTempFlow({
+                ...tempFlow,
+                category: value,
+              })
+            }
+          />
+        </div>
+      </div>
+      <div className="mt-6 text-second font-medium text-sm flex gap-0.5">
+        <span className="text-[#F74E43]">*</span>
+        <span>{t('workflow.nodes.flowModal.workflowDescription')}</span>
+      </div>
+      <p className="mt-1.5 text-xs font-medium desc-color">
+        {t('workflow.nodes.flowModal.workflowDescriptionTip')}
+      </p>
+      <div className="relative">
+        <TextArea
+          value={tempFlow?.description}
+          onChange={e =>
+            setTempFlow({
+              ...tempFlow,
+              description: e.target.value,
+            })
+          }
+          className="mt-1.5 global-textarea"
+          style={{ height: 104 }}
+          maxLength={200}
+          placeholder={t('common.inputPlaceholder')}
+        />
+        <div className="absolute bottom-3 right-3 ant-input-limit ">
+          {tempFlow?.description?.length} / 200
+        </div>
+      </div>
+    </div>
+  );
+};
 
 function EditModal({ currentFlow, setEditModal }): React.ReactElement {
   const { t } = useTranslation();
@@ -117,83 +203,12 @@ function EditModal({ currentFlow, setEditModal }): React.ReactElement {
                 onClick={() => setEditModal(false)}
               />
             </div>
-            <div className="mt-6">
-              <div className="flex items-center gap-6">
-                <div className="flex flex-col flex-1">
-                  <div className="text-second font-medium text-sm flex gap-0.5">
-                    <span className="text-[#F74E43]">*</span>
-                    <span>{t('workflow.nodes.flowModal.workflowName')}</span>
-                  </div>
-                  <div className="flex items-center mt-1.5">
-                    <div
-                      className={`w-10 h-10 flex justify-center items-center rounded-lg mr-3 cursor-pointer`}
-                      style={{
-                        background: `url(${tempFlow.avatarIcon}) no-repeat center / cover`,
-                      }}
-                      onClick={() => setShowModal(true)}
-                    ></div>
-                    <Input
-                      value={tempFlow?.name}
-                      maxLength={20}
-                      showCount
-                      onChange={e =>
-                        setTempFlow({
-                          ...tempFlow,
-                          name: e.target.value,
-                        })
-                      }
-                      placeholder={t('common.inputPlaceholder')}
-                      className="global-input flex-1"
-                    />
-                  </div>
-                </div>
-                <div className="flex flex-col flex-1">
-                  <div className="text-second font-medium text-sm flex gap-0.5">
-                    <span>
-                      {t('workflow.nodes.flowModal.workflowCategory')}
-                    </span>
-                  </div>
-                  <Select
-                    className="global-select w-full mt-1.5"
-                    suffixIcon={<img src={formSelect} className="w-4 h-4 " />}
-                    placeholder={t('common.pleaseSelect')}
-                    options={typeList}
-                    value={tempFlow?.category}
-                    onChange={value =>
-                      setTempFlow({
-                        ...tempFlow,
-                        category: value,
-                      })
-                    }
-                  />
-                </div>
-              </div>
-              <div className="mt-6 text-second font-medium text-sm flex gap-0.5">
-                <span className="text-[#F74E43]">*</span>
-                <span>{t('workflow.nodes.flowModal.workflowDescription')}</span>
-              </div>
-              <p className="mt-1.5 text-xs font-medium desc-color">
-                {t('workflow.nodes.flowModal.workflowDescriptionTip')}
-              </p>
-              <div className="relative">
-                <TextArea
-                  value={tempFlow?.description}
-                  onChange={e =>
-                    setTempFlow({
-                      ...tempFlow,
-                      description: e.target.value,
-                    })
-                  }
-                  className="mt-1.5 global-textarea"
-                  style={{ height: 104 }}
-                  maxLength={200}
-                  placeholder={t('common.inputPlaceholder')}
-                />
-                <div className="absolute bottom-3 right-3 ant-input-limit ">
-                  {tempFlow?.description?.length} / 200
-                </div>
-              </div>
-            </div>
+            <EditFlowForm
+              typeList={typeList}
+              tempFlow={tempFlow}
+              setTempFlow={setTempFlow}
+              setShowModal={setShowModal}
+            />
             <div className="flex items-end justify-between mt-10">
               <div className="flex items-center gap-3">
                 <p className="text-desc text-[#7F7F7F]">

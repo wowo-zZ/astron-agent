@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
-import { Input, Button, Spin, Tooltip } from 'antd';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
+import { Input, Spin, Tooltip } from 'antd';
 import { useDebounce, useMemoizedFn } from 'ahooks';
 import { cloneDeep } from 'lodash';
 import { v4 as uuid } from 'uuid';

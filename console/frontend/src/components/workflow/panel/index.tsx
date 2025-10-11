@@ -2,7 +2,7 @@ import React, { useState, useMemo, memo, useEffect } from 'react';
 import { Panel, MiniMap } from 'reactflow';
 import { Tooltip, Popover } from 'antd';
 import { cloneDeep } from 'lodash';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import dagre from 'dagre';
 import { copyFlowAPI } from '@/services/flow';
 import { useMemoizedFn } from 'ahooks';
@@ -232,9 +232,10 @@ function ZoomControls({
         className="w-[15px] h-[16px] cursor-pointer"
         alt=""
         onClick={() => {
-          const newZoom = zoom / 100 + 0.1;
+          let newZoom = zoom / 100 + 0.1;
+          newZoom = newZoom >= 2 ? 2 : newZoom;
           reactFlowInstance.zoomTo(newZoom);
-          setZoom(zoom + 10);
+          setZoom(zoom + 10 <= 200 ? zoom + 10 : 200);
         }}
       />
     </div>
@@ -482,12 +483,7 @@ function FlowToolbar({
   );
 }
 
-function index({
-  reactFlowInstance,
-  zoom,
-  setZoom,
-  historys,
-}): React.ReactElement {
+function index({ reactFlowInstance, zoom, setZoom }): React.ReactElement {
   const getCurrentStore = useFlowsManager(state => state.getCurrentStore);
   const historyVersion = useFlowsManager(state => state.historyVersion);
   const currentStore = getCurrentStore();
@@ -501,6 +497,7 @@ function index({
   const moveToPosition = currentStore(state => state.moveToPosition);
   const nodes = currentStore(state => state.nodes);
   const setEdges = currentStore(state => state.setEdges);
+  const historys = currentStore(state => state.historys);
   const [showMiniMap, setShowMiniMap] = useState(false);
   const [showBeginnerGuide, setShowBeginnerGuide] = useState(true);
   const [showNodeRemarks, setShowNodeRemarks] = useState(false);

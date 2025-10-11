@@ -85,6 +85,7 @@ export interface UseNodeFuncReturn {
   ) => void;
   handleAddOutputLine: () => void;
   handleRemoveOutputLine: (outputId: string) => void;
+  isFixedOutputComponentFunc: (output: OutputItem) => boolean;
 }
 
 export interface UseNodeOutputRenderReturn {
@@ -319,6 +320,25 @@ export interface UseVariableMemoryHandlersReturn {
     value: unknown
   ) => void;
   handleRemoveInputLine: (inputId: string) => void;
+}
+
+export interface UseAddNodeReturn {
+  handleAddNode: (
+    addNode: AddNodeType,
+    position: PositionType
+  ) => NewNodeType[] | null;
+}
+
+export interface UseAddToolNodeReturn {
+  handleAddToolNode: (tool: ToolType) => void;
+}
+
+export interface UseAddFlowNodeReturn {
+  handleAddFlowNode: (flow: FlowType) => void;
+}
+
+export interface UseAddRpaNodeReturn {
+  handleAddRpaNode: (rpa: RpaNodeParam) => void;
 }
 
 // 重新导出常用的类型以便在hooks中使用

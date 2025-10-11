@@ -36,6 +36,7 @@ const translation = {
       add: 'Add',
       noRobot: 'No Robot',
       noRpaTool: 'No Rpa tool',
+      noMore: 'No more',
     },
     agentNode: {
       type: 'Large Model',

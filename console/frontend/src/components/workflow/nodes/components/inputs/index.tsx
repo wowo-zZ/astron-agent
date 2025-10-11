@@ -7,8 +7,8 @@ import {
   FLowCollapse,
 } from '@/components/workflow/ui';
 import ChatHistory from '@/components/workflow/nodes/components/chat-history';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
-import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
+import { useNodeCommon } from '@/components/workflow/hooks/use-node-common';
 import { EnabledChatHistory } from '@/components/workflow/nodes/components/single-input';
 
 import inputAddIcon from '@/assets/imgs/workflow/input-add-icon.png';
@@ -73,7 +73,8 @@ export function TypeSelector({ id, data, item }: unknown): React.ReactElement {
 }
 
 export function ValueField({ id, data, item }: unknown): React.ReactElement {
-  const { references, handleChangeInputParam } = useNodeCommon({ id, data });
+  const { references, handleChangeInputParam, isFixedInputsNode } =
+    useNodeCommon({ id, data });
   const valueType = item?.schema?.value?.type;
 
   if (valueType === 'literal') {
@@ -88,6 +89,7 @@ export function ValueField({ id, data, item }: unknown): React.ReactElement {
 
   return (
     <ReferenceField
+      isFixedInputsNode={isFixedInputsNode}
       id={id}
       item={item}
       references={references}
@@ -139,6 +141,7 @@ function RemoveButton({ id, data, item }: unknown): React.ReactElement {
 
 /** 单独拆出引用选择 */
 function ReferenceField({
+  isFixedInputsNode,
   id,
   item,
   references,
@@ -158,7 +161,9 @@ function ReferenceField({
       item.id,
       (data, val) => {
         data.schema.value.content = val.content;
-        data.schema.type = val.type;
+        if (!isFixedInputsNode) {
+          data.schema.type = val.type;
+        }
         data.fileType = val.fileType;
       },
       {

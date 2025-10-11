@@ -4,7 +4,7 @@ import lombok.Data;
 
 /**
  * Base prepare data DTO
- * 
+ *
  * @author Omuigix
  */
 @Data

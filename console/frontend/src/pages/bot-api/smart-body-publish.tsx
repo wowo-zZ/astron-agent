@@ -179,7 +179,7 @@ const SmartBodyPublish: React.FC = () => {
           {!spaceId && spaceType == 'personal' && isOldApi ? (
             <div
               className={styles.historyButton}
-              onClick={() => navigate('/management/botApi/history')}
+              onClick={() => navigate('/management/bot-api/history')}
             >
               {t('botApi.SmartBodyPublish.queryAuthRecord')}
             </div>

@@ -116,6 +116,7 @@ const ToolInputParameters: FC<{ inputParamsData: InputParamsData[] }> = ({
       dataIndex: 'default',
       key: 'default',
       width: '10%',
+      render: value => value !== undefined && <div>{`${value}`}</div>,
     },
   ];
 

@@ -2,7 +2,7 @@ import React, { useMemo, memo } from 'react';
 import { FLowCollapse } from '@/components/workflow/ui';
 import Inputs from '@/components/workflow/nodes/components/inputs';
 import Outputs from '@/components/workflow/nodes/components/outputs';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import { useMemoizedFn } from 'ahooks';
 import MonacoEditor from '@/components/monaco-editor';
 import { useTranslation } from 'react-i18next';

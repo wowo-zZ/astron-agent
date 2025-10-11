@@ -12,9 +12,9 @@ import {
   getAgentDetail,
   handleAgentStatus,
   getMCPServiceDetail,
-  getAgentInputParams,
   getAgentTimeSeriesData,
   getAgentSummaryData,
+  getPreparationData,
   type AgentInputParam,
 } from '@/services/release-management';
 import {
@@ -132,8 +132,8 @@ const AgentList: React.FC<AgentListProps> = ({ AgentType }) => {
         if (releaseType == 1 && botId) {
           handleAgentStatus(botId, {
             action: 'OFFLINE',
-            reason: '维护更新',
             publishType: 'MARKET',
+            publishData: { reason: '维护更新' },
           })
             .then(() => {
               reasonRef.current = undefined;
@@ -353,49 +353,41 @@ const AgentList: React.FC<AgentListProps> = ({ AgentType }) => {
           {(pageInfo.botStatus === 0 || pageInfo.botStatus === -9) && (
             <span
               onClick={() => {
-                /* 工作流：input -- chain 即工作流详情（获取多参数） -- 发布 -- baseInfo 即详情 
-                TODO: 工作流智能体的返回数据不满足，等后端完成
-                getAgentInputParams -- 能否发布为mcp
+                /* moreParams -- 能否发布为微信
                 botMultiFileParam -- 能否发布到星火
                 */
                 if (bot.version === 3) {
                   // console.log(bot, 'bot---------');
-                  getAgentInputParams(bot.botId as unknown as number).then(
-                    (res: AgentInputParam[]) => {
-                      // console.log('🚀 ~ index.tsx:329 ~ res:', res);
-                      if (
-                        (res.length === 2 &&
-                          res[1]?.fileType === 'file' &&
-                          res[1]?.schema?.type === 'array-string') ||
-                        (res.length === 2 && res[1]?.fileType !== 'file') ||
-                        res.length > 2
-                      ) {
-                        setMoreParams(true);
-                      } else {
-                        setMoreParams(false);
-                      }
-                    }
-                  );
-
-                  /** ## 获取工作流智能体信息 */
-                  getChainInfo(bot?.botId).then(res => {
-                    setBotMultiFileParam(res.botMultiFileParam);
-                    publish({
-                      id: res.massId,
-                      botId: `${bot?.botId}`,
-                      flowId: res.flowId,
-                      name: bot?.botName || '',
-                      description: bot?.botDesc || '',
-                      data: { nodes: [] },
+                  getPreparationData(bot.botId as unknown as number)
+                    .then((res: any) => {
+                      setBotMultiFileParam(res?.data?.botMultiFileParam);
+                      getBotBaseInfo(bot?.botId);
+                      setFabuFlag(true);
+                      setOpenWxmol(true);
                     })
-                      .then(() => {
-                        getBotBaseInfo(bot?.botId);
-                        setFabuFlag(true);
-                        setOpenWxmol(true);
-                      })
-                      .catch(err => {
-                        message.error(err?.msg);
-                      });
+                    .catch(err => {
+                      message.error(err?.msg);
+                    });
+
+                  /* NOTE: Publishing as mcp is currently not supported - 2025.10
+                    original logic -- getAgentInputParams & getChainInfo
+                    new api -- getPreparationData
+                  */
+                  getPreparationData(
+                    bot.botId as unknown as number,
+                    'MCP'
+                  ).then((res: any) => {
+                    if (
+                      (res.length === 2 &&
+                        res[1]?.fileType === 'file' &&
+                        res[1]?.schema?.type === 'array-string') ||
+                      (res.length === 2 && res[1]?.fileType !== 'file') ||
+                      res.length > 2
+                    ) {
+                      setMoreParams(true);
+                    } else {
+                      setMoreParams(false);
+                    }
                   });
                 } else {
                   getBotBaseInfo(bot?.botId);
@@ -620,12 +612,14 @@ const AgentList: React.FC<AgentListProps> = ({ AgentType }) => {
           disjump={true}
           setIsOpenapi={setIsOpenapi}
           fabuFlag={fabuFlag}
-          isV1={false}
           show={openWxmol}
           onCancel={() => {
             setOpenWxmol(false);
           }}
           agentType={AgentType}
+          agentMassId={
+            AgentType === 'workflow' ? (botInfo?.massId as string) : null
+          }
         />
         <Table
           className={botList?.length === 0 ? styles.noData : ''}

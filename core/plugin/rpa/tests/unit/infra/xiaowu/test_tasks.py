@@ -300,7 +300,11 @@ class TestQueryTaskStatus:
             "data": {
                 "execution": {
                     "status": "COMPLETED",
-                    "result": {"data": {"output": "task completed"}},
+                    "result": {
+                        "code": "0000",
+                        "msg": "task completed",
+                        "data": {"output": "task completed"},
+                    },
                 }
             },
         }
@@ -312,7 +316,7 @@ class TestQueryTaskStatus:
         # Assert
         assert result == (
             ErrorCode.SUCCESS.code,
-            ErrorCode.SUCCESS.message,
+            "Success: 0000-task completed",
             {"output": "task completed"},
         )
         mock_http_client.get.assert_called_once_with(
@@ -349,9 +353,9 @@ class TestQueryTaskStatus:
 
         # Assert
         expected_message = (
-            f"{ErrorCode.QUERY_TASK_ERROR.message}: Task execution failed"
+            f"{ErrorCode.TASK_EXEC_FAILED.message}: Task execution failed"
         )
-        assert result == (ErrorCode.QUERY_TASK_ERROR.code, expected_message, {})
+        assert result == (ErrorCode.TASK_EXEC_FAILED.code, expected_message, {})
 
     @patch("plugin.rpa.infra.xiaowu.tasks.is_valid_url")
     @patch("plugin.rpa.infra.xiaowu.tasks.os.getenv")

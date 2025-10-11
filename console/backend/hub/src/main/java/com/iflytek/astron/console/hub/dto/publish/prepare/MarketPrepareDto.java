@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * Market publish prepare data DTO
- * 
+ *
  * @author Omuigix
  */
 @Data

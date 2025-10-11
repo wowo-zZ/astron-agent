@@ -31,8 +31,8 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for EnterpriseBizServiceImpl
- * Tests all public methods with comprehensive coverage of success and failure scenarios
+ * Unit tests for EnterpriseBizServiceImpl Tests all public methods with comprehensive coverage of
+ * success and failure scenarios
  */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("EnterpriseBizServiceImpl Unit Tests")
@@ -196,8 +196,8 @@ class EnterpriseBizServiceImplTest {
     @DisplayName("create - Should successfully create enterprise when valid input and user has purchase plan")
     void create_Success_WhenValidInputAndUserHasPurchasePlan() {
         try (MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class);
-             MockedStatic<OrderInfoUtil> mockedOrderInfo = mockStatic(OrderInfoUtil.class);
-             MockedStatic<IdWorker> mockedIdWorker = mockStatic(IdWorker.class)) {
+                MockedStatic<OrderInfoUtil> mockedOrderInfo = mockStatic(OrderInfoUtil.class);
+                MockedStatic<IdWorker> mockedIdWorker = mockStatic(IdWorker.class)) {
 
             // Arrange
             mockedRequestContext.when(RequestContextUtil::getUID).thenReturn(TEST_UID);
@@ -232,7 +232,7 @@ class EnterpriseBizServiceImplTest {
     @DisplayName("create - Should return error when user has no purchase plan")
     void create_Error_WhenUserHasNoPurchasePlan() {
         try (MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class);
-             MockedStatic<OrderInfoUtil> mockedOrderInfo = mockStatic(OrderInfoUtil.class)) {
+                MockedStatic<OrderInfoUtil> mockedOrderInfo = mockStatic(OrderInfoUtil.class)) {
 
             // Arrange
             mockedRequestContext.when(RequestContextUtil::getUID).thenReturn(TEST_UID);
@@ -253,7 +253,7 @@ class EnterpriseBizServiceImplTest {
     @DisplayName("create - Should return error when enterprise name already exists")
     void create_Error_WhenEnterpriseNameExists() {
         try (MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class);
-             MockedStatic<OrderInfoUtil> mockedOrderInfo = mockStatic(OrderInfoUtil.class)) {
+                MockedStatic<OrderInfoUtil> mockedOrderInfo = mockStatic(OrderInfoUtil.class)) {
 
             // Arrange
             mockedRequestContext.when(RequestContextUtil::getUID).thenReturn(TEST_UID);
@@ -278,7 +278,7 @@ class EnterpriseBizServiceImplTest {
     @DisplayName("create - Should return error when user already created enterprise")
     void create_Error_WhenUserAlreadyCreatedEnterprise() {
         try (MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class);
-             MockedStatic<OrderInfoUtil> mockedOrderInfo = mockStatic(OrderInfoUtil.class)) {
+                MockedStatic<OrderInfoUtil> mockedOrderInfo = mockStatic(OrderInfoUtil.class)) {
 
             // Arrange
             mockedRequestContext.when(RequestContextUtil::getUID).thenReturn(TEST_UID);
@@ -305,8 +305,8 @@ class EnterpriseBizServiceImplTest {
     @DisplayName("create - Should return error when enterprise save fails")
     void create_Error_WhenEnterpriseSaveFails() {
         try (MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class);
-             MockedStatic<OrderInfoUtil> mockedOrderInfo = mockStatic(OrderInfoUtil.class);
-             MockedStatic<IdWorker> mockedIdWorker = mockStatic(IdWorker.class)) {
+                MockedStatic<OrderInfoUtil> mockedOrderInfo = mockStatic(OrderInfoUtil.class);
+                MockedStatic<IdWorker> mockedIdWorker = mockStatic(IdWorker.class)) {
 
             // Arrange
             mockedRequestContext.when(RequestContextUtil::getUID).thenReturn(TEST_UID);
@@ -337,8 +337,8 @@ class EnterpriseBizServiceImplTest {
     @DisplayName("create - Should throw BusinessException when adding enterprise user fails")
     void create_ThrowsBusinessException_WhenAddingEnterpriseUserFails() {
         try (MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class);
-             MockedStatic<OrderInfoUtil> mockedOrderInfo = mockStatic(OrderInfoUtil.class);
-             MockedStatic<IdWorker> mockedIdWorker = mockStatic(IdWorker.class)) {
+                MockedStatic<OrderInfoUtil> mockedOrderInfo = mockStatic(OrderInfoUtil.class);
+                MockedStatic<IdWorker> mockedIdWorker = mockStatic(IdWorker.class)) {
 
             // Arrange
             mockedRequestContext.when(RequestContextUtil::getUID).thenReturn(TEST_UID);
@@ -357,7 +357,7 @@ class EnterpriseBizServiceImplTest {
 
             // Act & Assert
             BusinessException exception = assertThrows(BusinessException.class,
-                () -> enterpriseBizService.create(testEnterpriseAddDTO));
+                    () -> enterpriseBizService.create(testEnterpriseAddDTO));
 
             assertEquals(ResponseEnum.INVITE_ADD_TEAM_USER_FAILED, exception.getResponseEnum());
             verify(enterpriseService).save(any(Enterprise.class));

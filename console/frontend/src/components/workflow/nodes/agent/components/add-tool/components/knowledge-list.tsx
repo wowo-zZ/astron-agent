@@ -2,7 +2,7 @@ import React, { useMemo, useCallback } from 'react';
 import { Select, Button, message, Tooltip } from 'antd';
 import { FlowInput } from '@/components/workflow/ui';
 import { useTranslation } from 'react-i18next';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 
 import formSelect from '@/assets/imgs/main/icon_nav_dropdown.svg';
 import search from '@/assets/imgs/workflow/search-icon.svg';

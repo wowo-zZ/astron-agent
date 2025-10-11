@@ -20,12 +20,12 @@ import {
 } from '@/components/workflow/types';
 import { message } from 'antd';
 import NodeList from '@/pages/workflow/components/node-list';
-import useIteratorFlowStore from '@/components/workflow/store/useIteratorFlowStore';
-import useFlowStore from '@/components/workflow/store/useFlowStore';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useIteratorFlowStore from '@/components/workflow/store/use-iterator-flow-store';
+import useFlowStore from '@/components/workflow/store/use-flow-store';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import FlowPanel from '@/components/workflow/panel';
 import { ReactFlowProvider } from 'reactflow';
-import { useFlowCommon } from '@/components/workflow/hooks/useFlowCommon';
+import { useFlowCommon } from '@/components/workflow/hooks/use-flow-common';
 
 import CustomNode from '@/components/workflow/nodes';
 import CustomEdge from '@/components/workflow/edges';
@@ -379,7 +379,6 @@ function FlowContainer({
   const onConnect = useIteratorFlowStore(state => state.onConnect);
   const flowNodes = useFlowStore(state => state.nodes);
   const flowEdges = useFlowStore(state => state.edges);
-  const historys = useIteratorFlowStore(state => state.historys);
   const setHistorys = useIteratorFlowStore(state => state.setHistorys);
   const iteratorId = useFlowsManager(state => state.iteratorId);
   const canvasesDisabled = useFlowsManager(state => state.canvasesDisabled);
@@ -453,9 +452,8 @@ function FlowContainer({
       ref={dropZoneRef}
     >
       <ReactFlow
-        // onlyRenderVisibleElements={true}
         minZoom={0.01}
-        maxZoom={8}
+        maxZoom={2}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         nodes={nodes}
@@ -492,7 +490,6 @@ function FlowContainer({
           reactFlowInstance={reactFlowInstance}
           zoom={zoom}
           setZoom={setZoom}
-          historys={historys}
         />
       </ReactFlow>
     </div>

@@ -26,8 +26,11 @@ const spaceRole = {
   '3': 'member',
 } as const;
 
-export const PersonSpace = () => {
-  const [isShowAddSpace, setIsShowAddSpace] = useState<boolean>(false);
+export const PersonSpace = ({
+  setIsShowAddSpace,
+}: {
+  setIsShowAddSpace: (isShow: boolean) => void;
+}) => {
   const [searchValue, setSearchValue] = useState(''); // 搜索关键词状态
   const {
     spaceType,
@@ -48,6 +51,7 @@ export const PersonSpace = () => {
 
   //添加空间
   const handleAddSpace = () => {
+    console.log('song add space');
     setIsShowSpacePopover(false);
     setIsShowAddSpace(true);
   };
@@ -269,15 +273,6 @@ export const PersonSpace = () => {
           {t('spaceManagement.spaceManage')}
         </div>
       </div>
-      <SpaceModal
-        open={isShowAddSpace}
-        mode="create"
-        onClose={() => setIsShowAddSpace(false)}
-        onSuccess={() => {
-          eventBus.emit('spaceList');
-        }}
-        // onSubmit={handleAddSpaceSubmit}
-      />
     </div>
   );
 };

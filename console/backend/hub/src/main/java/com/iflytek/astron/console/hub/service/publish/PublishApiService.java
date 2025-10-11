@@ -17,4 +17,6 @@ public interface PublishApiService {
     List<AppListDTO> getAppList();
 
     BotApiInfoDTO createBotApi(CreateBotApiVo createBotApiVo, HttpServletRequest request);
+
+    BotApiInfoDTO getApiInfo(Long botId);
 }

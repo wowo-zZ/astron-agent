@@ -1,7 +1,7 @@
 import React, { useCallback, useState, memo } from 'react';
 import { cloneDeep } from 'lodash';
 import { FlowInputNumber, FLowCollapse } from '@/components/workflow/ui';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 
 function index({ id, data, children }): React.ReactElement {
   const getCurrentStore = useFlowsManager(state => state.getCurrentStore);

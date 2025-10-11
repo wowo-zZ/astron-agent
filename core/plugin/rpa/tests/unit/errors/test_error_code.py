@@ -149,6 +149,7 @@ class TestErrorCode:
             "CREATE_TASK_ERROR",
             "QUERY_TASK_ERROR",
             "TIMEOUT_ERROR",
+            "TASK_EXEC_FAILED",
             "CREATE_URL_INVALID",
             "QUERY_URL_INVALID",
             "UNKNOWN_ERROR",

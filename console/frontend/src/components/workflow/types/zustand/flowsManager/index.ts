@@ -4,6 +4,14 @@ import { FlowStoreType } from '../flow';
 import { UseBoundStore, StoreApi } from 'zustand';
 
 export type FlowsManagerStoreType = {
+  singleNodeDebuggingInfo: {
+    nodeId: string;
+    controller: unknown;
+  };
+  setSingleNodeDebuggingInfo: (singleNodeDebuggingInfo: {
+    nodeId: string;
+    controller: unknown;
+  }) => void;
   clearFlowCanvasModalInfo: {
     open: boolean;
   };

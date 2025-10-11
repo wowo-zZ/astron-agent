@@ -60,8 +60,7 @@ docker-compose logs -f
 
 ### 3. 访问服务
 
-- **控制台前端**: http://localhost:1881
-- **控制台Hub API**: http://localhost:8080
+- **控制台前端(nginx代理)**：http://localhost:80
 - **MinIO 控制台**: http://localhost:9001 (minioadmin/minioadmin123)
 
 ### 核心服务端口
@@ -125,7 +124,7 @@ docker-compose down -v
 ## 🌐 网络配置
 
 所有服务运行在 `astron-agent-network` 网络中：
-- 网段: 172.40.0.0/16 (可通过 NETWORK_SUBNET 配置)
+- 网段: 172.20.0.0/16 (可通过 NETWORK_SUBNET 配置)
 - 服务间通过服务名通信 (如: postgres:5432)
 
 ## 💾 数据持久化
@@ -137,76 +136,6 @@ docker-compose down -v
 - `elasticsearch_data` - Elasticsearch 索引
 - `kafka_data` - Kafka 消息
 - `minio_data` - MinIO 对象存储
-
-## 🔍 故障排除
-
-### 常见问题
-
-#### 1. 服务启动失败
-```bash
-# 查看详细错误信息
-docker-compose logs service-name
-
-# 检查资源使用情况
-docker stats
-
-# 检查端口占用
-netstat -tlnp | grep :8080
-```
-
-#### 2. 数据库连接失败
-```bash
-# 检查数据库服务状态
-docker-compose exec postgres pg_isready -U spark
-docker-compose exec mysql mysqladmin ping -h localhost
-
-# 重启数据库服务
-docker-compose restart postgres mysql
-```
-
-#### 3. 内存不足
-```bash
-# 减少中间件内存配置
-# 编辑 docker-compose.yaml
-ES_JAVA_OPTS: "-Xms256m -Xmx256m"
-
-# 或只启动必要服务
-docker-compose up -d postgres mysql redis console-hub console-frontend
-```
-
-#### 4. 镜像拉取失败
-```bash
-# 检查网络连接
-docker pull postgres:14
-
-# 使用国内镜像源
-# 编辑 /etc/docker/daemon.json
-{
-  "registry-mirrors": ["https://mirror.ccs.tencentyun.com"]
-}
-```
-
-### 性能优化
-
-#### 1. 资源分配
-```yaml
-# 在 docker-compose.yaml 中为服务添加资源限制
-deploy:
-  resources:
-    limits:
-      memory: 512M
-      cpus: '0.5'
-```
-
-#### 2. 数据库优化
-```bash
-# PostgreSQL
-shared_buffers = 256MB
-effective_cache_size = 1GB
-
-# MySQL
-innodb_buffer_pool_size = 512M
-```
 
 ## 📚 重要配置说明
 
@@ -224,19 +153,7 @@ POSTGRES_PASSWORD=spark123
 MYSQL_ROOT_PASSWORD=root123
 ```
 
-#### 2. 核心服务配置
-```bash
-# 各服务的端口配置
-CORE_TENANT_PORT=5052
-CORE_MEMORY_PORT=7990
-CORE_LINK_PORT=18888
-CORE_AITOOLS_PORT=18668
-CORE_AGENT_PORT=17870
-CORE_KNOWLEDGE_PORT=20010
-CORE_WORKFLOW_PORT=7880
-```
-
-#### 3. 外部服务集成配置
+#### 2. 外部服务集成配置
 ```bash
 # AI 工具服务配置
 AI_APP_ID=your-ai-app-id
@@ -262,19 +179,19 @@ RAGFLOW_TIMEOUT=60
 ### 镜像仓库
 
 所有服务镜像托管在 GitHub Container Registry:
-- `ghcr.io/lyj715824/astron-agent/core-tenant:latest`
-- `ghcr.io/lyj715824/astron-agent/core-memory:latest`
-- `ghcr.io/lyj715824/astron-agent/core-link:latest`
-- `ghcr.io/lyj715824/astron-agent/core-aitools:latest`
-- `ghcr.io/lyj715824/astron-agent/core-agent:latest`
-- `ghcr.io/lyj715824/astron-agent/core-knowledge:latest`
-- `ghcr.io/lyj715824/astron-agent/core-workflow:latest`
-- `ghcr.io/lyj715824/astron-agent/console-frontend:latest`
-- `ghcr.io/lyj715824/astron-agent/console-hub:latest`
+- `ghcr.io/iflytek/astron-agent/core-tenant:latest`
+- `ghcr.io/iflytek/astron-agent/core-memory:latest`
+- `ghcr.io/iflytek/astron-agent/core-link:latest`
+- `ghcr.io/iflytek/astron-agent/core-aitools:latest`
+- `ghcr.io/iflytek/astron-agent/core-agent:latest`
+- `ghcr.io/iflytek/astron-agent/core-knowledge:latest`
+- `ghcr.io/iflytek/astron-agent/core-workflow:latest`
+- `ghcr.io/iflytek/astron-agent/console-frontend:latest`
+- `ghcr.io/iflytek/astron-agent/console-hub:latest`
 
 ## 📚 其他资源
 
-- [astronAgent 官方文档](https://github.com/lyj715824/astron-agent)
+- [astronAgent 官方文档](https://github.com/iflytek/astron-agent)
 - [Docker Compose 官方文档](https://docs.docker.com/compose/)
 - [PostgreSQL 官方文档](https://www.postgresql.org/docs/)
 - [MySQL 官方文档](https://dev.mysql.com/doc/)

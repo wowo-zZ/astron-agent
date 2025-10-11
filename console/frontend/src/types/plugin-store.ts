@@ -1,3 +1,4 @@
+import React from 'react';
 //插件广场插件列表参数
 interface ListToolSquareParams {
   search?: string;
@@ -267,6 +268,23 @@ interface MCPToolDetail {
   /** SSE 服务的地址 URL */
   serverUrl: string;
 }
+interface UseMcpDetailProps {
+  handleInputParamsChange: (
+    toolIndex: number,
+    argIndex: number,
+    value: unknown
+  ) => void;
+  renderInput: (
+    arg: ToolArg,
+    toolIndex: number,
+    index: number
+  ) => React.ReactElement | undefined;
+  handleOpenTool: (toolIndex: number) => void;
+  handleDebugServerMCP: (
+    e: React.MouseEvent<HTMLButtonElement>,
+    toolIndex: number
+  ) => void;
+}
 
 export type {
   ListToolSquareParams,
@@ -283,4 +301,5 @@ export type {
   InputSchema,
   SchemaProperty,
   ToolArg,
+  UseMcpDetailProps,
 };

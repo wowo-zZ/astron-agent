@@ -1,9 +1,5 @@
 package com.iflytek.astron.console.hub.service.space.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
-import com.alibaba.excel.EasyExcel;
-import com.alibaba.excel.read.listener.ReadListener;
-import com.alibaba.fastjson2.JSONObject;
 import com.iflytek.astron.console.commons.constant.ResponseEnum;
 import com.iflytek.astron.console.commons.data.UserInfoDataService;
 import com.iflytek.astron.console.commons.dto.space.BatchChatUserVO;
@@ -12,7 +8,6 @@ import com.iflytek.astron.console.commons.dto.space.InviteRecordAddDTO;
 import com.iflytek.astron.console.commons.dto.space.InviteRecordVO;
 import com.iflytek.astron.console.commons.dto.space.UserLimitVO;
 import com.iflytek.astron.console.commons.entity.space.Enterprise;
-import com.iflytek.astron.console.commons.entity.space.EnterpriseUser;
 import com.iflytek.astron.console.commons.entity.space.InviteRecord;
 import com.iflytek.astron.console.commons.entity.space.Space;
 import com.iflytek.astron.console.commons.entity.space.SpaceUser;
@@ -25,7 +20,6 @@ import com.iflytek.astron.console.commons.util.RequestContextUtil;
 import com.iflytek.astron.console.commons.util.S3ClientUtil;
 import com.iflytek.astron.console.commons.util.space.EnterpriseInfoUtil;
 import com.iflytek.astron.console.commons.util.space.SpaceInfoUtil;
-import com.iflytek.astron.console.hub.dto.user.UserInfoExcelDTO;
 import com.iflytek.astron.console.hub.properties.InviteMessageTempProperties;
 import com.iflytek.astron.console.hub.properties.SpaceLimitProperties;
 import com.iflytek.astron.console.hub.service.notification.NotificationService;
@@ -56,8 +50,8 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for InviteRecordBizServiceImpl
- * Tests all public methods with comprehensive coverage of success and failure scenarios
+ * Unit tests for InviteRecordBizServiceImpl Tests all public methods with comprehensive coverage of
+ * success and failure scenarios
  */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("InviteRecordBizServiceImpl Unit Tests")
@@ -157,7 +151,7 @@ class InviteRecordBizServiceImplTest {
     @DisplayName("spaceInvite - Should successfully invite users to free space")
     void spaceInvite_Success_WhenInvitingToFreeSpace() {
         try (MockedStatic<SpaceInfoUtil> mockedSpaceInfo = mockStatic(SpaceInfoUtil.class);
-             MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class)) {
+                MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class)) {
 
             // Arrange
             List<InviteRecordAddDTO> dtos = Arrays.asList(testInviteDto);
@@ -175,7 +169,7 @@ class InviteRecordBizServiceImplTest {
             when(inviteRecordService.saveBatch(any())).thenAnswer(invocation -> {
                 List<InviteRecord> records = invocation.getArgument(0);
                 for (int i = 0; i < records.size(); i++) {
-                    records.get(i).setId((long)(i + 1));
+                    records.get(i).setId((long) (i + 1));
                 }
                 return true;
             });
@@ -270,7 +264,7 @@ class InviteRecordBizServiceImplTest {
     @DisplayName("enterpriseInvite - Should successfully invite users to enterprise")
     void enterpriseInvite_Success_WhenInvitingToEnterprise() {
         try (MockedStatic<EnterpriseInfoUtil> mockedEnterpriseInfo = mockStatic(EnterpriseInfoUtil.class);
-             MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class)) {
+                MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class)) {
 
             // Arrange
             List<InviteRecordAddDTO> dtos = Arrays.asList(testInviteDto);
@@ -288,7 +282,7 @@ class InviteRecordBizServiceImplTest {
             when(inviteRecordService.saveBatch(any())).thenAnswer(invocation -> {
                 List<InviteRecord> records = invocation.getArgument(0);
                 for (int i = 0; i < records.size(); i++) {
-                    records.get(i).setId((long)(i + 1));
+                    records.get(i).setId((long) (i + 1));
                 }
                 return true;
             });
@@ -655,7 +649,7 @@ class InviteRecordBizServiceImplTest {
 
             // Act & Assert
             BusinessException exception = assertThrows(BusinessException.class,
-                () -> inviteRecordBizService.getRecordByParam(encryptedParam));
+                    () -> inviteRecordBizService.getRecordByParam(encryptedParam));
             assertEquals(ResponseEnum.INVITE_PARAMETER_EXCEPTION, exception.getResponseEnum());
         }
     }
@@ -671,7 +665,7 @@ class InviteRecordBizServiceImplTest {
 
             // Act & Assert
             BusinessException exception = assertThrows(BusinessException.class,
-                () -> inviteRecordBizService.getRecordByParam(encryptedParam));
+                    () -> inviteRecordBizService.getRecordByParam(encryptedParam));
             assertEquals(ResponseEnum.INVITE_RECORD_NOT_FOUND, exception.getResponseEnum());
         }
     }

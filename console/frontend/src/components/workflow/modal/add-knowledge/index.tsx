@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { configListRepos } from '@/services/knowledge';
 import { debounce } from 'lodash';
 import dayjs from 'dayjs';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import { generateKnowledgeOutput } from '@/components/workflow/utils/reactflowUtils';
 import {
   KnowledgeItem,

@@ -3,19 +3,17 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   handleAgentStatus,
-  getMCPServiceDetail,
-  getAgentInputParams,
+  // getPreparationData,
+  // getAgentPublishStatus,
   type AgentInputParam,
 } from '@/services/release-management';
 import {
-  cancelBindWx,
   getBotInfo,
-  getWechatAuthUrl,
+  // getWechatAuthUrl,
   publishMCP,
-  getMcpContent,
-  getChainInfo,
+  // getMcpContent,
+  // getChainInfo,
 } from '@/services/spark-common';
-import { getInputsType } from '@/services/flow';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import eventBus from '@/utils/event-bus';
@@ -36,7 +34,6 @@ interface MultiModeCpnProps {
   showInfoModel?: any;
   show: boolean;
   onCancel?: any;
-  isV1?: any;
   updateData?: any;
   fabuFlag?: any;
   setIsOpenapi?: any;
@@ -47,6 +44,7 @@ interface MultiModeCpnProps {
   agentType?: any;
   moreParams?: any;
   workflowId?: number;
+  agentMassId?: string | null;
 }
 
 const WxModal: React.FC<MultiModeCpnProps> = ({
@@ -56,7 +54,6 @@ const WxModal: React.FC<MultiModeCpnProps> = ({
   showInfoModel,
   show,
   onCancel, //关闭弹窗
-  isV1,
   updateData,
   fabuFlag,
   setIsOpenapi,
@@ -67,9 +64,10 @@ const WxModal: React.FC<MultiModeCpnProps> = ({
   agentType,
   moreParams,
   workflowId,
+  agentMassId,
 }) => {
-  let i = 0;
-  let flag = false;
+  const i = 0;
+  const flag = false;
   const [form] = Form.useForm();
   const botInfo = useBotStateStore(state => state.botDetailInfo);
   const setBotDetailInfo = useBotStateStore(state => state.setBotDetailInfo);
@@ -103,6 +101,7 @@ const WxModal: React.FC<MultiModeCpnProps> = ({
     }
   };
 
+  /** 绑定微信 */
   const handleBind = (): void => {
     if (!appid.length) {
       message.warning(t('releaseModal.appidEmpty'));
@@ -111,32 +110,66 @@ const WxModal: React.FC<MultiModeCpnProps> = ({
     if (!botInfo) {
       return;
     }
-    getChainInfo(botInfo.botId).then(res => {
-      const redirectUrl =
-        'https://' + window.location.host + `/work_flow/${res.massId}/overview`;
-      setSpinning(true);
-      getWechatAuthUrl(botInfo.botId, appid, redirectUrl)
-        .then(res => {
-          const url = res.data;
-          if (url.includes('https://')) window.open(url, '_blank');
-          else window.open('https://' + url, '_blank');
-          onCancel();
-        })
-        .catch(error => {
-          message.error(error.msg);
-        })
-        .finally(() => setSpinning(false));
-    });
+
+    // NOTE: 新的应该是微信信息 -- 绑定到微信
+    // getAgentPublishStatus(botInfo.botId as number).then(res => {
+    //   console.log('123-------', res);
+    // });
+
+    const redirectUrl =
+      'https://' + window.location.host + `/work_flow/${agentMassId}/overview`;
+    const params = {
+      publishType: 'WECHAT' as const,
+      action: 'PUBLISH' as const,
+      publishData: { appId: appid, redirectUrl },
+    };
+    setSpinning(true);
+
+    handleAgentStatus(botInfo.botId as number, params)
+      .then((res: any) => {
+        // const url = res.data;
+        // if (url.includes('https://')) window.open(url, '_blank');
+        // else window.open('https://' + url, '_blank');
+        // onCancel();
+      })
+      .catch(error => {
+        message.error(error.msg);
+      })
+      .finally(() => setSpinning(false));
+
+    // NOTE: origin logic
+    // getChainInfo(botInfo.botId).then(res => {
+    //   const redirectUrl =
+    //     'https://' + window.location.host + `/work_flow/${res.massId}/overview`;
+    //   setSpinning(true);
+    //   getWechatAuthUrl(botInfo.botId, appid, redirectUrl)
+    //     .then(res => {
+    //       const url = res.data;
+    //       if (url.includes('https://')) window.open(url, '_blank');
+    //       else window.open('https://' + url, '_blank');
+    //       onCancel();
+    //     })
+    //     .catch(error => {
+    //       message.error(error.msg);
+    //     })
+    //     .finally(() => setSpinning(false));
+    // });
   };
 
-  //解绑
+  // 解绑微信
   const handleEndBind = (): void => {
     setSpinning(true);
     if (!botInfo) {
       setSpinning(false);
       return;
     }
-    cancelBindWx({ appid: botInfo.wechatAppid, botId: botInfo.botId })
+    const params = {
+      publishType: 'WECHAT' as const,
+      action: 'OFFLINE' as const,
+      publishData: { appId: botInfo.wechatAppid as string },
+    };
+
+    handleAgentStatus(botInfo.botId as number, params)
       .then(res => {
         getBotInfo({ botId: botInfo.botId }).then((res: any) => {
           setUnBindStatus(false);
@@ -213,13 +246,11 @@ const WxModal: React.FC<MultiModeCpnProps> = ({
       setQufabuFlag(true);
     }
 
-    // console.log('handlePublish---------', botInfo);
-
     // 提交审核
     handleAgentStatus((botInfo?.botId as number) || (workflowId as number), {
-      action: 'PUBLISH',
-      reason: '',
-      publishType: 'MARKET',
+      action: 'PUBLISH' as const,
+      publishType: 'MARKET' as const,
+      publishData: {},
     })
       .then(() => {
         // onCancel();
@@ -240,53 +271,53 @@ const WxModal: React.FC<MultiModeCpnProps> = ({
     return;
   };
 
-  /** ## 发布为mcp 逻辑 */
-  const handleMcpPublish = async (): Promise<void> => {
-    if (moreParams) {
-      return;
-    }
+  /** ## 发布为mcp 逻辑 -- NOTE: Publishing as mcp is currently not supported - 2025.10 */
+  // const handleMcpPublish = async (): Promise<void> => {
+  //   if (moreParams) {
+  //     return;
+  //   }
 
-    getMCPServiceDetail(botInfo?.botId as number).then((resp: any) => {
-      setReleased(resp?.released);
+  //   getMCPServiceDetail(botInfo?.botId as number).then((resp: any) => {
+  //     setReleased(resp?.released);
 
-      // MARK: 这里外部已经调用了一次吧? 怎么又调用了
-      getAgentInputParams(botInfo?.botId as number).then(
-        (res: AgentInputParam[]) => {
-          const arr: AgentInputParam[] = [...res];
-          arr.forEach((item: AgentInputParam, index: number) => {
-            if (Object.prototype.hasOwnProperty.call(item, 'allowedFileType')) {
-              i = index;
-              return (flag = true);
-            }
-            return;
-          });
-          if (flag) {
-            setArgs(arr);
-            setEditData({
-              botName: resp ? resp.serverName : botInfo?.botName,
-              botDesc: resp ? resp.description : botInfo?.botDesc,
-              name: arr?.[i]?.name ?? '',
-              type: arr?.[i]?.allowedFileType?.[0] ?? '',
-              default: arr?.[i]?.schema?.default ?? '',
-              content: resp?.content,
-            });
-          } else {
-            setArgs(arr);
-            setEditData({
-              botName: resp ? resp.serverName : botInfo?.botName,
-              botDesc: resp ? resp.description : botInfo?.botDesc,
-              name: arr?.[0]?.name ?? '',
-              type: arr?.[0]?.allowedFileType?.[0] ?? '',
-              default: arr?.[0]?.schema?.default ?? '',
-              content: resp?.content,
-            });
-          }
-          setIsMcpOpen(true);
-          // onCancel();
-        }
-      );
-    });
-  };
+  //     // MARK: 这里外部已经调用了一次吧? 怎么又调用了
+  //     getAgentInputParams(botInfo?.botId as number).then(
+  //       (res: AgentInputParam[]) => {
+  //         const arr: AgentInputParam[] = [...res];
+  //         arr.forEach((item: AgentInputParam, index: number) => {
+  //           if (Object.prototype.hasOwnProperty.call(item, 'allowedFileType')) {
+  //             i = index;
+  //             return (flag = true);
+  //           }
+  //           return;
+  //         });
+  //         if (flag) {
+  //           setArgs(arr);
+  //           setEditData({
+  //             botName: resp ? resp.serverName : botInfo?.botName,
+  //             botDesc: resp ? resp.description : botInfo?.botDesc,
+  //             name: arr?.[i]?.name ?? '',
+  //             type: arr?.[i]?.allowedFileType?.[0] ?? '',
+  //             default: arr?.[i]?.schema?.default ?? '',
+  //             content: resp?.content,
+  //           });
+  //         } else {
+  //           setArgs(arr);
+  //           setEditData({
+  //             botName: resp ? resp.serverName : botInfo?.botName,
+  //             botDesc: resp ? resp.description : botInfo?.botDesc,
+  //             name: arr?.[0]?.name ?? '',
+  //             type: arr?.[0]?.allowedFileType?.[0] ?? '',
+  //             default: arr?.[0]?.schema?.default ?? '',
+  //             content: resp?.content,
+  //           });
+  //         }
+  //         setIsMcpOpen(true);
+  //         // onCancel();
+  //       }
+  //     );
+  //   });
+  // };
 
   useEffect(() => {
     setIsClickFabu(false);
@@ -302,23 +333,21 @@ const WxModal: React.FC<MultiModeCpnProps> = ({
 
   return (
     <>
-      {isV1 ? (
-        <Modal
-          centered
-          open={show}
-          onCancel={onCancel}
-          footer={null}
-          wrapClassName="wx-modal"
-        >
-          <Spin spinning={spinning}>
-            {unBindStatus ? (
-              <>
-                <div className={styles.header}>
-                  {t('releaseModal.unBindTip')}
-                </div>
-                <div className={styles.tip}>
-                  {t('releaseModal.unBindTipDesc')}
-                  <br />
+      <Modal
+        centered
+        open={show}
+        onCancel={onCancel}
+        footer={null}
+        width={700}
+        wrapClassName="wx-modal"
+      >
+        <Spin spinning={spinning}>
+          {unBindStatus ? (
+            <>
+              <div className={styles.header}>{t('releaseModal.unBindTip')}</div>
+              <div className={styles.tip}>
+                <div>{t('releaseModal.unBindTipDesc')}</div>
+                <div>
                   {t('releaseModal.unBindTipDesc2')}
                   <a
                     className={styles.wx_link}
@@ -330,323 +359,226 @@ const WxModal: React.FC<MultiModeCpnProps> = ({
                   </a>
                   {t('releaseModal.unBindTipDesc4')}
                 </div>
-                <div className={styles.bottom_btn}>
-                  <div
-                    className={styles.cancel}
-                    onClick={() => setUnBindStatus(false)}
-                  >
-                    {t('releaseModal.cancel')}
-                  </div>
-                  <div className={styles.confirm} onClick={handleEndBind}>
-                    {t('releaseModal.ok')}
-                  </div>
+              </div>
+              <div className={styles.bottom_btn}>
+                <div
+                  className={styles.cancel}
+                  onClick={() => setUnBindStatus(false)}
+                >
+                  {t('releaseModal.cancel')}
                 </div>
-              </>
-            ) : (
-              <>
-                <div className={styles.header}>
-                  {t('releaseModal.releasePlatformWx')}
+                <div className={styles.confirm} onClick={handleEndBind}>
+                  {t('releaseModal.ok')}
                 </div>
-                <div className={styles.tip}>
-                  {t('releaseModal.releasePlatformWxTip2')}
-                </div>
-                {botInfo?.wechatRelease ? (
-                  <>
-                    <div className={styles.id_header}>
-                      {t('releaseModal.bindWxAppId')}
-                    </div>
-                    <Input
-                      placeholder={t('global.input')}
-                      value={(botInfo.wechatAppid as string) || ''}
-                      onKeyDown={e => {
-                        e.stopPropagation();
-                      }}
-                      disabled
+              </div>
+            </>
+          ) : (
+            <>
+              <div className={styles.header}>
+                <div>{t('releaseModal.applyRelease')}</div>
+                {moreParams && (
+                  <div className={styles.headertip}>
+                    <ExclamationCircleOutlined
+                      className={styles.ExclamationCircleOutlined}
                     />
-                    <div className={styles.edit_btn_wrap}>
+                    {t('releaseModal.multiParamsTip')}
+                  </div>
+                )}
+              </div>
+              <div className={styles.pingtai}>
+                <span className={styles.xinghao}>*</span>
+                {t('releaseModal.releasePlatform')}
+              </div>
+              <div className={styles.tip}>
+                {t('releaseModal.releasePlatformTip')}
+              </div>
+              <div>
+                <div
+                  className={cls(styles.spark_fabu, {
+                    [styles.spark_fabuactive as string]: fabuActive,
+                  })}
+                  onClick={() => {
+                    setWxfabuActive(false);
+                    setApifabuActive(false);
+                    setFabuActive(true);
+                  }}
+                >
+                  <div className={styles.text_title}>
+                    <img
+                      className={styles.xinghuoImg}
+                      src={xinghuoImg}
+                      alt=""
+                    />
+                    <div>
                       <div
-                        className={styles.cancel_bind}
-                        onClick={() => setUnBindStatus(true)}
+                        className={cls(styles.text_sparktop, {
+                          [styles.text_sparktopactive as string]: fabuActive,
+                        })}
                       >
-                        {t('releaseModal.unBind')}
+                        {t('releaseModal.sparkAgent')}
+                      </div>
+                      <div className={styles.text_sparkbottom}>
+                        {t('releaseModal.sparkAgentTip')}
                       </div>
                     </div>
-                  </>
-                ) : (
-                  <>
-                    <div className={styles.id_header}>
-                      {t('releaseModal.wxAppId')}
-                    </div>
-                    <Input
-                      placeholder={t('global.input')}
-                      onChange={e => setAppid(e.target.value)}
-                      onKeyDown={e => {
-                        e.stopPropagation();
-                      }}
-                      value={appid}
-                    />
-                    <div className={styles.warning} ref={waringRef}>
-                      {t('releaseModal.wxAppIdTip')}
-                    </div>
-                    <div className={styles.next_btn} onClick={handleBind}>
-                      {t('releaseModal.bindWxTip')}
-                    </div>
-                  </>
-                )}
-              </>
-            )}
-          </Spin>
-        </Modal>
-      ) : (
-        <Modal
-          centered
-          open={show}
-          onCancel={onCancel}
-          footer={null}
-          width={700}
-          wrapClassName="wx-modal"
-        >
-          <Spin spinning={spinning}>
-            {unBindStatus ? (
-              <>
-                <div className={styles.header}>
-                  {t('releaseModal.unBindTip')}
-                </div>
-                <div className={styles.tip}>
-                  <div>{t('releaseModal.unBindTipDesc')}</div>
-                  <div>
-                    {t('releaseModal.unBindTipDesc2')}
-                    <a
-                      className={styles.wx_link}
-                      href="https://mp.weixin.qq.com/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {t('releaseModal.unBindTipDesc3')}
-                    </a>
-                    {t('releaseModal.unBindTipDesc4')}
                   </div>
-                </div>
-                <div className={styles.bottom_btn}>
                   <div
-                    className={styles.cancel}
-                    onClick={() => setUnBindStatus(false)}
+                    className={cls(styles.queren, {
+                      [styles.disableButton as string]: botMultiFileParam,
+                    })}
+                    onClick={handlePublish}
                   >
-                    {t('releaseModal.cancel')}
+                    {(Array.isArray(botInfo?.releaseType) &&
+                      botInfo.releaseType.includes(1)) ||
+                    isClickFabu
+                      ? t('releaseModal.updateRelease')
+                      : t('releaseModal.release')}
                   </div>
-                  <div className={styles.confirm} onClick={handleEndBind}>
-                    {t('releaseModal.ok')}
-                  </div>
                 </div>
-              </>
-            ) : (
-              <>
-                <div className={styles.header}>
-                  <div>{t('releaseModal.applyRelease')}</div>
-                  {moreParams && (
-                    <div className={styles.headertip}>
-                      <ExclamationCircleOutlined
-                        className={styles.ExclamationCircleOutlined}
-                      />
-                      {t('releaseModal.multiParamsTip')}
-                    </div>
-                  )}
-                </div>
-                <div className={styles.pingtai}>
-                  <span className={styles.xinghao}>*</span>
-                  {t('releaseModal.releasePlatform')}
-                </div>
-                <div className={styles.tip}>
-                  {t('releaseModal.releasePlatformTip')}
-                </div>
-                <div>
+                {(agentType == 'workflow' ||
+                  window.location.pathname.includes('work_flow')) && (
                   <div
-                    className={cls(styles.spark_fabu, {
-                      [styles.spark_fabuactive as string]: fabuActive,
+                    className={cls(styles.wx_fabu, {
+                      [styles.wx_fabuactive as string]: wxfabuActive,
                     })}
                     onClick={() => {
-                      setWxfabuActive(false);
+                      setWxfabuActive(true);
+                      setFabuActive(false);
+                      setMcpfabuActive(false);
                       setApifabuActive(false);
-                      setFabuActive(true);
+                    }}
+                    onKeyDown={e => {
+                      if (e.ctrlKey && e.key === 'v') {
+                        e.stopPropagation();
+                      }
                     }}
                   >
-                    <div className={styles.text_title}>
-                      <img
-                        className={styles.xinghuoImg}
-                        src={xinghuoImg}
-                        alt=""
-                      />
-                      <div>
-                        <div
-                          className={cls(styles.text_sparktop, {
-                            [styles.text_sparktopactive as string]: fabuActive,
-                          })}
-                        >
-                          {t('releaseModal.sparkAgent')}
-                        </div>
-                        <div className={styles.text_sparkbottom}>
-                          {t('releaseModal.sparkAgentTip')}
-                        </div>
-                      </div>
+                    <div>
+                      <img className={styles.wxImg} src={wxImg} alt="" />
                     </div>
-                    <div
-                      className={cls(styles.queren, {
-                        [styles.disableButton as string]: botMultiFileParam,
-                      })}
-                      onClick={handlePublish}
-                    >
-                      {(Array.isArray(botInfo?.releaseType) &&
-                        botInfo.releaseType.includes(1)) ||
-                      isClickFabu
-                        ? t('releaseModal.updateRelease')
-                        : t('releaseModal.release')}
-                    </div>
-                  </div>
-                  {(agentType == 'workflow' ||
-                    window.location.pathname.includes('work_flow')) && (
-                    <div
-                      className={cls(styles.wx_fabu, {
-                        [styles.wx_fabuactive as string]: wxfabuActive,
-                      })}
-                      onClick={() => {
-                        setWxfabuActive(true);
-                        setFabuActive(false);
-                        setMcpfabuActive(false);
-                        setApifabuActive(false);
-                      }}
-                      onKeyDown={e => {
-                        if (e.ctrlKey && e.key === 'v') {
-                          e.stopPropagation();
-                        }
-                      }}
-                    >
-                      <div>
-                        <img className={styles.wxImg} src={wxImg} alt="" />
+                    <div className={styles.wx_right}>
+                      <div
+                        className={cls(styles.wx_text, {
+                          [styles.wx_textactive as string]: wxfabuActive,
+                        })}
+                      >
+                        {t('releaseModal.releasePlatformWx')}
                       </div>
-                      <div className={styles.wx_right}>
-                        <div
-                          className={cls(styles.wx_text, {
-                            [styles.wx_textactive as string]: wxfabuActive,
-                          })}
-                        >
-                          {t('releaseModal.releasePlatformWx')}
+                      <div className={styles.tip}>
+                        {t('releaseModal.releasePlatformWxTip')}
+                      </div>
+                      {Array.isArray(botInfo?.releaseType) &&
+                      botInfo.releaseType.includes(3) ? (
+                        <div className={styles.wx_flex}>
+                          <div className={styles.id_header}>
+                            {t('releaseModal.wxAppId')}：
+                          </div>
+                          <Input
+                            placeholder={t('global.input')}
+                            value={(botInfo.wechatAppid as string) || ''}
+                            onKeyDown={e => {
+                              e.stopPropagation();
+                            }}
+                            className={styles.id_input}
+                            disabled
+                          />
+                          <div className={styles.edit_btn_wrap}>
+                            <div
+                              className={styles.cancel_bind}
+                              onClick={() => setUnBindStatus(true)}
+                            >
+                              {t('releaseModal.unBind')}
+                            </div>
+                          </div>
                         </div>
-                        <div className={styles.tip}>
-                          {t('releaseModal.releasePlatformWxTip')}
-                        </div>
-                        {Array.isArray(botInfo?.releaseType) &&
-                        botInfo.releaseType.includes(3) ? (
+                      ) : (
+                        <>
                           <div className={styles.wx_flex}>
                             <div className={styles.id_header}>
-                              {t('releaseModal.wxAppId')}：
+                              {t('releaseModal.wxAppId')}
+                              <span className={styles.wx_xinghao}>*</span>
                             </div>
                             <Input
+                              className={styles.id_input}
                               placeholder={t('global.input')}
-                              value={(botInfo.wechatAppid as string) || ''}
+                              onChange={e => setAppid(e.target.value)}
                               onKeyDown={e => {
                                 e.stopPropagation();
                               }}
-                              className={!isV1 ? styles.id_input : ''}
-                              disabled
+                              value={appid}
+                              style={{ fontWeight: 'lighter' }}
                             />
-                            <div className={styles.edit_btn_wrap}>
-                              <div
-                                className={styles.cancel_bind}
-                                onClick={() => setUnBindStatus(true)}
-                              >
-                                {t('releaseModal.unBind')}
-                              </div>
+                            <div className={styles.warning} ref={waringRef}>
+                              {t('releaseModal.wxAppIdTip')}
+                            </div>
+                            <div
+                              className={cls(styles.next_btnV2, {
+                                [styles.disableButton as string]: moreParams,
+                              })}
+                              onClick={() => {
+                                if (moreParams) {
+                                  return;
+                                }
+                                handleBind();
+                              }}
+                            >
+                              {t('releaseModal.bindWx')}{' '}
                             </div>
                           </div>
-                        ) : (
-                          <>
-                            <div className={styles.wx_flex}>
-                              <div className={styles.id_header}>
-                                {t('releaseModal.wxAppId')}
-                                <span className={styles.wx_xinghao}>*</span>
-                              </div>
-                              <Input
-                                className={!isV1 ? styles.id_input : ''}
-                                placeholder={t('global.input')}
-                                onChange={e => setAppid(e.target.value)}
-                                onKeyDown={e => {
-                                  e.stopPropagation();
-                                }}
-                                value={appid}
-                                style={{ fontWeight: 'lighter' }}
-                              />
-                              <div className={styles.warning} ref={waringRef}>
-                                {t('releaseModal.wxAppIdTip')}
-                              </div>
-                              <div
-                                className={cls(styles.next_btnV2, {
-                                  [styles.disableButton as string]: moreParams,
-                                })}
-                                onClick={() => {
-                                  if (moreParams) {
-                                    return;
-                                  }
-                                  // TODO: 绑定微信还没提供接口
-                                  handleBind();
-                                }}
-                              >
-                                {t('releaseModal.bindWx')}
-                              </div>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                  <div
-                    className={cls(styles.spark_fabu, {
-                      [styles.spark_apifabuActive as string]: apifabuActive,
-                    })}
-                    onClick={() => {
-                      if (botInfo) {
-                        navigate(
-                          `/management/botApi?id=${botInfo.botId}&version=${botInfo.version}`
-                        );
-                      }
-                      setWxfabuActive(false);
-                      setFabuActive(false);
-                      setMcpfabuActive(false);
-                      setApifabuActive(true);
-                    }}
-                  >
-                    <div className={styles.text_title}>
-                      <img className={styles.xinghuoImg} src={apiImg} alt="" />
-                      <div>
-                        <div
-                          className={cls(styles.text_sparktop, {
-                            [styles.text_sparktopactive as string]:
-                              apifabuActive,
-                          })}
-                        >
-                          {t('releaseModal.releaseToApi')}
-                        </div>
-                        <div className={styles.text_sparkbottom}>
-                          {t('releaseModal.apiConfigTip')}
-                        </div>
-                      </div>
-                    </div>
-                    <div
-                      className={styles.peizhiApi}
-                      onClick={() => {
-                        setIsOpenapi(true);
-                        if (currentNew == 'intro') {
-                          setCurrentNew('api');
-                        }
-                        // onCancel();
-                      }}
-                    >
-                      {Array.isArray(botInfo?.releaseType) &&
-                      botInfo.releaseType.includes(2)
-                        ? t('releaseModal.updateConfigure')
-                        : t('releaseModal.configure')}
+                        </>
+                      )}
                     </div>
                   </div>
-                  {(agentType == 'workflow' ||
+                )}
+                <div
+                  className={cls(styles.spark_fabu, {
+                    [styles.spark_apifabuActive as string]: apifabuActive,
+                  })}
+                  onClick={() => {
+                    if (botInfo) {
+                      navigate(
+                        `/management/bot-api?id=${botInfo.botId}&version=${botInfo.version}`
+                      );
+                    }
+                    setWxfabuActive(false);
+                    setFabuActive(false);
+                    setMcpfabuActive(false);
+                    setApifabuActive(true);
+                  }}
+                >
+                  <div className={styles.text_title}>
+                    <img className={styles.xinghuoImg} src={apiImg} alt="" />
+                    <div>
+                      <div
+                        className={cls(styles.text_sparktop, {
+                          [styles.text_sparktopactive as string]: apifabuActive,
+                        })}
+                      >
+                        {t('releaseModal.releaseToApi')}
+                      </div>
+                      <div className={styles.text_sparkbottom}>
+                        {t('releaseModal.apiConfigTip')}
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    className={styles.peizhiApi}
+                    onClick={() => {
+                      setIsOpenapi(true);
+                      if (currentNew == 'intro') {
+                        setCurrentNew('api');
+                      }
+                      // onCancel();
+                    }}
+                  >
+                    {Array.isArray(botInfo?.releaseType) &&
+                    botInfo.releaseType.includes(2)
+                      ? t('releaseModal.updateConfigure')
+                      : t('releaseModal.configure')}
+                  </div>
+                </div>
+                {/* NOTE: publishing as mcp is currently not supported - 2025.10 */}
+                {/* {(agentType == 'workflow' ||
                     window.location.pathname.includes('work_flow')) && (
                     <div
                       className={cls(styles.mcp_fabu, {
@@ -692,13 +624,13 @@ const WxModal: React.FC<MultiModeCpnProps> = ({
                           : t('releaseModal.configure')}
                       </div>
                     </div>
-                  )}
-                </div>
-              </>
-            )}
-          </Spin>
-        </Modal>
-      )}
+                  )} */}
+              </div>
+            </>
+          )}
+        </Spin>
+      </Modal>
+
       <Modal
         okText={
           released ? t('releaseModal.updateRelease') : t('releaseModal.ok')

@@ -17,8 +17,13 @@ import {
   FlowCascader,
   FLowCollapse,
 } from '@/components/workflow/ui';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
-import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
+import { useNodeCommon } from '@/components/workflow/hooks/use-node-common';
+import {
+  UseConditionActionsReturnProps,
+  UseInputHelpersReturnProps,
+  UseNotInModalReturnProps,
+} from '@/components/workflow/types';
 
 import inputAddIcon from '@/assets/imgs/workflow/input-add-icon.png';
 import remove from '@/assets/imgs/workflow/input-remove-icon.png';
@@ -28,7 +33,7 @@ import arrowDownIcon from '@/assets/imgs/workflow/arrow-down-icon.png';
 import { conditions } from '@/constants';
 
 const ModalContext = createContext<string | null>(null);
-const CaseTitle = ({ item, mode }) => {
+const CaseTitle = ({ item, mode }): React.ReactElement => {
   const { t } = useTranslation();
   return (
     <div className="flex items-center mt-2">
@@ -58,7 +63,7 @@ const OperatorSelect = ({
   operatorRef,
   operatorId,
   handleOperatorChange,
-}) => {
+}): React.ReactElement => {
   const { t } = useTranslation();
   return (
     <div className="flex-shrink-0 w-[50px] mr-4 my-4">
@@ -92,7 +97,7 @@ const OperatorSelect = ({
                 onClick={(e): void => {
                   e.stopPropagation();
                   setOperatorId('');
-                  handleOperatorChange(item.id, 'and');
+                  handleOperatorChange('and');
                 }}
                 style={{
                   display: item.logicalOperator === 'and' ? 'none' : 'flex',
@@ -105,7 +110,7 @@ const OperatorSelect = ({
                 onClick={e => {
                   e.stopPropagation();
                   setOperatorId('');
-                  handleOperatorChange(item.id, 'or');
+                  handleOperatorChange('or');
                 }}
                 style={{
                   display: item.logicalOperator === 'or' ? 'none' : 'flex',
@@ -140,7 +145,7 @@ const ConditionRow = ({
   handleNotInClick,
   getTextArray,
   handleRemoveLine,
-}) => {
+}): React.ReactElement => {
   const { t } = useTranslation();
   return (
     <div>
@@ -309,7 +314,7 @@ const ConditionList = ({
   handleNotInClick,
   getTextArray,
   handleRemoveLine,
-}) => {
+}): React.ReactElement => {
   return (
     <div className="flex w-full">
       {item?.conditions.length > 1 && (
@@ -354,7 +359,7 @@ const useConditionActions = ({
   autoSaveCurrentFlow,
   canPublishSetNot,
   fieldOptions,
-}) => {
+}): UseConditionActionsReturnProps => {
   const handleAddLine = useCallback(() => {
     takeSnapshot();
     setNode(id, old => {
@@ -412,9 +417,8 @@ const useConditionActions = ({
     [takeSnapshot]
   );
   const handleOperatorChange = useCallback(
-    (caseId, value): void => {
+    (value): void => {
       setNode(id, old => {
-        // const currentCase = old.data.nodeParam.casles.find(item => item.id === caseId)
         const currentCase = old.data.nodeParam.cases[0];
         currentCase.logicalOperator = value;
         return {
@@ -481,7 +485,7 @@ const useConditionActions = ({
   };
 };
 
-const useInputHelpers = ({ inputs }) => {
+const useInputHelpers = ({ inputs }): UseInputHelpersReturnProps => {
   const curentInput = useCallback(
     (activeCondition): unknown => {
       return inputs?.find(input => input.id === activeCondition.varIndex);
@@ -509,7 +513,7 @@ const useNotInModal = ({
   id,
   delayCheckNode,
   modal,
-}) => {
+}): UseNotInModalReturnProps => {
   const { t } = useTranslation();
   const checkArrayElementsType = (arr, type): boolean => {
     if (!arr || arr.length === 0) return true;

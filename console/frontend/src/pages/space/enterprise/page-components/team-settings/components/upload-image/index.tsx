@@ -7,6 +7,7 @@ import Cropper from 'react-easy-crop';
 import { compressImage } from '@/utils';
 import { updateLogo } from '@/services/enterprise-auth-api';
 import useEnterpriseStore from '@/store/enterprise-store';
+import { uploadFile } from '@/utils/utils';
 // 定义认证状态枚举
 export enum CertificationStatus {
   NOT_CERTIFIED = 'not_certified', // 未认证
@@ -105,6 +106,37 @@ const UploadImage: React.FC<UploadImageProps> = ({
     };
   };
 
+  // Convert FormData to File for upload
+  const convertFormDataToFile = (formData: FormData): File | null => {
+    const fileEntry =
+      (formData.get('file') as File) || (formData.get('avatar') as File);
+    return fileEntry || null;
+  };
+
+  const handleOk = async () => {
+    if (!formData) {
+      message.info('图片处理未完成，请稍候...');
+      return;
+    }
+
+    const file = convertFormDataToFile(formData);
+    if (!file) {
+      message.error('无法获取图片文件');
+      return;
+    }
+
+    try {
+      const result = await uploadFile(file, 'space');
+      if (result?.url) {
+        onSuccess(result?.url);
+      }
+    } catch (error: any) {
+      message.error(error?.message || '上传失败');
+    }
+
+    setVisible(false);
+  };
+
   return (
     <>
       <input
@@ -123,12 +155,7 @@ const UploadImage: React.FC<UploadImageProps> = ({
         style={{ height: '600px' }}
         width={600}
         maskClosable={false}
-        onOk={() => {
-          uploadBotImg(formData as FormData).then(res => {
-            onSuccess(res);
-            setVisible(false);
-          });
-        }}
+        onOk={handleOk}
       >
         {uploadedSrc && (
           <div

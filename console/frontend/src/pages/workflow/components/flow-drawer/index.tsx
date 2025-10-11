@@ -6,7 +6,7 @@ import VersionManagement from '@/components/workflow/drawer/version-management';
 import NodeDetail from '@/components/workflow/drawer/node-detail';
 import ChatResult from '@/components/workflow/drawer/chat-result';
 import CodeIDEA from '@/components/workflow/drawer/code-idea';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 
 function index(): React.ReactElement {
   const versionManagement = useFlowsManager(state => state.versionManagement);

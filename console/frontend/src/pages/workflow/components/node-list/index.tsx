@@ -1,8 +1,8 @@
 import React, { useState, memo, useMemo } from 'react';
 import { Tooltip } from 'antd';
 import { useTranslation } from 'react-i18next';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
-import { useFlowCommon } from '@/components/workflow/hooks/useFlowCommon';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
+import { useFlowCommon } from '@/components/workflow/hooks/use-flow-common';
 import NodeDetail from '@/components/workflow/modal/node-detail';
 import { generateRandomPosition } from '@/components/workflow/utils/reactflowUtils';
 

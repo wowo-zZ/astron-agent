@@ -23,8 +23,8 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 
 /**
- * Market publish strategy implementation
- * Handles bot publishing to market channel using event-driven architecture
+ * Market publish strategy implementation Handles bot publishing to market channel using
+ * event-driven architecture
  */
 @Slf4j
 @Component
@@ -39,7 +39,7 @@ public class MarketPublishStrategy implements PublishStrategy {
     @Override
     public ApiResult<Object> publish(Integer botId, Object publishData, String currentUid, Long spaceId) {
         log.info("Publishing bot to market: botId={}, currentUid={}, spaceId={}", botId, currentUid, spaceId);
-        
+
         try {
             // 1. Validate bot permission
             int hasPermission = chatBotBaseMapper.checkBotPermission(botId, currentUid, spaceId);
@@ -82,10 +82,10 @@ public class MarketPublishStrategy implements PublishStrategy {
             eventPublisher.publishEvent(new BotPublishStatusChangedEvent(
                     this, botId, currentUid, spaceId, "PUBLISH",
                     currentStatus, newStatus, newChannels));
-            
+
             log.info("Market publish completed successfully: botId={}", botId);
             return ApiResult.success(null);
-                
+
         } catch (Exception e) {
             log.error("Market publish failed: botId={}, error={}", botId, e.getMessage(), e);
             throw e;
@@ -95,7 +95,7 @@ public class MarketPublishStrategy implements PublishStrategy {
     @Override
     public ApiResult<Object> offline(Integer botId, Object publishData, String currentUid, Long spaceId) {
         log.info("Offlining bot from market: botId={}, currentUid={}, spaceId={}", botId, currentUid, spaceId);
-        
+
         try {
             // 1. Validate bot permission
             int hasPermission = chatBotBaseMapper.checkBotPermission(botId, currentUid, spaceId);
@@ -124,10 +124,10 @@ public class MarketPublishStrategy implements PublishStrategy {
             eventPublisher.publishEvent(new BotPublishStatusChangedEvent(
                     this, botId, currentUid, spaceId, "OFFLINE",
                     currentStatus, newStatus, newChannels));
-            
-           log.info("Market offline completed successfully: botId={}", botId);
-           return ApiResult.success(null);
-            
+
+            log.info("Market offline completed successfully: botId={}", botId);
+            return ApiResult.success(null);
+
         } catch (Exception e) {
             log.error("Market offline failed: botId={}, error={}", botId, e.getMessage(), e);
             throw e;
@@ -140,12 +140,11 @@ public class MarketPublishStrategy implements PublishStrategy {
     }
 
     /**
-     * Handle bot market data synchronization
-     * Common logic for both instructional and workflow bots
+     * Handle bot market data synchronization Common logic for both instructional and workflow bots
      */
-    public void handleBotMarketSync(Integer botId, String uid, Long spaceId, 
-                                   Integer newStatus, String newChannels, boolean isFirstPublish) {
-        log.info("Syncing bot data to market table: botId={}, uid={}, isFirstPublish={}", 
+    public void handleBotMarketSync(Integer botId, String uid, Long spaceId,
+            Integer newStatus, String newChannels, boolean isFirstPublish) {
+        log.info("Syncing bot data to market table: botId={}, uid={}, isFirstPublish={}",
                 botId, uid, isFirstPublish);
 
         if (isFirstPublish) {
@@ -158,8 +157,8 @@ public class MarketPublishStrategy implements PublishStrategy {
     }
 
     /**
-     * Insert bot market record (used for first time publishing)
-     * Sync complete data from chat_bot_base to chat_bot_market
+     * Insert bot market record (used for first time publishing) Sync complete data from chat_bot_base
+     * to chat_bot_market
      */
     private void insertBotMarketRecord(Integer botId, String uid, Long spaceId, Integer status, String channels) {
         // First query bot basic information
@@ -170,7 +169,7 @@ public class MarketPublishStrategy implements PublishStrategy {
 
         // Create market record with complete data sync
         ChatBotMarket marketRecord = new ChatBotMarket();
-        
+
         // Basic information
         marketRecord.setBotId(botId);
         marketRecord.setUid(uid);
@@ -178,22 +177,22 @@ public class MarketPublishStrategy implements PublishStrategy {
         marketRecord.setBotDesc(botBase.getBotDesc());
         marketRecord.setAvatar(botBase.getAvatar());
         marketRecord.setBotType(botBase.getBotType());
-        
+
         // Core configuration
         marketRecord.setPrompt(botBase.getPrompt());
         marketRecord.setPrologue(botBase.getPrologue());
         marketRecord.setVersion(botBase.getVersion());
-        
+
         // Background images
         marketRecord.setPcBackground(botBase.getPcBackground());
         marketRecord.setAppBackground(botBase.getAppBackground());
-        
+
         // Functional configuration
         marketRecord.setSupportContext(botBase.getSupportContext());
-        
+
         // Market-specific fields
         marketRecord.setShowIndex(0); // Default not recommended
-        
+
         // Status and channel management
         marketRecord.setBotStatus(status);
         marketRecord.setPublishChannels(channels);
@@ -207,13 +206,13 @@ public class MarketPublishStrategy implements PublishStrategy {
             throw new BusinessException(ResponseEnum.BOT_UPDATE_FAILED);
         }
 
-        log.info("Created bot market record: botId={}, version={}, status={}, channels={}", 
+        log.info("Created bot market record: botId={}, version={}, status={}, channels={}",
                 botId, botBase.getVersion(), status, channels);
     }
 
     /**
-     * Sync bot data from chat_bot_base to chat_bot_market (for existing records)
-     * When re-publishing, sync all latest data to ensure consistency
+     * Sync bot data from chat_bot_base to chat_bot_market (for existing records) When re-publishing,
+     * sync all latest data to ensure consistency
      */
     private void syncBotDataToMarket(Integer botId, String uid, Long spaceId, Integer newStatus, String newChannels) {
         // Query latest bot data
@@ -223,51 +222,50 @@ public class MarketPublishStrategy implements PublishStrategy {
         }
 
         // Build update wrapper to sync all data fields
-        com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper<ChatBotMarket> updateWrapper = 
+        com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper<ChatBotMarket> updateWrapper =
                 new com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper<>();
-        
+
         updateWrapper.eq("bot_id", botId)
-                     .eq("uid", uid);
+                .eq("uid", uid);
 
         // Sync all data fields from chat_bot_base to ensure data consistency
         updateWrapper.set("bot_name", botBase.getBotName())
-                     .set("bot_desc", botBase.getBotDesc())
-                     .set("avatar", botBase.getAvatar())
-                     .set("bot_type", botBase.getBotType())
-                     .set("prompt", botBase.getPrompt())
-                     .set("prologue", botBase.getPrologue())
-                     .set("version", botBase.getVersion())
-                     .set("pc_background", botBase.getPcBackground())
-                     .set("app_background", botBase.getAppBackground())
-                     .set("support_context", botBase.getSupportContext())
-                     .set("bot_status", newStatus)
-                     .set("publish_channels", newChannels)
-                     .set("update_time", LocalDateTime.now());
+                .set("bot_desc", botBase.getBotDesc())
+                .set("avatar", botBase.getAvatar())
+                .set("bot_type", botBase.getBotType())
+                .set("prompt", botBase.getPrompt())
+                .set("prologue", botBase.getPrologue())
+                .set("version", botBase.getVersion())
+                .set("pc_background", botBase.getPcBackground())
+                .set("app_background", botBase.getAppBackground())
+                .set("support_context", botBase.getSupportContext())
+                .set("bot_status", newStatus)
+                .set("publish_channels", newChannels)
+                .set("update_time", LocalDateTime.now());
 
         int updateCount = chatBotMarketMapper.update(null, updateWrapper);
         if (updateCount == 0) {
             throw new BusinessException(ResponseEnum.BOT_UPDATE_FAILED);
         }
 
-        log.info("Synced bot data to market: botId={}, version={}, status={}, channels={}", 
+        log.info("Synced bot data to market: botId={}, version={}, status={}, channels={}",
                 botId, botBase.getVersion(), newStatus, newChannels);
     }
 
     /**
-     * Handle bot market offline operation
-     * Only update status and channels for offline operation
+     * Handle bot market offline operation Only update status and channels for offline operation
      */
     private void handleBotMarketOffline(Integer botId, String uid, Long spaceId, Integer newStatus, String newChannels) {
-        log.info("Handling bot market offline: botId={}, uid={}, status={}, channels={}", 
+        log.info("Handling bot market offline: botId={}, uid={}, status={}, channels={}",
                 botId, uid, newStatus, newChannels);
 
         // Only update status and channels for offline operation
         int updateCount = chatBotMarketMapper.updatePublishStatus(botId, uid, spaceId, newStatus, newChannels);
         if (updateCount == 0) {
-            log.warn("Bot offline update failed, record not found: botId={}, uid={}, spaceId={}", 
+            log.warn("Bot offline update failed, record not found: botId={}, uid={}, spaceId={}",
                     botId, uid, spaceId);
         } else {
-            log.info("Bot offline update successful: botId={}, status={}, channels={}", 
+            log.info("Bot offline update successful: botId={}, status={}, channels={}",
                     botId, newStatus, newChannels);
         }
     }

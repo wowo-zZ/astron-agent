@@ -37,6 +37,98 @@ interface FeedbackModalProps {
   onCancel: () => void;
 }
 
+const FeedbackForm = ({
+  form,
+  detailMode,
+  previewImages,
+  uploadProps,
+}): React.ReactElement => {
+  return (
+    <Form form={form} layout="vertical">
+      <Form.Item
+        name="description"
+        label={i18next.t('workflow.promptDebugger.feedbackContent')}
+        rules={[
+          {
+            required: true,
+            message: i18next.t(
+              'workflow.promptDebugger.pleaseEnterFeedbackContent'
+            ),
+          },
+          {
+            max: 1000,
+            message: i18next.t(
+              'workflow.promptDebugger.feedbackContentMaxLength'
+            ),
+          },
+        ]}
+        required={!detailMode}
+      >
+        <TextArea
+          rows={4}
+          showCount={!detailMode}
+          maxLength={1000}
+          placeholder={i18next.t('workflow.promptDebugger.feedbackPlaceholder')}
+          className={classNames('!border-[#E4EAFF]', '!leading-6', {
+            '!bg-[#F7F7FA]': detailMode,
+          })}
+          style={{ resize: 'none', height: detailMode ? '136px' : '150px' }}
+          styles={{
+            count: {
+              paddingBottom: '2px',
+              fontWeight: 'normal',
+              color: '#B2B2B2',
+            },
+          }}
+          disabled={detailMode}
+        />
+      </Form.Item>
+
+      <Form.Item
+        name="picUrl"
+        label={i18next.t('workflow.promptDebugger.uploadImage')}
+        getValueFromEvent={e => {
+          if (Array.isArray(e)) return e;
+          return e && e.fileList;
+        }}
+        hidden={detailMode && previewImages.length === 0}
+      >
+        {detailMode ? (
+          <div className="flex flex-wrap gap-[12px]">
+            {previewImages.map((url, index) => (
+              <div
+                key={index}
+                className="w-[139px] h-[104px] border border-solid border-[#E4EAFF] rounded-[12px] overflow-hidden"
+              >
+                <Image
+                  src={url}
+                  className="object-cover"
+                  width={'100%'}
+                  height={'100%'}
+                  alt=""
+                />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <Upload.Dragger {...uploadProps} className={styles.feedbackUpload}>
+            <img src={uploadAct} className="w-10 h-10" alt="" />
+            <div className="mt-6 font-[500]">
+              {i18next.t('workflow.promptDebugger.dragFileHereOr')}
+              <span className="text-[#275EFF]">
+                {i18next.t('workflow.promptDebugger.selectFile')}
+              </span>
+            </div>
+            <p className="mt-2 text-desc">
+              {i18next.t('workflow.promptDebugger.supportUploadFormat')}
+            </p>
+          </Upload.Dragger>
+        )}
+      </Form.Item>
+    </Form>
+  );
+};
+
 const FeedbackDialog: React.FC<FeedbackModalProps> = props => {
   const { visible, detailMode, flowId, botId, sid, detail, onCancel } = props;
   const [form] = Form.useForm();
@@ -88,7 +180,7 @@ const FeedbackDialog: React.FC<FeedbackModalProps> = props => {
     onCancel();
   };
 
-  const beforeUpload = (file: RcFile, files: RcFile[]): boolean => {
+  const beforeUpload = (file: RcFile, files: RcFile[]): boolean | string => {
     const totalFiles =
       fileList.filter(file => file.status !== 'error').length + files.length;
     if (totalFiles > 10) {
@@ -183,90 +275,12 @@ const FeedbackDialog: React.FC<FeedbackModalProps> = props => {
           </div>
         </div>
       )}
-      <Form form={form} layout="vertical">
-        <Form.Item
-          name="description"
-          label={i18next.t('workflow.promptDebugger.feedbackContent')}
-          rules={[
-            {
-              required: true,
-              message: i18next.t(
-                'workflow.promptDebugger.pleaseEnterFeedbackContent'
-              ),
-            },
-            {
-              max: 1000,
-              message: i18next.t(
-                'workflow.promptDebugger.feedbackContentMaxLength'
-              ),
-            },
-          ]}
-          required={!detailMode}
-        >
-          <TextArea
-            rows={4}
-            showCount={!detailMode}
-            maxLength={1000}
-            placeholder={i18next.t(
-              'workflow.promptDebugger.feedbackPlaceholder'
-            )}
-            className={classNames('!border-[#E4EAFF]', '!leading-6', {
-              '!bg-[#F7F7FA]': detailMode,
-            })}
-            style={{ resize: 'none', height: detailMode ? '136px' : '150px' }}
-            styles={{
-              count: {
-                paddingBottom: '2px',
-                fontWeight: 'normal',
-                color: '#B2B2B2',
-              },
-            }}
-            disabled={detailMode}
-          />
-        </Form.Item>
-
-        <Form.Item
-          name="picUrl"
-          label={i18next.t('workflow.promptDebugger.uploadImage')}
-          getValueFromEvent={e => {
-            if (Array.isArray(e)) return e;
-            return e && e.fileList;
-          }}
-          hidden={detailMode && previewImages.length === 0}
-        >
-          {detailMode ? (
-            <div className="flex flex-wrap gap-[12px]">
-              {previewImages.map((url, index) => (
-                <div
-                  key={index}
-                  className="w-[139px] h-[104px] border border-solid border-[#E4EAFF] rounded-[12px] overflow-hidden"
-                >
-                  <Image
-                    src={url}
-                    className="object-cover"
-                    width={'100%'}
-                    height={'100%'}
-                    alt=""
-                  />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <Upload.Dragger {...uploadProps} className={styles.feedbackUpload}>
-              <img src={uploadAct} className="w-10 h-10" alt="" />
-              <div className="mt-6 font-[500]">
-                {i18next.t('workflow.promptDebugger.dragFileHereOr')}
-                <span className="text-[#275EFF]">
-                  {i18next.t('workflow.promptDebugger.selectFile')}
-                </span>
-              </div>
-              <p className="mt-2 text-desc">
-                {i18next.t('workflow.promptDebugger.supportUploadFormat')}
-              </p>
-            </Upload.Dragger>
-          )}
-        </Form.Item>
-      </Form>
+      <FeedbackForm
+        form={form}
+        detailMode={detailMode}
+        previewImages={previewImages}
+        uploadProps={uploadProps}
+      />
     </Modal>
   );
 };

@@ -1,6 +1,6 @@
 import React, { useCallback, memo } from 'react';
 import { BaseEdge, EdgeLabelRenderer, getBezierPath, Edge } from 'reactflow';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 
 // 类型导入
 import { CustomEdgeProps } from '@/components/workflow/types';

@@ -3,19 +3,11 @@ import { createPortal } from 'react-dom';
 import { isJSON } from '@/utils';
 import { useMemoizedFn } from 'ahooks';
 import { Input, Button, Spin } from 'antd';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
-import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
+import { useNodeCommon } from '@/components/workflow/hooks/use-node-common';
 import { WebSocketMessage } from '@/components/workflow/types';
 import { Icons } from '@/components/workflow/icons';
-
-const wsOrigin =
-  import.meta.env.MODE === 'development' || import.meta.env.MODE === 'test'
-    ? 'dev-agent.xfyun.cn'
-    : window.location.host;
-const wsType =
-  import.meta.env.MODE === 'development' || import.meta.env.MODE === 'test'
-    ? `ws://`
-    : `wss://`;
+import { getWsFixedUrl } from '@/components/workflow/utils';
 
 const { TextArea } = Input;
 
@@ -50,7 +42,7 @@ function PromptModal(): React.ReactElement {
     setOptimizationPrompt(() => '');
     wsMessageStatus.current = 'start';
     setIsReciving(true);
-    const url = wsType + wsOrigin + '/xingchen-api/prompt-enhance';
+    const url = getWsFixedUrl('/prompt-enhance');
     wsRef.current = new WebSocket(url);
     wsRef.current.onopen = (): void => {
       if (wsRef.current) {

@@ -134,7 +134,7 @@ class RPAServer:
         uvicorn_config = uvicorn.Config(
             app=rpa_server_app(),
             host="0.0.0.0",
-            port=int(os.getenv(const.SERVICE_PORT_KEY, "19999")),
+            port=int(os.getenv(const.SERVICE_PORT_KEY, "17198")),
             workers=20,
             reload=False,
             # log_config=None

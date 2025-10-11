@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 
 /**
  * Feishu publish prepare data DTO
- * 
+ *
  * @author Omuigix
  */
 @Data

@@ -119,10 +119,10 @@ export const useMoreIcons = ({
       setBotIcon(previewIcon as { value: string; name: string; code: string });
       setBotColor(previewColor);
     } else if (activeTab === 'upload') {
-      setBotIcon({ ...botIcon, value: uploadImageObject.s3Key });
+      setBotIcon({ ...botIcon, value: uploadImageObject.downloadLink });
       setBotColor('');
     } else {
-      setBotIcon({ ...botIcon, value: generateImageObject.s3Key });
+      setBotIcon({ ...botIcon, value: generateImageObject.downloadLink });
       setBotColor('');
     }
 
@@ -154,7 +154,7 @@ export const useMoreIcons = ({
 
   const uploadProps = {
     name: 'file',
-    action: '/xingchen-api/image/upload',
+    action: '/image/upload',
     showUploadList: false,
     headers: {
       Authorization: `Bearer ${localStorage.getItem('accessToken')}`,

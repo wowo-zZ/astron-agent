@@ -1,12 +1,12 @@
 import React, { useMemo, useEffect, useState } from 'react';
 import { Drawer } from 'antd';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import { useMemoizedFn } from 'ahooks';
 import NodeOperation from '@/components/workflow/nodes/components/node-operation';
 import { Label } from '@/components/workflow/nodes/node-common';
 import cloneDeep from 'lodash/cloneDeep';
 import { nodeTypeComponentMap } from '@/components/workflow/constant';
-import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import { useNodeCommon } from '@/components/workflow/hooks/use-node-common';
 
 // 类型导入
 import {

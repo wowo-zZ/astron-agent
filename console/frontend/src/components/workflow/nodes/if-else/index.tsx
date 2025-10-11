@@ -9,11 +9,11 @@ import {
   FlowCascader,
   FlowNodeInput,
 } from '@/components/workflow/ui';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import { compareOperators } from '@/constants';
 import { SourceHandle } from '@/components/workflow/nodes/components/handle';
-import { useIfElseNodeCompareOperator } from '@/components/workflow/hooks/useIfElseNodeCompareOperator';
-import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import { useIfElseNodeCompareOperator } from '@/components/workflow/hooks/use-if-else-node-compare-operator';
+import { useNodeCommon } from '@/components/workflow/hooks/use-node-common';
 import { useMemoizedFn } from 'ahooks';
 
 import inputAddIcon from '@/assets/imgs/workflow/input-add-icon.png';

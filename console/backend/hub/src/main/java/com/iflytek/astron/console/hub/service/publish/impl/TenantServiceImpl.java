@@ -43,19 +43,21 @@ public class TenantServiceImpl implements TenantService {
         requestBody.put("dev_id", 1);
         requestBody.put("cloud_id", "0");
 
-        RequestBody body = RequestBody.create(MediaType.parse("application/json"), requestBody.toJSONString());
+        RequestBody requestBodyForPost = RequestBody.create(MediaType.parse("application/json"), requestBody.toJSONString());
         Request request = new Request.Builder()
                 .url(createApp)
-                .method("POST", body)
+                .method("POST", requestBodyForPost)
                 .build();
 
         JSONObject reqJson = new JSONObject();
         try (Response response = HTTP_CLIENT.newCall(request).execute()) {
-            if ((!response.isSuccessful()) || (response.body() == null)) {
+            ResponseBody body = response.body();
+            if ((!response.isSuccessful()) || (body == null)) {
                 log.error("tenant-service-create-app error request:  {}, response: {}", requestBody, reqJson);
                 return null;
             }
-            reqJson = JSONObject.parseObject(response.body().string());
+            String responseBody = body.string();
+            reqJson = JSONObject.parseObject(responseBody);
             if (reqJson.getInteger("code") == 0 && reqJson.containsKey("data") && reqJson.getJSONObject("data").containsKey("app_id")) {
                 return reqJson.getJSONObject("data").getString("app_id");
             } else {
@@ -77,11 +79,13 @@ public class TenantServiceImpl implements TenantService {
 
         JSONObject reqJson = new JSONObject();
         try (Response response = HTTP_CLIENT.newCall(request).execute()) {
-            if ((!response.isSuccessful()) || (response.body() == null)) {
+            ResponseBody body = response.body();
+            if ((!response.isSuccessful()) || (body == null)) {
                 log.error("tenant-service-get-app-detail  error requestUrl: {}, response: {}", requestUrl, reqJson);
                 return null;
             }
-            reqJson = JSONObject.parseObject(response.body().string());
+            String responseBody = body.string();
+            reqJson = JSONObject.parseObject(responseBody);
             if (reqJson.getInteger("code") == 0 && reqJson.containsKey("data")
                     && reqJson.getJSONArray("data").getJSONObject(0).containsKey("auth_list")) {
                 return JSONArray.parseArray(reqJson.getJSONArray("data").getJSONObject(0).getString("auth_list"), TenantAuth.class).get(0);

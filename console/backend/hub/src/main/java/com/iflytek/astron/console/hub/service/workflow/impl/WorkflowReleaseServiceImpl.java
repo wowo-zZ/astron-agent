@@ -135,6 +135,8 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
     private String getNextVersionName(String flowId, Long spaceId) {
         log.info("Getting next workflow version name: flowId={}, spaceId={}", flowId, spaceId);
 
+        String fallbackVersion = "v" + System.currentTimeMillis();
+
         try {
             // Build request parameters
             JSONObject requestBody = new JSONObject();
@@ -154,17 +156,27 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
             }
 
             try (Response response = okHttpClient.newCall(requestBuilder.build()).execute()) {
+                ResponseBody body = response.body();
+                String responseBody = body != null ? body.string() : null;
+
                 if (!response.isSuccessful()) {
-                    log.error("Failed to get next version name: flowId={}, responseCode={}", flowId, response.code());
-                    // Fallback strategy - generate timestamp-based version
-                    return "v" + System.currentTimeMillis();
+                    log.error("Failed to get next version name: flowId={}, responseCode={}, response={}",
+                            flowId, response.code(), responseBody);
+                    return fallbackVersion;
                 }
 
-                String responseBody = response.body().string();
-                log.debug("Get next version name response: {}", responseBody);
+                if (!StringUtils.hasText(responseBody)) {
+                    log.warn("Empty response while getting next version name: flowId={}", flowId);
+                    return fallbackVersion;
+                }
 
-                // Parse response
                 JSONObject responseJson = JSON.parseObject(responseBody);
+                if (responseJson == null) {
+                    log.warn("Failed to parse response while getting version name: flowId={}, response={}",
+                            flowId, responseBody);
+                    return fallbackVersion;
+                }
+
                 JSONObject data = responseJson.getJSONObject("data");
 
                 if (data != null && data.containsKey("workflowVersionName")) {
@@ -173,42 +185,40 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
                     return versionName;
                 }
 
-                log.warn("Version name not found in response: flowId={}", flowId);
-                // Fallback strategy - generate timestamp-based version
-                return "v" + System.currentTimeMillis();
+                log.warn("Version name not found in response: flowId={}, response={}", flowId, responseBody);
+                return fallbackVersion;
             }
 
         } catch (Exception e) {
             log.error("Exception occurred while getting next workflow version name: flowId={}, spaceId={}", flowId, spaceId, e);
-            // Fallback strategy - generate timestamp-based version
-            return "v" + System.currentTimeMillis();
+            return fallbackVersion;
         }
     }
 
     /**
-     * Check if a workflow version already exists for the given botId and versionName
-     * Reference: old project's VersionService.getVersionSysData method
+     * Check if a workflow version already exists for the given botId and versionName Reference: old
+     * project's VersionService.getVersionSysData method
      */
     private boolean isVersionExists(Integer botId, String versionName) {
         log.info("Checking if version exists: botId={}, versionName={}", botId, versionName);
-        
+
         try {
             // Query workflow_version table to check if version exists
             LambdaQueryWrapper<WorkflowVersion> queryWrapper = new LambdaQueryWrapper<WorkflowVersion>()
                     .eq(WorkflowVersion::getBotId, botId.toString()) // botId is stored as String in WorkflowVersion
                     .eq(WorkflowVersion::getName, versionName)
                     .last("LIMIT 1");
-            
+
             WorkflowVersion existingVersion = workflowVersionMapper.selectOne(queryWrapper);
-            
+
             boolean exists = existingVersion != null;
-            log.debug("Version exists check result: botId={}, versionName={}, exists={}", 
+            log.debug("Version exists check result: botId={}, versionName={}, exists={}",
                     botId, versionName, exists);
-            
+
             return exists;
-            
+
         } catch (Exception e) {
-            log.error("Failed to check if version exists: botId={}, versionName={}", 
+            log.error("Failed to check if version exists: botId={}, versionName={}",
                     botId, versionName, e);
             // In case of error, assume version doesn't exist to allow creation
             return false;
@@ -221,7 +231,7 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
         try {
             String jsonBody = JSON.toJSONString(request);
             String authHeader = getAuthorizationHeader();
-            
+
             if (authHeader.isEmpty()) {
                 return createErrorResponse("No authorization header available");
             }
@@ -235,24 +245,34 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
                     .build();
 
             try (Response response = okHttpClient.newCall(httpRequest).execute()) {
+                ResponseBody body = response.body();
+                String responseBody = body != null ? body.string() : null;
+
                 if (!response.isSuccessful()) {
                     log.error("Failed to create workflow version: statusCode={}, response={}",
-                            response.code(), response.body().string());
+                            response.code(), responseBody);
                     return createErrorResponse("Failed to create version: HTTP " + response.code());
                 }
 
-                String responseBody = response.body().string();
+                if (!StringUtils.hasText(responseBody)) {
+                    log.error("Empty response when creating workflow version");
+                    return createErrorResponse("响应数据格式错误");
+                }
+
                 log.debug("Create workflow version response: {}", responseBody);
 
-                // Parse response
                 JSONObject responseJson = JSON.parseObject(responseBody);
+                if (responseJson == null) {
+                    log.error("Failed to parse workflow version response: {}", responseBody);
+                    return createErrorResponse("响应数据格式错误");
+                }
+
                 JSONObject data = responseJson.getJSONObject("data");
 
                 if (data != null) {
                     WorkflowReleaseResponseDto result = new WorkflowReleaseResponseDto();
                     result.setSuccess(true);
 
-                    // 提取版本ID和版本名称
                     if (data.containsKey("workflowVersionId")) {
                         result.setWorkflowVersionId(data.getLong("workflowVersionId"));
                     }
@@ -291,7 +311,7 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
 
             // 2. 使用 MaasUtil 的 createApi 方法进行发布和绑定
             maasUtil.createApi(flowId, appId, versionName, versionData);
-            
+
             log.info("同步工作流到API系统成功: botId={}, flowId={}, versionName={}", botId, flowId, versionName);
 
         } catch (Exception e) {
@@ -360,7 +380,7 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
 
             String jsonBody = requestBody.toJSONString();
             String authHeader = getAuthorizationHeader();
-            
+
             if (authHeader.isEmpty()) {
                 log.error("No authorization header available for audit result update");
                 return false;
@@ -375,17 +395,29 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
                     .build();
 
             try (Response response = okHttpClient.newCall(httpRequest).execute()) {
+                ResponseBody body = response.body();
+                String responseBody = body != null ? body.string() : null;
+
                 if (!response.isSuccessful()) {
-                    log.error("Failed to update audit result: versionId={}, auditResult={}, responseCode={}",
-                            versionId, auditResult, response.code());
+                    log.error("Failed to update audit result: versionId={}, auditResult={}, responseCode={}, response={}",
+                            versionId, auditResult, response.code(), responseBody);
                     return false;
                 }
 
-                String responseBody = response.body().string();
+                if (!StringUtils.hasText(responseBody)) {
+                    log.error("Empty response when updating audit result: versionId={}, auditResult={}",
+                            versionId, auditResult);
+                    return false;
+                }
+
                 log.debug("Update audit result response: {}", responseBody);
 
-                // Parse response to check result
                 JSONObject responseJson = JSON.parseObject(responseBody);
+                if (responseJson == null) {
+                    log.error("Failed to parse audit result response: versionId={}, response={}", versionId, responseBody);
+                    return false;
+                }
+
                 Integer code = responseJson.getInteger("code");
 
                 if (code != null && code.equals(0)) {
@@ -429,9 +461,9 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
             LambdaQueryWrapper<ChatBotApi> queryWrapper = new LambdaQueryWrapper<ChatBotApi>()
                     .eq(ChatBotApi::getBotId, botId)
                     .last("LIMIT 1");
-            
+
             ChatBotApi chatBotApi = chatBotApiMapper.selectOne(queryWrapper);
-            
+
             if (chatBotApi != null && chatBotApi.getAppId() != null) {
                 log.debug("Found appId for botId {}: {}", botId, chatBotApi.getAppId());
                 return chatBotApi.getAppId();

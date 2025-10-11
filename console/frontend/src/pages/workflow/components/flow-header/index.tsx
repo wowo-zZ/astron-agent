@@ -1,7 +1,7 @@
 import React, { useMemo, useState, ReactNode, memo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import FlowEdit from '@/components/workflow/modal/flow-edit';
 import dayjs from 'dayjs';
 

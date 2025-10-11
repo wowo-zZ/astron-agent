@@ -7,15 +7,23 @@ import com.iflytek.astron.console.commons.entity.bot.UserLangChainInfo;
 import com.iflytek.astron.console.hub.dto.PageResponse;
 import com.iflytek.astron.console.commons.constant.ResponseEnum;
 import com.iflytek.astron.console.commons.dto.bot.BotListRequestDto;
-import com.iflytek.astron.console.commons.dto.bot.BotPublishQueryResult;
-import com.iflytek.astron.console.commons.dto.bot.BotQueryCondition;
-import com.iflytek.astron.console.commons.dto.workflow.WorkflowInputsResponseDto;
-import com.iflytek.astron.console.commons.entity.bot.UserLangChainInfo;
-import com.iflytek.astron.console.commons.entity.model.McpData;
+import com.iflytek.astron.console.hub.dto.publish.BotPublishInfoDto;
+import com.iflytek.astron.console.hub.dto.publish.BotDetailResponseDto;
+import com.iflytek.astron.console.hub.dto.publish.BotVersionVO;
+import com.iflytek.astron.console.hub.dto.publish.BotSummaryStatsVO;
+import com.iflytek.astron.console.hub.dto.publish.BotTimeSeriesResponseDto;
+import com.iflytek.astron.console.hub.dto.publish.BotTimeSeriesStatsVO;
+import com.iflytek.astron.console.hub.dto.publish.WechatAuthUrlResponseDto;
+import com.iflytek.astron.console.hub.dto.publish.BotTraceRequestDto;
+import com.iflytek.astron.console.hub.dto.publish.UnifiedPrepareDto;
+import com.iflytek.astron.console.hub.dto.publish.prepare.*;
+import com.iflytek.astron.console.hub.dto.publish.prepare.WechatPrepareDto;
+import com.iflytek.astron.console.commons.enums.bot.ReleaseTypeEnum;
+import com.iflytek.astron.console.commons.service.data.UserLangChainDataService;
 import com.iflytek.astron.console.commons.enums.PublishChannelEnum;
 import com.iflytek.astron.console.commons.enums.ShelfStatusEnum;
-import com.iflytek.astron.console.commons.enums.bot.ReleaseTypeEnum;
-import com.iflytek.astron.console.commons.exception.BusinessException;
+import com.iflytek.astron.console.commons.mapper.bot.ChatBotMarketMapper;
+import com.iflytek.astron.console.hub.mapper.BotDashboardCountLogMapper;
 import com.iflytek.astron.console.commons.mapper.bot.ChatBotBaseMapper;
 import com.iflytek.astron.console.commons.mapper.bot.ChatBotMarketMapper;
 import com.iflytek.astron.console.commons.mapper.model.McpDataMapper;
@@ -23,12 +31,10 @@ import com.iflytek.astron.console.commons.service.data.UserLangChainDataService;
 import com.iflytek.astron.console.commons.util.BotFileParamUtil;
 import com.iflytek.astron.console.hub.converter.BotPublishConverter;
 import com.iflytek.astron.console.hub.converter.WorkflowVersionConverter;
-import com.iflytek.astron.console.hub.dto.PageResponse;
-import com.iflytek.astron.console.hub.dto.publish.*;
-import com.iflytek.astron.console.hub.dto.publish.prepare.*;
-import com.iflytek.astron.console.hub.entity.BotConversationStats;
-import com.iflytek.astron.console.hub.event.BotPublishStatusChangedEvent;
-import com.iflytek.astron.console.hub.mapper.BotConversationStatsMapper;
+import com.iflytek.astron.console.hub.service.publish.PublishChannelService;
+import com.iflytek.astron.console.hub.service.wechat.WechatThirdpartyService;
+import com.iflytek.astron.console.commons.dto.bot.BotPublishQueryResult;
+import com.iflytek.astron.console.hub.entity.BotDashboardCountLog;
 import com.iflytek.astron.console.hub.service.publish.BotPublishService;
 import com.iflytek.astron.console.hub.service.publish.PublishChannelService;
 import com.iflytek.astron.console.hub.service.publish.WorkflowInputService;
@@ -49,7 +55,7 @@ import java.util.stream.Collectors;
 
 /**
  * Bot Publishing Management Service Implementation
- * <p>
+ *
  * Unified bot publishing management service implementation, including: - Bot list query and detail
  * retrieval - Publishing status management (publish/take offline) - Version management - Statistics
  * data query
@@ -67,11 +73,6 @@ public class BotPublishServiceImpl implements BotPublishService {
     private final PublishChannelService publishChannelService;
     private final WechatThirdpartyService wechatThirdpartyService;
     private final ApplicationEventPublisher eventPublisher;
-    private final WorkflowInputService workflowInputService;
-    private final McpDataMapper mcpDataMapper;
-
-    @Value("${maas.mcpHost}")
-    private String mcpHost;
     private final UserLangChainDataService userLangChainDataService;
 
     // Version management related
@@ -79,7 +80,7 @@ public class BotPublishServiceImpl implements BotPublishService {
     private final WorkflowVersionConverter workflowVersionConverter;
 
     // Statistics data related
-    private final BotConversationStatsMapper botConversationStatsMapper;
+    private final BotDashboardCountLogMapper botDashboardCountLogMapper;
 
     @Override
     public PageResponse<BotPublishInfoDto> getBotList(
@@ -180,7 +181,7 @@ public class BotPublishServiceImpl implements BotPublishService {
         }
 
         // 2. Query summary statistics data
-        BotSummaryStatsVO summaryStats = botConversationStatsMapper.selectSummaryStats(botId, null, null);
+        BotSummaryStatsVO summaryStats = botDashboardCountLogMapper.selectSummaryStats(botId, null, null);
         if (summaryStats == null) {
             // If no statistics data, return default values (using primitive type long, will be 0 automatically)
             summaryStats = new BotSummaryStatsVO();
@@ -194,7 +195,7 @@ public class BotPublishServiceImpl implements BotPublishService {
 
     @Override
     public BotTimeSeriesResponseDto getBotTimeSeriesStats(Integer botId, Integer overviewDays,
-                                                          String currentUid, Long currentSpaceId) {
+            String currentUid, Long currentSpaceId) {
         log.info("Get bot time series statistics: botId={}, overviewDays={}, uid={}, spaceId={}",
                 botId, overviewDays, currentUid, currentSpaceId);
 
@@ -206,7 +207,7 @@ public class BotPublishServiceImpl implements BotPublishService {
 
         // 2. Query time series statistics data
         LocalDate startDate = LocalDate.now().minusDays(overviewDays);
-        List<BotTimeSeriesStatsVO> timeSeriesStats = botConversationStatsMapper.selectTimeSeriesStats(
+        List<BotTimeSeriesStatsVO> timeSeriesStats = botDashboardCountLogMapper.selectTimeSeriesStats(
                 botId, startDate, null, null);
 
         // 3. Build time series data response
@@ -223,31 +224,31 @@ public class BotPublishServiceImpl implements BotPublishService {
     }
 
     @Override
-    public void recordConversationStats(String uid, Long spaceId, Integer botId, Long chatId,
-                                        String sid, Integer tokenConsumed, Integer messageRounds) {
-        log.info("Record conversation statistics: uid={}, spaceId={}, botId={}, chatId={}, tokenConsumed={}, messageRounds={}",
+    public void recordDashboardCountLog(String uid, Long spaceId, Integer botId, Long chatId,
+            String sid, Integer tokenConsumed, Integer messageRounds) {
+        log.info("Record dashboard count log: uid={}, spaceId={}, botId={}, chatId={}, tokenConsumed={}, messageRounds={}",
                 uid, spaceId, botId, chatId, tokenConsumed, messageRounds);
 
         try {
-            BotConversationStats stats = BotConversationStats.createBuilder()
+            BotDashboardCountLog countLog = BotDashboardCountLog.createBuilder()
                     .uid(uid)
-                    .spaceId(spaceId)
                     .botId(botId)
+                    .channel(1)
                     .chatId(chatId)
+                    .chatTime(0)
+                    .token(tokenConsumed)
                     .sid(sid)
-                    .tokenConsumed(tokenConsumed)
-                    .messageRounds(messageRounds)
                     .build();
-            int result = botConversationStatsMapper.insert(stats);
+            int result = botDashboardCountLogMapper.insert(countLog);
 
             if (result > 0) {
-                log.info("Conversation statistics recorded successfully: chatId={}, statsId={}", chatId, stats.getId());
+                log.info("Dashboard count log recorded successfully: chatId={}, logId={}", chatId, countLog.getId());
 
             } else {
-                log.warn("Conversation statistics record failed: chatId={}", chatId);
+                log.warn("Dashboard count log record failed: chatId={}", chatId);
             }
         } catch (Exception e) {
-            log.error("Record conversation statistics exception: chatId={}", chatId, e);
+            log.error("Record dashboard count log exception: chatId={}", chatId, e);
             // Do not throw exception to avoid affecting main business flow
         }
     }
@@ -279,8 +280,8 @@ public class BotPublishServiceImpl implements BotPublishService {
     }
 
     /**
-     * Create market record (for publish channel)
-     * Note: This method now delegates to event-driven architecture
+     * Create market record (for publish channel) Note: This method now delegates to event-driven
+     * architecture
      */
     private void createMarketRecordForChannel(Integer botId, String uid, Long spaceId, String channels) {
         // Publish event to create market record - handled by InstructionalBotPublishListener
@@ -391,7 +392,7 @@ public class BotPublishServiceImpl implements BotPublishService {
 
     @Override
     public WechatAuthUrlResponseDto getWechatAuthUrl(Integer botId, String appid, String redirectUrl,
-                                                     String uid, Long spaceId) {
+            String uid, Long spaceId) {
         log.info("Get WeChat authorization URL: botId={}, appid={}, redirectUrl={}, uid={}, spaceId={}",
                 botId, appid, redirectUrl, uid, spaceId);
 
@@ -436,21 +437,6 @@ public class BotPublishServiceImpl implements BotPublishService {
 
         // Return empty result for now
         return PageResponse.of(requestDto.getPage(), requestDto.getPageSize(), 0L, new ArrayList<>());
-    }
-
-    // ==================== Workflow Input Management ====================
-
-    @Override
-    public WorkflowInputsResponseDto getInputsType(Integer botId, String uid, Long spaceId) {
-        log.info("Getting workflow input parameters: botId={}, uid={}, spaceId={}", botId, uid, spaceId);
-
-        // Delegate to WorkflowInputService
-        WorkflowInputsResponseDto result = workflowInputService.getInputsType(botId, uid, spaceId);
-
-        log.info("Workflow input parameters retrieved successfully: botId={}, paramCount={}",
-                botId, result.getParameters().size());
-
-        return result;
     }
 
     // ==================== Publish Prepare Data Management ====================
@@ -523,7 +509,7 @@ public class BotPublishServiceImpl implements BotPublishService {
             if (flowId != null) {
                 // TODO: Get complete workflow configuration JSON
                 // This should call the workflow service to get the full configuration
-                marketData.setWorkflowConfigJson("{}"); // Placeholder
+                marketData.setWorkflowConfigJson("{}");
             }
         } catch (Exception e) {
             log.warn("Failed to get workflow config for market prepare: botId={}", botId, e);
@@ -532,7 +518,7 @@ public class BotPublishServiceImpl implements BotPublishService {
         // Set bot basic info
         marketData.setBotName(botDetail.getBotName());
         marketData.setBotDescription(botDetail.getBotDesc());
-        marketData.setBotAvatar(null); // TODO: Get bot avatar from appropriate source
+        marketData.setBotAvatar(null);
 
         // Set multi-file parameter support based on extraInputsConfig
         boolean isMultiFileParam = false;
@@ -560,109 +546,13 @@ public class BotPublishServiceImpl implements BotPublishService {
         McpPrepareDto result = new McpPrepareDto();
         result.setPublishType(ReleaseTypeEnum.MCP.name());
 
-        // 1. Set workflow input types
-        result.setInputTypes(getWorkflowInputTypes(botId, currentUid, spaceId));
-
-        // 2. Set suggested configuration
-        result.setSuggestedConfig(buildMcpSuggestedConfig(botId, botDetail));
-
-        // 3. Set MCP content (existing or default)
-        result.setContentInfo(getMcpContentInfo(botId, botDetail));
+        // TODO: Implement MCP prepare data logic
+        // For now, return basic structure
+        result.setInputTypes(new ArrayList<>());
+        result.setSuggestedConfig(new McpPrepareDto.SuggestedConfig());
+        result.setContentInfo(new McpPrepareDto.McpContentInfo());
 
         return result;
-    }
-
-    private List<McpPrepareDto.InputTypeDto> getWorkflowInputTypes(Integer botId, String currentUid, Long spaceId) {
-        try {
-            WorkflowInputsResponseDto inputsResponse = getInputsType(botId, currentUid, spaceId);
-            if (inputsResponse != null && inputsResponse.getParameters() != null) {
-                return inputsResponse.getParameters()
-                        .stream()
-                        .map(param -> {
-                            McpPrepareDto.InputTypeDto inputType = new McpPrepareDto.InputTypeDto();
-                            inputType.setName(param.getName());
-                            inputType.setType(param.getType());
-                            inputType.setDescription(param.getDescription());
-                            inputType.setRequired(param.getRequired());
-                            return inputType;
-                        })
-                        .collect(Collectors.toList());
-            }
-        } catch (Exception e) {
-            log.warn("Failed to get input types for MCP prepare: botId={}", botId, e);
-        }
-        return new ArrayList<>();
-    }
-
-    private McpPrepareDto.SuggestedConfig buildMcpSuggestedConfig(Integer botId, BotDetailResponseDto botDetail) {
-        String botName = botDetail.getBotName();
-        String botDesc = botDetail.getBotDesc();
-
-        McpPrepareDto.SuggestedConfig suggestedConfig = new McpPrepareDto.SuggestedConfig();
-        suggestedConfig.setServiceName(botName != null ? botName : "bot-" + botId);
-        suggestedConfig.setOverview("基于工作流的智能助手");
-        suggestedConfig.setContent(botDesc != null ? botDesc : "提供智能对话和任务处理能力");
-        return suggestedConfig;
-    }
-
-    private McpPrepareDto.McpContentInfo getMcpContentInfo(Integer botId, BotDetailResponseDto botDetail) {
-        // Try to get existing MCP data from database
-        McpPrepareDto.McpContentInfo contentInfo = loadExistingMcpContent(botId);
-
-        if (contentInfo != null) {
-            log.info("Using existing MCP content: botId={}, released={}", botId, contentInfo.getReleased());
-            return contentInfo;
-        }
-
-        // Generate default MCP content for new setup
-        log.info("Generating default MCP content: botId={}", botId);
-        return generateDefaultMcpContent(botId, botDetail);
-    }
-
-    private McpPrepareDto.McpContentInfo loadExistingMcpContent(Integer botId) {
-        try {
-            McpData mcpData = mcpDataMapper.selectLatestByBotId(botId);
-            if (mcpData != null) {
-                McpPrepareDto.McpContentInfo contentInfo = new McpPrepareDto.McpContentInfo();
-                contentInfo.setServerName(mcpData.getServerName());
-                contentInfo.setDescription(mcpData.getDescription());
-                contentInfo.setContent(mcpData.getContent());
-                contentInfo.setIcon(mcpData.getIcon());
-                contentInfo.setServerUrl(mcpData.getServerUrl());
-                contentInfo.setArgs(mcpData.getArgs());
-                contentInfo.setVersionName(mcpData.getVersionName());
-                contentInfo.setReleased(mcpData.getReleased() != null && mcpData.getReleased() == 1 ? "1" : "0");
-                return contentInfo;
-            }
-        } catch (Exception e) {
-            log.warn("Failed to load existing MCP content: botId={}", botId, e);
-        }
-        return null;
-    }
-
-    private McpPrepareDto.McpContentInfo generateDefaultMcpContent(Integer botId, BotDetailResponseDto botDetail) {
-        String botName = botDetail.getBotName();
-        String botDesc = botDetail.getBotDesc();
-
-        McpPrepareDto.McpContentInfo contentInfo = new McpPrepareDto.McpContentInfo();
-        contentInfo.setServerName(botName != null ? botName : "bot-" + botId);
-        contentInfo.setDescription("基于工作流的智能助手");
-        contentInfo.setContent(botDesc != null ? botDesc : "提供智能对话和任务处理能力");
-        contentInfo.setReleased("0"); // Not published yet
-
-        // Generate MCP server URL using mcpHost configuration
-        try {
-            String flowId = userLangChainDataService.findFlowIdByBotId(botId);
-            if (flowId != null && mcpHost != null) {
-                String serverUrl = String.format(mcpHost, flowId);
-                contentInfo.setServerUrl(serverUrl);
-                log.info("Generated MCP server URL: botId={}, flowId={}, serverUrl={}", botId, flowId, serverUrl);
-            }
-        } catch (Exception e) {
-            log.warn("Failed to generate MCP server URL: botId={}", botId, e);
-        }
-
-        return contentInfo;
     }
 
     private FeishuPrepareDto getFeishuPrepareData(Integer botId, BotDetailResponseDto botDetail, String currentUid, Long spaceId) {
@@ -678,7 +568,7 @@ public class BotPublishServiceImpl implements BotPublishService {
         // Set bot info
         feishuData.setBotName(botDetail.getBotName());
         feishuData.setBotDescription(botDetail.getBotDesc());
-        feishuData.setBotAvatar(null); // TODO: Get bot avatar from appropriate source
+        feishuData.setBotAvatar(null);
 
         // Set suggested configuration
         FeishuPrepareDto.SuggestedConfig suggestedConfig = new FeishuPrepareDto.SuggestedConfig();
@@ -698,7 +588,7 @@ public class BotPublishServiceImpl implements BotPublishService {
         // Set API endpoint
         apiData.setApiEndpoint("/api/v1/chat/" + botId);
         apiData.setDocumentation("API文档URL");
-        apiData.setApiKey("生成的API Key"); // TODO: Generate actual API key
+        apiData.setApiKey("生成的API Key");
         apiData.setAuthType("Bearer");
 
         // Set suggested configuration

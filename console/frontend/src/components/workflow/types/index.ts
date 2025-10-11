@@ -127,6 +127,32 @@ export type ConnectionLineProps = {
   connectionLineStyle?: React.CSSProperties;
 };
 
+export type UseDropdownControlReturn = {
+  handleKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => void;
+  onKeyUp: (e: React.KeyboardEvent<HTMLDivElement>) => void;
+  handleDropdownKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => void;
+};
+
+export type UseFlowTemplateEditorReturn = {
+  insertOption: (option: string, isLeaf: boolean) => void;
+  getCursorPosition: () => void;
+  filterArr: (
+    arr: string[],
+    value: string,
+    offset: number,
+    content: string
+  ) => string[];
+  noProperties: boolean;
+  hasData: boolean;
+  inputsOption: string[];
+};
+
+export type UseFlowTemplateInputReturn = {
+  handleClick: () => void;
+  handleInput: () => void;
+  handleTreeSelect: (selectedKeys: string[]) => void;
+};
+
 // 导出 Drawer 相关类型
 export * from './drawer';
 

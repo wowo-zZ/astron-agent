@@ -12,7 +12,7 @@ export const ModalDetail = forwardRef<{
   const { t } = useTranslation();
   const [currentRobot, setCurrentRobot] = useState<RpaRobot | null>(null);
   useImperativeHandle(ref, () => ({
-    showModal: values => {
+    showModal: (values): void => {
       setCurrentRobot(values || null);
       showModal();
     },

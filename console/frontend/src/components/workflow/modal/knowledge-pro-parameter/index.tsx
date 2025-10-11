@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { Slider, Button } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { FlowInputNumber } from '@/components/workflow/ui';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import { useMemoizedFn } from 'ahooks';
 import { cloneDeep } from 'lodash';
 import { KnowledgeProRepoConfig } from '@/components/workflow/types';

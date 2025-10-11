@@ -2,8 +2,8 @@ import React, { useMemo, memo } from 'react';
 import { cloneDeep } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { FLowCollapse, FLowTree } from '@/components/workflow/ui';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
-import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
+import { useNodeCommon } from '@/components/workflow/hooks/use-node-common';
 
 import inputAddIcon from '@/assets/imgs/workflow/input-add-icon.png';
 

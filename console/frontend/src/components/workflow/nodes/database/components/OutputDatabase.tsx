@@ -2,7 +2,7 @@ import React, { useMemo, memo } from 'react';
 import { cloneDeep } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { FLowCollapse, FLowTree } from '@/components/workflow/ui';
-import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import { useNodeCommon } from '@/components/workflow/hooks/use-node-common';
 
 function index({ id, data, children }): React.ReactElement {
   const { addUniqueComponentToProperties, currentNode, outputs } =

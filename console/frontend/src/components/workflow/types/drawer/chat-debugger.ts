@@ -675,3 +675,10 @@ export interface UseChatInputProps {
     value: unknown
   ) => void;
 }
+
+export interface UseChatDebuggerContentProps {
+  startNode: StartNodeType;
+  trialRun: boolean;
+  multiParams: boolean;
+  xfYunBot: XfYunBotConfig;
+}

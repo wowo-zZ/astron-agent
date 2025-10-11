@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { FLowCollapse, FLowTree } from '@/components/workflow/ui';
 import { useTranslation } from 'react-i18next';
-import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import { useNodeCommon } from '@/components/workflow/hooks/use-node-common';
 
 function index({ id, data }): React.ReactElement {
   const { titleRender, outputs } = useNodeCommon({ id, data });

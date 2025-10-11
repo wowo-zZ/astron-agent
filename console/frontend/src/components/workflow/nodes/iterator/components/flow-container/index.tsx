@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useState } from 'react';
 import { Background, Panel } from 'reactflow';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 
 import fullScreenIcon from '@/assets/imgs/workflow/full-screen-icon.png';
 

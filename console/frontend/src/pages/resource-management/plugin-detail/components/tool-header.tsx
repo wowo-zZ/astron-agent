@@ -62,11 +62,7 @@ const ToolHeader: FC<{
               cursor: filterTools.length > 0 ? 'pointer' : 'default',
             }}
           >
-            <img
-              src={botIcon?.name || '' + botIcon?.value || ''}
-              className="w-6 h-6"
-              alt=""
-            />
+            <img src={botIcon?.value || ''} className="w-6 h-6" alt="" />
             <h1>{toolInfo.name}</h1>
             {filterTools.length > 0 && (
               <img src={formSelect} className="w-4 h-4" alt="" />

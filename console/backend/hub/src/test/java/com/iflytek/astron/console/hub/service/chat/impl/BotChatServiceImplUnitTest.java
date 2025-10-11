@@ -111,7 +111,7 @@ class BotChatServiceImplUnitTest {
         ChatBotMarket chatBotMarket = createChatBotMarket();
         chatBotMarket.setModelId(null);
         chatBotMarket.setVersion(1);
-        chatBotMarket.setSupportDocument(1);  // Enable knowledge base support
+        chatBotMarket.setSupportDocument(1); // Enable knowledge base support
 
         ChatReqRecords createdRecord = createChatReqRecords();
         List<String> knowledgeList = Arrays.asList("knowledge1", "knowledge2");

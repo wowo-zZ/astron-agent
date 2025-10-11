@@ -106,7 +106,7 @@ const TeamInfo = () => {
             <div className={styles.infoLabel}>创建时间</div>
             <div className={styles.infoValue}>{createTime}</div>
           </div>
-          <div className={styles.infoItem}>
+          {/* <div className={styles.infoItem}>
             <div className={styles.infoLabel}>到期时间</div>
             <div className={styles.infoValue}>
               {expireTime}
@@ -114,17 +114,17 @@ const TeamInfo = () => {
                 立即续费
               </span>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 
       {/* 企业认证卡片区域 */}
-      <div className={styles.certificationSection}>
+      {/* <div className={styles.certificationSection}>
         <EnterpriseCertificationCard
           status={certificationStatus}
           onUpgrade={handleUpgradeEnterprise}
         />
-      </div>
+      </div> */}
     </div>
   );
 };

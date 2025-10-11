@@ -181,15 +181,11 @@ function ModelCardHeader({
             style={{
               background: model.color
                 ? model.color
-                : `url(${model.address || ''}${model.icon}) no-repeat center / cover`,
+                : `url(${model.icon}) no-repeat center / cover`,
             }}
           >
             {model.color && (
-              <img
-                src={`${model.address || ''}${model.icon}`}
-                className="w-[28px] h-[28px]"
-                alt=""
-              />
+              <img src={model.icon} className="w-[28px] h-[28px]" alt="" />
             )}
           </span>
         ) : (

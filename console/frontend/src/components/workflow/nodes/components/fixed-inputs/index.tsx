@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Tooltip } from 'antd';
 import { FLowCollapse } from '@/components/workflow/ui';
 import ChatHistory from '@/components/workflow/nodes/components/chat-history';
-import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import { useNodeCommon } from '@/components/workflow/hooks/use-node-common';
 import {
   TypeSelector,
   ValueField,

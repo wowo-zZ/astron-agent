@@ -37,13 +37,26 @@ public class WXBizMsgCrypt {
      *         this exception
      */
     public WXBizMsgCrypt(String token, String encodingAesKey, String appId) throws AesException {
+        this(token, validateAndDecodeAesKey(encodingAesKey), appId);
+    }
+
+    /**
+     * Private constructor that doesn't throw exceptions
+     */
+    private WXBizMsgCrypt(String token, byte[] aesKey, String appId) {
+        this.token = token;
+        this.aesKey = aesKey;
+        this.appId = appId;
+    }
+
+    /**
+     * Validate and decode AES key
+     */
+    private static byte[] validateAndDecodeAesKey(String encodingAesKey) throws AesException {
         if (encodingAesKey.length() != 43) {
             throw new AesException(AesException.IllegalAesKey);
         }
-
-        this.token = token;
-        this.appId = appId;
-        aesKey = Base64.decodeBase64(encodingAesKey + "=");
+        return Base64.decodeBase64(encodingAesKey + "=");
     }
 
     // Generate 4-byte network byte order
@@ -266,7 +279,7 @@ public class WXBizMsgCrypt {
             String str = sb.toString();
             // SHA1 signature generation
             MessageDigest md = MessageDigest.getInstance("SHA-1");
-            md.update(str.getBytes());
+            md.update(str.getBytes(CHARSET));
             byte[] digest = md.digest();
 
             StringBuilder hexstr = new StringBuilder();
@@ -330,11 +343,11 @@ public class WXBizMsgCrypt {
             }
             // Get padding character
             char padChr = chr(amountToPad);
-            String tmp = new String();
+            StringBuilder tmp = new StringBuilder(amountToPad);
             for (int index = 0; index < amountToPad; index++) {
-                tmp += padChr;
+                tmp.append(padChr);
             }
-            return tmp.getBytes(CHARSET);
+            return tmp.toString().getBytes(CHARSET);
         }
 
         /**

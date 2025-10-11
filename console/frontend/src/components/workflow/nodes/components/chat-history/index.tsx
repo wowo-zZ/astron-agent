@@ -3,7 +3,7 @@ import { FLowTree } from '@/components/workflow/ui';
 import { InputNumber, Tooltip } from 'antd';
 import { renderType } from '@/components/workflow/utils/reactflowUtils';
 import { cloneDeep } from 'lodash';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import { useTranslation } from 'react-i18next';
 
 import arrowUp from '@/assets/imgs/chat/arrow_up.png';

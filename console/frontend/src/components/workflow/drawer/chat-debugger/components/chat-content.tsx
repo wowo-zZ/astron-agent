@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image } from 'antd';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import { isJSON } from '@/utils';
 import MarkdownRender from '@/components/markdown-render';
 import JSONPretty from 'react-json-view';
@@ -511,7 +511,6 @@ const MessageReply = ({
 };
 
 const useChatContent = ({ chatList, setChatList }): UseChatContentProps => {
-  let optionId = useRef<string | undefined>('');
   const currentFlow = useFlowsManager(state => state.currentFlow);
   const [sid, setSid] = useState<string | undefined>('');
   const advancedConfig = useMemo<ChatContentAdvancedConfig>(() => {
@@ -558,7 +557,6 @@ const useChatContent = ({ chatList, setChatList }): UseChatContentProps => {
     }
   }, [currentFlow?.advancedConfig]);
   const copyData = useMemoizedFn((params: ChatListItemExtended): void => {
-    optionId = params.id;
     const clickData = chatList.find(item => item.id === params.id) as
       | ChatListItemExtended
       | undefined;
@@ -724,11 +722,16 @@ function ChatContent({
       />
       {chatList.map((chat, index) =>
         chat.type === 'divider' ? (
-          <MessageDivider chat={chat} t={t} />
+          <MessageDivider key={chat.id} chat={chat} t={t} />
         ) : chat.type === 'ask' ? (
-          <MessageAsk chat={chat} renderInputElement={renderInputElement} />
+          <MessageAsk
+            key={chat.id}
+            chat={chat}
+            renderInputElement={renderInputElement}
+          />
         ) : (
           <MessageReply
+            key={chat.id}
             chat={chat}
             currentFlow={currentFlow}
             debuggering={debuggering}

@@ -1,15 +1,15 @@
-import FlowInput from './FlowInput';
-import FlowInputNumber from './FlowInputNumber';
-import FlowTextArea from './FlowTextArea';
-import FlowSelect from './FlowSelect';
-import FlowCascader from './FlowCascader';
-import FlowTypeCascader from './FlowTypeCascader';
-import FLowTree from './FlowTree';
-import FLowCollapse from './FlowCollapse';
-import FlowTemplateEditor from './FlowTemplateEditor';
-import FlowNodeInput from './FlowNodeInput';
-import FlowNodeTextArea from './FlowNodeTextArea';
-import FlowUpload from './FlowUpload';
+import FlowInput from './flow-input';
+import FlowInputNumber from './flow-input-number';
+import FlowTextArea from './flow-textarea';
+import FlowSelect from './flow-select';
+import FlowCascader from './flow-cascader';
+import FlowTypeCascader from './flow-type-cascader';
+import FLowTree from './flow-tree';
+import FLowCollapse from './flow-collapse';
+import FlowTemplateEditor from './flow-template-editor';
+import FlowNodeInput from './flow-node-input';
+import FlowNodeTextArea from './flow-node-textarea';
+import FlowUpload from './flow-upload';
 
 export {
   FlowInput,

@@ -22,8 +22,6 @@ import creatorImg from '@/assets/imgs/space/person-space-icon.svg';
 
 import { searchInviteUsers, getUserLimit } from './config';
 import { MEMBER_ROLE } from '@/pages/space/config';
-import { patterns } from '@/utils/pattern';
-import { init } from 'echarts';
 
 interface User {
   uid: string;
@@ -92,11 +90,6 @@ const AddMemberModal: React.FC<AddMemberModalProps> = React.memo(
       setMaxMembers(maxNums);
     }, [inviteType]);
 
-    // 验证手机号的函数
-    const isValidPhoneNumber = (phone: string) => {
-      return patterns.phoneNumber?.pattern.test(phone);
-    };
-
     // 搜索用户接口调用
     const searchUsers = useCallback(
       async (searchKeyword: string) => {
@@ -111,13 +104,8 @@ const AddMemberModal: React.FC<AddMemberModalProps> = React.memo(
             return;
           }
 
-          if (!isValidPhoneNumber(searchKeyword.trim())) {
-            message.error(patterns.phoneNumber?.message);
-            return;
-          }
-
           const res = await searchInviteUsers(
-            { mobile: searchKeyword },
+            { username: searchKeyword },
             inviteType
           );
           const users = (res || []).map(user => ({
@@ -139,21 +127,12 @@ const AddMemberModal: React.FC<AddMemberModalProps> = React.memo(
     const handleSearch = useCallback(
       (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
-        // 只允许输入数字，且最多11位
-        const numericValue = value.replace(/\D/g, '').slice(0, 11);
-        setSearchValue(numericValue);
+        setSearchValue(value);
 
         // 当输入为空时，执行搜索以清空列表
-        if (numericValue === '') {
+        if (value === '') {
           searchUsers('');
           return;
-        }
-
-        // 当输入长度达到11位时，自动执行搜索
-        if (numericValue.length === 11) {
-          if (isValidPhoneNumber(numericValue)) {
-            searchUsers(numericValue);
-          }
         }
       },
       [searchUsers]
@@ -166,7 +145,7 @@ const AddMemberModal: React.FC<AddMemberModalProps> = React.memo(
           e.preventDefault();
           const trimmedValue = searchValue.trim();
           if (!trimmedValue) {
-            message.warning('请输入手机号');
+            message.warning('请输入用户名');
             return;
           }
           searchUsers(trimmedValue);
@@ -325,7 +304,7 @@ const AddMemberModal: React.FC<AddMemberModalProps> = React.memo(
     // 缓存空状态的文本
     const emptyStateText = useMemo(() => {
       return !lastSearchedValue
-        ? '搜索手机号以添加新成员'
+        ? '搜索用户名以添加新成员'
         : `未找到"${lastSearchedValue}"相关用户`;
     }, [lastSearchedValue]);
 
@@ -362,7 +341,7 @@ const AddMemberModal: React.FC<AddMemberModalProps> = React.memo(
           <div className={styles.leftPanel}>
             <div className={styles.searchSection}>
               <SpaceSearch
-                placeholder="搜索手机号"
+                placeholder="搜索用户名"
                 value={searchValue}
                 onChange={handleSearch}
                 onKeyPress={handleKeyPress}

@@ -33,8 +33,8 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for EnterpriseUserBizServiceImpl
- * Tests all public methods with comprehensive coverage of success and failure scenarios
+ * Unit tests for EnterpriseUserBizServiceImpl Tests all public methods with comprehensive coverage
+ * of success and failure scenarios
  */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("EnterpriseUserBizServiceImpl Unit Tests")
@@ -339,7 +339,7 @@ class EnterpriseUserBizServiceImplTest {
     @DisplayName("quitEnterprise - Should successfully quit enterprise for regular user")
     void quitEnterprise_Success_WhenRegularUser() {
         try (MockedStatic<EnterpriseInfoUtil> mockedEnterpriseInfo = mockStatic(EnterpriseInfoUtil.class);
-             MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class)) {
+                MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class)) {
 
             // Arrange
             mockedEnterpriseInfo.when(EnterpriseInfoUtil::getEnterpriseId).thenReturn(TEST_ENTERPRISE_ID);
@@ -364,7 +364,7 @@ class EnterpriseUserBizServiceImplTest {
     @DisplayName("quitEnterprise - Should return error when super admin tries to quit")
     void quitEnterprise_Error_WhenSuperAdminTriesToQuit() {
         try (MockedStatic<EnterpriseInfoUtil> mockedEnterpriseInfo = mockStatic(EnterpriseInfoUtil.class);
-             MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class)) {
+                MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class)) {
 
             // Arrange
             mockedEnterpriseInfo.when(EnterpriseInfoUtil::getEnterpriseId).thenReturn(TEST_ENTERPRISE_ID);
@@ -387,7 +387,7 @@ class EnterpriseUserBizServiceImplTest {
     @DisplayName("quitEnterprise - Should return error and clear cache when quit fails")
     void quitEnterprise_Error_WhenQuitFails() {
         try (MockedStatic<EnterpriseInfoUtil> mockedEnterpriseInfo = mockStatic(EnterpriseInfoUtil.class);
-             MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class)) {
+                MockedStatic<RequestContextUtil> mockedRequestContext = mockStatic(RequestContextUtil.class)) {
 
             // Arrange
             mockedEnterpriseInfo.when(EnterpriseInfoUtil::getEnterpriseId).thenReturn(TEST_ENTERPRISE_ID);

@@ -1,8 +1,8 @@
 import React, { useMemo, useCallback, memo } from 'react';
 import { Drawer, message } from 'antd';
 import { useTranslation } from 'react-i18next';
-import useFlowStore from '@/components/workflow/store/useFlowStore';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowStore from '@/components/workflow/store/use-flow-store';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import copy from 'copy-to-clipboard';
 import JSONPretty from 'react-json-view';
 import MarkdownRender from '@/components/markdown-render';

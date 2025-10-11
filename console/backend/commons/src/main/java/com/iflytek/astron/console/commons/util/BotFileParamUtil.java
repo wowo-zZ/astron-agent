@@ -17,7 +17,7 @@ public class BotFileParamUtil {
 
     /**
      * Determine if it's a multi-file parameter bot
-     * 
+     *
      * @param botId Bot ID for logging
      * @param extraInputsConfig Extra inputs configuration
      * @return true if it's a multi-file parameter bot, false otherwise

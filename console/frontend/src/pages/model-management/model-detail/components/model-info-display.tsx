@@ -43,15 +43,11 @@ const renderModelIcon = (
         style={{
           background: modelDetail.color
             ? modelDetail.color
-            : `url(${modelDetail.address || ''}${modelDetail.icon}) no-repeat center / cover`,
+            : `url(${modelDetail.icon}) no-repeat center / cover`,
         }}
       >
         {modelDetail.color && (
-          <img
-            src={`${modelDetail.address || ''}${modelDetail.icon}`}
-            className="w-[48px] h-[48px]"
-            alt=""
-          />
+          <img src={modelDetail.icon} className="w-[48px] h-[48px]" alt="" />
         )}
       </span>
     );

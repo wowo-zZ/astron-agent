@@ -149,20 +149,26 @@ class CotRunner(RunnerBase):
                 thinks += reasoning_content
                 answers += content
 
-                node_data_usage.completion_tokens = 0
-                node_data_usage.prompt_tokens = 0
-                node_data_usage.total_tokens = 0
-                if chunk.usage and chunk.usage.model_dump().get("total_tokens") != 0:
+                # Accumulate usage from chunks instead of resetting
+                if chunk.usage:
                     usage_data = chunk.usage.model_dump()
-                    node_data_usage.completion_tokens = usage_data.get(
+                    node_data_usage.completion_tokens += usage_data.get(
                         "completion_tokens", 0
                     )
-                    node_data_usage.prompt_tokens = usage_data.get("prompt_tokens", 0)
-                    node_data_usage.total_tokens = usage_data.get("total_tokens", 0)
+                    node_data_usage.prompt_tokens += usage_data.get(
+                        "prompt_tokens", 0
+                    )
+                    node_data_usage.total_tokens += (
+                        usage_data.get("total_tokens", 0)
+                    )
 
+                # Don't send usage in intermediate chunks
                 if final_answer and content:
                     yield AgentResponse(
-                        typ="content", content=content, model=self.model.name
+                        typ="content",
+                        content=content,
+                        model=self.model.name,
+                        usage=None,
                     )
                     continue
 
@@ -171,6 +177,7 @@ class CotRunner(RunnerBase):
                         typ="reasoning_content",
                         content=reasoning_content,
                         model=self.model.name,
+                        usage=None,
                     )
                     continue
 
@@ -181,12 +188,22 @@ class CotRunner(RunnerBase):
                             typ="content",
                             content=step_content.split("Final Answer:")[1],
                             model=self.model.name,
+                            usage=None,
                         )
                         final_answer = True
                         continue
 
                 if "Observation:" in step_content or "Final Answer:" in step_content:
                     break
+
+            # Usage will be attached to stop chunk in _finalize_run
+            sp.add_info_events({
+                "accumulated_usage": {
+                    "completion_tokens": node_data_usage.completion_tokens,
+                    "prompt_tokens": node_data_usage.prompt_tokens,
+                    "total_tokens": node_data_usage.total_tokens
+                }
+            })
 
             node_end_time = int(round(time.time() * 1000))
             data_llm_output = answers

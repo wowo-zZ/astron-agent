@@ -17,7 +17,7 @@ import { debounce, throttle } from 'lodash';
 import dayjs from 'dayjs';
 import { isJSON } from '@/utils';
 import { capitalizeFirstLetter } from '@/components/workflow/utils/reactflowUtils';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import DeletePlugin from '@/components/workflow/modal/add-plugin/delete-plugin';
 import {
   CreateTool,

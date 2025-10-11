@@ -118,18 +118,36 @@ async def query_task_status(
 
             status = execution.get("status", "")
             if status in ["COMPLETED"]:
-                result = execution.get("result", {})
-                data = result.get("data", {})
-                return ErrorCode.SUCCESS.code, ErrorCode.SUCCESS.message, data
-
-            if status in ["FAILED"]:
-                msg = execution.get("error", "")
+                result = execution.get("result", {}) or {}
+                r_code = result.get("code", "-1")
+                r_msg = result.get("msg", "")
+                r_data = result.get("data", {})
                 return (
-                    ErrorCode.QUERY_TASK_ERROR.code,
-                    f"{ErrorCode.QUERY_TASK_ERROR.message}: {msg}",
-                    {},
+                    ErrorCode.SUCCESS.code,
+                    f"{ErrorCode.SUCCESS.message}: {r_code}-{r_msg}",
+                    r_data,
                 )
-            if status in ["PENDING"]:
+
+            elif status in ["FAILED"]:
+                error = execution.get("error", "")
+                result = execution.get("result", {})
+                if not result:
+                    return (
+                        ErrorCode.TASK_EXEC_FAILED.code,
+                        f"{ErrorCode.TASK_EXEC_FAILED.message}: {error}",
+                        {},
+                    )
+
+                r_code = result.get("code", "-1")
+                r_msg = result.get("msg", "")
+                r_data = result.get("data", {})
+                return (
+                    ErrorCode.TASK_EXEC_FAILED.code,
+                    f"{ErrorCode.TASK_EXEC_FAILED.message}: {r_code}-{r_msg}",
+                    r_data or {},
+                )
+
+            elif status in ["PENDING"]:
                 return None
 
             raise HTTPException(

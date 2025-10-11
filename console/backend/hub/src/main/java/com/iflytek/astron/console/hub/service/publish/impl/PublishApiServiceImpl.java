@@ -1,6 +1,7 @@
 package com.iflytek.astron.console.hub.service.publish.impl;
 
 import com.iflytek.astron.console.commons.constant.ResponseEnum;
+import com.iflytek.astron.console.commons.dto.bot.ChatBotApi;
 import com.iflytek.astron.console.commons.entity.bot.ChatBotBase;
 import com.iflytek.astron.console.commons.entity.bot.DatasetInfo;
 import com.iflytek.astron.console.commons.entity.bot.UserLangChainInfo;
@@ -87,11 +88,11 @@ public class PublishApiServiceImpl implements PublishApiService {
         }
 
         String appId = tenantService.createApp(uid, createAppVo.getAppName(), createAppVo.getAppDescribe());
-        if (appId == null) {
+        if (StringUtils.isBlank(appId)) {
             throw new BusinessException(ResponseEnum.USER_APP_ID_CREATE_ERROR);
         }
         TenantAuth tenantAuth = tenantService.getAppDetail(appId);
-        if (tenantAuth == null) {
+        if (Objects.isNull(tenantAuth)) {
             throw new BusinessException(ResponseEnum.USER_APP_ID_CREATE_ERROR);
         }
         appMstService.insert(uid, appId, createAppVo.getAppName(), createAppVo.getAppDescribe(), tenantAuth.getApiKey(), tenantAuth.getApiSecret());
@@ -120,7 +121,7 @@ public class PublishApiServiceImpl implements PublishApiService {
 
         ChatBotBase botBase = chatBotDataService.findOne(uid, createBotApiVo.getBotId());
         AppMst appMst = appMstService.getByAppId(uid, createBotApiVo.getAppId());
-        if (botBase == null || appMst == null) {
+        if (Objects.isNull(botBase) || Objects.isNull(appMst)) {
             throw new BusinessException(ResponseEnum.USER_APP_ID_NOT_EXISTE);
         }
 
@@ -144,6 +145,38 @@ public class PublishApiServiceImpl implements PublishApiService {
 
     }
 
+    @Override
+    public BotApiInfoDTO getApiInfo(Long botId) {
+        String uid = RequestContextUtil.getUID();
+        // Only the space creator can publish APIs
+        if (!uid.equals(SpaceInfoUtil.getUidByCurrentSpaceId())) {
+            throw new BusinessException(ResponseEnum.USER_NO_APPROVEL);
+        }
+        ChatBotBase botBase = chatBotDataService.findOne(uid, botId);
+        if (Objects.isNull(botBase)) {
+            throw new BusinessException(ResponseEnum.BOT_NOT_EXISTS);
+        }
+        ChatBotApi botApi = chatBotApiService.getOneByUidAndBotId(uid, botId);
+        if (Objects.isNull(botApi)) {
+            throw new BusinessException(ResponseEnum.USER_APP_ID_NOT_EXISTE);
+        }
+        AppMst appMst = appMstService.getByAppId(uid, botApi.getAppId());
+        if (Objects.isNull(appMst)) {
+            throw new BusinessException(ResponseEnum.USER_APP_ID_NOT_EXISTE);
+        }
+        String serviceUrlHost = botBase.getVersion() == 1 ? BOT_API_CBM_BASE_URL : BOT_API_MASS_BASE_URL;
+        return BotApiInfoDTO.builder()
+                .botId(Math.toIntExact(botId))
+                .botName(botBase.getBotName())
+                .appName(appMst.getAppName())
+                .appId(appMst.getAppId())
+                .appKey(appMst.getAppKey())
+                .appSecret(appMst.getAppSecret())
+                .serviceUrl(serviceUrlHost + "/workflow/v1/chat/completions")
+                .flowId(botApi.getAssistantId())
+                .build();
+    }
+
     private BotApiInfoDTO createMaasApi(String uid, AppMst appMst, ChatBotBase botBase, HttpServletRequest request) {
         Long spaceId = SpaceInfoUtil.getSpaceId();
         Integer botId = botBase.getId();
@@ -161,9 +194,21 @@ public class PublishApiServiceImpl implements PublishApiService {
 
         releaseManageClientService.releaseBotApi(botId, flowId, versionName, spaceId, request);
 
-        chatBotApiService.insertOrUpdate(uid, botId, flowId, appMst.getAppId(),
-                appMst.getAppSecret(), appMst.getAppKey(), "", "", "",
-                "/workflow/v1/chat/completions", botBase.getBotName());
+        ChatBotApi chatBotApi = ChatBotApi.builder()
+                .uid(uid)
+                .botId(botId)
+                .assistantId(flowId)
+                .appId(appMst.getAppId())
+                .apiSecret(appMst.getAppSecret())
+                .apiKey(appMst.getAppKey())
+                .prompt("")
+                .pluginId("")
+                .embeddingId("")
+                .apiPath("/workflow/v1/chat/completions")
+                .description(botBase.getBotName())
+                .build();
+
+        chatBotApiService.insertOrUpdate(chatBotApi);
 
         return BotApiInfoDTO.builder()
                 .botId(botId)
@@ -189,9 +234,20 @@ public class PublishApiServiceImpl implements PublishApiService {
         List<Long> datasetIdList = datasetInfos.stream().map(DatasetInfo::getId).toList();
         String embeddingIds = StringUtils.defaultString(datasetIdList.stream().map(Objects::toString).collect(Collectors.joining(",")), "");
 
-        chatBotApiService.insertOrUpdate(uid, botId, null, appMst.getAppId(),
-                appMst.getAppSecret(), appMst.getAppKey(), prompt, "", embeddingIds,
-                null, botBase.getBotName());
+        ChatBotApi chatBotApi = ChatBotApi.builder()
+                .uid(uid)
+                .botId(botId)
+                .appId(appMst.getAppId())
+                .apiSecret(appMst.getAppSecret())
+                .apiKey(appMst.getAppKey())
+                .prompt(prompt)
+                .pluginId("")
+                .embeddingId(embeddingIds)
+                .apiPath(null)
+                .description(botBase.getBotName())
+                .build();
+
+        chatBotApiService.insertOrUpdate(chatBotApi);
 
         // TODO: capability authorization
 

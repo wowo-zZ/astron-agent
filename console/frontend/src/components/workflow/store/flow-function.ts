@@ -15,7 +15,7 @@ import {
 import { v4 as uuid } from 'uuid';
 import { message } from 'antd';
 import { cloneDeep } from 'lodash';
-import useFlowsManager from './useFlowsManager';
+import useFlowsManager from './use-flows-manager';
 import {
   Edge,
   EdgeChange,
@@ -93,13 +93,14 @@ const setHistorys = (
   });
 };
 
-const moveToPosition = (
-  viewport: unknown,
-  get: () => {
-    reactFlowInstance: { setViewport: (viewport: unknown) => void };
+const moveToPosition = (viewport: unknown): void => {
+  const flowStore = useFlowsManager?.getState?.();
+  const currentStore = flowStore?.getCurrentStore?.();
+  const currentState = currentStore?.getState?.();
+  const reactFlowInstance = currentState?.reactFlowInstance;
+  if (reactFlowInstance) {
+    reactFlowInstance.setViewport(viewport);
   }
-): void => {
-  get().reactFlowInstance.setViewport(viewport);
 };
 
 const setReactFlowInstance = (

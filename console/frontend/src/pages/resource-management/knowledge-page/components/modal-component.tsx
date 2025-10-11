@@ -14,22 +14,22 @@ export type VersionType = 'AIUI-RAG2' | 'CBG-RAG' | 'Ragflow-RAG';
 export const versionList: {
   type: VersionType;
   title: string;
-  description: string;
+  description?: string;
 }[] = [
+  // {
+  //   type: 'AIUI-RAG2',
+  //   title: 'xingchenKnowledge',
+  //   description: 'xingchenDescription',
+  // },
   {
-    type: 'AIUI-RAG2',
-    title: 'xingchenKnowledge',
-    description: 'xingchenDescription',
+    type: 'Ragflow-RAG',
+    title: 'ragflowRAG',
+    description: 'ragflowRAGDescription',
   },
   {
     type: 'CBG-RAG',
     title: 'xinghuoKnowledge',
     description: 'xingpuDescription',
-  },
-  {
-    type: 'Ragflow-RAG',
-    title: 'ragflowRAG',
-    description: 'ragflowRAGDescription',
   },
 ];
 
@@ -184,26 +184,26 @@ export const CreateModal: FC<{ setCreateModal: (value: boolean) => void }> = ({
             </div>
           </div>
         </div>
-        {/* <div className="mt-6 flex flex-col gap-2">
+        <div className="mt-6 flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <div className="text-second font-medium text-sm">
               <span className="text-[#F74E43]">*</span>
-              {t("knowledge.knowledgeVersion")}
+              {t('knowledge.knowledgeVersion')}
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            {versionList.map((item) => (
+            {versionList.map(item => (
               <VersionItem
                 key={item.type}
                 version={version}
                 setVersion={setVersion}
                 type={item.type}
                 title={item.title}
-                description={item.description}
+                description={item.description || ''}
               />
             ))}
           </div>
-        </div> */}
+        </div>
         <div className="flex flex-row-reverse gap-3 mt-7">
           <Button
             type="primary"
@@ -237,7 +237,7 @@ export const VersionItem: FC<{
   const { t } = useTranslation();
   return (
     <div
-      className="w-full rounded-lg p-3.5 flex flex-col cursor-pointer relative"
+      className="w-full rounded-lg p-3.5 flex flex-col cursor-pointer relative "
       style={{
         border: version === type ? '1px solid #275EFF' : '1px solid #E2E8FF',
       }}

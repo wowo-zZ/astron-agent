@@ -13,7 +13,12 @@ import { getServerToolDetailAPI, debugServerToolAPI } from '@/services/plugin';
 import MarkdownRender from '@/components/markdown-render';
 import JsonMonacoEditor from '@/components/monaco-editor/JsonMonacoEditor';
 import { useTranslation } from 'react-i18next';
-import { MCPToolDetail, InputSchema, ToolArg } from '@/types/plugin-store';
+import { transformSchemaToArray } from '@/components/workflow/utils/reactflowUtils';
+import {
+  MCPToolDetail,
+  ToolArg,
+  UseMcpDetailProps,
+} from '@/types/plugin-store';
 import toolArrowLeft from '@/assets/imgs/workflow/tool-arrow-left.png';
 import publishIcon from '@/assets/imgs/workflow/publish-icon.png';
 import trialRunIcon from '@/assets/imgs/workflow/trial-run-icon.png';
@@ -67,51 +72,13 @@ function MCPDetailWrapper({
   );
 }
 
-export function MCPDetail({
+const useMCPDetail = ({
+  setCurrentMcp,
+  tools,
+  currentMcp,
   currentToolId,
-}: {
-  currentToolId: string;
-}): React.ReactElement {
+}): UseMcpDetailProps => {
   const { t } = useTranslation();
-  const [currentTab, setCurrentTab] = useState('content');
-  const [currentMcp, setCurrentMcp] = useState<MCPToolDetail>(
-    {} as MCPToolDetail
-  );
-
-  const tools = useMemo(() => {
-    return currentMcp?.tools || [];
-  }, [currentMcp]);
-
-  const generateDefaultInputValue = (type: string): unknown => {
-    if (type === 'string') {
-      return '';
-    } else if (type === 'number') {
-      return 0;
-    } else if (type === 'boolean') {
-      return false;
-    } else if (type === 'int' || type === 'integer') {
-      return 0;
-    } else if (type === 'array') {
-      return '[]';
-    } else if (type === 'object') {
-      return '{}';
-    }
-  };
-
-  const transformSchemaToArray = (schema: InputSchema): ToolArg[] => {
-    const requiredFields = schema.required || [];
-    return Object.entries(schema.properties).map(([name, property]) => {
-      return {
-        name,
-        type: property.type,
-        description: property.description,
-        required: requiredFields.includes(name),
-        enum: property.enum,
-        value: property?.default || generateDefaultInputValue(property.type),
-      };
-    });
-  };
-
   const handleInputParamsChange = (
     toolIndex: number,
     argIndex: number,
@@ -128,7 +95,6 @@ export function MCPDetail({
       return cloneDeep(mcp);
     });
   };
-
   const handleDebugServerMCP = (
     e: React.MouseEvent<HTMLButtonElement>,
     toolIndex: number
@@ -152,7 +118,7 @@ export function MCPDetail({
       toolArgs,
     };
     setCurrentMcp(mcp => {
-      const tool = mcp?.tools?.find((item, index) => index === toolIndex);
+      const tool = mcp?.tools?.find((_, index) => index === toolIndex);
       if (tool) {
         tool.loading = true;
       }
@@ -161,7 +127,7 @@ export function MCPDetail({
     debugServerToolAPI(params)
       .then(data => {
         setCurrentMcp(mcp => {
-          const tool = mcp?.tools?.find((item, index) => index === toolIndex);
+          const tool = mcp?.tools?.find((_, index) => index === toolIndex);
           if (tool && data?.content) {
             tool.textResult = (
               data as { content: { text: string }[] }
@@ -183,12 +149,11 @@ export function MCPDetail({
         });
       });
   };
-
   const renderInput = (
     arg: ToolArg,
     toolIndex: number,
     index: number
-  ): React.ReactNode => {
+  ): React.ReactElement | undefined => {
     if (arg.enum?.length && arg.enum?.length > 0) {
       return (
         <Select
@@ -270,8 +235,8 @@ export function MCPDetail({
         />
       );
     }
+    return;
   };
-
   const handleOpenTool = (toolIndex: number): void => {
     setCurrentMcp(mcp => {
       const tool = mcp?.tools?.find((item, index) => index === toolIndex);
@@ -281,6 +246,35 @@ export function MCPDetail({
       return cloneDeep(mcp);
     });
   };
+  return {
+    handleInputParamsChange,
+    renderInput,
+    handleOpenTool,
+    handleDebugServerMCP,
+  };
+};
+
+export function MCPDetail({
+  currentToolId,
+}: {
+  currentToolId: string;
+}): React.ReactElement {
+  const { t } = useTranslation();
+  const [currentTab, setCurrentTab] = useState('content');
+  const [currentMcp, setCurrentMcp] = useState<MCPToolDetail>(
+    {} as MCPToolDetail
+  );
+
+  const tools = useMemo(() => {
+    return currentMcp?.tools || [];
+  }, [currentMcp]);
+
+  const { renderInput, handleOpenTool, handleDebugServerMCP } = useMCPDetail({
+    setCurrentMcp,
+    tools,
+    currentMcp,
+    currentToolId,
+  });
 
   useEffect(() => {
     if (currentToolId) {
@@ -292,8 +286,6 @@ export function MCPDetail({
             : [],
         }));
         setCurrentMcp(data);
-        if (data?.mcpType !== 'flow') {
-        }
       });
     }
   }, [currentToolId]);

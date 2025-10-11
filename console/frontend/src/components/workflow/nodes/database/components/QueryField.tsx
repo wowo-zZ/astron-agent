@@ -2,11 +2,12 @@ import React, { useMemo, useState, memo, useEffect } from 'react';
 import { v4 as uuid } from 'uuid';
 import { useTranslation } from 'react-i18next';
 import { FLowCollapse } from '@/components/workflow/ui';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import { capitalizeFirstLetter } from '@/components/workflow/utils/reactflowUtils';
 import { Select, Radio } from 'antd';
 import { cn } from '@/utils';
-import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import { useNodeCommon } from '@/components/workflow/hooks/use-node-common';
+import { UseQueryFieldReturnProps } from '@/components/workflow/types';
 
 import inputAddIcon from '@/assets/imgs/workflow/input-add-icon.png';
 import remove from '@/assets/imgs/workflow/input-remove-icon.png';
@@ -21,7 +22,7 @@ const useQueryField = ({
   from,
   data,
   allFields,
-}) => {
+}): UseQueryFieldReturnProps => {
   const handleRemoveLine = (id): void => {
     const newList = fieldList.filter(it => it.id != id);
     setFieldList(newList);
@@ -211,7 +212,7 @@ function index({ id, data, allFields, from, children }): React.ReactElement {
                     <div className="flex items-center gap-3 overflow-hidden">
                       <div className="flex flex-shrink-0 w-1/3">
                         <div className="flex items-center relative gap-2.5 overflow-hidden">
-                          <span className="relative flex items-center gap-1.5 max-w-[130px]">
+                          <span className="relative flex items-center gap-1.5 max-w-[100px]">
                             <span
                               className="flex-1 text-overflow"
                               title={item?.name}

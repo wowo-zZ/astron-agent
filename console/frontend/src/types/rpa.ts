@@ -107,4 +107,5 @@ export interface RpaNode extends Node {
 export interface RpaNodeParam extends RpaRobot {
   fields: RpaDetailInfo['fields'];
   platform?: string;
+  rpaId?: number;
 }

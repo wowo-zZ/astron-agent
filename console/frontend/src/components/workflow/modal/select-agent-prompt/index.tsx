@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import { Input, Button, Spin } from 'antd';
 import { useDebounce, useMemoizedFn } from 'ahooks';
 import { cloneDeep } from 'lodash';

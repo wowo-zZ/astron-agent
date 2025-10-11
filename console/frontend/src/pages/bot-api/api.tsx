@@ -422,7 +422,9 @@ export default function BotApi({
         title={t('botApi.createApp')}
         width={500}
         centered
-        closable={false}
+        // closable={false}
+        maskClosable={false}
+        destroyOnClose
         footer={[
           <Button onClick={() => setIsShowCreateAppModal(false)}>
             {t('btnCancel')}

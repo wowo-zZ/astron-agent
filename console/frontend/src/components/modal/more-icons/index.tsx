@@ -268,11 +268,7 @@ export const GalleryContent: FC<{
                   setPreviewIcon(item);
                 }}
               >
-                <img
-                  src={(item.name || '') + (item.value || '')}
-                  className="w-8 h-8"
-                  alt=""
-                />
+                <img src={item.value || ''} className="w-8 h-8" alt="" />
               </div>
             ))}
         </div>
@@ -293,11 +289,7 @@ export const GalleryContent: FC<{
                   setPreviewIcon(item);
                 }}
               >
-                <img
-                  src={(item.name || '') + (item.value || '')}
-                  className="w-8 h-8"
-                  alt=""
-                />
+                <img src={item.value || ''} className="w-8 h-8" alt="" />
               </div>
             ))}
         </div>
@@ -318,11 +310,7 @@ export const GalleryContent: FC<{
                   setPreviewIcon(item);
                 }}
               >
-                <img
-                  src={(item.name || '') + (item.value || '')}
-                  className="w-8 h-8"
-                  alt=""
-                />
+                <img src={item.value || ''} className="w-8 h-8" alt="" />
               </div>
             ))}
         </div>
@@ -343,11 +331,7 @@ export const GalleryContent: FC<{
                   setPreviewIcon(item);
                 }}
               >
-                <img
-                  src={(item.name || '') + (item.value || '')}
-                  className="w-8 h-8"
-                  alt=""
-                />
+                <img src={item.value || ''} className="w-8 h-8" alt="" />
               </div>
             ))}
         </div>

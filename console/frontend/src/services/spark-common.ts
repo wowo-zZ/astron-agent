@@ -414,8 +414,8 @@ export const listRepos = () => {
 };
 
 // 获取模版数据
-export const getBotTemplate = (botId: any) => {
-  return http.get(`/bot/template?botId=${botId}`);
+export const getBotTemplate = (botId?: any) => {
+  return http.get(`/bot/template${botId ? `?botId=${botId}` : ''}`);
 };
 
 // 生成开场白

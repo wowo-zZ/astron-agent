@@ -2,7 +2,10 @@ package com.iflytek.astron.console.hub.controller.publish;
 
 import com.iflytek.astron.console.commons.annotation.RateLimit;
 import com.iflytek.astron.console.commons.response.ApiResult;
-import com.iflytek.astron.console.hub.dto.publish.*;
+import com.iflytek.astron.console.hub.dto.publish.AppListDTO;
+import com.iflytek.astron.console.hub.dto.publish.BotApiInfoDTO;
+import com.iflytek.astron.console.hub.dto.publish.CreateAppVo;
+import com.iflytek.astron.console.hub.dto.publish.CreateBotApiVo;
 import com.iflytek.astron.console.hub.service.publish.PublishApiService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -50,11 +53,11 @@ public class PublishApiController {
         return ApiResult.success(publishApiService.createBotApi(createBotApiVo, request));
     }
 
-    @Operation(summary = "Get Api Usage", description = "User api real-time usage")
+    @Operation(summary = "Get Bot Api Info", description = "Get Bot Api Info")
     @RateLimit(limit = 30, window = 60, dimension = "USER")
-    @GetMapping("/usage-real-time")
-    public ApiResult<BotApiRealTimeUsageDTO> usageRealTime(@RequestParam Integer botId) {
-        return ApiResult.success(null);
+    @GetMapping("/get-bot-api-info")
+    public ApiResult<BotApiInfoDTO> usageRealTime(@RequestParam Long botId) {
+        return ApiResult.success(publishApiService.getApiInfo(botId));
     }
 
 }

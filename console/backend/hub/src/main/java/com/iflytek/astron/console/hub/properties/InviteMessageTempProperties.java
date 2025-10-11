@@ -13,6 +13,7 @@ public class InviteMessageTempProperties {
 
     /**
      * Get localized space invitation title
+     *
      * @return localized space invitation title
      */
     public String getSpaceTitle() {
@@ -21,6 +22,7 @@ public class InviteMessageTempProperties {
 
     /**
      * Get localized space invitation content template
+     *
      * @return localized space invitation content template
      */
     public String getSpaceContent() {
@@ -29,6 +31,7 @@ public class InviteMessageTempProperties {
 
     /**
      * Get localized enterprise invitation title
+     *
      * @return localized enterprise invitation title
      */
     public String getEnterpriseTitle() {
@@ -37,6 +40,7 @@ public class InviteMessageTempProperties {
 
     /**
      * Get localized enterprise invitation content template
+     *
      * @return localized enterprise invitation content template
      */
     public String getEnterpriseContent() {

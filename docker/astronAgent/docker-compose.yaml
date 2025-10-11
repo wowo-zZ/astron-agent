@@ -151,7 +151,7 @@ services:
     container_name: astron-agent-core-tenant
     environment:
       SERVICE_PORT: "${CORE_TENANT_PORT:-5052}"
-      SERVICE_LOCATION: "${SERVICE_LOCATION:-localhost}"
+      SERVICE_LOCATION: "${SERVICE_LOCATION:-hf}"
       DATABASE_DB_TYPE: "${DATABASE_DB_TYPE:-mysql}"
       DATABASE_USERNAME: "${DATABASE_USERNAME:-root}"
       DATABASE_PASSWORD: "${DATABASE_PASSWORD:-root123}"
@@ -320,13 +320,7 @@ services:
     image: ghcr.io/iflytek/astron-agent/core-agent:latest
     container_name: astron-agent-core-agent
     environment:
-      PYTHONUNBUFFERED: "${PYTHONUNBUFFERED:-1}"
-      RUN_ENVIRON: "${RUN_ENVIRON:-dev}"
-      USE_POLARIS: "${USE_POLARIS:-false}"
-      SERVICE_NAME: "${SERVICE_NAME:-Agent}"
-      SERVICE_SUB: "${SERVICE_SUB:-sag}"
       SERVICE_LOCATION: "${SERVICE_LOCATION:-hf}"
-      SERVICE_APP: "${SERVICE_APP:-app:app}"
       SERVICE_HOST: "${SERVICE_HOST:-0.0.0.0}"
       SERVICE_PORT: "${CORE_AGENT_PORT:-17870}"
       SERVICE_WORKERS: "${SERVICE_WORKERS:-1}"
@@ -365,7 +359,6 @@ services:
       LIST_MCP_PLUGIN_URL: "${LIST_MCP_PLUGIN_URL:-http://core-link:18888/api/v1/mcp/tool_list}"
       RUN_MCP_PLUGIN_URL: "${RUN_MCP_PLUGIN_URL:-http://core-link:18888/api/v1/mcp/call_tool}"
       APP_AUTH_HOST: "${APP_AUTH_HOST:-core-tenant}"
-      APP_AUTH_ROUTER: "${APP_AUTH_ROUTER:-/api-services/v2/app/details}"
       APP_AUTH_PROT: "${APP_AUTH_PROT:-http}"
       APP_AUTH_API_KEY: "${APP_AUTH_API_KEY:-YOUR_APP_AUTH_API_KEY}"
       APP_AUTH_SECRET: "${APP_AUTH_SECRET:-YOUR_APP_AUTH_SECRET}"
@@ -483,18 +476,38 @@ services:
   # astron-agent Console Services
   # ============================================================================
 
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: astron-agent-nginx
+    ports:
+      - "${EXPOSE_NGINX_PORT:-80}:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - nginx_logs:/var/log/nginx
+    depends_on:
+      - console-frontend
+      - console-hub
+    networks:
+      - astron-agent-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/nginx-health"]
+      interval: ${HEALTH_CHECK_INTERVAL:-30s}
+      timeout: ${HEALTH_CHECK_TIMEOUT:-10s}
+      retries: ${HEALTH_CHECK_RETRIES:-60}
+
   # Console Frontend
   console-frontend:
     image: ghcr.io/iflytek/astron-agent/console-frontend:latest
     container_name: astron-agent-console-frontend
     environment:
-      CONSOLE_API_URL: "${CONSOLE_API_URL:-http://console-hub:8080/}"
       CONSOLE_CASDOOR_URL: "${CONSOLE_CASDOOR_URL:-}"
       CONSOLE_CASDOOR_ID: "${CONSOLE_CASDOOR_ID:-}"
       CONSOLE_CASDOOR_APP: "${CONSOLE_CASDOOR_APP:-}"
       CONSOLE_CASDOOR_ORG: "${CONSOLE_CASDOOR_ORG:-}"
-    ports:
-      - "${CONSOLE_FRONTEND_PORT:-1881}:1881"
+    expose:
+      - "1881"
     networks:
       - astron-agent-network
     restart: always
@@ -504,21 +517,35 @@ services:
     image: ghcr.io/iflytek/astron-agent/console-hub:latest
     container_name: astron-agent-console-hub
     environment:
-      ASTRON_DOMAIN: "${ASTRON_DOMAIN:-https://your.deployment.domain}"
+      CONSOLE_CASDOOR_URL: "${CONSOLE_CASDOOR_URL:-}"
+      CONSOLE_CASDOOR_ID: "${CONSOLE_CASDOOR_ID:-}"
+      CONSOLE_CASDOOR_APP: "${CONSOLE_CASDOOR_APP:-}"
+      CONSOLE_CASDOOR_ORG: "${CONSOLE_CASDOOR_ORG:-}"
+      CONSOLE_DOMAIN: "${CONSOLE_DOMAIN:-https://your.deployment.domain}"
       MYSQL_URL: "${MYSQL_URL:-jdbc:mysql://mysql:3306/astron_console}"
-      MYSQL_USERNAME: "${MYSQL_USER:-root}"
+      MYSQL_USER: "${MYSQL_USER:-root}"
       MYSQL_PASSWORD: "${MYSQL_PASSWORD:-root123}"
       REDIS_HOST: "${REDIS_HOST:-redis}"
       REDIS_PORT: "${REDIS_PORT:-6379}"
-      REDIS_DATABASE: "${REDIS_DATABASE:-0}"
-      S3_ENDPOINT: "${S3_ENDPOINT:-http://minio:9000}"
-      S3_ACCESS_KEY: "${S3_ACCESS_KEY:-minioadmin}"
-      S3_SECRET_KEY: "${S3_SECRET_KEY:-minioadmin}"
-      S3_BUCKET: "${S3_BUCKET:-astron-project}"
-      S3_PRESIGN_EXPIRY_SECONDS: "${S3_PRESIGN_EXPIRY_SECONDS:-600}"
+      REDIS_DATABASE_CONSOLE: "${REDIS_DATABASE_CONSOLE:-0}"
+      OSS_ENDPOINT: "${OSS_ENDPOINT:-http://minio:9000}"
+      OSS_ACCESS_KEY_ID: "${OSS_ACCESS_KEY_ID:-minioadmin}"
+      OSS_ACCESS_KEY_SECRET: "${OSS_ACCESS_KEY_SECRET:-minioadmin123}"
+      OSS_BUCKET_CONSOLE: "${OSS_BUCKET_CONSOLE:-console}"
+      OSS_PRESIGN_EXPIRY_SECONDS_CONSOLE: "${OSS_PRESIGN_EXPIRY_SECONDS_CONSOLE:-600}"
       OAUTH2_ISSUER_URI: "${OAUTH2_ISSUER_URI:-http://auth-server:8000}"
       OAUTH2_JWK_SET_URI: "${OAUTH2_JWK_SET_URI:-http://auth-server:8000/.well-known/jwks}"
       OAUTH2_AUDIENCE: "${OAUTH2_AUDIENCE:-your-oauth2-client-id}"
+      SPARK_APP_ID: "${SPARK_APP_ID:-your-spark-app-id}"
+      SPARK_API_KEY: "${SPARK_API_KEY:-your-spark-api-key}"
+      SPARK_API_SECRET: "${SPARK_API_SECRET:-your-spark-api-secret}"
+      SPARK_API_PASSWORD: "${SPARK_API_PASSWORD:-your-spark-api-password}"
+      SPARK_LFASR_KEY: "${SPARK_LFASR_KEY:-your-spark-lfasr-key}"
+      SPARK_LFASR_APPID: "${SPARK_LFASR_APPID:-your-spark-lfasr-appid}"
+      WECHAT_COMPONENT_APPID: "${WECHAT_COMPONENT_APPID:-your-wechat-component-appid}"
+      WECHAT_COMPONENT_SECRET: "${WECHAT_COMPONENT_SECRET:-your-wechat-component-secret}"
+      WECHAT_TOKEN: "${WECHAT_TOKEN:-your-wechat-token}"
+      WECHAT_ENCODING_AES_KEY: "${WECHAT_ENCODING_AES_KEY:-your-wechat-encoding-aes-key}"
       API_AUTH_SECRET: "${API_AUTH_SECRET:-secret}"
       COMMON_APPID: "${COMMON_APPID:-appid}"
       COMMON_APIKEY: "${COMMON_APIKEY:-apiKey}"
@@ -535,8 +562,8 @@ services:
       MAAS_CONSUMER_ID: "${MAAS_CONSUMER_ID:-your-maas-consumer-id}"
       MAAS_CONSUMER_SECRET: "${MAAS_CONSUMER_SECRET:-your-maas-consumer-secret}"
       MAAS_CONSUMER_KEY: "${MAAS_CONSUMER_KEY:-your-maas-consumer-key}"
-    ports:
-      - "${CONSOLE_HUB_PORT:-8080}:8080"
+    expose:
+      - "8080"
     depends_on:
       postgres:
         condition: service_healthy
@@ -579,4 +606,6 @@ volumes:
   kafka_data:
     driver: local
   minio_data:
+    driver: local
+  nginx_logs:
     driver: local

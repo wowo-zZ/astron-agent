@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import styles from './index.module.scss';
 import { useSize } from 'ahooks';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import cloneDeep from 'lodash/cloneDeep';
 import { useDebounceFn } from 'ahooks';
 import { useTranslation } from 'react-i18next';

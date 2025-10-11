@@ -3,7 +3,7 @@ import { useClickAway } from 'ahooks';
 import { FlowInputNumber } from '@/components/workflow/ui';
 import { Tooltip, Switch, Slider } from 'antd';
 import { v4 as uuid } from 'uuid';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import { useTranslation } from 'react-i18next';
 
 import answerSettings from '@/assets/imgs/workflow/answer-settings.svg';

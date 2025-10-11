@@ -17,13 +17,11 @@ import cn.hutool.core.text.UnicodeUtil;
 import java.util.Map;
 
 /**
- * WeChat third-party platform callback controller
- * Based on original WXOpenApiCallback design
- * Handles callbacks from WeChat third-party platform including:
- * 1. System messages (verify ticket, authorization events)
- * 2. User messages from official accounts
- * 3. Authorization callbacks from frontend
- * 
+ * WeChat third-party platform callback controller Based on original WXOpenApiCallback design
+ * Handles callbacks from WeChat third-party platform including: 1. System messages (verify ticket,
+ * authorization events) 2. User messages from official accounts 3. Authorization callbacks from
+ * frontend
+ *
  * @author Omuigix
  */
 @Slf4j

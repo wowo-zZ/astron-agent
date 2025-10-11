@@ -15,6 +15,7 @@ class ErrorCode(Enum):
     CREATE_TASK_ERROR = (55001, "Create task error")
     QUERY_TASK_ERROR = (55002, "Query task error")
     TIMEOUT_ERROR = (55003, "Timeout error")
+    TASK_EXEC_FAILED = (55004, "Task exec failed")
 
     CREATE_URL_INVALID = (55101, "Create Task Url Invalid")
     QUERY_URL_INVALID = (55102, "Query Task Url Invalid")

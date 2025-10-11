@@ -51,11 +51,14 @@ class RunnerBase(BaseModel):
             node_start_time = int(round(time.time() * 1000))
             node_running_status = True
             node_data_input = {
-                "model_general_stream_input": json.dumps(messages, ensure_ascii=False)
+                "model_general_stream_input": json.dumps(
+                    messages, ensure_ascii=False
+                )
             }
             node_data_output: dict[str, Any] = {}
             node_data_config: dict[str, Any] = {}
             node_data_usage = NodeDataUsage()
+            last_chunk_has_content = False
             async for chunk in self.model.stream(messages, True, sp):
                 if not chunk.choices:
                     continue
@@ -63,29 +66,47 @@ class RunnerBase(BaseModel):
                 reasoning_content = delta.get("reasoning_content")
                 content = delta.get("content")
 
-                node_data_usage.completion_tokens = 0
-                node_data_usage.prompt_tokens = 0
-                node_data_usage.total_tokens = 0
-                if chunk.usage and chunk.usage.model_dump().get("total_tokens") != 0:
+                # Accumulate usage from chunks instead of resetting
+                if chunk.usage:
                     usage_data = chunk.usage.model_dump()
-                    node_data_usage.completion_tokens = usage_data.get(
+                    node_data_usage.completion_tokens += usage_data.get(
                         "completion_tokens", 0
                     )
-                    node_data_usage.prompt_tokens = usage_data.get("prompt_tokens", 0)
-                    node_data_usage.total_tokens = usage_data.get("total_tokens", 0)
+                    node_data_usage.prompt_tokens += usage_data.get(
+                        "prompt_tokens", 0
+                    )
+                    node_data_usage.total_tokens += (
+                        usage_data.get("total_tokens", 0)
+                    )
 
+                # For intermediate chunks, don't send usage yet
                 if reasoning_content:
                     yield AgentResponse(
                         typ="reasoning_content",
                         content=reasoning_content,
                         model=self.model.name,
+                        usage=None,
                     )
                     thinks += reasoning_content
+                    last_chunk_has_content = True
                 if content:
                     yield AgentResponse(
-                        typ="content", content=content, model=self.model.name
+                        typ="content",
+                        content=content,
+                        model=self.model.name,
+                        usage=None,
                     )
                     answers += content
+                    last_chunk_has_content = True
+
+            # Usage will be attached to stop chunk in _finalize_run
+            sp.add_info_events({
+                "accumulated_usage": {
+                    "completion_tokens": node_data_usage.completion_tokens,
+                    "prompt_tokens": node_data_usage.prompt_tokens,
+                    "total_tokens": node_data_usage.total_tokens
+                }
+            })
 
             node_end_time = int(round(time.time() * 1000))
             data_llm_output = answers

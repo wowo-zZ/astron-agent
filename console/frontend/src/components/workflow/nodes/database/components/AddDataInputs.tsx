@@ -8,8 +8,8 @@ import {
   FlowCascader,
   FLowCollapse,
 } from '@/components/workflow/ui';
-import useFlowsManager from '@/components/workflow/store/useFlowsManager';
-import { useNodeCommon } from '@/components/workflow/hooks/useNodeCommon';
+import useFlowsManager from '@/components/workflow/store/use-flows-manager';
+import { useNodeCommon } from '@/components/workflow/hooks/use-node-common';
 
 import inputAddIcon from '@/assets/imgs/workflow/input-add-icon.png';
 import remove from '@/assets/imgs/workflow/input-remove-icon.png';
@@ -23,7 +23,7 @@ const RenderNameCell = ({ item }): React.ReactElement => {
   return (
     <div className="flex flex-col flex-shrink-0 w-1/3">
       <div className="flex items-center w-[204px] relative gap-2.5 overflow-hidden">
-        <span className="relative flex items-center gap-1.5 max-w-[130px]">
+        <span className="relative flex items-center gap-1.5 max-w-[100px]">
           <span className="flex-1 text-overflow" title={item?.name}>
             {item.name}
           </span>
