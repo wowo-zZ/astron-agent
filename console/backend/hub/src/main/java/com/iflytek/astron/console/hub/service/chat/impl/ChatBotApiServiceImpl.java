@@ -43,8 +43,8 @@ public class ChatBotApiServiceImpl implements ChatBotApiService {
     }
 
     @Override
-    public void insert(String uid, Integer botId, String assistantId, String appId, String appSecret, String appKey,
-            String prompt, String pluginIds, String embeddingIds, String apiPath, String description) {
+    public void insertOrUpdate(String uid, Integer botId, String assistantId, String appId, String appSecret, String appKey,
+                               String prompt, String pluginIds, String embeddingIds, String apiPath, String description) {
         ChatBotApi chatBotApi = ChatBotApi.builder()
                 .uid(uid)
                 .botId(botId)
@@ -59,7 +59,12 @@ public class ChatBotApiServiceImpl implements ChatBotApiService {
                 .description(description)
                 .createTime(LocalDateTime.now())
                 .build();
-        chatBotApiMapper.insert(chatBotApi);
+        if (assistantId != null && chatBotApiMapper.exists(Wrappers.lambdaQuery(ChatBotApi.class).eq(ChatBotApi::getAssistantId, assistantId))) {
+            chatBotApiMapper.updateById(chatBotApi);
+        } else {
+            chatBotApiMapper.insert(chatBotApi);
+        }
+
     }
 
 }
