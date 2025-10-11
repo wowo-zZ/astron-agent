@@ -426,7 +426,6 @@ public class MaasUtil {
         RequestBody requestBody = RequestBody.create(
                 JSONObject.toJSONString(bodyData),
                 MediaType.parse("application/json; charset=utf-8"));
-
         Request request = new Request.Builder()
                 .url(url)
                 .post(requestBody)

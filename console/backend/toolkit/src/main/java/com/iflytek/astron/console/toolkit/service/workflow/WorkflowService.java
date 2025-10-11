@@ -828,10 +828,10 @@ public class WorkflowService extends ServiceImpl<WorkflowMapper, Workflow> {
         String nFlowId = addResult.data();
 
         BizWorkflowData data = handleDataClone(nFlowId, src.getData());
-        if (data != null) {
-            flowReq.setData(data);
-            saveRemote(flowReq, nFlowId); // Sync to core
-        }
+//        if (data != null) {
+//            flowReq.setData(data);
+//            saveRemote(flowReq, nFlowId); // Sync to core
+//        }
 
         final Workflow replica = new Workflow();
         org.springframework.beans.BeanUtils.copyProperties(src, replica);
