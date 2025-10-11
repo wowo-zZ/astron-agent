@@ -410,10 +410,11 @@ public class KnowledgeService {
         // try {
         // session.startTransaction();
         // knowledgeRepository.deleteById(id);
-        knowledgeMapper.deleteById(id);
+
         JSONArray delKbList = new JSONArray();
         delKbList.add(knowledge.getId());
         this.deleteKnowledgeChunks(uuids.getFirst(), delKbList);
+        knowledgeMapper.deleteById(id);
         // session.commitTransaction();
         // } catch (Exception e) {
         // // Rollback transaction
