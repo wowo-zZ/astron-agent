@@ -584,6 +584,12 @@ services:
       MAAS_WORKFLOW_CONFIG: "${MAAS_WORKFLOW_CONFIG:-}"
       TENANT_CREATE_APP: "${TENANT_CREATE_APP:-}"
       TENANT_GET_APP_DETAIL: "${TENANT_GET_APP_DETAIL:-}"
+      APP_URL: "${APP_URL:-}"
+      KNOWLEDGE_URL: "${KNOWLEDGE_URL:-}"
+      TOOL_URL: "${TOOL_URL:-}"
+      WORKFLOW_URL: "${WORKFLOW_URL:-}"
+      SPARK_DB_URL: "${SPARK_DB_URL:-}"
+      LOCAL_MODEL_URL: "${LOCAL_MODEL_URL:-}"
     expose:
       - "8080"
     depends_on:
