@@ -166,17 +166,17 @@ public class McpPublishStrategy implements PublishStrategy {
      */
     private String getVersionName(Integer botId, String currentUid, Long spaceId) {
         try {
-            // 1. Get flowId from botId (same as original project)
+            // 1. Get flowId from botId
             String flowId = userLangChainDataService.findFlowIdByBotId(botId);
             if (flowId == null || flowId.trim().isEmpty()) {
                 log.error("getVersionName - Failed to get flowId by botId, botId={}", botId);
                 return generateDefaultVersion();
             }
 
-            // 2. Send HTTP request to get version name (same as original project)
+            // 2. Send HTTP request to get version name
             log.info("Getting version name for MCP publish: botId={}, flowId={}", botId, flowId);
 
-            // Build request body (same as original project)
+            // Build request body
             JSONObject requestBody = new JSONObject();
             requestBody.put("flowId", flowId);
             String jsonBody = requestBody.toJSONString();
@@ -189,7 +189,7 @@ public class McpPublishStrategy implements PublishStrategy {
                     .addHeader("Content-Type", "application/json")
                     .addHeader("Authorization", authHeader);
 
-            // Add spaceId to header (same as original project)
+            // Add spaceId to header
             if (spaceId != null) {
                 requestBuilder.addHeader("space-id", spaceId.toString());
             }
@@ -204,7 +204,7 @@ public class McpPublishStrategy implements PublishStrategy {
                 String responseBody = response.body().string();
                 log.debug("getVersionName response: {}", responseBody);
 
-                // Parse response (same as original project)
+                // Parse response
                 JSONObject responseJson = JSON.parseObject(responseBody);
                 JSONObject data = responseJson.getJSONObject("data");
 
@@ -266,7 +266,7 @@ public class McpPublishStrategy implements PublishStrategy {
      */
     private void recordMcpRelease(Integer botId, String versionName, String currentUid, Long spaceId) {
         try {
-            // Get flowId (same as original project)
+            // Get flowId
             String flowId = userLangChainDataService.findFlowIdByBotId(botId);
             if (flowId == null || flowId.trim().isEmpty()) {
                 log.error("recordMcpRelease - Failed to get flowId by botId, botId={}", botId);
@@ -275,7 +275,7 @@ public class McpPublishStrategy implements PublishStrategy {
 
             log.info("Recording MCP release: botId={}, flowId={}, versionName={}", botId, flowId, versionName);
 
-            // Build release bot request (same as original project)
+            // Build release bot request
             JSONObject releaseBotDto = new JSONObject();
             releaseBotDto.put("botId", botId.toString());
             releaseBotDto.put("flowId", flowId);
@@ -286,7 +286,7 @@ public class McpPublishStrategy implements PublishStrategy {
 
             String jsonParams = releaseBotDto.toJSONString();
 
-            // Build HTTP request (same as original project)
+            // Build HTTP request
             String authHeader = getCurrentAuthorizationHeader();
             Request.Builder requestBuilder = new Request.Builder()
                     .url(baseUrl) // ADD_VERSION_URL is empty string, so just use baseUrl
@@ -294,7 +294,7 @@ public class McpPublishStrategy implements PublishStrategy {
                     .addHeader("Content-Type", "application/json")
                     .addHeader("Authorization", authHeader);
 
-            // Add spaceId to header (same as original project)
+            // Add spaceId to header
             if (spaceId != null) {
                 requestBuilder.addHeader("space-id", spaceId.toString());
             }
@@ -309,7 +309,7 @@ public class McpPublishStrategy implements PublishStrategy {
                 String responseBody = response.body().string();
                 log.debug("recordMcpRelease response: {}", responseBody);
 
-                // Parse response (same as original project)
+                // Parse response
                 JSONObject responseJson = JSON.parseObject(responseBody);
                 JSONObject data = responseJson.getJSONObject("data");
 
