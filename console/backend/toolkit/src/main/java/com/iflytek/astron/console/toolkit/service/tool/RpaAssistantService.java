@@ -13,10 +13,12 @@ import com.iflytek.astron.console.commons.exception.BusinessException;
 import com.iflytek.astron.console.commons.util.space.SpaceInfoUtil;
 import com.iflytek.astron.console.toolkit.entity.biz.workflow.BizWorkflowData;
 import com.iflytek.astron.console.toolkit.entity.biz.workflow.BizWorkflowNode;
+import com.iflytek.astron.console.toolkit.entity.table.ConfigInfo;
 import com.iflytek.astron.console.toolkit.entity.table.tool.*;
 import com.iflytek.astron.console.toolkit.entity.tool.*;
 import com.iflytek.astron.console.toolkit.handler.RpaHandler;
 import com.iflytek.astron.console.toolkit.handler.UserInfoManagerHandler;
+import com.iflytek.astron.console.toolkit.mapper.ConfigInfoMapper;
 import com.iflytek.astron.console.toolkit.mapper.tool.*;
 import com.iflytek.astron.console.toolkit.service.workflow.WorkflowService;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +48,7 @@ public class RpaAssistantService {
     private final RpaHandler rpaHandler;
     private final WorkflowService workflowService;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ConfigInfoMapper configInfoMapper;
 
     /**
      * Create an RPA assistant with plaintext credentials.
@@ -72,13 +75,14 @@ public class RpaAssistantService {
                 .collect(Collectors.toMap(PlatformFieldSpec::getName, s -> s, (a, b) -> a));
 
         // 2. Validate required fields and types (only required & string check for now)
-        validate(specMap, req.fields());
+        Integer count = validate(specMap, req.fields());
 
         // 3. Insert main assistant record
         String username = UserInfoManagerHandler.get().getUsername();
         RpaUserAssistant assistant = new RpaUserAssistant();
         assistant.setUserId(currentUserId);
         assistant.setUserName(username);
+        assistant.setRobotCount(count);
         assistant.setPlatformId(req.platformId());
         assistant.setAssistantName(req.assistantName());
         assistant.setStatus(1);
@@ -149,7 +153,7 @@ public class RpaAssistantService {
      * @param fields actual field key-value pairs
      * @throws BusinessException if required fields are missing or validation fails
      */
-    private void validate(Map<String, PlatformFieldSpec> specMap, Map<String, String> fields) {
+    private Integer validate(Map<String, PlatformFieldSpec> specMap, Map<String, String> fields) {
         // Required fields check
         List<String> missing = specMap.values()
                 .stream()
@@ -163,6 +167,7 @@ public class RpaAssistantService {
         }
         // Type validation (simple demo: only string type is allowed; can extend to number/bool/url/regex
         // etc.)
+        Integer total = 0;
         if (fields != null) {
             for (Map.Entry<String, String> e : fields.entrySet()) {
                 PlatformFieldSpec s = specMap.get(e.getKey());
@@ -172,8 +177,13 @@ public class RpaAssistantService {
                 if (!"string".equals(t)) {
                     // Extend validation for other types here
                 }
+                String value = e.getValue();
+                JSONObject rpaList = rpaHandler.getRpaList(1, 100, value);
+                // 4) Update robot count with actual platform total (not affected by name filter)
+                total = rpaList.getInteger("total");
             }
         }
+        return total;
     }
 
     /**
@@ -216,6 +226,13 @@ public class RpaAssistantService {
         JSONArray records = rpaList.getJSONArray("records");
         if (records == null) {
             records = new JSONArray();
+        }
+        ConfigInfo iconConfig = configInfoMapper.getByCategoryAndCode("ICON", "rpa_robot");
+        for (Object record : records) {
+            if (!(record instanceof JSONObject obj)) {
+                continue;
+            }
+            obj.put("icon", iconConfig.getName() + iconConfig.getValue());
         }
 
         if (StringUtils.isNotBlank(name)) {
