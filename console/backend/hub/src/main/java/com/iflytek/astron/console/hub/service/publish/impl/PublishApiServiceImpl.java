@@ -161,7 +161,7 @@ public class PublishApiServiceImpl implements PublishApiService {
 
         releaseManageClientService.releaseBotApi(botId, flowId, versionName, spaceId, request);
 
-        chatBotApiService.insert(uid, botId, flowId, appMst.getAppId(),
+        chatBotApiService.insertOrUpdate(uid, botId, flowId, appMst.getAppId(),
                 appMst.getAppSecret(), appMst.getAppKey(), "", "", "",
                 "/workflow/v1/chat/completions", botBase.getBotName());
 
@@ -189,7 +189,7 @@ public class PublishApiServiceImpl implements PublishApiService {
         List<Long> datasetIdList = datasetInfos.stream().map(DatasetInfo::getId).toList();
         String embeddingIds = StringUtils.defaultString(datasetIdList.stream().map(Objects::toString).collect(Collectors.joining(",")), "");
 
-        chatBotApiService.insert(uid, botId, null, appMst.getAppId(),
+        chatBotApiService.insertOrUpdate(uid, botId, null, appMst.getAppId(),
                 appMst.getAppSecret(), appMst.getAppKey(), prompt, "", embeddingIds,
                 null, botBase.getBotName());
 
