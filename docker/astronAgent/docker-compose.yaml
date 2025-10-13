@@ -218,27 +218,34 @@ services:
     restart: always
 
   # RPA Plugin Service
-#  core-rpa:
-#    image: ghcr.io/iflytek/astron-agent/astron-agent-core-rpa:latest
-#    container_name: astron-agent-core-rpa
-#    ports:
-#      - "${CORE_RPA_PORT:-8003}:8000"
-#    depends_on:
-#      postgres:
-#        condition: service_healthy
-#      mysql:
-#        condition: service_healthy
-#      redis:
-#        condition: service_healthy
-#      elasticsearch:
-#        condition: service_healthy
-#      kafka:
-#        condition: service_healthy
-#      minio:
-#        condition: service_healthy
-#    networks:
-#      - astron-agent-network
-#    restart: always
+  core-rpa:
+    image: ghcr.io/iflytek/astron-agent/core-rpa:latest
+    container_name: astron-agent-core-rpa
+    environment:
+      OTLP_ENDPOINT: "${OTLP_ENDPOINT:-127.0.0.1:4317}"
+      KAFKA_SERVERS: "${KAFKA_SERVERS:-kafka:29092}"
+      XIAOWU_RPA_TASK_CREATE_URL: "${XIAOWU_RPA_TASK_CREATE_URL:-}"
+      XIAOWU_RPA_TASK_QUERY_URL: "${XIAOWU_RPA_TASK_QUERY_URL:-}"
+    ports:
+      - "${CORE_RPA_PORT:-17198}:17198"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    volumes:
+      - ./config/rpa/config.env:/opt/rpa/plugin/rpa/config.env
+    networks:
+      - astron-agent-network
+    restart: always
 
   # Link Plugin Service
   core-link:
@@ -536,25 +543,28 @@ services:
       OAUTH2_ISSUER_URI: "${OAUTH2_ISSUER_URI:-http://auth-server:8000}"
       OAUTH2_JWK_SET_URI: "${OAUTH2_JWK_SET_URI:-http://auth-server:8000/.well-known/jwks}"
       OAUTH2_AUDIENCE: "${OAUTH2_AUDIENCE:-your-oauth2-client-id}"
+      PLATFORM_APP_ID: "${PLATFORM_APP_ID:-your-app-id}"
+      PLATFORM_API_KEY: "${PLATFORM_API_KEY:-your-api-key}"
+      PLATFORM_API_SECRET: "${PLATFORM_API_SECRET:-your-api-secret}"
       SPARK_APP_ID: "${SPARK_APP_ID:-your-spark-app-id}"
       SPARK_API_KEY: "${SPARK_API_KEY:-your-spark-api-key}"
       SPARK_API_SECRET: "${SPARK_API_SECRET:-your-spark-api-secret}"
       SPARK_API_PASSWORD: "${SPARK_API_PASSWORD:-your-spark-api-password}"
       SPARK_LFASR_KEY: "${SPARK_LFASR_KEY:-your-spark-lfasr-key}"
       SPARK_LFASR_APPID: "${SPARK_LFASR_APPID:-your-spark-lfasr-appid}"
+      SPARK_IMAGE_APP_ID: "${SPARK_IMAGE_APP_ID:-your-image-appid}"
+      SPARK_IMAGE_API_KEY: "${SPARK_IMAGE_API_KEY:-your-image-api-key}"
+      SPARK_IMAGE_API_SECRET: "${SPARK_IMAGE_API_SECRET:-your-image-api-secret}"
       WECHAT_COMPONENT_APPID: "${WECHAT_COMPONENT_APPID:-your-wechat-component-appid}"
       WECHAT_COMPONENT_SECRET: "${WECHAT_COMPONENT_SECRET:-your-wechat-component-secret}"
       WECHAT_TOKEN: "${WECHAT_TOKEN:-your-wechat-token}"
       WECHAT_ENCODING_AES_KEY: "${WECHAT_ENCODING_AES_KEY:-your-wechat-encoding-aes-key}"
-      API_AUTH_SECRET: "${API_AUTH_SECRET:-secret}"
       COMMON_APPID: "${COMMON_APPID:-appid}"
       COMMON_APIKEY: "${COMMON_APIKEY:-apiKey}"
       COMMON_API_SECRET: "${COMMON_API_SECRET:-apiSecret}"
       TENANT_ID: "${TENANT_ID:-tenantId}"
       TENANT_KEY: "${TENANT_KEY:-tenantKey}"
       TENANT_SECRET: "${TENANT_SECRET:-tenantSecret}"
-      APP_APIKEY: "${APP_APIKEY:-apikey}"
-      APP_API_SECRET: "${APP_API_SECRET:-apiSecret}"
       ADMIN_UID: "${ADMIN_UID:-9999}"
       MAAS_APP_ID: "${MAAS_APP_ID:-your-maas-app-id}"
       MAAS_API_KEY: "${MAAS_API_KEY:-your-maas-api-key}"
@@ -562,6 +572,18 @@ services:
       MAAS_CONSUMER_ID: "${MAAS_CONSUMER_ID:-your-maas-consumer-id}"
       MAAS_CONSUMER_SECRET: "${MAAS_CONSUMER_SECRET:-your-maas-consumer-secret}"
       MAAS_CONSUMER_KEY: "${MAAS_CONSUMER_KEY:-your-maas-consumer-key}"
+      MAAS_WORKFLOW_VERSION: "${MAAS_WORKFLOW_VERSION:-}"
+      MAAS_SYNCHRONIZE_WORK_FLOW: "${MAAS_SYNCHRONIZE_WORK_FLOW:-}"
+      MAAS_PUBLISH: "${MAAS_PUBLISH:-}"
+      MAAS_CLONE_WORK_FLOW: "${MAAS_CLONE_WORK_FLOW:-}"
+      MAAS_GET_INPUTS: "${MAAS_GET_INPUTS:-}"
+      MAAS_CAN_PUBLISH_URL: "${MAAS_CAN_PUBLISH_URL:-}"
+      MAAS_PUBLISH_API: "${MAAS_PUBLISH_API:-}"
+      MAAS_AUTH_API: "${MAAS_AUTH_API:-}"
+      MAAS_MCP_REGISTER: "${MAAS_MCP_REGISTER:-}"
+      MAAS_WORKFLOW_CONFIG: "${MAAS_WORKFLOW_CONFIG:-}"
+      TENANT_CREATE_APP: "${TENANT_CREATE_APP:-}"
+      TENANT_GET_APP_DETAIL: "${TENANT_GET_APP_DETAIL:-}"
     expose:
       - "8080"
     depends_on:

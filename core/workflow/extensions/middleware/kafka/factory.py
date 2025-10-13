@@ -36,4 +36,15 @@ class KafkaProducerServiceFactory(ServiceFactory):
 
         # Build configuration dictionary with bootstrap servers and additional parameters
         config = {"bootstrap.servers": servers, **kwargs}
+        protocol = os.getenv("KAFKA_SECURITY_PROTOCOL", "SASL_PLAINTEXT").upper()
+        mechanism = os.getenv("KAFKA_SASL_MECHANISM", "PLAIN").upper()
+        username = os.getenv("KAFKA_SASL_USERNAME", "")
+        password = os.getenv("KAFKA_SASL_PASSWORD", "")
+        if username and password:
+            config.update(
+                security_protocol=protocol,
+                sasl_mechanism=mechanism,
+                sasl_plain_username=username,
+                sasl_plain_password=password,
+            )
         return KafkaProducerService(config)

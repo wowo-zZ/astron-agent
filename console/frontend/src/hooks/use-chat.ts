@@ -275,9 +275,21 @@ const useChat = () => {
     navigate(`/chat/${botId}`);
   };
 
+  const handleFlowToChat = (item: any) => {
+    let url = `${location.origin}/chat?botId=${item?.botId}`;
+    if (item?.version) {
+      url += `&version=${item?.version}`;
+    }
+    window.open(url, '_blank');
+    if (item?.chatId || item?.id) {
+      setCurrentChatId(item?.chatId || item?.id);
+    }
+  };
+
   return {
     onSendMsg,
     handleToChat,
+    handleFlowToChat,
     fetchSSE,
     handleReAnswer,
   };

@@ -60,7 +60,7 @@ CREATE TABLE `agent_enterprise_permission`
     `id`                bigint  NOT NULL AUTO_INCREMENT,
     `module`            varchar(50)  DEFAULT NULL COMMENT 'Permission module',
     `description`       varchar(255) DEFAULT NULL COMMENT 'Description',
-    `permission_key`    varchar(64)  DEFAULT NULL COMMENT 'Permission unique identifier',
+    `permission_key`    varchar(128)  DEFAULT NULL COMMENT 'Permission unique identifier',
     `officer`           tinyint NOT NULL COMMENT 'Super administrator (has permission): 1 yes, 0 no',
     `governor`          tinyint NOT NULL COMMENT 'Administrator (has permission): 1 yes, 0 no',
     `staff`             tinyint NOT NULL COMMENT 'Member (has permission): 1 yes, 0 no',
@@ -176,6 +176,9 @@ INSERT INTO `agent_enterprise_permission` (`id`, `module`, `description`, `permi
                                            `staff`, `available_expired`, `create_time`, `update_time`)
 VALUES (51, 'Invitation Management', 'Enterprise invitation batch search user', 'InviteRecordController_enterpriseBatchSearchUser_POST', 1, 1, 1, 0,
         '2025-01-01 00:00:00', '2025-01-01 00:00:00');
+INSERT INTO `astron_console`.`agent_enterprise_permission` (`module`, `description`, `permission_key`, `officer`, `governor`, `staff`, `available_expired`, `create_time`, `update_time`) VALUES ('Invitation Management', 'Enterprise invitation search username', 'InviteRecordController_enterpriseBatchSearchUsername_POST', 1, 1, 1, 0, '2025-01-01 00:00:00', '2025-01-01 00:00:00');
+INSERT INTO `astron_console`.`agent_enterprise_permission` (`module`, `description`, `permission_key`, `officer`, `governor`, `staff`, `available_expired`, `create_time`, `update_time`) VALUES ('Invitation Management', 'Enterprise invitation batch search username', 'InviteRecordController_enterpriseSearchUsernameInviteRecordController_enterpriseSearchUsername_GET_GET', 1, 1, 0, 0, '2025-01-01 00:00:00', '2025-01-01 00:00:00');
+
 COMMIT;
 
 -- ----------------------------
@@ -272,7 +275,7 @@ CREATE TABLE `agent_space_permission`
     `module`            varchar(50)  DEFAULT NULL COMMENT 'Permission module',
     `point`             varchar(50)  DEFAULT NULL COMMENT 'Permission point',
     `description`       varchar(255) DEFAULT NULL COMMENT 'Description',
-    `permission_key`    varchar(64)  DEFAULT NULL COMMENT 'Permission unique identifier',
+    `permission_key`    varchar(128)  DEFAULT NULL COMMENT 'Permission unique identifier',
     `owner`             tinyint NOT NULL COMMENT 'Owner (has permission): 1 yes, 0 no',
     `admin`             tinyint NOT NULL COMMENT 'Administrator (has permission): 1 yes, 0 no',
     `member`            tinyint NOT NULL COMMENT 'Member (has permission): 1 yes, 0 no',
@@ -851,8 +854,6 @@ INSERT INTO `agent_space_permission` (`id`, `module`, `point`, `description`, `p
                                       `member`, `available_expired`, `create_time`, `update_time`)
 VALUES (283, 'Update Bot', '', '', 'BotCreateController_update_POST', 1, 1, 1, 0, '2025-08-11 09:19:40',
         '2025-08-11 09:19:40');
-INSERT INTO `astron_console`.`agent_space_permission` (`id`, `module`, `point`, `description`, `permission_key`, `owner`, `admin`, `member`, `available_expired`, `create_time`, `update_time`) VALUES (282, '创建工作流智能体', NULL, NULL, 'BotCreateController_create_POST', 1, 1, 1, 0, '2025-01-01 00:00:00', '2025-01-01 00:00:00');
-INSERT INTO `astron_console`.`agent_space_permission` (`id`, `module`, `point`, `description`, `permission_key`, `owner`, `admin`, `member`, `available_expired`, `create_time`, `update_time`) VALUES (283, '更新工作流智能体', NULL, NULL, 'BotCreateController_update_POST', 1, 1, 1, 0, '2025-01-01 00:00:00', '2025-01-01 00:00:00');
 COMMIT;
 
 -- ----------------------------

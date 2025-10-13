@@ -135,7 +135,7 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
     private String getNextVersionName(String flowId, Long spaceId) {
         log.info("Getting next workflow version name: flowId={}, spaceId={}", flowId, spaceId);
 
-        String fallbackVersion = "v" + System.currentTimeMillis();
+        // Use old project logic for fallback version generation
 
         try {
             // Build request parameters
@@ -162,19 +162,19 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
                 if (!response.isSuccessful()) {
                     log.error("Failed to get next version name: flowId={}, responseCode={}, response={}",
                             flowId, response.code(), responseBody);
-                    return fallbackVersion;
+                    return generateFallbackVersionName(flowId);
                 }
 
                 if (!StringUtils.hasText(responseBody)) {
                     log.warn("Empty response while getting next version name: flowId={}", flowId);
-                    return fallbackVersion;
+                    return generateFallbackVersionName(flowId);
                 }
 
                 JSONObject responseJson = JSON.parseObject(responseBody);
                 if (responseJson == null) {
                     log.warn("Failed to parse response while getting version name: flowId={}, response={}",
                             flowId, responseBody);
-                    return fallbackVersion;
+                    return generateFallbackVersionName(flowId);
                 }
 
                 JSONObject data = responseJson.getJSONObject("data");
@@ -186,12 +186,94 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
                 }
 
                 log.warn("Version name not found in response: flowId={}, response={}", flowId, responseBody);
-                return fallbackVersion;
+                return generateFallbackVersionName(flowId);
             }
 
         } catch (Exception e) {
             log.error("Exception occurred while getting next workflow version name: flowId={}, spaceId={}", flowId, spaceId, e);
-            return fallbackVersion;
+        }
+        
+        // Use fallback version generation based on old project logic
+        String fallbackVersion = generateFallbackVersionName(flowId);
+        log.info("Using fallback version name: {} for flowId: {}", fallbackVersion, flowId);
+        return fallbackVersion;
+    }
+
+    /**
+     * Generate fallback version name based on old project logic
+     * Returns v1.0 for first version, then increments based on existing versions
+     */
+    private String generateFallbackVersionName(String flowId) {
+        try {
+            // Query for the latest version of this workflow
+            LambdaQueryWrapper<WorkflowVersion> queryWrapper = new LambdaQueryWrapper<WorkflowVersion>()
+                    .eq(WorkflowVersion::getFlowId, flowId)
+                    .orderByDesc(WorkflowVersion::getCreatedTime)
+                    .isNotNull(WorkflowVersion::getSysData)
+                    .last("LIMIT 1");
+
+            WorkflowVersion latestVersion = workflowVersionMapper.selectOne(queryWrapper);
+            
+            if (latestVersion == null) {
+                // First version
+                return "v1.0";
+            }
+
+            String latestVersionName = latestVersion.getName();
+            if (latestVersionName == null || latestVersionName.trim().isEmpty()) {
+                return "v1.0";
+            }
+
+            // Extract version number and increment
+            return incrementVersion(latestVersionName, true);
+            
+        } catch (Exception e) {
+            log.error("Failed to generate fallback version name for flowId: {}", flowId, e);
+            // Ultimate fallback
+            return "v1.0";
+        }
+    }
+
+    /**
+     * Increment version number based on old project logic
+     * @param maxVersion Current maximum version (e.g., "v1.0", "v2.0")
+     * @param shouldIncrement Whether to increment the version number
+     * @return Incremented version string
+     */
+    private String incrementVersion(String maxVersion, boolean shouldIncrement) {
+        if (maxVersion == null || maxVersion.trim().isEmpty()) {
+            return "v1.0";
+        }
+
+        double maxVersionNumber = extractVersionNumber(maxVersion);
+
+        if (shouldIncrement) {
+            maxVersionNumber += 1.0;
+        }
+
+        return "v" + String.valueOf(maxVersionNumber);
+    }
+
+    /**
+     * Extract version number from version string
+     * @param version Version string like "v1.0", "v2.5"
+     * @return Numeric version value
+     */
+    private double extractVersionNumber(String version) {
+        if (version == null || version.trim().isEmpty()) {
+            return 1.0;
+        }
+
+        try {
+            // Remove 'v' or 'V' prefix and extract number
+            String numberPart = version.replaceAll("^[vV]", "").trim();
+            if (numberPart.isEmpty()) {
+                return 1.0;
+            }
+            return Double.parseDouble(numberPart);
+        } catch (NumberFormatException e) {
+            log.warn("Failed to parse version number from: {}, using default 1.0", version);
+            return 1.0;
         }
     }
 

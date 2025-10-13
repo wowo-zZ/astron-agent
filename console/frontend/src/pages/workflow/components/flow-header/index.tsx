@@ -137,7 +137,7 @@ const FlowHeader: React.FC<FlowHeaderProps> = ({
             src={arrowLeft}
             className="w-[28px] cursor-pointer"
             alt=""
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/space/agent')}
           />
           <div className="relative flex items-center gap-4">
             <img

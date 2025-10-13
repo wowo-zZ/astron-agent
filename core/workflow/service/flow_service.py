@@ -349,7 +349,7 @@ def build(
 
         # Create workflow engine to validate flow structure
         WorkflowEngineFactory.create_engine(
-            WorkflowDSL.parse_obj(flow.data.get("data")), span
+            WorkflowDSL.model_validate(flow.data.get("data")), span
         )
 
         # Report successful build

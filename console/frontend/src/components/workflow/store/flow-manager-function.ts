@@ -479,8 +479,8 @@ function addErrNode({ errNodes, currentNode, msg }): void {
   if (isExist) return;
   const errNode = {
     id: currentNode?.id,
-    icon: currentNode?.data?.icon,
     name: currentNode?.data?.label,
+    nodeType: currentNode?.nodeType,
     errorMsg: msg,
     childErrList: currentNode?.childErrList || [],
   };
@@ -676,8 +676,10 @@ function checkIteratorNode({ iteratorId, outerErrNodes, get }): void {
     edge => nodeIds?.includes(edge?.source) || nodeIds?.includes(edge?.target)
   );
 
-  const startNode = nodes.find(node => node.nodeType === 'node-start');
-  const endNode = nodes.find(node => node.nodeType === 'node-end');
+  const startNode = nodes.find(
+    node => node.nodeType === 'iteration-node-start'
+  );
+  const endNode = nodes.find(node => node.nodeType === 'iteration-node-end');
 
   const visitedNodes = new Set();
   const errNodes: unknown = [];
@@ -798,13 +800,11 @@ export function checkFlow(get): boolean {
     validateNodeBase({ currentCheckNode, variableNodes, checkNode, errNodes });
 
     if (currentCheckNode?.nodeType === 'iteration') {
-      checkIteratorNode(
-        {
-          iteratorId: currentCheckNode.id,
-          outerErrNodes: errNodes,
-        },
-        get
-      );
+      checkIteratorNode({
+        iteratorId: currentCheckNode.id,
+        outerErrNodes: errNodes,
+        get,
+      });
     }
 
     if (nodeId === endNode.id) {

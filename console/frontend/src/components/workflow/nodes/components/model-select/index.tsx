@@ -140,6 +140,9 @@ const useModelSelect = (
   const { t } = useTranslation();
   const user = useUserStore(state => state.user);
   const currentStore = useFlowsManager(state => state.getCurrentStore());
+  const autoSaveCurrentFlow = useFlowsManager(
+    state => state.autoSaveCurrentFlow
+  );
   const updateNodeRef = currentStore(state => state.updateNodeRef);
   const setNode = currentStore(state => state.setNode);
   const handleResetModelParams = useMemoizedFn(currentSelectModel => {
@@ -164,6 +167,7 @@ const useModelSelect = (
             ...cloneDeep(old),
           };
         });
+        autoSaveCurrentFlow();
       });
     } else {
       getModelConfigDetail(
@@ -196,6 +200,7 @@ const useModelSelect = (
             ...cloneDeep(old),
           };
         });
+        autoSaveCurrentFlow();
       });
     }
   });

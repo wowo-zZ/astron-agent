@@ -172,7 +172,7 @@ public class PublishApiServiceImpl implements PublishApiService {
                 .appId(appMst.getAppId())
                 .appKey(appMst.getAppKey())
                 .appSecret(appMst.getAppSecret())
-                .serviceUrl(serviceUrlHost + "/workflow/v1/chat/completions")
+                .serviceUrl(serviceUrlHost + botApi.getApiPath())
                 .flowId(botApi.getAssistantId())
                 .build();
     }

@@ -380,15 +380,17 @@ public class MaasUtil {
     }
 
     /**
-     * Create API (with version)
+     * Create API (with version) - data parameter is not sent to workflow/v1/publish
      *
      * @param flowId Workflow ID
      * @param appid Application ID
      * @param version Version number
+     * @param data Version data (not used in publish request)
      * @return JSONObject response result
      */
     public JSONObject createApi(String flowId, String appid, String version, JSONObject data) {
-        return createApiInternal(flowId, appid, version, data);
+        // Note: data parameter is not passed to publish API as per requirement
+        return createApiInternal(flowId, appid, version, null);
     }
 
     /**
@@ -401,7 +403,8 @@ public class MaasUtil {
      */
     private JSONObject createApiInternal(String flowId, String appid, String version, JSONObject data) {
         log.info("----- Publishing mass workflow flowId: {}", flowId);
-        MaasApi maasApi = new MaasApi(flowId, appid, version, data);
+        // Create MaasApi without data parameter for publish request
+        MaasApi maasApi = new MaasApi(flowId, appid, version);
 
         // Execute publish request
         String publishResponse = executeRequest(publishApi, maasApi);

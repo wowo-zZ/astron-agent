@@ -17,7 +17,7 @@ CREATE TABLE `app` (
   `api_secret` varchar(50) NOT NULL,
   `description` varchar(255) DEFAULT NULL,
   `is_tenant` tinyint(4) DEFAULT '0' COMMENT '是否为租户app\n0: 否\n1: 是',
-  `source` tinyint(4) DEFAULT '0' COMMENT '租户归属。\n1: 星辰平台\n2: 开放平台\n4: AIUI',
+  `source` tinyint(4) DEFAULT '0' COMMENT '租户归属，采用二进制位权的十进制表示。如：1: 星辰平台, 2: 开放平台, 4: AIUI',
   `actual_source` tinyint(4) DEFAULT '0' COMMENT '应用实际归属',
   `plat_release_auth` tinyint(4) DEFAULT '0' COMMENT '针对租户账户，提供平台授权权限。值为source或值',
   `status` tinyint(4) DEFAULT '1' COMMENT '应用状态\n0: 禁用\n1: 启用',
@@ -37,8 +37,8 @@ CREATE TABLE `app` (
 DROP TABLE IF EXISTS `app_source`;
 CREATE TABLE `app_source` (
   `id` bigint(20) NOT NULL,
-  `source` tinyint(4) NOT NULL,
-  `source_id` varchar(32) NOT NULL,
+  `source` tinyint(4) NOT NULL COMMENT '租户归属，采用二进制位权的十进制表示。如：1: 星辰平台, 2: 开放平台, 4: AIUI',
+  `source_id` varchar(32) NOT NULL COMMENT '租户源ID',
   `description` varchar(16) NOT NULL,
   `create_at` datetime NOT NULL,
   `update_at` datetime NOT NULL,
@@ -107,3 +107,9 @@ CREATE TABLE `workflow_node_history` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+INSERT INTO `workflow`.`app` (`id`, `name`, `alias_id`, `api_key`, `api_secret`, `description`, `is_tenant`, `source`, `actual_source`, `plat_release_auth`, `status`, `audit_policy`, `create_by`, `update_by`, `create_at`, `update_at`)
+VALUES (1, '星辰', '680ab54f', '7b709739e8da44536127a333c7603a83', 'NjhmY2NmM2NkZDE4MDFlNmM5ZjcyZjMy', '星辰', 1, 1, 1, 1, 1, 0, 1, 1, '2025-09-20 14:10:48', '2025-09-20 14:10:51');
+
+INSERT INTO `workflow`.`app_source` (`id`, `source`, `source_id`, `description`, `create_at`, `update_at`)
+VALUES (1, 1, 'admin', '星辰', '2025-10-11 09:21:11', '2025-10-11 09:21:11');
