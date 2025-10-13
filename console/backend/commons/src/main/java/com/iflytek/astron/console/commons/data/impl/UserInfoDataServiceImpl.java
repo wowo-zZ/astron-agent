@@ -19,8 +19,8 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -152,7 +152,6 @@ public class UserInfoDataServiceImpl implements UserInfoDataService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public UserInfo createOrGetUser(UserInfo userInfo) {
         if (userInfo == null) {
             throw new IllegalArgumentException("User information cannot be null");
