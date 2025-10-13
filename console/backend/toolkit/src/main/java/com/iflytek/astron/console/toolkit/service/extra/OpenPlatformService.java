@@ -57,7 +57,7 @@ public class OpenPlatformService {
         cloneSynchronize.setCurrentId(currentId);
         cloneSynchronize.setSpaceId(spaceId);
         log.info("OpenPlatformService syncWorkflowClonereqBody = {}", cloneSynchronize);
-        Integer botId = botMassService.massCopySynchronize(cloneSynchronize);
+        Integer botId = botMassService.maasCopySynchronize(cloneSynchronize);
         log.info("OpenPlatformService syncWorkflowClone response = {}", botId);
         return botId;
     }

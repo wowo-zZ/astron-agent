@@ -125,8 +125,8 @@ public class WorkflowListener extends EventSourceListener {
                     answerType = 41;
                     log.debug("workflow api format response, sseId:{}, uid:{}, data:{}", sseId, chatReqRecords.getUid(), finalResultStr);
                 } else if (WorkflowEventData.WorkflowOperation.STOP.getOperation().equals(finishReason)) {
-                    wssListenerService.getRedissonClient().getBucket(StrUtil.format(RedisKeyConstant.MASS_WORKFLOW_EVENT_ID, chatReqRecords.getUid(), chatReqRecords.getChatId())).delete();
-                    wssListenerService.getRedissonClient().getBucket(StrUtil.format(RedisKeyConstant.MASS_WORKFLOW_EVENT_VALUE_TYPE, chatReqRecords.getUid(), chatReqRecords.getChatId())).delete();
+                    wssListenerService.getRedissonClient().getBucket(StrUtil.format(RedisKeyConstant.MAAS_WORKFLOW_EVENT_ID, chatReqRecords.getUid(), chatReqRecords.getChatId())).delete();
+                    wssListenerService.getRedissonClient().getBucket(StrUtil.format(RedisKeyConstant.MAAS_WORKFLOW_EVENT_VALUE_TYPE, chatReqRecords.getUid(), chatReqRecords.getChatId())).delete();
                 }
                 wssListenerService.getChatRecordModelService().saveChatResponse(chatReqRecords, new StringBuffer(finalResultStr), new StringBuffer(sid), false, answerType);
                 trySendCompleteAndEnd(emitter, buildCompleteData(new StringBuffer(finalResultStr), thinkingResult, chatReqRecords), sseId);
@@ -181,9 +181,9 @@ public class WorkflowListener extends EventSourceListener {
     private String processWorkFlowInterrupt(JSONObject jsonObject, String backValue) {
         WorkflowEventData eventData = jsonObject.getObject("event_data", WorkflowEventData.class);
         // Cache event ID, wait for second phase use
-        wssListenerService.getRedissonClient().<String>getBucket(StrUtil.format(RedisKeyConstant.MASS_WORKFLOW_EVENT_ID, chatReqRecords.getUid(), chatReqRecords.getChatId())).set(eventData.getEventId(), Duration.ofDays(1));
+        wssListenerService.getRedissonClient().<String>getBucket(StrUtil.format(RedisKeyConstant.MAAS_WORKFLOW_EVENT_ID, chatReqRecords.getUid(), chatReqRecords.getChatId())).set(eventData.getEventId(), Duration.ofDays(1));
         String tag = WorkflowEventData.WorkflowValueType.getTag(eventData.getValue().getType());
-        wssListenerService.getRedissonClient().<String>getBucket(StrUtil.format(RedisKeyConstant.MASS_WORKFLOW_EVENT_VALUE_TYPE, chatReqRecords.getUid(), chatReqRecords.getChatId())).set(tag, Duration.ofDays(1));
+        wssListenerService.getRedissonClient().<String>getBucket(StrUtil.format(RedisKeyConstant.MAAS_WORKFLOW_EVENT_VALUE_TYPE, chatReqRecords.getUid(), chatReqRecords.getChatId())).set(tag, Duration.ofDays(1));
         Map<String, String> displayOperation = WorkflowEventData.WorkflowOperation.getDisplayOperation(eventData.isNeedReply());
         // Interrupt scenario: First frame returns intelligent answer type tag and operation tag
         SseEmitterUtil.sendData(emitter, displayOperation);
@@ -200,7 +200,7 @@ public class WorkflowListener extends EventSourceListener {
      */
     @Override
     public void onFailure(@NotNull EventSource eventSource, Throwable t, Response response) {
-        log.error(".....MassListener failed to establish connection with chain-sse....., sseId: {}, uid: {}, chatId: {}", sseId, chatReqRecords.getUid(), chatReqRecords.getChatId(), t);
+        log.error(".....MaasListener failed to establish connection with chain-sse....., sseId: {}, uid: {}, chatId: {}", sseId, chatReqRecords.getUid(), chatReqRecords.getChatId(), t);
         // Close current websocket connection
         if (chainClient != null) {
             chainClient.closeSse();

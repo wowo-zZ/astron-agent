@@ -5,6 +5,7 @@ import com.iflytek.astron.console.commons.dto.chat.*;
 import com.iflytek.astron.console.commons.dto.llm.SparkChatRequest;
 import com.iflytek.astron.console.commons.service.data.ChatDataService;
 import com.iflytek.astron.console.commons.service.data.ChatHistoryService;
+import com.iflytek.astron.console.commons.util.I18nUtil;
 import com.iflytek.astron.console.hub.data.ReqKnowledgeRecordsDataService;
 import com.iflytek.astron.console.hub.entity.ReqKnowledgeRecords;
 import lombok.extern.slf4j.Slf4j;
@@ -31,14 +32,6 @@ public class ChatHistoryServiceImpl implements ChatHistoryService {
     private ReqKnowledgeRecordsDataService reqKnowledgeRecordsDataService;
 
     public static final int MAX_HISTORY_NUMBERS = 8000;
-
-    public static final String LOOSE_PREFIX_PROMPT = """
-            请将下列文档的片段作为已知信息:[]
-            请根据以上文段的原文和你所知道的知识准确地回答问题
-            当回答用户问题时，请使用户提问的语言回答问题
-            如果以上内容无法回答用户信息，结合你所知道的信息, 回答用户提问
-            简洁而专业地充分回答用户的问题，不允许在答案中添加编造成分。
-            """;
 
     /**
      * Get historical message records of system bot
@@ -248,11 +241,11 @@ public class ChatHistoryServiceImpl implements ChatHistoryService {
 
             // Build enhanced content with knowledge wrapping
             StringBuilder promptBuilder = new StringBuilder();
-            promptBuilder.append(LOOSE_PREFIX_PROMPT);
+            promptBuilder.append(I18nUtil.getMessage("loose.prefix.prompt"));
 
             // Insert knowledge content into the placeholder
             promptBuilder.insert(promptBuilder.indexOf("[") + 1, knowledgeStr);
-            promptBuilder.append("\n接下来我的输入是：{{}}");
+            promptBuilder.append(I18nUtil.getMessage("loose.suffix.prompt"));
             promptBuilder.insert(promptBuilder.indexOf("{{") + 2, originalAsk);
 
             String enhancedContent = promptBuilder.toString();

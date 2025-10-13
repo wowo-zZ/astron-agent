@@ -176,7 +176,7 @@ jobs:
           if [[ "${{ steps.detect.outputs.has-core-services }}" == "true" ]]; then
             echo "### 🏗️ Core服务组件" >> "$CHANGELOG_FILE"
             echo "- 🏢 Core Tenant: ghcr.io/${{ github.repository }}/core-tenant:$CURRENT_TAG" >> "$CHANGELOG_FILE"
-            echo "- 🧠 Core Memory: ghcr.io/${{ github.repository }}/core-memory:$CURRENT_TAG" >> "$CHANGELOG_FILE"
+            echo "- 🧠 Core Database: ghcr.io/${{ github.repository }}/core-database:$CURRENT_TAG" >> "$CHANGELOG_FILE"
             echo "- 🤖 Core RPA: ghcr.io/${{ github.repository }}/core-rpa:$CURRENT_TAG" >> "$CHANGELOG_FILE"
             echo "- 🔗 Core Link: ghcr.io/${{ github.repository }}/core-link:$CURRENT_TAG" >> "$CHANGELOG_FILE"
             echo "- 🛠️ Core AI Tools: ghcr.io/${{ github.repository }}/core-aitools:$CURRENT_TAG" >> "$CHANGELOG_FILE"
@@ -241,7 +241,7 @@ jobs:
       matrix:
         service:
           - { name: "tenant", path: "core/tenant", emoji: "🏢" }
-          - { name: "memory", path: "core/memory/database", emoji: "🧠" }
+          - { name: "database", path: "core/memory/database", emoji: "🧠" }
           - { name: "rpa", path: "core/plugin/rpa", emoji: "🤖" }
           - { name: "link", path: "core/plugin/link", emoji: "🔗" }
           - { name: "aitools", path: "core/plugin/aitools", emoji: "🛠️" }

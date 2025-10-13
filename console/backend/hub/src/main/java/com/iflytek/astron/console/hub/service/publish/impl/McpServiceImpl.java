@@ -78,7 +78,7 @@ public class McpServiceImpl implements McpService {
         // throw new BusinessException("MCP with this version already exists, please do not republish");
         // }
 
-        // 6. Register MCP and get server URL (corresponds to massUtil.registerMcp in original project)
+        // 6. Register MCP and get server URL (corresponds to maasUtil.registerMcp in original project)
         String serverUrl = registerMcpAndGetUrl(botId, request, versionName, currentUid, spaceId);
 
         // 7. Build MCP data with the server URL from registration
@@ -151,7 +151,7 @@ public class McpServiceImpl implements McpService {
     }
 
     /**
-     * Register MCP and get server URL (corresponds to massUtil.registerMcp in original project)
+     * Register MCP and get server URL (corresponds to maasUtil.registerMcp in original project)
      */
     private String registerMcpAndGetUrl(Integer botId, McpPublishRequestDto request, String versionName, String currentUid, Long spaceId) {
         // TODO: Implement MCP registration logic that calls workflow release service

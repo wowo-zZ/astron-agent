@@ -10,8 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * MCP publish strategy implementation
- * Handles bot publishing to MCP server channel
+ * MCP publish strategy implementation Handles bot publishing to MCP server channel
  */
 @Slf4j
 @Component

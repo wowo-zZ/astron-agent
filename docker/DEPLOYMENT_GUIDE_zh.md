@@ -133,6 +133,26 @@ CONSOLE_CASDOOR_ORG=your-casdoor-org-name
 
 ### 第四步：启动 astronAgent 核心服务（必要部署步骤）
 
+#### 4.1 配置 讯飞开放平台 相关APP_ID API_KEY等信息
+
+获取文档详见：https://www.xfyun.cn/doc/platform/quickguide.html
+
+创建应用完成后可能需要购买或领取相应能力的API授权服务量
+- 星火大模型API: https://xinghuo.xfyun.cn/sparkapi
+  (对于大模型API会有额外的SPARK_API_PASSWORD需要在页面上获取)
+- 语音转写API: https://www.xfyun.cn/services/lfasr
+- 图片生成API: https://www.xfyun.cn/services/wtop
+
+最后编辑 `docker/astronAgent/.env` 文件，更新相关环境变量：
+```env
+PLATFORM_APP_ID=your-app-id
+PLATFORM_API_KEY=your-api-key
+PLATFORM_API_SECRET=your-api-secret
+
+SPARK_API_PASSWORD=your-api-password
+```
+
+
 ```bash
 # 进入 astronAgent 目录
 cd docker/astronAgent

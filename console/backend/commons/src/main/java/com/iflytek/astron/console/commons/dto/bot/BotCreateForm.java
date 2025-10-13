@@ -144,8 +144,8 @@ public class BotCreateForm {
     @Schema(description = "Character setting")
     private String virtualCharacter;
 
-    @Schema(description = "mass_bot_id")
-    private String massBotId;
+    @Schema(description = "maas_bot_id")
+    private String maasBotId;
 
     @Data
     public static class PromptStruct {

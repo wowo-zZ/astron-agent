@@ -8,8 +8,7 @@ import lombok.Data;
 import java.time.LocalDate;
 
 /**
- * Bot Dashboard Count Log Entity
- * Corresponds to bot_dashboard_count_log table
+ * Bot Dashboard Count Log Entity Corresponds to bot_dashboard_count_log table
  *
  * @author Omuigix
  */

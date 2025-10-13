@@ -77,7 +77,7 @@ public class PublishApiServiceImpl implements PublishApiService {
 
     private static final String BOT_API_CBM_BASE_URL = "ws(s)://spark-openapi.cn-huabei-1.xf-yun.com";
 
-    private static final String BOT_API_MASS_BASE_URL = "http(s)://xingchen-api.xf-yun.com";
+    private static final String BOT_API_MAAS_BASE_URL = "http(s)://xingchen-api.xf-yun.com";
 
     @Override
     public Boolean createApp(CreateAppVo createAppVo) {
@@ -164,7 +164,7 @@ public class PublishApiServiceImpl implements PublishApiService {
         if (Objects.isNull(appMst)) {
             throw new BusinessException(ResponseEnum.USER_APP_ID_NOT_EXISTE);
         }
-        String serviceUrlHost = botBase.getVersion() == 1 ? BOT_API_CBM_BASE_URL : BOT_API_MASS_BASE_URL;
+        String serviceUrlHost = botBase.getVersion() == 1 ? BOT_API_CBM_BASE_URL : BOT_API_MAAS_BASE_URL;
         return BotApiInfoDTO.builder()
                 .botId(Math.toIntExact(botId))
                 .botName(botBase.getBotName())
@@ -217,7 +217,7 @@ public class PublishApiServiceImpl implements PublishApiService {
                 .appId(appMst.getAppId())
                 .appKey(appMst.getAppKey())
                 .appSecret(appMst.getAppSecret())
-                .serviceUrl(BOT_API_MASS_BASE_URL + "/workflow/v1/chat/completions")
+                .serviceUrl(BOT_API_MAAS_BASE_URL + "/workflow/v1/chat/completions")
                 .flowId(flowId)
                 .build();
     }

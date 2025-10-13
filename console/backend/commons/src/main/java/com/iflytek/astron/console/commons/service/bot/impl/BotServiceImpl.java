@@ -353,7 +353,7 @@ public class BotServiceImpl implements BotService {
         botBase.setStyle(bot.getStyle());
         botBase.setBackground(bot.getBackground());
         botBase.setVirtualCharacter(bot.getVirtualCharacter());
-        botBase.setMassBotId(bot.getMassBotId());
+        botBase.setMaasBotId(bot.getMaasBotId());
         botBase.setVersion(1);
         botBase.setSpaceId(spaceId);
         setInputExamples(botBase, bot.getInputExample(), bot.getInputExampleEn());
@@ -478,7 +478,7 @@ public class BotServiceImpl implements BotService {
                 .style(bot.getStyle())
                 .background(bot.getBackground())
                 .virtualCharacter(bot.getVirtualCharacter())
-                .massBotId(bot.getMassBotId())
+                .maasBotId(bot.getMaasBotId())
                 .inputExample(bot.getInputExample() != null && !bot.getInputExample().isEmpty() ? String.join(BOT_INPUT_EXAMPLE_SPLIT, bot.getInputExample()) : null)
                 .modelId(bot.getModelId())
                 .build();

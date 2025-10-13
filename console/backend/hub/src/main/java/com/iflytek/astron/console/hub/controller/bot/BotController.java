@@ -97,12 +97,12 @@ public class BotController {
 
     @PostMapping("/publish")
     @Operation(summary = "publish agent")
-    public ApiResult<String> massPublish(HttpServletRequest request, @RequestBody JSONObject botJson) {
+    public ApiResult<String> maasPublish(HttpServletRequest request, @RequestBody JSONObject botJson) {
         String uid = RequestContextUtil.getUID();
         String botId = (String) botJson.get("botId");
         botPermissionUtil.checkBot(Integer.parseInt(botId));
         maasUtil.setBotTag(botJson);
-        log.info("***** uid: {}, botId: {} submit MASS assistant", uid, botId);
+        log.info("***** uid: {}, botId: {} submit MAAS assistant", uid, botId);
         String flowId = botJson.getString("flowId");
         JSONObject result = maasUtil.createApi(flowId, tenantId);
         if (Objects.isNull(result)) {

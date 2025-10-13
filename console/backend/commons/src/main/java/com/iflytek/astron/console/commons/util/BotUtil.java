@@ -61,12 +61,12 @@ public class BotUtil {
         chatBotDataService.createBot(botBase);
 
         String flowId = workflow.getFlowId();
-        JSONObject mass = new JSONObject();
+        JSONObject maas = new JSONObject();
         JSONObject data = new JSONObject();
         data.put("flowId", flowId);
         data.put("id", workflow.getId());
-        mass.put("data", data);
-        botService.addMaasInfo(uid, mass, botBase.getId(), spaceId);
+        maas.put("data", data);
+        botService.addMaasInfo(uid, maas, botBase.getId(), spaceId);
         return botBase.getId();
     }
 

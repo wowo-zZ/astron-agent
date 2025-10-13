@@ -155,7 +155,7 @@ public class WorkflowBotChatServiceImpl implements WorkflowBotChatService {
         log.info("apiUsedUrl:{}, workflow request parameters:{}", apiUsedUrl, JSON.toJSONString(workflowApiRequest));
         // If resuming session, use resume interface
         if (WorkflowEventData.WorkflowOperation.resumeDial(workflowOperation)) {
-            String valueType = redissonClient.<String>getBucket(StrUtil.format(RedisKeyConstant.MASS_WORKFLOW_EVENT_VALUE_TYPE, uid, chatId)).get();
+            String valueType = redissonClient.<String>getBucket(StrUtil.format(RedisKeyConstant.MAAS_WORKFLOW_EVENT_VALUE_TYPE, uid, chatId)).get();
             if (WorkflowEventData.WorkflowValueType.OPTION.getTag().equals(valueType)) {
                 try {
                     WorkflowEventData.EventValue.ValueOption askValue = JSON.parseObject(chatBotReqDto.getAsk(),
@@ -168,7 +168,7 @@ public class WorkflowBotChatServiceImpl implements WorkflowBotChatService {
                 }
             }
             WorkflowResumeRequest build = WorkflowResumeRequest.builder()
-                    .eventId(redissonClient.<String>getBucket(StrUtil.format(RedisKeyConstant.MASS_WORKFLOW_EVENT_ID, uid,
+                    .eventId(redissonClient.<String>getBucket(StrUtil.format(RedisKeyConstant.MAAS_WORKFLOW_EVENT_ID, uid,
                             chatId)).get())
                     .eventType(workflowOperation)
                     .content(ask)

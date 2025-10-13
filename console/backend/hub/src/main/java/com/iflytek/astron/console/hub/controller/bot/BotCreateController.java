@@ -1,22 +1,24 @@
 package com.iflytek.astron.console.hub.controller.bot;
 
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.iflytek.astron.console.commons.annotation.RateLimit;
 import com.iflytek.astron.console.commons.annotation.space.SpacePreAuth;
 import com.iflytek.astron.console.commons.constant.ResponseEnum;
 import com.iflytek.astron.console.commons.dto.bot.BotCreateForm;
 import com.iflytek.astron.console.commons.dto.bot.BotInfoDto;
+import com.iflytek.astron.console.commons.dto.bot.BotModelDto;
+import com.iflytek.astron.console.commons.entity.bot.BotTemplate;
 import com.iflytek.astron.console.commons.entity.bot.BotTypeList;
+import com.iflytek.astron.console.commons.enums.bot.DefaultBotModelEnum;
 import com.iflytek.astron.console.commons.mapper.bot.BotTemplateMapper;
 import com.iflytek.astron.console.commons.response.ApiResult;
 import com.iflytek.astron.console.commons.service.bot.BotDatasetService;
 import com.iflytek.astron.console.commons.service.bot.BotService;
-import com.iflytek.astron.console.commons.entity.bot.BotTemplate;
 import com.iflytek.astron.console.commons.util.I18nUtil;
 import com.iflytek.astron.console.commons.util.RequestContextUtil;
 import com.iflytek.astron.console.commons.util.space.SpaceInfoUtil;
 import com.iflytek.astron.console.hub.dto.bot.BotGenerationDTO;
-import com.iflytek.astron.console.commons.dto.bot.BotModelDto;
-import com.iflytek.astron.console.commons.enums.bot.DefaultBotModelEnum;
 import com.iflytek.astron.console.hub.service.bot.BotAIService;
 import com.iflytek.astron.console.hub.util.BotPermissionUtil;
 import com.iflytek.astron.console.toolkit.service.model.LLMService;
@@ -34,8 +36,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import com.alibaba.fastjson2.JSONObject;
-import com.alibaba.fastjson2.JSONArray;
 
 @Slf4j
 @RestController
@@ -299,6 +299,21 @@ public class BotCreateController {
         sparkModel.setModelIcon(DefaultBotModelEnum.SPARK_4_0.getIcon());
         sparkModel.setIsCustom(false);
         allModels.add(sparkModel);
+
+        // Add DeepSeek models
+        BotModelDto deepseekV3Model = new BotModelDto();
+        deepseekV3Model.setModelDomain(DefaultBotModelEnum.DEEPSEEK_V3.getDomain());
+        deepseekV3Model.setModelName(DefaultBotModelEnum.DEEPSEEK_V3.getName());
+        deepseekV3Model.setModelIcon(DefaultBotModelEnum.DEEPSEEK_V3.getIcon());
+        deepseekV3Model.setIsCustom(false);
+        allModels.add(deepseekV3Model);
+
+        BotModelDto deepseekR1Model = new BotModelDto();
+        deepseekR1Model.setModelDomain(DefaultBotModelEnum.DEEPSEEK_R1.getDomain());
+        deepseekR1Model.setModelName(DefaultBotModelEnum.DEEPSEEK_R1.getName());
+        deepseekR1Model.setModelIcon(DefaultBotModelEnum.DEEPSEEK_R1.getIcon());
+        deepseekR1Model.setIsCustom(false);
+        allModels.add(deepseekR1Model);
 
         // 2. Get custom models
         JSONObject result = JSONObject.from(llmService.getLlmAuthList(request, null, "workflow", "spark-llm"));

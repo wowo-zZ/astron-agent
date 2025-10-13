@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface WorkflowVersionMapper extends BaseMapper<WorkflowVersion> {
     Page<WorkflowVersion> selectPageByCondition(Page<WorkflowVersion> page, @Param("flowId") String flowId);
+
     IPage<WorkflowVersion> selectPageLatestByName(Page<?> page, @Param("botId") String botId);
 
     Long countLatestByName(@Param("botId") String botId);

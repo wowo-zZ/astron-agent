@@ -51,23 +51,23 @@ public class BotMaasServiceImpl implements BotMaasService {
     private MaasTemplateMapper maasTemplateMapper;
 
     @Override
-    public BotInfoDto createFromTemplate(String uid, MaasDuplicate massDuplicate) {
+    public BotInfoDto createFromTemplate(String uid, MaasDuplicate maasDuplicate) {
         Long spaceId = SpaceInfoUtil.getSpaceId();
-        // Create an event, consumed by /massCopySynchronize
-        Long maasId = massDuplicate.getMaasId();
+        // Create an event, consumed by /maasCopySynchronize
+        Long maasId = maasDuplicate.getMaasId();
         UserLangChainInfo userLangChainInfo = userLangChainDataService.selectByMaasId(maasId);
         if (Objects.isNull(userLangChainInfo)) {
             log.info("----- Xinghuo did not find Astron workflow: {}", JSONObject.toJSONString(userLangChainInfo));
             throw new BusinessException(ResponseEnum.BOT_NOT_EXIST);
         }
         redissonClient.getBucket(MaasUtil.generatePrefix(uid, Math.toIntExact(userLangChainInfo.getId()))).set(userLangChainInfo.getId().toString(), Duration.ofSeconds(60));
-        BotInfoDto botInfoDto = botService.insertWorkflowBot(uid, massDuplicate, spaceId);
+        BotInfoDto botInfoDto = botService.insertWorkflowBot(uid, maasDuplicate, spaceId);
         // Check if response is successful
         if (botInfoDto == null) {
             throw new BusinessException(ResponseEnum.CREATE_BOT_FAILED);
         }
         // Copy a new workflow for the assistant
-        JSONObject res = maasUtil.copyWorkFlow(massDuplicate.getMaasId(), uid);
+        JSONObject res = maasUtil.copyWorkFlow(maasDuplicate.getMaasId(), uid);
         if (Objects.isNull(res) || res.isEmpty()) {
             throw new BusinessException(ResponseEnum.CREATE_BOT_FAILED);
         }
@@ -78,7 +78,7 @@ public class BotMaasServiceImpl implements BotMaasService {
     }
 
     @Override
-    public Integer massCopySynchronize(CloneSynchronize synchronize) {
+    public Integer maasCopySynchronize(CloneSynchronize synchronize) {
         log.info("------ Astron workflow copy synchronization: {}", JSONObject.toJSONString(synchronize));
         String uid = synchronize.getUid();
         Long originId = synchronize.getOriginId();
@@ -91,7 +91,7 @@ public class BotMaasServiceImpl implements BotMaasService {
             throw new BusinessException(ResponseEnum.BOT_NOT_EXIST);
         }
         Integer botId = userLangChainInfo.getBotId();
-        // If massId already exists, end directly
+        // If maasId already exists, end directly
         if (redissonClient.getBucket(MaasUtil.generatePrefix(uid, botId)).isExists()) {
             log.info("----- Xinghuo has obtained this workflow, ending task: {}", JSONObject.toJSONString(synchronize));
             redissonClient.getBucket(MaasUtil.generatePrefix(uid, botId)).delete();
@@ -108,7 +108,7 @@ public class BotMaasServiceImpl implements BotMaasService {
                 .updateTime(LocalDateTime.now())
                 .build();
         userLangChainDataService.insertUserLangChainInfo(userLangChainInfoNew);
-        log.info("----- Astron workflow synchronization successful, original massId: {}, flowId: {}, new assistant: {}", originId, flowId, currentBotId);
+        log.info("----- Astron workflow synchronization successful, original maasId: {}, flowId: {}, new assistant: {}", originId, flowId, currentBotId);
         return base.getId();
     }
 

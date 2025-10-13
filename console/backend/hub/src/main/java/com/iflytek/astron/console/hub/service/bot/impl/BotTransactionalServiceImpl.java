@@ -48,7 +48,7 @@ public class BotTransactionalServiceImpl implements BotTransactionalService {
         if (base.getVersion() == 2) {
             botChainService.copyBot(uid, Long.valueOf(botId), targetId, spaceId);
         } else if (base.getVersion() == 3) {
-            // Create an event to be consumed at /massCopySynchronize
+            // Create an event to be consumed at /maasCopySynchronize
             redissonClient.getBucket(MaasUtil.generatePrefix(uid, botId)).set(String.valueOf(botId));
             redissonClient.getBucket(MaasUtil.generatePrefix(uid, botId)).expire(Duration.ofSeconds(60));
             // Synchronize Xingchen MAAS

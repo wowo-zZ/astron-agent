@@ -16,7 +16,7 @@
         a.prologue,
         a.bot_desc AS botDesc,
         a.model,
-        a.mass_bot_id as massBotId,
+        a.mass_bot_id as maasBotId,
         a.create_time as createTime,
         a.bot_desc_en AS botDescEn,
         a.bot_template AS botTemplate,

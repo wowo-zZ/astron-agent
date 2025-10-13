@@ -32,7 +32,7 @@ public interface BotService {
 
     Boolean updateBotBasicInfo(String uid, BotCreateForm bot, Long spaceId);
 
-    void addMaasInfo(String uid, JSONObject mass, Integer botId, Long spaceId);
+    void addMaasInfo(String uid, JSONObject maas, Integer botId, Long spaceId);
 
     void addV2Bot(String uid, Integer botId);
 }

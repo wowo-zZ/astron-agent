@@ -13,7 +13,7 @@ import java.util.List;
 public interface BotMaasService {
     BotInfoDto createFromTemplate(String uid, MaasDuplicate massDuplicate);
 
-    Integer massCopySynchronize(CloneSynchronize synchronize);
+    Integer maasCopySynchronize(CloneSynchronize synchronize);
 
     List<MaasTemplate> templateList(WorkflowTemplateQueryDto queryDto);
 }

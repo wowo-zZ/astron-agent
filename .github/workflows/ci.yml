@@ -75,7 +75,7 @@ jobs:
               name=$(basename "$project")
               # Handle nested paths
               if [[ "$project" == core/memory/database ]]; then
-                name="core-memory"
+                name="core-database"
               elif [[ "$project" == core/plugin/* ]]; then
                 name="core-$(basename "$project")"
               fi

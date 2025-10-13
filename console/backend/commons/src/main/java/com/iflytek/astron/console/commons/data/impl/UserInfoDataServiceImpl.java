@@ -20,7 +20,6 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -152,7 +151,6 @@ public class UserInfoDataServiceImpl implements UserInfoDataService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public UserInfo createOrGetUser(UserInfo userInfo) {
         if (userInfo == null) {
             throw new IllegalArgumentException("User information cannot be null");
@@ -396,7 +394,7 @@ public class UserInfoDataServiceImpl implements UserInfoDataService {
         userInfo.setUpdateTime(LocalDateTime.now());
         userInfoMapper.updateById(userInfo);
 
-        // 如果昵称发生了变化，发布事件
+        // If the nickname has changed, publish an event
         if (StringUtils.isNotBlank(nickname) && !nickname.equals(oldNickname)) {
             eventPublisher.publishEvent(new UserNicknameUpdatedEvent(this, uid, oldNickname, nickname));
             log.info("Published nickname update event for uid: {}, oldNickname: {}, newNickname: {}",
@@ -427,7 +425,7 @@ public class UserInfoDataServiceImpl implements UserInfoDataService {
         userInfo.setUpdateTime(LocalDateTime.now());
         userInfoMapper.updateById(userInfo);
 
-        // 如果昵称发生了变化，发布事件
+        // If the nickname has changed, publish an event
         if (StringUtils.isNotBlank(nickname) && !nickname.equals(oldNickname)) {
             eventPublisher.publishEvent(new UserNicknameUpdatedEvent(this, currentUid, oldNickname, nickname));
             log.info("Published nickname update event for uid: {}, oldNickname: {}, newNickname: {}",
