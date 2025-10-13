@@ -1,11 +1,8 @@
 package com.iflytek.astron.console.toolkit.service.extra;
 
 import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.iflytek.astron.console.commons.constant.ResponseEnum;
 import com.iflytek.astron.console.commons.exception.BusinessException;
-import com.iflytek.astron.console.commons.response.ApiResult;
 import com.iflytek.astron.console.toolkit.common.constant.CommonConst;
 import com.iflytek.astron.console.toolkit.config.properties.ApiUrl;
 import com.iflytek.astron.console.toolkit.config.properties.CommonConfig;
@@ -35,11 +32,15 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class CoreSystemServiceTest {
 
-    @Mock ApiUrl apiUrl;
-    @Mock CommonConfig commonConfig;
-    @Mock AppService appService;
+    @Mock
+    ApiUrl apiUrl;
+    @Mock
+    CommonConfig commonConfig;
+    @Mock
+    AppService appService;
 
-    @InjectMocks CoreSystemService service;
+    @InjectMocks
+    CoreSystemService service;
 
     // ================== helpers ==================
 
@@ -92,21 +93,21 @@ class CoreSystemServiceTest {
 
         try (MockedStatic<OkHttpUtil> http = mockStatic(OkHttpUtil.class)) {
             http.when(() -> OkHttpUtil.post(anyString(), anyMap(), anyString()))
-                .thenAnswer(inv -> {
-                    String url = inv.getArgument(0);
-                    Map<String, String> header = inv.getArgument(1);
-                    String body = inv.getArgument(2);
-                    assertThat(url).isEqualTo("http://wf" + CoreSystemService.API_PUBLISH_PATH);
-                    // header 应包含用户名与签名字段
-                    assertThat(header).containsEntry(CoreSystemService.X_CONSUMER_USERNAME, "tid");
-                    assertThat(header).containsKeys("authorization", "host", "date", "digest");
-                    JSONObject b = JSONObject.parseObject(body);
-                    assertThat(b.getString("flow_id")).isEqualTo("F1");
-                    assertThat(b.getInteger("plat")).isEqualTo(2);
-                    assertThat(b.getInteger("release_status")).isEqualTo(1);
-                    assertThat(b.getString("version")).isEqualTo("v1");
-                    return ok(null);
-                });
+                    .thenAnswer(inv -> {
+                        String url = inv.getArgument(0);
+                        Map<String, String> header = inv.getArgument(1);
+                        String body = inv.getArgument(2);
+                        assertThat(url).isEqualTo("http://wf" + CoreSystemService.API_PUBLISH_PATH);
+                        // header 应包含用户名与签名字段
+                        assertThat(header).containsEntry(CoreSystemService.X_CONSUMER_USERNAME, "tid");
+                        assertThat(header).containsKeys("authorization", "host", "date", "digest");
+                        JSONObject b = JSONObject.parseObject(body);
+                        assertThat(b.getString("flow_id")).isEqualTo("F1");
+                        assertThat(b.getInteger("plat")).isEqualTo(2);
+                        assertThat(b.getInteger("release_status")).isEqualTo(1);
+                        assertThat(b.getString("version")).isEqualTo("v1");
+                        return ok(null);
+                    });
 
             service.publish("F1", 2, 1, "v1");
         }
@@ -123,11 +124,11 @@ class CoreSystemServiceTest {
 
         try (MockedStatic<OkHttpUtil> http = mockStatic(OkHttpUtil.class)) {
             http.when(() -> OkHttpUtil.post(anyString(), anyMap(), anyString()))
-                .thenReturn(fail("bad"));
+                    .thenReturn(fail("bad"));
 
             assertThatThrownBy(() -> service.publish("F1", 2, 1, null))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("bad");
+                    .isInstanceOf(BusinessException.class)
+                    .hasMessageContaining("bad");
         }
     }
 
@@ -140,17 +141,17 @@ class CoreSystemServiceTest {
 
         try (MockedStatic<OkHttpUtil> http = mockStatic(OkHttpUtil.class)) {
             http.when(() -> OkHttpUtil.post(anyString(), anyMap(), anyString()))
-                .thenAnswer(inv -> {
-                    Map<String, String> header = inv.getArgument(1);
-                    String body = inv.getArgument(2);
-                    // 只有 X-Consumer-Username，无签名头
-                    assertThat(header).containsOnlyKeys(CoreSystemService.X_CONSUMER_USERNAME);
-                    assertThat(header).containsEntry(CoreSystemService.X_CONSUMER_USERNAME, "tid");
-                    JSONObject b = JSONObject.parseObject(body);
-                    assertThat(b.getString("app_id")).isEqualTo("a01c2bc7");
-                    assertThat(b.getString("flow_id")).isEqualTo("F2");
-                    return ok(null);
-                });
+                    .thenAnswer(inv -> {
+                        Map<String, String> header = inv.getArgument(1);
+                        String body = inv.getArgument(2);
+                        // 只有 X-Consumer-Username，无签名头
+                        assertThat(header).containsOnlyKeys(CoreSystemService.X_CONSUMER_USERNAME);
+                        assertThat(header).containsEntry(CoreSystemService.X_CONSUMER_USERNAME, "tid");
+                        JSONObject b = JSONObject.parseObject(body);
+                        assertThat(b.getString("app_id")).isEqualTo("a01c2bc7");
+                        assertThat(b.getString("flow_id")).isEqualTo("F2");
+                        return ok(null);
+                    });
             service.auth("F2", "ignored", 1);
         }
     }
@@ -166,11 +167,11 @@ class CoreSystemServiceTest {
 
         try (MockedStatic<OkHttpUtil> http = mockStatic(OkHttpUtil.class)) {
             http.when(() -> OkHttpUtil.post(anyString(), anyMap(), anyString()))
-                .thenReturn(fail("auth-err"));
+                    .thenReturn(fail("auth-err"));
 
             assertThatThrownBy(() -> service.auth("F3", "APP", 1))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("auth-err");
+                    .isInstanceOf(BusinessException.class)
+                    .hasMessageContaining("auth-err");
         }
     }
 
@@ -296,8 +297,7 @@ class CoreSystemServiceTest {
     @Test
     @DisplayName("assembleRequestHeader - 非法URL应抛BusinessException")
     void assembleRequestHeader_badUrl() {
-        assertThatThrownBy(() ->
-                service.assembleRequestHeader("::::", "ak", "sk", "POST", "x".getBytes()))
+        assertThatThrownBy(() -> service.assembleRequestHeader("::::", "ak", "sk", "POST", "x".getBytes()))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("assemble requestHeader  error");
     }

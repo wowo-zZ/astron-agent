@@ -26,9 +26,9 @@ public interface BotDashboardCountLogMapper extends BaseMapper<BotDashboardCount
      * @param spaceId space ID (nullable)
      * @return summary statistics
      */
-    BotSummaryStatsVO selectSummaryStats(@Param("botId") Integer botId, 
-                                        @Param("uid") String uid, 
-                                        @Param("spaceId") Long spaceId);
+    BotSummaryStatsVO selectSummaryStats(@Param("botId") Integer botId,
+            @Param("uid") String uid,
+            @Param("spaceId") Long spaceId);
 
     /**
      * Get bot time series statistics
@@ -40,7 +40,7 @@ public interface BotDashboardCountLogMapper extends BaseMapper<BotDashboardCount
      * @return time series statistics list
      */
     List<BotTimeSeriesStatsVO> selectTimeSeriesStats(@Param("botId") Integer botId,
-                                                     @Param("startDate") LocalDate startDate,
-                                                     @Param("uid") String uid,
-                                                     @Param("spaceId") Long spaceId);
+            @Param("startDate") LocalDate startDate,
+            @Param("uid") String uid,
+            @Param("spaceId") Long spaceId);
 }

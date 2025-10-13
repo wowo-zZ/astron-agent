@@ -16,7 +16,6 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Field;
-import java.sql.Timestamp;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
@@ -94,13 +93,11 @@ class GroupVisibilityServiceTest {
 
 
 
-
-
         @Test
         @DisplayName("uids 为空：只删除不保存")
         void emptyUids_shouldOnlyRemove_noSave() {
             try (MockedStatic<SpaceInfoUtil> space = mockStatic(SpaceInfoUtil.class);
-                 MockedStatic<UserInfoManagerHandler> user = mockStatic(UserInfoManagerHandler.class)) {
+                    MockedStatic<UserInfoManagerHandler> user = mockStatic(UserInfoManagerHandler.class)) {
 
                 space.when(SpaceInfoUtil::getSpaceId).thenReturn(null);
                 user.when(UserInfoManagerHandler::getUserId).thenReturn("ownerC");
@@ -137,7 +134,7 @@ class GroupVisibilityServiceTest {
     @DisplayName("getRepoVisibilityList：应传递当前用户与 spaceId")
     void getRepoVisibilityList_shouldDelegateWithSpaceId() {
         try (MockedStatic<UserInfoManagerHandler> user = mockStatic(UserInfoManagerHandler.class);
-             MockedStatic<SpaceInfoUtil> space = mockStatic(SpaceInfoUtil.class)) {
+                MockedStatic<SpaceInfoUtil> space = mockStatic(SpaceInfoUtil.class)) {
 
             user.when(UserInfoManagerHandler::getUserId).thenReturn("u-2");
             space.when(SpaceInfoUtil::getSpaceId).thenReturn(666L);

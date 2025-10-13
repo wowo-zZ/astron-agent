@@ -248,7 +248,7 @@ public class LLMService {
                 JSONObject obj = (JSONObject) o;
                 // 1.0 2.0 3.0 4.0
                 Float precision = obj.getFloat("precision");
-                if(precision != null){
+                if (precision != null) {
                     obj.put("precision", convertPrecisionValue(precision));
                 }
             }
@@ -274,6 +274,7 @@ public class LLMService {
         }
         return precision;
     }
+
     /**
      * Generate random llmId
      *

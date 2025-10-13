@@ -28,12 +28,15 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class OpenPlatformServiceTest {
 
-    @Mock ApiUrl apiUrl;
+    @Mock
+    ApiUrl apiUrl;
     @Mock
     CommonConfig commonConfig;
-    @Mock WorkflowBotService botMassService;
+    @Mock
+    WorkflowBotService botMassService;
 
-    @InjectMocks OpenPlatformService service;
+    @InjectMocks
+    OpenPlatformService service;
 
     @BeforeEach
     void setSecret() throws Exception {

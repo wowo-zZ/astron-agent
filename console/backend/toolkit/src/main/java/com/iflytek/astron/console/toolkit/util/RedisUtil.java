@@ -120,8 +120,7 @@ public class RedisUtil {
         Long ret = redisTemplate.execute(LUA_RENEW,
                 Collections.singletonList(key),
                 token,
-                pttl
-        );
+                pttl);
         boolean ok = ret != null && ret > 0;
         log.debug("redis.renew key={}, ttl={}s, token={}, ok={}", key, ttlSeconds, safe(token), ok);
         return ok;
