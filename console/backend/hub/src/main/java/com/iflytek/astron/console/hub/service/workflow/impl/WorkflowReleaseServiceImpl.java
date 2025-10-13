@@ -22,6 +22,8 @@ import okhttp3.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.util.Random;
+
 import java.time.Duration;
 
 /**
@@ -129,152 +131,66 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
     }
 
     /**
-     * Get next version name for workflow release This method calls the workflow service to generate the
-     * next version name for a new release
+     * Get next version name for workflow release
+     * Simplified to match old project logic exactly - no fallback
      */
     private String getNextVersionName(String flowId, Long spaceId) {
         log.info("Getting next workflow version name: flowId={}, spaceId={}", flowId, spaceId);
 
-        // Use old project logic for fallback version generation
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("flowId", flowId);
 
-        try {
-            // Build request parameters
-            JSONObject requestBody = new JSONObject();
-            requestBody.put("flowId", flowId);
+        String jsonBody = requestBody.toJSONString();
 
-            String jsonBody = requestBody.toJSONString();
+        Request.Builder requestBuilder = new Request.Builder()
+                .url(baseUrl + GET_VERSION_NAME_URL)
+                .post(RequestBody.create(jsonBody, JSON_MEDIA_TYPE))
+                .addHeader("Content-Type", "application/json");
 
-            // Send request using OkHttp
-            Request.Builder requestBuilder = new Request.Builder()
-                    .url(baseUrl + GET_VERSION_NAME_URL)
-                    .post(RequestBody.create(jsonBody, JSON_MEDIA_TYPE))
-                    .addHeader("Content-Type", "application/json");
+        if (spaceId != null) {
+            requestBuilder.addHeader("space-id", spaceId.toString());
+        }
 
-            // Add spaceId to header
-            if (spaceId != null) {
-                requestBuilder.addHeader("space-id", spaceId.toString());
+        try (Response response = okHttpClient.newCall(requestBuilder.build()).execute()) {
+            ResponseBody body = response.body();
+            if (body != null && response.isSuccessful()) {
+                String responseStr = body.string();
+                log.debug("Version name API response: {}", responseStr);
+
+                JSONObject responseJson = JSON.parseObject(responseStr);
+                if (responseJson != null && responseJson.getInteger("code") == 0) {
+                    JSONObject data = responseJson.getJSONObject("data");
+                    if (data != null && data.containsKey("workflowVersionName")) {
+                        String versionName = data.getString("workflowVersionName");
+                        if (versionName != null && !versionName.trim().isEmpty()) {
+                            log.info("Got version name from API: {} for flowId: {}", versionName, flowId);
+                            return versionName;
+                        }
+                    }
+                }
             }
-
-            try (Response response = okHttpClient.newCall(requestBuilder.build()).execute()) {
-                ResponseBody body = response.body();
-                String responseBody = body != null ? body.string() : null;
-
-                if (!response.isSuccessful()) {
-                    log.error("Failed to get next version name: flowId={}, responseCode={}, response={}",
-                            flowId, response.code(), responseBody);
-                    return generateFallbackVersionName(flowId);
-                }
-
-                if (!StringUtils.hasText(responseBody)) {
-                    log.warn("Empty response while getting next version name: flowId={}", flowId);
-                    return generateFallbackVersionName(flowId);
-                }
-
-                JSONObject responseJson = JSON.parseObject(responseBody);
-                if (responseJson == null) {
-                    log.warn("Failed to parse response while getting version name: flowId={}, response={}",
-                            flowId, responseBody);
-                    return generateFallbackVersionName(flowId);
-                }
-
-                JSONObject data = responseJson.getJSONObject("data");
-
-                if (data != null && data.containsKey("workflowVersionName")) {
-                    String versionName = data.getString("workflowVersionName");
-                    log.info("Successfully got next version name: flowId={}, versionName={}", flowId, versionName);
-                    return versionName;
-                }
-
-                log.warn("Version name not found in response: flowId={}, response={}", flowId, responseBody);
-                return generateFallbackVersionName(flowId);
-            }
-
         } catch (Exception e) {
-            log.error("Exception occurred while getting next workflow version name: flowId={}, spaceId={}", flowId, spaceId, e);
+            log.error("getVersionName-获取助手版本号异常,flowId={}", flowId, e);
+            return null;
         }
         
-        // Use fallback version generation based on old project logic
-        String fallbackVersion = generateFallbackVersionName(flowId);
-        log.info("Using fallback version name: {} for flowId: {}", fallbackVersion, flowId);
-        return fallbackVersion;
+        // If we reach here, API call failed - return null like old project
+        return null;
     }
 
     /**
-     * Generate fallback version name based on old project logic
-     * Returns v1.0 for first version, then increments based on existing versions
+     * Generate timestamp-based version number like old project
+     * @return Timestamp version number (e.g., "1760323182721")
      */
-    private String generateFallbackVersionName(String flowId) {
-        try {
-            // Query for the latest version of this workflow
-            LambdaQueryWrapper<WorkflowVersion> queryWrapper = new LambdaQueryWrapper<WorkflowVersion>()
-                    .eq(WorkflowVersion::getFlowId, flowId)
-                    .orderByDesc(WorkflowVersion::getCreatedTime)
-                    .isNotNull(WorkflowVersion::getSysData)
-                    .last("LIMIT 1");
-
-            WorkflowVersion latestVersion = workflowVersionMapper.selectOne(queryWrapper);
-            
-            if (latestVersion == null) {
-                // First version
-                return "v1.0";
-            }
-
-            String latestVersionName = latestVersion.getName();
-            if (latestVersionName == null || latestVersionName.trim().isEmpty()) {
-                return "v1.0";
-            }
-
-            // Extract version number and increment
-            return incrementVersion(latestVersionName, true);
-            
-        } catch (Exception e) {
-            log.error("Failed to generate fallback version name for flowId: {}", flowId, e);
-            // Ultimate fallback
-            return "v1.0";
+    private String generateTimestampVersionNumber() {
+        long timestamp = System.currentTimeMillis();
+        Random random = new Random();
+        int randomNumber = random.nextInt(900000) + 100000;
+        String versionNumber = String.valueOf(timestamp) + String.valueOf(randomNumber);
+        if (versionNumber.length() > 19) {
+            versionNumber = versionNumber.substring(0, 19);
         }
-    }
-
-    /**
-     * Increment version number based on old project logic
-     * @param maxVersion Current maximum version (e.g., "v1.0", "v2.0")
-     * @param shouldIncrement Whether to increment the version number
-     * @return Incremented version string
-     */
-    private String incrementVersion(String maxVersion, boolean shouldIncrement) {
-        if (maxVersion == null || maxVersion.trim().isEmpty()) {
-            return "v1.0";
-        }
-
-        double maxVersionNumber = extractVersionNumber(maxVersion);
-
-        if (shouldIncrement) {
-            maxVersionNumber += 1.0;
-        }
-
-        return "v" + String.valueOf(maxVersionNumber);
-    }
-
-    /**
-     * Extract version number from version string
-     * @param version Version string like "v1.0", "v2.5"
-     * @return Numeric version value
-     */
-    private double extractVersionNumber(String version) {
-        if (version == null || version.trim().isEmpty()) {
-            return 1.0;
-        }
-
-        try {
-            // Remove 'v' or 'V' prefix and extract number
-            String numberPart = version.replaceAll("^[vV]", "").trim();
-            if (numberPart.isEmpty()) {
-                return 1.0;
-            }
-            return Double.parseDouble(numberPart);
-        } catch (NumberFormatException e) {
-            log.warn("Failed to parse version number from: {}, using default 1.0", version);
-            return 1.0;
-        }
+        return versionNumber;
     }
 
     /**
@@ -311,7 +227,21 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
         log.info("Creating workflow version: request={}", request);
 
         try {
-            String jsonBody = JSON.toJSONString(request);
+            // Generate timestamp-based version number like old project
+            String timestampVersionNum = generateTimestampVersionNumber();
+            log.info("Generated timestamp version number: {}", timestampVersionNum);
+            
+            // Create a new request with timestamp version number
+            WorkflowReleaseRequestDto requestWithVersionNum = new WorkflowReleaseRequestDto();
+            requestWithVersionNum.setBotId(request.getBotId());
+            requestWithVersionNum.setFlowId(request.getFlowId());
+            requestWithVersionNum.setPublishChannel(request.getPublishChannel());
+            requestWithVersionNum.setPublishResult(request.getPublishResult());
+            requestWithVersionNum.setDescription(request.getDescription());
+            requestWithVersionNum.setName(request.getName());
+            requestWithVersionNum.setVersionNum(timestampVersionNum);
+            
+            String jsonBody = JSON.toJSONString(requestWithVersionNum);
             String authHeader = getAuthorizationHeader();
 
             if (authHeader.isEmpty()) {
