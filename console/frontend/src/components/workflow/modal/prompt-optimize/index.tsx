@@ -48,6 +48,7 @@ function PromptModal(): React.ReactElement {
       openWhenHidden: true,
       method: 'POST',
       headers: {
+        'Content-Type': 'application/json',
         Authorization: getAuthorization(),
       },
       signal: controller.signal,
