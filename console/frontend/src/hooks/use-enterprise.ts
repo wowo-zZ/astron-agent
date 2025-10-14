@@ -72,7 +72,7 @@ export const useEnterprise = (navigate?: any) => {
         joined: 0,
       });
     }
-  }, [setSpaceStatistics]);
+  }, [setSpaceStatistics, spaceType]);
 
   const visitEnterprise = useCallback(async (enterpriseId: string) => {
     try {
