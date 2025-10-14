@@ -56,6 +56,7 @@ export interface ModelListData {
   modelName: string;
   modelId: string;
   modelIcon: string;
+  model?: string;
 }
 // 获取模型列表
 export const getModelList = (): Promise<ModelListData[]> => {
