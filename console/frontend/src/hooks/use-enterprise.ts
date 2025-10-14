@@ -55,6 +55,13 @@ export const useEnterprise = (navigate?: any) => {
   );
 
   const getEnterpriseSpaceCount = useCallback(async () => {
+    if (spaceType === 'personal') {
+      setSpaceStatistics({
+        total: 0,
+        joined: 0,
+      });
+      return;
+    }
     try {
       const res: any = await getCorporateCount();
       setSpaceStatistics(res);
