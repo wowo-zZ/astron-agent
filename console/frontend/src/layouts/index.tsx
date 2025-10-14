@@ -30,7 +30,7 @@ const BasicLayout: FC<BasicLayoutProps> = ({ showHeader }) => {
       <div className="flex h-full w-full overflow-hidden global-background">
         <Sidebar />
 
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col overflow-hidden page-container-UI">
           {shouldShowHeader && <Header />}
           <Outlet />
         </div>

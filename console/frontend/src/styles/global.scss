@@ -80,3 +80,77 @@ html,
     color: #fff;
   }
 }
+
+
+.scroll-bar-UI {
+  /* 滚动条样式 */
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: transparent;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 3px;
+    background: #E7E7F0;
+    transition: background-color 0.2s ease;
+  }
+
+  &::-webkit-scrollbar-button {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  &::-webkit-scrollbar-corner {
+    background-color: transparent;
+  }
+
+  &::-webkit-scrollbar-track-piece {
+    background-color: transparent;
+  }
+}
+
+/* Firefox 滚动条样式 - 使用 @supports hack 避免覆盖 webkit 样式 */
+@supports (-moz-appearance: none) {
+  .scroll-bar-UI {
+    scrollbar-width: thin;
+    scrollbar-color: #E7E7F0 transparent;
+  }
+}
+
+.retractable-input-UI {
+  width: 200px !important;
+  padding-left: 32px !important;
+  border-radius: 10px !important;
+  background: #FFFFFF !important;
+  box-sizing: border-box !important;
+  border: 1px solid #E7E7F0 !important;
+
+  &:focus {
+    border: 1px solid #6356EA !important;
+  }
+}
+
+.retractable-select-UI {
+  .ant-select-selector {
+    border-radius: 10px !important;
+    border: 1px solid #E7E7F0 !important;
+  }
+}
+
+.page-container-UI {
+  background: #F7F9FD !important;
+  box-shadow: inset 0px 1px 10px 0px rgba(146, 136, 225, 0.2) !important;
+
+  .page-container-inner-UI {
+    width: 86%;
+    max-width: 1425px;
+    margin: 0 auto;
+    padding: 20px 0;
+  }
+}

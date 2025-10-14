@@ -127,9 +127,10 @@ const ModelManagementHeader: React.FC<ModelManagementHeaderProps> = ({
           </div> */}
 
           {/* 右侧控件 */}
-          <div className="ml-auto flex items-center gap-4">
+          <div className="ml-auto flex items-center gap-2">
             {activeTab === 'personalModel' && (
               <Select
+                className="retractable-select-UI"
                 placeholder={t('model.pleaseSelect')}
                 value={filterType}
                 style={{ width: 120 }}
@@ -142,6 +143,7 @@ const ModelManagementHeader: React.FC<ModelManagementHeaderProps> = ({
               />
             )}
             <RetractableInput
+              className="retractable-input-UI"
               value={searchInput}
               restrictFirstChar={true}
               onChange={getRobotsDebounce}

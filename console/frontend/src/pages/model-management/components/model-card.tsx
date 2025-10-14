@@ -1,10 +1,11 @@
-import { useState, useMemo, useCallback, JSX } from 'react';
+import { useState, useMemo, useCallback, JSX, Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Switch, message } from 'antd';
 import JSEncrypt from 'jsencrypt';
 
 import { DeleteModal, CreateModal } from './modal-component';
+import StatusTag from './status-tag';
 import {
   enabledModelAPI,
   getModelDetail,
@@ -22,6 +23,8 @@ import {
 } from '@/types/model';
 import { ResponseBusinessError } from '@/types/global';
 import i18next from 'i18next';
+import styles from './model-card.module.scss';
+import classNames from 'classnames';
 
 // 加密API密钥工具函数
 const encryptApiKey = (publicKey: string, apiKey: string): string => {
@@ -174,7 +177,7 @@ function ModelCardHeader({
   const [enabled, setEnabled] = useState(model.enabled);
   return (
     <div className="flex items-start justify-between mb-3">
-      <div className="flex items-center">
+      <div className={`flex items-center ${styles.modelCardHeader}`}>
         {model?.llmSource === LLMSource.CUSTOM ? (
           <span
             className="w-12 h-12 flex items-center justify-center rounded-lg flex-shrink-0 mr-3"
@@ -194,7 +197,7 @@ function ModelCardHeader({
           </div>
         )}
         <div>
-          <span className="font-semibold text-gray-900">{model.name}</span>
+          <span className={styles.modelCardTitle}>{model.name}</span>
           {model.llmSource === LLMSource.CUSTOM &&
             ((): JSX.Element | null => {
               const statusInfo = getPublishStatusInfo(model.status);
@@ -206,7 +209,7 @@ function ModelCardHeader({
                 </span>
               ) : null;
             })()}
-          <span
+          {/* <span
             style={{
               borderRadius: '12.5px',
               padding: '2px 8px',
@@ -225,14 +228,15 @@ function ModelCardHeader({
               : model.shelfStatus === ShelfStatus.OFF_SHELF
                 ? t('model.offShelf')
                 : ''}
-          </span>
+          </span> */}
+          <StatusTag status={model.shelfStatus} />
           <p className="text-sm text-gray-500 flex flex-wrap gap-x-2 gap-2 mt-2">
             {modelCategoryTags
               .filter(name => name !== t('model.other'))
               .map(name => (
                 <span
                   key={name}
-                  className="px-1.5 py-0.5 text-xs rounded-sm bg-[#E4EAFF] opacity-60 text-[#000000]"
+                  className={classNames(styles.modelTag, styles.category)}
                 >
                   {name}
                 </span>
@@ -242,7 +246,7 @@ function ModelCardHeader({
               .map(name => (
                 <span
                   key={name}
-                  className="px-1.5 py-0.5 text-xs rounded-sm bg-[#E8E8EA] opacity-60"
+                  className={styles.modelTag}
                   style={{ color: '#000000' }}
                 >
                   {name}
@@ -253,17 +257,18 @@ function ModelCardHeader({
       </div>
       {model.llmSource === LLMSource.CUSTOM && (
         <Switch
-          size="small"
+          size="default"
           checked={enabled}
           disabled={[
             LocalModelStatus.FAILED,
             LocalModelStatus.PENDING,
           ].includes(model.status)}
-          className={
+          className={`${
             model.enabled
-              ? '[&_.ant-switch-inner]:bg-[#275EFF]'
+              ? '[&_.ant-switch-inner]:bg-[#6356EA]'
               : '[&_.ant-switch-inner]:bg-gray-400'
           }
+            ${styles.modelSwitch}`}
           onChange={(checked, e) => {
             e.stopPropagation();
             setEnabled(checked);
@@ -318,17 +323,21 @@ function ModelCardFooter({
   const { t } = useTranslation();
   return (
     <>
-      <div className="flex justify-between items-center mt-auto pt-3 border-t border-dashed border-[#E4EAFF]">
-        <div className="flex items-center gap-x-2">
-          {bottomTexts.map((text, index) => (
-            <div key={index} className="flex items-center gap-x-2">
-              <span className="text-xs text-[#7F7F7F]">{text}</span>
-              {index !== bottomTexts.length - 1 && (
-                <span className="h-[8px] border rounded-[18px] border-[#e4eafe]"></span>
+      <div className="flex justify-between items-center mt-auto pt-3">
+        <span
+          className={styles.modelInfo}
+          title={bottomTexts.join(' \u00A0\u00A0|\u00A0\u00A0 ')}
+        >
+          {bottomTexts.map((t, index) => (
+            <Fragment key={index}>
+              <span>{t}</span>
+              {index < bottomTexts.length - 1 && (
+                <span className={styles.modelInfoDivider}></span>
               )}
-            </div>
+            </Fragment>
           ))}
-        </div>
+          {/* {bottomTexts.join(' \u00A0\u00A0|\u00A0\u00A0 ')} */}
+        </span>
         {model.llmSource === LLMSource.CUSTOM && (
           <div className="relative">
             <button
@@ -487,7 +496,7 @@ function ModelCard({
 
   return (
     <div
-      className="bg-[#FFFFFF] rounded-[18px] p-4 hover:shadow-lg transition-shadow duration-200 flex flex-col h-full cursor-pointer min-h-[192px]"
+      className={`p-5 duration-200 flex flex-col h-full cursor-pointer h-[188px] ${styles.modelCard}`}
       onClick={handleUse}
     >
       <ModelCardHeader
@@ -499,7 +508,7 @@ function ModelCard({
 
       {/* 描述 */}
       <p
-        className="text-sm text-[#7F7F7F] mb-3 line-clamp-2"
+        className={styles.modelDesc}
         title={model.desc} // 原生浏览器提示
       >
         {model.desc}

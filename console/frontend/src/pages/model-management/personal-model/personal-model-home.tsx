@@ -17,15 +17,9 @@ const PersonalModelContent: React.FC = () => {
   const filters = useModelFilters();
 
   return (
-    <div className="w-full h-screen flex flex-col">
+    <div className="w-full h-screen flex flex-col page-container-inner-UI">
       <div className="pr-19">
-        <div
-          className="flex-none pt-4 pb-2 sm:pt-4 sm:pb-2 lg:pt-5 lg:pb-2 mt-1"
-          style={{
-            paddingLeft: '7%',
-            paddingRight: '7%',
-          }}
-        >
+        <div className="flex-none mb-5">
           <ModelManagementHeader
             activeTab="personalModel"
             shelfOffModel={state.shelfOffModels}
@@ -40,9 +34,9 @@ const PersonalModelContent: React.FC = () => {
       </div>
 
       <div className="flex-1 overflow-hidden">
-        <div className="mx-auto h-full w-full flex flex-col lg:flex-row gap-6 lg:gap-8 pl-[7%]">
+        <div className="mx-auto h-full w-full flex flex-col lg:flex-row gap-6 lg:gap-8 ">
           {/* 右侧卡片 */}
-          <main className="col-span-4 rounded-lg overflow-y-auto [&::-webkit-scrollbar-thumb]:rounded-full w-full">
+          <main className="col-span-4 rounded-lg overflow-y-auto scroll-bar-UI">
             <ModelCardList
               models={filters.filteredModels}
               showCreate
