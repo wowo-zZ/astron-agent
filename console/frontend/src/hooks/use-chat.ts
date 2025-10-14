@@ -92,7 +92,7 @@ const useChat = () => {
     controllerRef.current = controller;
     setControllerRef(controllerRef.current);
     const headerConfig = {
-      'Lang-Code': getLanguageCode(),
+      'Accept-Language': getLanguageCode(),
       authorization: `Bearer ${localStorage.getItem('accessToken')}`,
     };
     if (isnewchat) {

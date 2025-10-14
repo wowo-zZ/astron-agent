@@ -364,10 +364,12 @@ interface IteratorChildNodeProps {
 // 迭代器子节点组件
 export const IteratorChildNode = memo<IteratorChildNodeProps>(
   ({ id, data }) => {
-    const { isConnectable, hasTargetHandle, hasSourceHandle } = useNodeCommon({
+    const { isConnectable, isIteratorStart, isIteratorEnd } = useNodeCommon({
       id,
       data,
     });
+    const hasTargetHandle = !isIteratorStart;
+    const hasSourceHandle = !isIteratorEnd;
     return (
       <div className="px-4 py-2 iterator-child-node">
         <span>{data?.label}</span>

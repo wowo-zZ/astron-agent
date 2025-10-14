@@ -201,7 +201,7 @@ const ExceptionHandlingSwitch = ({
   const currentStore = useFlowsManager(state => state.getCurrentStore());
   const updateNodeRef = currentStore(state => state.updateNodeRef);
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
       <div className="flex items-center gap-2 justify-between w-full">
         <h4 className="text-base font-medium">
           {t('workflow.exceptionHandling.title')}
@@ -297,6 +297,9 @@ const ExceptionHandlingForm = ({
               handleChangeNodeParam('errorStrategy', value, (data, value) => {
                 if (value === 1 || value === 0) {
                   handleRemoveExceptionHandlingEdge();
+                }
+                if (value === 0 || value === 2) {
+                  Reflect.deleteProperty(data?.retryConfig, 'customOutput');
                 }
                 if (value === 1) {
                   if (!checkedNodeOutputData(data?.outputs, currentNode)) {

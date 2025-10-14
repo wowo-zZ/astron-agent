@@ -29,6 +29,9 @@ function OperationResult({
   const checkFlow = useFlowsManager(state => state.checkFlow) as () => void;
   const currentStore = useFlowsManager(state => state.getCurrentStore());
   const nodeList = useFlowsManager(state => state.nodeList);
+  const setNodeInfoEditDrawerlInfo = useFlowsManager(
+    state => state.setNodeInfoEditDrawerlInfo
+  );
   const nodes = currentStore(state => state.nodes);
   const moveToPosition = currentStore(state => state.moveToPosition);
   const [drawerStyle, setDrawerStyle] = useState<DrawerStyle>({
@@ -51,22 +54,26 @@ function OperationResult({
       window.removeEventListener('resize', handleAdjustmentDrawerStyle);
   }, [drawerStyle]);
 
-  const handleMoveToPosition = useCallback(
-    (id: string, inputNodes?: ReactFlowNode[]): void => {
-      const currentNode = (inputNodes || nodes).find(node => node.id === id);
-      const zoom = 0.8;
-      const xPos = currentNode?.position?.x ?? 0;
-      const yPos = currentNode?.position?.y ?? 0;
-      const position: PositionData = {
-        x: -xPos * zoom + 200,
-        y: -yPos * zoom + 200,
-        zoom,
-      };
-      moveToPosition(position);
-    },
-    [nodes, moveToPosition]
-  );
+  const handleMoveToPosition = useMemoizedFn((id: string): void => {
+    const currentNode = nodes.find(node => node.id === id);
+    const zoom = 0.8;
+    const xPos = currentNode?.position?.x ?? 0;
+    const yPos = currentNode?.position?.y ?? 0;
+    const position: PositionData = {
+      x: -xPos * zoom + 200,
+      y: -yPos * zoom + 200,
+      zoom,
+    };
+    moveToPosition(position);
+    setNodeInfoEditDrawerlInfo({
+      open: true,
+      nodeId: id,
+    });
+  });
 
+  const handleClickErrorNode = useMemoizedFn((id: string) => {
+    handleMoveToPosition(id);
+  });
   const showErrorNodesDrawer = useMemo(() => {
     return errNodes?.length !== 0;
   }, [errNodes]);
@@ -129,7 +136,7 @@ function OperationResult({
               <div
                 key={node.id}
                 className="border border-[#E0E3E7] p-4 mt-4 rounded-lg cursor-pointer"
-                onClick={() => handleMoveToPosition(node.id)}
+                onClick={() => handleClickErrorNode(node.id)}
               >
                 <div className="flex items-center  gap-5">
                   <img

@@ -181,7 +181,7 @@ const PromptTry = forwardRef<
       const controller = new AbortController();
       controllerRef.current = controller;
       const headerConfig = {
-        'Lang-Code': getLanguageCode(),
+        'Accept-Language': getLanguageCode(),
         authorization: `Bearer ${localStorage.getItem('accessToken')}`,
       };
       setIsLoading(true);
