@@ -684,7 +684,7 @@ function checkIteratorNode({ iteratorId, outerErrNodes, get }): void {
   const visitedNodes = new Set();
   const errNodes: unknown = [];
   const cycleEdges: unknown[] = [];
-  const stack: unknown[] = [{ nodeId: startNode.id }];
+  const stack: unknown[] = [{ nodeId: startNode?.id }];
   const variableNodes: unknown[] = [];
   const recStack = new Set();
 
@@ -785,7 +785,7 @@ export function checkFlow(get): boolean {
   const endNode = nodes.find(node => node.nodeType === 'node-end');
   const visitedNodes = new Set();
   const recStack = new Set();
-  const stack: unknown[] = [{ nodeId: startNode.id }];
+  const stack: unknown[] = [{ nodeId: startNode?.id }];
   const variableNodes: unknown[] = [];
 
   function dfs(): void {

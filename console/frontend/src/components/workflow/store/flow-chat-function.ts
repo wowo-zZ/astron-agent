@@ -55,7 +55,7 @@ const initChatInfo: ChatInfoType = {
 export const initialStatus = {
   userInput: '',
   chatList: [],
-  chatInfoRef: initChatInfo,
+  chatInfoRef: cloneDeep(initChatInfo),
   messageNodeTextQueue: '',
   endNodeReasoningTextQueue: '',
   endNodeTextQueue: '',

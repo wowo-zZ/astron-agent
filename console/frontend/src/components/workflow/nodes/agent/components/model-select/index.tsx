@@ -59,11 +59,7 @@ function index({ id, data }): React.ReactElement {
                   <div className="flex items-start gap-2 flex-1 overflow-hidden">
                     <div className="flex items-center gap-2">
                       <img
-                        src={
-                          model?.llmSource === 0
-                            ? model?.address + model?.icon
-                            : model.icon
-                        }
+                        src={model.icon}
                         className="w-[20px] h-[20px] flex-shrink-0"
                       />
                       <span className="text-xs">{model.name}</span>
