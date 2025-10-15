@@ -431,8 +431,9 @@ axios.interceptors.response.use(
 const getBaseURL = (): string => {
   const mode = import.meta.env.MODE;
   const VITE_TEST_URL = import.meta.env.VITE_TEST_URL;
-
+  const VITE_DEV_URL = import.meta.env.VITE_DEV_URL;
   console.log('VITE_TEST_URL', VITE_TEST_URL);
+  console.log('VITE_DEV_URL', VITE_DEV_URL);
 
   if (mode === 'production') {
     return '/console-api';
