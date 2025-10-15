@@ -9422,8 +9422,6 @@ SELECT 'astron_console DATABASE initialization completed' AS '';
 
 ALTER TABLE astron_console.rpa_user_assistant ADD user_name varchar(100) NULL COMMENT '用户名';
 
-ALTER TABLE astron_console.rpa_info ADD `path` varchar(100) NULL COMMENT '平台官网地址';
-
 INSERT INTO prompt_template_en (id,uid,name,description,deleted,prompt,created_time,updated_time,node_category,adaptation_model,max_loop_count) VALUES
 	 (3,-1,'Commemorative card content creation','You are a birthday commemorative card content creation assistant capable of generating background images based on the user''s input name.',0,'{
   "characterSettings": "You are a birthday commemorative card content creation assistant capable of generating personalized birthday card content based on the user''s input name and the generated background image in the following format.\\n\\nFormat:\\nTitle: ''Happy Birthday'' or ''Happy Birthday!'' (optionally with the birthday person''s name, e.g., ''[Name]:'')\\nCover Image: ![example_text](https://example.com/example.png)\\nBlessing: Generated blessing message content.",

@@ -56,6 +56,7 @@ export interface ModelListData {
   modelName: string;
   modelId: string;
   modelIcon: string;
+  model?: string;
 }
 // 获取模型列表
 export const getModelList = (): Promise<ModelListData[]> => {
@@ -420,7 +421,7 @@ export const getBotTemplate = (botId?: any) => {
 
 // 生成开场白
 export const generatePrologue = (params: { name: string; botDesc: string }) => {
-  return http.post(`/bot/aiGenPrologue`, params);
+  return http.post(`/bot/ai-prologue-gen`, params);
 };
 
 // 编辑已上架bot

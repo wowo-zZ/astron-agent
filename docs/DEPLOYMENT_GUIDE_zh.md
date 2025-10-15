@@ -34,9 +34,6 @@ Casdoor 是一个开源的身份和访问管理平台，提供OAuth 2.0、OIDC�
 # 进入 Casdoor 目录
 cd docker/casdoor
 
-# 修改环境变量配置
-vim conf/app.conf
-
 # 创建日志挂载目录
 mkdir -p logs
 
@@ -73,13 +70,13 @@ RagFlow 是一个开源的RAG（检索增强生成）引擎，使用深度文档
 cd docker/ragflow
 
 # 启动 RagFlow 服务（包含所有依赖）
-docker-compose up -d
+docker compose up -d
 
 # 查看服务状态
-docker-compose ps
+docker compose ps
 
 # 查看服务日志
-docker-compose logs -f ragflow
+docker compose logs -f ragflow
 ```
 
 **访问地址：**
@@ -105,6 +102,11 @@ cp .env.example .env
 
 编辑 docker/astronAgent/.env 文件，配置 RagFlow 连接信息：
 
+```bash
+# 编辑环境变量配置
+vim .env
+```
+
 **关键配置项：**
 
 ```env
@@ -117,9 +119,9 @@ RAGFLOW_DEFAULT_GROUP=星辰知识库
 
 **获取 RagFlow API Token：**
 1. 访问 RagFlow Web界面：http://localhost/
-2. 登录并进入用户设置
-3. 生成 API Token
-4. 将 Token 更新到配置文件中
+2. 登录并点击头像进入用户设置
+3. 点击API生成 API KEY
+4. 将生成的 API KEY 更新到.env文件中的RAGFLOW_API_TOKEN
 
 #### 3.2 配置 Casdoor 认证集成
 

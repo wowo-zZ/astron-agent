@@ -40,7 +40,7 @@ class OpenPlatformServiceTest {
 
     @BeforeEach
     void setSecret() throws Exception {
-        // Manually inject private @Value field in test environment
+        // 私有 @Value 字段在单测环境手动注入
         Field f = OpenPlatformService.class.getDeclaredField("secret");
         f.setAccessible(true);
         f.set(service, "sec-xyz");
@@ -49,7 +49,7 @@ class OpenPlatformServiceTest {
     // ================ syncWorkflowClone ================
 
     @Test
-    @DisplayName("syncWorkflowClone - should build CloneSynchronize and call botMassService, return its result")
+    @DisplayName("syncWorkflowClone - 应组装 CloneSynchronize 并调用 botMassService，返回其结果")
     void syncWorkflowClone_shouldBuildDto_andDelegate() {
         ArgumentCaptor<CloneSynchronize> cap =
                 ArgumentCaptor.forClass(CloneSynchronize.class);
@@ -68,7 +68,7 @@ class OpenPlatformServiceTest {
     }
 
     @Test
-    @DisplayName("syncWorkflowClone - exception from downstream should propagate outward")
+    @DisplayName("syncWorkflowClone - 下游抛异常应向外传播")
     void syncWorkflowClone_shouldPropagateException() {
         when(botMassService.maasCopySynchronize(any()))
                 .thenThrow(new RuntimeException("down"));
@@ -84,7 +84,7 @@ class OpenPlatformServiceTest {
     class SyncWorkflowUpdateTests {
 
         @Test
-        @DisplayName("syncWorkflowUpdate - success: should correctly assemble URL/Headers/Body and return data")
+        @DisplayName("syncWorkflowUpdate - 成功：应正确拼 URL/Headers/Body 并返回 data")
         void syncWorkflowUpdate_success() {
             when(apiUrl.getOpenPlatform()).thenReturn("http://open");
 
@@ -94,11 +94,11 @@ class OpenPlatformServiceTest {
             try (MockedStatic<OpenPlatformTool> sign = mockStatic(OpenPlatformTool.class);
                  MockedStatic<OkHttpUtil> http = mockStatic(OkHttpUtil.class)) {
 
-                // Signature stub: verify appId and secret, return fixed signature
+                // 签名桩：校验 appId 与 secret，返回固定签名
                 sign.when(() -> OpenPlatformTool.getSignature(eq(commonConfig.getAppId()), eq("sec-xyz"), anyLong()))
                     .thenReturn("SIG-123");
 
-                // HTTP stub: precisely verify URL/Headers/Body, return code=0 response
+                // HTTP 桩：精确校验 URL/Headers/Body，返回 code=0 的响应
                 http.when(() -> OkHttpUtil.post(anyString(), anyMap(), anyString()))
                     .thenAnswer(inv -> {
                         String url = inv.getArgument(0);
@@ -107,13 +107,13 @@ class OpenPlatformServiceTest {
                         String body = inv.getArgument(2);
 
                         assertThat(url).isEqualTo("http://open/workflow/updateSynchronize");
-                        // header: appId, signature, timestamp
+                        // header：appId、签名、时间戳
                         assertThat(headers).containsEntry("appId", commonConfig.getAppId());
                         assertThat(headers).containsEntry("signature", "SIG-123");
                         assertThat(headers).containsKey("timestamp");
-                        assertThat(headers.get("timestamp")).matches("\\d{10}"); // second-level timestamp
+                        assertThat(headers.get("timestamp")).matches("\\d{10}"); // 秒级时间戳
 
-                        // body: fields and values
+                        // body：字段与值
                         JSONObject jo = JSON.parseObject(body);
                         assertThat(jo.getLong("massId")).isEqualTo(9L);
                         assertThat(jo.getString("botDesc")).isEqualTo("desc");
@@ -130,18 +130,18 @@ class OpenPlatformServiceTest {
 
                 Object out = service.syncWorkflowUpdate(9L, "desc", "pro", Arrays.asList("i1", "i2"));
 
-                // data returned as-is
+                // data 原样返回
                 assertThat(out).isInstanceOfAny(Map.class, JSONObject.class);
                 assertThat(JSON.toJSONString(out)).contains("\"ok\":true");
 
-                // Verify signature function was called (fixed appId/secret, arbitrary long timestamp)
+                // 验证签名函数被调用（appId/secret 固定，时间戳为任意 long）
                 sign.verify(() -> OpenPlatformTool.getSignature(
                         eq(commonConfig.getAppId()), eq("sec-xyz"), anyLong()));
             }
         }
 
         @Test
-        @DisplayName("syncWorkflowUpdate - platform returns non-zero should throw BusinessException(common.response.failed)")
+        @DisplayName("syncWorkflowUpdate - 平台返回非0应抛 BusinessException(common.response.failed)")
         void syncWorkflowUpdate_failed_shouldThrowBusinessException() {
             when(apiUrl.getOpenPlatform()).thenReturn("http://open");
 
@@ -167,7 +167,7 @@ class OpenPlatformServiceTest {
         }
 
         @Test
-        @DisplayName("syncWorkflowUpdate - allows null parameters and proceeds with request normally")
+        @DisplayName("syncWorkflowUpdate - 允许 null 参数并照常发起请求")
         void syncWorkflowUpdate_nulls_shouldStillCallHttp() {
             when(apiUrl.getOpenPlatform()).thenReturn("http://open");
 
@@ -181,7 +181,7 @@ class OpenPlatformServiceTest {
                     .thenAnswer(inv -> {
                         String body = inv.getArgument(2);
                         JSONObject jo = JSON.parseObject(body);
-                        // Allow nulls
+                        // 允许为 null
                         assertThat(jo.get("botDesc")).isNull();
                         assertThat(jo.get("prologue")).isNull();
                         assertThat(jo.get("inputExample")).isNull();

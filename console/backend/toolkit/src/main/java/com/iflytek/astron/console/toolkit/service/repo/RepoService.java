@@ -559,7 +559,7 @@ public class RepoService extends ServiceImpl<RepoMapper, Repo> {
             repoDto.setAddress(address);
 
             // Agent Bots
-            List<SparkBotVO> sparkBotVOList = sparkBotMapper.listSparkBotByRepoId(repoDto.getId(), UserInfoManagerHandler.getUserId());
+            List<SparkBotVO> sparkBotVOList = sparkBotMapper.listSparkBotByRepoId(repoDto.getId(), repoDto.getUserId());
             if (!CollectionUtils.isEmpty(sparkBotVOList)) {
                 sparkBotVOList.forEach(e -> e.setAddress(address));
             }

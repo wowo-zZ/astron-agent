@@ -27,7 +27,7 @@ api:
     sparkDB: ${SPARK_DB_URL:http://127.0.0.1:7990}
     sparkDocUrl: https://chatdoc.xfyun.cn
     mcpUrlServer: http://127.0.0.1:port
-    localModel: ${LOCAL_MODEL_URL:http://127.0.0.1:33777}
+    localModel: ${LOCAL_MODEL_URL:http://127.0.0.1:33778}
     datasetUrl: http://127.0.0.1:8080/dataset/getDataset
     datasetFileUrl: http://127.0.0.1:8080/dataset/getDatasetFiles
     xinghuoDatasetFileUrl: http://127.0.0.1:8080/dataset/addXinghuoDatasetFile

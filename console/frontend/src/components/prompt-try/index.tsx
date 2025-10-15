@@ -14,6 +14,7 @@ import { getLanguageCode } from '@/utils/http';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 import eventBus from '@/utils/event-bus';
 import { baseURL } from '@/utils/http';
+import { ModelListData } from '@/services/spark-common';
 
 // PromptTry组件暴露的方法接口
 export interface PromptTryRef {
@@ -43,7 +44,6 @@ interface SSEData {
 const PromptTry = forwardRef<
   PromptTryRef,
   {
-    newModel?: string;
     newPrompt?: string;
     baseinfo?: any;
     inputExample?: string[];
@@ -56,11 +56,13 @@ const PromptTry = forwardRef<
     choosedAlltool?: {
       [key: string]: boolean;
     };
+    findModelOptionByUniqueKey: (
+      uniqueKey: string
+    ) => ModelListData | undefined;
   }
 >(
   (
     {
-      newModel,
       newPrompt,
       baseinfo,
       inputExample,
@@ -70,6 +72,7 @@ const PromptTry = forwardRef<
       model,
       supportContext,
       choosedAlltool,
+      findModelOptionByUniqueKey,
     },
     ref
   ) => {
@@ -141,11 +144,11 @@ const PromptTry = forwardRef<
     const getAnswer = (question: string) => {
       const esURL = `${baseURL}/chat-message/bot-debug`;
       const form = new FormData();
-      if (model) {
-        form.append('model', newModel ? newModel : model);
-      } else {
-        form.append('model', newModel ? newModel : 'spark');
+      const useModel = findModelOptionByUniqueKey(model || '');
+      if (useModel?.isCustom) {
+        form.append('modelId', useModel.modelId);
       }
+      form.append('model', useModel?.modelDomain || 'spark');
 
       form.append('text', question);
       const datasetList: string[] = [];

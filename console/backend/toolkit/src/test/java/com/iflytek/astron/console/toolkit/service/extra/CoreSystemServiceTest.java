@@ -54,12 +54,12 @@ class CoreSystemServiceTest {
     private static MultipartFile mockFile(String name, byte[] bytes) throws Exception {
         MultipartFile f = mock(MultipartFile.class);
 
-        // These may not be called in some branches → use lenient() to avoid UnnecessaryStubbingException
+        // 这些在某些分支可能不会被调用 → 用 lenient()，避免 UnnecessaryStubbingException
         lenient().when(f.getOriginalFilename()).thenReturn(name);
         lenient().when(f.getInputStream()).thenReturn(new ByteArrayInputStream(bytes));
         lenient().when(f.isEmpty()).thenReturn(bytes == null || bytes.length == 0);
 
-        // This will be used in the current upload success path → keep strict
+        // 这条在当前 upload 成功路径会被使用 → 保持严格
         when(f.getBytes()).thenReturn(bytes);
 
         return f;
@@ -84,7 +84,7 @@ class CoreSystemServiceTest {
     // ================== publish / auth ==================
 
     @Test
-    @DisplayName("publish(prod) - non-dev environment should sign and verify return code")
+    @DisplayName("publish(prod) - 非dev环境应签名并校验返回码")
     void publish_prod_success() throws Exception {
         setEnv("prod");
         when(apiUrl.getWorkflow()).thenReturn("http://wf");
@@ -99,7 +99,7 @@ class CoreSystemServiceTest {
                         Map<String, String> header = inv.getArgument(1);
                         String body = inv.getArgument(2);
                         assertThat(url).isEqualTo("http://wf" + CoreSystemService.API_PUBLISH_PATH);
-                        // header should contain username and signature fields
+                        // header 应包含用户名与签名字段
                         assertThat(header).containsEntry(CoreSystemService.X_CONSUMER_USERNAME, "tid");
                         assertThat(header).containsKeys("authorization", "host", "date", "digest");
                         JSONObject b = JSONObject.parseObject(body);
@@ -115,7 +115,7 @@ class CoreSystemServiceTest {
     }
 
     @Test
-    @DisplayName("publish - non-zero return code should throw BusinessException")
+    @DisplayName("publish - 返回码非0应抛BusinessException")
     void publish_fail_throws() throws Exception {
         setEnv("prod");
         when(apiUrl.getWorkflow()).thenReturn("http://wf");
@@ -134,7 +134,7 @@ class CoreSystemServiceTest {
     }
 
     @Test
-    @DisplayName("auth(dev) - dev environment forces app_id=a01c2bc7 and requires no signature")
+    @DisplayName("auth(dev) - dev环境强制app_id=a01c2bc7且无需签名")
     void auth_dev_forcedAppId() throws Exception {
         setEnv(CommonConst.ENV_DEV); // "dev"
         when(apiUrl.getWorkflow()).thenReturn("http://wf");
@@ -145,7 +145,7 @@ class CoreSystemServiceTest {
                     .thenAnswer(inv -> {
                         Map<String, String> header = inv.getArgument(1);
                         String body = inv.getArgument(2);
-                        // Only X-Consumer-Username, no signature headers
+                        // 只有 X-Consumer-Username，无签名头
                         assertThat(header).containsOnlyKeys(CoreSystemService.X_CONSUMER_USERNAME);
                         assertThat(header).containsEntry(CoreSystemService.X_CONSUMER_USERNAME, "tid");
                         JSONObject b = JSONObject.parseObject(body);
@@ -158,7 +158,7 @@ class CoreSystemServiceTest {
     }
 
     @Test
-    @DisplayName("auth(prod) - non-zero return code should throw BusinessException")
+    @DisplayName("auth(prod) - 返回码非0应抛BusinessException")
     void auth_prod_fail() throws Exception {
         setEnv("prod");
         when(apiUrl.getWorkflow()).thenReturn("http://wf");
@@ -179,7 +179,7 @@ class CoreSystemServiceTest {
     // ================== upload file(s) ==================
 
     @Test
-    @DisplayName("uploadFile - success: return data.url and assemble necessary headers")
+    @DisplayName("uploadFile - 成功：返回data.url并拼接必要Header")
     void uploadFile_success() throws Exception {
         when(apiUrl.getWorkflow()).thenReturn("http://wf");
         when(apiUrl.getTenantId()).thenReturn("tid");
@@ -207,7 +207,7 @@ class CoreSystemServiceTest {
     }
 
     @Test
-    @DisplayName("uploadFile - non-zero return code should throw BusinessException")
+    @DisplayName("uploadFile - 返回码非0应抛BusinessException")
     void uploadFile_fail_code() throws Exception {
         when(apiUrl.getWorkflow()).thenReturn("http://wf");
         when(apiUrl.getTenantId()).thenReturn("tid");
@@ -225,7 +225,7 @@ class CoreSystemServiceTest {
     }
 
     @Test
-    @DisplayName("uploadFile - HTTP exception should be wrapped as BusinessException")
+    @DisplayName("uploadFile - HTTP异常应被包装为BusinessException")
     void uploadFile_httpException() throws Exception {
         when(apiUrl.getWorkflow()).thenReturn("http://wf");
         when(apiUrl.getTenantId()).thenReturn("tid");
@@ -243,7 +243,7 @@ class CoreSystemServiceTest {
     }
 
     @Test
-    @DisplayName("batchUploadFile - success: return data.urls[]")
+    @DisplayName("batchUploadFile - 成功：返回data.urls[]")
     void batchUploadFile_success() throws Exception {
         when(apiUrl.getWorkflow()).thenReturn("http://wf");
         when(apiUrl.getTenantId()).thenReturn("tid");
@@ -264,7 +264,7 @@ class CoreSystemServiceTest {
     }
 
     @Test
-    @DisplayName("batchUploadFile - non-zero return code should throw BusinessException")
+    @DisplayName("batchUploadFile - 返回码非0应抛BusinessException")
     void batchUploadFile_fail_code() throws Exception {
         when(apiUrl.getWorkflow()).thenReturn("http://wf");
         when(apiUrl.getTenantId()).thenReturn("tid");
@@ -282,7 +282,7 @@ class CoreSystemServiceTest {
     // ================== header signature ==================
 
     @Test
-    @DisplayName("assembleRequestHeader - normal: should generate authorization/host/date/digest")
+    @DisplayName("assembleRequestHeader - 正常：应生成authorization/host/date/digest")
     void assembleRequestHeader_success() {
         Map<String, String> h = service.assembleRequestHeader(
                 "http://host:8080/path", "ak", "sk", "POST", "abc".getBytes(StandardCharsets.UTF_8));
@@ -296,7 +296,7 @@ class CoreSystemServiceTest {
     }
 
     @Test
-    @DisplayName("assembleRequestHeader - invalid URL should throw BusinessException")
+    @DisplayName("assembleRequestHeader - 非法URL应抛BusinessException")
     void assembleRequestHeader_badUrl() {
         assertThatThrownBy(() -> service.assembleRequestHeader("::::", "ak", "sk", "POST", "x".getBytes()))
                 .isInstanceOf(BusinessException.class)
@@ -306,7 +306,7 @@ class CoreSystemServiceTest {
     // ================== compare add/delete ==================
 
     @Test
-    @DisplayName("addComparisons - success")
+    @DisplayName("addComparisons - 成功")
     void addComparisons_success() {
         when(apiUrl.getWorkflow()).thenReturn("http://wf");
 
@@ -319,7 +319,7 @@ class CoreSystemServiceTest {
     }
 
     @Test
-    @DisplayName("addComparisons - non-zero return code should throw BusinessException")
+    @DisplayName("addComparisons - 返回码非0应抛BusinessException")
     void addComparisons_fail() {
         when(apiUrl.getWorkflow()).thenReturn("http://wf");
 
@@ -334,7 +334,7 @@ class CoreSystemServiceTest {
     }
 
     @Test
-    @DisplayName("deleteComparisons - success")
+    @DisplayName("deleteComparisons - 成功")
     void deleteComparisons_success() {
         when(apiUrl.getWorkflow()).thenReturn("http://wf");
 
@@ -347,7 +347,7 @@ class CoreSystemServiceTest {
     }
 
     @Test
-    @DisplayName("deleteComparisons - non-zero return code should throw BusinessException")
+    @DisplayName("deleteComparisons - 返回码非0应抛BusinessException")
     void deleteComparisons_fail() {
         when(apiUrl.getWorkflow()).thenReturn("http://wf");
 
@@ -364,7 +364,7 @@ class CoreSystemServiceTest {
     // ================== SparkDB create/DDL/DML ==================
 
     @Test
-    @DisplayName("createDatabase - success returns database_id")
+    @DisplayName("createDatabase - 成功返回 database_id")
     void createDatabase_success() {
         when(apiUrl.getSparkDB()).thenReturn("http://db");
         when(apiUrl.getTenantId()).thenReturn("tid");
@@ -381,7 +381,7 @@ class CoreSystemServiceTest {
     }
 
     @Test
-    @DisplayName("execDDL - success (just needs to not throw exception)")
+    @DisplayName("execDDL - 成功（只需不抛异常）")
     void execDDL_success() {
         when(apiUrl.getSparkDB()).thenReturn("http://db");
         when(apiUrl.getTenantId()).thenReturn("tid");
@@ -398,7 +398,7 @@ class CoreSystemServiceTest {
     class ExecDmlTests {
 
         @Test
-        @DisplayName("execDML - other operation types: should return null")
+        @DisplayName("execDML - 其他操作类型：应返回 null")
         void execDml_otherOp_returnsNull() {
             when(apiUrl.getSparkDB()).thenReturn("http://db");
             when(apiUrl.getTenantId()).thenReturn("tid");
@@ -408,20 +408,20 @@ class CoreSystemServiceTest {
                 http.when(() -> OkHttpUtil.post(anyString(), anyMap(), anyString()))
                         .thenReturn(ok(Collections.singletonMap("exec_success", "[]")));
 
-                //              sql               uid  dbId  spaceId opType envCode(✅changed to valid value 1)
+                //              sql               uid  dbId  spaceId opType envCode(✅改为合法值 1)
                 Object ret = service.execDML("update t set a=1", "u", null, 1L, 999, 1);
                 assertThat(ret).isNull();
             }
         }
 
         @Test
-        @DisplayName("execDML - parse exception should be wrapped as BusinessException (with fixed prefix)")
+        @DisplayName("execDML - 解析异常应包装为BusinessException（含固定前缀）")
         void execDml_parseError_shouldWrap() {
             when(apiUrl.getSparkDB()).thenReturn("http://db");
             when(apiUrl.getTenantId()).thenReturn("tid");
             when(commonConfig.getAppId()).thenReturn("APP");
 
-            // Invalid exec_success string, triggers parse exception
+            // 非法 exec_success 字符串，触发 parse 异常
             Map<String, Object> data = new HashMap<>();
             data.put("exec_success", "not-json");
 
@@ -440,14 +440,14 @@ class CoreSystemServiceTest {
     // ================== clone/drop/modify DB ==================
 
     @Test
-    @DisplayName("cloneDataBase - success returns database_id")
+    @DisplayName("cloneDataBase - 成功返回 database_id")
     void cloneDatabase_success() {
         when(apiUrl.getSparkDB()).thenReturn("http://db");
         when(apiUrl.getTenantId()).thenReturn("tid");
 
         try (MockedStatic<OkHttpUtil> http = mockStatic(OkHttpUtil.class)) {
             http.when(() -> OkHttpUtil.post(eq("http://db" + CoreSystemService.CLONE_DATABASE_PATH), anyMap(), anyString()))
-                    // Key: using long beyond int range, Fastjson2 will deserialize as Long
+                    // 关键：用超过 int 范围的 long，Fastjson2 会反序列化为 Long
                     .thenReturn(ok(new HashMap<String, Object>() {{
                         put("database_id", 3_000_000_001L);
                     }}));
@@ -458,7 +458,7 @@ class CoreSystemServiceTest {
     }
 
     @Test
-    @DisplayName("cloneDataBase - HTTP exception should be wrapped as BusinessException")
+    @DisplayName("cloneDataBase - HTTP异常应被包装为BusinessException")
     void cloneDatabase_httpException() {
         when(apiUrl.getSparkDB()).thenReturn("http://db");
         when(apiUrl.getTenantId()).thenReturn("tid");
@@ -474,7 +474,7 @@ class CoreSystemServiceTest {
     }
 
     @Test
-    @DisplayName("dropDataBase - success (just needs to not throw exception)")
+    @DisplayName("dropDataBase - 成功（只需不抛异常）")
     void dropDatabase_success() {
         when(apiUrl.getSparkDB()).thenReturn("http://db");
         when(apiUrl.getTenantId()).thenReturn("tid");
@@ -488,7 +488,7 @@ class CoreSystemServiceTest {
     }
 
     @Test
-    @DisplayName("dropDataBase - HTTP exception should be wrapped as BusinessException")
+    @DisplayName("dropDataBase - HTTP异常应被包装为BusinessException")
     void dropDatabase_httpException() {
         when(apiUrl.getSparkDB()).thenReturn("http://db");
         when(apiUrl.getTenantId()).thenReturn("tid");
@@ -504,7 +504,7 @@ class CoreSystemServiceTest {
     }
 
     @Test
-    @DisplayName("modifyDataBase - success (just needs to not throw exception)")
+    @DisplayName("modifyDataBase - 成功（只需不抛异常）")
     void modifyDatabase_success() {
         when(apiUrl.getSparkDB()).thenReturn("http://db");
         when(apiUrl.getTenantId()).thenReturn("tid");
@@ -518,7 +518,7 @@ class CoreSystemServiceTest {
     }
 
     @Test
-    @DisplayName("modifyDataBase - HTTP exception should be wrapped as BusinessException")
+    @DisplayName("modifyDataBase - HTTP异常应被包装为BusinessException")
     void modifyDatabase_httpException() {
         when(apiUrl.getSparkDB()).thenReturn("http://db");
         when(apiUrl.getTenantId()).thenReturn("tid");
