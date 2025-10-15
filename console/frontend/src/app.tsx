@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 import type { ReactElement } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import router from '@/router';
-import LoginModal from '@/components/login-modal';
 import useUserStore, { UserState } from '@/store/user-store';
 import { useEnterprise } from './hooks/use-enterprise';
 import { useSpaceType } from './hooks/use-space-type';
@@ -50,7 +49,6 @@ export default function App(): ReactElement {
   return (
     <>
       <RouterProvider router={router} />
-      <LoginModal />
     </>
   );
 }

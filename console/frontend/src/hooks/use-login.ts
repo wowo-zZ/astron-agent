@@ -1,7 +1,5 @@
 import { useCallback, useState } from 'react';
 import http from '@/utils/http';
-import type { CheckAccountParams } from '@/services/login';
-import type { User } from '@/store/user-store';
 
 interface LoginState {
   loading: boolean;
@@ -60,9 +58,6 @@ export const tokenStorage: TokenStorage = {
 const useLogin = (): {
   loading: boolean;
   error: string | null;
-  login: (credentials: CheckAccountParams) => Promise<unknown>;
-  logout: () => Promise<void>;
-  getUserInfo: () => Promise<User>;
   refreshToken: () => Promise<boolean>;
   tokenStorage: TokenStorage;
 } => {
@@ -111,9 +106,6 @@ const useLogin = (): {
 
   return {
     ...state,
-    login: loginUser,
-    logout: logoutUser,
-    getUserInfo,
     refreshToken,
     tokenStorage,
   };
