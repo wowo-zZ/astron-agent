@@ -46,7 +46,7 @@ const transition = {
     clearChatHistoryFailed: '清空聊天记录失败',
     confirm: '确认',
     cancel: '取消',
-    answeringInProgress: '正在回答中~',
+    answeringInProgress: '正在回答中...',
     uploadingInProgress: '正在上传中...',
     stopFailed: '停止失败！',
     cancelFailed: '取消失败！',
