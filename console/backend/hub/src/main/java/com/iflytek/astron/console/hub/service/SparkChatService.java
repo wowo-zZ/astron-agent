@@ -13,14 +13,18 @@ import com.iflytek.astron.console.commons.service.data.ChatDataService;
 import com.iflytek.astron.console.commons.dto.llm.SparkChatRequest;
 import com.iflytek.astron.console.commons.entity.chat.ChatReqRecords;
 import com.iflytek.astron.console.commons.entity.chat.ChatTraceSource;
+import com.iflytek.astron.console.commons.entity.chat.ChatList;
 import com.iflytek.astron.console.commons.service.ChatRecordModelService;
+import com.iflytek.astron.console.commons.service.data.ChatListDataService;
 import com.iflytek.astron.console.commons.util.SseEmitterUtil;
+import com.iflytek.astron.console.hub.event.ConversationCompletionEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import okio.BufferedSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -44,6 +48,12 @@ public class SparkChatService {
 
     @Autowired
     private ChatRecordModelService chatRecordModelService;
+
+    @Autowired
+    private ChatListDataService chatListDataService;
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     /**
      * Create and return an SseEmitter object for handling chat room streaming requests
@@ -698,6 +708,9 @@ public class SparkChatService {
         chatRecordModelService.saveChatResponse(chatReqRecords, finalResult, sid, edit, 2);
         chatRecordModelService.saveThinkingResult(chatReqRecords, thinkingResult, edit);
         saveTraceResult(chatReqRecords, traceResult, edit);
+
+        // Publish conversation completion event for statistics recording
+        publishConversationCompletionEvent(chatReqRecords, sid.toString());
     }
 
     /**
@@ -751,5 +764,44 @@ public class SparkChatService {
         chatDataService.createTraceSource(chatTraceSource);
         log.info("Create new trace record, reqId: {}, chatId: {}, uid: {}",
                 chatReqRecords.getId(), chatReqRecords.getChatId(), chatReqRecords.getUid());
+    }
+
+    /**
+     * Publish conversation completion event for statistics recording
+     *
+     * @param chatReqRecords Chat request records
+     * @param sid Session identifier
+     */
+    private void publishConversationCompletionEvent(ChatReqRecords chatReqRecords, String sid) {
+        try {
+            // Get bot ID from chat list
+            ChatList chatList = chatListDataService.findByUidAndChatId(
+                    chatReqRecords.getUid(),
+                    chatReqRecords.getChatId()
+            );
+
+            if (chatList == null) {
+                log.warn("Cannot find chat list for chatId: {}, uid: {}",
+                        chatReqRecords.getChatId(), chatReqRecords.getUid());
+                return;
+            }
+
+            ConversationCompletionEvent event = ConversationCompletionEvent.forBot(
+                    this,
+                    chatReqRecords.getUid(),
+                    null, // spaceId - will be extracted from chat context if needed
+                    chatList.getBotId(),
+                    chatReqRecords.getChatId(),
+                    sid,
+                    0 // tokenConsumed - could be extracted from response if available
+            );
+
+            eventPublisher.publishEvent(event);
+            log.debug("Published bot conversation completion event for chatId: {}, botId: {}",
+                    chatReqRecords.getChatId(), chatList.getBotId());
+        } catch (Exception e) {
+            log.warn("Failed to publish conversation completion event for chatId: {}",
+                    chatReqRecords.getChatId(), e);
+        }
     }
 }

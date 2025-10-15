@@ -264,7 +264,7 @@ public class BotPublishServiceImpl implements BotPublishService {
     }
 
     @Override
-    public void recordDashboardCountLog(String uid, Long spaceId, Integer botId, Long chatId,
+    public void recordConversationStats(String uid, Long spaceId, Integer botId, Long chatId,
             String sid, Integer tokenConsumed) {
         log.info("Record conversation statistics: uid={}, spaceId={}, botId={}, chatId={}, tokenConsumed={}",
                 uid, spaceId, botId, chatId, tokenConsumed);

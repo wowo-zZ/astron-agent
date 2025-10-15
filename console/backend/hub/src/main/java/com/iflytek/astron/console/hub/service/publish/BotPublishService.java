@@ -96,7 +96,7 @@ public interface BotPublishService {
      * @param sid Session identifier
      * @param tokenConsumed Token consumption count
      */
-    void recordDashboardCountLog(String uid, Long spaceId, Integer botId, Long chatId,
+    void recordConversationStats(String uid, Long spaceId, Integer botId, Long chatId,
             String sid, Integer tokenConsumed);
 
     // ==================== Publish Channel Management ====================
