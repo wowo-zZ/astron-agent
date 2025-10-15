@@ -281,9 +281,6 @@ const useChat = () => {
       url += `?version=${item?.version}`;
     }
     window.open(url, '_blank');
-    if (item?.chatId || item?.id) {
-      setCurrentChatId(item?.chatId || item?.id);
-    }
   };
 
   return {
