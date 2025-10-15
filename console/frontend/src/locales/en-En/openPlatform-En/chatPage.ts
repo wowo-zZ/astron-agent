@@ -46,7 +46,7 @@ const transition = {
     clearChatHistoryFailed: 'Failed to clear chat history',
     confirm: 'Confirm',
     cancel: 'Cancel',
-    answeringInProgress: 'Answering in progress~',
+    answeringInProgress: 'Answering in progress...',
     uploadingInProgress: 'Uploading in progress...',
     stopFailed: 'Stop failed!',
     cancelFailed: 'Cancel failed!',
