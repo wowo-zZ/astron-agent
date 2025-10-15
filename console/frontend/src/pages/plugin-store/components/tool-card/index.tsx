@@ -50,11 +50,7 @@ const ToolCard: React.FC<ToolCardProps> = ({
           {/* 图标区域 */}
           <div className={styles.iconContainer}>
             <img
-              src={
-                tool.isMcp
-                  ? tool?.address
-                  : (tool?.address || '') + (tool?.icon || '')
-              }
+              src={tool.isMcp ? tool?.address : tool?.icon}
               className={styles.toolIcon}
               alt={tool.name}
             />

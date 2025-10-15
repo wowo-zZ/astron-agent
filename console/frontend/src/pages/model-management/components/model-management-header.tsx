@@ -130,7 +130,7 @@ const ModelManagementHeader: React.FC<ModelManagementHeaderProps> = ({
           <div className="ml-auto flex items-center gap-2">
             {activeTab === 'personalModel' && (
               <Select
-                className="retractable-select-UI"
+                className="ant-select-UI"
                 placeholder={t('model.pleaseSelect')}
                 value={filterType}
                 style={{ width: 120 }}

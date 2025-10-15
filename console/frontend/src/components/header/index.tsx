@@ -1,4 +1,11 @@
-import { useState, useEffect, JSX, useMemo, useRef, useCallback } from 'react';
+import React, {
+  useState,
+  useEffect,
+  JSX,
+  useMemo,
+  useRef,
+  useCallback,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { debounce } from 'lodash';

@@ -45,13 +45,13 @@ const defaultBannerImgs: BannerImage[] = [
 
 const Banner: React.FC<BannerProps> = ({
   autoPlay = true,
-  interval = 3000,
+  interval = 5000,
 }) => {
   const [images, setImages] = useState<BannerImage[]>(defaultBannerImgs);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false); // 鼠标悬停状态
   const [containerWidth, setContainerWidth] = useState(0); // 容器宽度
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   // 图片尺寸配置
@@ -82,19 +82,19 @@ const Banner: React.FC<BannerProps> = ({
     };
   }, []);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const res = await getPluginSquareBannerConfig();
-  //     console.log(res, 'getPluginSquareBannerConfig');
-  //     setImages(
-  //       res.map((item: any) => ({
-  //         src: item.name,
-  //         link: `/store/plugin/${item.value}?isMcp=${item.remarks === 'mcp'}&category=0&tab=`,
-  //       }))
-  //     );
-  //   };
-  //   fetchData();
-  // }, []);
+  useEffect(() => {
+    // const fetchData = async () => {
+    //   const res = await getPluginSquareBannerConfig();
+    //   console.log(res, 'getPluginSquareBannerConfig');
+    //   setImages(
+    //     res.map((item: any) => ({
+    //       src: item.name,
+    //       link: `/store/plugin/${item.value}?isMcp=${item.remarks === 'mcp'}&category=0&tab=`,
+    //     }))
+    //   );
+    // };
+    // fetchData();
+  }, []);
 
   useEffect(() => {
     // 只有在自动播放开启、图片数量大于1且鼠标未悬停时才启动定时器
@@ -131,7 +131,7 @@ const Banner: React.FC<BannerProps> = ({
     const distance = Math.abs(position);
 
     // 根据容器宽度动态调整缩放比例
-    let adjustedScaleCenter = 1;
+    let adjustedScaleCenter = 1.1;
     let adjustedScaleDistance1 = SCALE_DISTANCE_1;
     let adjustedScaleDistance2 = SCALE_DISTANCE_2;
 
@@ -141,8 +141,8 @@ const Banner: React.FC<BannerProps> = ({
       const minRequiredWidthForOuterSlides =
         SLIDE_WIDTH * SCALE_DISTANCE_2 + EDGE_PADDING * 2;
 
-      // 同时检查中心图片是否会超出
-      const minRequiredWidthForCenter = SLIDE_WIDTH + EDGE_PADDING * 2;
+      // 同时检查中心图片是否会超出（中心图片缩放1.2倍）
+      const minRequiredWidthForCenter = SLIDE_WIDTH * 1.2 + EDGE_PADDING * 2;
 
       // 取两者中的较大值
       const minRequiredWidth = Math.max(
@@ -157,11 +157,11 @@ const Banner: React.FC<BannerProps> = ({
           (containerWidth - EDGE_PADDING * 2) /
           (SLIDE_WIDTH * SCALE_DISTANCE_2);
         const scaleFactorCenter =
-          (containerWidth - EDGE_PADDING * 2) / SLIDE_WIDTH;
+          (containerWidth - EDGE_PADDING * 2) / (SLIDE_WIDTH * 1.2);
         const scaleFactor = Math.min(scaleFactorOuter, scaleFactorCenter);
 
         // 所有图片按相同比例缩小，保持视觉层次
-        adjustedScaleCenter = 1 * scaleFactor;
+        adjustedScaleCenter = 1.2 * scaleFactor;
         adjustedScaleDistance1 = SCALE_DISTANCE_1 * scaleFactor;
         adjustedScaleDistance2 = SCALE_DISTANCE_2 * scaleFactor;
       }
@@ -280,7 +280,7 @@ const Banner: React.FC<BannerProps> = ({
     const image = images[index];
 
     // 如果点击的是当前激活的图片，且有链接配置，则跳转
-    if (index === currentIndex && image.link) {
+    if (index === currentIndex && image?.link) {
       navigate(image.link);
     } else {
       // 如果点击的不是当前激活的图片，则切换到该图片

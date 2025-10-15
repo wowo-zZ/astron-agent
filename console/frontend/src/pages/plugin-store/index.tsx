@@ -20,6 +20,7 @@ import type { ResponseBusinessError, ResponseResultPage } from '@/types/global';
 
 import formSelect from '@/assets/svgs/icon-nav-dropdown.svg';
 import defaultPng from '@/assets/imgs/tool-square/default.png';
+import { useScrollbar } from '@/hooks/use-scrollbar';
 // todo-newImg
 import './style.css';
 
@@ -51,6 +52,7 @@ function PluginStore(): ReactElement {
   );
   const [hoverClassify, setHoverClassify] = useState<string | number>('');
   const [tagFlag, setTagFlag] = useState<string | number>(tab ? '' : 0);
+  const hasScrollbar = useScrollbar(toolRef, [tools]);
 
   const { run } = useDebounceFn(
     inputValue => {
@@ -167,12 +169,6 @@ function PluginStore(): ReactElement {
 
   return (
     <div className="w-full flex-1 flex flex-col overflow-hidden page-container-inner-UI">
-      <div className="w-full flex justify-between pt-1">
-        <div className="square-title">
-          <span>{t('common.storePlugin.pluginSquare')}</span>
-        </div>
-      </div>
-
       <Banner />
 
       <div className="flex-1 flex flex-col items-center justify-start w-full h-full overflow-hidden">
@@ -229,9 +225,9 @@ function PluginStore(): ReactElement {
             <div className="flex items-center">
               <Select
                 suffixIcon={<img src={formSelect} className="w-4 h-4" />}
-                className="search-select detail-select"
+                className="ant-select-UI"
                 value={searchValue.orderFlag}
-                style={{ borderRadius: '8px' }}
+                style={{ width: '160px' }}
                 onChange={value => {
                   setSearchValue(() => ({
                     ...searchValue,
@@ -273,6 +269,7 @@ function PluginStore(): ReactElement {
             {tools.length > 0 && (
               <div
                 className="flex items-start justify-center flex-1 w-full overflow-auto scroll-bar-UI"
+                style={hasScrollbar ? { paddingRight: '10px' } : {}}
                 ref={toolRef}
                 onScroll={handleScroll}
               >
@@ -300,15 +297,6 @@ function PluginStore(): ReactElement {
             )}
           </div>
         </div>
-
-        {loading && <Spin className="mt-2" size="large" />}
-
-        {!loading && tools?.length === 0 && (
-          <div className="flex flex-col items-center justify-center gap-2">
-            <img src={defaultPng} className="w-[140px] h-[140px]" alt="" />
-            <div>{t('common.storePlugin.noPlugins')}</div>
-          </div>
-        )}
       </div>
     </div>
   );

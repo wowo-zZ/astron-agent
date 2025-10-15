@@ -57,7 +57,7 @@ const PluginPage: FC = () => {
                   ? t('plugin.noSearchResults')
                   : t('plugin.emptyDescription')
               }
-              buttonText={t('plugin.createNew')}
+              buttonText={t('plugin.createPlugin')}
               onCreate={handleCreatePlugin}
             />
           ) : (

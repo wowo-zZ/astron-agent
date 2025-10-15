@@ -62,7 +62,10 @@ const CardButtonGroup: React.FC<CardButtonGroupProps> = ({
   }
 
   // 处理按钮点击
-  const handleClick = (btn: ButtonItemConfig, event: React.MouseEvent<HTMLDivElement>) => {
+  const handleClick = (
+    btn: ButtonItemConfig,
+    event: React.MouseEvent<HTMLDivElement>
+  ) => {
     if (btn.disabled) {
       return;
     }
@@ -82,18 +85,18 @@ const CardButtonGroup: React.FC<CardButtonGroupProps> = ({
         gap: `${gap}px`,
       }}
     >
-      {visibleButtons.map((btn) => (
+      {visibleButtons.map(btn => (
         <div
           key={btn.key}
           className={classNames(
             styles.buttonItem,
             {
-              [styles.disabled]: btn.disabled,
-              [styles.danger]: btn.danger,
+              [styles.disabled as string]: btn.disabled,
+              [styles.danger as string]: btn.danger,
             },
             btn.className
           )}
-          onClick={(e) => handleClick(btn, e)}
+          onClick={e => handleClick(btn, e)}
         >
           {btn.icon && <span className={styles.icon}>{btn.icon}</span>}
           <span className={styles.text}>{btn.text}</span>
@@ -104,4 +107,3 @@ const CardButtonGroup: React.FC<CardButtonGroupProps> = ({
 };
 
 export default CardButtonGroup;
-
