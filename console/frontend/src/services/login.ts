@@ -16,17 +16,6 @@ export async function plugValidate(): Promise<AxiosResponse> {
 }
 
 /**
- * @description: 用户登录
- * @param {Object} params
- * @return {*}
- */
-export async function login(
-  params: CheckAccountParams
-): Promise<AxiosResponse> {
-  return http.post('/xingchen-api/login/check-account', params);
-}
-
-/**
  * @description: 用户登出
  * @return {*}
  */
