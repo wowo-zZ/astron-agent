@@ -14,6 +14,7 @@ import com.iflytek.astron.console.commons.entity.chat.ChatList;
 import com.iflytek.astron.console.commons.entity.chat.ChatReqRecords;
 import com.iflytek.astron.console.commons.enums.ShelfStatusEnum;
 import com.iflytek.astron.console.commons.enums.bot.BotTypeEnum;
+import com.iflytek.astron.console.commons.enums.bot.DefaultBotModelEnum;
 import com.iflytek.astron.console.commons.exception.BusinessException;
 import com.iflytek.astron.console.commons.service.bot.BotService;
 import com.iflytek.astron.console.commons.service.bot.ChatBotDataService;
@@ -24,6 +25,7 @@ import com.iflytek.astron.console.commons.service.workflow.WorkflowBotChatServic
 import com.iflytek.astron.console.commons.util.I18nUtil;
 import com.iflytek.astron.console.commons.util.SseEmitterUtil;
 import com.iflytek.astron.console.commons.util.space.SpaceInfoUtil;
+import com.iflytek.astron.console.hub.config.ModelConfig;
 import com.iflytek.astron.console.hub.data.ReqKnowledgeRecordsDataService;
 import com.iflytek.astron.console.hub.entity.ReqKnowledgeRecords;
 import com.iflytek.astron.console.hub.service.PromptChatService;
@@ -94,6 +96,9 @@ public class BotChatServiceImpl implements BotChatService {
     @Autowired
     private ReqKnowledgeRecordsDataService reqKnowledgeRecordsDataService;
 
+    @Autowired
+    private ModelConfig modelConfig;
+
     /**
      * Function to handle chat messages
      *
@@ -115,9 +120,23 @@ public class BotChatServiceImpl implements BotChatService {
                 int maxInputTokens = this.maxInputTokens;
                 ChatReqRecords chatReqRecords = createChatRequest(chatBotReqDto);
                 if (botConfig.modelId == null) {
-                    List<SparkChatRequest.MessageDto> messages = buildMessageList(chatBotReqDto, botConfig.supportContext, botConfig.supportDocument, botConfig.prompt, maxInputTokens, chatReqRecords.getId());
-                    SparkChatRequest sparkChatRequest = buildSparkChatRequest(chatBotReqDto, botConfig, messages);
-                    sparkChatService.chatStream(sparkChatRequest, sseEmitter, sseId, chatReqRecords, false, false);
+                    if (botConfig.model.equals(DefaultBotModelEnum.X1.getDomain()) || botConfig.model.equals(DefaultBotModelEnum.SPARK_4_0.getDomain())) {
+                        List<SparkChatRequest.MessageDto> messages = buildMessageList(chatBotReqDto, botConfig.supportContext, botConfig.supportDocument, botConfig.prompt, maxInputTokens, chatReqRecords.getId());
+                        SparkChatRequest sparkChatRequest = buildSparkChatRequest(chatBotReqDto, botConfig, messages);
+                        sparkChatService.chatStream(sparkChatRequest, sseEmitter, sseId, chatReqRecords, false, false);
+                    } else {
+                        // Try to find model configuration from ModelConfig by domain
+                        ModelConfig.ModelProperties modelProps = findModelByDomain(botConfig.model);
+                        if (modelProps != null) {
+                            log.info("Found model configuration for domain: {}, name: {}", botConfig.model, modelProps.getName());
+                            List<SparkChatRequest.MessageDto> messages = buildMessageList(chatBotReqDto, botConfig.supportContext, botConfig.supportDocument, botConfig.prompt, maxInputTokens, chatReqRecords.getId());
+                            JSONObject jsonObject = buildPromptChatRequestFromModelConfig(modelProps, messages);
+                            promptChatService.chatStream(jsonObject, sseEmitter, sseId, chatReqRecords, false, false);
+                        } else {
+                            log.warn("No model configuration found for domain: {}", botConfig.model);
+                            throw new BusinessException(ResponseEnum.MODEL_NOT_EXIST);
+                        }
+                    }
                 } else {
                     ModelConfigResult modelConfig = getModelConfiguration(botConfig.modelId, sseEmitter);
                     List<SparkChatRequest.MessageDto> messages = buildMessageList(chatBotReqDto, botConfig.supportContext, botConfig.supportDocument, botConfig.prompt, modelConfig.maxInputTokens(), chatReqRecords.getId());
@@ -677,5 +696,43 @@ public class BotChatServiceImpl implements BotChatService {
         }
         List<String> tools = CollectionUtil.newArrayList(Objects.requireNonNull(tool).split(","));
         return tools.contains("ifly_search");
+    }
+
+    /**
+     * Find model configuration by domain name
+     *
+     * @param domain Model domain name to search for
+     * @return ModelProperties if found, null otherwise
+     */
+    private ModelConfig.ModelProperties findModelByDomain(String domain) {
+        if (StringUtils.isBlank(domain) || modelConfig == null) {
+            return null;
+        }
+
+        for (ModelConfig.ModelProperties props : modelConfig.getAllModels().values()) {
+            if (domain.equals(props.getDomain())) {
+                return props;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Build JSON object for prompt chat request from ModelConfig properties
+     *
+     * @param modelProps ModelProperties object containing URL, API key and model information
+     * @param messages List of chat messages
+     * @return JSON object representing the prompt chat request
+     */
+    private JSONObject buildPromptChatRequestFromModelConfig(ModelConfig.ModelProperties modelProps, List<SparkChatRequest.MessageDto> messages) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("url", modelProps.getUrl());
+        jsonObject.put("apiKey", modelProps.getApikey());
+        jsonObject.put("model", modelProps.getDomain());
+        jsonObject.put("messages", messages);
+        // ModelConfig doesn't have additional config, so we just set an empty config array
+        jsonObject.put("config", new JSONArray());
+        return jsonObject;
     }
 }

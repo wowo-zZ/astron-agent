@@ -18,6 +18,7 @@ import com.iflytek.astron.console.commons.service.bot.BotService;
 import com.iflytek.astron.console.commons.util.I18nUtil;
 import com.iflytek.astron.console.commons.util.RequestContextUtil;
 import com.iflytek.astron.console.commons.util.space.SpaceInfoUtil;
+import com.iflytek.astron.console.hub.config.ModelConfig;
 import com.iflytek.astron.console.hub.dto.bot.BotGenerationDTO;
 import com.iflytek.astron.console.hub.service.bot.BotAIService;
 import com.iflytek.astron.console.hub.util.BotPermissionUtil;
@@ -65,6 +66,9 @@ public class BotCreateController {
 
     @Autowired
     private RedisUtil redisUtil;
+
+    @Autowired
+    private ModelConfig modelConfig;
 
     /**
      * Create workflow assistant
@@ -264,6 +268,19 @@ public class BotCreateController {
         sparkModel.setModelIcon(DefaultBotModelEnum.SPARK_4_0.getIcon());
         sparkModel.setIsCustom(false);
         allModels.add(sparkModel);
+
+        // 1.5 Add models from ModelConfig
+        if (modelConfig != null && !modelConfig.getAllModels().isEmpty()) {
+            log.info("Adding {} model(s) from ModelConfig", modelConfig.getAllModels().size());
+            for (ModelConfig.ModelProperties props : modelConfig.getAllModels().values()) {
+                BotModelDto configModel = new BotModelDto();
+                configModel.setModelDomain(props.getDomain());
+                configModel.setModelName(props.getName());
+                configModel.setModelIcon(props.getIcon());
+                configModel.setIsCustom(false);
+                allModels.add(configModel);
+            }
+        }
 
         // 2. Get custom models
         JSONObject result = JSONObject.from(llmService.getLlmAuthList(request, null, "workflow", "spark-llm"));
