@@ -28,15 +28,6 @@ export async function logOutAPI(): Promise<AxiosResponse> {
   return response.data.data;
 }
 
-/**
- * @description: 获取用户信息
- * @return {*}
- */
-export async function queryCurrentUser(): Promise<User> {
-  const response: User = await http.get('/userInfo');
-  return response;
-}
-
 export async function getUserInfoMe(): Promise<User> {
   const response: User = await http.get('/user-info/me');
   return response;
