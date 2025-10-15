@@ -86,11 +86,6 @@ spark:
   image-apiKey: ${SPARK_IMAGE_API_KEY:xxx}
   image-apiSecret: ${SPARK_IMAGE_API_SECRET:xxx}
 
-# DeepSeek configuration example
-deepseek:
-  url: ${DEEPSEEK_URL:https://api.deepseek.com}
-  api-key: ${DEEPSEEK_API_KEY:your-deepseek-api-key}    # Write timeout
-
 # Workflow configuration
 workflow:
   chatUrl: ${WORKFLOW_CHAT_URL:http://}
