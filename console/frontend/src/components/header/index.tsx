@@ -116,7 +116,7 @@ function index({ onSearch, onCreate }: HeaderProps): JSX.Element {
     <div
       className="mx-auto max-w-[1425px]"
       style={{
-        width: '85%',
+        width: '86%',
       }}
     >
       <div className={styles.headerTitle}>

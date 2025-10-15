@@ -1,7 +1,7 @@
 
 .headerTitle {
-  height: 66px;
-  line-height: 66px;
+  padding: 20px 0;
+  line-height: 20px;
   font-family: 'PingFang-Sim';
   font-size: 20px;
   font-weight: 500;
@@ -40,7 +40,7 @@
 .toolsContainer {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 8px;
 }
 
 .searchContainer {

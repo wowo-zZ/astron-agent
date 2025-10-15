@@ -28,7 +28,7 @@ const PluginPage: FC = () => {
   } = usePluginPage();
 
   return (
-    <div className="w-full h-full flex flex-col overflow-hidden py-5">
+    <div className="w-full h-full overflow-hidden page-container-inner-UI">
       {deleteModal && (
         <DeleteModal
           currentTool={currentTool}
@@ -44,35 +44,28 @@ const PluginPage: FC = () => {
       )}
 
       <div className="w-full flex-1 overflow-scroll scroll-bar-UI">
-        <div
-          className="h-full mx-auto max-w-[1425px]"
-          style={{
-            width: '86%',
-          }}
-        >
-          {tools.length === 0 ? (
-            <ResourceEmpty
-              description={
-                searchValue
-                  ? t('plugin.noSearchResults')
-                  : t('plugin.emptyDescription')
-              }
-              buttonText={t('plugin.createPlugin')}
-              onCreate={handleCreatePlugin}
-            />
-          ) : (
-            <div className="grid lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-3 gap-6">
-              {tools.map((tool: any) => (
-                <CardItem
-                  key={tool.id}
-                  tool={tool}
-                  onCardClick={handleCardClick}
-                  onDeleteClick={handleDeleteClick}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+        {tools.length === 0 ? (
+          <ResourceEmpty
+            description={
+              searchValue
+                ? t('plugin.noSearchResults')
+                : t('plugin.emptyDescription')
+            }
+            buttonText={t('plugin.createPlugin')}
+            onCreate={handleCreatePlugin}
+          />
+        ) : (
+          <div className="grid lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-3 gap-6">
+            {tools.map((tool: any) => (
+              <CardItem
+                key={tool.id}
+                tool={tool}
+                onCardClick={handleCardClick}
+                onDeleteClick={handleDeleteClick}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

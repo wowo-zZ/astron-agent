@@ -70,7 +70,7 @@ const ModelManagementHeader: React.FC<ModelManagementHeaderProps> = ({
       <div className="w-full relative z-10 flex flex-col justify-between rounded-2xl">
         <div className="flex items-center gap-3 w-full">
           {/* 标题 */}
-          <h1 className="font-medium text-[20px] text-[#333] leading-none">
+          <h1 className="font-medium text-[20px] text-[#222529] leading-none font-[PingFang-Sim]">
             {t('model.modelManagement')}
           </h1>
 

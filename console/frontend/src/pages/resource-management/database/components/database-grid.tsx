@@ -29,31 +29,29 @@ const DatabaseGrid = ({
   const { t } = useTranslation();
 
   return (
-    <div className="w-full h-full pb-6 overflow-hidden">
-      <div className="flex flex-col h-full gap-6 pt-8 overflow-hidden">
+    <div className="w-full h-full pb-6 overflow-hidden page-container-inner-UI">
+      <div className="flex flex-col h-full gap-6 overflow-hidden">
         {/* 网格内容区域 */}
-        <div className="relative flex-1 w-full overflow-auto">
-          <div className="mx-auto max-w-[1425px] w-[85%] min-h-[1000px]">
-            {dataSource?.length === 0 ? (
-              <ResourceEmpty
-                description={t('database.emptyDescription')}
-                buttonText={t('database.createDatabase')}
-                onCreate={onCreateDatabaseClick}
-              />
-            ) : (
-              <div className="grid items-end gap-6 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-3">
-                {/* 数据库列表卡片 */}
-                {dataSource?.map((database: DatabaseItem) => (
-                  <CardItem
-                    key={database.id}
-                    database={database}
-                    onClick={onDatabaseClick}
-                    onDelete={onDeleteClick}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
+        <div className="relative flex-1 w-full overflow-auto scroll-bar-UI">
+          {dataSource?.length === 0 ? (
+            <ResourceEmpty
+              description={t('database.emptyDescription')}
+              buttonText={t('database.createDatabase')}
+              onCreate={onCreateDatabaseClick}
+            />
+          ) : (
+            <div className="grid items-end gap-6 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-3">
+              {/* 数据库列表卡片 */}
+              {dataSource?.map((database: DatabaseItem) => (
+                <CardItem
+                  key={database.id}
+                  database={database}
+                  onClick={onDatabaseClick}
+                  onDelete={onDeleteClick}
+                />
+              ))}
+            </div>
+          )}
 
           {/* 无限滚动加载器 */}
           {hasMore && <div ref={loader}></div>}

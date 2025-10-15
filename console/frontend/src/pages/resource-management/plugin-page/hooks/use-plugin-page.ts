@@ -72,13 +72,21 @@ export const usePluginPage = (): {
     navigate('/resource/plugin/create');
   };
 
+  // 处理Header组件的搜索事件
+  const handleSearch = useCallback(
+    (value: string) => {
+      setSearchValue(value);
+      getTools(value?.trim());
+    },
+    [setSearchValue, getTools]
+  );
+
   // 监听Header组件的搜索事件
   useEffect(() => {
     const handleHeaderSearch = (event: CustomEvent) => {
       const { value, type } = event.detail;
       if (type === 'plugin') {
-        setSearchValue(value);
-        getTools(value?.trim());
+        handleSearch(value);
       }
     };
 
@@ -107,7 +115,7 @@ export const usePluginPage = (): {
         headerCreatePlugin as EventListener
       );
     };
-  }, []);
+  }, [handleSearch, handleCreatePlugin]);
 
   return {
     user,

@@ -169,7 +169,14 @@ function PluginStore(): ReactElement {
 
   return (
     <div className="w-full flex-1 flex flex-col overflow-hidden page-container-inner-UI">
-      <Banner />
+      <div className="w-full flex justify-between mb-3">
+        <div className="flex items-center font-medium leading-normal tracking-wider">
+          <span className="font-medium text-[20px] text-[#222529] leading-none font-[PingFang-Sim]">
+            {t('common.storePlugin.pluginSquare')}
+          </span>
+        </div>
+      </div>
+      {/* <Banner /> */}
 
       <div className="flex-1 flex flex-col items-center justify-start w-full h-full overflow-hidden">
         {/* 1.工具栏 */}
