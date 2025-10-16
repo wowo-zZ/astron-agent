@@ -95,6 +95,9 @@ const transition = {
     thinking: 'Thinking in progress',
     waitingAnswer: 'Generating answer...',
   },
+  sourceInfoBox: {
+    sourceReference: 'Source: {{count}} articles were obtained as references.',
+  },
 };
 
 export default transition;
