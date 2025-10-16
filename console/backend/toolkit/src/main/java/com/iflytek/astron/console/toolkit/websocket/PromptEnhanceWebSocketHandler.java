@@ -43,13 +43,26 @@ import java.util.Map;
  * @since 2025/10/09
  */
 @Slf4j
-public class PromptEnhanceWebSocketHandler extends TextWebSocketHandler {
+public final class PromptEnhanceWebSocketHandler extends TextWebSocketHandler {
 
     /** Mapper for configuration information. */
-    private final ConfigInfoMapper configInfoMapper = SpringUtils.getBean(ConfigInfoMapper.class);
+    private final ConfigInfoMapper configInfoMapper;
 
     /** Common configuration bean. */
-    private final CommonConfig commonConfig = SpringUtils.getBean(CommonConfig.class);
+    private final CommonConfig commonConfig;
+
+    /**
+     * Constructor to initialize beans safely. Retrieves beans from Spring context during construction.
+     */
+    public PromptEnhanceWebSocketHandler() {
+        try {
+            this.configInfoMapper = SpringUtils.getBean(ConfigInfoMapper.class);
+            this.commonConfig = SpringUtils.getBean(CommonConfig.class);
+        } catch (Exception e) {
+            log.error("Failed to initialize PromptEnhanceWebSocketHandler beans", e);
+            throw new IllegalStateException("Failed to initialize required beans", e);
+        }
+    }
 
     /** Default Spark API WebSocket endpoint URL. */
     public static final String URL = "wss://spark-api.xf-yun.com/v3.5/chat";

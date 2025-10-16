@@ -1991,7 +1991,7 @@ public class WorkflowService extends ServiceImpl<WorkflowMapper, Workflow> {
             return;
         }
         JSONArray mcpServerIds = plugin.getJSONArray("mcpServerIds");
-        if(mcpServerIds != null || !mcpServerIds.isEmpty()){
+        if (mcpServerIds != null && !mcpServerIds.isEmpty()) {
             JSONArray mcpServerUrls = plugin.getJSONArray("mcpServerUrls");
             for (Object mcpServerId : mcpServerIds) {
                 String server = (String) mcpServerId;

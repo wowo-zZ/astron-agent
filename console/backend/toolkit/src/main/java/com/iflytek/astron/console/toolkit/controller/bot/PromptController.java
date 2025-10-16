@@ -1,7 +1,7 @@
 package com.iflytek.astron.console.toolkit.controller.bot;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.iflytek.astron.console.commons.response.ApiResult;
+import com.iflytek.astron.console.toolkit.common.Result;
 import com.iflytek.astron.console.toolkit.common.anno.ResponseResultBody;
 import com.iflytek.astron.console.toolkit.entity.biz.AiCode;
 import com.iflytek.astron.console.toolkit.entity.biz.AiGenerate;
@@ -48,7 +48,7 @@ public class PromptController {
      */
     @PostMapping("/next-question-advice")
     public Object nqa(@RequestBody JSONObject req) {
-        return ApiResult.success(promptService.nextQuestionAdvice(req.getString("question")));
+        return Result.success(promptService.nextQuestionAdvice(req.getString("question")));
     }
 
     /**

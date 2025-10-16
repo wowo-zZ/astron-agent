@@ -169,7 +169,7 @@ public class CoreSystemService {
             return ((Map<String, String>) authResult.data()).get("url");
         } catch (Exception ex) {
             log.error("workflow protocol upload file error", ex);
-            throw new BusinessException(ResponseEnum.RESPONSE_FAILED, ex.getMessage());
+            throw new BusinessException(ResponseEnum.RESPONSE_FAILED, "workflow protocol upload file error: " + ex.getMessage());
         }
     }
 
@@ -202,7 +202,7 @@ public class CoreSystemService {
             return ((Map<String, List<String>>) authResult.data()).get("urls");
         } catch (Exception ex) {
             log.error("workflow protocol upload files error", ex);
-            throw new BusinessException(ResponseEnum.RESPONSE_FAILED, ex.getMessage());
+            throw new BusinessException(ResponseEnum.RESPONSE_FAILED, "workflow protocol upload files error: " + ex.getMessage());
         }
     }
 
@@ -512,7 +512,7 @@ public class CoreSystemService {
             return ((Map<String, Long>) result.data()).get("database_id");
         } catch (Exception ex) {
             log.error("clone database error", ex);
-            throw new BusinessException(ResponseEnum.RESPONSE_FAILED, ex.getMessage());
+            throw new BusinessException(ResponseEnum.RESPONSE_FAILED, "clone database error: " + ex.getMessage());
         }
     }
 
@@ -542,7 +542,7 @@ public class CoreSystemService {
             }
         } catch (Exception ex) {
             log.error("drop database error", ex);
-            throw new BusinessException(ResponseEnum.RESPONSE_FAILED, ex.getMessage());
+            throw new BusinessException(ResponseEnum.RESPONSE_FAILED, "drop database error: " + ex.getMessage());
         }
     }
 
@@ -574,7 +574,7 @@ public class CoreSystemService {
             }
         } catch (Exception ex) {
             log.error("modify database error", ex);
-            throw new BusinessException(ResponseEnum.RESPONSE_FAILED, ex.getMessage());
+            throw new BusinessException(ResponseEnum.RESPONSE_FAILED, "modify database error: " + ex.getMessage());
         }
     }
 }
