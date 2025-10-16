@@ -72,6 +72,7 @@ s3:
   secretKey: ${OSS_ACCESS_KEY_SECRET:astron-uploader-secret}
   bucket: ${OSS_BUCKET_CONSOLE:astron-agent}
   presignExpirySeconds: ${OSS_PRESIGN_EXPIRY_SECONDS_CONSOLE:600}
+  enablePublicRead: true
 
 # Spark LLM configuration
 spark:
