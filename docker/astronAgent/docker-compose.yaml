@@ -276,6 +276,7 @@ services:
     container_name: astron-agent-core-aitools
     environment:
       SERVICE_PORT: "${CORE_AITOOLS_PORT:-18668}"
+      OSS_TYPE: "${OSS_TYPE:-s3}"
       OSS_ENDPOINT: "${OSS_ENDPOINT:-http://minio:9000}"
       OSS_ACCESS_KEY_ID: "${OSS_ACCESS_KEY_ID:-minioadmin}"
       OSS_ACCESS_KEY_SECRET: "${OSS_ACCESS_KEY_SECRET:-minioadmin123}"
@@ -300,7 +301,7 @@ services:
         condition: service_healthy
     volumes:
       - ./config/aitools/config.env:/opt/core/plugin/aitools/config.env
-      - ./config/aitools/logs/:/opt/core/plugin/aitools/logs/
+      - ./config/aitools/logs/:/opt/core/logs/
     networks:
       - astron-agent-network
     restart: always

@@ -590,7 +590,7 @@ const AgentList: React.FC<AgentListProps> = ({ AgentType }) => {
                     { label: t('releaseManagement.unreleased'), value: -9 },
                     // { label: t('releaseManagement.releasing'), value: 1 },
                     { label: t('releaseManagement.released'), value: 2 },
-                    { label: t('releaseManagement.auditFailed'), value: 3 },
+                    // { label: t('releaseManagement.auditFailed'), value: 3 },
                   ]}
                 />
               </div>

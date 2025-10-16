@@ -54,7 +54,7 @@ const MakeCreateModal: React.FC<MakeCreateModalProps> = ({
       req['name'] = item.title + Date.now();
       await createFromTemplate(req)
         .then((res: any) => {
-          navigate(`/work_flow/${res.maasId}/arrange`);
+          navigate(`/work_flow/${res.flowId}/arrange`);
         })
         .catch(e => {
           message.error(e?.message || '创建失败');

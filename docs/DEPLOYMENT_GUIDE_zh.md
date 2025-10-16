@@ -235,7 +235,7 @@ XINGHUO_DATASET_ID=
 
 #### 4.3 启动 astronAgent 服务
 
-启动之请配置一些必须的环境变量
+启动之前请配置一些必须的环境变量，并确保nginx和minio的端口开放
 
 ```bash
 # 进入 astronAgent 目录
@@ -246,7 +246,7 @@ vim .env
 ```
 
 ```env
-HOST_BASE_ADDRESS=http://localhost (主机地址)
+HOST_BASE_ADDRESS=http://localhost (astronAgent服务主机地址)
 ```
 
 启动 astronAgent 服务请运行我们的 [docker-compose.yaml](/docker/astronAgent/docker-compose.yaml) 文件。在运行安装命令之前，请确保您的机器上安装了 Docker 和 Docker Compose。
