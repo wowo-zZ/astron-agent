@@ -587,12 +587,12 @@ public class BotAIServiceImpl implements BotAIService {
      */
     private int mapBotType(String botTypeName) {
         if (StringUtils.isBlank(botTypeName)) {
-            return 1; // Default type
+            return 17; // Default type Life
         }
 
         // Get bot type mappings from database
         Map<String, Integer> typeMap = getBotTypeMappings();
-        return typeMap.getOrDefault(botTypeName, 1);
+        return typeMap.getOrDefault(botTypeName, 17);
     }
 
     @Override
