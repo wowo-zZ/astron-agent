@@ -199,6 +199,7 @@ PLATFORM_API_KEY=your-api-key
 PLATFORM_API_SECRET=your-api-secret
 
 SPARK_API_PASSWORD=your-api-password
+SPARK_RTASR_API_KEY=your-rtasr-api-key
 ```
 
 #### 4.2 如果您想使用星火RAG云服务，请按照如下配置
