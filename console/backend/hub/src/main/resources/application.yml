@@ -81,8 +81,8 @@ spark:
   api-secret: ${SPARK_API_SECRET:xxx}
   api:
     password: ${SPARK_API_PASSWORD:xxx}
-  lfasr-key: ${SPARK_LFASR_KEY:xxx}
-  lfasr-appId: ${SPARK_LFASR_APPID:xxx}
+  rtasr-key: ${SPARK_RTASR_KEY:xxx}
+  rtasr-appId: ${SPARK_RTASR_APPID:xxx}
   image-appId: ${SPARK_IMAGE_APP_ID:xxx}
   image-apiKey: ${SPARK_IMAGE_API_KEY:xxx}
   image-apiSecret: ${SPARK_IMAGE_API_SECRET:xxx}
