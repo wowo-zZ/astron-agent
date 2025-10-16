@@ -173,9 +173,23 @@ public class BotChatServiceImpl implements BotChatService {
             chatBotReqDto.setEdit(true);
             int maxInputTokens = this.maxInputTokens;
             if (botConfig.modelId == null) {
-                List<SparkChatRequest.MessageDto> messages = buildMessageList(chatBotReqDto, botConfig.supportContext, botConfig.supportDocument, botConfig.prompt, maxInputTokens, chatReqRecords.getId());
-                SparkChatRequest sparkChatRequest = buildSparkChatRequest(chatBotReqDto, botConfig, messages);
-                sparkChatService.chatStream(sparkChatRequest, sseEmitter, sseId, chatReqRecords, true, false);
+                if (botConfig.model.equals(DefaultBotModelEnum.X1.getDomain()) || botConfig.model.equals(DefaultBotModelEnum.SPARK_4_0.getDomain())) {
+                    List<SparkChatRequest.MessageDto> messages = buildMessageList(chatBotReqDto, botConfig.supportContext, botConfig.supportDocument, botConfig.prompt, maxInputTokens, chatReqRecords.getId());
+                    SparkChatRequest sparkChatRequest = buildSparkChatRequest(chatBotReqDto, botConfig, messages);
+                    sparkChatService.chatStream(sparkChatRequest, sseEmitter, sseId, chatReqRecords, true, false);
+                } else {
+                    // Try to find model configuration from ModelConfig by domain
+                    ModelConfig.ModelProperties modelProps = findModelByDomain(botConfig.model);
+                    if (modelProps != null) {
+                        log.info("Found model configuration for domain: {}, name: {}", botConfig.model, modelProps.getName());
+                        List<SparkChatRequest.MessageDto> messages = buildMessageList(chatBotReqDto, botConfig.supportContext, botConfig.supportDocument, botConfig.prompt, maxInputTokens, chatReqRecords.getId());
+                        JSONObject jsonObject = buildPromptChatRequestFromModelConfig(modelProps, messages);
+                        promptChatService.chatStream(jsonObject, sseEmitter, sseId, chatReqRecords, true, false);
+                    } else {
+                        log.warn("No model configuration found for domain: {}", botConfig.model);
+                        throw new BusinessException(ResponseEnum.MODEL_NOT_EXIST);
+                    }
+                }
             } else {
                 ModelConfigResult modelConfig = getModelConfiguration(botConfig.modelId, sseEmitter);
                 List<SparkChatRequest.MessageDto> messages = buildMessageList(chatBotReqDto, botConfig.supportContext, botConfig.supportDocument, botConfig.prompt, modelConfig.maxInputTokens(), chatReqRecords.getId());
@@ -209,14 +223,28 @@ public class BotChatServiceImpl implements BotChatService {
             List<SparkChatRequest.MessageDto> messageList;
 
             if (modelId == null) {
-                messageList = buildDebugMessageList(text, prompt, messages, maxInputTokens, maasDatasetList);
-                SparkChatRequest sparkChatRequest = new SparkChatRequest();
-                sparkChatRequest.setModel(model);
-                sparkChatRequest.setMessages(messageList);
-                sparkChatRequest.setChatId(null);
-                sparkChatRequest.setUserId(uid);
-                sparkChatRequest.setEnableWebSearch(enableWebSearch(openedTool));
-                sparkChatService.chatStream(sparkChatRequest, sseEmitter, sseId, null, false, true);
+                if (model.equals(DefaultBotModelEnum.X1.getDomain()) || model.equals(DefaultBotModelEnum.SPARK_4_0.getDomain())) {
+                    messageList = buildDebugMessageList(text, prompt, messages, maxInputTokens, maasDatasetList);
+                    SparkChatRequest sparkChatRequest = new SparkChatRequest();
+                    sparkChatRequest.setModel(model);
+                    sparkChatRequest.setMessages(messageList);
+                    sparkChatRequest.setChatId(null);
+                    sparkChatRequest.setUserId(uid);
+                    sparkChatRequest.setEnableWebSearch(enableWebSearch(openedTool));
+                    sparkChatService.chatStream(sparkChatRequest, sseEmitter, sseId, null, false, true);
+                } else {
+                    // Try to find model configuration from ModelConfig by domain
+                    ModelConfig.ModelProperties modelProps = findModelByDomain(model);
+                    if (modelProps != null) {
+                        log.info("Found model configuration for domain: {}, name: {}", model, modelProps.getName());
+                        messageList = buildDebugMessageList(text, prompt, messages, maxInputTokens, maasDatasetList);
+                        JSONObject jsonObject = buildPromptChatRequestFromModelConfig(modelProps, messageList);
+                        promptChatService.chatStream(jsonObject, sseEmitter, sseId, null, false, true);
+                    } else {
+                        log.warn("No model configuration found for domain: {}", model);
+                        throw new BusinessException(ResponseEnum.MODEL_NOT_EXIST);
+                    }
+                }
             } else {
                 ModelConfigResult modelConfig = getModelConfiguration(modelId, sseEmitter);
                 messageList = buildDebugMessageList(text, prompt, messages, modelConfig.maxInputTokens(), maasDatasetList);
