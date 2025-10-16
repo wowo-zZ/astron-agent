@@ -57,13 +57,13 @@ public class RtasrController {
      * Get signature
      *
      * @param ts Timestamp
-     * @param lfasrApikey API key
+     * @param rtasrApikey API key
      * @param appId Application ID
      * @return Signature string
      */
-    public String getSign(String ts, String lfasrApikey, String appId) {
+    public String getSign(String ts, String rtasrApikey, String appId) {
         try {
-            String sign = CryptTools.hmacEncrypt(CryptTools.HMAC_SHA1, CryptTools.md5Encrypt(appId + ts), lfasrApikey);
+            String sign = CryptTools.hmacEncrypt(CryptTools.HMAC_SHA1, CryptTools.md5Encrypt(appId + ts), rtasrApikey);
             return URLEncoder.encode(sign, StandardCharsets.UTF_8);
         } catch (Exception e) {
             log.error("Exception occurred while getting authorization token for real-time speech recognition", e);
