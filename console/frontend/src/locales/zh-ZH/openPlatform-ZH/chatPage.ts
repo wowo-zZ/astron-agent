@@ -94,6 +94,9 @@ const transition = {
     thinking: '正在思考中',
     waitingAnswer: '答案生成中...',
   },
+  sourceInfoBox: {
+    sourceReference: '来源：获取到{{count}}篇资料作为参考',
+  },
 };
 
 export default transition;
