@@ -41,7 +41,6 @@ interface SetConfigParams {
 interface WebSocketParams {
   common?: {
     app_id: string;
-    uid: string;
   };
   business?: {
     aue: string;
@@ -57,57 +56,6 @@ interface WebSocketParams {
     status: number;
     text: string;
   };
-  header?: {
-    app_id: string;
-    uid: string;
-    did: string;
-    imei: string;
-    imsi: string;
-    mac: string;
-    net_type: string;
-    net_isp: string;
-    status: number;
-    request_id: null;
-    res_id: string;
-  };
-  parameter?: {
-    tts: {
-      vcn: string;
-      speed: number;
-      volume: number;
-      pitch: number;
-      bgs: number;
-      reg: number;
-      rdn: number;
-      rhy: number;
-      scn?: number;
-      emotion?: number;
-      LanguageID?: number;
-      style?: string;
-      audio: {
-        encoding: string;
-        sample_rate: number;
-        channels: number;
-        bit_depth: number;
-        frame_size: number;
-      };
-      pybuf: {
-        encoding: string;
-        compress: string;
-        format: string;
-      };
-    };
-  };
-  payload?: {
-    text: {
-      encoding: string;
-      compress: string;
-      format: string;
-      status: number;
-      seq: number;
-      text: string;
-    };
-  };
 }
 
 interface WebSocketResponse {
@@ -116,13 +64,9 @@ interface WebSocketResponse {
   header?: {
     status: number;
   };
-  payload?: {
-    audio?: {
-      audio: string;
-    };
-  };
   data?: {
     audio: string;
+    status: number;
   };
 }
 
@@ -131,9 +75,6 @@ export interface TtsSignResponse {
   authorization: string;
   url: string;
 }
-
-const DEFAULT_TEXT =
-  '科大讯飞成立于1999年，是中国先进的智能化语音技术提供商。我们提供的语音合成效果，达到了真正可商用的标准，您可以在这里输入任意文本进行语音合成体验。';
 
 const NOT_SUPPORT_TIP = '当前浏览器不支持该功能，请换个浏览器试试';
 
@@ -145,7 +86,6 @@ class Experience {
   private voice: number;
   private pitch: number;
   private text: string;
-  private defaultText: string;
   private engineType: string;
   private tte: string;
   private voiceName: string;
@@ -171,14 +111,12 @@ class Experience {
     isDialect = false,
     tte = 'UTF8',
     language = 'cn',
-    defaultText = '',
     close,
   }: ExperienceConfig = {}) {
     this.speed = speed;
     this.voice = voice;
     this.pitch = pitch;
     this.text = text;
-    this.defaultText = defaultText;
     this.engineType = engineType;
     this.voiceName = voiceName;
     this.isDialect = isDialect;
@@ -195,7 +133,6 @@ class Experience {
     voice,
     pitch,
     text,
-    defaultText,
     engineType,
     voiceName,
     isDialect,
@@ -206,7 +143,6 @@ class Experience {
     voice !== undefined && (this.voice = voice);
     pitch !== undefined && (this.pitch = pitch);
     text && (this.text = text);
-    defaultText && (this.defaultText = defaultText);
     engineType && (this.engineType = engineType);
     voiceName && (this.voiceName = voiceName);
     isDialect !== undefined && (this.isDialect = isDialect);
@@ -240,10 +176,7 @@ class Experience {
     const self = this;
     const form = new FormData();
     form.append('text', self.text);
-    form.append(
-      'tts',
-      self.voiceName.includes('x5_once_clone_') ? 'x5_clone' : self.voiceName
-    );
+    form.append('tts', self.voiceName);
     getTtsSign(form)
       .then((result: TtsSignResponse) => {
         const appId = result.appId;
@@ -278,83 +211,26 @@ class Experience {
         this.resetAudio();
         return;
       }
-
-      let params: WebSocketParams = {};
-
-      params = {
-        header: {
+      //websocket参数 可参考https://www.xfyun.cn/doc/tts/online_tts/API.html#%E6%8E%A5%E5%8F%A3%E8%B0%83%E7%94%A8%E6%B5%81%E7%A8%8B
+      const params: WebSocketParams = {
+        common: {
           app_id: appId,
-          uid: '',
-          did: '',
-          imei: '',
-          imsi: '',
-          mac: '',
-          net_type: 'wifi',
-          net_isp: 'CMCC',
+        },
+        business: {
+          aue: 'raw',
+          auf: 'audio/L16;rate=16000',
+          ent: 'input65',
+          pitch: self.pitch || 50,
+          tte: 'UTF8',
+          vcn: self.voiceName,
+          volume: 50,
+          speed: self.speed,
+        },
+        data: {
           status: 2,
-          request_id: null,
-          res_id: self.voiceName.includes('x5_once_clone_')
-            ? self.voiceName.replace('x5_once_clone_', '')
-            : '',
-        },
-        parameter: {
-          tts: {
-            vcn: self.voiceName.includes('x5_once_clone_')
-              ? 'x5_clone'
-              : self.voiceName,
-            speed: self.speed,
-            volume: 50,
-            pitch: self.pitch || 50,
-            bgs: 0,
-            reg: 0,
-            rdn: 0,
-            rhy: 0,
-            scn: self.voiceName.includes('x5_once_clone_') ? undefined : 0,
-            audio: {
-              encoding: 'raw',
-              sample_rate: 16000,
-              channels: 1,
-              bit_depth: 16,
-              frame_size: 0,
-            },
-            pybuf: {
-              encoding: 'utf8',
-              compress: 'raw',
-              format: 'plain',
-            },
-          },
-        },
-        payload: {
-          text: {
-            encoding: 'utf8',
-            compress: 'raw',
-            format: 'plain',
-            status: 2,
-            seq: 0,
-            text: self.encodeText(
-              self.text || self.defaultText || DEFAULT_TEXT
-            ) as string,
-          },
+          text: self.encodeText(self.text) as string,
         },
       };
-
-      if (self.voiceName.includes('x5_once_clone_') && params.parameter?.tts) {
-        params.parameter.tts.LanguageID = 0;
-        params.parameter.tts.audio.sample_rate = 16000;
-      }
-
-      const hasStyleVcn = [
-        'x4_lingfeichen',
-        'x4_lingxiaoqi',
-        'x4_lingfeizhe',
-        'x4_EnUs_Luna',
-        'x4_EnUs_Gavin',
-        'x4_lingxiaoqi_em_v2',
-      ];
-
-      if (hasStyleVcn.indexOf(self.voiceName) > -1 && params.parameter?.tts) {
-        params.parameter.tts.style = 'assistant';
-      }
 
       this.websocket?.send(JSON.stringify(params));
       this.playTimeout = setTimeout(() => {
@@ -364,7 +240,7 @@ class Experience {
 
     this.websocket.onmessage = (e: MessageEvent) => {
       const jsonData: WebSocketResponse = JSON.parse(e.data);
-      let audioData = jsonData?.payload?.audio?.audio;
+      let audioData = jsonData?.data?.audio;
       if (audioData) {
         const s16 = this.base64ToS16(audioData);
         const f32 = this.transS16ToF32(s16);
@@ -380,7 +256,7 @@ class Experience {
         }
       }
       // 合成结束
-      if (jsonData?.header?.status === 2) {
+      if (jsonData?.data?.status === 2) {
         this.websocket?.close();
       }
     };
@@ -466,7 +342,7 @@ class Experience {
     this.getAudio();
   }
 
-  audioPause(state?: string): void {
+  audioPause(): void {
     if (this.playState === 'play') {
       clearTimeout(this.playTimeout);
       try {
@@ -536,7 +412,7 @@ class Experience {
       } else {
         // 没有更多数据且WebSocket已关闭，播放完毕
         this.close?.();
-        this.audioPause('endPlay');
+        this.audioPause();
       }
     };
   }
