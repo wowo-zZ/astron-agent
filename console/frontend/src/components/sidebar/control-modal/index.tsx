@@ -9,7 +9,6 @@ import logoutIcon from '@/assets/imgs/sidebar/logout.svg';
 // import HeaderFeedbackModal from '@/components/header-feedback-modal';
 import spaceChooseIcon from '@/assets/imgs/sidebar/space-choosed.png';
 // import config from '@/config/index';
-// import SSO from '@/lib/sso.min.js';
 import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import classNames from 'classnames';
@@ -212,19 +211,6 @@ const ControlModal = ({
     setFeedbackModalVisible(true);
     onClose?.();
   };
-
-  //退出登录点击
-  // const handleLogout = async () => {
-  //   const SSONeed = {
-  //     passportOrigin: config.PASSPORT,
-  //     ssoOrigin: config.AUTH_SITE,
-  //   };
-  //   await SSO.setOrigin(SSONeed);
-  //   await SSO.logout();
-  //   localStorage.removeItem('registerFrom');
-  //   // window.location.reload();
-  //   window.location.href = '/home';
-  // };
 
   useEffect(() => {
     if (enterpriseId) {

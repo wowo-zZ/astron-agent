@@ -535,7 +535,7 @@ const BaseConfig: React.FC<ChatProps> = ({
               navigate('/space/agent');
             })
             .catch(err => {
-              message.error(err?.msg);
+              //
             });
         })
         .catch(err => {
@@ -1345,7 +1345,7 @@ const BaseConfig: React.FC<ChatProps> = ({
                       navigate('/space/agent');
                     })
                     .catch(err => {
-                      message.error(err.msg);
+                      //
                     });
                 } else {
                   const maasDatasetList: string[] = [];
@@ -1393,7 +1393,7 @@ const BaseConfig: React.FC<ChatProps> = ({
                       navigate('/space/agent');
                     })
                     .catch(err => {
-                      message.error(err.msg);
+                      //
                     });
                 }
               }}

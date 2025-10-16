@@ -33,7 +33,7 @@ api:
     xinghuoDatasetFileUrl: http://127.0.0.1:8080/dataset/addXinghuoDatasetFile
     deleteXinghuoDatasetFileUrl: http://127.0.0.1:8080/dataset/deleteXinghuoDatasetFile
     deleteXinghuoDatasetUrl: http://127.0.0.1:8080/dataset/deleteXinghuoDataset
-    rpaUrl: https://newapi.iflyrpa.com
+    rpaUrl: ${RPA_URL:https://newapi.iflyrpa.com}
 
 # Business-specific configuration
 biz:

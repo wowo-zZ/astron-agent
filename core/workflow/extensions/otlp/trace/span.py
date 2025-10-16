@@ -190,7 +190,11 @@ class Span:
         :param node_log: Optional node log for additional logging
         """
         # Log exception
-        logger.opt(depth=1).error(f"sid: {self.sid}, error: {traceback.format_exc()}")
+        logger.opt(depth=1).error(
+            f"sid: {self.sid}, "
+            f"event: {attributes}, "
+            f"error: {''.join(traceback.format_exception(type(ex), ex, ex.__traceback__))}"
+        )
         # Record exception with current timestamp
         self.get_otlp_span().record_exception(
             ex, attributes=attributes, timestamp=int(int(round(time.time() * 1000)))
@@ -297,7 +301,7 @@ class Span:
         :param node_log: Optional node log for additional logging
         """
         # Log event
-        logger.opt(depth=1).info(f"sid: {self.sid}, event: {value}")
+        logger.opt(depth=1).error(f"sid: {self.sid}, event: {value}")
         # Mark span as having an error
         self.set_attribute("error", True)
         # Add ERROR event to span
@@ -323,7 +327,7 @@ class Span:
         :param node_log: Optional node log for additional logging
         """
         # Log event
-        logger.opt(depth=1).info(f"sid: {self.sid}, event: {attributes}")
+        logger.opt(depth=1).error(f"sid: {self.sid}, event: {attributes}")
         # Add ERROR event to span
         self.get_otlp_span().add_event(
             SpanLevel.ERROR.value, attributes=attributes, timestamp=timestamp

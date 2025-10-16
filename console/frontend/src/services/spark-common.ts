@@ -72,51 +72,6 @@ export const uploadBotImg = (formData: FormData): Promise<any> => {
   });
 };
 
-// 获取登录二维码
-export const getLoginQrcode = (params: any) => {
-  return http.post(`/login/scan/qrcode?fd=${params}`);
-};
-
-//获取用户是否扫码并确认
-export const getAppSacnCode = (params: any) => {
-  return http.post(`/login/scan/uids?fd=${params}`);
-};
-
-export const getLoginCaptcha = () => {
-  return http.get(`/plug/validate`);
-};
-
-//获取手机验证码
-export const getVerifyCode = (params: any) => {
-  return http.post(`/login/mobile/send-verify-code`, params, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
-};
-
-//手机号登录
-export const phoneLogin = (params: any) => {
-  return http.post(`/login/phone-quick-login`, params, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
-};
-
-//账号密码登录(默认有极验)
-export const passwordlogin = (params: any) => {
-  return http({
-    url: `/login/check-account`,
-    method: 'POST',
-    data: params,
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-  });
-  // return http.post(`/login/check-account`, params);
-};
-
 // 检查用户信息
 export const checkUserInfo = () => {
   let referOrigin = '';
@@ -387,7 +342,6 @@ export const generateInputExample = (params: any) => {
       'Content-Type': 'multipart/form-data',
     },
   });
-  // return http.post(`/login/check-account`, params);
 };
 
 /**
