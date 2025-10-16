@@ -52,6 +52,7 @@ const ControlModal = ({
   // 根据spaceType统一获取当前空间列表和配置
   const spaceConfig = useMemo(() => {
     const isPersonal = spaceType === 'personal';
+    console.log('song serviceType', info?.serviceType);
     return {
       icon: isPersonal ? personalIcon : teamIcon,
       displayType: isPersonal
