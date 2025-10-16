@@ -65,9 +65,9 @@ const SpaceModal: React.FC<SpaceModalProps> = ({
       setName(initialData.name || '');
       setDescription(initialData.description || '');
     }
-    if (open) {
-      getIsNeedUpgrade();
-    }
+    // if (open) {
+    //   getIsNeedUpgrade();
+    // }
   }, [open, initialData]);
 
   // 🎯 策略模式：将不同模式的处理逻辑抽取为独立的处理器
@@ -136,45 +136,45 @@ const SpaceModal: React.FC<SpaceModalProps> = ({
   };
 
   //判断用户是否需要升级
-  const getIsNeedUpgrade = async () => {
-    try {
-      const spaceList: any = await getMyCreateSpace();
-      // const userCombo: any = await getUserMeta();
+  // const getIsNeedUpgrade = async () => {
+  //   try {
+  //     const spaceList: any = await getMyCreateSpace();
+  //     // const userCombo: any = await getUserMeta();
 
-      // // 检查 userCombo 是否为数组，并包含 FREE_EDITION
-      // const hasFreeEdition = Array.isArray(userCombo)
-      //   ? userCombo.some(item => item.menu === 'FREE_EDITION')
-      //   : userCombo.menu === 'FREE_EDITION';
-      // TODO: 测试环境，暂时设置为true
-      const hasFreeEdition = true;
-      // // 检查 userCombo 是否为数组，并包含 PERSONAL_EDITION
-      // const hasPersonalEdition = Array.isArray(userCombo)
-      //   ? userCombo.some(item => item.menu === 'PERSONAL_EDITION')
-      //   : userCombo.menu === 'PERSONAL_EDITION';
-      // TODO: 测试环境，暂时设置为true
-      const hasPersonalEdition = true;
-      if (
-        hasFreeEdition &&
-        spaceList?.length >= 1 &&
-        spaceType === 'personal' &&
-        mode === 'create'
-      ) {
-        // 免费版：拥有1个及以上owner空间就需要升级
-        setIsNeedUpgrade(true);
-      } else if (
-        hasPersonalEdition &&
-        spaceType === 'personal' &&
-        spaceList?.length >= 10 &&
-        mode === 'create'
-      ) {
-        // 个人版：拥有10个及以上owner空间且spaceType为personal才需要升级
-        setIsNeedUpgrade(true);
-      }
-    } catch (error: any) {
-      console.log(error, 'error');
-      message.error(error?.msg || error?.desc);
-    }
-  };
+  //     // // 检查 userCombo 是否为数组，并包含 FREE_EDITION
+  //     // const hasFreeEdition = Array.isArray(userCombo)
+  //     //   ? userCombo.some(item => item.menu === 'FREE_EDITION')
+  //     //   : userCombo.menu === 'FREE_EDITION';
+  //     // TODO: 测试环境，暂时设置为true
+  //     const hasFreeEdition = true;
+  //     // // 检查 userCombo 是否为数组，并包含 PERSONAL_EDITION
+  //     // const hasPersonalEdition = Array.isArray(userCombo)
+  //     //   ? userCombo.some(item => item.menu === 'PERSONAL_EDITION')
+  //     //   : userCombo.menu === 'PERSONAL_EDITION';
+  //     // TODO: 测试环境，暂时设置为true
+  //     const hasPersonalEdition = true;
+  //     if (
+  //       hasFreeEdition &&
+  //       spaceList?.length >= 1 &&
+  //       spaceType === 'personal' &&
+  //       mode === 'create'
+  //     ) {
+  //       // 免费版：拥有1个及以上owner空间就需要升级
+  //       setIsNeedUpgrade(true);
+  //     } else if (
+  //       hasPersonalEdition &&
+  //       spaceType === 'personal' &&
+  //       spaceList?.length >= 10 &&
+  //       mode === 'create'
+  //     ) {
+  //       // 个人版：拥有10个及以上owner空间且spaceType为personal才需要升级
+  //       setIsNeedUpgrade(true);
+  //     }
+  //   } catch (error: any) {
+  //     console.log(error, 'error');
+  //     message.error(error?.msg || error?.desc);
+  //   }
+  // };
 
   const handleCancel = () => {
     form.resetFields();
