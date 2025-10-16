@@ -10,14 +10,12 @@ import useUserStore from '@/store/user-store';
 
 interface IconEntryProps {
   onMessageClick?: () => void;
-  onNotLogin?: () => void;
   isCollapsed?: boolean;
   unreadCount?: number;
 }
 
 const IconEntry: React.FC<IconEntryProps> = ({
   onMessageClick,
-  onNotLogin,
   isCollapsed,
   unreadCount = 0,
 }) => {
@@ -33,8 +31,6 @@ const IconEntry: React.FC<IconEntryProps> = ({
   const handleMessageClick = () => {
     if (isLogin) {
       onMessageClick?.();
-    } else {
-      onNotLogin?.();
     }
   };
 
