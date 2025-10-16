@@ -1535,6 +1535,7 @@ CREATE TABLE `chat_bot_market`
     `opened_tool`      varchar(255)                                                 DEFAULT NULL COMMENT 'Enabled tools',
     `publish_channels` varchar(255)                                                 DEFAULT NULL COMMENT 'Publishing channels: MARKET,API,WECHAT,MCP comma separated',
     `model_id`         bigint                                                       DEFAULT NULL COMMENT 'Custom model ID',
+    `support_document`  tinyint NOT NULL                                             DEFAULT '0' COMMENT 'Does it support the knowledge base? 0 - Not supported, 1 - Supported',
     PRIMARY KEY (`id`),
     KEY                `idx_bot_id` (`bot_id`),
     KEY                `idx_create_time3` (`create_time`),
