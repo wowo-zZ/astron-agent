@@ -218,7 +218,7 @@ export default function BotApi({
             </div>
             <div className={styles.appid_box}>
               <div className={styles.appid_select}>
-                {apiInfo && (
+                {apiInfo?.appId && (
                   <>
                     <span className={styles.appid_select_title}>
                       {t('botApi.bindAppID')}
@@ -262,7 +262,7 @@ export default function BotApi({
                     )}
                   </>
                 )}
-                {!apiInfo && (
+                {!apiInfo?.appId && (
                   <>
                     <Select
                       showSearch

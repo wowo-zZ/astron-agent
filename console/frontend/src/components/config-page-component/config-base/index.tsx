@@ -155,8 +155,24 @@ const BaseConfig: React.FC<ChatProps> = ({
     speed: 50,
   });
   const [modelList, setModelList]: any = useState([
-    { model: 'spark', promptAnswerCompleted: true },
-    { model: 'spark', promptAnswerCompleted: true },
+    {
+      modelId: 'null',
+      modelName: '星火大模型 Spark X1',
+      modelDomain: 'x1',
+      model: '', // 将在 modelOptions 加载后初始化
+      modelIcon:
+        'https://openres.xfyun.cn/xfyundoc/2025-09-24/e9b74fbb-c2d6-4f4a-8c07-0ea7f03ee03a/1758681839941/icon.png',
+      promptAnswerCompleted: true,
+    },
+    {
+      modelId: 'null',
+      modelName: '星火大模型 Spark X1',
+      modelDomain: 'x1',
+      model: '', // 将在 modelOptions 加载后初始化
+      modelIcon:
+        'https://openres.xfyun.cn/xfyundoc/2025-09-24/e9b74fbb-c2d6-4f4a-8c07-0ea7f03ee03a/1758681839941/icon.png',
+      promptAnswerCompleted: true,
+    },
   ]);
   const [questionTipActive, setQuestionTipActive] = useState(-1);
   const navigate = useNavigate();
@@ -519,7 +535,7 @@ const BaseConfig: React.FC<ChatProps> = ({
               navigate('/space/agent');
             })
             .catch(err => {
-              message.error(err?.msg);
+              //
             });
         })
         .catch(err => {
@@ -549,6 +565,25 @@ const BaseConfig: React.FC<ChatProps> = ({
       const { modelId, modelDomain } = pendingModelData;
       handleModelDisplay(modelId, modelDomain);
       setPendingModelData(null); // 清除待处理数据
+      const firstModel = modelOptions[0];
+      if (!firstModel) return;
+      setModelList((prevList: any[]) =>
+        prevList.map((item, index) => {
+          // 如果已经有 model 字段，就不更新
+          if (item.model) {
+            return item;
+          }
+          // 否则，设置为第一个 modelOption 的 uniqueKey
+          return {
+            ...item,
+            model: getModelUniqueKey(firstModel, 0),
+            modelName: firstModel.modelName,
+            modelIcon: firstModel.modelIcon,
+            modelDomain: firstModel.modelDomain,
+            modelId: firstModel.modelId,
+          };
+        })
+      );
     }
   }, [modelOptions, pendingModelData]);
 
@@ -1041,9 +1076,19 @@ const BaseConfig: React.FC<ChatProps> = ({
       return;
     }
     debouncedAddModelPk(showModelPk, setShowModelPk);
+    const firstModel = modelOptions[0];
     setModelList([
       ...modelList,
-      { model: 'spark', promptAnswerCompleted: true },
+      {
+        modelId: firstModel?.modelId || 'null',
+        modelName: firstModel?.modelName || '星火大模型 Spark X1',
+        modelDomain: firstModel?.modelDomain || 'x1',
+        model: firstModel ? getModelUniqueKey(firstModel, 0) : 'x1_0',
+        modelIcon:
+          firstModel?.modelIcon ||
+          'https://openres.xfyun.cn/xfyundoc/2025-09-24/e9b74fbb-c2d6-4f4a-8c07-0ea7f03ee03a/1758681839941/icon.png',
+        promptAnswerCompleted: true,
+      },
     ]);
   };
 
@@ -1300,7 +1345,7 @@ const BaseConfig: React.FC<ChatProps> = ({
                       navigate('/space/agent');
                     })
                     .catch(err => {
-                      message.error(err.msg);
+                      //
                     });
                 } else {
                   const maasDatasetList: string[] = [];
@@ -1348,7 +1393,7 @@ const BaseConfig: React.FC<ChatProps> = ({
                       navigate('/space/agent');
                     })
                     .catch(err => {
-                      message.error(err.msg);
+                      //
                     });
                 }
               }}
@@ -1755,15 +1800,7 @@ const BaseConfig: React.FC<ChatProps> = ({
               {/* 模型对比才显示 */}
               {showModelPk !== 0 && !showTipPk && (
                 <div className={styles.testBtn}>
-                  <Button
-                    onClick={() => {
-                      setShowModelPk(0);
-                      setModelList([
-                        { model: 'spark', promptAnswerCompleted: true },
-                        { model: 'spark', promptAnswerCompleted: true },
-                      ]);
-                    }}
-                  >
+                  <Button onClick={() => setShowModelPk(0)}>
                     {t('configBase.restoreDefaultDisplay')}
                   </Button>
                   <Button onClick={addModelPk}>
@@ -1788,6 +1825,7 @@ const BaseConfig: React.FC<ChatProps> = ({
                       promptText={promptNow}
                       supportContext={supportContextFlag ? 1 : 0}
                       choosedAlltool={choosedAlltool}
+                      findModelOptionByUniqueKey={findModelOptionByUniqueKey}
                     />
                   )}
                   {showTipPk &&
@@ -1825,6 +1863,9 @@ const BaseConfig: React.FC<ChatProps> = ({
                           promptText={promptNow}
                           supportContext={supportContextFlag ? 1 : 0}
                           choosedAlltool={choosedAlltool}
+                          findModelOptionByUniqueKey={
+                            findModelOptionByUniqueKey
+                          }
                         />
                       </div>
                     ))}
@@ -1834,7 +1875,7 @@ const BaseConfig: React.FC<ChatProps> = ({
               {/* 模型对比 样式区域 */}
               {showModelPk > 0 && !showTipPk && (
                 <>
-                  {modelList.map((item: PageDataItem, index: number) => (
+                  {modelList.map((item: ModelListData, index: number) => (
                     <div
                       key={index}
                       style={
@@ -1853,7 +1894,7 @@ const BaseConfig: React.FC<ChatProps> = ({
                         style={{ display: 'flex', justifyContent: 'center' }}
                       >
                         <Select
-                          defaultValue={item.model}
+                          value={item.model}
                           onChange={e => handleModelChangeNew(e, index)}
                           style={{ width: '60%' }}
                           placeholder="请选择模型"
@@ -1881,16 +1922,16 @@ const BaseConfig: React.FC<ChatProps> = ({
                             modelPromptTryRefs.current[index] = ref;
                           }
                         }}
-                        newModel={item.model}
                         baseinfo={baseinfo}
                         inputExample={inputExample}
                         coverUrl={coverUrl}
                         selectSource={selectSource}
                         prompt={prompt}
-                        model={model}
+                        model={item.model}
                         promptText={promptNow}
                         supportContext={supportContextFlag ? 1 : 0}
                         choosedAlltool={choosedAlltool}
+                        findModelOptionByUniqueKey={findModelOptionByUniqueKey}
                       />
                     </div>
                   ))}
@@ -1905,7 +1946,6 @@ const BaseConfig: React.FC<ChatProps> = ({
               value={askValue}
               onChange={setAskValue}
               isLoading={globalLoading}
-              isCompleted={!globalLoading}
             />
           </div>
         </div>

@@ -462,7 +462,6 @@ const useConditionActions = ({
         );
         const item = fieldOptions.find(item => item.name === value);
         currentInput.schema.type = item.type.toLowerCase();
-        currentInput.name = value;
         currentCondition.fieldType = item.type;
         currentCondition.fieldName = value;
         if (['in', 'not in'].includes(currentCondition.selectCondition)) {

@@ -48,6 +48,7 @@ function PromptModal(): React.ReactElement {
       openWhenHidden: true,
       method: 'POST',
       headers: {
+        'Content-Type': 'application/json',
         Authorization: getAuthorization(),
       },
       signal: controller.signal,
@@ -56,7 +57,7 @@ function PromptModal(): React.ReactElement {
         if (e && e.data) {
           if (e.data && isJSON(e.data)) {
             const data: WebSocketMessage = JSON.parse(e.data);
-            const content = data?.payload?.choices?.text?.[0]?.content;
+            const content = data?.payload?.message?.content;
             if (content) {
               textQueue.current = [...textQueue.current, ...content.split('')];
             }

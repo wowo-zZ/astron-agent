@@ -13,6 +13,7 @@ import { getFavoriteList } from '@/services/agent-square';
 import { PostChatItem, FavoriteEntry } from '@/types/chat';
 import eventBus from '@/utils/event-bus';
 import CreateApplicationModal from '@/components/create-application-modal';
+import { getMessageCountApi } from '@/services/notification';
 
 interface User {
   nickname?: string;
@@ -81,12 +82,19 @@ const Sidebar = ({
   const [noticeModalVisible, setNoticeModalVisible] = useState(false);
   const [ApplicationModalVisible, setCreateModalVisible] =
     useState<boolean>(false); //创建应用
+  const [unreadCount, setUnreadCount] = useState<number>(0);
 
   // Shared chat data state
   const [mixedChatList, setMixedChatList] = useState<PostChatItem[]>([]);
   const [favoriteBotList, setFavoriteBotList] = useState<FavoriteEntry[]>([]);
 
   const getIsLogin = useUserStore.getState().getIsLogin;
+
+  // 获取消息数量
+  const getMessageCount = async () => {
+    const res = await getMessageCountApi();
+    setUnreadCount(res);
+  };
 
   // Page info for favorites
   const PAGE_SIZE = 45;
@@ -126,6 +134,7 @@ const Sidebar = ({
   useEffect(() => {
     getChatList();
     getFavoriteBotListLocal();
+    getMessageCount();
 
     // Setup event bus listeners for data changes
     eventBus.on('chatListChange', getChatList);
@@ -175,7 +184,7 @@ const Sidebar = ({
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-col flex-1">
+      <div className="flex flex-col h-full">
         {/* Logo Section */}
         <SidebarLogo
           isCollapsed={isCollapsed}
@@ -196,7 +205,6 @@ const Sidebar = ({
         <MenuList
           isCollapsed={isCollapsed}
           mixedChatList={mixedChatList}
-          favoriteBotList={favoriteBotList}
           onRefreshData={() => {
             getChatList();
             getFavoriteBotListLocal();
@@ -209,6 +217,8 @@ const Sidebar = ({
             setNoticeModalVisible(true);
           }}
           onNotLogin={onNotLogin}
+          isCollapsed={isCollapsed}
+          unreadCount={unreadCount}
         />
 
         {/* Bottom Login */}
@@ -241,6 +251,7 @@ const Sidebar = ({
           onClose={() => {
             setNoticeModalVisible(false);
           }}
+          onMessageRead={getMessageCount}
         />
         <CreateApplicationModal
           visible={ApplicationModalVisible}
