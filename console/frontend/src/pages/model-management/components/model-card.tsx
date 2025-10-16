@@ -1,11 +1,12 @@
 import { useState, useMemo, useCallback, JSX, Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Switch, message } from 'antd';
+import { Switch, message, Button } from 'antd';
 import JSEncrypt from 'jsencrypt';
 
 import { DeleteModal, CreateModal } from './modal-component';
 import StatusTag from './status-tag';
+import { EllipsisIcon } from '@/components/svg-icons/model';
 import {
   enabledModelAPI,
   getModelDetail,
@@ -340,15 +341,16 @@ function ModelCardFooter({
         </span>
         {model.llmSource === LLMSource.CUSTOM && (
           <div className="relative">
-            <button
-              className="w-6 h-6 flex items-center justify-center rounded-[4px] font-extrabold text-[20px] text-[#7F7F7F] hover:text-black"
+            <Button
+              className={styles.modelEllipsis}
+              type="text"
+              size="small"
+              icon={<EllipsisIcon />}
               onClick={e => {
                 e.stopPropagation();
                 setMenuVisible(!menuVisible);
               }}
-            >
-              ⋯
-            </button>
+            />
             {menuVisible && (
               <div
                 className="absolute top-full right-0 mt-1 w-24 bg-white border rounded shadow z-10"

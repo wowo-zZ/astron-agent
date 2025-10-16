@@ -12,6 +12,41 @@ import useUserStore, { User } from '@/store/user-store';
 import { ModalForm } from './components/modal-form';
 import { RpaDetailFormInfo, RpaInfo } from '@/types/rpa';
 import { deleteRpa, getRpaDetail } from '@/services/rpa';
+
+const mockRpaList: RpaInfo[] = [
+  {
+    id: 1,
+    category: 'RPA 1',
+    name: 'RPA 1',
+    assistantName: 'assistantName 1',
+    userName: '用户名1',
+    remarks:
+      'RPA 1 remarksRPA 1 remarksRPA 1 remarksRPA 1 remarksRPA 1 remarksRPA 1 remarksRPA 1 remarksRPA 1 remarksRPA 1 remarksRPA 1 remarksRPA 1 remarksRPA 1 remarksRPA 1 remarksRPA 1 remarksRPA 1 remarksRPA 1 remarksRPA 1 remarksRPA 1 remarksRPA 1 remarksRPA 1 remarksRPA 1 remarks',
+    robotCount: 1,
+    icon: 'http://172.31.205.72:17900/astron-project/icon/user/sparkBot_7505b85b8c62449bb989e24652410792.png',
+    status: 1,
+    createTime: new Date().toISOString(),
+    updateTime: new Date().toISOString(),
+    value: '1',
+    isDeleted: 0,
+  },
+  {
+    id: 2,
+    name: 'RPA 2',
+    category: 'RPA 2',
+    assistantName: 'assistantName 2',
+    userName: '用户名1',
+    remarks: 'RPA 2 remarks',
+    robotCount: 2,
+    icon: 'http://172.31.205.72:17900/astron-project/icon/user/sparkBot_7505b85b8c62449bb989e24652410792.png',
+    status: 1,
+    createTime: new Date().toISOString(),
+    updateTime: new Date().toISOString(),
+    value: '2',
+    isDeleted: 1,
+  },
+];
+
 const RpaPage: FC = () => {
   const { t } = useTranslation();
   const modalFormRef = useRef<{
@@ -78,7 +113,7 @@ const RpaPage: FC = () => {
                 </div>
               </div>
             </div>
-            {rpas.map(rpa => (
+            {mockRpaList.map(rpa => (
               <RpaCard
                 rpa={rpa}
                 key={rpa.id}

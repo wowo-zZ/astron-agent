@@ -98,9 +98,7 @@ const ToolCard: React.FC<ToolCardProps> = ({
           </div>
 
           {/* 标签按钮 */}
-          <div className={styles.tagButton}>
-            {tool.isMcp ? 'MCP工具' : '插件'}
-          </div>
+          <div className={styles.tagButton}>{tool.tags?.[0] || ''}</div>
         </div>
       </div>
     </div>
