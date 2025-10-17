@@ -160,7 +160,7 @@ public class BotChatServiceImpl implements BotChatService {
             } else {
                 ModelConfigResult modelConfig = getModelConfiguration(botConfig.modelId, sseEmitter);
                 List<SparkChatRequest.MessageDto> messages = buildMessageList(chatBotReqDto, botConfig.supportContext, botConfig.supportDocument, botConfig.prompt, modelConfig.maxInputTokens(), chatReqRecords.getId());
-                JSONObject jsonObject = buildPromptChatRequest(modelConfig.llmInfoVo, messages);
+                JSONObject jsonObject = buildPromptChatRequest(modelConfig.llmInfoVo(), messages);
                 promptChatService.chatStream(jsonObject, sseEmitter, sseId, chatReqRecords, false, false);
             }
         } catch (Exception e) {
@@ -202,8 +202,8 @@ public class BotChatServiceImpl implements BotChatService {
                 ModelConfigResult modelConfig = getModelConfiguration(modelId, sseEmitter);
                 messageList = buildDebugMessageList(text, prompt, messages, modelConfig.maxInputTokens(), maasDatasetList);
                 Long spaceId = SpaceInfoUtil.getSpaceId();
-                if (!modelService.checkModelBase(LLMService.generate9DigitRandomFromId(modelConfig.llmInfoVo.getLlmId()),
-                        modelConfig.llmInfoVo().getServiceId(), modelConfig.llmInfoVo.getUrl(), uid, spaceId)) {
+                if (!modelService.checkModelBase(LLMService.generate9DigitRandomFromId(modelConfig.llmInfoVo().getLlmId()),
+                        modelConfig.llmInfoVo().getServiceId(), modelConfig.llmInfoVo().getUrl(), uid, spaceId)) {
                     throw new BusinessException(ResponseEnum.MODEL_CHECK_FAILED);
                 }
                 JSONObject jsonObject = buildPromptChatRequest(modelConfig.llmInfoVo(), messageList);

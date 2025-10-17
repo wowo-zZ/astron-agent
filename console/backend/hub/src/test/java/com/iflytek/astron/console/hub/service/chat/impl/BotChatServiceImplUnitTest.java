@@ -22,14 +22,17 @@ import com.iflytek.astron.console.hub.service.PromptChatService;
 import com.iflytek.astron.console.hub.service.SparkChatService;
 import com.iflytek.astron.console.hub.service.chat.ChatListService;
 import com.iflytek.astron.console.hub.service.knowledge.KnowledgeService;
+import com.iflytek.astron.console.commons.util.space.SpaceInfoUtil;
 import com.iflytek.astron.console.toolkit.entity.vo.CategoryTreeVO;
 import com.iflytek.astron.console.toolkit.entity.vo.LLMInfoVo;
+import com.iflytek.astron.console.toolkit.service.model.LLMService;
 import com.iflytek.astron.console.toolkit.service.model.ModelService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -322,31 +325,40 @@ class BotChatServiceImplUnitTest {
 
     @Test
     void testDebugChatMessageBot_WithModelId() {
-        // Given
-        String text = "test message";
-        String prompt = "test prompt";
-        List<String> messages = Arrays.asList("message1", "message2");
-        String uid = "test-uid";
-        String openedTool = "ifly_search";
-        String model = "test-model";
-        Long modelId = 1L;
-        List<String> maasDatasetList = Arrays.asList("dataset1");
-        SseEmitter sseEmitter = new SseEmitter();
-        String sseId = "test-sse-id";
+        try (MockedStatic<LLMService> llmServiceMock = mockStatic(LLMService.class);
+             MockedStatic<SpaceInfoUtil> spaceInfoUtilMock = mockStatic(SpaceInfoUtil.class)) {
 
-        LLMInfoVo llmInfoVo = createLLMInfoVo();
-        when(modelService.getDetail(anyInt(), anyLong(), any())).thenReturn(new ApiResult<>(0, "success", llmInfoVo, 1L));
-        when(modelService.checkModelBase(anyLong(), anyString(), anyString(), anyString(), anyLong())).thenReturn(true);
-        when(knowledgeService.getChuncks(any(), anyString(), anyInt(), anyBoolean())).thenReturn(Arrays.asList("knowledge"));
-        doNothing().when(promptChatService).chatStream(any(), any(), any(), any(), anyBoolean(), anyBoolean());
+            // Given
+            String text = "test message";
+            String prompt = "test prompt";
+            List<String> messages = Arrays.asList("message1", "message2");
+            String uid = "test-uid";
+            String openedTool = "ifly_search";
+            String model = "test-model";
+            Long modelId = 1L;
+            List<String> maasDatasetList = Arrays.asList("dataset1");
+            SseEmitter sseEmitter = new SseEmitter();
+            String sseId = "test-sse-id";
 
-        // When
-        botChatService.debugChatMessageBot(text, prompt, messages, uid, openedTool, model, modelId, maasDatasetList, sseEmitter, sseId);
+            LLMInfoVo llmInfoVo = createLLMInfoVo();
 
-        // Then
-        verify(modelService).getDetail(eq(0), eq(modelId), isNull());
-        verify(promptChatService).chatStream(any(JSONObject.class), eq(sseEmitter), eq(sseId), isNull(), eq(false), eq(true));
-        verify(sparkChatService, never()).chatStream(any(), any(), any(), any(), anyBoolean(), anyBoolean());
+            // Mock static methods
+            llmServiceMock.when(() -> LLMService.generate9DigitRandomFromId(anyLong())).thenReturn(123456789L);
+            spaceInfoUtilMock.when(SpaceInfoUtil::getSpaceId).thenReturn(1L);
+
+            when(modelService.getDetail(anyInt(), anyLong(), any())).thenReturn(new ApiResult<>(0, "success", llmInfoVo, 1L));
+            when(modelService.checkModelBase(anyLong(), anyString(), anyString(), anyString(), anyLong())).thenReturn(true);
+            when(knowledgeService.getChuncks(any(), anyString(), anyInt(), anyBoolean())).thenReturn(Arrays.asList("knowledge"));
+            doNothing().when(promptChatService).chatStream(any(), any(), any(), any(), anyBoolean(), anyBoolean());
+
+            // When
+            botChatService.debugChatMessageBot(text, prompt, messages, uid, openedTool, model, modelId, maasDatasetList, sseEmitter, sseId);
+
+            // Then
+            verify(modelService).getDetail(eq(0), eq(modelId), isNull());
+            verify(promptChatService).chatStream(any(JSONObject.class), eq(sseEmitter), eq(sseId), isNull(), eq(false), eq(true));
+            verify(sparkChatService, never()).chatStream(any(), any(), any(), any(), anyBoolean(), anyBoolean());
+        }
     }
 
     @Test
@@ -509,6 +521,8 @@ class BotChatServiceImplUnitTest {
     private LLMInfoVo createLLMInfoVo() {
         LLMInfoVo llmInfoVo = new LLMInfoVo();
         llmInfoVo.setId(1L);
+        llmInfoVo.setLlmId(1L);
+        llmInfoVo.setServiceId("test-service-id");
         llmInfoVo.setName("test-model");
         llmInfoVo.setUrl("http://test.com");
         llmInfoVo.setApiKey("test-api-key");

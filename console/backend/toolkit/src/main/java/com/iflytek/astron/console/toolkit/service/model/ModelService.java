@@ -298,9 +298,9 @@ public class ModelService extends ServiceImpl<ModelMapper, Model> {
             LambdaQueryWrapper<Model> lqw = new LambdaQueryWrapper<Model>()
                     .eq(Model::getName, request.getModelName())
                     .eq(Model::getIsDeleted, 0);
-            if(spaceId != null){
+            if (spaceId != null) {
                 lqw.eq(Model::getSpaceId, spaceId);
-            }else{
+            } else {
                 lqw.eq(Model::getUid, request.getUid()).isNull(Model::getSpaceId);
             }
             Model exist = this.getOne(lqw);

@@ -74,11 +74,10 @@ public class S3ClientUtil {
             if (enablePublicRead) {
                 String publicReadPolicy = buildPublicReadPolicy(defaultBucket);
                 minioClient.setBucketPolicy(
-                    SetBucketPolicyArgs.builder()
-                        .bucket(defaultBucket)
-                        .config(publicReadPolicy)
-                        .build()
-                );
+                        SetBucketPolicyArgs.builder()
+                                .bucket(defaultBucket)
+                                .config(publicReadPolicy)
+                                .build());
                 log.info("Set public read policy for bucket: {}", defaultBucket);
             }
         } catch (ErrorResponseException | InsufficientDataException | InternalException | InvalidKeyException | InvalidResponseException | IOException | NoSuchAlgorithmException | ServerException | XmlParserException e) {
@@ -88,8 +87,8 @@ public class S3ClientUtil {
     }
 
     /**
-     * Build public read policy JSON for a bucket using fastjson2.
-     * This allows anonymous users to read/download objects from the bucket.
+     * Build public read policy JSON for a bucket using fastjson2. This allows anonymous users to
+     * read/download objects from the bucket.
      *
      * @param bucketName bucket name
      * @return JSON policy string
@@ -264,13 +263,12 @@ public class S3ClientUtil {
     public String generatePresignedGetUrl(String bucketName, String objectKey, int expirySeconds) {
         try {
             return minioClient.getPresignedObjectUrl(
-                GetPresignedObjectUrlArgs.builder()
-                    .method(Method.GET)
-                    .bucket(bucketName)
-                    .object(objectKey)
-                    .expiry(expirySeconds)
-                    .build()
-            );
+                    GetPresignedObjectUrlArgs.builder()
+                            .method(Method.GET)
+                            .bucket(bucketName)
+                            .object(objectKey)
+                            .expiry(expirySeconds)
+                            .build());
         } catch (ErrorResponseException | InsufficientDataException | InternalException | InvalidKeyException | InvalidResponseException | IOException | NoSuchAlgorithmException | XmlParserException | ServerException e) {
             log.error("S3 error on presign GET for bucket '{}', object '{}': {}", bucketName, objectKey, e.getMessage(), e);
             throw new BusinessException(ResponseEnum.S3_PRESIGN_ERROR);
