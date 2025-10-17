@@ -290,8 +290,8 @@ jobs:
             VERSION=${{ needs.prepare-release.outputs.version }}
             GIT_COMMIT=${{ github.sha }}
             BUILD_TIME=${{ github.run_id }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=core-${{ matrix.service.name }}
+          cache-to: type=gha,scope=core-${{ matrix.service.name }},mode=max
 
   build-console-hub:
     name: ☕ 构建Console Hub

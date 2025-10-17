@@ -25,6 +25,10 @@ from knowledge.infra.ragflow.ragflow_client import (
 
 logger = logging.getLogger(__name__)
 
+# Module-level locks for dataset creation to prevent race conditions
+_dataset_locks: Dict[str, asyncio.Lock] = {}
+_locks_lock = asyncio.Lock()
+
 
 class RagflowUtils:
     """RAGFlow utility class providing document processing helper methods"""
@@ -97,45 +101,57 @@ class RagflowUtils:
         """
         Ensure dataset exists, create if it doesn't exist
 
+        Uses per-dataset locks to prevent race conditions when multiple concurrent
+        requests try to create the same dataset.
+
         Args:
             group: Dataset name
 
         Returns:
             Dataset ID
         """
-        try:
-            # 1. Check if dataset exists
-            logger.info(f"Checking if dataset exists: {group}")
-            datasets_response = await list_datasets(name=group)
+        # Get or create a lock for this specific dataset name
+        async with _locks_lock:
+            if group not in _dataset_locks:
+                _dataset_locks[group] = asyncio.Lock()
 
-            if datasets_response.get("code") == 0:
-                datasets = datasets_response.get("data", [])
-                for dataset in datasets:
-                    if dataset.get("name") == group:
-                        dataset_id = dataset.get("id")
-                        logger.info(
-                            f"Found existing dataset: {group}, ID: {dataset_id}"
-                        )
-                        return dataset_id
+        # Acquire the lock for this dataset to ensure serial execution
+        async with _dataset_locks[group]:
+            try:
+                # 1. Check if dataset exists (Double-Check Locking pattern)
+                logger.info(f"Checking if dataset exists: {group}")
+                datasets_response = await list_datasets(name=group)
 
-            # 2. Dataset doesn't exist, create new dataset
-            logger.info(f"Dataset doesn't exist, creating new dataset: {group}")
-            create_response = await create_dataset(
-                name=group,
-                description=f"Automatically created dataset: {group}",
-                chunk_method="naive",
-            )
+                if datasets_response.get("code") == 0:
+                    datasets = datasets_response.get("data", [])
+                    for dataset in datasets:
+                        if dataset.get("name") == group:
+                            dataset_id = dataset.get("id")
+                            logger.info(
+                                f"Found existing dataset: {group}, ID: {dataset_id}"
+                            )
+                            return dataset_id
 
-            if create_response.get("code") == 0:
-                dataset_id = create_response.get("data", {}).get("id")
-                logger.info(f"Dataset created successfully: {group}, ID: {dataset_id}")
-                return dataset_id
-            else:
-                raise Exception(f"Dataset creation failed: {create_response}")
+                # 2. Dataset doesn't exist, create new dataset
+                logger.info(f"Dataset doesn't exist, creating new dataset: {group}")
+                create_response = await create_dataset(
+                    name=group,
+                    description=f"Automatically created dataset: {group}",
+                    chunk_method="naive",
+                )
 
-        except Exception as e:
-            logger.error(f"Dataset management failed: {e}")
-            raise Exception(f"Unable to ensure dataset exists: {str(e)}")
+                if create_response.get("code") == 0:
+                    dataset_id = create_response.get("data", {}).get("id")
+                    logger.info(
+                        f"Dataset created successfully: {group}, ID: {dataset_id}"
+                    )
+                    return dataset_id
+                else:
+                    raise Exception(f"Dataset creation failed: {create_response}")
+
+            except Exception as e:
+                logger.error(f"Dataset management failed: {e}")
+                raise Exception(f"Unable to ensure dataset exists: {str(e)}")
 
     @staticmethod
     async def _download_url_file(file: str) -> tuple[bytes, str]:

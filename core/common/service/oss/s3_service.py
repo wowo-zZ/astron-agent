@@ -8,7 +8,7 @@ from loguru import logger
 
 from common.exceptions.codes import c9010
 from common.exceptions.errs import OssServiceException
-from common.service.base import Service
+from common.service.base import Service, ServiceType
 from common.service.oss.base_oss import BaseOSSService
 from common.utils.hmac_auth import HMACAuth
 
@@ -19,6 +19,8 @@ class S3Service(BaseOSSService, Service):
     This class provides file upload functionality using S3-compatible
     storage services with public read access.
     """
+
+    name = ServiceType.OSS_SERVICE
 
     def __init__(
         self,
