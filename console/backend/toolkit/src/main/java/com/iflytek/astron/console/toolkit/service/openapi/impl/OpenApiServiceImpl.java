@@ -45,7 +45,7 @@ public class OpenApiServiceImpl implements OpenApiService {
 
             if (!StringUtils.hasText(appId)) {
                 log.error("appId is empty, apiKey:{}", request.getApiKey());
-                throw new BusinessException(ResponseEnum.UNAUTHORIZED);
+                throw new BusinessException(ResponseEnum.OPENAPI_APPID_NOT_NULL);
             }
 
             // String appId = "663777f0";
@@ -54,7 +54,7 @@ public class OpenApiServiceImpl implements OpenApiService {
 
             if (chatBotApiList.isEmpty()) {
                 log.info("No ChatBotApi records found for appId: {}", appId);
-                return null;
+                throw new BusinessException(ResponseEnum.OPENAPI_NO_WORKFLOW_FOUND);
             }
 
             return processWorkflowTransformations(chatBotApiList);
@@ -82,7 +82,7 @@ public class OpenApiServiceImpl implements OpenApiService {
         if (appInfoResponse.getCode() != 0 || appInfoResponse.getData() == null) {
             log.error("Failed to get app info from external API: code={}, message={}",
                     appInfoResponse.getCode(), appInfoResponse.getMessage());
-            throw new BusinessException(ResponseEnum.DATA_NOT_FOUND);
+            throw new BusinessException(ResponseEnum.OPENAPI_INVALID_AUTH_INFO);
         }
 
         String appId = appInfoResponse.getData().getAppid();
@@ -166,9 +166,9 @@ public class OpenApiServiceImpl implements OpenApiService {
      * Add workflow metadata to transformation object
      */
     private void enrichTransformationWithMetadata(JSONObject transformation, Workflow workflow) {
-        transformation.put("workflowId", workflow.getId());
-        transformation.put("workflowName", workflow.getName());
-        transformation.put("workDescription", workflow.getDescription());
+        transformation.put("flowId", workflow.getFlowId());
+        transformation.put("name", workflow.getName());
+        transformation.put("description", workflow.getDescription());
         transformation.put("uid", workflow.getUid());
         transformation.put("spaceId", workflow.getSpaceId());
         transformation.put("createTime", workflow.getCreateTime());

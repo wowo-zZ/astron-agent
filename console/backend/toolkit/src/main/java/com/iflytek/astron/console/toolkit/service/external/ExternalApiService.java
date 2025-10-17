@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class ExternalApiService {
-    @Value("${api.url.appIdQryUrl}")
+    @Value("${api.url.appUrl}")
     private String appIdQryUrl;
 
 
@@ -24,7 +24,7 @@ public class ExternalApiService {
      * @return AppInfoResponse
      */
     public AppInfoResponse getAppInfoByApiKey(String apiKey) {
-        String url = appIdQryUrl + "/v2/app/key/api_key/" + apiKey;
+        String url = appIdQryUrl + "/key/api_key/" + apiKey;
         log.debug("Calling external API: {}", url);
 
         try {

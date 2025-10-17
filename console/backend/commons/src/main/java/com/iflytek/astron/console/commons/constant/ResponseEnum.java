@@ -204,6 +204,8 @@ public enum ResponseEnum {
     COMMON_REMOTE_CALLER_FAILED(8012, "common.remote.caller.failed"),
     FAILED_GET_TRACE(8013, "failed.get.trace"),
 
+
+
     // Workflow 8100 - 8300
     WORKFLOW_VERSION_ADD_FAILED(8100, "workflow.version.add.failed"),
     WORKFLOW_VERSION_GET_NAME_FAILED(8101, "workflow.version.get.name.failed"),
@@ -369,7 +371,17 @@ public enum ResponseEnum {
     NOTIFICATION_ALREADY_READ(90009, "notification.already.read"),
 
     // System errors 9xxxx
-    SYSTEM_ERROR(99999, "system.error");
+    SYSTEM_ERROR(99999, "system.error"),
+
+    // openapi errors
+    OPENAPI_MISSING_AUTH_INFO(11001, "openapi.missing.auth.info"),
+    OPENAPI_AUTH_INFO_FORMAT_ERROR(11002, "openapi.auth.info.format.error"),
+    OPENAPI_INVALID_AUTH_INFO(11003, "openapi.invalid.auth.info"),
+    OPENAPI_APPID_NOT_NULL(11004, "openapi.appid.not.null"),
+    OPENAPI_NO_WORKFLOW_FOUND(11005, "openapi.no.workflow.found"),
+    ;
+
+
 
     @Getter
     private final int code;
