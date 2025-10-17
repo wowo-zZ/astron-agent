@@ -18,6 +18,7 @@ import messageSpace from '@/assets/imgs/share-page/message_space.svg';
 interface NoticeModalProps {
   open: boolean;
   onClose: () => void;
+  onMessageRead?: () => void;
 }
 
 const initCoverImg = (messageItem: Notification): string => {
@@ -150,7 +151,11 @@ const messageTypeList = [
   },
 ];
 
-const NoticeModal: React.FC<NoticeModalProps> = ({ open, onClose }) => {
+const NoticeModal: React.FC<NoticeModalProps> = ({
+  open,
+  onClose,
+  onMessageRead,
+}) => {
   const [selectType, setSelectType] = useState<string>('0');
   const myMessage = useSparkCommonStore(state => state.myMessage);
   const setMyMessage = useSparkCommonStore(state => state.setMyMessage);
@@ -208,6 +213,8 @@ const NoticeModal: React.FC<NoticeModalProps> = ({ open, onClose }) => {
     }
 
     getMessages(selectType);
+    // 调用父组件的回调，更新消息数量
+    onMessageRead?.();
   };
 
   const delMessage = async (messageItem: Notification, e: any) => {
@@ -215,6 +222,8 @@ const NoticeModal: React.FC<NoticeModalProps> = ({ open, onClose }) => {
       .then(res => {
         message.success(t('systemMessage.deleteSuccess'));
         getMessages(selectType);
+        // 调用父组件的回调，更新消息数量
+        onMessageRead?.();
       })
       .catch(() => {
         message.error(t('systemMessage.deleteFail'));
@@ -231,6 +240,8 @@ const NoticeModal: React.FC<NoticeModalProps> = ({ open, onClose }) => {
     })
       .then(res => {
         getMessages(selectType);
+        // 调用父组件的回调，更新消息数量
+        onMessageRead?.();
       })
       .catch(e => {
         message.error(t('systemMessage.historyAudioLoading'));

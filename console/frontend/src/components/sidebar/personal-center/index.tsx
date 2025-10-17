@@ -297,11 +297,11 @@ const PersonalCenterHeader: FC<{
         </div>
         <div className={styles.flexInfo}>
           <img src={user} alt="" />
-          <div className={styles.uid}>UID：{userInfo?.uid}</div>
+          <div className={styles.uid}>用户名：{userInfo?.username}</div>
           <img
             onClick={() => {
               copyText({
-                text: `${userInfo?.uid}`,
+                text: `${userInfo?.username}`,
                 successText: '复制成功',
               });
             }}

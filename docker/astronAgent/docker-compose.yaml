@@ -208,10 +208,12 @@ services:
     image: ghcr.io/iflytek/astron-agent/core-rpa:latest
     container_name: astron-agent-core-rpa
     environment:
+      SERVICE_PORT: "${CORE_RPA_PORT:-17198}"
       OTLP_ENDPOINT: "${OTLP_ENDPOINT:-127.0.0.1:4317}"
+      OTLP_ENABLE: "${OTLP_ENABLE:-0}"
       KAFKA_SERVERS: "${KAFKA_SERVERS:-kafka:29092}"
-      XIAOWU_RPA_TASK_CREATE_URL: "${XIAOWU_RPA_TASK_CREATE_URL:-}"
-      XIAOWU_RPA_TASK_QUERY_URL: "${XIAOWU_RPA_TASK_QUERY_URL:-}"
+      XIAOWU_RPA_TASK_CREATE_URL: "${XIAOWU_RPA_TASK_CREATE_URL:-https://newapi.iflyrpa.com/api/rpa-openapi/workflows/execute-async}"
+      XIAOWU_RPA_TASK_QUERY_URL: "${XIAOWU_RPA_TASK_QUERY_URL:-https://newapi.iflyrpa.com/api/rpa-openapi/executions}"
     depends_on:
       postgres:
         condition: service_healthy
@@ -237,6 +239,7 @@ services:
     image: ghcr.io/iflytek/astron-agent/core-link:latest
     container_name: astron-agent-core-link
     environment:
+      SERVICE_PORT: "${CORE_LINK_PORT:-18888}"
       MYSQL_HOST: "${MYSQL_HOST:-mysql}"
       MYSQL_PORT: "${MYSQL_PORT:-3306}"
       MYSQL_USER: "${MYSQL_USER:-root}"
@@ -247,6 +250,7 @@ services:
       REDIS_CLUSTER_ADDR: "${REDIS_CLUSTER_ADDR}"
       REDIS_PASSWORD: "${REDIS_PASSWORD}"
       OTLP_ENDPOINT: "${OTLP_ENDPOINT:-127.0.0.1:4317}"
+      OTLP_ENABLE: "${OTLP_ENABLE:-0}"
       KAFKA_SERVERS: "${KAFKA_SERVERS:-kafka:29092}"
     depends_on:
       postgres:
@@ -274,10 +278,12 @@ services:
     container_name: astron-agent-core-aitools
     environment:
       SERVICE_PORT: "${CORE_AITOOLS_PORT:-18668}"
+      OSS_TYPE: "${OSS_TYPE:-s3}"
       OSS_ENDPOINT: "${OSS_ENDPOINT:-http://minio:9000}"
       OSS_ACCESS_KEY_ID: "${OSS_ACCESS_KEY_ID:-minioadmin}"
       OSS_ACCESS_KEY_SECRET: "${OSS_ACCESS_KEY_SECRET:-minioadmin123}"
       OSS_BUCKET_NAME: "${OSS_BUCKET_NAME}"
+      OSS_DOWNLOAD_HOST: "${OSS_DOWNLOAD_HOST:-http://minio:9000}"
       OSS_TTL: "${OSS_TTL:-157788000}"
       KAFKA_SERVERS: "${KAFKA_SERVERS:-kafka:29092}"
       AI_APP_ID: "${PLATFORM_APP_ID}"
@@ -298,7 +304,7 @@ services:
         condition: service_healthy
     volumes:
       - ./config/aitools/config.env:/opt/core/plugin/aitools/config.env
-      - ./config/aitools/logs/:/opt/core/plugin/aitools/logs/
+      - ./config/aitools/logs/:/opt/core/logs/
     networks:
       - astron-agent-network
     restart: always
@@ -564,6 +570,7 @@ services:
       WORKFLOW_URL: "${WORKFLOW_URL:-}"
       SPARK_DB_URL: "${SPARK_DB_URL:-}"
       LOCAL_MODEL_URL: "${LOCAL_MODEL_URL:-}"
+      RPA_URL: "${RPA_URL:-}"
       MAAS_APP_ID: "${MAAS_APP_ID:-your-maas-app-id}"
       MAAS_API_KEY: "${MAAS_API_KEY:-your-maas-api-key}"
       MAAS_API_SECRET: "${MAAS_API_SECRET:-your-maas-api-secret}"

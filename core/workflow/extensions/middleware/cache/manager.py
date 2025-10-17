@@ -35,7 +35,6 @@ class RedisCache(BaseCacheService, Service):
             self._client = self.init_redis_cluster(addr, password)
         else:
             self._client = self.init_redis(addr, password)
-        logger.debug("redis init success")
         self.expiration_time = expiration_time
 
     def init_redis_cluster(self, cluster_addr: str, password: str) -> Any:
@@ -46,7 +45,7 @@ class RedisCache(BaseCacheService, Service):
         :param password: Redis authentication password
         :return: RedisCluster client instance
         """
-        logger.debug("redis cluster init in progress")
+        logger.debug("🔍 Initializing Redis cluster connection")
         from rediscluster import RedisCluster  # type: ignore
 
         host_port_pairs = cluster_addr.split(",")
@@ -67,7 +66,7 @@ class RedisCache(BaseCacheService, Service):
         :param password: Redis authentication password
         :return: Redis client instance
         """
-        logger.debug("redis init in progress")
+        logger.debug("🔍 Initializing Redis connection")
         from redis import Redis  # type: ignore
 
         host, port = addr.split(":")

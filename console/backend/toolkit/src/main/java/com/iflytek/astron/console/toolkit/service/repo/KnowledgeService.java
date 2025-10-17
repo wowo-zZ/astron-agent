@@ -430,117 +430,115 @@ public class KnowledgeService {
 
 
     /**
-     * Asynchronously extract knowledge from document content
+     * Asynchronously extract knowledge from document content.
+     * <p>
+     * Behavior keeps parity with original implementation:
+     * <ul>
+     * <li>CBG source ⇒ upload file stream from S3; others ⇒ split by URL.</li>
+     * <li>On non-zero response code, extract inner message when code==11111 and mark task as
+     * failed.</li>
+     * <li>On empty chunks, set user-friendly reason based on contentType (image vs non-image).</li>
+     * <li>Persist preview chunks to DB, update charCount and lastUuid rules, then update statuses.</li>
+     * </ul>
+     * </p>
      *
-     * @param contentType the MIME type of the document content
-     * @param url the URL of the document to be processed
-     * @param sliceConfig configuration for document slicing/chunking
-     * @param fileInfoV2 file information object containing metadata
-     * @param extractKnowledgeTask task object to track extraction progress
-     * @throws BusinessException if document processing fails or file doesn't meet requirements
+     * @param contentType MIME type of the document
+     * @param url original file URL
+     * @param sliceConfig chunking configuration
+     * @param fileInfoV2 file info
+     * @param extractKnowledgeTask task status carrier
      */
     @Async
-    public void knowledgeExtractAsync(String contentType, String url, SliceConfig sliceConfig, FileInfoV2 fileInfoV2, ExtractKnowledgeTask extractKnowledgeTask) {
-        // 1/2: Parse the user-provided text and perform chunking
-        KnowledgeResponse response = processDocumentForChunking(url, sliceConfig, fileInfoV2, extractKnowledgeTask);
-        if (response == null) {
-            return; // Error already handled in helper method
+    public void knowledgeExtractAsync(String contentType, String url,
+            SliceConfig sliceConfig,
+            FileInfoV2 fileInfoV2,
+            ExtractKnowledgeTask extractKnowledgeTask) {
+
+        final String source = fileInfoV2.getSource();
+        KnowledgeResponse response;
+
+        // 1) Split: CBG=upload, others=URL split
+        if (ProjectContent.isCbgRagCompatible(source)) {
+            response = doCbgUploadSplit(sliceConfig, fileInfoV2, extractKnowledgeTask);
+            if (response == null)
+                return; // already updated status on failure
+        } else {
+            response = doUrlSplit(url, sliceConfig, fileInfoV2);
         }
 
-        // Validate chunking response
-        String errorMessage = validateChunkingResponse(response);
-        if (errorMessage != null) {
-            this.updateTaskAndFileStatus(fileInfoV2, extractKnowledgeTask, errorMessage, false);
+        // 2) Check response code & normalize message when needed
+        if (response.getCode() != 0) {
+            String errMsg = normalizeErrMsgIfParenthesized(response.getCode(), response.getMessage());
+            log.error("Document chunking failed : {}", errMsg);
+            updateTaskAndFileStatus(fileInfoV2, extractKnowledgeTask,
+                    "Document chunking failed, " + errMsg, false);
             return;
         }
 
-        // Parse chunk infos
-        List<ChunkInfo> chunkInfos = parseChunkInfos(response, fileInfoV2, extractKnowledgeTask);
-        if (chunkInfos == null) {
-            return; // Error already handled in helper method
-        }
+        // 3) Parse data -> List<ChunkInfo>
+        final List<ChunkInfo> chunkInfos = parseChunkInfosOrFail(response, fileInfoV2, extractKnowledgeTask);
+        if (chunkInfos == null)
+            return; // status updated inside on failure
 
-        // Validate chunks not empty
-        if (!validateChunksNotEmpty(chunkInfos, contentType, fileInfoV2, extractKnowledgeTask)) {
+        // 4) Empty result guard with image-specific hint
+        if (chunkInfos.isEmpty()) {
+            String reason = isImage(contentType)
+                    ? "Document cannot be chunked, please check if the image contains text"
+                    : "Document cannot be chunked, please check if the file meets upload requirements";
+            updateTaskAndFileStatus(fileInfoV2, extractKnowledgeTask, reason, false);
             return;
         }
 
-        // 3. Store data in database
-        this.storagePreviewKnowledge(fileInfoV2.getUuid(), fileInfoV2.getId(), chunkInfos);
+        // 5) Persist preview chunks
+        storagePreviewKnowledge(fileInfoV2.getUuid(), fileInfoV2.getId(), chunkInfos);
 
-        // Calculate character count
-        int charCount = calculateCharCount(chunkInfos);
+        // 6) Update char count
+        int charCount = countTotalChars(chunkInfos);
         if (charCount > 0) {
             fileInfoV2.setCharCount((long) charCount);
         }
 
-        // Update file UUID
-        updateFileUuidForChunking(fileInfoV2, chunkInfos);
+        // 7) Update lastUuid rule (CBG uses chunk's docId)
+        updateLastUuidBySource(fileInfoV2, chunkInfos);
 
-        this.updateTaskAndFileStatus(fileInfoV2, extractKnowledgeTask, null, true);
+        // 8) Final success status
+        updateTaskAndFileStatus(fileInfoV2, extractKnowledgeTask, null, true);
     }
 
-    /**
-     * Process document for chunking based on source type (CBG or other)
-     *
-     * @param url the URL of the document
-     * @param sliceConfig slice configuration
-     * @param fileInfoV2 file information
-     * @param extractKnowledgeTask extraction task
-     * @return KnowledgeResponse or null if error occurred
-     */
-    private KnowledgeResponse processDocumentForChunking(String url, SliceConfig sliceConfig,
-            FileInfoV2 fileInfoV2, ExtractKnowledgeTask extractKnowledgeTask) {
-        String source = fileInfoV2.getSource();
-
-        if (ProjectContent.isCbgRagCompatible(source)) {
-            return processCbgDocument(sliceConfig, fileInfoV2, extractKnowledgeTask);
-        } else {
-            return processNonCbgDocument(url, sliceConfig, fileInfoV2);
-        }
-    }
-
-    /**
-     * Process CBG compatible document
-     */
-    private KnowledgeResponse processCbgDocument(SliceConfig sliceConfig,
-            FileInfoV2 fileInfoV2, ExtractKnowledgeTask extractKnowledgeTask) {
-        try {
-            String s3Key = fileInfoV2.getAddress();
-            InputStream fileStream = s3Util.getObject(s3Key);
+    /** CBG: upload S3 stream and call documentUpload; on failure update status & return null. */
+    private KnowledgeResponse doCbgUploadSplit(SliceConfig sliceConfig,
+            FileInfoV2 fileInfoV2,
+            ExtractKnowledgeTask extractKnowledgeTask) {
+        try (InputStream fileStream = s3Util.getObject(fileInfoV2.getAddress())) {
             if (fileStream == null) {
-                this.updateTaskAndFileStatus(fileInfoV2, extractKnowledgeTask, "Failed to get file from S3", false);
+                updateTaskAndFileStatus(fileInfoV2, extractKnowledgeTask, "Failed to get file from S3", false);
                 return null;
             }
-
             byte[] fileBytes = inputStreamToByteArray(fileStream);
             MultipartFile multipartFile = new MockMultipartFile(
                     "file", fileInfoV2.getName(), "application/octet-stream", fileBytes);
 
-            try {
-                fileStream.close();
-            } catch (Exception e) {
-                log.warn("Failed to close file stream", e);
-            }
+            List<String> sliceConf = sliceConfig.getSeperator();
+            List<String> separator = (sliceConf != null && !sliceConf.isEmpty())
+                    ? Collections.singletonList(sliceConf.get(0))
+                    : Collections.singletonList("\n");
 
-            List<String> separator = getSeparator(sliceConfig);
             Integer resourceType = ProjectContent.HTML_FILE_TYPE.equals(fileInfoV2.getType()) ? 1 : 0;
 
             return knowledgeV2ServiceCallHandler.documentUpload(
                     multipartFile, sliceConfig.getLengthRange(), separator,
                     fileInfoV2.getSource(), resourceType);
+
         } catch (Exception e) {
             log.error("Failed to upload file for chunking: {}", e.getMessage(), e);
-            this.updateTaskAndFileStatus(fileInfoV2, extractKnowledgeTask,
+            updateTaskAndFileStatus(fileInfoV2, extractKnowledgeTask,
                     "Failed to upload file: " + e.getMessage(), false);
             return null;
         }
     }
 
-    /**
-     * Process non-CBG document
-     */
-    private KnowledgeResponse processNonCbgDocument(String url, SliceConfig sliceConfig, FileInfoV2 fileInfoV2) {
+    /** Non-CBG: split by URL. */
+    private KnowledgeResponse doUrlSplit(String url, SliceConfig sliceConfig, FileInfoV2 fileInfoV2) {
         SplitRequest request = new SplitRequest();
         request.setFile(url.replaceAll("\\+", "%20"));
         request.setLengthRange(sliceConfig.getLengthRange());
@@ -552,125 +550,57 @@ public class KnowledgeService {
         return knowledgeV2ServiceCallHandler.documentSplit(request);
     }
 
-    /**
-     * Get separator from slice config
-     */
-    private List<String> getSeparator(SliceConfig sliceConfig) {
-        List<String> sliceConf = sliceConfig.getSeperator();
-        return (sliceConf != null && !sliceConf.isEmpty())
-                ? Collections.singletonList(sliceConf.get(0))
-                : Collections.singletonList("\n");
-    }
-
-    /**
-     * Validate chunking response
-     *
-     * @param response the chunking response
-     * @return error message if validation failed, null if successful
-     */
-    private String validateChunkingResponse(KnowledgeResponse response) {
-        if (response.getCode() != 0) {
-            String errMsg = response.getMessage();
-            log.error("Document chunking failed : {}", errMsg);
-            if (response.getCode() == 11111) {
-                errMsg = extractErrorMessage(errMsg);
-            }
-            return "Document chunking failed, " + errMsg;
+    /** When code==11111 extract inner parentheses text, keep original message otherwise. */
+    private String normalizeErrMsgIfParenthesized(int code, String message) {
+        if (code != 11111 || message == null)
+            return message;
+        try {
+            Matcher m = Pattern.compile("[（(](.*?)[)）]").matcher(message);
+            return m.find() ? m.group(1) : message;
+        } catch (Exception ignore) {
+            return message;
         }
-        return null;
     }
 
-    /**
-     * Extract error message from response using regex
-     */
-    private String extractErrorMessage(String errMsg) {
-        String regex = "[（(](.*?)[)）]";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(errMsg);
-        if (matcher.find()) {
-            return matcher.group(1);
-        }
-        return errMsg;
-    }
-
-    /**
-     * Parse chunk infos from response
-     *
-     * @param response the chunking response
-     * @param fileInfoV2 file information
-     * @param extractKnowledgeTask extraction task
-     * @return list of ChunkInfo or null if parsing failed
-     */
-    private List<ChunkInfo> parseChunkInfos(KnowledgeResponse response,
-            FileInfoV2 fileInfoV2, ExtractKnowledgeTask extractKnowledgeTask) {
+    /** Parse chunk list with failure reporting. Returns null on failure (already updated status). */
+    private List<ChunkInfo> parseChunkInfosOrFail(KnowledgeResponse response,
+            FileInfoV2 fileInfoV2,
+            ExtractKnowledgeTask task) {
         try {
             return ((JSONArray) response.getData()).toJavaList(ChunkInfo.class);
         } catch (Exception e) {
             log.error("Failed to get document chunking result : {}", e.getMessage(), e);
-            this.updateTaskAndFileStatus(fileInfoV2, extractKnowledgeTask,
+            updateTaskAndFileStatus(fileInfoV2, task,
                     "Failed to get document chunking result:" + e.getMessage(), false);
             return null;
         }
     }
 
-    /**
-     * Validate chunks are not empty
-     *
-     * @param chunkInfos list of chunk infos
-     * @param contentType content type
-     * @param fileInfoV2 file information
-     * @param extractKnowledgeTask extraction task
-     * @return true if valid, false if empty
-     */
-    private boolean validateChunksNotEmpty(List<ChunkInfo> chunkInfos, String contentType,
-            FileInfoV2 fileInfoV2, ExtractKnowledgeTask extractKnowledgeTask) {
-        if (chunkInfos.isEmpty()) {
-            String errorMsg = isImageContentType(contentType)
-                    ? "Document cannot be chunked, please check if the image contains text"
-                    : "Document cannot be chunked, please check if the file meets upload requirements";
-            this.updateTaskAndFileStatus(fileInfoV2, extractKnowledgeTask, errorMsg, false);
-            return false;
-        }
-        return true;
+    /** Image file types used by original logic. */
+    private boolean isImage(String contentType) {
+        return ProjectContent.JPEG_FILE_TYPE.equals(contentType)
+                || ProjectContent.JPG_FILE_TYPE.equals(contentType)
+                || ProjectContent.PNG_FILE_TYPE.equals(contentType)
+                || ProjectContent.BMP_FILE_TYPE.equals(contentType);
     }
 
-    /**
-     * Check if content type is image
-     */
-    private boolean isImageContentType(String contentType) {
-        return contentType.equals(ProjectContent.JPEG_FILE_TYPE)
-                || contentType.equals(ProjectContent.JPG_FILE_TYPE)
-                || contentType.equals(ProjectContent.PNG_FILE_TYPE)
-                || contentType.equals(ProjectContent.BMP_FILE_TYPE);
-    }
-
-    /**
-     * Calculate character count from chunks
-     *
-     * @param chunkInfos list of chunk infos
-     * @return total character count
-     */
-    private int calculateCharCount(List<ChunkInfo> chunkInfos) {
-        int charCount = 0;
-        for (ChunkInfo chunkInfo : chunkInfos) {
-            String content = chunkInfo.getContent();
-            if (!StringUtils.isEmpty(content)) {
-                charCount += content.length();
+    /** Sum of text length in all chunks; null-safe as in original semantics. */
+    private int countTotalChars(List<ChunkInfo> chunkInfos) {
+        int total = 0;
+        for (ChunkInfo c : chunkInfos) {
+            String s = c.getContent();
+            if (!StringUtils.isEmpty(s)) {
+                total += s.length();
             }
         }
-        return charCount;
+        return total;
     }
 
-    /**
-     * Update file UUID for chunking based on CBG compatibility
-     *
-     * @param fileInfoV2 file information
-     * @param chunkInfos list of chunk infos
-     */
-    private void updateFileUuidForChunking(FileInfoV2 fileInfoV2, List<ChunkInfo> chunkInfos) {
+    /** Preserve original lastUuid rules: CBG uses chunk's docId; others keep file uuid. */
+    private void updateLastUuidBySource(FileInfoV2 fileInfoV2, List<ChunkInfo> chunkInfos) {
         if (ProjectContent.isCbgRagCompatible(fileInfoV2.getSource())) {
             if (fileInfoV2.getLastUuid() == null) {
-                fileInfoV2.setUuid(chunkInfos.get(0).getDocId());
+                fileInfoV2.setUuid(chunkInfos.get(0).getDocId()); // keep parity with original first-set logic
             }
             fileInfoV2.setLastUuid(chunkInfos.get(0).getDocId());
         } else {
@@ -679,72 +609,84 @@ public class KnowledgeService {
     }
 
     /**
-     * Asynchronously extract and embed knowledge from document content
+     * Asynchronously extract and embed knowledge from document content.
+     * <p>
+     * Behavior parity with the original:
+     * </p>
+     * <ul>
+     * <li>CBG source ⇒ upload file stream from S3; others ⇒ split by URL.</li>
+     * <li>On non-zero response code, when code==11111 extract the inner message.</li>
+     * <li>On empty chunks, set image/non-image specific friendly reason.</li>
+     * <li>Persist preview chunks, update charCount & lastUuid, then update statuses.</li>
+     * <li>On success, call {@code saveTaskAndUpdateFileStatus} and {@code embeddingFile}.</li>
+     * </ul>
      *
-     * @param contentType the MIME type of the document content
+     * @param contentType MIME type of the document content
      * @param url the URL of the document to be processed
      * @param sliceConfig configuration for document slicing/chunking
      * @param fileInfoV2 file information object containing metadata
      * @param extractKnowledgeTask task object to track extraction progress
      * @param fileInfoV2Service service for file information operations
-     * @throws BusinessException if document processing, embedding, or file operations fail
      */
     @Async
-    public void knowledgeEmbeddingExtractAsync(String contentType, String url, SliceConfig sliceConfig, FileInfoV2 fileInfoV2,
-            ExtractKnowledgeTask extractKnowledgeTask, FileInfoV2Service fileInfoV2Service) {
-        // 1/2: Parse the user-provided text and perform chunking
-        KnowledgeResponse response = processDocumentForChunking(url, sliceConfig, fileInfoV2, extractKnowledgeTask);
-        if (response == null) {
-            return; // Error already handled in helper method
+    public void knowledgeEmbeddingExtractAsync(String contentType, String url,
+            SliceConfig sliceConfig,
+            FileInfoV2 fileInfoV2,
+            ExtractKnowledgeTask extractKnowledgeTask,
+            FileInfoV2Service fileInfoV2Service) {
+        final String source = fileInfoV2.getSource();
+        KnowledgeResponse response;
+
+        // 1) Split: CBG=upload, others=URL split
+        if (ProjectContent.isCbgRagCompatible(source)) {
+            response = doCbgUploadSplit(sliceConfig, fileInfoV2, extractKnowledgeTask);
+            if (response == null) {
+                return; // already updated status on failure
+            }
+        } else {
+            response = doUrlSplit(url, sliceConfig, fileInfoV2);
         }
 
-        // Validate chunking response
-        String errorMessage = validateChunkingResponse(response);
-        if (errorMessage != null) {
-            this.updateTaskAndFileStatus(fileInfoV2, extractKnowledgeTask, errorMessage, false);
+        // 2) Check response code & normalize message for code==11111
+        if (response.getCode() != 0) {
+            String errMsg = normalizeErrMsgIfParenthesized(response.getCode(), response.getMessage());
+            log.error("Document chunking failed : {}", errMsg);
+            updateTaskAndFileStatus(fileInfoV2, extractKnowledgeTask,
+                    "Document chunking failed, " + errMsg, false);
             return;
         }
 
-        // Parse chunk infos
-        List<ChunkInfo> chunkInfos = parseChunkInfos(response, fileInfoV2, extractKnowledgeTask);
+        // 3) Parse data -> List<ChunkInfo>
+        final List<ChunkInfo> chunkInfos = parseChunkInfosOrFail(response, fileInfoV2, extractKnowledgeTask);
         if (chunkInfos == null) {
-            return; // Error already handled in helper method
+            return; // status updated inside on failure
         }
 
-        // Validate chunks not empty
-        if (!validateChunksNotEmpty(chunkInfos, contentType, fileInfoV2, extractKnowledgeTask)) {
+        // 4) Empty result guard with image-specific hint
+        if (chunkInfos.isEmpty()) {
+            String reason = isImage(contentType)
+                    ? "Document cannot be chunked, please check if the image contains text"
+                    : "Document cannot be chunked, please check if the file meets upload requirements";
+            updateTaskAndFileStatus(fileInfoV2, extractKnowledgeTask, reason, false);
             return;
         }
 
-        // 3. Store data in database
-        this.storagePreviewKnowledge(fileInfoV2.getUuid(), fileInfoV2.getId(), chunkInfos);
+        // 5) Persist preview chunks
+        storagePreviewKnowledge(fileInfoV2.getUuid(), fileInfoV2.getId(), chunkInfos);
 
-        // Calculate character count
-        int charCount = calculateCharCount(chunkInfos);
+        // 6) Update char count
+        int charCount = countTotalChars(chunkInfos);
         if (charCount > 0) {
             fileInfoV2.setCharCount((long) charCount);
         }
 
-        // Update file UUID (simplified for embedding)
-        updateFileUuidForEmbedding(fileInfoV2, chunkInfos);
+        // 7) Update lastUuid rule (CBG uses chunk's docId)
+        updateLastUuidBySource(fileInfoV2, chunkInfos);
 
-        this.updateTaskAndFileStatus(fileInfoV2, extractKnowledgeTask, null, true);
+        // 8) Final success status + embedding-trigger
+        updateTaskAndFileStatus(fileInfoV2, extractKnowledgeTask, null, true);
         fileInfoV2Service.saveTaskAndUpdateFileStatus(fileInfoV2.getId());
         fileInfoV2Service.embeddingFile(fileInfoV2.getId(), fileInfoV2.getSpaceId());
-    }
-
-    /**
-     * Update file UUID for embedding based on CBG compatibility
-     *
-     * @param fileInfoV2 file information
-     * @param chunkInfos list of chunk infos
-     */
-    private void updateFileUuidForEmbedding(FileInfoV2 fileInfoV2, List<ChunkInfo> chunkInfos) {
-        if (ProjectContent.isCbgRagCompatible(fileInfoV2.getSource())) {
-            fileInfoV2.setLastUuid(chunkInfos.get(0).getDocId());
-        } else {
-            fileInfoV2.setLastUuid(fileInfoV2.getUuid());
-        }
     }
 
     /**
