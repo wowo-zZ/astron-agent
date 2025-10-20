@@ -4,6 +4,7 @@ from typing import Any, List, Literal, Optional, Union
 
 from pydantic import BaseModel, Field, field_validator
 from pydantic_core.core_schema import ValidationInfo
+from sqlalchemy import text
 
 from workflow.consts.database import DBMode, ExecuteEnv
 from workflow.engine.entities.variable_pool import ParamKey, VariablePool
@@ -181,14 +182,14 @@ class PGSqlNode(BaseNode):
         :return: Formatted INSERT SQL statement
         """
         # Build column names and values for INSERT statement
-        columns = ", ".join(data.keys())
-        values = ", ".join(
-            [
-                f"'{value}'" if isinstance(value, str) else str(value)
-                for value in data.values()
-            ]
-        )
-        return f"INSERT INTO {self.tableName} ({columns}) VALUES ({values});"
+        columns = list(data.keys())
+        values = list(data.values())
+        cols_sql = ", ".join(columns)
+        placeholders = ", ".join([f":v{i}" for i in range(len(values))])
+        stmt = text(
+            f"""INSERT INTO {self.tableName} ({cols_sql}) VALUES ({placeholders});"""
+        ).bindparams(**{f"v{i}": v for i, v in enumerate(values)})
+        return str(stmt.compile(compile_kwargs={"literal_binds": True}))
 
     def generate_update_statement(self, data: dict, case: Case) -> str:
         """Generate UPDATE SQL statement with SET clause and WHERE conditions.
@@ -199,56 +200,50 @@ class PGSqlNode(BaseNode):
         :raises CustomException: If WHERE conditions are empty or invalid
         """
         # Build SET clause for UPDATE statement
-        set_clause = ", ".join(
-            [
-                f"{key} = '{value}'" if isinstance(value, str) else f"{key} = {value}"
-                for key, value in data.items()
-            ]
-        )
+        set_clause = ", ".join([f"{col} = :s_{col}" for col in data])
+        params = {f"s_{k}": v for k, v in data.items()}
+        w_idx = 0
         # Build WHERE clause conditions
         parts = []
         for condition in case.conditions:
-            # Process each condition in the WHERE clause
-            var_index = condition.varIndex
-            if condition.selectCondition in ["null", "not null"]:
-                # Handle NULL/NOT NULL conditions with zero value fallback
-                part = f"{condition.fieldName} IS {condition.selectCondition.upper()}"
-                field_type = condition.fieldType
-                if field_type:
-                    field_type = field_type.lower()
-                    zero_value = ZERO.get(field_type)
-                    if zero_value is not None:
-                        # Add zero value comparison for better null handling
-                        logic_op = (
-                            "OR" if condition.selectCondition == "null" else "AND"
-                        )
-                        comp_op = "=" if condition.selectCondition == "null" else "!="
-                        zero_str = {
-                            "string": f"'{zero_value}'",
-                            "integer": str(zero_value),
-                            "number": str(zero_value),
-                            "boolean": str(zero_value).upper(),
-                        }.get(field_type)
-                        if zero_str is not None:
-                            part = (
-                                "("
-                                + part
-                                + f" {logic_op} {condition.fieldName} {comp_op} {zero_str})"
-                            )
-            elif isinstance(var_index, str):
-                # Handle string comparisons with LIKE/NOT LIKE support
-                if condition.selectCondition in ["like", "not like"]:
-                    var_index = f"%{var_index}%"
-                part = f"{condition.fieldName} {condition.selectCondition.upper()} '{var_index}'"
+            fld = condition.fieldName
+            op = condition.selectCondition.upper()
+            val = condition.varIndex
+
+            if op in ("NULL", "NOT NULL"):
+                part = f"{fld} IS {op}"
+                field_type = (condition.fieldType or "").lower()
+                zero_value = ZERO.get(field_type)
+                if zero_value is not None:
+                    logic_op = "OR" if op == "NULL" else "AND"
+                    comp_op = "=" if op == "NULL" else "!="
+                    zero_str = {
+                        "string": str(zero_value),
+                        "integer": str(zero_value),
+                        "number": str(zero_value),
+                        "boolean": str(zero_value).upper(),
+                    }.get(field_type)
+                    if zero_str is not None:
+                        part = f"({part} {logic_op} {fld} {comp_op} :w_zero_{w_idx})"
+                        params[f"w_zero_{w_idx}"] = zero_value
+                        w_idx += 1
+
             else:
-                # Handle numeric and other comparisons
-                part = f"{condition.fieldName} {condition.selectCondition.upper()} {var_index}"
+                if op in ("LIKE", "NOT LIKE"):
+                    val = f"%{val}%"
+                placeholder = f":w_val_{w_idx}"
+                part = f"{fld} {op} {placeholder}"
+                params[f"w_val_{w_idx}"] = val
+                w_idx += 1
+
             parts.append(part)
 
         # Combine conditions with logical operator
         where_clause = f" {case.logicalOperator.upper()} ".join(parts)
         if where_clause:
-            return f"UPDATE {self.tableName} SET {set_clause} WHERE {where_clause};"
+            sql = f"UPDATE {self.tableName} SET {set_clause} WHERE {where_clause};"
+            stmt = text(sql).bindparams(**params)
+            return str(stmt.compile(compile_kwargs={"literal_binds": True}))
         else:
             raise CustomException(
                 err_code=CodeEnum.PG_SQL_NODE_EXECUTION_ERROR,
@@ -265,47 +260,40 @@ class PGSqlNode(BaseNode):
         """
         # Build WHERE clause conditions for DELETE statement
         parts = []
+        params = {}
+        idx = 0
+
         for condition in case.conditions:
-            # Process each condition in the WHERE clause
-            var_index = condition.varIndex
-            if condition.selectCondition in ["null", "not null"]:
-                # Handle NULL/NOT NULL conditions with zero value fallback
-                part = f"{condition.fieldName} IS {condition.selectCondition.upper()}"
-                field_type = condition.fieldType
-                if field_type:
-                    field_type = field_type.lower()
-                    zero_value = ZERO.get(field_type)
-                    if zero_value is not None:
-                        # Add zero value comparison for better null handling
-                        logic_op = (
-                            "OR" if condition.selectCondition == "null" else "AND"
-                        )
-                        comp_op = "=" if condition.selectCondition == "null" else "!="
-                        zero_str = {
-                            "string": f"'{zero_value}'",
-                            "integer": str(zero_value),
-                            "boolean": str(zero_value).upper(),
-                        }.get(field_type)
-                        if zero_str is not None:
-                            part = (
-                                "("
-                                + part
-                                + f" {logic_op} {condition.fieldName} {comp_op} {zero_str})"
-                            )
-            elif isinstance(var_index, str):
-                # Handle string comparisons with LIKE/NOT LIKE support
-                if condition.selectCondition in ["like", "not like"]:
-                    var_index = f"%{var_index}%"
-                part = f"{condition.fieldName} {condition.selectCondition.upper()} '{var_index}'"
+            fld = condition.fieldName
+            op = condition.selectCondition.upper()
+            val = condition.varIndex
+
+            if op in ("NULL", "NOT NULL"):
+                part = f"{fld} IS {op}"
+                field_type = (condition.fieldType or "").lower()
+                zero_value = ZERO.get(field_type)
+                if zero_value is not None:
+                    logic_op = "OR" if op == "NULL" else "AND"
+                    comp_op = "=" if op == "NULL" else "!="
+                    z_key = f"z_{idx}"
+                    part = f"({part} {logic_op} {fld} {comp_op} :{z_key})"
+                    params[z_key] = zero_value
+                    idx += 1
             else:
-                # Handle numeric and other comparisons
-                part = f"{condition.fieldName} {condition.selectCondition.upper()} {var_index}"
+                if isinstance(val, str) and op in ("LIKE", "NOT LIKE"):
+                    val = f"%{val}%"
+                v_key = f"v_{idx}"
+                part = f"{fld} {op} :{v_key}"
+                params[v_key] = val
+                idx += 1
+
             parts.append(part)
 
-        # Combine conditions with logical operator
         where_clause = f" {case.logicalOperator.upper()} ".join(parts)
         if where_clause:
-            return f"DELETE FROM {self.tableName} WHERE {where_clause};"
+            sql = f"DELETE FROM {self.tableName} WHERE {where_clause};"
+            stmt = text(sql).bindparams(**params)
+            return str(stmt.compile(compile_kwargs={"literal_binds": True}))
         else:
             raise CustomException(
                 err_code=CodeEnum.PG_SQL_NODE_EXECUTION_ERROR,
@@ -314,6 +302,11 @@ class PGSqlNode(BaseNode):
             )
 
     # ---------- Helper Methods for SQL Generation ----------
+    def _next_param(self, prefix: str = "p") -> str:
+        name = f"{prefix}_{self._param_seq}"
+        self._param_seq += 1
+        return name
+
     def _build_where(
         self,
         case: Optional[Case] = None,
@@ -353,31 +346,24 @@ class PGSqlNode(BaseNode):
                 # Add zero value comparison for better null handling
                 logic = "OR" if op == "NULL" else "AND"
                 comp = "=" if op == "NULL" else "!="
-                zero_str = self._zero_literal(ft)
-                return f"({base} {logic} {field} {comp} {zero_str})"
+                z_name = self._next_param("z")
+                zero_val = ZERO[ft]
+                self._params[z_name] = zero_val
+                return f"({base} {logic} {field} {comp} :{z_name})"
             return base
 
         # Handle string comparisons with LIKE/NOT LIKE support
         if isinstance(var, str):
             if op in ("LIKE", "NOT LIKE"):
                 var = f"%{var}%"
-            return f"{field} {op} '{var}'"
+            v_name = self._next_param("v")
+            self._params[v_name] = var
+            return f"{field} {op} :{v_name}"
 
         # Handle numeric and other comparisons
-        return f"{field} {op} {var}"
-
-    def _zero_literal(self, ft: str) -> str:
-        """Convert zero value to SQL literal based on field type.
-
-        :param ft: Field type (string, integer, number, boolean)
-        :return: SQL literal representation of zero value
-        """
-        z = ZERO[ft]
-        if ft == "string":
-            return f"'{z}'"
-        if ft == "boolean":
-            return str(z).upper()
-        return str(z)
+        v_name = self._next_param("v")
+        self._params[v_name] = var
+        return f"{field} {op} :{v_name}"
 
     def _build_order(self, order_by: List[OrderItem]) -> str:
         """Build ORDER BY clause from order configuration.
@@ -415,11 +401,18 @@ class PGSqlNode(BaseNode):
         :return: Formatted SELECT SQL statement
         """
         # Build all components of the SELECT statement
+        # 每次新生成语句时重置
+        self._param_seq: int = 0
+        self._params: dict = {}
+
         cols = self._build_columns(columns)
         where = self._build_where(case)
         order = self._build_order(order_by)
         lim = f" LIMIT {limit}" if isinstance(limit, int) else ""
-        return f"SELECT {cols} FROM {self.tableName}{where}{order}{lim};"
+
+        sql = f"SELECT {cols} FROM {self.tableName}{where}{order}{lim};"
+        stmt = text(sql).bindparams(**self._params)
+        return str(stmt.compile(compile_kwargs={"literal_binds": True}))
 
     async def generate_dml(self, inputs: dict, span: Span) -> str:
         """Generate DML statement based on operation mode and input data.

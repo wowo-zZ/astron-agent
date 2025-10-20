@@ -1,11 +1,13 @@
 import asyncio
+import base64
 import json
 import os
 from abc import abstractmethod
 from asyncio import Event
 from typing import Any, AsyncIterator, Dict, List, Literal, Optional, Tuple
 
-from pydantic import BaseModel, Field
+import requests  # type: ignore
+from pydantic import BaseModel, Field, PrivateAttr
 
 from workflow.consts.engine.chat_status import ChatStatus, SparkLLMStatus
 from workflow.consts.engine.model_provider import ModelProviderEnum
@@ -22,6 +24,7 @@ from workflow.engine.entities.msg_or_end_dep_info import MsgOrEndDepInfo
 from workflow.engine.entities.node_entities import NodeType
 from workflow.engine.entities.node_running_status import NodeRunningStatus
 from workflow.engine.entities.output_mode import EndNodeOutputModeEnum
+from workflow.engine.entities.private_config import PrivateConfig
 from workflow.engine.entities.retry_config import RetryConfig
 from workflow.engine.entities.variable_pool import ParamKey, VariablePool
 from workflow.engine.nodes.entities.node_run_result import (
@@ -52,7 +55,6 @@ from workflow.infra.providers.llm.iflytek_spark.schemas import (
     StreamOutputMsg,
 )
 from workflow.infra.providers.llm.types import SystemUserMsg
-from workflow.utils.file_util import url_to_base64
 
 
 class BaseNode(BaseModel):
@@ -78,6 +80,7 @@ class BaseNode(BaseModel):
     node_type: str = ""
     alias_name: str = ""
     node_id: str = ""
+    _private_config: PrivateConfig = PrivateAttr(default_factory=PrivateConfig)
     retry_config: RetryConfig = Field(default_factory=RetryConfig)
     stream_node_first_token: Event = Field(
         default_factory=Event
@@ -1180,13 +1183,16 @@ class BaseLLMNode(BaseNode):
                         if not image_url:
                             image_url = payload_comp_history[0].content
                         payload_comp_history.pop(0)
-        image_base64 = None
         # If it's an image understanding model, reserve the first position in array for image
         if image_url:
-            image_base64 = url_to_base64(image_url)
+            image_response = requests.get(image_url)
+            if image_response.status_code != 200:
+                raise Exception(f"Failed to download image from {image_url}")
             image_msg = {
                 "role": "user",
-                "content": image_base64,
+                "content": str(
+                    base64.b64encode(image_response.content).decode("utf-8")
+                ),
                 "content_type": "image",
             }
             span_context.add_info_events({"image": str(image_url)})

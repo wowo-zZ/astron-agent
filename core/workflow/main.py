@@ -183,9 +183,6 @@ if __name__ == "__main__":
     # Log the current platform for debugging purposes
     logger.debug(f"🔍 Current platform: {sys.platform}")
 
-    # Load environment configuration
-    set_env()
-
     # Start the Uvicorn ASGI server with platform-specific configuration
     uvicorn.run(
         app="main:create_app",  # Reference to the FastAPI app factory function
