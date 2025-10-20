@@ -107,6 +107,8 @@ def create_app() -> FastAPI:
         logger.info("Registered routes:")
         for route_info in route_infos:
             logger.info(json.dumps(route_info, ensure_ascii=False))
+        logger.info("🚀 FastAPI service started successfully!")
+        print("🚀 FastAPI service started successfully!")
 
     # Define final shutdown logic callback
     async def do_final_shutdown_logic() -> None:
@@ -152,14 +154,14 @@ def set_env() -> None:
     else:
         env_file = Path(__file__).parent.parent / "workflow/config.env"
 
-    logger.debug(f"config.env: {env_file}")
+    logger.debug(f"🔍 Loading config.env file: {env_file}")
 
     # Load environment variables from the configuration file
     if os.path.exists(env_file):
         load_dotenv(env_file, override=False)
-        logger.debug("Using config.env file.")
+        logger.debug("✅ Using config.env file.")
     else:
-        raise ValueError("No config.env file found.")
+        raise ValueError("❌ No config.env file found.")
 
 
 def _get_worker_count() -> int:
@@ -169,7 +171,7 @@ def _get_worker_count() -> int:
     worker_count: int = int(os.getenv("WORKERS", "0"))
     if worker_count == 0:
         worker_count = multiprocessing.cpu_count() + 1
-    logger.debug(f"worker_count: {worker_count}")
+    logger.debug(f"🔍 Worker count: {worker_count}")
     return worker_count
 
 
@@ -179,7 +181,7 @@ if __name__ == "__main__":
     # ASGI server with appropriate configuration for different platforms.
 
     # Log the current platform for debugging purposes
-    logger.debug(f"current platform {sys.platform}")
+    logger.debug(f"🔍 Current platform: {sys.platform}")
 
     # Load environment configuration
     set_env()

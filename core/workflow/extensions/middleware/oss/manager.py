@@ -10,6 +10,7 @@ from urllib.parse import urlencode
 
 import boto3  # type: ignore
 import requests  # type: ignore
+from botocore.exceptions import ClientError
 from loguru import logger
 
 from workflow.exception.e import CustomException
@@ -53,8 +54,27 @@ class S3Service(BaseOSSService, Service):
             aws_secret_access_key=access_key_secret,
             verify=False,
         )
+        self._ensure_bucket_exists(bucket_name)
         self.bucket_name = bucket_name
         self.oss_download_host = oss_download_host
+
+    def _ensure_bucket_exists(self, bucket_name: str) -> None:
+        """
+        Ensure the bucket exists. If not, create it.
+
+        :param bucket_name: The name of the bucket to ensure
+        :raise Exception: If the bucket creation fails
+        """
+        try:
+            self.client.head_bucket(Bucket=bucket_name)
+        except ClientError as e:
+            error_code = int(e.response["Error"]["Code"])
+            if error_code == 404:
+                logger.debug(f"⚠️ Bucket '{bucket_name}' not found. Creating...")
+                self.client.create_bucket(Bucket=bucket_name)
+                logger.debug(f"✅ Bucket '{bucket_name}' created successfully.")
+            else:
+                raise
 
     def upload_file(
         self, filename: str, file_bytes: bytes, bucket_name: Optional[str] = None

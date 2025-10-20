@@ -127,8 +127,8 @@ jobs:
             VERSION=${{ needs.detect-and-prepare.outputs.version }}
             GIT_COMMIT=${{ github.sha }}
             BUILD_TIME=${{ github.run_id }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=core-tenant
+          cache-to: type=gha,scope=core-tenant,mode=max
 
   build-core-database:
     name: 🧠 Build Core Database
@@ -174,8 +174,8 @@ jobs:
             VERSION=${{ needs.detect-and-prepare.outputs.version }}
             GIT_COMMIT=${{ github.sha }}
             BUILD_TIME=${{ github.run_id }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=core-database
+          cache-to: type=gha,scope=core-database,mode=max
 
   build-core-rpa:
     name: 🤖 Build Core RPA
@@ -221,8 +221,8 @@ jobs:
             VERSION=${{ needs.detect-and-prepare.outputs.version }}
             GIT_COMMIT=${{ github.sha }}
             BUILD_TIME=${{ github.run_id }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=core-rpa
+          cache-to: type=gha,scope=core-rpa,mode=max
 
   build-core-link:
     name: 🔗 Build Core Link
@@ -268,8 +268,8 @@ jobs:
             VERSION=${{ needs.detect-and-prepare.outputs.version }}
             GIT_COMMIT=${{ github.sha }}
             BUILD_TIME=${{ github.run_id }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=core-link
+          cache-to: type=gha,scope=core-link,mode=max
 
   build-core-aitools:
     name: 🛠️ Build Core AI Tools
@@ -315,8 +315,8 @@ jobs:
             VERSION=${{ needs.detect-and-prepare.outputs.version }}
             GIT_COMMIT=${{ github.sha }}
             BUILD_TIME=${{ github.run_id }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=core-aitools
+          cache-to: type=gha,scope=core-aitools,mode=max
 
   build-core-agent:
     name: 🤖 Build Core Agent
@@ -362,8 +362,8 @@ jobs:
             VERSION=${{ needs.detect-and-prepare.outputs.version }}
             GIT_COMMIT=${{ github.sha }}
             BUILD_TIME=${{ github.run_id }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=core-agent
+          cache-to: type=gha,scope=core-agent,mode=max
 
   build-core-knowledge:
     name: 📚 Build Core Knowledge
@@ -409,8 +409,8 @@ jobs:
             VERSION=${{ needs.detect-and-prepare.outputs.version }}
             GIT_COMMIT=${{ github.sha }}
             BUILD_TIME=${{ github.run_id }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=core-knowledge
+          cache-to: type=gha,scope=core-knowledge,mode=max
 
   build-core-workflow:
     name: ⚡ Build Core Workflow
@@ -456,8 +456,8 @@ jobs:
             VERSION=${{ needs.detect-and-prepare.outputs.version }}
             GIT_COMMIT=${{ github.sha }}
             BUILD_TIME=${{ github.run_id }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=core-workflow
+          cache-to: type=gha,scope=core-workflow,mode=max
 
   build-console-frontend:
     name: 🌐 Build Console Frontend

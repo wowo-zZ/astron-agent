@@ -323,9 +323,6 @@ function index() {
                 { label: t('agentPage.agentPage.allStatus'), value: 0 },
                 { label: t('agentPage.agentPage.published'), value: 1 },
                 { label: t('agentPage.agentPage.unpublished'), value: 2 },
-                // NOTE: 发布中并入已发布, 仅从状态说明中做区分 -- 09.01
-                // { label: t('agentPage.agentPage.publishing'), value: 1 },
-                { label: t('agentPage.agentPage.rejected'), value: 3 },
               ]}
             />
             <RetractableInput
@@ -417,46 +414,28 @@ function index() {
                       </div>
                       <Tooltip
                         title={
-                          k.botStatus === 2
-                            ? t('agentPage.agentPage.searchableInMarketplace')
-                            : k.botStatus === -9 || k.botStatus === 0
-                              ? t('agentPage.agentPage.personalUseOnly')
-                              : k.botStatus === 1 || k.botStatus === 4
-                                ? t('agentPage.agentPage.underReview')
-                                : t('agentPage.agentPage.needsModification') +
-                                  k.blockReason
+                          k.botStatus === -9 || k.botStatus === 0
+                            ? t('agentPage.agentPage.personalUseOnly')
+                            : t('agentPage.agentPage.searchableInMarketplace')
                         }
                       >
                         <div
                           className="px-1.5 py-0.5 rounded-md font-medium text-sm absolute right-[-1px] top-[-1px]"
-                          // NOTE: 本期定下：1 审核中，2 已发布，3 审核不通过，4修改审核中， -9 || 0 未发布
                           style={{
                             background:
-                              k.botStatus === 2 ||
-                              k.botStatus === 1 ||
-                              k.botStatus === 4
-                                ? '#CFF4E1'
-                                : k.botStatus === -9 || k.botStatus === 0
-                                  ? '#E6E6E8'
-                                  : '#FEEDEC',
+                              k.botStatus === -9 || k.botStatus === 0
+                                ? '#E6E6E8'
+                                : '#CFF4E1',
                             color:
-                              k.botStatus === 2 ||
-                              k.botStatus === 1 ||
-                              k.botStatus === 4
-                                ? '#477D62'
-                                : k.botStatus === -9 || k.botStatus === 0
-                                  ? '#666666'
-                                  : '#F74E43',
+                              k.botStatus === -9 || k.botStatus === 0
+                                ? '#666666'
+                                : '#477D62',
                             borderRadius: '0px 18px 0px 8px',
                           }}
                         >
-                          {k.botStatus === 2 ||
-                          k.botStatus === 1 ||
-                          k.botStatus === 4
-                            ? t('agentPage.agentPage.published')
-                            : k.botStatus === -9 || k.botStatus === 0
-                              ? t('agentPage.agentPage.unpublished')
-                              : t('agentPage.agentPage.rejected')}
+                          {k.botStatus === -9 || k.botStatus === 0
+                            ? t('agentPage.agentPage.unpublished')
+                            : t('agentPage.agentPage.published')}
                         </div>
                       </Tooltip>
                     </div>

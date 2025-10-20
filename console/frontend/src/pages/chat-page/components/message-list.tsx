@@ -28,6 +28,7 @@ import WorkflowNodeOptions from './workflow-node-options';
 import { formatFileSize, getFileIcon } from '@/utils';
 import FilePreview from './file-preview';
 import ResqBottomButtons from './resq-bottom-buttons';
+import { useTranslation } from 'react-i18next';
 //渲染全新开始
 const renderRestart = (): ReactElement => {
   return (
@@ -57,7 +58,7 @@ const MessageList = (props: {
     botNameColor,
     handleSendMessage,
   } = props;
-  const languageCode = getLanguageCode();
+  const { t } = useTranslation();
   const scrollAnchorRef = useRef<HTMLDivElement>(null);
   const answerPercent = useChatStore((state: any) => state.answerPercent); //回答进度条
   const isLoading = useChatStore(state => state.isLoading); //是否正在加载
@@ -237,7 +238,7 @@ const MessageList = (props: {
                   }}
                 />
                 <span className="text-sm text-gray-500">
-                  {languageCode === 'zh' ? '正在回答中...' : 'Processing...'}
+                  {t('chatPage.chatWindow.answeringInProgress')}
                 </span>
                 {!!answerPercent && (
                   <Progress
