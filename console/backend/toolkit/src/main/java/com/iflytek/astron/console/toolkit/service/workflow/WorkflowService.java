@@ -2542,7 +2542,7 @@ public class WorkflowService extends ServiceImpl<WorkflowMapper, Workflow> {
         return vo;
     }
 
-    private JSONObject getIoTrans(List<BizWorkflowNode> nodes) {
+    public JSONObject getIoTrans(List<BizWorkflowNode> nodes) {
         if (nodes.isEmpty()) {
             return null;
         }

@@ -397,7 +397,8 @@ public class MaasUtil {
      */
     private JSONObject createApiInternal(String flowId, String appid, String version, JSONObject data) {
         log.info("----- Publishing maas workflow flowId: {}", flowId);
-        MaasApi maasApi = new MaasApi(flowId, appid, version, data);
+        // Create MaasApi without data parameter for publish request
+        MaasApi maasApi = new MaasApi(flowId, appid, version);
 
         // Execute publish request
         String publishResponse = executeRequest(publishApi, maasApi);
@@ -623,11 +624,7 @@ public class MaasUtil {
      */
     public static boolean isFileArray(JSONObject param) {
         try {
-            if ("array-string".equalsIgnoreCase(param.getJSONObject("schema").getString("type"))) {
-                return true;
-            } else {
-                return false;
-            }
+            return "array-string".equalsIgnoreCase(param.getJSONObject("schema").getString("type"));
         } catch (Exception e) {
             log.error("Exception determining if parameter is array type: {}", e.getMessage());
             return false;

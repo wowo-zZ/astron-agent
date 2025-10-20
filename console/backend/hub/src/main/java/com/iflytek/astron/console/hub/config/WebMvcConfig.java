@@ -19,6 +19,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
             "/workflow/hasQaNode",
             "/workflow/version/update_channel_result",
             "/home-page/agent-square/**",
+            "/api/v1/agent/**",
             "/error"
     };
 

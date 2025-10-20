@@ -288,6 +288,7 @@ public class BotPublishServiceImpl implements BotPublishService {
             }
         } catch (Exception e) {
             log.error("Record conversation statistics exception: chatId={}", chatId, e);
+            // Do not throw exception to avoid affecting main business flow
         }
     }
 

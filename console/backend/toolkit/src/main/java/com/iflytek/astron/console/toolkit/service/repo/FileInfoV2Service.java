@@ -917,7 +917,19 @@ public class FileInfoV2Service extends ServiceImpl<FileInfoV2Mapper, FileInfoV2>
             knowledges = knowledgeMapper.findByFileIdInAndAuditType(fileUuIds, auditType);
         }
 
-        long count = knowledgeMapper.countByFileIdIn(fileUuIds);
+        // Fix totalCount calculation to match filtering logic
+        long count;
+        if (auditType != null && auditType == 1) {
+            // Count filtered by audit type
+            count = knowledgeMapper.countByFileIdInAndAuditType(fileUuIds, auditType);
+        } else if (!StringUtils.isEmpty(queryContent)) {
+            // Count filtered by content query
+            count = knowledgeMapper.countByFileIdInAndContentLike(fileUuIds, queryContent);
+        } else {
+            // Count all records for the file IDs
+            count = knowledgeMapper.countByFileIdIn(fileUuIds);
+        }
+
         long auditBlockCount = knowledgeMapper.findByFileIdInAndAuditType(fileUuIds, 1).size();
         Map<String, Object> extMap = new HashMap<>();
         extMap.put("auditBlockCount", auditBlockCount);
