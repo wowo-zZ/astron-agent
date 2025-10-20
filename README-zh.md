@@ -119,6 +119,6 @@ docker-compose up -d
 [![Follow](https://img.shields.io/github/followers/iflytek?style=social&label=关注)](https://github.com/iflytek)
 [![Star](https://img.shields.io/github/stars/iflytek/astron-agent?style=social&label=Star)](https://github.com/iflytek/astron-agent)
 [![Fork](https://img.shields.io/github/forks/iflytek/astron-agent?style=social&label=Fork)](https://github.com/iflytek/astron-agent/fork)
-[![Watch](https://img.shields.io/github/watchers/iflytek/astron-agent?style=social&label=关注)](https://github.com/iflytek/astron-agent/watchers)
+[![Watch](https://img.shields.io/github/watchers/iflytek/astron-agent?style=social&label=Watch)](https://github.com/iflytek/astron-agent/watchers)
 
 </div>
