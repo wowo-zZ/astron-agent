@@ -79,7 +79,7 @@ class Knowledge(BaseModel):
     name: str = Field(min_length=1, max_length=128)
     description: str = Field(min_length=0, max_length=1024)
     topK: int = Field(ge=1, le=5)
-    repoType: int = Field(..., ge=1, le=2)
+    repoType: int = Field(..., ge=1, le=3)
     match: Match
 
     @model_validator(mode="after")

@@ -1169,8 +1169,9 @@ class WorkflowEngine(BaseModel):
         error: CustomException | None = None
         try:
             strategy = self.strategy_manager.get_strategy(node.node_id.split("::")[0])
-            run_result = await strategy.execute_node(
-                node, self.engine_ctx, span_context
+            run_result = await asyncio.wait_for(
+                strategy.execute_node(node, self.engine_ctx, span_context),
+                timeout=node.node_instance._private_config.timeout,
             )
             return run_result, False
         except Exception as err:

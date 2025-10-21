@@ -116,7 +116,9 @@ const ChatPage = (): ReactElement => {
 
   //停止生成
   const stopAnswer = () => {
-    postStopChat(streamId);
+    postStopChat(streamId).catch(err => {
+      console.error(err);
+    });
   };
 
   //设置颜色

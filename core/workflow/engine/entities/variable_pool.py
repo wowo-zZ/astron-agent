@@ -1,3 +1,4 @@
+import ast
 import asyncio
 import copy
 import re
@@ -357,7 +358,7 @@ class VariablePool:
                             )
                         else:
                             try:
-                                input_content = eval(input_content)
+                                input_content = ast.literal_eval(input_content)
                             except Exception:
                                 raise Exception(
                                     f"Failed to convert literal value {input_key} to type {json_input_type}, literal value: {input_content_org}"

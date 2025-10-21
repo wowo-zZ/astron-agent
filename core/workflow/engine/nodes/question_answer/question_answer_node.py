@@ -5,12 +5,13 @@ import time
 from enum import Enum
 from typing import Any, Dict, List, Literal, Optional, cast
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, PrivateAttr
 from typing_extensions import Annotated
 
 from workflow.cache.event_registry import EventRegistry
 from workflow.consts.engine.chat_status import ChatStatus
 from workflow.engine.callbacks.callback_handler import ChatCallBacks
+from workflow.engine.entities.private_config import PrivateConfig
 from workflow.engine.entities.variable_pool import VariablePool
 from workflow.engine.entities.workflow_dsl import OutputItem
 from workflow.engine.nodes.base_node import BaseLLMNode
@@ -178,6 +179,9 @@ class QuestionAnswerNode(BaseLLMNode):
     supporting user interaction through interrupts and resume mechanisms.
     """
 
+    _private_config: PrivateConfig = PrivateAttr(
+        default_factory=lambda: PrivateConfig(timeout=None)
+    )
     question: str = Field(...)
     answerType: Literal["option", "direct"] = Field(...)
     timeout: int = Field(..., ge=1, le=5)

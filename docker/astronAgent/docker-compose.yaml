@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # ============================================================================
   # Infrastructure Services
@@ -210,10 +208,12 @@ services:
     image: ghcr.io/iflytek/astron-agent/core-rpa:latest
     container_name: astron-agent-core-rpa
     environment:
+      SERVICE_PORT: "${CORE_RPA_PORT:-17198}"
       OTLP_ENDPOINT: "${OTLP_ENDPOINT:-127.0.0.1:4317}"
+      OTLP_ENABLE: "${OTLP_ENABLE:-0}"
       KAFKA_SERVERS: "${KAFKA_SERVERS:-kafka:29092}"
-      XIAOWU_RPA_TASK_CREATE_URL: "${XIAOWU_RPA_TASK_CREATE_URL:-}"
-      XIAOWU_RPA_TASK_QUERY_URL: "${XIAOWU_RPA_TASK_QUERY_URL:-}"
+      XIAOWU_RPA_TASK_CREATE_URL: "${XIAOWU_RPA_TASK_CREATE_URL:-https://newapi.iflyrpa.com/api/rpa-openapi/workflows/execute-async}"
+      XIAOWU_RPA_TASK_QUERY_URL: "${XIAOWU_RPA_TASK_QUERY_URL:-https://newapi.iflyrpa.com/api/rpa-openapi/executions}"
     depends_on:
       postgres:
         condition: service_healthy
@@ -239,6 +239,7 @@ services:
     image: ghcr.io/iflytek/astron-agent/core-link:latest
     container_name: astron-agent-core-link
     environment:
+      SERVICE_PORT: "${CORE_LINK_PORT:-18888}"
       MYSQL_HOST: "${MYSQL_HOST:-mysql}"
       MYSQL_PORT: "${MYSQL_PORT:-3306}"
       MYSQL_USER: "${MYSQL_USER:-root}"
@@ -249,6 +250,7 @@ services:
       REDIS_CLUSTER_ADDR: "${REDIS_CLUSTER_ADDR}"
       REDIS_PASSWORD: "${REDIS_PASSWORD}"
       OTLP_ENDPOINT: "${OTLP_ENDPOINT:-127.0.0.1:4317}"
+      OTLP_ENABLE: "${OTLP_ENABLE:-0}"
       KAFKA_SERVERS: "${KAFKA_SERVERS:-kafka:29092}"
     depends_on:
       postgres:
@@ -276,10 +278,12 @@ services:
     container_name: astron-agent-core-aitools
     environment:
       SERVICE_PORT: "${CORE_AITOOLS_PORT:-18668}"
+      OSS_TYPE: "${OSS_TYPE:-s3}"
       OSS_ENDPOINT: "${OSS_ENDPOINT:-http://minio:9000}"
       OSS_ACCESS_KEY_ID: "${OSS_ACCESS_KEY_ID:-minioadmin}"
       OSS_ACCESS_KEY_SECRET: "${OSS_ACCESS_KEY_SECRET:-minioadmin123}"
       OSS_BUCKET_NAME: "${OSS_BUCKET_NAME}"
+      OSS_DOWNLOAD_HOST: "${OSS_DOWNLOAD_HOST:-http://minio:9000}"
       OSS_TTL: "${OSS_TTL:-157788000}"
       KAFKA_SERVERS: "${KAFKA_SERVERS:-kafka:29092}"
       AI_APP_ID: "${PLATFORM_APP_ID}"
@@ -300,7 +304,7 @@ services:
         condition: service_healthy
     volumes:
       - ./config/aitools/config.env:/opt/core/plugin/aitools/config.env
-      - ./config/aitools/logs/:/opt/core/plugin/aitools/logs/
+      - ./config/aitools/logs/:/opt/core/logs/
     networks:
       - astron-agent-network
     restart: always
@@ -383,6 +387,8 @@ services:
       RAGFLOW_TIMEOUT: "${RAGFLOW_TIMEOUT:-60}"
       RAGFLOW_DEFAULT_GROUP: "${RAGFLOW_DEFAULT_GROUP}"
       XINGHUO_DATASET_ID: "${XINGHUO_DATASET_ID:-}"
+      XINGHUO_APP_ID: "${PLATFORM_APP_ID}"
+      XINGHUO_APP_SECRET: "${PLATFORM_API_SECRET}"
     depends_on:
       postgres:
         condition: service_healthy
@@ -439,6 +445,14 @@ services:
       KAFKA_SERVERS: "${KAFKA_SERVERS:-kafka:29092}"
       KAFKA_TIMEOUT: "${KAFKA_TIMEOUT:-60}"
       KAFKA_TOPIC: "${WORKFLOW_KAFKA_TOPIC:-spark-agent-builder}"
+      KNOWLEDGE_BASE_URL: "${KNOWLEDGE_BASE_URL:-http://core-knowledge:${CORE_KNOWLEDGE_PORT}}"
+      KNOWLEDGE_PRO_BASE_URL: "${KNOWLEDGE_PRO_BASE_URL:-http://core-knowledge:${CORE_KNOWLEDGE_PORT}}"
+      PLUGIN_BASE_URL: "${PLUGIN_BASE_URL:-http://core-link:${CORE_LINK_PORT}}"
+      WORKFLOW_BASE_URL: "${WORKFLOW_BASE_URL:-http://core-workflow:${CORE_WORKFLOW_PORT}}"
+      APP_MANAGE_PLAT_BASE_URL: "${APP_MANAGE_PLAT_BASE_URL:-http://core-tenant:${CORE_TENANT_PORT}}"
+      AGENT_BASE_URL: "${AGENT_BASE_URL:-http://core-agent:${CORE_AGENT_PORT}}"
+      PGSQL_BASE_URL: "${PGSQL_BASE_URL:-http://core-database:${CORE_DATABASE_PORT}}"
+      RPA_BASE_URL: "${RPA_BASE_URL:-http://core-rpa:${CORE_RPA_PORT}}"
     depends_on:
       postgres:
         condition: service_healthy
@@ -531,8 +545,8 @@ services:
       SPARK_API_KEY: "${SPARK_API_KEY:-your-spark-api-key}"
       SPARK_API_SECRET: "${SPARK_API_SECRET:-your-spark-api-secret}"
       SPARK_API_PASSWORD: "${SPARK_API_PASSWORD:-your-spark-api-password}"
-      SPARK_LFASR_KEY: "${SPARK_LFASR_KEY:-your-spark-lfasr-key}"
-      SPARK_LFASR_APPID: "${SPARK_LFASR_APPID:-your-spark-lfasr-appid}"
+      SPARK_RTASR_KEY: "${SPARK_RTASR_KEY:-your-spark-rtasr-key}"
+      SPARK_RTASR_APPID: "${SPARK_RTASR_APPID:-your-spark-rtasr-appid}"
       SPARK_IMAGE_APP_ID: "${SPARK_IMAGE_APP_ID:-your-image-appid}"
       SPARK_IMAGE_API_KEY: "${SPARK_IMAGE_API_KEY:-your-image-api-key}"
       SPARK_IMAGE_API_SECRET: "${SPARK_IMAGE_API_SECRET:-your-image-api-secret}"
@@ -556,6 +570,7 @@ services:
       WORKFLOW_URL: "${WORKFLOW_URL:-}"
       SPARK_DB_URL: "${SPARK_DB_URL:-}"
       LOCAL_MODEL_URL: "${LOCAL_MODEL_URL:-}"
+      RPA_URL: "${RPA_URL:-}"
       MAAS_APP_ID: "${MAAS_APP_ID:-your-maas-app-id}"
       MAAS_API_KEY: "${MAAS_API_KEY:-your-maas-api-key}"
       MAAS_API_SECRET: "${MAAS_API_SECRET:-your-maas-api-secret}"
