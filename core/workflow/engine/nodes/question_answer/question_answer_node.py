@@ -5,6 +5,7 @@ import time
 from enum import Enum
 from typing import Any, Dict, List, Literal, Optional, cast
 
+from common.utils.json_schema.json_schema_validator import JsonSchemaValidator
 from pydantic import BaseModel, Field, PrivateAttr
 from typing_extensions import Annotated
 
@@ -25,7 +26,6 @@ from workflow.exception.e import CustomException
 from workflow.exception.errors.err_code import CodeEnum
 from workflow.extensions.otlp.log_trace.node_log import NodeLog
 from workflow.extensions.otlp.trace.span import Span
-from workflow.utils.json_schema.json_schema_validator import JsonSchemaValidator
 
 
 class EventType(str, Enum):

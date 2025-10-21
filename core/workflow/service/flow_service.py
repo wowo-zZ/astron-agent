@@ -9,6 +9,7 @@ import json
 import time
 from typing import Any, cast
 
+from common.utils.snowfake import get_id
 from sqlmodel import Session
 
 from workflow.cache import flow as flow_cache
@@ -38,7 +39,6 @@ from workflow.extensions.otlp.log_trace.workflow_log import WorkflowLog
 from workflow.extensions.otlp.trace.span import Span
 from workflow.repository import flow_dao, license_dao
 from workflow.service import audit_service, ops_service
-from workflow.utils.snowfake import get_id
 
 
 def save(flow: Flow, app_info: App, session: Session, span: Span) -> Flow:

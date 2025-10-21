@@ -12,13 +12,13 @@ from urllib.parse import urlencode
 import boto3  # type: ignore
 import requests  # type: ignore
 from botocore.exceptions import ClientError
+from common.utils.hmac_auth import HMACAuth
 from loguru import logger
 
 from workflow.exception.e import CustomException
 from workflow.exception.errors.err_code import CodeEnum
 from workflow.extensions.middleware.base import Service
 from workflow.extensions.middleware.oss.base import BaseOSSService
-from workflow.utils.hmac_auth import HMACAuth
 
 
 class S3Service(BaseOSSService, Service):

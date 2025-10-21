@@ -24,6 +24,7 @@ from workflow.cache.event_registry import Event, EventRegistry
 from workflow.consts.app_audit import AppAuditPolicy
 from workflow.consts.engine.chat_status import ChatStatus
 from workflow.consts.engine.model_provider import ModelProviderEnum
+from workflow.consts.engine.timeout import QueueTimeout
 from workflow.domain.entities.chat import ChatVo
 from workflow.domain.entities.response import Streaming
 from workflow.engine.callbacks.callback_handler import (
@@ -729,13 +730,16 @@ async def _get_response(
         )
     elif app_audit_policy == AppAuditPolicy.AGENT_PLATFORM and audit_strategy:
         frame_audit_result: FrameAuditResult = await asyncio.wait_for(
-            audit_strategy.context.output_queue.get(), timeout=120
+            audit_strategy.context.output_queue.get(),
+            timeout=QueueTimeout.AsyncQT.value,
         )
         if frame_audit_result.error:
             raise frame_audit_result.error
         response = cast(LLMGenerate, frame_audit_result.source_frame)
     else:
-        response = await asyncio.wait_for(response_queue.get(), timeout=120)
+        response = await asyncio.wait_for(
+            response_queue.get(), timeout=QueueTimeout.AsyncQT.value
+        )
     return response
 
 
@@ -745,7 +749,8 @@ async def _get_resume_response(
     response: LLMGenerate
     if audit_strategy:
         frame_audit_result: FrameAuditResult = await asyncio.wait_for(
-            audit_strategy.context.output_queue.get(), timeout=100
+            audit_strategy.context.output_queue.get(),
+            timeout=QueueTimeout.AsyncQT.value,
         )
         if frame_audit_result.error:
             raise frame_audit_result.error

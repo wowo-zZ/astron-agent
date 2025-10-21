@@ -3,6 +3,7 @@ import os
 from typing import Any
 
 import requests  # type: ignore
+from common.utils.hmac_auth import HMACAuth
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.types import ASGIApp
@@ -16,7 +17,6 @@ from workflow.extensions.fastapi.base import (
 )
 from workflow.extensions.middleware.getters import get_cache_service
 from workflow.extensions.otlp.trace.span import Span
-from workflow.utils.hmac_auth import HMACAuth
 
 
 class AuthMiddleware(BaseHTTPMiddleware):

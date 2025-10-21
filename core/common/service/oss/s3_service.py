@@ -13,6 +13,7 @@ from common.service.base import Service, ServiceType
 from common.service.oss.base_oss import BaseOSSService
 from common.utils.hmac_auth import HMACAuth
 
+
 class S3Service(BaseOSSService, Service):
     """
     S3-compatible object storage service implementation.
@@ -116,9 +117,7 @@ class S3Service(BaseOSSService, Service):
             )
             return f"{self.oss_download_host}/{bucket_name}/{filename}"
         except Exception as e:
-            raise OssServiceException(*c9010)(
-                str(e)
-            ) from e
+            raise OssServiceException(*c9010)(str(e)) from e
 
 
 class IFlyGatewayStorageClient(BaseOSSService, Service):
@@ -186,19 +185,13 @@ class IFlyGatewayStorageClient(BaseOSSService, Service):
             logger.error(e)
             return ""
         if resp.status_code != 200:
-            raise OssServiceException(*c9010)(
-                str(e)
-            ) from e
+            raise OssServiceException(*c9010)(str(e)) from e
 
         ret = resp.json()
         if ret["code"] != 0:
-            raise OssServiceException(*c9010)(
-                str(e)
-            ) from e
+            raise OssServiceException(*c9010)(str(e)) from e
         try:
             link = ret["data"]["link"]
         except Exception as e:
-            raise OssServiceException(*c9010)(
-                str(e)
-            ) from e
+            raise OssServiceException(*c9010)(str(e)) from e
         return link

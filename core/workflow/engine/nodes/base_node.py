@@ -12,6 +12,7 @@ from pydantic import BaseModel, Field, PrivateAttr
 from workflow.consts.engine.chat_status import ChatStatus, SparkLLMStatus
 from workflow.consts.engine.model_provider import ModelProviderEnum
 from workflow.consts.engine.template import TemplateSplitType, TemplateType
+from workflow.consts.engine.timeout import QueueTimeout
 from workflow.domain.entities.chat import HistoryItem
 from workflow.engine.callbacks.callback_handler import ChatCallBacks
 from workflow.engine.callbacks.openai_types_sse import GenerateUsage
@@ -877,7 +878,9 @@ class BaseOutputNode(BaseNode):
                 # Scenario: User limited output token count, reasoning ended early, avoid waiting for content
                 if llm_output_status[dep_node_id]:
                     break
-                msg: StreamOutputMsg = await asyncio.wait_for(queue.get(), timeout=120)
+                msg: StreamOutputMsg = await asyncio.wait_for(
+                    queue.get(), timeout=QueueTimeout.AsyncQT.value
+                )
                 llm_response = msg.llm_response
                 exception_occurred = msg.exception_occurred
                 span.add_info_events(
