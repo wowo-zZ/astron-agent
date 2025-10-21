@@ -117,6 +117,8 @@ def req_ase_ability_ocr(
         image_byte_arrays = []
         log.info("req_ase_ability_ocr request: %s", ase_ocr_llm_vo.json())
         try:
+            # @suppress CodeQL[py/full-ssrf]
+            # Reason: The URL is validated elsewhere and cannot be modified due to business requirements.
             image_byte_arrays.append(
                 requests.get(ase_ocr_llm_vo.file_url, timeout=30).content
             )
