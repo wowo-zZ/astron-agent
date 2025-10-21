@@ -402,7 +402,7 @@ services:
         condition: service_healthy
     volumes:
       - ./config/knowledge/config.env:/opt/core/knowledge/config.env
-      - ./config/knowledge/logs/:/opt/core/knowledge/logs
+      - ./config/knowledge/logs/:/opt/core/logs
     networks:
       - astron-agent-network
     restart: always
