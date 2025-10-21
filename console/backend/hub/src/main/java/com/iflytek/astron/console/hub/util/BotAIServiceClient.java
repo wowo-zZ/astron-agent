@@ -37,7 +37,7 @@ public class BotAIServiceClient {
     private static final List<Integer> ALLOWED_IMAGE_SIZES = Arrays.asList(512, 640, 768, 1024);
     private static final int DEFAULT_IMAGE_SIZE = 1024;
     private static final String IMAGE_GENERATION_DOMAIN = "safecfa46";
-    private static final String TEXT_HOST_URL = "https://spark-openapi.cn-huabei-1.xf-yun.com/v4.0/multimodal";
+    private static final String TEXT_HOST_URL = "https://spark-api.xf-yun.com/v4.0/chat";
     private static final String imageHost = "http://spark-openapi.cn-huabei-1.xf-yun.com/v2.1/tti";
     private final OkHttpClient httpClient = new OkHttpClient().newBuilder()
             .connectionPool(new ConnectionPool(100, 5, TimeUnit.MINUTES))
