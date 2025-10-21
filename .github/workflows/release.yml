@@ -368,6 +368,8 @@ jobs:
           name: "Astron Agent ${{ needs.prepare-release.outputs.version }}"
           body: ${{ needs.prepare-release.outputs.changelog }}
           prerelease: ${{ needs.prepare-release.outputs.is-prerelease }}
+          generate_release_notes: true
+          append_body: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 发布总结
