@@ -46,7 +46,7 @@ public class SecurityConfig {
                 // 2. Stateless session management (no cookies)
                 // 3. CSRF attacks only affect cookie-based authentication
                 // 4. Bearer tokens cannot be automatically sent by browsers
-                // .csrf(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(restfulAuthenticationEntryPoint)
                         .accessDeniedHandler(restfulAccessDeniedHandler))
