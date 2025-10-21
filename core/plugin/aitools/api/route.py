@@ -12,7 +12,8 @@ import logging
 import os
 import time
 import uuid
-from typing import Union
+from typing import Optional, Union
+from urllib.parse import urlparse
 
 import requests
 from fastapi import APIRouter, Request
@@ -117,11 +118,11 @@ def req_ase_ability_ocr(
         image_byte_arrays = []
         log.info("req_ase_ability_ocr request: %s", ase_ocr_llm_vo.json())
         try:
-            # @suppress CodeQL[py/full-ssrf]
-            # Reason: The URL is validated elsewhere and cannot be modified due to business requirements.
-            image_byte_arrays.append(
-                requests.get(ase_ocr_llm_vo.file_url, timeout=30).content
-            )
+            file_url = ase_ocr_llm_vo.file_url
+            if not is_valid_url(file_url):
+                raise Exception(f"invalid file url:{file_url}")
+
+            image_byte_arrays.append(requests.get(file_url, timeout=30).content)
             client = OcrLLMClientMultithreading(url=os.getenv("OCR_LLM_WS_URL"))
             asyncio.run(
                 client.invoke(
@@ -351,3 +352,40 @@ async def translation_api(
         source_language=params.source_language,
         request=request,
     )
+
+
+def is_valid_url(url: Optional[str]) -> bool:
+    """Validate whether the given string is a valid URL."""
+    try:
+        if not url or not isinstance(url, str):
+            return False
+
+        # Strip whitespace
+        url = url.strip()
+        if not url:
+            return False
+
+        result = urlparse(url)
+
+        # Must have scheme and netloc
+        if not result.scheme or not result.netloc:
+            return False
+
+        # Netloc should not be just whitespace, dots, or contain spaces
+        netloc = result.netloc.strip()
+        if (
+            not netloc
+            or netloc in [".", ".."]
+            or netloc.isspace()
+            or " " in result.netloc
+        ):
+            return False
+
+        # Scheme should be valid (no spaces, from known schemes)
+        valid_schemes = {"http", "https", "ftp", "ftps", "file", "ws", "wss"}
+        if " " in result.scheme or result.scheme.lower() not in valid_schemes:
+            return False
+
+        return True
+    except (ValueError, AttributeError, TypeError):
+        return False

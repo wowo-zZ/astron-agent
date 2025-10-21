@@ -34,12 +34,6 @@ To start Casdoor service, run our [docker-compose.yaml](/docker/casdoor/docker-c
 # Navigate to Casdoor directory
 cd docker/casdoor
 
-# Create logs directory for mounting
-mkdir -p logs
-
-# Set permissions for logs directory
-chmod -R 777 logs
-
 # Start Casdoor service
 docker-compose up -d
 
@@ -55,9 +49,10 @@ docker-compose logs -f
 - Container name: casdoor
 - Default configuration: Production mode (GIN_MODE=release)
 
-**Configuration Directories:**
-- Configuration files: `./conf` directory
-- Log files: `./logs` directory
+**Data Storage:**
+- Configuration files: `./conf` directory (local mount)
+- Log files: Docker named volume `casdoor-logs` (automatic permission management, cross-platform compatible)
+- Database data: Docker named volume `casdoor-mysql-data` (persistent storage)
 
 ### Step 2: Start RagFlow Knowledge Base Service (Deploy as Needed)
 
@@ -158,8 +153,7 @@ CONSOLE_CASDOOR_ORG=your-casdoor-org-name
 
    Fill in the following information when creating the application:
    - **Name**: Custom application name, e.g., `agent`
-   - **Redirect URL**: Set to the project's callback address, e.g., `http://your-local-ip:80/callback`
-     (This address is the callback port for the Nginx container in the project, default `80`)
+   - **Redirect URL**: Set to the project's callback address. If the Nginx exposed port is `80`, use `http://your-local-ip/callback`; if it's a different port (e.g., `888`), use `http://your-local-ip:888/callback`
    - **Organization**: Select the organization name just created
 5. After saving the application, record the following information and map it to the project configuration items:
 

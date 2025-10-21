@@ -34,12 +34,6 @@ Casdoor 是一个开源的身份和访问管理平台，提供OAuth 2.0、OIDC�
 # 进入 Casdoor 目录
 cd docker/casdoor
 
-# 创建日志挂载目录
-mkdir -p logs
-
-# 设置日志目录权限
-chmod -R 777 logs
-
 # 启动 Casdoor 服务
 docker-compose up -d
 
@@ -55,9 +49,10 @@ docker-compose logs -f
 - 容器名称：casdoor
 - 默认配置：生产模式 (GIN_MODE=release)
 
-**配置目录：**
-- 配置文件：`./conf` 目录
-- 日志文件：`./logs` 目录
+**数据存储说明：**
+- 配置文件：`./conf` 目录（本地挂载）
+- 日志文件：Docker命名卷 `casdoor-logs`（自动管理权限，跨平台兼容）
+- 数据库数据：Docker命名卷 `casdoor-mysql-data`（持久化存储）
 
 ### 第二步：启动 RagFlow 知识库服务（根据需要部署）
 
@@ -158,8 +153,7 @@ CONSOLE_CASDOOR_ORG=your-casdoor-org-name
 
    创建应用时填写以下信息：
    - **Name**：自定义应用名称，例如 `agent`
-   - **Redirect URL**：设置为项目的回调地址，例如 `http://your-local-ip:80/callback`  
-     （该地址为项目中 Nginx 容器的回调端口，默认 `80`）
+   - **Redirect URL**：设置为项目的回调地址。如果 Nginx 暴露的端口号是 `80`，使用 `http://your-local-ip/callback`；如果是其他端口（例如 `888`），使用 `http://your-local-ip:888/callback`
    - **Organization**：选择刚创建的组织名称
 5. 保存应用后，记录以下信息并与项目配置项一一对应：  
 
@@ -189,8 +183,8 @@ vim .env
 创建应用完成后可能需要购买或领取相应能力的API授权服务量
 - 星火大模型API: https://xinghuo.xfyun.cn/sparkapi
   (对于大模型API会有额外的SPARK_API_PASSWORD需要在页面上获取)
-  (指令型助手对应的文本AI生成/优化功能需要开通Spark Ultra能力，页面地址为https://console.xfyun.cn/services/bm4)
-- 实时语音转写API: https://www.xfyun.cn/services/rtasr
+-   (指令型助手对应的文本AI生成/优化功能需要开通Spark Ultra能力，页面地址为https://console.xfyun.cn/services/bm4)
+- 实时语音转写API: https://console.xfyun.cn/services/rta
 - 图片生成API: https://www.xfyun.cn/services/wtop
 
 最后编辑 docker/astronAgent/.env 文件，更新相关环境变量：

@@ -5,6 +5,7 @@ This module provides concrete implementations of OSS services,
 including S3-compatible storage and iFly Gateway Storage clients.
 """
 
+import json
 from typing import Optional
 from urllib.parse import urlencode
 
@@ -70,9 +71,32 @@ class S3Service(BaseOSSService, Service):
         except ClientError as e:
             error_code = int(e.response["Error"]["Code"])
             if error_code == 404:
+
                 logger.debug(f"⚠️ Bucket '{bucket_name}' not found. Creating...")
                 self.client.create_bucket(Bucket=bucket_name)
                 logger.debug(f"✅ Bucket '{bucket_name}' created successfully.")
+
+                # Set the bucket policy to allow public reads
+                bucket_policy = {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Sid": "PublicReadGetObject",
+                            "Effect": "Allow",
+                            "Principal": "*",
+                            "Action": "s3:GetObject",
+                            "Resource": f"arn:aws:s3:::{bucket_name}/*",
+                        }
+                    ],
+                }
+                # Apply the bucket strategy
+                self.client.put_bucket_policy(
+                    Bucket=bucket_name, Policy=json.dumps(bucket_policy)
+                )
+                logger.debug(
+                    f"✅ Public read policy applied to bucket '{bucket_name}'."
+                )
+
             else:
                 raise
 
