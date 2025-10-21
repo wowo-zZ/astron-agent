@@ -44,15 +44,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
-  flex-shrink: 0;
   margin-right: 12px;
-}
+  flex-shrink: 0;
+  border-radius: 16px;
+  border: 1px solid #E7E7F0;
+  overflow: hidden;
 
-.toolIcon {
-  width: 64px;
-  height: 64px;
-  border-radius: 4px;
+  .toolIcon {
+    width: 64px;
+    height: 64px;
+  }
 }
 
 .titleArea {

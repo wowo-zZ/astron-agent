@@ -14,19 +14,27 @@
 }
 
 .cardItem {
-  /* 自动布局 */
+  min-height: 180px;
+  padding: 20px;
+  position: relative;
   display: flex;
   flex-direction: column;
-  padding: 20px;
   gap: 12px;
-  align-self: stretch;
-  z-index: 0;
-
   border-radius: 20px;
-  background: #FFFFFF;
+  border: 1px solid transparent;
   /* 阴影/一级 */
   box-shadow: 0px 1px 10px 0px rgba(122, 120, 150, 0.1);
+  font-family: 'PingFang-Sim';
+  background: #ffffff;
+  border-radius: 20px;
   cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: #6356EA;
+    /* 阴影/二级 */
+    box-shadow: 0px 4px 16px 0px rgba(134, 130, 191, 0.3);
+  }
 
   .header {
     display: flex;

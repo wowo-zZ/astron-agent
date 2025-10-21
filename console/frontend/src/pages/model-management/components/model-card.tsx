@@ -199,7 +199,7 @@ function ModelCardHeader({
         )}
         <div>
           <span className={styles.modelCardTitle}>{model.name}</span>
-          {model.llmSource === LLMSource.CUSTOM &&
+          {/* {model.llmSource === LLMSource.CUSTOM &&
             ((): JSX.Element | null => {
               const statusInfo = getPublishStatusInfo(model.status);
               return statusInfo.text ? (
@@ -209,27 +209,7 @@ function ModelCardHeader({
                   {statusInfo.text}
                 </span>
               ) : null;
-            })()}
-          {/* <span
-            style={{
-              borderRadius: '12.5px',
-              padding: '2px 8px',
-              color: '#fff',
-              marginLeft: '20px',
-              background:
-                model.shelfStatus === ShelfStatus.WAIT_OFF_SHELF
-                  ? '#F74E43'
-                  : model.shelfStatus === ShelfStatus.OFF_SHELF
-                    ? '#7F7F7F'
-                    : '',
-            }}
-          >
-            {model.shelfStatus === ShelfStatus.WAIT_OFF_SHELF
-              ? t('model.toBeOffShelf')
-              : model.shelfStatus === ShelfStatus.OFF_SHELF
-                ? t('model.offShelf')
-                : ''}
-          </span> */}
+            })()} */}
           <StatusTag status={model.shelfStatus} />
           <p className="text-sm text-gray-500 flex flex-wrap gap-x-2 gap-2 mt-2">
             {modelCategoryTags

@@ -81,12 +81,14 @@ html,
   }
 }
 
-
+:root {
+  --scrollbar-width: 6px;
+}
 .scroll-bar-UI {
   /* 滚动条样式 */
   &::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: var(--scrollbar-width);
+    height: var(--scrollbar-width);
   }
 
   &::-webkit-scrollbar-track {
@@ -141,11 +143,11 @@ html,
   border-radius: 10px !important;
   background: #FFFFFF !important;
   box-sizing: border-box !important;
-  border: 1px solid #E7E7F0 !important;
+  // border: 1px solid #E7E7F0 !important;
 
-  &:focus {
-    border: 1px solid #6356EA !important;
-  }
+  // &:focus {
+  //   border: 1px solid #6356EA !important;
+  // }
 }
 
 .ant-select-UI {

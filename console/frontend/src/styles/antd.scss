@@ -1,4 +1,4 @@
-$primaryColor: #275eff;
+$primaryColor: var(--primary-color);
 
 .ant-btn {
   color: rgba(0, 0, 0, 0.8);
@@ -1719,5 +1719,11 @@ input[type="number"]::-webkit-outer-spin-button {
         background-color: #f2f5fe;
       }
     }
+  }
+}
+
+.ant-spin {
+  .ant-spin-dot-holder {
+    color: var(--primary-color);
   }
 }

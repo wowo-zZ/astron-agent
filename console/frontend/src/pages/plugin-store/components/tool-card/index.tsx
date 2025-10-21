@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './index.module.scss';
 
@@ -32,15 +32,24 @@ const ToolCard: React.FC<ToolCardProps> = ({
   onFavoriteClick,
 }) => {
   const { t } = useTranslation();
+  const [isHovering, setIsHovering] = useState<boolean>(false);
 
   const handleCardClick = () => {
     onCardClick?.(tool);
   };
 
-  const handleFavoriteClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onFavoriteClick?.(tool);
-  };
+  // const handleFavoriteClick = (e: React.MouseEvent) => {
+  //   e.stopPropagation();
+  //   onFavoriteClick?.(tool);
+  // };
+
+  // const handleMouseEnter = () => {
+  //   setIsHovering(true);
+  // };
+
+  // const handleMouseLeave = () => {
+  //   setIsHovering(false);
+  // };
 
   return (
     <div className={styles.toolCard} onClick={handleCardClick}>
@@ -62,9 +71,11 @@ const ToolCard: React.FC<ToolCardProps> = ({
               <div className={styles.toolTitle} title={tool.name}>
                 {tool.name}
               </div>
-              {/* <div 
+              {/* <div
                 className={styles.favoriteButton}
                 onClick={handleFavoriteClick}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
               >
                 <img
                   src={tool?.isFavorite ? checkCollect : collect}

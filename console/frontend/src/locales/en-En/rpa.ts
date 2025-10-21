@@ -1,5 +1,7 @@
 const translation = {
   createRpa: 'Create RPA',
+  emptyDescription: 'No RPA, create one now~',
+  noSearchResults: 'No related RPA found',
   back: 'Back',
   deleteRpa: 'Delete RPA',
   deleteRpaConfirm: 'Confirm delete?',

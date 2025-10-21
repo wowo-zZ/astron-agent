@@ -2,7 +2,6 @@ import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Dropdown, message, Modal } from 'antd';
-import { EllipsisOutlined } from '@ant-design/icons';
 import { EllipsisIcon } from '@/components/svg-icons/model';
 
 import { RpaInfo, RpaDetailFormInfo } from '@/types/rpa';

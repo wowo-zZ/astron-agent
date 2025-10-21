@@ -4,7 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { CloseOutlined } from '@ant-design/icons';
 import RetractableInput from '@/components/ui/global/retract-table-input';
 import { Select } from 'antd';
+import { SpaceButton } from '@/components/button-group';
 import { ModelInfo } from '@/types/model';
+import ArrowDownIconWhite from '@/assets/svgs/arrow-down-white.svg';
+import { useModelContext } from '../context/model-context';
 
 interface ModelManagementHeaderProps {
   activeTab: string;
@@ -31,6 +34,7 @@ const ModelManagementHeader: React.FC<ModelManagementHeaderProps> = ({
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(initialActiveTab);
   const { pathname } = useLocation();
+  const { state, actions } = useModelContext();
 
   useEffect(() => {
     setActiveTab(initialActiveTab);
@@ -65,12 +69,17 @@ const ModelManagementHeader: React.FC<ModelManagementHeaderProps> = ({
     }
   };
 
+  const handleCreateClick = (): void => {
+    actions.setCurrentEditModel(undefined);
+    actions.setCreateModal(true);
+  };
+
   return (
     <div>
       <div className="w-full relative z-10 flex flex-col justify-between rounded-2xl">
-        <div className="flex items-center gap-3 w-full">
+        <div className="flex items-center gap-3 w-full pt-5">
           {/* 标题 */}
-          <h1 className="font-medium text-[20px] text-[#222529] leading-none font-[PingFang-Sim]">
+          <h1 className="font-medium text-[20px] text-[#222529] leading-[26px] font-[PingFang-Sim]">
             {t('model.modelManagement')}
           </h1>
 
@@ -148,6 +157,24 @@ const ModelManagementHeader: React.FC<ModelManagementHeaderProps> = ({
               restrictFirstChar={true}
               onChange={getRobotsDebounce}
             />
+            {activeTab === 'personalModel' && (
+              <SpaceButton
+                config={{
+                  key: 'create-model',
+                  text: t('model.createModel'),
+                  type: 'primary',
+                  size: 'small',
+                  icon: (
+                    <img
+                      src={ArrowDownIconWhite}
+                      alt="arrow-down"
+                      style={{ width: 14, height: 14 }}
+                    />
+                  ),
+                  onClick: () => handleCreateClick?.(),
+                }}
+              />
+            )}
           </div>
         </div>
       </div>

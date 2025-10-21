@@ -6,7 +6,7 @@ import { ModelProvider, useModelContext } from '../context/model-context';
 import { useModelInitializer } from '../hooks/use-model-initializer';
 import { useModelOperations } from '../hooks/use-model-operations';
 import { useModelFilters } from '../hooks/use-model-filters';
-import { useScrollbar } from '@/hooks/use-scrollbar';
+import SiderContainer from '@/components/sider-container';
 
 // 个人模型页面内容组件
 const PersonalModelContent: React.FC = () => {
@@ -16,11 +16,11 @@ const PersonalModelContent: React.FC = () => {
   useModelInitializer(2); // 2表示个人模型
   const operations = useModelOperations(2);
   const filters = useModelFilters();
-  const hasScrollbar = useScrollbar(mainRef, [filters.filteredModels]);
+
   return (
-    <div className="w-full h-screen flex flex-col page-container-inner-UI">
-      <div className="pr-19">
-        <div className="flex-none mb-5">
+    <div className="w-full h-screen flex flex-col">
+      <SiderContainer
+        topBar={
           <ModelManagementHeader
             activeTab="personalModel"
             shelfOffModel={state.shelfOffModels}
@@ -31,32 +31,23 @@ const PersonalModelContent: React.FC = () => {
             setFilterType={filters.handleFilterTypeChange}
             setShowShelfOnly={operations.handleCloseQuickFilter}
           />
-        </div>
-      </div>
-
-      <div
-        className="flex-1 overflow-hidden"
-        style={hasScrollbar ? { marginRight: '-16px' } : {}}
-      >
-        <div className="mx-auto h-full w-full flex flex-col lg:flex-row gap-6 lg:gap-8 ">
-          {/* 右侧卡片 */}
-          <main
-            ref={mainRef}
-            className="w-full col-span-4 rounded-lg overflow-y-auto scroll-bar-UI"
-            style={hasScrollbar ? { paddingRight: '10px' } : {}}
-          >
-            <ModelCardList
-              models={filters.filteredModels}
-              showCreate
-              keyword={state.searchInput}
-              filterType={state.filterType}
-              setModels={operations.setModels}
-              refreshModels={operations.refreshModels}
-              showShelfOnly={state.showShelfOnly}
-            />
-          </main>
-        </div>
-      </div>
+        }
+        rightContent={
+          <div className="mx-auto h-full w-full flex flex-col lg:flex-row gap-6 lg:gap-8 ">
+            <main ref={mainRef} className="w-full col-span-4">
+              <ModelCardList
+                models={filters.filteredModels}
+                showCreate
+                keyword={state.searchInput}
+                filterType={state.filterType}
+                setModels={operations.setModels}
+                refreshModels={operations.refreshModels}
+                showShelfOnly={state.showShelfOnly}
+              />
+            </main>
+          </div>
+        }
+      />
 
       {/* 模态框 */}
       <ModelModalComponents modelType={2} />

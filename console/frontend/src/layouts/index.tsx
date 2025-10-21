@@ -59,6 +59,14 @@ const BasicLayout: FC<BasicLayoutProps> = ({ showHeader }) => {
           window.dispatchEvent(createDbEvent);
           break;
         }
+        case 'rpa': {
+          // 数据库新建通过模态框处理，触发自定义事件
+          const createRPAEvent = new CustomEvent('headerCreateRPA', {
+            detail: { type },
+          });
+          window.dispatchEvent(createRPAEvent);
+          break;
+        }
         default:
           break;
       }

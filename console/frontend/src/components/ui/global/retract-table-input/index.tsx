@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { Input } from 'antd';
 
 import search from '@/assets/imgs/file/icon-zhishi-search.png';
+import styles from './index.module.scss';
+import RetractableInput from '@/components/ui/global/retract-table-input';
 
 type SearchInputProps = {
   onChange?: (_e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -42,7 +44,7 @@ const RetracTableInput: React.FC<SearchInputProps> = ({
   };
 
   return (
-    <div className="relative">
+    <div className={styles.retractableInput}>
       <img
         src={search}
         className="w-4 h-4 absolute left-[8px] top-[8px] z-10 cursor-pointer"

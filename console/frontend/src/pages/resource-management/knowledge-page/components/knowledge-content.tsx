@@ -28,9 +28,9 @@ export const KnowledgeContent: FC<{
 }) => {
   const { t } = useTranslation();
   return (
-    <div className="h-full overflow-hidden page-container-inner-UI">
+    <div className="h-full overflow-hidden">
       <div
-        className="w-full flex-1 overflow-scroll scroll-bar-UI"
+        className="h-full w-full flex-1"
         ref={knowledgeRef as React.RefObject<HTMLDivElement>}
       >
         {knowledges?.length === 0 ? (
@@ -42,7 +42,7 @@ export const KnowledgeContent: FC<{
             }}
           />
         ) : (
-          <div className="grid lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-3 gap-6">
+          <div className="grid lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-3 gap-6">
             {knowledges.map(k => (
               <CardItem
                 key={k.id}

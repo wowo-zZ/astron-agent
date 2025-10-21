@@ -1,5 +1,7 @@
 const translation = {
   createRpa: '新建RPA',
+  emptyDescription: '暂无RPA，快去创建吧~',
+  noSearchResults: '未找到相关RPA',
   back: '返回',
   deleteRpa: '删除RPA',
   deleteRpaConfirm: '确定删除吗？',

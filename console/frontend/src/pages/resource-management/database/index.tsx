@@ -9,6 +9,7 @@ import DatabaseGrid from './components/database-grid';
 import { jumpToLogin } from '@/utils/http';
 import { DatabaseItem, CreateDbParams } from '@/types/database';
 import { useDatabaseList } from './hooks/use-database-list';
+import SiderContainer from '@/components/sider-container';
 
 // 数据库管理页面
 const DataBase = (): JSX.Element => {
@@ -123,14 +124,19 @@ const DataBase = (): JSX.Element => {
 
   return (
     <>
-      <DatabaseGrid
-        dataSource={dataSource}
-        hasMore={hasMore}
-        loader={loader}
-        onDatabaseClick={handleDatabaseClick}
-        onDeleteClick={handleDeleteClick}
-        onCreateDatabaseClick={handleCreateDatabaseClick}
+      <SiderContainer
+        rightContent={
+          <DatabaseGrid
+            dataSource={dataSource}
+            hasMore={hasMore}
+            loader={loader}
+            onDatabaseClick={handleDatabaseClick}
+            onDeleteClick={handleDeleteClick}
+            onCreateDatabaseClick={handleCreateDatabaseClick}
+          />
+        }
       />
+
       {createDatabaseOpen && (
         <CreateDatabase
           open={createDatabaseOpen}
