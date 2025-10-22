@@ -19,6 +19,7 @@ try:
 except ImportError:
     from sqlalchemy.orm import Session  # type: ignore[assignment]
 
+from common.utils.snowfake import get_id
 from starlette.responses import JSONResponse, StreamingResponse
 
 from workflow.cache.event_registry import Event, EventRegistry
@@ -33,7 +34,6 @@ from workflow.extensions.middleware.getters import get_session
 from workflow.extensions.otlp.metric.meter import Meter
 from workflow.extensions.otlp.trace.span import Span
 from workflow.service import app_service, audit_service, chat_service, flow_service
-from workflow.utils.snowfake import get_id
 
 router = APIRouter(tags=["SSE_OPENAPI"])
 

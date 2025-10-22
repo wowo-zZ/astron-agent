@@ -8,11 +8,11 @@ including workflow data, metadata, and versioning information.
 from datetime import datetime
 from typing import Dict
 
+from common.utils.snowfake import get_id
 from sqlalchemy import JSON, Column
 from sqlmodel import Field  # type: ignore
 
 from workflow.domain.models.base import SQLModelSerializable
-from workflow.utils.snowfake import get_id
 
 
 class Flow(SQLModelSerializable, table=True):  # type: ignore

@@ -298,9 +298,9 @@ public class ModelService extends ServiceImpl<ModelMapper, Model> {
             LambdaQueryWrapper<Model> lqw = new LambdaQueryWrapper<Model>()
                     .eq(Model::getName, request.getModelName())
                     .eq(Model::getIsDeleted, 0);
-            if(spaceId != null){
+            if (spaceId != null) {
                 lqw.eq(Model::getSpaceId, spaceId);
-            }else{
+            } else {
                 lqw.eq(Model::getUid, request.getUid()).isNull(Model::getSpaceId);
             }
             Model exist = this.getOne(lqw);
@@ -365,6 +365,21 @@ public class ModelService extends ServiceImpl<ModelMapper, Model> {
         }
 
         // Common fields
+        setCommonFileds(request, model);
+
+        if (isNew) {
+            model.setSpaceId(spaceId);
+            mapper.insert(model);
+            log.info("New model added successfully, domain={}, uid={}", request.getDomain(), request.getUid());
+        } else {
+            mapper.updateById(model);
+            log.info("Model updated successfully, domain={}, uid={}", request.getDomain(), request.getUid());
+        }
+
+        insertTagInfo(request, model);
+    }
+
+    private static void setCommonFileds(ModelValidationRequest request, Model model) {
         model.setName(request.getModelName());
         model.setDomain(request.getDomain());
         model.setUrl(request.getEndpoint());
@@ -379,17 +394,6 @@ public class ModelService extends ServiceImpl<ModelMapper, Model> {
         model.setConfig(
                 Optional.ofNullable(request.getConfig()).map(JSON::toJSONString).orElse(null));
         model.setUpdateTime(new Date());
-
-        if (isNew) {
-            model.setSpaceId(spaceId);
-            mapper.insert(model);
-            log.info("New model added successfully, domain={}, uid={}", request.getDomain(), request.getUid());
-        } else {
-            mapper.updateById(model);
-            log.info("Model updated successfully, domain={}, uid={}", request.getDomain(), request.getUid());
-        }
-
-        insertTagInfo(request, model);
     }
 
     private void insertTagInfo(ModelValidationRequest request, Model model) {
