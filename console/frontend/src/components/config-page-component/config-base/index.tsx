@@ -215,6 +215,33 @@ const BaseConfig: React.FC<ChatProps> = ({
     enabled: false,
     vcn: '',
   });
+
+  // 人设相关状态
+  const [personalityData, setPersonalityData] = useState({
+    enablePersonality: false,
+    personalityConfig: null as {
+      personality?: string;
+      sceneType?: 1 | 2;
+      sceneInfo?: string;
+    } | null,
+  });
+
+  // 处理人设数据变化，保持enablePersonality的用户选择状态
+  const handlePersonalityChange = useCallback(
+    (data: {
+      enablePersonality: boolean;
+      personalityConfig: {
+        personality?: string;
+        sceneType?: 1 | 2;
+        sceneInfo?: string;
+      } | null;
+    }) => {
+      // 直接保存用户选择的enablePersonality状态，不根据内容自动改变
+      setPersonalityData(data);
+    },
+    []
+  );
+
   const [files, setFiles] = useState<any[]>([]);
   const [repoConfig, setRepoConfig] = useState({
     topK: 5,
@@ -434,8 +461,31 @@ const BaseConfig: React.FC<ChatProps> = ({
       })(),
       isCustom: findModelOptionByUniqueKey(model)?.isCustom,
       prompt: prompt,
+      // 人设相关字段
+      enablePersonality: personalityData.enablePersonality,
+      personalityConfig: personalityData.personalityConfig,
       ...(!useFormValues && { promptStructList: [] }),
     };
+  };
+
+  // 验证人设信息
+  const validatePersonality = () => {
+    if (personalityData.enablePersonality) {
+      // 验证人设信息必填
+      if (!personalityData.personalityConfig?.personality?.trim()) {
+        message.info(t('configBase.CapabilityDevelopment.personalityRequired'));
+        return false;
+      }
+      // 验证场景描述（如果选择了场景类型）
+      if (
+        personalityData.personalityConfig?.sceneType &&
+        !personalityData.personalityConfig?.sceneInfo?.trim()
+      ) {
+        message.info(t('configBase.CapabilityDevelopment.sceneInfoRequired'));
+        return false;
+      }
+    }
+    return true;
   };
 
   const savebot = (e: any) => {
@@ -679,6 +729,18 @@ const BaseConfig: React.FC<ChatProps> = ({
           form.setFieldsValue(save == 'true' ? configPageData : res);
           setDetailInfo(save == 'true' ? { ...res, ...configPageData } : res);
           setCoverUrl(save == 'true' ? configPageData?.avatar : res.avatar);
+
+          // 回显人设数据
+          setPersonalityData({
+            enablePersonality:
+              save == 'true'
+                ? (configPageData?.enablePersonality as boolean) || false
+                : res?.personalityConfig !== null || false,
+            personalityConfig:
+              save == 'true'
+                ? configPageData?.personalityConfig || null
+                : res.personalityConfig || null,
+          });
 
           // 处理模型回显逻辑
           const currentModelData = save == 'true' ? configPageData : res;
@@ -1203,6 +1265,9 @@ const BaseConfig: React.FC<ChatProps> = ({
                       })(),
                       isCustom: findModelOptionByUniqueKey(model)?.isCustom,
                       prompt: prompt,
+                      // 人设相关字段
+                      enablePersonality: personalityData.enablePersonality,
+                      personalityConfig: personalityData.personalityConfig,
                     };
                     updateBot(obj)
                       .then(() => {
@@ -1262,6 +1327,9 @@ const BaseConfig: React.FC<ChatProps> = ({
                       })(),
                       isCustom: findModelOptionByUniqueKey(model)?.isCustom,
                       prompt: prompt,
+                      // 人设相关字段
+                      enablePersonality: personalityData.enablePersonality,
+                      personalityConfig: personalityData.personalityConfig,
                     };
                     updateBot(obj)
                       .then(() => {
@@ -1338,6 +1406,9 @@ const BaseConfig: React.FC<ChatProps> = ({
                     prologue: prologue,
                     model: model,
                     prompt: prompt,
+                    // 人设相关字段
+                    enablePersonality: personalityData.enablePersonality,
+                    personalityConfig: personalityData.personalityConfig,
                   };
 
                   insertBot(obj)
@@ -1386,6 +1457,9 @@ const BaseConfig: React.FC<ChatProps> = ({
                     prologue: prologue,
                     model: model,
                     prompt: prompt,
+                    // 人设相关字段
+                    enablePersonality: personalityData.enablePersonality,
+                    personalityConfig: personalityData.personalityConfig,
                   };
 
                   insertBot(obj)
@@ -1664,8 +1738,6 @@ const BaseConfig: React.FC<ChatProps> = ({
                       baseinfo={baseinfo}
                       detailInfo={detailInfo}
                       prompt={prompt}
-                      supportSystemFlag={supportSystemFlag}
-                      setSupportSystemFlag={setSupportSystemFlag}
                       prologue={prologue}
                       setPrologue={setPrologue}
                       inputExample={inputExample}
@@ -1676,38 +1748,20 @@ const BaseConfig: React.FC<ChatProps> = ({
                       setSupportContextFlag={setSupportContextFlag}
                       selectSource={selectSource}
                       setSelectSource={setSelectSource}
-                      currentRobot={currentRobot}
-                      repoConfig={repoConfig}
-                      setRepoConfig={setRepoConfig}
                       files={files}
-                      setFiles={setFiles}
                       tree={tree}
                       setTree={setTree}
                       tools={tools}
                       setTools={setTools}
-                      flows={flows}
-                      setFlows={setFlows}
                       conversation={conversation}
                       setConversation={setConversation}
-                      conversationStarter={conversationStarter}
-                      setConversationStarter={setConversationStarter}
-                      presetQuestion={presetQuestion}
-                      setPresetQuestion={setPresetQuestion}
-                      resource={resource}
-                      setResource={setResource}
-                      suggest={suggest}
-                      setSuggest={setSuggest}
-                      speechToText={speechToText}
-                      setSpeechToText={setSpeechToText}
-                      feedback={feedback}
-                      setFeedback={setFeedback}
                       textToSpeech={textToSpeech}
-                      setTextToSpeech={setTextToSpeech}
                       multiModelDebugging={multiModelDebugging}
                       growOrShrinkConfig={growOrShrinkConfig}
                       setGrowOrShrinkConfig={setGrowOrShrinkConfig}
-                      knowledges={knowledges}
-                      vcnList={vcnList}
+                      personalityData={personalityData}
+                      setPersonalityData={handlePersonalityChange}
+                      model={model}
                     />
                   </Tabs.TabPane>
                 </Tabs>
@@ -1826,6 +1880,11 @@ const BaseConfig: React.FC<ChatProps> = ({
                       supportContext={supportContextFlag ? 1 : 0}
                       choosedAlltool={choosedAlltool}
                       findModelOptionByUniqueKey={findModelOptionByUniqueKey}
+                      personalityConfig={
+                        personalityData.enablePersonality
+                          ? personalityData.personalityConfig
+                          : null
+                      }
                     />
                   )}
                   {showTipPk &&
@@ -1865,6 +1924,11 @@ const BaseConfig: React.FC<ChatProps> = ({
                           choosedAlltool={choosedAlltool}
                           findModelOptionByUniqueKey={
                             findModelOptionByUniqueKey
+                          }
+                          personalityConfig={
+                            personalityData.enablePersonality
+                              ? personalityData.personalityConfig
+                              : null
                           }
                         />
                       </div>
@@ -1932,6 +1996,11 @@ const BaseConfig: React.FC<ChatProps> = ({
                         supportContext={supportContextFlag ? 1 : 0}
                         choosedAlltool={choosedAlltool}
                         findModelOptionByUniqueKey={findModelOptionByUniqueKey}
+                        personalityConfig={
+                          personalityData.enablePersonality
+                            ? personalityData.personalityConfig
+                            : null
+                        }
                       />
                     </div>
                   ))}
