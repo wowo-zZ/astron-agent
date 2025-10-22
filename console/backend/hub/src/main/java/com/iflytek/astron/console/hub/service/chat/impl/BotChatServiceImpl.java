@@ -10,6 +10,7 @@ import com.iflytek.astron.console.commons.dto.chat.ChatListCreateResponse;
 import com.iflytek.astron.console.commons.dto.llm.SparkChatRequest;
 import com.iflytek.astron.console.commons.entity.bot.ChatBotBase;
 import com.iflytek.astron.console.commons.entity.bot.ChatBotMarket;
+import com.iflytek.astron.console.commons.entity.bot.PersonalityConfig;
 import com.iflytek.astron.console.commons.entity.chat.ChatList;
 import com.iflytek.astron.console.commons.entity.chat.ChatReqRecords;
 import com.iflytek.astron.console.commons.enums.ShelfStatusEnum;
@@ -28,6 +29,7 @@ import com.iflytek.astron.console.hub.data.ReqKnowledgeRecordsDataService;
 import com.iflytek.astron.console.hub.entity.ReqKnowledgeRecords;
 import com.iflytek.astron.console.hub.service.PromptChatService;
 import com.iflytek.astron.console.hub.service.SparkChatService;
+import com.iflytek.astron.console.hub.service.bot.PersonalityConfigService;
 import com.iflytek.astron.console.hub.service.chat.BotChatService;
 import com.iflytek.astron.console.hub.service.chat.ChatListService;
 import com.iflytek.astron.console.hub.service.knowledge.KnowledgeService;
@@ -93,6 +95,9 @@ public class BotChatServiceImpl implements BotChatService {
 
     @Autowired
     private ReqKnowledgeRecordsDataService reqKnowledgeRecordsDataService;
+    
+    @Autowired
+    private PersonalityConfigService personalityConfigService;
 
     /**
      * Function to handle chat messages
@@ -182,13 +187,15 @@ public class BotChatServiceImpl implements BotChatService {
      * @param maasDatasetList MaaS dataset list
      * @param sseEmitter SSE emitter
      * @param sseId SSE ID
+     * @param personalityConfig Personality configuration string
      */
     @Override
-    public void debugChatMessageBot(String text, String prompt, List<String> messages, String uid, String openedTool, String model, Long modelId, List<String> maasDatasetList, SseEmitter sseEmitter, String sseId) {
+    public void debugChatMessageBot(String text, String prompt, List<String> messages, String uid, String openedTool, String model, Long modelId, List<String> maasDatasetList, SseEmitter sseEmitter, String sseId, String personalityConfig) {
         try {
             int maxInputTokens = this.maxInputTokens;
             List<SparkChatRequest.MessageDto> messageList;
-
+            // get personality config prompt
+            prompt = personalityConfigService.getChatPrompt(personalityConfig, prompt);
             if (modelId == null) {
                 messageList = buildDebugMessageList(text, prompt, messages, maxInputTokens, maasDatasetList);
                 SparkChatRequest sparkChatRequest = new SparkChatRequest();

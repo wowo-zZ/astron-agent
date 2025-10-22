@@ -13,7 +13,7 @@ public interface BotChatService {
 
     void reAnswerMessageBot(Long requestId, Integer botId, SseEmitter sseEmitter, String sseId);
 
-    void debugChatMessageBot(String text, String prompt, List<String> messages, String uid, String openedTool, String model, Long modelId, List<String> maasDatasetList, SseEmitter sseEmitter, String sseId);
+    void debugChatMessageBot(String text, String prompt, List<String> messages, String uid, String openedTool, String model, Long modelId, List<String> maasDatasetList, SseEmitter sseEmitter, String sseId, String personalityConfig);
 
     ChatListCreateResponse clear(Long chatId, String uid, Integer botId, ChatBotBase botBase);
 

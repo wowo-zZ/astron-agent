@@ -390,7 +390,7 @@ public class ChatMessageController {
         try {
             sendStartSignal(sseEmitter, sseId, new ChatContext(uid, 0L, 0));
             botChatService.debugChatMessageBot(debugRequest.getText(), debugRequest.getPrompt(), messageList,
-                    uid, debugRequest.getOpenedTool(), debugRequest.getModel(), debugRequest.getModelId(), maasDatasetList, sseEmitter, sseId);
+                    uid, debugRequest.getOpenedTool(), debugRequest.getModel(), debugRequest.getModelId(), maasDatasetList, sseEmitter, sseId, debugRequest.getPersonalityConfig());
             return sseEmitter;
         } catch (Exception e) {
             log.error("Bot debug error, sseId: {}", sseId, e);

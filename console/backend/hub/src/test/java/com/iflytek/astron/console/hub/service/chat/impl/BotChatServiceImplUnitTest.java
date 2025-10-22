@@ -313,7 +313,7 @@ class BotChatServiceImplUnitTest {
         doNothing().when(sparkChatService).chatStream(any(), any(), any(), any(), anyBoolean(), anyBoolean());
 
         // When
-        botChatService.debugChatMessageBot(text, prompt, messages, uid, openedTool, model, modelId, maasDatasetList, sseEmitter, sseId);
+        botChatService.debugChatMessageBot(text, prompt, messages, uid, openedTool, model, modelId, maasDatasetList, sseEmitter, sseId, null);
 
         // Then
         verify(sparkChatService).chatStream(any(SparkChatRequest.class), eq(sseEmitter), eq(sseId), isNull(), eq(false), eq(true));
@@ -341,7 +341,7 @@ class BotChatServiceImplUnitTest {
         doNothing().when(promptChatService).chatStream(any(), any(), any(), any(), anyBoolean(), anyBoolean());
 
         // When
-        botChatService.debugChatMessageBot(text, prompt, messages, uid, openedTool, model, modelId, maasDatasetList, sseEmitter, sseId);
+        botChatService.debugChatMessageBot(text, prompt, messages, uid, openedTool, model, modelId, maasDatasetList, sseEmitter, sseId, null);
 
         // Then
         verify(modelService).getDetail(eq(0), eq(modelId), isNull());
