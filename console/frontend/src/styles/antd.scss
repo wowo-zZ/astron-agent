@@ -1727,3 +1727,12 @@ input[type="number"]::-webkit-outer-spin-button {
     color: var(--primary-color);
   }
 }
+
+// Typography 复制图标样式定制
+.ant-typography-copy {
+  color: var(--primary-color) !important;
+  
+  &:hover {
+    opacity: 0.8;
+  }
+}

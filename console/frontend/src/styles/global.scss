@@ -93,11 +93,11 @@ html,
 
   &::-webkit-scrollbar-track {
     background-color: transparent;
-    border-radius: 3px;
+    border-radius: calc(var(--scrollbar-width) / 2);
   }
 
   &::-webkit-scrollbar-thumb {
-    border-radius: 3px;
+    border-radius: calc(var(--scrollbar-width) / 2);
     background: #E7E7F0;
     transition: background-color 0.2s ease;
   }
