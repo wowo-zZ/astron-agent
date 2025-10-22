@@ -1719,3 +1719,10 @@ input[type="number"]::-webkit-outer-spin-button {
     }
   }
 }
+
+// Speaker modal popover styles
+.spearker-modal-type-tip-pop {
+  .ant-popover-inner-content {
+    color: #fff;
+  }
+}

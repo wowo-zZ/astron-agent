@@ -1,6 +1,6 @@
+import { getTtsSign } from '@/services/chat';
 import { message } from 'antd';
 import { Base64 } from 'js-base64';
-import { getTtsSign } from '@/services/chat';
 
 // 类型定义
 interface ExperienceConfig {
@@ -41,6 +41,7 @@ interface SetConfigParams {
 interface WebSocketParams {
   common?: {
     app_id: string;
+    uid: string;
   };
   business?: {
     aue: string;
@@ -56,6 +57,57 @@ interface WebSocketParams {
     status: number;
     text: string;
   };
+  header?: {
+    app_id: string;
+    uid: string;
+    did: string;
+    imei: string;
+    imsi: string;
+    mac: string;
+    net_type: string;
+    net_isp: string;
+    status: number;
+    request_id: null;
+    res_id: string;
+  };
+  parameter?: {
+    tts: {
+      vcn: string;
+      speed: number;
+      volume: number;
+      pitch: number;
+      bgs: number;
+      reg: number;
+      rdn: number;
+      rhy: number;
+      scn?: number;
+      emotion?: number;
+      LanguageID?: number;
+      style?: string;
+      audio: {
+        encoding: string;
+        sample_rate: number;
+        channels: number;
+        bit_depth: number;
+        frame_size: number;
+      };
+      pybuf: {
+        encoding: string;
+        compress: string;
+        format: string;
+      };
+    };
+  };
+  payload?: {
+    text: {
+      encoding: string;
+      compress: string;
+      format: string;
+      status: number;
+      seq: number;
+      text: string;
+    };
+  };
 }
 
 interface WebSocketResponse {
@@ -64,9 +116,14 @@ interface WebSocketResponse {
   header?: {
     status: number;
   };
+  payload?: {
+    audio?: {
+      audio: string;
+    };
+  };
   data?: {
     audio: string;
-    status: number;
+    status?: number;
   };
 }
 
@@ -77,6 +134,10 @@ export interface TtsSignResponse {
 }
 
 const NOT_SUPPORT_TIP = '当前浏览器不支持该功能，请换个浏览器试试';
+// 优化缓冲参数以减少破音
+const START_MIN_FRAMES = 16000 * 0.5; // 至少缓冲 500ms 音频（增加缓冲）
+const MAX_WAIT_MS = 600; // 最多等待 600ms（稍微延长等待时间）
+const MIN_PLAYABLE_FRAMES = 16000 * 0.2; // 每次播放至少 200ms 的数据
 
 let audioCtx: AudioContext | null = null;
 let source: AudioBufferSourceNode | null = null;
@@ -100,6 +161,8 @@ class Experience {
   private audioDatasIndex: number = 0;
   private playTimeout: NodeJS.Timeout | undefined;
   private flag: boolean = false;
+  private firstBufferWaitStartMs: number | null = null; // 首次播放的预缓冲起始时间
+  private emotion: number | undefined; // 情感参数
 
   constructor({
     speed = 2,
@@ -109,6 +172,7 @@ class Experience {
     engineType = 'intp65',
     voiceName = 'x4_EnUs_Gavin',
     isDialect = false,
+    emotion,
     tte = 'UTF8',
     language = 'cn',
     close,
@@ -120,6 +184,7 @@ class Experience {
     this.engineType = engineType;
     this.voiceName = voiceName;
     this.isDialect = isDialect;
+    this.emotion = emotion;
     this.tte = tte;
     this.language = language;
     this.playState = '';
@@ -175,8 +240,10 @@ class Experience {
   getAudio(): void {
     const self = this;
     const form = new FormData();
+    let ttsValue = self.voiceName;
+
     form.append('text', self.text);
-    form.append('tts', self.voiceName);
+    form.append('tts', ttsValue);
     getTtsSign(form)
       .then((result: TtsSignResponse) => {
         const appId = result.appId;
@@ -184,7 +251,7 @@ class Experience {
         this.connectWebsocket(url, appId);
       })
       .catch(err => {
-        message.info(err.desc || '合成体验签名获取失败');
+        message.info(err?.msg || '合成体验签名获取失败');
         this.resetAudio();
         this.close?.();
       });
@@ -202,7 +269,8 @@ class Experience {
       message.info(NOT_SUPPORT_TIP);
       return;
     }
-
+    const includesHost =
+      url.includes('ws-api-dx.xfyun.cn') || url.includes('ws-api-hu.xfyun.cn');
     const self = this;
     if (!this.websocket) return;
 
@@ -211,26 +279,92 @@ class Experience {
         this.resetAudio();
         return;
       }
-      //websocket参数 可参考https://www.xfyun.cn/doc/tts/online_tts/API.html#%E6%8E%A5%E5%8F%A3%E8%B0%83%E7%94%A8%E6%B5%81%E7%A8%8B
-      const params: WebSocketParams = {
-        common: {
-          app_id: appId,
-        },
-        business: {
-          aue: 'raw',
-          auf: 'audio/L16;rate=16000',
-          ent: 'input65',
-          pitch: self.pitch || 50,
-          tte: 'UTF8',
-          vcn: self.voiceName,
-          volume: 50,
-          speed: self.speed,
-        },
-        data: {
-          status: 2,
-          text: self.encodeText(self.text) as string,
-        },
-      };
+
+      // 计算正确的 vcn 值
+      const vcnValue = self.voiceName;
+
+      let params: any = {};
+
+      params = includesHost
+        ? {
+            common: {
+              app_id: appId,
+            },
+            business: {
+              aue: 'raw',
+              auf: 'audio/L16;rate=16000',
+              ent: 'input65',
+              pitch: self.pitch || 50,
+              tte: 'UTF8',
+              vcn: vcnValue,
+              volume: 50,
+              speed: self.speed,
+            },
+            data: {
+              status: 2,
+              text: self.encodeText(self.text),
+            },
+          }
+        : {
+            header: {
+              app_id: appId,
+              uid: '',
+              did: '',
+              imei: '',
+              imsi: '',
+              mac: '',
+              net_type: 'wifi',
+              net_isp: 'CMCC',
+              status: 2,
+              request_id: null,
+              res_id: self.voiceName.includes('x5_once_clone_')
+                ? self.voiceName.replace('x5_once_clone_', '')
+                : '',
+            },
+            parameter: {
+              tts: {
+                vcn: vcnValue,
+                speed: self.speed,
+                volume: 50,
+                pitch: self.pitch || 50,
+                bgs: 0,
+                reg: 0,
+                rdn: 0,
+                rhy: 0,
+                scn: self.voiceName.includes('x5_once_clone_') ? undefined : 0,
+                ...(self.emotion !== undefined
+                  ? { emotion: self.emotion }
+                  : {}),
+                audio: {
+                  encoding: 'raw',
+                  sample_rate: 16000,
+                  channels: 1,
+                  bit_depth: 16,
+                  frame_size: 0,
+                },
+                pybuf: {
+                  encoding: 'utf8',
+                  compress: 'raw',
+                  format: 'plain',
+                },
+              },
+            },
+            payload: {
+              text: {
+                encoding: 'utf8',
+                compress: 'raw',
+                format: 'plain',
+                status: 2,
+                seq: 0,
+                text: self.encodeText(self.text) as string,
+              },
+            },
+          };
+
+      if (self.voiceName.includes('x5_once_clone_') && params?.parameter?.tts) {
+        params.parameter.tts.LanguageID = 0;
+        params.parameter.tts.audio.sample_rate = 16000;
+      }
 
       this.websocket?.send(JSON.stringify(params));
       this.playTimeout = setTimeout(() => {
@@ -240,23 +374,53 @@ class Experience {
 
     this.websocket.onmessage = (e: MessageEvent) => {
       const jsonData: WebSocketResponse = JSON.parse(e.data);
-      let audioData = jsonData?.data?.audio;
+      let audioData = jsonData?.payload?.audio?.audio;
+      if (includesHost) {
+        audioData = jsonData?.data?.audio;
+      }
       if (audioData) {
         const s16 = this.base64ToS16(audioData);
         const f32 = this.transS16ToF32(s16);
         this.audioDatas.push(f32);
 
-        // 收到第一个音频块立即开始播放，减少延迟
+        // 首包：按数据量自适应预缓冲，避免启动后断流
         if (this.audioDatas.length === 1) {
           clearTimeout(this.playTimeout);
-          // 短延迟确保AudioContext准备好
-          this.playTimeout = setTimeout(() => {
-            this.playSource();
-          }, 100) as NodeJS.Timeout;
+
+          if (this.firstBufferWaitStartMs == null) {
+            this.firstBufferWaitStartMs = performance.now();
+          }
+          const tryStart = () => {
+            // 计算当前可用的帧数
+            let frames = 0;
+            for (
+              let i = this.audioDatasIndex;
+              i < this.audioDatas.length;
+              i++
+            ) {
+              const chunk = this.audioDatas[i];
+              if (chunk) frames += chunk.length;
+            }
+            const waited =
+              performance.now() - (this.firstBufferWaitStartMs || 0);
+
+            //缓冲判断，确保有足够数据再开始
+            const hasEnoughBuffer = frames >= START_MIN_FRAMES;
+            const hasWaitedTooLong = waited >= MAX_WAIT_MS;
+            const hasMinimumBuffer = frames >= MIN_PLAYABLE_FRAMES;
+
+            if ((hasEnoughBuffer || hasWaitedTooLong) && hasMinimumBuffer) {
+              this.firstBufferWaitStartMs = null;
+              this.playSource();
+            } else {
+              this.playTimeout = setTimeout(tryStart, 50) as NodeJS.Timeout;
+            }
+          };
+          this.playTimeout = setTimeout(tryStart, 50) as NodeJS.Timeout;
         }
       }
       // 合成结束
-      if (jsonData?.data?.status === 2) {
+      if (jsonData?.header?.status === 2 || jsonData?.data?.status === 2) {
         this.websocket?.close();
       }
     };
@@ -312,6 +476,7 @@ class Experience {
     this.audioDatas = [];
     this.websocket && this.websocket.close();
     clearTimeout(this.playTimeout);
+    this.firstBufferWaitStartMs = null;
   }
 
   audioPlay(): void {
@@ -326,7 +491,6 @@ class Experience {
           (window as unknown as { webkitAudioContext: typeof AudioContext })
             .webkitAudioContext;
         audioCtx = new AudioContextClass();
-        audioCtx.resume();
       }
       if (!audioCtx) {
         message.info(NOT_SUPPORT_TIP);
@@ -368,6 +532,30 @@ class Experience {
       }
     }
 
+    // 若没有可播放的数据，稍后重试，避免创建零长度 buffer 造成频繁 onended
+    if (bufferLength === 0) {
+      clearTimeout(this.playTimeout);
+      this.playTimeout = setTimeout(() => {
+        if (this.playState === 'play') {
+          this.playSource();
+        }
+      }, 10) as NodeJS.Timeout;
+      return;
+    }
+
+    // ⭐ 优化：确保有足够的数据再播放，避免播放过短的片段导致破音
+    const isWebSocketOpen = this.websocket?.readyState === WebSocket.OPEN;
+    if (bufferLength < MIN_PLAYABLE_FRAMES && isWebSocketOpen) {
+      // 数据太少且还在接收中，等待更多数据
+      clearTimeout(this.playTimeout);
+      this.playTimeout = setTimeout(() => {
+        if (this.playState === 'play') {
+          this.playSource();
+        }
+      }, 50) as NodeJS.Timeout;
+      return;
+    }
+
     if (!audioCtx) return;
 
     const audioBuffer = audioCtx.createBuffer(1, bufferLength, 16000);
@@ -396,19 +584,17 @@ class Experience {
       }
       // 首先检查是否还有未播放的音频数据
       if (this.audioDatasIndex < this.audioDatas.length) {
-        // 还有数据，继续播放
-        setTimeout(() => {
-          if (this.playState === 'play') {
-            this.playSource();
-          }
-        }, 50);
+        // 还有数据，立即继续播放，避免空隙
+        if (this.playState === 'play') {
+          this.playSource();
+        }
       } else if (this.websocket?.readyState === WebSocket.OPEN) {
-        // 没有更多数据但WebSocket还开着，等待新数据
-        setTimeout(() => {
+        // 没有更多数据但WebSocket还开着，快速轮询等待新数据
+        this.playTimeout = setTimeout(() => {
           if (this.playState === 'play') {
             this.playSource();
           }
-        }, 100);
+        }, 10) as NodeJS.Timeout;
       } else {
         // 没有更多数据且WebSocket已关闭，播放完毕
         this.close?.();
