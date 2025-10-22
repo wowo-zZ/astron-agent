@@ -10,7 +10,8 @@ export interface IPictureBookObj {
 
 interface TtsModuleProps {
   text: string;
-  language: string; //通过api/detect接口获取语言
+  language?: string;
+  voiceName?: string;
   isPlaying: boolean;
   setIsPlaying: (isPlaying: boolean) => void;
 }
@@ -20,12 +21,12 @@ type LanguageKey = 'cn' | 'en' | 'ja' | 'ko' | 'ru';
 const TtsModule: React.FC<TtsModuleProps> = ({
   text,
   language = 'cn',
+  voiceName,
   isPlaying,
   setIsPlaying,
 }) => {
   // State hooks
   const [experienceObj, setExperienceObj] = useState<Experience | null>(null);
-
   // Zustand stores
   const { activeVcn } = useVoicePlayStore();
 
@@ -55,35 +56,40 @@ const TtsModule: React.FC<TtsModuleProps> = ({
 
   // Initialize TTS object
   useEffect(() => {
-    const ttsText = text.replace(/[*#&$]/g, '');
+    const ttsText = text?.replace(/[*#&$]/g, '');
     const newExperienceObj = new Experience({
       language,
       voiceName: getVoiceKeyByLan(language),
       engineType: 'ptts',
       tte: 'UTF8',
-      speed: vcnUsed?.speed,
+      speed: 50,
       voice: 5,
       pitch: 50,
       text: ttsText,
       close: () => setIsPlaying(false),
     });
     setExperienceObj(newExperienceObj);
+
+    // 组件卸载时清理
+    return () => {
+      newExperienceObj?.resetAudio();
+    };
   }, []);
 
   useEffect(() => {
     if (isPlaying) {
       const ttsText = text.replace(/[*#&$]/g, '');
-      let vcn = getVoiceKeyByLan(language);
+      // 优先使用传入的 voiceName prop，如果没有则使用默认逻辑
+      let vcn = voiceName || getVoiceKeyByLan(language);
       const tempExperienceObj = {
         language,
         voiceName: vcn,
         engineType: 'ptts',
         tte: 'UTF8',
-        speed: vcnUsed?.speed,
+        speed: 50,
         voice: 5,
         pitch: 50,
         text: ttsText,
-        playBtn: '.audio-ctrl-btn-tts',
       };
       experienceObj?.setConfig(tempExperienceObj);
       experienceObj?.audioPlay();
@@ -91,7 +97,7 @@ const TtsModule: React.FC<TtsModuleProps> = ({
     } else {
       experienceObj?.resetAudio();
     }
-  }, [isPlaying, text]);
+  }, [isPlaying, voiceName]);
 
   return <div />;
 };

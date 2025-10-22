@@ -1,5 +1,7 @@
 // Advanced Configuration 模块的类型定义
 
+import { TFunction } from 'i18next';
+
 // VCN语音配置类型定义
 export interface VcnItem {
   id: string;
@@ -28,10 +30,8 @@ export interface AdvancedConfigType {
   };
   textToSpeech: {
     enabled: boolean;
-    vcn?: string;
-  };
-  speechToText: {
-    enabled: boolean;
+    vcn_cn?: string;
+    vcn_en?: string;
   };
   suggestedQuestionsAfterAnswer: {
     enabled: boolean;
@@ -51,14 +51,7 @@ export interface UploadResponse {
   };
 }
 
-export interface UploadProps {
-  name: string;
-  action: string;
-  showUploadList: boolean;
-  accept: string;
-  beforeUpload: (file: unknown) => boolean;
-  onChange: (info: unknown) => void;
-}
+export type UploadProps = Record<string, any>;
 
 // 抽屉样式类型定义
 export interface DrawerStyleType {
@@ -81,6 +74,39 @@ export type DeepPartial<T> = {
 
 // 配置更新类型
 export type AdvancedConfigUpdate = DeepPartial<AdvancedConfigType>;
+
+// Component Props Types
+export interface CommonComponentProps {
+  advancedConfig: AdvancedConfigType;
+  handleAdvancedConfigChange: (callback: () => void) => void;
+  updateAdvancedConfigParams: (updateParams: AdvancedConfigUpdate) => void;
+  t: TFunction;
+}
+
+export interface ConversationStarterProps extends CommonComponentProps {
+  setOpeningRemarksModal: (value: boolean) => void;
+  updateAdvancedConfigParamsDebounce: (updateParams: AdvancedConfigUpdate) => void;
+  handlePresetQuestionChange: (index: number, value: string) => void;
+}
+
+export interface ChatBackgroundProps extends CommonComponentProps {
+  uploadProps: UploadProps;
+  chatBackgroundInfo: ChatBackgroundInfo | null;
+  setChatBackgroundInfo: (value: ChatBackgroundInfo | null) => void;
+}
+
+export interface UseAdvancedConfigurationReturn {
+  advancedConfig: AdvancedConfigType;
+  handleAdvancedConfigChange: (callback: () => void) => void;
+  updateAdvancedConfigParams: (updateParams: AdvancedConfigUpdate) => void;
+  updateAdvancedConfigParamsDebounce: (updateParams: AdvancedConfigUpdate) => void;
+  handlePresetQuestionChange: (index: number, value: string) => void;
+  openingRemarksModal: boolean;
+  setOpeningRemarksModal: (value: boolean) => void;
+  chatBackgroundInfo: ChatBackgroundInfo | null;
+  setChatBackgroundInfo: (value: ChatBackgroundInfo | null) => void;
+  uploadProps: UploadProps;
+}
 
 export interface useAdvancedConfigurationProps {
   advancedConfig: AdvancedConfigType;

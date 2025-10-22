@@ -1197,15 +1197,13 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
           </a>
         </Checkbox>
       </div>
-      {showSpeakerModal && (
-        <SpeakerModal
-          changeSpeakerModal={setShowSpeakerModal}
-          botCreateMode={true}
-          botCreateCallback={setBotCreateVcn}
-          setBotCreateActiveV={setBotCreateActiveV}
-          botCreateActiveV={botCreateActiveV}
-        />
-      )}
+      <SpeakerModal
+        changeSpeakerModal={setShowSpeakerModal}
+        botCreateCallback={setBotCreateVcn}
+        setBotCreateActiveV={setBotCreateActiveV}
+        botCreateActiveV={botCreateActiveV}
+        showSpeakerModal={showSpeakerModal}
+      />
     </div>
   );
 }

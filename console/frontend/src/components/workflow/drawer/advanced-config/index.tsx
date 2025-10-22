@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { Drawer, Switch, Input, Upload, message } from 'antd';
-import type { UploadProps, UploadFile } from 'antd';
+import type { UploadProps as AntdUploadProps, UploadFile } from 'antd';
 import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import { saveFlowAPI } from '@/services/flow';
 import { debounce, cloneDeep } from 'lodash';
@@ -8,6 +8,7 @@ import { isJSON } from '@/utils';
 import { getFixedUrl, getAuthorization } from '@/components/workflow/utils';
 import OpeningRemarks from './opening-remarks';
 import { useTranslation } from 'react-i18next';
+import { vcnCnJson, vcnEnJson } from '@/components/speaker-modal/vcn';
 import {
   FlowType,
   ChatBackgroundInfo,
@@ -15,18 +16,22 @@ import {
   UploadResponse,
   DrawerStyleType,
   AdvancedConfigUpdate,
-  useAdvancedConfigurationProps,
+  CommonComponentProps,
+  ConversationStarterProps,
+  ChatBackgroundProps,
+  UseAdvancedConfigurationReturn,
 } from '@/components/workflow/types';
 
 // 从统一的图标管理中导入
 import { Icons } from '@/components/workflow/icons';
+import SpeakerModal from '@/components/speaker-modal';
 
 // 获取 Advanced Config 模块的图标
 const icons = Icons.advancedConfig;
 
 const { Dragger } = Upload;
 
-const ConversationStarter = ({
+const ConversationStarter: React.FC<ConversationStarterProps> = ({
   advancedConfig,
   handleAdvancedConfigChange,
   updateAdvancedConfigParams,
@@ -34,7 +39,7 @@ const ConversationStarter = ({
   updateAdvancedConfigParamsDebounce,
   handlePresetQuestionChange,
   t,
-}): React.ReactElement => {
+}) => {
   return (
     <div
       className="bg-[#F7F7FA] rounded-lg"
@@ -175,12 +180,12 @@ const ConversationStarter = ({
   );
 };
 
-const SuggestedQuestions = ({
+const SuggestedQuestions: React.FC<CommonComponentProps> = ({
   advancedConfig,
   handleAdvancedConfigChange,
   updateAdvancedConfigParams,
   t,
-}): React.ReactElement => {
+}) => {
   return (
     <div
       className="bg-[#F7F7FA] rounded-lg"
@@ -222,7 +227,116 @@ const SuggestedQuestions = ({
   );
 };
 
-const ChatBackground = ({
+const CharacterVoice: React.FC<CommonComponentProps> = ({
+  advancedConfig,
+  handleAdvancedConfigChange,
+  updateAdvancedConfigParams,
+  t,
+}) => {
+  const [showSpeakerModal, setShowSpeakerModal] = useState<boolean>(false);
+  const [botCreateActiveV, setBotCreateActiveV] = useState<{
+    cn: string;
+    en: string;
+  }>({
+    cn: advancedConfig?.textToSpeech?.vcn_cn || 'x4_lingxiaoqi',
+    en: advancedConfig?.textToSpeech?.vcn_en || 'x4_EnUs_Luna',
+  });
+
+  const handleVoiceChange = (voice: { cn: string; en: string }): void => {
+    setBotCreateActiveV(voice);
+    handleAdvancedConfigChange(() => {
+      advancedConfig.textToSpeech.vcn_cn = voice.cn;
+      advancedConfig.textToSpeech.vcn_en = voice.en;
+    });
+    updateAdvancedConfigParams({
+      textToSpeech: {
+        vcn_cn: voice.cn,
+        vcn_en: voice.en,
+      },
+    });
+  };
+
+  // 渲染发音人显示
+  const renderBotVcn = () => {
+    let vcnObj = vcnCnJson.find(
+      (item: any) => item.vcn === botCreateActiveV.cn
+    );
+    return (
+      <>
+        <img
+          className="w-[30px] h-[30px] mr-2 rounded-full"
+          src={vcnObj?.imgUrl}
+          alt=""
+        />
+        <span
+          title={vcnObj?.name}
+          className="flex-1 overflow-hidden text-ellipsis whitespace-nowrap"
+        >
+          {vcnObj?.name}
+        </span>
+        <img src={icons.editVcn} className="w-4 h-4" alt="" />
+      </>
+    );
+  };
+
+  return (
+    <div
+      className="bg-[#F7F7FA] rounded-lg"
+      style={{
+        padding: '10px 17px 16px 17px',
+      }}
+    >
+      <div className="w-full flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <img
+            src={icons.characterVoice}
+            className="w-[22px] h-[22px]"
+            alt=""
+          />
+          <div className="font-medium">
+            {t('workflow.advancedConfiguration.characterVoice')}
+          </div>
+        </div>
+        <Switch
+          className="list-switch config-switch"
+          checked={advancedConfig?.textToSpeech?.enabled}
+          onChange={value => {
+            handleAdvancedConfigChange(
+              () => (advancedConfig.textToSpeech.enabled = value)
+            );
+            updateAdvancedConfigParams({
+              textToSpeech: {
+                enabled: value,
+              },
+            });
+          }}
+        />
+      </div>
+      <div className="text-xs font-medium text-[#666] mt-1 max-w-[274px] whitespace-pre-wrap">
+        {t('workflow.advancedConfiguration.characterVoiceDescription')}
+      </div>
+      {advancedConfig?.textToSpeech?.enabled && (
+        <div className="w-full flex items-center gap-4 mt-2.5">
+          <div
+            className="flex-1 h-10 px-3 pt-3 border-t border-[#EDEDED] flex items-center cursor-pointer"
+            onClick={() => setShowSpeakerModal(true)}
+          >
+            {renderBotVcn()}
+          </div>
+        </div>
+      )}
+      <SpeakerModal
+        showSpeakerModal={showSpeakerModal}
+        changeSpeakerModal={setShowSpeakerModal}
+        botCreateCallback={handleVoiceChange}
+        botCreateActiveV={botCreateActiveV}
+        setBotCreateActiveV={setBotCreateActiveV}
+      />
+    </div>
+  );
+};
+
+const ChatBackground: React.FC<ChatBackgroundProps> = ({
   advancedConfig,
   handleAdvancedConfigChange,
   updateAdvancedConfigParams,
@@ -230,7 +344,7 @@ const ChatBackground = ({
   uploadProps,
   chatBackgroundInfo,
   setChatBackgroundInfo,
-}): React.ReactElement => {
+}) => {
   return (
     <div
       className="bg-[#F7F7FA] rounded-lg"
@@ -321,7 +435,7 @@ const ChatBackground = ({
   );
 };
 
-const useAdvancedConfiguration = (): useAdvancedConfigurationProps => {
+const useAdvancedConfiguration = (): UseAdvancedConfigurationReturn => {
   const { t } = useTranslation();
   const currentFlow = useFlowsManager(state => state.currentFlow) as
     | FlowType
@@ -333,8 +447,9 @@ const useAdvancedConfiguration = (): useAdvancedConfigurationProps => {
     useState<ChatBackgroundInfo | null>(null);
 
   const advancedConfig = useMemo<AdvancedConfigType>(() => {
-    if (currentFlow?.advancedConfig && isJSON(currentFlow.advancedConfig)) {
-      const parsedConfig = JSON.parse(currentFlow.advancedConfig);
+    const configStr = currentFlow?.advancedConfig as string | undefined;
+    if (configStr && typeof configStr === 'string' && isJSON(configStr)) {
+      const parsedConfig = JSON.parse(configStr);
       if (parsedConfig?.chatBackground?.info) {
         setChatBackgroundInfo(parsedConfig.chatBackground.info);
       }
@@ -347,6 +462,11 @@ const useAdvancedConfiguration = (): useAdvancedConfigurationProps => {
         },
         feedback: {
           enabled: parsedConfig?.feedback?.enabled ?? true,
+        },
+        textToSpeech: {
+          enabled: parsedConfig?.textToSpeech?.enabled ?? true,
+          vcn_cn: parsedConfig?.textToSpeech?.vcn_cn || 'x4_lingxiaoqi',
+          vcn_en: parsedConfig?.textToSpeech?.vcn_en || 'x4_EnUs_Luna',
         },
         suggestedQuestionsAfterAnswer: {
           enabled: parsedConfig?.suggestedQuestionsAfterAnswer?.enabled ?? true,
@@ -365,6 +485,11 @@ const useAdvancedConfiguration = (): useAdvancedConfigurationProps => {
         },
         feedback: {
           enabled: true,
+        },
+        textToSpeech: {
+          enabled: true,
+          vcn_cn: 'x4_lingxiaoqi',
+          vcn_en: 'x4_EnUs_Luna',
         },
         suggestedQuestionsAfterAnswer: {
           enabled: true,
@@ -456,7 +581,7 @@ const useAdvancedConfiguration = (): useAdvancedConfigurationProps => {
     );
   };
 
-  const uploadProps: UploadProps = {
+  const uploadProps: AntdUploadProps = {
     name: 'file',
     action: getFixedUrl('/image/upload'),
     showUploadList: false,
@@ -600,6 +725,12 @@ function AdvancedConfiguration(): React.ReactElement {
             t={t}
           />
           <SuggestedQuestions
+            advancedConfig={advancedConfig}
+            handleAdvancedConfigChange={handleAdvancedConfigChange}
+            updateAdvancedConfigParams={updateAdvancedConfigParams}
+            t={t}
+          />
+          <CharacterVoice
             advancedConfig={advancedConfig}
             handleAdvancedConfigChange={handleAdvancedConfigChange}
             updateAdvancedConfigParams={updateAdvancedConfigParams}

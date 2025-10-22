@@ -17,7 +17,6 @@ import LoadingAnimate from '@/constants/lottie-react/chat-loading.json';
 import { Progress, Skeleton } from 'antd';
 import useUserStore from '@/store/user-store';
 import useChatStore from '@/store/chat-store';
-import { getLanguageCode } from '@/utils/http';
 import Lottie from 'lottie-react';
 import DeepThinkProgress from './deep-think-progress';
 import MarkdownRender from '@/components/markdown-render';
