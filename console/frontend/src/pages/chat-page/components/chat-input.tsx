@@ -5,7 +5,7 @@ import {
   type UploadFileInfo,
 } from '@/types/chat';
 import TextArea from 'antd/es/input/TextArea';
-import { ReactElement, useEffect, useRef, useState } from 'react';
+import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import newChatIcon from '@/assets/imgs/chat/new-chat.svg';
 import stopIcon from '@/assets/imgs/chat/stop-icon.svg';
 import delIcon from '@/assets/imgs/chat/delete-history.svg';
@@ -48,6 +48,7 @@ const ChatInput = (props: {
   const [inputValue, setInputValue] = useState<string>(''); //  输入框值
   const textAreaRef = useRef<HTMLTextAreaElement>(null); //  输入框ref
   const $record = useRef<RecorderRef>(null); //  录音ref
+  const recordStartTextRef = useRef<string>(''); //  录音开始时的文本
   const {
     fileList,
     setFileList,
@@ -82,6 +83,21 @@ const ChatInput = (props: {
   useEffect(() => {
     setFileList(chatFileListNoReq);
   }, [chatFileListNoReq]);
+
+  // 录音状态变化回调
+  const handleRecorderStatusChange = useCallback(
+    (status: 'ready' | 'start' | 'end' | 'play') => {
+      // 录音开始时，保存当前文本
+      if (status === 'play') {
+        recordStartTextRef.current = inputValue || '';
+      }
+      // 录音结束时，清空 ref
+      if (status === 'end') {
+        recordStartTextRef.current = '';
+      }
+    },
+    [inputValue]
+  );
 
   //全新对话
   const handleNewChat = async () => {
@@ -120,7 +136,6 @@ const ChatInput = (props: {
     if (!inputValue.trim()) {
       return;
     }
-
     // 检查是否有错误文件
     if (hasErrorFiles()) {
       message.error('请先删除上传失败的文件再发送消息');
@@ -135,6 +150,7 @@ const ChatInput = (props: {
         setFileList([]);
       },
     });
+    $record?.current?.stopAudio();
   };
 
   //按下回车键
@@ -308,11 +324,13 @@ const ChatInput = (props: {
             </div>
             <div className="flex items-center pb-2.5">
               <RecorderCom
+                changeStatus={handleRecorderStatusChange}
                 ref={$record}
                 disabled={hasWorkflowOptionsToSelect()}
                 send={result => {
                   textAreaRef?.current?.focus();
-                  setInputValue(prev => prev + result);
+                  const newValue = (recordStartTextRef.current || '') + result;
+                  setInputValue(newValue);
                 }}
               />
               <div

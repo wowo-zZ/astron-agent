@@ -1,4 +1,10 @@
-import React, { useEffect, useRef, useMemo, useState } from 'react';
+import React, {
+  useEffect,
+  useRef,
+  useMemo,
+  useState,
+  useCallback,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image } from 'antd';
 import useFlowsManager from '@/components/workflow/store/use-flows-manager';
@@ -23,6 +29,8 @@ import {
 
 // 从统一的图标管理中导入
 import { Icons } from '@/components/workflow/icons';
+import useVoicePlayStore from '@/store/voice-play-store';
+import TtsModule from '@/components/tts-module';
 
 // 获取 Chat Content 模块的图标
 const icons = Icons.chatDebugger.chatContent;
@@ -221,6 +229,41 @@ const MessageActions = ({
   copyData,
   advancedConfig,
 }): React.ReactElement => {
+  // 为每个消息创建播放状态映射
+  const [playingStates, setPlayingStates] = useState<Record<string, boolean>>(
+    {}
+  );
+  const useLanguage = useRef<string>('cn');
+  const currentPlayingId = useVoicePlayStore(state => state.currentPlayingId);
+  const setCurrentPlayingId = useVoicePlayStore(
+    state => state.setCurrentPlayingId
+  );
+  // 播放语音
+  const playAudio = useCallback(
+    async (item: any) => {
+      console.log(item, '111111');
+      if (playingStates[item.id]) {
+        // 如果当前正在播放，则停止
+        setCurrentPlayingId(null);
+      } else {
+        // 开始播放
+        const formData = new FormData();
+        formData.append('text', item.content);
+        // const { language } = await detectText(formData);
+        // useLanguage.current = language;
+        setCurrentPlayingId(item.id);
+        // 检测语言
+      }
+    },
+    [playingStates, setCurrentPlayingId]
+  );
+  useEffect(() => {
+    const newPlayingStates: Record<string, boolean> = {};
+    chatList.forEach((chat: any) => {
+      newPlayingStates[chat.id] = currentPlayingId === chat.id;
+    });
+    setPlayingStates(newPlayingStates);
+  }, [currentPlayingId, chatList]);
   return (
     <>
       {(index !== chatList?.length - 1 || !debuggering) && (
@@ -229,6 +272,26 @@ const MessageActions = ({
             className="inline-flex items-center justify-end gap-1.5 ml-6 shrink-0"
             onClick={e => e.stopPropagation()}
           >
+            {advancedConfig?.textToSpeech?.enabled && (
+              <>
+                <span
+                  onClick={() => playAudio(chat)}
+                  className={`${
+                    playingStates[chat.id] ? 'play-active' : 'play-normal'
+                  }`}
+                ></span>
+                <TtsModule
+                  text={chat.content}
+                  language={useLanguage.current}
+                  isPlaying={playingStates[chat.id] || false}
+                  setIsPlaying={playing => {
+                    if (!playing) {
+                      setCurrentPlayingId(null);
+                    }
+                  }}
+                />
+              </>
+            )}
             <img
               src={icons.feedback}
               className="w-[16px] cursor-pointer"
@@ -443,7 +506,7 @@ const MessageReply = ({
               <span>{t('workflow.nodes.chatDebugger.deepThinking')}</span>
             </div>
           )}
-          <div className="rounded-xl p-4  relative flex-1 bg-[#f7f7fa]">
+          <div className="rounded-xl p-4 relative flex-1 bg-[#f7f7fa]">
             <MessageReplyContent
               chat={chat}
               debuggering={debuggering}

@@ -204,6 +204,7 @@ interface AdvancedConfigIcons {
   likeAndDislike: string;
   characterVoice: string;
   settingBackground: string;
+  editVcn: string;
 }
 
 interface ChatContentIcons {
@@ -390,6 +391,7 @@ import mouseBigPng from '@/assets/imgs/workflow/mouse-big.svg';
 import keyboardBigPng from '@/assets/imgs/workflow/keyboard-big.svg';
 import mouseBigActivePng from '@/assets/imgs/workflow/mouse-big-active.svg';
 import keyboardBigActivePng from '@/assets/imgs/workflow/keyboard-big-active.svg';
+import editVcnIcon from "@/assets/imgs/workflow/edit-voice.svg";
 
 interface PanelIcons {
   zoomOut: string;
@@ -415,6 +417,7 @@ interface PanelIcons {
   keyboardBig: string;
   mouseBigActive: string;
   keyboardBigActive: string;
+  editVcn: string;
 }
 
 // 工作流图标集合接口
@@ -464,6 +467,7 @@ export const Icons: WorkflowIcons = {
     likeAndDislike: likeAndDislikeIcon,
     characterVoice: characterVoiceIcon,
     settingBackground: settingBackgroundIcon,
+    editVcn: editVcnIcon,
   },
   chatDebugger: {
     close: closeIcon,
@@ -625,6 +629,7 @@ export const Icons: WorkflowIcons = {
     keyboardBig: keyboardBigPng,
     mouseBigActive: mouseBigActivePng,
     keyboardBigActive: keyboardBigActivePng,
+    editVcn: editVcnIcon,
   },
   nodeOperation: {
     nodeEdit: nodeEditPng,
