@@ -7,6 +7,7 @@ public enum EnterpriseServiceTypeEnum {
     TEAM(1, "Team"),
     ENTERPRISE(2, "Enterprise");
 
+
     @EnumValue
     private Integer code;
 
