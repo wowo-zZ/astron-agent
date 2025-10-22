@@ -187,14 +187,16 @@ public class PersonalityConfigServiceImpl implements PersonalityConfigService {
     }
 
     @Override
-    @Cacheable(value = "personalityCache", key = "#root.methodName", cacheManager = "cacheManager5min")
     public PageResponse<PersonalityRole> getPersonalityRoles(Long categoryId, int pageNum, int pageSize) {
-        Page<PersonalityRole> page = personalityRoleMapper.selectPage(new Page<>(pageNum, pageSize),
-                new LambdaQueryWrapper<PersonalityRole>()
-                        .eq(PersonalityRole::getCategoryId, categoryId)
-                        .eq(PersonalityRole::getDeleted, 0)
-                        .orderByAsc(PersonalityRole::getSort));
-        return PageResponse.of(pageNum, pageSize, page.getTotal(), page.getRecords());
+        Page<PersonalityRole> page = new Page<>(pageNum, pageSize);
+        LambdaQueryWrapper<PersonalityRole> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(PersonalityRole::getDeleted, 0)
+                    .orderByAsc(PersonalityRole::getSort);
+        if (categoryId != 1) {
+            queryWrapper.eq(PersonalityRole::getCategoryId, categoryId);
+        }
+        Page<PersonalityRole> result = personalityRoleMapper.selectPage(page, queryWrapper);
+        return PageResponse.of((int) result.getCurrent(), (int) result.getSize(), result.getTotal(), result.getRecords());
     }
 
     public String getChatPrompt(PersonalityConfig personalityConfig, String originalPrompt) {

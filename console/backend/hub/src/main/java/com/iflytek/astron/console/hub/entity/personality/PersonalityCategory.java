@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 
 /**
  * Personality Category Entity
- * 性格类别实体类
  */
 @Data
 @TableName("personality_category")

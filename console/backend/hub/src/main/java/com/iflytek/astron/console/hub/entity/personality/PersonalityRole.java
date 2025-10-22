@@ -74,7 +74,7 @@ public class PersonalityRole implements Serializable {
      */
     @Schema(description = "Category ID")
     @TableField("category_id")
-    private String categoryId;
+    private Long categoryId;
 
     /**
      * Deletion Status (0: normal, 1: deleted)
