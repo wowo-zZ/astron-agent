@@ -3,20 +3,28 @@ package com.iflytek.astron.console.hub.service.bot.impl;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.iflytek.astron.console.commons.constant.ResponseEnum;
+import com.iflytek.astron.console.hub.dto.PageResponse;
 import com.iflytek.astron.console.commons.dto.bot.PersonalityConfigDto;
-import com.iflytek.astron.console.commons.entity.bot.PersonalityConfig;
-import com.iflytek.astron.console.commons.enums.bot.ConfigTypeEnum;
+import com.iflytek.astron.console.hub.entity.personality.PersonalityCategory;
+import com.iflytek.astron.console.hub.entity.personality.PersonalityConfig;
+import com.iflytek.astron.console.hub.enums.ConfigTypeEnum;
 import com.iflytek.astron.console.commons.exception.BusinessException;
-import com.iflytek.astron.console.commons.mapper.bot.PersonalityConfigMapper;
+import com.iflytek.astron.console.hub.entity.personality.PersonalityRole;
+import com.iflytek.astron.console.hub.mapper.personality.PersonalityCategoryMapper;
+import com.iflytek.astron.console.hub.mapper.personality.PersonalityConfigMapper;
 import com.iflytek.astron.console.commons.util.I18nUtil;
+import com.iflytek.astron.console.hub.mapper.personality.PersonalityRoleMapper;
 import com.iflytek.astron.console.hub.service.bot.PersonalityConfigService;
 import com.iflytek.astron.console.hub.util.BotAIServiceClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.cache.annotation.Cacheable;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +32,10 @@ import java.time.LocalDateTime;
 public class PersonalityConfigServiceImpl implements PersonalityConfigService {
 
     private final PersonalityConfigMapper personalityConfigMapper;
+
+    private final PersonalityCategoryMapper personalityCategoryMapper;
+    
+    private final PersonalityRoleMapper personalityRoleMapper;
 
     private final BotAIServiceClient aiServiceClient;
 
@@ -67,8 +79,7 @@ public class PersonalityConfigServiceImpl implements PersonalityConfigService {
     }
 
     @Override
-    public String getChatPrompt(Long botId, String originalPrompt, boolean isCreator) {
-        ConfigTypeEnum configType = isCreator ? ConfigTypeEnum.DEBUG : ConfigTypeEnum.MARKET;
+    public String getChatPrompt(Long botId, String originalPrompt, ConfigTypeEnum configType) {
         PersonalityConfig personalityConfig = personalityConfigMapper.selectOne(new LambdaQueryWrapper<PersonalityConfig>()
                 .eq(PersonalityConfig::getBotId, botId)
                 .eq(PersonalityConfig::getConfigType, configType.getValue())
@@ -152,9 +163,39 @@ public class PersonalityConfigServiceImpl implements PersonalityConfigService {
 
     @Override
     public PersonalityConfigDto getPersonalConfig(Long botId) {
-        return null;
+        PersonalityConfig config = personalityConfigMapper.selectOne(
+                new LambdaQueryWrapper<PersonalityConfig>()
+                        .eq(PersonalityConfig::getBotId, botId)
+                        .eq(PersonalityConfig::getConfigType, ConfigTypeEnum.DEBUG.getValue())
+                        .eq(PersonalityConfig::getDeleted, 0));
+        if (config == null) {
+            return null;
+        }
+        PersonalityConfigDto dto = new PersonalityConfigDto();
+        dto.setPersonality(config.getPersonality());
+        dto.setSceneType(config.getSceneType());
+        dto.setSceneInfo(config.getSceneInfo());
+        return dto;
     }
 
+    @Override
+    @Cacheable(value = "personalityCache", key = "#root.methodName", cacheManager = "cacheManager5min")
+    public List<PersonalityCategory> getPersonalityCategories() {
+        return personalityCategoryMapper.selectList(new LambdaQueryWrapper<PersonalityCategory>()
+                .orderByAsc(PersonalityCategory::getSort)
+                .eq(PersonalityCategory::getDeleted, 0));
+    }
+
+    @Override
+    @Cacheable(value = "personalityCache", key = "#root.methodName", cacheManager = "cacheManager5min")
+    public PageResponse<PersonalityRole> getPersonalityRoles(Long categoryId, int pageNum, int pageSize) {
+        Page<PersonalityRole> page = personalityRoleMapper.selectPage(new Page<>(pageNum, pageSize),
+                new LambdaQueryWrapper<PersonalityRole>()
+                        .eq(PersonalityRole::getCategoryId, categoryId)
+                        .eq(PersonalityRole::getDeleted, 0)
+                        .orderByAsc(PersonalityRole::getSort));
+        return PageResponse.of(pageNum, pageSize, page.getTotal(), page.getRecords());
+    }
 
     public String getChatPrompt(PersonalityConfig personalityConfig, String originalPrompt) {
         if (personalityConfig == null) {

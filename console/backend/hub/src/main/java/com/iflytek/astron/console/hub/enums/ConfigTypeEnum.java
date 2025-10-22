@@ -1,4 +1,4 @@
-package com.iflytek.astron.console.commons.enums.bot;
+package com.iflytek.astron.console.hub.enums;
 
 /**
  * Configuration type enumeration for personality settings Used to distinguish between different

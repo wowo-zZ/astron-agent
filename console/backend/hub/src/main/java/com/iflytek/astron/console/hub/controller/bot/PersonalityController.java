@@ -1,14 +1,17 @@
 package com.iflytek.astron.console.hub.controller.bot;
 
 import com.iflytek.astron.console.commons.response.ApiResult;
+import com.iflytek.astron.console.hub.dto.PageResponse;
+import com.iflytek.astron.console.hub.entity.personality.PersonalityCategory;
+import com.iflytek.astron.console.hub.entity.personality.PersonalityRole;
 import com.iflytek.astron.console.hub.service.bot.PersonalityConfigService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * REST controller for personality configuration operations Provides endpoints for AI-powered
@@ -61,6 +64,33 @@ public class PersonalityController {
             @RequestParam("prompt") String prompt,
             @RequestParam("personality") String personality) {
         return ApiResult.success(personalityConfigService.aiPolishing(botName, category, info, prompt, personality));
+    }
+
+
+    /**
+     * Get personality category list
+     *
+     * @return ApiResult containing the personality category list
+     */
+    @GetMapping("/getCategory")
+    public ApiResult<List<PersonalityCategory>> getCategory() {
+        return ApiResult.success(personalityConfigService.getPersonalityCategories());
+    }
+
+
+    
+    @GetMapping("/getRole")
+    public ApiResult<PageResponse<PersonalityRole>> getRole(
+            @RequestParam("categoryId") Long categoryId,
+            @RequestParam("pageNum") Integer pageNum,
+            @RequestParam("pageSize") Integer pageSize) {
+        if (pageNum < 0) {  
+            pageNum = 0;
+        }
+        if (pageSize > 100) {
+            pageSize = 100;
+        }
+        return ApiResult.success(personalityConfigService.getPersonalityRoles(categoryId, pageNum, pageSize));
     }
 
 }

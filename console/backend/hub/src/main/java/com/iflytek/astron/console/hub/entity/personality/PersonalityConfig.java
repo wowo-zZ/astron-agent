@@ -1,4 +1,4 @@
-package com.iflytek.astron.console.commons.entity.bot;
+package com.iflytek.astron.console.hub.entity.personality;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -10,6 +10,7 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 @TableName("personality_config")
 public class PersonalityConfig implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

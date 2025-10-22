@@ -10,7 +10,6 @@ import com.iflytek.astron.console.commons.dto.chat.ChatListCreateResponse;
 import com.iflytek.astron.console.commons.dto.llm.SparkChatRequest;
 import com.iflytek.astron.console.commons.entity.bot.ChatBotBase;
 import com.iflytek.astron.console.commons.entity.bot.ChatBotMarket;
-import com.iflytek.astron.console.commons.entity.bot.PersonalityConfig;
 import com.iflytek.astron.console.commons.entity.chat.ChatList;
 import com.iflytek.astron.console.commons.entity.chat.ChatReqRecords;
 import com.iflytek.astron.console.commons.enums.ShelfStatusEnum;
@@ -27,6 +26,7 @@ import com.iflytek.astron.console.commons.util.SseEmitterUtil;
 import com.iflytek.astron.console.commons.util.space.SpaceInfoUtil;
 import com.iflytek.astron.console.hub.data.ReqKnowledgeRecordsDataService;
 import com.iflytek.astron.console.hub.entity.ReqKnowledgeRecords;
+import com.iflytek.astron.console.hub.enums.ConfigTypeEnum;
 import com.iflytek.astron.console.hub.service.PromptChatService;
 import com.iflytek.astron.console.hub.service.SparkChatService;
 import com.iflytek.astron.console.hub.service.bot.PersonalityConfigService;
@@ -298,7 +298,7 @@ public class BotChatServiceImpl implements BotChatService {
 
         if (chatBotMarket != null && ShelfStatusEnum.isOnShelf(chatBotMarket.getBotStatus())) {
             return new BotConfiguration(
-                    chatBotMarket.getPrompt(),
+                    personalityConfigService.getChatPrompt(botId.longValue(), chatBotMarket.getPrompt(), ConfigTypeEnum.MARKET),
                     chatBotMarket.getSupportContext() == 1,
                     chatBotMarket.getModel(),
                     chatBotMarket.getOpenedTool(),
@@ -309,7 +309,7 @@ public class BotChatServiceImpl implements BotChatService {
             ChatBotBase chatBotBase = chatBotDataService.findById(botId)
                     .orElseThrow(() -> new BusinessException(ResponseEnum.BOT_NOT_EXISTS));
             return new BotConfiguration(
-                    chatBotBase.getPrompt(),
+                    personalityConfigService.getChatPrompt(botId.longValue(), chatBotBase.getPrompt(), ConfigTypeEnum.DEBUG),
                     chatBotBase.getSupportContext() == 1,
                     chatBotBase.getModel(),
                     chatBotBase.getOpenedTool(),

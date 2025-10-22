@@ -1,7 +1,12 @@
 package com.iflytek.astron.console.hub.service.bot;
 
+import com.iflytek.astron.console.hub.dto.PageResponse;
 import com.iflytek.astron.console.commons.dto.bot.PersonalityConfigDto;
-import com.iflytek.astron.console.commons.enums.bot.ConfigTypeEnum;
+import com.iflytek.astron.console.hub.enums.ConfigTypeEnum;
+import com.iflytek.astron.console.hub.entity.personality.PersonalityCategory;
+import com.iflytek.astron.console.hub.entity.personality.PersonalityRole;
+
+import java.util.List;
 
 /**
  * Service interface for managing personality configurations for chatbots Provides functionality for
@@ -40,7 +45,7 @@ public interface PersonalityConfigService {
      * @param isCreator whether the user is the creator of the bot
      * @return processed chat prompt
      */
-    String getChatPrompt(Long botId, String originalPrompt, boolean isCreator);
+    String getChatPrompt(Long botId, String originalPrompt, ConfigTypeEnum configType);
 
     /**
      * Get chat prompt using personality configuration string
@@ -85,4 +90,19 @@ public interface PersonalityConfigService {
      */
     PersonalityConfigDto getPersonalConfig(Long botId);
 
+    /**
+     * Get personality categories
+     *
+     * @return List of PersonalityCategory
+     */
+    List<PersonalityCategory> getPersonalityCategories();
+
+    /**
+     * Get personality roles by category ID
+     * @param categoryId the ID of the category
+     * @param pageNum the page number
+     * @param pageSize the page size
+     * @return Page of PersonalityRole with pagination
+     */
+    PageResponse<PersonalityRole> getPersonalityRoles(Long categoryId, int pageNum, int pageSize);
 }
