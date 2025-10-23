@@ -142,7 +142,8 @@ const Sidebar = ({
   return (
     <div
       className={`
-        relative bg-white flex flex-col flex-shrink-0 p-4 h-full
+        relative bg-white flex flex-col flex-shrink-0 h-full
+        pt-[22px] px-4 pb-4
         ${isCollapsed ? 'w-[76px] items-center justify-between' : 'w-[220px]'}
         ${className}
       `}
