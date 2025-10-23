@@ -5,7 +5,7 @@
     <!-- Disable personality configurations for specified bot ID and config type -->
     <update id="setDisabledByBotIdAndConfigType">
         UPDATE personality_config
-        SET enabled = 0,
+        SET enabled = 0
             WHERE bot_id = #{botId}
                 AND config_type = #{configType}
                 AND deleted = 0
