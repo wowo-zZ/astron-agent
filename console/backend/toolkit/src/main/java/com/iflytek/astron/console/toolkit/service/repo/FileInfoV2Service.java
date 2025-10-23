@@ -60,11 +60,13 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import okhttp3.HttpUrl;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -1807,11 +1809,11 @@ public class FileInfoV2Service extends ServiceImpl<FileInfoV2Mapper, FileInfoV2>
      */
     public void createFolder(CreateFolderVO folderVO) {
         String name = folderVO.getName();
-        String regex = ".*[\\\\/:*?\"<>|].*";
+        Pattern pattern = Pattern.compile("[\\\\/:*?\"<>|]");
         if (ObjectIsNull.check(name)) {
             throw new BusinessException(ResponseEnum.REPO_FILE_NAME_CANNOT_EMPTY);
         } else {
-            boolean flag = name.matches(regex);
+            boolean flag = pattern.matcher(name).find();
             if (flag) {
                 throw new BusinessException(ResponseEnum.REPO_FOLDER_NAME_ILLEGAL);
             }
@@ -1851,11 +1853,11 @@ public class FileInfoV2Service extends ServiceImpl<FileInfoV2Mapper, FileInfoV2>
      */
     public void updateFolder(CreateFolderVO folderVO) {
         String name = folderVO.getName();
-        String regex = ".*[\\\\/:*?\"<>|].*";
+        Pattern pattern = Pattern.compile("[\\\\/:*?\"<>|]");
         if (ObjectIsNull.check(name)) {
             throw new BusinessException(ResponseEnum.REPO_FILE_NAME_CANNOT_EMPTY);
         } else {
-            boolean flag = name.matches(regex);
+            boolean flag = pattern.matcher(name).find();
             if (flag) {
                 throw new BusinessException(ResponseEnum.REPO_FOLDER_NAME_ILLEGAL);
             }
@@ -1946,18 +1948,42 @@ public class FileInfoV2Service extends ServiceImpl<FileInfoV2Mapper, FileInfoV2>
 
     /* ======================== Spark Branch ======================== */
     private void streamSparkSearch(SseEmitter emitter, Long repoId, String fileName, HttpServletRequest request) throws IOException {
-        String url = apiUrl.getDatasetFileUrl() + "?datasetId="
-                .concat(repoId.toString())
-                .concat("&searchValue=")
-                .concat(fileName);
-        log.info("searchFile request url: {}", url);
+        // Use HttpUrl.Builder to construct URL safely and prevent SSRF attacks
+        HttpUrl url;
+        try {
+            HttpUrl base = HttpUrl.parse(apiUrl.getDatasetFileUrl());
+            if (base == null) {
+                log.error("Failed to parse base URL: {}", apiUrl.getDatasetFileUrl());
+                throw new IOException("Invalid base URL configuration");
+            }
+
+            url = base.newBuilder()
+                    .addQueryParameter("datasetId", repoId.toString())
+                    .addQueryParameter("searchValue", fileName)
+                    .build();
+
+            // Validate that the constructed URL has the same host as the base URL
+            String expectedHost = base.host();
+            if (!url.host().equals(expectedHost)) {
+                log.error("Refusing to send request to unexpected host: {}", url.host());
+                throw new IOException("Refusing to send request to untrusted host");
+            }
+
+            log.info("searchFile request url: {}", url);
+        } catch (NullPointerException e) {
+            log.error("Null pointer exception while constructing URL", e);
+            throw new IOException("Failed to construct request URL", e);
+        } catch (IllegalArgumentException e) {
+            log.error("Invalid URL format", e);
+            throw new IOException("Invalid URL format", e);
+        }
 
         Map<String, String> header = new HashMap<>();
         String authorization = request.getHeader("Authorization");
         if (StringUtils.isNotBlank(authorization)) {
             header.put("Authorization", authorization);
         }
-        String resp = OkHttpUtil.get(url, header);
+        String resp = OkHttpUtil.get(url.toString(), header);
         JSONObject obj = JSON.parseObject(resp);
         log.info("searchFile response data: {}", resp);
 

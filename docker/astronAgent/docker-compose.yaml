@@ -1,3 +1,6 @@
+include:
+  - docker-compose-with-auth.yml
+
 services:
   # ============================================================================
   # Infrastructure Services
@@ -58,53 +61,53 @@ services:
       timeout: ${HEALTH_CHECK_TIMEOUT:-10s}
       retries: ${HEALTH_CHECK_RETRIES:-60}
 
-  # Elasticsearch Search Engine
-  elasticsearch:
-    image: elasticsearch:7.16.2
-    container_name: astron-agent-elasticsearch
-    environment:
-      - discovery.type=single-node
-      - "ES_JAVA_OPTS=${ES_JAVA_OPTS:--Xms512m -Xmx512m}"
-      - xpack.security.enabled=${ELASTICSEARCH_SECURITY_ENABLED:-false}
-      - cluster.name=astron-agent-cluster
-    volumes:
-      - elasticsearch_data:/usr/share/elasticsearch/data
-    networks:
-      - astron-agent-network
-    restart: always
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9200/_cluster/health"]
-      interval: ${HEALTH_CHECK_INTERVAL:-30s}
-      timeout: ${HEALTH_CHECK_TIMEOUT:-10s}
-      retries: ${HEALTH_CHECK_RETRIES:-60}
+  # Elasticsearch Search Engine (Disabled by default, uncomment to enable)
+  # elasticsearch:
+  #   image: elasticsearch:7.16.2
+  #   container_name: astron-agent-elasticsearch
+  #   environment:
+  #     - discovery.type=single-node
+  #     - "ES_JAVA_OPTS=${ES_JAVA_OPTS:--Xms512m -Xmx512m}"
+  #     - xpack.security.enabled=${ELASTICSEARCH_SECURITY_ENABLED:-false}
+  #     - cluster.name=astron-agent-cluster
+  #   volumes:
+  #     - elasticsearch_data:/usr/share/elasticsearch/data
+  #   networks:
+  #     - astron-agent-network
+  #   restart: always
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:9200/_cluster/health"]
+  #     interval: ${HEALTH_CHECK_INTERVAL:-30s}
+  #     timeout: ${HEALTH_CHECK_TIMEOUT:-10s}
+  #     retries: ${HEALTH_CHECK_RETRIES:-60}
 
-  # Kafka Message Queue
-  kafka:
-    image: apache/kafka:3.7.0
-    container_name: astron-agent-kafka
-    environment:
-      KAFKA_NODE_ID: 1
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,CONTROLLER://0.0.0.0:29093
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:29093
-      KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: ${KAFKA_REPLICATION_FACTOR:-1}
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: ${KAFKA_REPLICATION_FACTOR:-1}
-      CLUSTER_ID: ${KAFKA_CLUSTER_ID:-MkU3OEVBNTcwNTJENDM2Qk}
-    volumes:
-      - kafka_data:/var/lib/kafka/data
-    networks:
-      - astron-agent-network
-    restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "netstat -tulpn | grep 29092 || exit 1"]
-      interval: ${HEALTH_CHECK_INTERVAL:-30s}
-      timeout: ${HEALTH_CHECK_TIMEOUT:-10s}
-      retries: ${HEALTH_CHECK_RETRIES:-60}
+  # Kafka Message Queue (Disabled by default, uncomment to enable)
+  # kafka:
+  #   image: apache/kafka:3.7.0
+  #   container_name: astron-agent-kafka
+  #   environment:
+  #     KAFKA_NODE_ID: 1
+  #     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+  #     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092
+  #     KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,CONTROLLER://0.0.0.0:29093
+  #     KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+  #     KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+  #     KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:29093
+  #     KAFKA_PROCESS_ROLES: broker,controller
+  #     KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+  #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: ${KAFKA_REPLICATION_FACTOR:-1}
+  #     KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: ${KAFKA_REPLICATION_FACTOR:-1}
+  #     CLUSTER_ID: ${KAFKA_CLUSTER_ID:-MkU3OEVBNTcwNTJENDM2Qk}
+  #   volumes:
+  #     - kafka_data:/var/lib/kafka/data
+  #   networks:
+  #     - astron-agent-network
+  #   restart: always
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "netstat -tulpn | grep 29092 || exit 1"]
+  #     interval: ${HEALTH_CHECK_INTERVAL:-30s}
+  #     timeout: ${HEALTH_CHECK_TIMEOUT:-10s}
+  #     retries: ${HEALTH_CHECK_RETRIES:-60}
 
   # MinIO Object Storage
   minio:
@@ -134,7 +137,7 @@ services:
 
   # Tenant Service
   core-tenant:
-    image: ghcr.io/iflytek/astron-agent/core-tenant:latest
+    image: ghcr.io/iflytek/astron-agent/core-tenant:${ASTRON_AGENT_VERSION:-latest}
     container_name: astron-agent-core-tenant
     environment:
       SERVICE_PORT: "${CORE_TENANT_PORT:-5052}"
@@ -153,10 +156,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      elasticsearch:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
       minio:
         condition: service_healthy
     volumes:
@@ -170,7 +169,7 @@ services:
   # Memory Database Service
 
   core-database:
-    image: ghcr.io/iflytek/astron-agent/core-database:latest
+    image: ghcr.io/iflytek/astron-agent/core-database:${ASTRON_AGENT_VERSION:-latest}
     container_name: astron-agent-core-database
     environment:
       SERVICE_PORT: "${CORE_DATABASE_PORT:-7990}"
@@ -188,10 +187,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      elasticsearch:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
       minio:
         condition: service_healthy
     volumes:
@@ -203,7 +198,7 @@ services:
 
   # RPA Plugin Service
   core-rpa:
-    image: ghcr.io/iflytek/astron-agent/core-rpa:latest
+    image: ghcr.io/iflytek/astron-agent/core-rpa:${ASTRON_AGENT_VERSION:-latest}
     container_name: astron-agent-core-rpa
     environment:
       SERVICE_PORT: "${CORE_RPA_PORT:-17198}"
@@ -219,10 +214,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      elasticsearch:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
       minio:
         condition: service_healthy
     volumes:
@@ -234,7 +225,7 @@ services:
 
   # Link Plugin Service
   core-link:
-    image: ghcr.io/iflytek/astron-agent/core-link:latest
+    image: ghcr.io/iflytek/astron-agent/core-link:${ASTRON_AGENT_VERSION:-latest}
     container_name: astron-agent-core-link
     environment:
       SERVICE_PORT: "${CORE_LINK_PORT:-18888}"
@@ -257,10 +248,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      elasticsearch:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
       minio:
         condition: service_healthy
     volumes:
@@ -272,7 +259,7 @@ services:
 
   # AI Tools Plugin Service
   core-aitools:
-    image: ghcr.io/iflytek/astron-agent/core-aitools:latest
+    image: ghcr.io/iflytek/astron-agent/core-aitools:${ASTRON_AGENT_VERSION:-latest}
     container_name: astron-agent-core-aitools
     environment:
       SERVICE_PORT: "${CORE_AITOOLS_PORT:-18668}"
@@ -294,10 +281,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      elasticsearch:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
       minio:
         condition: service_healthy
     volumes:
@@ -309,7 +292,7 @@ services:
 
   # Agent Service
   core-agent:
-    image: ghcr.io/iflytek/astron-agent/core-agent:latest
+    image: ghcr.io/iflytek/astron-agent/core-agent:${ASTRON_AGENT_VERSION:-latest}
     container_name: astron-agent-core-agent
     environment:
       SERVICE_LOCATION: "${SERVICE_LOCATION:-hf}"
@@ -361,10 +344,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      elasticsearch:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
       minio:
         condition: service_healthy
     volumes:
@@ -375,7 +354,7 @@ services:
 
   # Knowledge Base Service
   core-knowledge:
-    image: ghcr.io/iflytek/astron-agent/core-knowledge:latest
+    image: ghcr.io/iflytek/astron-agent/core-knowledge:${ASTRON_AGENT_VERSION:-latest}
     container_name: astron-agent-core-knowledge
     environment:
       SERVICE_PORT: "${CORE_KNOWLEDGE_PORT:-20010}"
@@ -394,10 +373,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      elasticsearch:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
       minio:
         condition: service_healthy
     volumes:
@@ -409,7 +384,7 @@ services:
 
   # Workflow Service
   core-workflow:
-    image: ghcr.io/iflytek/astron-agent/core-workflow:latest
+    image: ghcr.io/iflytek/astron-agent/core-workflow:${ASTRON_AGENT_VERSION:-latest}
     container_name: astron-agent-core-workflow
     environment:
       RUNTIME_ENV: "${RUNTIME_ENV:-dev}"
@@ -458,10 +433,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      elasticsearch:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
       minio:
         condition: service_healthy
     volumes:
@@ -498,7 +469,7 @@ services:
 
   # Console Frontend
   console-frontend:
-    image: ghcr.io/iflytek/astron-agent/console-frontend:latest
+    image: ghcr.io/iflytek/astron-agent/console-frontend:${ASTRON_AGENT_VERSION:-latest}
     container_name: astron-agent-console-frontend
     environment:
       CONSOLE_CASDOOR_URL: "${CONSOLE_CASDOOR_URL:-}"
@@ -507,13 +478,15 @@ services:
       CONSOLE_CASDOOR_ORG: "${CONSOLE_CASDOOR_ORG:-}"
     expose:
       - "1881"
+    depends_on:
+      - casdoor
     networks:
       - astron-agent-network
     restart: always
 
 #   Console Hub Service
   console-hub:
-    image: ghcr.io/iflytek/astron-agent/console-hub:latest
+    image: ghcr.io/iflytek/astron-agent/console-hub:${ASTRON_AGENT_VERSION:-latest}
     container_name: astron-agent-console-hub
     environment:
       CONSOLE_CASDOOR_URL: "${CONSOLE_CASDOOR_URL:-}"
@@ -593,15 +566,13 @@ services:
     expose:
       - "8080"
     depends_on:
+      casdoor:
+        condition: service_started
       postgres:
         condition: service_healthy
       mysql:
         condition: service_healthy
       redis:
-        condition: service_healthy
-      elasticsearch:
-        condition: service_healthy
-      kafka:
         condition: service_healthy
       minio:
         condition: service_healthy
