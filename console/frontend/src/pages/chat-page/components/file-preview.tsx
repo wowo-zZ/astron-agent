@@ -14,10 +14,8 @@ const FilePreview = ({
 }): ReactElement => {
   // 根据文件类型渲染预览内容
   const renderFilePreview = () => {
-    const fileType = file.type?.split('/')[0] || '';
     const extension = file.fileName?.split('.').pop()?.toLowerCase();
-
-    switch (fileType || extension) {
+    switch (extension) {
       case 'jpg':
       case 'jpeg':
       case 'png':

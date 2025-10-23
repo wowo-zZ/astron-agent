@@ -154,6 +154,7 @@ const useChat = () => {
           ignore,
           error,
           reqId,
+          message,
         } = deCodedData;
         sseId && setStreamId(sseId);
         id && (sidRef.current = id.toString());
@@ -215,7 +216,7 @@ const useChat = () => {
             return;
           }
           // 更新流式消息内容
-          ans = `${ans}${choices?.[0]?.delta?.content || ''}`;
+          ans = `${ans}${choices?.[0]?.delta?.content || message}`;
           updateStreamingMessage(ans);
         } else {
           //统一的报错处理
@@ -242,19 +243,17 @@ const useChat = () => {
     msg: string;
     workflowOperation?: string;
     version?: string;
-    fileUrl?: string;
     onSendCallback?: () => void;
   }) => {
     setIsWorkflowOption(false);
     setWorkflowOption({ option: [], content: '' });
-    const { msg, workflowOperation, version, fileUrl, onSendCallback } = params;
+    const { msg, workflowOperation, version, onSendCallback } = params;
     const esURL = `${baseURL}/chat-message/chat`;
     const form = new FormData();
     form.append('text', msg || '');
     form.append('chatId', `${currentChatId}`);
     form.append('workflowVersion', version || '');
     workflowOperation && form.append('workflowOperation', workflowOperation);
-    fileUrl && form.append('fileUrl', fileUrl);
     // 执行回调函数
     onSendCallback && onSendCallback();
     fetchSSE(esURL, form);
