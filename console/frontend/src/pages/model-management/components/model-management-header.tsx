@@ -152,7 +152,6 @@ const ModelManagementHeader: React.FC<ModelManagementHeaderProps> = ({
               />
             )}
             <RetractableInput
-              className="retractable-input-UI"
               value={searchInput}
               restrictFirstChar={true}
               onChange={getRobotsDebounce}

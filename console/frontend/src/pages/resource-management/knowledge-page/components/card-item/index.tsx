@@ -77,9 +77,9 @@ const CardItem: React.FC<CardItemProps> = ({ knowledge, onDelete }) => {
         <div className={styles.header}>
           <img src={folderIcon} className={styles.folderIcon} alt="" />
           <div className={styles.headerRight}>
-            <span className={styles.title} title={knowledge.name}>
+            <div className={styles.title} title={knowledge.name}>
               {knowledge.name}
-            </span>
+            </div>
             <div className={styles.description} title={knowledge.description}>
               {knowledge.description}
             </div>

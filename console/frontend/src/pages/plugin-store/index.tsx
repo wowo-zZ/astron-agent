@@ -239,7 +239,6 @@ function PluginStore(): ReactElement {
             ></Select>
             <div className="relative ml-[8px] search-input-rounded">
               <RetractableInput
-                className="retractable-input-UI"
                 restrictFirstChar={true}
                 onChange={getToolsDebounce}
                 value={content}

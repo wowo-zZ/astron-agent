@@ -144,7 +144,6 @@ function index({ onSearch, onCreate }: HeaderProps): JSX.Element {
           {currentTabConfig && (
             <div className={styles.searchContainer}>
               <RetractableInput
-                className="retractable-input-UI"
                 restrictFirstChar={true}
                 onChange={handleSearchDebounce}
                 placeholder={t(currentTabConfig.searchPlaceholder)}

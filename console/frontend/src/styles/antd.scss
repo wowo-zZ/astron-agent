@@ -1650,7 +1650,7 @@ input[type='number']::-webkit-outer-spin-button {
 }
 
 .common-btn-primary {
-  background: #275eff !important;
+  background: var(--primary-color) !important;
   color: #ffffff;
   border: none;
 }
@@ -1659,15 +1659,16 @@ input[type='number']::-webkit-outer-spin-button {
   color: #333333;
   border-color: #d3dbf8;
   &:hover {
-    color: #275eff;
-    border-color: #275eff;
+    color: var(--primary-color);
+    border-color: var(--primary-color);
   }
 }
 
-a.ant-typography {
-  color: #6356ea;
+a.ant-typography,
+.ant-typography .ant-typography-copy {
+  color: var(--primary-color);
   &:hover {
-    color: #6356ea;
+    color: var(--primary-color);
     opacity: 0.6;
   }
 }
