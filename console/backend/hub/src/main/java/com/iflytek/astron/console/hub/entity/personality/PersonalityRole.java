@@ -61,7 +61,7 @@ public class PersonalityRole implements Serializable {
     @Schema(description = "Cover Image")
     @TableField("cover")
     private String cover;
-    
+
     /**
      * Sort
      */

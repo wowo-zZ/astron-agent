@@ -34,7 +34,7 @@ public class PersonalityConfigServiceImpl implements PersonalityConfigService {
     private final PersonalityConfigMapper personalityConfigMapper;
 
     private final PersonalityCategoryMapper personalityCategoryMapper;
-    
+
     private final PersonalityRoleMapper personalityRoleMapper;
 
     private final BotAIServiceClient aiServiceClient;
@@ -193,7 +193,7 @@ public class PersonalityConfigServiceImpl implements PersonalityConfigService {
         Page<PersonalityRole> page = new Page<>(pageNum, pageSize);
         LambdaQueryWrapper<PersonalityRole> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(PersonalityRole::getDeleted, 0)
-                    .orderByAsc(PersonalityRole::getSort);
+                .orderByAsc(PersonalityRole::getSort);
         if (categoryId != 1) {
             queryWrapper.eq(PersonalityRole::getCategoryId, categoryId);
         }
@@ -212,11 +212,13 @@ public class PersonalityConfigServiceImpl implements PersonalityConfigService {
         if (config == null) {
             return;
         }
-        insertOrUpdate(new PersonalityConfigDto() {{
-            setPersonality(config.getPersonality());
-            setSceneType(config.getSceneType());
-            setSceneInfo(config.getSceneInfo());
-        }}, targetBotId.longValue(), ConfigTypeEnum.DEBUG);
+        insertOrUpdate(new PersonalityConfigDto() {
+            {
+                setPersonality(config.getPersonality());
+                setSceneType(config.getSceneType());
+                setSceneInfo(config.getSceneInfo());
+            }
+        }, targetBotId.longValue(), ConfigTypeEnum.DEBUG);
     }
 
     public String getChatPrompt(PersonalityConfig personalityConfig, String originalPrompt) {

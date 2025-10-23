@@ -93,11 +93,11 @@ public class MyBotController {
         // Return model information, if modelId is empty, it indicates default model
         BotModelDto botModelDto = chatListService.getBotModelDto(request, botDetail.getModelId(), botDetail.getModel());
         botDetail.setBotModel(botModelDto);
-        
+
         // Get personality config
         PersonalityConfigDto personalityConfigDto = personalityConfigService.getPersonalConfig(botId.longValue());
         botDetail.setPersonalityConfig(personalityConfigDto);
-        
+
         return ApiResult.success(botDetail);
     }
 

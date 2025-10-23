@@ -57,7 +57,7 @@ public class BotDebugRequest {
     private String maasDatasetListStr;
 
     private Long modelId;
-    
+
     /**
      * Personality configuration
      */

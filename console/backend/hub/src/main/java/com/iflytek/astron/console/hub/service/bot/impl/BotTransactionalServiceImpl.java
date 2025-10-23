@@ -30,7 +30,7 @@ public class BotTransactionalServiceImpl implements BotTransactionalService {
 
     @Autowired
     private RedissonClient redissonClient;
-    
+
     @Autowired
     private PersonalityConfigService personalityConfigService;
 

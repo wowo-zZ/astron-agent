@@ -67,7 +67,7 @@ public class BotCreateController {
 
     @Autowired
     private RedisUtil redisUtil;
-    
+
     @Autowired
     private PersonalityConfigService personalityConfigService;
 
@@ -111,9 +111,9 @@ public class BotCreateController {
         if (maasDocumentExist) {
             botDatasetMaasService.botAssociateDataset(uid, botId, maasDatasetList, supportDocument);
         }
-        
+
         if (Boolean.TRUE.equals(bot.getEnablePersonality())) {
-            personalityConfigService.insertOrUpdate(bot.getPersonalityConfig(), botId.longValue(), ConfigTypeEnum.DEBUG);       
+            personalityConfigService.insertOrUpdate(bot.getPersonalityConfig(), botId.longValue(), ConfigTypeEnum.DEBUG);
         } else {
             personalityConfigService.setDisabledByBotId(botId.longValue());
         }

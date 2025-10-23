@@ -95,7 +95,7 @@ public class BotChatServiceImpl implements BotChatService {
 
     @Autowired
     private ReqKnowledgeRecordsDataService reqKnowledgeRecordsDataService;
-    
+
     @Autowired
     private PersonalityConfigService personalityConfigService;
 
