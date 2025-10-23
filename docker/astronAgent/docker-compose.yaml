@@ -586,9 +586,6 @@ services:
 networks:
   astron-agent-network:
     driver: bridge
-    ipam:
-      config:
-        - subnet: ${NETWORK_SUBNET:-172.40.0.0/16}
 
 # ============================================================================
 # Volume Configuration

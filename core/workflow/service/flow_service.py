@@ -57,7 +57,6 @@ def save(flow: Flow, app_info: App, session: Session, span: Span) -> Flow:
         name=flow.name,
         data=flow.data,
         description=flow.description,
-        status=flow.status,
         app_id=flow.app_id,
         source=app_info.actual_source,
         version="-1",  # Initial version for new flows
@@ -95,11 +94,6 @@ def update(
             db_flow.app_id = flow.app_id
         if flow.data:
             db_flow.data = flow.data
-        if flow.status:
-            db_flow.status = flow.status
-            # Set release data when status is published (status > 0)
-            if flow.status > 0:
-                db_flow.release_data = db_flow.data
 
         session.add(db_flow)
         session.commit()

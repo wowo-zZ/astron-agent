@@ -1,7 +1,6 @@
 import re
 from typing import Tuple
 
-import requests  # type: ignore
 from pydantic import BaseModel
 
 from workflow.configs import workflow_config
@@ -121,6 +120,8 @@ class File(BaseModel):
         """
         try:
             # Send HEAD request
+            import requests  # type: ignore
+
             response = requests.head(input_file_url)
             # Get file metadata from response headers
             content_length = response.headers.get(

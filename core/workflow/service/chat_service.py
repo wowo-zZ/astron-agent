@@ -19,7 +19,6 @@ from typing import (
 
 from loguru import logger
 
-from workflow.cache.engine import get_engine, set_engine
 from workflow.cache.event_registry import Event, EventRegistry
 from workflow.consts.app_audit import AppAuditPolicy
 from workflow.consts.engine.chat_status import ChatStatus
@@ -38,7 +37,6 @@ from workflow.engine.callbacks.openai_types_sse import (
     WorkflowStep,
 )
 from workflow.engine.dsl_engine import WorkflowEngine, WorkflowEngineFactory
-from workflow.engine.entities.file import File
 from workflow.engine.entities.msg_or_end_dep_info import MsgOrEndDepInfo
 from workflow.engine.entities.node_entities import NodeType
 from workflow.engine.entities.variable_pool import ParamKey, VariablePool
@@ -176,6 +174,8 @@ async def _get_or_build_workflow_engine(
     need_rebuild = True
 
     # Attempt to retrieve engine from cache
+    from workflow.cache.engine import get_engine, set_engine
+
     sparkflow_engine_cache_obj = get_engine(
         is_release, chat_vo.flow_id, chat_vo.version, app_alias_id
     )
@@ -311,6 +311,8 @@ async def _validate_file_inputs(
     :raises CustomException: When file validation fails or
                              required parameters are missing
     """
+    from workflow.engine.entities.file import File
+
     file_info_list, has_file = File.has_file_in_dsl(workflow_dsl, span_context)
     if not has_file:
         return
