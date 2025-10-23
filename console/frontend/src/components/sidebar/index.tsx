@@ -142,12 +142,9 @@ const Sidebar = ({
   return (
     <div
       className={`
-        relative bg-white flex flex-col flex-shrink-0 p-4 h-full
-        ${
-          isCollapsed
-            ? 'w-[76px] items-center justify-between'
-            : 'w-[232px] rounded-r-3xl'
-        }
+        relative bg-white flex flex-col flex-shrink-0 h-full
+        pt-[22px] px-4 pb-4
+        ${isCollapsed ? 'w-[76px] items-center justify-between' : 'w-[220px]'}
         ${className}
       `}
     >
@@ -158,7 +155,7 @@ const Sidebar = ({
           flex items-center justify-center
           w-8 h-8 bg-white rounded-full cursor-pointer
           shadow-[0px_0px_20px_0px_rgba(0,18,70,0.08)]
-          hover:bg-[#275EFF] transition-colors duration-300
+          hover:bg-[#6356EA] transition-colors duration-300
           group
         "
         onClick={() => setIsCollapsed(!isCollapsed)}
@@ -205,6 +202,7 @@ const Sidebar = ({
 
         {/* Icon Entry */}
         <IconEntry
+          isCollapsed={isCollapsed}
           onMessageClick={() => {
             setNoticeModalVisible(true);
           }}

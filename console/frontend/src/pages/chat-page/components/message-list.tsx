@@ -105,7 +105,7 @@ const MessageList = (props: {
             ?.slice(0, 3)
             .map((item: string, index: number) => (
               <div
-                className="h-12 flex items-center mb-2 bg-white border border-[#e4eaff] rounded-xl px-4 cursor-pointer text-sm font-normal transition-all duration-200 ease-in-out hover:border-[#275eff]"
+                className="h-12 flex items-center mb-2 bg-white border border-[#e4eaff] rounded-xl px-4 cursor-pointer text-sm font-normal transition-all duration-200 ease-in-out hover:border-[#6356EA]"
                 key={index}
                 onClick={() =>
                   handleSendMessage({
@@ -162,7 +162,7 @@ const MessageList = (props: {
         className="max-w-[90%] text-white py-2.5 flex flex-row-reverse leading-[1.4] ml-auto h-auto"
       >
         <img src={user?.avatar} alt="" className="h-9 w-9 rounded-full ml-4" />
-        <div className="bg-[#275eff] rounded-[12px_0px_12px_12px] p-[14px_19px] relative max-w-full">
+        <div className="bg-[#6356EA] rounded-[12px_0px_12px_12px] p-[14px_19px] relative max-w-full">
           <div className="text-base font-normal text-white leading-[25px] whitespace-pre-wrap w-auto break-words">
             {item.message}
           </div>

@@ -245,7 +245,7 @@ const ChatInput = (props: {
         </div>
         <div
           className={clsx(
-            'rounded-2xl min-h-[140px] bg-white border px-2.5 pt-4 border-[#d3dbf8] focus-within:border-[1.5px] focus-within:border-[#275eff]',
+            'rounded-2xl min-h-[140px] bg-white border px-2.5 pt-4 border-[#d3dbf8] focus-within:border-[1.5px] focus-within:border-[#6356EA]',
             {
               'opacity-50 cursor-not-allowed': hasWorkflowOptionsToSelect(),
             }

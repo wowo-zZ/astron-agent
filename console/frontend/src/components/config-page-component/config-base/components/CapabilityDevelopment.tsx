@@ -566,7 +566,7 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
               onClick={() => {
                 setVisible(true);
               }}
-              style={{ color: '#275EFF', cursor: 'pointer' }}
+              style={{ color: '#6356EA', cursor: 'pointer' }}
             >
               + {t('configBase.CapabilityDevelopment.addKnowledgeBase')}
             </div>
@@ -891,7 +891,7 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
                 <>
                   <div className="relative">
                     <div
-                      className="absolute bottom-2 right-2.5 inline-flex items-center rounded-lg gap-1 cursor-pointer border border-[#275EFF] py-1 px-2.5 text-[#275EFF] text-sm bg-[#eff1f9] z-20"
+                      className="absolute bottom-2 right-2.5 inline-flex items-center rounded-lg gap-1 cursor-pointer border border-[#6356EA] py-1 px-2.5 text-[#6356EA] text-sm bg-[#eff1f9] z-20"
                       onClick={() => setOpeningRemarksModal(true)}
                     >
                       <img src={aiGenerate} className="w-4 h-4" alt="" />

@@ -179,7 +179,7 @@ export default function index(): React.ReactElement {
                                 <Space size={24}>
                                   <Button
                                     type="link"
-                                    className="p-0 !text-[#275EFF]"
+                                    className="p-0 !text-[#6356EA]"
                                     onClick={() => {
                                       modalDetailRef.current?.showModal(item);
                                     }}
@@ -194,7 +194,7 @@ export default function index(): React.ReactElement {
                                         rpaId: rpaDetail?.id,
                                       });
                                     }}
-                                    className="w-[100px] text-center px-[16px] py-[4px] bg-white rounded-lg box-border border border-gray-200 shadow-sm font-normal text-[14px] text-[#275EFF]"
+                                    className="w-[100px] text-center px-[16px] py-[4px] bg-white rounded-lg box-border border border-gray-200 shadow-sm font-normal text-[14px] text-[#6356EA]"
                                   >
                                     {t('workflow.nodes.rpaNode.add')}
                                     <span>

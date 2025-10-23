@@ -92,7 +92,7 @@ const ModelManagementHeader: React.FC<ModelManagementHeaderProps> = ({
 
               {/* 快速筛选 */}
               <span
-                className="ml-auto mr-2 text-[#275eff] cursor-pointer hover:underline"
+                className="ml-auto mr-2 text-[#6356EA] cursor-pointer hover:underline"
                 onClick={() => refreshModels?.()}
               >
                 {t('model.quickFilter')}
@@ -115,8 +115,8 @@ const ModelManagementHeader: React.FC<ModelManagementHeaderProps> = ({
               className={`min-w-[70px] h-8 px-3 rounded-lg text-sm flex items-center justify-center cursor-pointer transition-colors
             ${
               pathname === '/management/model'
-                ? 'bg-white text-[#275eff] shadow'
-                : 'text-[#7f7f7f] hover:text-[#275eff]'
+                ? 'bg-white text-[#6356EA] shadow'
+                : 'text-[#7f7f7f] hover:text-[#6356EA]'
             }`}
               onClick={() => navigate('/management/model')}
             >
@@ -126,8 +126,8 @@ const ModelManagementHeader: React.FC<ModelManagementHeaderProps> = ({
               className={`min-w-[70px] h-8 px-3 rounded-lg text-sm flex items-center justify-center cursor-pointer transition-colors
             ${
               pathname === '/management/model/personalModel'
-                ? 'bg-white text-[#275eff] shadow'
-                : 'text-[#7f7f7f] hover:text-[#275eff]'
+                ? 'bg-white text-[#6356EA] shadow'
+                : 'text-[#7f7f7f] hover:text-[#6356EA]'
             }`}
               onClick={() => navigate('/management/model/personalModel')}
             >
@@ -152,7 +152,6 @@ const ModelManagementHeader: React.FC<ModelManagementHeaderProps> = ({
               />
             )}
             <RetractableInput
-              className="retractable-input-UI"
               value={searchInput}
               restrictFirstChar={true}
               onChange={getRobotsDebounce}
