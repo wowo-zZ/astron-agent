@@ -5,6 +5,7 @@ const translation = {
     APIKey: 'API密钥',
     instructional: '指令型',
     workflow: '工作流',
+    virtual: '虚拟人',
     agentId: '智能体编号',
     agentName: '智能体名称',
     platform: '发布平台',
@@ -138,6 +139,8 @@ const translation = {
     unBindTipDesc2: '如需彻底完成解绑，您还需要前往',
     unBindTipDesc3: '微信服务号',
     unBindTipDesc4: '平台进行取消授权操作',
+    virtualPlatformPublishTitle: '发布到虚拟人交互平台',
+    virtualPlatformPublishTip: '发布成功',
   },
 };
 

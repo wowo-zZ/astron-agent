@@ -1,5 +1,3 @@
-$primaryColor: var(--primary-color);
-
 .ant-btn {
   color: rgba(0, 0, 0, 0.8);
   height: 40px;
@@ -7,14 +5,16 @@ $primaryColor: var(--primary-color);
   padding-top: 0px;
   padding-bottom: 0px;
   border-radius: 10px;
-  font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei",
-    "WenQuanYi Micro Hei", sans-serif !important;
+  font-family:
+    'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Hiragino Sans GB',
+    'Heiti SC', 'Microsoft YaHei', 'WenQuanYi Micro Hei', sans-serif !important;
   background: transparent !important;
 }
 
 .ant-input-show-count-suffix {
-  font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei",
-    "WenQuanYi Micro Hei", sans-serif !important;
+  font-family:
+    'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Hiragino Sans GB',
+    'Heiti SC', 'Microsoft YaHei', 'WenQuanYi Micro Hei', sans-serif !important;
   color: #a4a4a4 !important;
   font-weight: 500;
   font-size: 12px;
@@ -22,13 +22,17 @@ $primaryColor: var(--primary-color);
 
 .ant-btn-primary {
   color: #fff;
-  background: $primaryColor !important;
+  background: #6356ea !important;
 }
 
 .ant-btn-primary:disabled {
   opacity: 0.5;
   color: #fff;
-  background: $primaryColor;
+  background: #6356ea;
+}
+
+.ant-btn-default:not(:disabled):not(.ant-btn-disabled):hover {
+  border-color: #6356ea;
 }
 
 .origin-btn {
@@ -44,7 +48,7 @@ $primaryColor: var(--primary-color);
 }
 
 .primary-btn {
-  background: $primaryColor !important;
+  background: #6356ea !important;
   border-radius: 10px;
   color: #fff;
 }
@@ -59,18 +63,18 @@ $primaryColor: var(--primary-color);
   background: #ffffff !important;
   border: transparent;
   border-radius: 10px;
-  color: $primaryColor;
+  color: #6356ea;
 }
 
 .link-border-btn {
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.7843);
-  border: 1px solid $primaryColor;
-  color: $primaryColor;
+  border: 1px solid #6356ea;
+  color: #6356ea;
 }
 
 .ant-picker-footer .ant-btn-primary {
-  background: $primaryColor !important;
+  background: #6356ea !important;
 }
 
 .config-slider {
@@ -79,7 +83,7 @@ $primaryColor: var(--primary-color);
 
 .config-slider .ant-slider-track,
 .ant-slider-handle {
-  background: $primaryColor;
+  background: #6356ea;
 }
 
 .config-slider .ant-slider-handle {
@@ -98,11 +102,11 @@ $primaryColor: var(--primary-color);
 }
 
 .config-slider:hover .ant-slider-track {
-  background: $primaryColor;
+  background: #6356ea;
 }
 
 .config-slider .ant-slider-handle::after {
-  box-shadow: 0 0 0 2px $primaryColor !important;
+  box-shadow: 0 0 0 2px #6356ea !important;
 }
 
 .chat-feedback .ant-checkbox-group {
@@ -125,7 +129,7 @@ $primaryColor: var(--primary-color);
 }
 
 .ant-checkbox-checked .ant-checkbox-inner {
-  background-color: $primaryColor;
+  background-color: #6356ea;
 }
 
 .ant-message {
@@ -135,7 +139,7 @@ $primaryColor: var(--primary-color);
 .knowledge-upload .ant-upload {
   width: 766px;
   padding: 0px;
-  background: url("../assets/imgs/knowledge/pic_zhishi_bg.png") no-repeat center;
+  background: url('../assets/imgs/knowledge/pic_zhishi_bg.png') no-repeat center;
   background-size: cover;
 }
 
@@ -238,7 +242,7 @@ $primaryColor: var(--primary-color);
 }
 
 .upload-progress .ant-progress-bg {
-  background: $primaryColor;
+  background: #6356ea;
 }
 
 .hit-progress .ant-progress-inner {
@@ -266,8 +270,9 @@ $primaryColor: var(--primary-color);
     background-color: #f2f5fe;
     color: #7f7f7f;
     font-size: 12px;
-    font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei",
-      "WenQuanYi Micro Hei", sans-serif !important;
+    font-family:
+      'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Hiragino Sans GB',
+      'Heiti SC', 'Microsoft YaHei', 'WenQuanYi Micro Hei', sans-serif !important;
   }
 
   .ant-table-tbody {
@@ -283,12 +288,9 @@ $primaryColor: var(--primary-color);
   .ant-table-tbody .ant-table-cell {
     font-size: 14px;
     padding: 14px 20px;
-    font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei",
-      "WenQuanYi Micro Hei", sans-serif !important;
-    .ant-empty-normal {
-      align-items: center;
-      justify-content: center;
-    }
+    font-family:
+      'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Hiragino Sans GB',
+      'Heiti SC', 'Microsoft YaHei', 'WenQuanYi Micro Hei', sans-serif !important;
   }
 }
 
@@ -383,7 +385,7 @@ $primaryColor: var(--primary-color);
     line-height: 28px;
 
     &:hover {
-      background: $primaryColor;
+      background: #6356ea;
 
       > a {
         color: #f9fafb;
@@ -404,7 +406,7 @@ $primaryColor: var(--primary-color);
   }
 
   .ant-pagination-item-active {
-    background: $primaryColor;
+    background: #6356ea;
     font-size: 14px;
     font-weight: 500;
 
@@ -422,7 +424,7 @@ $primaryColor: var(--primary-color);
 
 .list-switch.ant-switch-checked {
   .ant-switch-inner {
-    background: $primaryColor;
+    background: #6356ea;
   }
 }
 
@@ -444,7 +446,7 @@ $primaryColor: var(--primary-color);
   .ant-switch-inner {
     width: 36px;
     height: 22px;
-    background: $primaryColor;
+    background: #6356ea;
   }
 }
 
@@ -455,8 +457,9 @@ $primaryColor: var(--primary-color);
     color: #f0f3f9;
     // background: rgba(0, 0, 0, 0.7);
     background: #333333;
-    font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei",
-      "WenQuanYi Micro Hei", sans-serif;
+    font-family:
+      'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Hiragino Sans GB',
+      'Heiti SC', 'Microsoft YaHei', 'WenQuanYi Micro Hei', sans-serif;
     font-size: 12px;
     font-weight: 500;
   }
@@ -475,8 +478,9 @@ $primaryColor: var(--primary-color);
   .ant-tooltip-inner {
     color: #f0f3f9;
     background: #ea1717;
-    font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei",
-      "WenQuanYi Micro Hei", sans-serif;
+    font-family:
+      'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Hiragino Sans GB',
+      'Heiti SC', 'Microsoft YaHei', 'WenQuanYi Micro Hei', sans-serif;
     font-size: 12px;
     font-weight: 500;
   }
@@ -560,8 +564,9 @@ $primaryColor: var(--primary-color);
 
   .ant-table-cell {
     border-inline-end: none !important;
-    font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei",
-      "WenQuanYi Micro Hei", sans-serif;
+    font-family:
+      'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Hiragino Sans GB',
+      'Heiti SC', 'Microsoft YaHei', 'WenQuanYi Micro Hei', sans-serif;
   }
 
   .ant-table-thead .ant-table-cell {
@@ -667,8 +672,8 @@ $primaryColor: var(--primary-color);
   }
 }
 
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
@@ -680,80 +685,6 @@ input[type="number"]::-webkit-outer-spin-button {
 .ant-checkbox-disabled .ant-checkbox-inner {
   background: #f5f5f5 !important;
 }
-
-// Universal antd table expand icon and content inline alignment
-.ant-table-cell:first-child {
-  // Keep normal table cell behavior but ensure inline layout
-  white-space: nowrap; // Prevent line breaks
-
-  .ant-table-row-expand-icon {
-    display: inline-block;
-    vertical-align: middle;
-    margin-right: 8px;
-    flex-shrink: 0; // Prevent icon from shrinking
-  }
-
-  // Custom expand icon styles (for cases using img instead of standard expand icon)
-  > img {
-    display: inline-block;
-    vertical-align: top;
-    margin-top: 10px; // Fixed distance from top instead of center
-    margin-right: 8px;
-    flex-shrink: 0; // Prevent icon from shrinking
-  }
-
-  // Default content container - no expand icon (leaf nodes)
-  > div {
-    display: inline-flex;
-    vertical-align: middle;
-    white-space: normal; // Allow text wrapping inside content
-    width: 100%; // Full width for rows without expand icon
-    max-width: 100%;
-  }
-
-  // When expand icon exists, adjust content width
-  &:has(.ant-table-row-expand-icon) > div,
-  &:has(> img) > div {
-    width: calc(100% - 24px); // Reserve space for expand icon (16px) + margin (8px)
-    max-width: calc(100% - 24px);
-  }
-}
-
-// Universal solution for all levels (1-20)
-// Generate using SCSS loop for maintainability and consistency
-@for $level from 1 through 20 {
-  $indent: $level * 15px;
-  $total-with-icon: $indent + 24px;
-
-  // Leaf nodes without expand icons
-  .ant-table-row-level-#{$level} .ant-table-cell:first-child > div {
-    width: calc(100% - #{$indent});
-    max-width: calc(100% - #{$indent});
-  }
-
-  // Rows with expand icons (override above)
-  .ant-table-row-level-#{$level} .ant-table-cell:first-child:has(.ant-table-row-expand-icon) > div,
-  .ant-table-row-level-#{$level} .ant-table-cell:first-child:has(> img) > div {
-    width: calc(100% - #{$total-with-icon});
-    max-width: calc(100% - #{$total-with-icon});
-  }
-}
-
-// Alternative: JavaScript-based dynamic solution (if needed for levels > 20)
-// Add this to your component to handle unlimited levels:
-/*
-  React solution for unlimited levels:
-  
-  const getIndentStyle = (level, hasExpandIcon) => {
-    const indent = level * 15;
-    const iconSpace = hasExpandIcon ? 24 : 0;
-    const totalOffset = indent + iconSpace;
-    return {
-      width: `calc(100% - ${totalOffset}px)`,
-      maxWidth: `calc(100% - ${totalOffset}px)`
-    };
-  };
-*/
 
 .global-monaco-editor-json {
   flex: 1;
@@ -917,10 +848,10 @@ input[type="number"]::-webkit-outer-spin-button {
   }
 
   .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
-    border-color: $primaryColor;
+    border-color: #6356ea;
 
     .checked-icon-container {
-      border-color: $primaryColor;
+      border-color: #6356ea;
 
       .checked-icon {
         display: block;
@@ -938,6 +869,12 @@ input[type="number"]::-webkit-outer-spin-button {
 .tool-params-table {
   .ant-table {
     background: transparent !important;
+  }
+
+  .ant-table-cell-with-append {
+    width: 100% !important;
+    display: inline-flex !important;
+    align-items: center;
   }
 
   .ant-table-cell {
@@ -1317,7 +1254,7 @@ input[type="number"]::-webkit-outer-spin-button {
   }
 }
 
-.flow-pagination-template {
+.flow-pagination-tamplate {
   font-size: 14px;
 
   .ant-pagination-item {
@@ -1331,7 +1268,7 @@ input[type="number"]::-webkit-outer-spin-button {
   }
 
   .ant-pagination-item-active {
-    background: $primaryColor;
+    background: #6356ea;
     border: none;
 
     a {
@@ -1364,7 +1301,11 @@ input[type="number"]::-webkit-outer-spin-button {
     background: #f2f5fe !important;
   }
 
-  .ant-table-content > table .ant-table-tbody .ant-table-placeholder .ant-table-cell {
+  .ant-table-content
+    > table
+    .ant-table-tbody
+    .ant-table-placeholder
+    .ant-table-cell {
     border: none !important;
   }
 }
@@ -1377,13 +1318,15 @@ input[type="number"]::-webkit-outer-spin-button {
     }
   }
 }
+
 .ant-popover-content .ant-popconfirm-buttons .ant-btn.popver-footer-button {
   padding: 0 16px !important;
   height: 32px;
   line-height: 32px;
 }
 
-.ant-select-dropdown .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+.ant-select-dropdown
+  .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
   background-color: #f2f5fe;
 }
 
@@ -1409,7 +1352,9 @@ input[type="number"]::-webkit-outer-spin-button {
 .ant-form {
   .ant-form-item
     .ant-form-item-label
-    > label.ant-form-item-required:not(.ant-form-item-required-mark-optional)::before {
+    > label.ant-form-item-required:not(
+      .ant-form-item-required-mark-optional
+    )::before {
     color: #f74e43;
   }
 }
@@ -1481,7 +1426,7 @@ input[type="number"]::-webkit-outer-spin-button {
   border-radius: 8px;
 
   &:focus-within {
-    border-color: $primaryColor;
+    border-color: #6356ea;
   }
 
   .ant-input {
@@ -1606,18 +1551,17 @@ input[type="number"]::-webkit-outer-spin-button {
       font-weight: normal;
       color: rgba(0, 0, 0, 0.6);
 
-      // 分页组件激活态样式
       &.ant-pagination-item-active {
-        background-color: $primaryColor !important;
-        border-color: $primaryColor !important;
+        background-color: #6356ea !important;
+        border-color: #6356ea !important;
 
         a {
           color: rgba(255, 255, 255, 0.9) !important;
         }
 
         &:hover {
-          background-color: $primaryColor !important;
-          border-color: $primaryColor !important;
+          background-color: #6356ea !important;
+          border-color: #6356ea !important;
 
           a {
             color: #ffffff !important;
@@ -1626,22 +1570,17 @@ input[type="number"]::-webkit-outer-spin-button {
       }
     }
   }
-
-  .ant-empty-normal {
-    justify-content: center;
-    align-items: center;
-  }
 }
 
 .xingchen-textarea {
   position: relative;
 
   .ant-input-data-count {
-    bottom: 2px !important; // Distance from bottom border: 2px
-    right: 6px !important; // Slightly adjust right distance
+    bottom: 2px !important; 
+    right: 6px !important; 
     padding: 2px 4px;
     font-size: 12px;
-    pointer-events: none; // Avoid affecting text input
+    pointer-events: none; 
   }
 }
 
@@ -1655,19 +1594,18 @@ input[type="number"]::-webkit-outer-spin-button {
   z-index: 99999 !important;
 
   .ant-popover-title {
-    font-size: 20px;
-    font-weight: 600;
+    font-size: 16px;
+    font-weight: 500;
   }
 
   .control-mode-item {
     &:hover {
-      box-shadow:
-        0 8px 24px 0 rgba(0, 0, 0, 0.16),
-        0 16px 48px 0 rgba(0, 0, 0, 0.08);
+      background: #f8faff;
+      box-shadow: 0px 2px 4px 0px rgba(46, 51, 68, 0.0373);
     }
 
     p {
-      color: #7e7d84;
+      color: #979797;
     }
 
     &.active {
@@ -1678,61 +1616,64 @@ input[type="number"]::-webkit-outer-spin-button {
       background: #e6e9ff;
 
       h1 {
-        color: $primaryColor;
+        color: #6356ea;
       }
 
       p {
-        color: $primaryColor;
+        font-size: 12px;
+        color: #7487fe;
       }
     }
   }
 }
 
-.dropdown {
-  width: max-content;
-  .ant-dropdown-menu {
-    .ant-dropdown-menu-item {
-      padding: 4px;
+.document-more-dropdown {
+  .ant-dropdown-menu-item:hover {
+    background-color: #f2f5fe !important;
+  }
+  .ant-dropdown-menu-item-active {
+    .ant-dropdown-menu-title-content {
+      color: #6356ea;
     }
-    .ant-dropdown-menu-item[data-type="delete"] {
-      .delete-icon {
-        background-image: url("@/assets/imgs/workflow/delete.svg");
-        background-repeat: no-repeat;
-        background-position: center center;
-        background-size: auto;
-      }
-      .delete-text {
-        color: #99a1b6;
-      }
-      &:hover {
-        background-color: #feedec;
-        .delete-icon {
-          background-image: url("@/assets/imgs/workflow/delete_hover.svg");
-        }
-        .delete-text {
-          color: #f74e43;
-        }
-      }
-    }
-    .ant-dropdown-menu-item:not([data-type="delete"]) {
-      &:hover {
-        background-color: #f2f5fe;
-      }
-    }
+  }
+}
+
+.common-btn-white {
+  background: #ffffff !important;
+  color: #333333;
+  border: none;
+  border-radius: 8px;
+  &:hover {
+    color: inherit !important;
+    border-color: none !important;
+  }
+}
+
+.common-btn-primary {
+  background: #275eff !important;
+  color: #ffffff;
+  border: none;
+}
+
+.common-btn-default {
+  color: #333333;
+  border-color: #d3dbf8;
+  &:hover {
+    color: #275eff;
+    border-color: #275eff;
+  }
+}
+
+a.ant-typography {
+  color: #6356ea;
+  &:hover {
+    color: #6356ea;
+    opacity: 0.6;
   }
 }
 
 .ant-spin {
   .ant-spin-dot-holder {
     color: var(--primary-color);
-  }
-}
-
-// Typography 复制图标样式定制
-.ant-typography-copy {
-  color: var(--primary-color) !important;
-  
-  &:hover {
-    opacity: 0.8;
   }
 }
