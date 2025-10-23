@@ -396,7 +396,7 @@ const handleNodeStatusChange = ({
         ) {
           edge.animated = true;
           edge.style = {
-            stroke: '#275EFF',
+            stroke: '#6356EA',
             strokeWidth: 2,
             strokeDasharray: '5 5',
           };
@@ -504,7 +504,7 @@ const handleMessageEnd = (data: WebSocketMessageData, get): void => {
       ...edge,
       animated: false,
       style: {
-        stroke: '#275EFF',
+        stroke: '#6356EA',
         strokeWidth: 2,
       },
     }))
@@ -921,7 +921,7 @@ const handleStopConversation = (get): void => {
       ...edge,
       animated: false,
       style: {
-        stroke: '#275EFF',
+        stroke: '#6356EA',
         strokeWidth: 2,
       },
     }))

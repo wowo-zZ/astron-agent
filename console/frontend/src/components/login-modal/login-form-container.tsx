@@ -77,11 +77,11 @@ const LoginFormContainer = ({
           >
             <Checkbox className="text-sm text-gray-600">
               我已阅读并同意
-              <a href="#" className="text-[#275EFF] hover:underline mx-1">
+              <a href="#" className="text-[#6356EA] hover:underline mx-1">
                 服务协议
               </a>
               和
-              <a href="#" className="text-[#275EFF] hover:underline ml-1">
+              <a href="#" className="text-[#6356EA] hover:underline ml-1">
                 隐私政策
               </a>
             </Checkbox>
@@ -96,7 +96,7 @@ const LoginFormContainer = ({
               block
               loading={loading}
               disabled={loading}
-              className="h-12 bg-gradient-to-r from-[#275EFF] to-[#C927FF] border-none rounded-lg font-medium text-base hover:opacity-90 transition-opacity"
+              className="h-12 bg-gradient-to-r from-[#6356EA] to-[#C927FF] border-none rounded-lg font-medium text-base hover:opacity-90 transition-opacity"
             >
               {loading ? '登录中...' : '登录'}
             </Button>
@@ -110,7 +110,7 @@ const LoginFormContainer = ({
             type="link"
             onClick={onSwitchToRegister}
             disabled={loading}
-            className="p-0 h-auto font-normal text-[#275EFF] hover:underline"
+            className="p-0 h-auto font-normal text-[#6356EA] hover:underline"
           >
             立即注册
           </Button>

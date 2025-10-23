@@ -104,7 +104,7 @@ const MessageDivider = ({ chat, t }): React.ReactElement => {
         className="w-[151px] h-[7px]"
         alt=""
       />
-      <span className="text-[#275EFF] font-medium">
+      <span className="text-[#6356EA] font-medium">
         {t('workflow.nodes.chatDebugger.startNewConversation')}
       </span>
       <img
@@ -122,7 +122,7 @@ const MessageAsk = ({ chat, renderInputElement }): React.ReactElement => {
       <div className="flex items-center gap-4">
         <img src={icons.chatUser} className="w-9 h-9" alt="" />
       </div>
-      <div className="w-fit min-w-[50px] bg-[#275EFF] p-3 flex flex-col gap-2.5 rounded-xl overflow-hidden">
+      <div className="w-fit min-w-[50px] bg-[#6356EA] p-3 flex flex-col gap-2.5 rounded-xl overflow-hidden">
         {chat?.inputs?.map((input, index) => (
           <div key={index}>
             {renderInputElement(chat as ChatListItemExtended, input)}
@@ -335,7 +335,7 @@ const MessageRegenerate = ({
         <div className="flex items-center gap-2 ml-[52px]">
           {!needReply && (
             <div
-              className="px-4 py-1.5 text-[#7F7F7F] border border-[transparent] rounded-[16px] hover:bg-[#F8FAFF] hover:text-[#275EFF] cursor-pointer flex items-center gap-1 group"
+              className="px-4 py-1.5 text-[#7F7F7F] border border-[transparent] rounded-[16px] hover:bg-[#F8FAFF] hover:text-[#6356EA] cursor-pointer flex items-center gap-1 group"
               onClick={() => handleResumeChat('')}
             >
               <img

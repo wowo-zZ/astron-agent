@@ -123,7 +123,7 @@
             text-overflow: ellipsis;
             &.activeState {
               font-weight: 500;
-              color: #275eff;
+              color: #6356EA;
               background: rgba(255, 255, 255, 1);
               box-shadow: 0px 2px 4px 0px rgba(46, 51, 68, 0.0373);
               border-radius: 10px;
@@ -271,8 +271,8 @@
         //  }
         //
         &.ant-pagination-item-active {
-          background: #275eff;
-          border: 1px solid #275eff;
+          background: #6356EA;
+          border: 1px solid #6356EA;
           color: #fff;
           a {
             color: #fff;

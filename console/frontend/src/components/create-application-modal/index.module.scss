@@ -53,7 +53,7 @@
         cursor: pointer;
         &:hover {
           border: none;
-          outline: 2px solid #275eff;
+          outline: 2px solid #6356EA;
           box-shadow: 0px 20px 30px 0px rgba(39, 94, 255, 0.15);
         }
       }
@@ -134,7 +134,7 @@
         padding: 16px;
         cursor: pointer;
         &:hover {
-          outline: 2px solid #275eff;
+          outline: 2px solid #6356EA;
           box-shadow: 0px 20px 30px 0px rgba(39, 94, 255, 0.15);
         }
       }
@@ -172,7 +172,7 @@
 
       .selected {
         border: none;
-        outline: 2px solid #275eff;
+        outline: 2px solid #6356EA;
       }
     }
   }

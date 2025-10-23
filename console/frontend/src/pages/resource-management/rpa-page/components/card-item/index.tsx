@@ -111,7 +111,7 @@ export const CardItem: FC<CardItemProps> = ({
             },
             items: [
               {
-                label: <span className="text-[#275EFF]">{t('rpa.edit')}</span>,
+                label: <span className="text-[#6356EA]">{t('rpa.edit')}</span>,
                 key: 'edit',
               },
               {

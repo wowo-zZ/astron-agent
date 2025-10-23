@@ -10,11 +10,13 @@ import useUserStore from '@/store/user-store';
 import { getMessageCountApi } from '@/services/notification';
 
 interface IconEntryProps {
+  isCollapsed: boolean;
   onMessageClick?: () => void;
   onNotLogin?: () => void;
 }
 
 const IconEntry: React.FC<IconEntryProps> = ({
+  isCollapsed,
   onMessageClick,
   onNotLogin,
 }) => {
@@ -53,7 +55,7 @@ const IconEntry: React.FC<IconEntryProps> = ({
 
   return (
     <div
-      className={`flex items-center justify-center gap-8 mt-4 ${styles.toolsIcon}`}
+      className={`flex items-center justify-center gap-8 ${isCollapsed ? 'flex-col' : ''} ${styles.toolsIcon}`}
     >
       <Tooltip
         title={t('sidebar.documentCenter')}

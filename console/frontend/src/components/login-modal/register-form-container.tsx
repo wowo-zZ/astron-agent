@@ -139,7 +139,7 @@ const RegisterFormContainer = ({
               block
               loading={loading}
               disabled={loading}
-              className="h-12 bg-gradient-to-r from-[#275EFF] to-[#C927FF] border-none rounded-lg font-medium text-base hover:opacity-90 transition-opacity"
+              className="h-12 bg-gradient-to-r from-[#6356EA] to-[#C927FF] border-none rounded-lg font-medium text-base hover:opacity-90 transition-opacity"
             >
               {loading ? '注册中...' : '注册'}
             </Button>
@@ -153,7 +153,7 @@ const RegisterFormContainer = ({
             type="link"
             onClick={onSwitchToLogin}
             disabled={loading}
-            className="p-0 h-auto font-normal text-[#275EFF] hover:underline"
+            className="p-0 h-auto font-normal text-[#6356EA] hover:underline"
           >
             立即登录
           </Button>

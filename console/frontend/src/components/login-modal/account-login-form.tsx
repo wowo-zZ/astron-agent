@@ -20,7 +20,7 @@ const AccountLoginForm = ({
           placeholder="请输入账号"
           size="large"
           disabled={disabled}
-          className="h-10 rounded-lg border-gray-300 focus:border-[#275EFF] focus:ring-2 focus:ring-[#275EFF]/20"
+          className="h-10 rounded-lg border-gray-300 focus:border-[#6356EA] focus:ring-2 focus:ring-[#6356EA]/20"
         />
       </Form.Item>
 
@@ -34,7 +34,7 @@ const AccountLoginForm = ({
           placeholder="请输入密码"
           size="large"
           disabled={disabled}
-          className="h-10 rounded-lg border-gray-300 focus:border-[#275EFF] focus:ring-2 focus:ring-[#275EFF]/20"
+          className="h-10 rounded-lg border-gray-300 focus:border-[#6356EA] focus:ring-2 focus:ring-[#6356EA]/20"
         />
       </Form.Item>
     </>

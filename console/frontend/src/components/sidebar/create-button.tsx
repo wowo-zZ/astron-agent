@@ -53,18 +53,21 @@ const CreateButton = ({
   };
 
   return (
-    <div className="w-full mt-4">
+    <div className="w-full" style={{ marginTop: '27px' }}>
       <div
         className={`
-          h-9 rounded-[10px] bg-[#275EFF] flex items-center justify-center cursor-pointer
+          h-10 rounded-[10px] bg-[#6356EA] flex items-center justify-center cursor-pointer
           transition-opacity duration-200 hover:opacity-80
-          ${isCollapsed ? 'w-9 mx-auto' : 'w-full'}
+          ${isCollapsed ? 'w-9 h-9 mx-auto' : 'w-full'}
         `}
         onClick={handleClick}
       >
         <img src={addIcon} className="w-[14px] h-[14px]" alt="" />
         {!isCollapsed && (
-          <span className="ml-2 text-sm font-medium leading-6 tracking-[-0.2px] text-white">
+          <span
+            className="ml-2 text-sm font-medium leading-6 tracking-[-0.2px] text-white"
+            style={{ fontFamily: 'PingFang SC' }}
+          >
             {t('sidebar.create')}
           </span>
         )}

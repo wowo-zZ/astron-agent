@@ -71,7 +71,7 @@
   }
 
   .card-chat:hover {
-    color: #275eff;
+    color: #6356EA;
     font-weight: 500;
 
     .chat-icon {
@@ -106,7 +106,7 @@
     }
 
     .go-setting {
-      color: #275eff;
+      color: #6356EA;
     }
   }
 }
