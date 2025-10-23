@@ -49,8 +49,9 @@ public class PersonalityConfigServiceImpl implements PersonalityConfigService {
         String answer;
         try {
             String format = smartFormat(I18nUtil.getMessage("personality.ai.generated"), botName, category, info, prompt);
-            answer = aiServiceClient.generateText(format, "gpt4", 60);
+            answer = aiServiceClient.generateText(format, "4.0Ultra", 60);
         } catch (Exception e) {
+            log.error("aiGeneratedPersonality error, botName: {}, category: {}, info: {}, prompt: {}", botName, category, info, prompt, e);
             throw new BusinessException(ResponseEnum.PERSONALITY_AI_GENERATE_ERROR);
         }
         if (StringUtils.isBlank(answer)) {
@@ -68,8 +69,9 @@ public class PersonalityConfigServiceImpl implements PersonalityConfigService {
         String answer;
         try {
             String format = smartFormat(I18nUtil.getMessage("personality.ai.polishing"), botName, category, info, prompt, personality);
-            answer = aiServiceClient.generateText(format, "gpt4", 60);
+            answer = aiServiceClient.generateText(format, "4.0Ultra", 60);
         } catch (Exception e) {
+            log.error("aiPolishing error, botName: {}, category: {}, info: {}, prompt: {}, personality: {}", botName, category, info, prompt, personality, e);
             throw new BusinessException(ResponseEnum.PERSONALITY_AI_GENERATE_ERROR);
         }
         if (StringUtils.isBlank(answer)) {
