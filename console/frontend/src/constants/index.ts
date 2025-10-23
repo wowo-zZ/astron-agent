@@ -14,8 +14,8 @@ import resourceManagement from '@/assets/svgs/aside-resource.svg';
 import resourceManagementAct from '@/assets/svgs/aside-resource-act.svg';
 
 // TODO 应用管理图标替换
-import appManagement from '@/assets/imgs/sidebar/icon_nav_effectEvaluation.png';
-import appManagementAct from '@/assets/imgs/sidebar/icon_nav_effectEvaluation_act.png';
+import appManagement from '@/assets/svgs/aside-app-manage.svg';
+import appManagementAct from '@/assets//svgs/aside-app-manage-act.svg';
 
 import promptTab from '@/assets/imgs/sidebar/prompt.svg';
 import promptTabActive from '@/assets/imgs/sidebar/prompt-active.svg';
