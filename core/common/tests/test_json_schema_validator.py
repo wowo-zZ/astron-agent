@@ -7,7 +7,7 @@ including validation, data preprocessing, and type fixing functionality.
 
 from typing import Any, Dict, List
 
-from workflow.utils.json_schema.json_schema_validator import JsonSchemaValidator
+from common.utils.json_schema.json_schema_validator import JsonSchemaValidator
 
 
 class TestJsonSchemaValidator:

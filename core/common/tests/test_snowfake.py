@@ -9,7 +9,7 @@ import time
 
 import pytest
 
-from workflow.utils.snowfake import get_id
+from common.utils.snowfake import get_id
 
 
 class TestSnowfake:

@@ -120,114 +120,65 @@ jobs:
           echo "has-console-hub=$HAS_CONSOLE_HUB" >> $GITHUB_OUTPUT
           echo "has-console-frontend=$HAS_CONSOLE_FRONTEND" >> $GITHUB_OUTPUT
 
-      - name: 生成变更日志
+      - name: Generate Changelog
         id: changelog
         run: |
-          echo "📝 生成变更日志..."
-          
-          # 获取上一个标签
+          echo "📝 Generating changelog..."
+
+          # Get previous tag
           PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
           CURRENT_TAG="${{ steps.meta.outputs.version }}"
-          
+
           if [[ -z "$PREVIOUS_TAG" ]]; then
-            echo "🆕 这是第一个发布版本"
+            echo "🆕 This is the first release"
             COMMIT_RANGE="HEAD"
           else
-            echo "📊 对比版本: $PREVIOUS_TAG...$CURRENT_TAG"
+            echo "📊 Comparing: $PREVIOUS_TAG...$CURRENT_TAG"
             COMMIT_RANGE="$PREVIOUS_TAG..HEAD"
           fi
-          
-          # 创建简单的changelog
+
+          # Create changelog
           CHANGELOG_FILE="/tmp/changelog.md"
-          
-          # 写入标题
-          echo "## 🚀 主要变更" > "$CHANGELOG_FILE"
+
+          # Write header
+          echo "## What's Changed" > "$CHANGELOG_FILE"
           echo "" >> "$CHANGELOG_FILE"
-          
-          # 获取并分类提交
-          echo "### ✨ 新功能" >> "$CHANGELOG_FILE"
-          if git log --pretty=format:"%s" $COMMIT_RANGE | grep "^feat" | sed 's/^feat[^:]*: /- /' >> "$CHANGELOG_FILE"; then
-            true
+
+          # Collect and categorize commits
+          echo "### ✨ New Features" >> "$CHANGELOG_FILE"
+          FEATURES=$(git log --pretty=format:"%s" $COMMIT_RANGE | grep "^feat" | sed 's/^feat[^:]*: /- /')
+          if [[ -n "$FEATURES" ]]; then
+            echo "$FEATURES" >> "$CHANGELOG_FILE"
           else
-            echo "- 暂无新功能" >> "$CHANGELOG_FILE"
+            echo "- No new features in this release" >> "$CHANGELOG_FILE"
           fi
-          
+
           echo "" >> "$CHANGELOG_FILE"
-          echo "### 🐛 问题修复" >> "$CHANGELOG_FILE"
-          if git log --pretty=format:"%s" $COMMIT_RANGE | grep "^fix" | sed 's/^fix[^:]*: /- /' >> "$CHANGELOG_FILE"; then
-            true
+          echo "### 🐛 Fixes" >> "$CHANGELOG_FILE"
+          FIXES=$(git log --pretty=format:"%s" $COMMIT_RANGE | grep "^fix" | sed 's/^fix[^:]*: /- /')
+          if [[ -n "$FIXES" ]]; then
+            echo "$FIXES" >> "$CHANGELOG_FILE"
           else
-            echo "- 暂无问题修复" >> "$CHANGELOG_FILE"
+            echo "- No bug fixes in this release" >> "$CHANGELOG_FILE"
           fi
-          
+
           echo "" >> "$CHANGELOG_FILE"
-          echo "### 🔧 其他改进" >> "$CHANGELOG_FILE"
-          if git log --pretty=format:"%s" $COMMIT_RANGE | grep -E "^(chore|docs|refactor|test|ci)" | sed 's/^[^:]*: /- /' >> "$CHANGELOG_FILE"; then
-            true
+          echo "### 🔧 Improvements" >> "$CHANGELOG_FILE"
+          IMPROVEMENTS=$(git log --pretty=format:"%s" $COMMIT_RANGE | grep -E "^(chore|docs|refactor|test|ci|perf|style)" | sed 's/^[^:]*: /- /')
+          if [[ -n "$IMPROVEMENTS" ]]; then
+            echo "$IMPROVEMENTS" >> "$CHANGELOG_FILE"
           else
-            echo "- 暂无其他改进" >> "$CHANGELOG_FILE"
-          fi
-          
-          # 添加Docker镜像信息
-          echo "" >> "$CHANGELOG_FILE"
-          echo "## 📦 Docker镜像" >> "$CHANGELOG_FILE"
-          echo "" >> "$CHANGELOG_FILE"
-
-          if [[ "${{ steps.detect.outputs.has-core-services }}" == "true" ]]; then
-            echo "### 🏗️ Core服务组件" >> "$CHANGELOG_FILE"
-            echo "- 🏢 Core Tenant: ghcr.io/${{ github.repository }}/core-tenant:$CURRENT_TAG" >> "$CHANGELOG_FILE"
-            echo "- 🧠 Core Database: ghcr.io/${{ github.repository }}/core-database:$CURRENT_TAG" >> "$CHANGELOG_FILE"
-            echo "- 🤖 Core RPA: ghcr.io/${{ github.repository }}/core-rpa:$CURRENT_TAG" >> "$CHANGELOG_FILE"
-            echo "- 🔗 Core Link: ghcr.io/${{ github.repository }}/core-link:$CURRENT_TAG" >> "$CHANGELOG_FILE"
-            echo "- 🛠️ Core AI Tools: ghcr.io/${{ github.repository }}/core-aitools:$CURRENT_TAG" >> "$CHANGELOG_FILE"
-            echo "- 🤖 Core Agent: ghcr.io/${{ github.repository }}/core-agent:$CURRENT_TAG" >> "$CHANGELOG_FILE"
-            echo "- 📚 Core Knowledge: ghcr.io/${{ github.repository }}/core-knowledge:$CURRENT_TAG" >> "$CHANGELOG_FILE"
-            echo "- ⚡ Core Workflow: ghcr.io/${{ github.repository }}/core-workflow:$CURRENT_TAG" >> "$CHANGELOG_FILE"
-            echo "" >> "$CHANGELOG_FILE"
+            echo "- No improvements in this release" >> "$CHANGELOG_FILE"
           fi
 
-          if [[ "${{ steps.detect.outputs.has-console-hub }}" == "true" ]]; then
-            echo "### 🎯 Console服务" >> "$CHANGELOG_FILE"
-            echo "- ☕ Console Hub: ghcr.io/${{ github.repository }}/console-hub:$CURRENT_TAG" >> "$CHANGELOG_FILE"
-            echo "" >> "$CHANGELOG_FILE"
-          fi
-
-          if [[ "${{ steps.detect.outputs.has-console-frontend }}" == "true" ]]; then
-            echo "### 🌐 前端应用" >> "$CHANGELOG_FILE"
-            echo "- 🟦 Console Frontend: ghcr.io/${{ github.repository }}/console-frontend:$CURRENT_TAG" >> "$CHANGELOG_FILE"
-            echo "" >> "$CHANGELOG_FILE"
-          fi
-
-          # 添加使用说明
-          echo "## 📋 使用说明" >> "$CHANGELOG_FILE"
-          echo "" >> "$CHANGELOG_FILE"
-          echo "### 快速开始" >> "$CHANGELOG_FILE"
-          echo '```bash' >> "$CHANGELOG_FILE"
-          echo "# 克隆项目" >> "$CHANGELOG_FILE"
-          echo "git clone https://github.com/${{ github.repository }}.git" >> "$CHANGELOG_FILE"
-          echo "cd astron-agent" >> "$CHANGELOG_FILE"
-          echo "git checkout $CURRENT_TAG" >> "$CHANGELOG_FILE"
-          echo "" >> "$CHANGELOG_FILE"
-          echo "# 使用Docker Compose运行" >> "$CHANGELOG_FILE"
-          echo "docker-compose up -d" >> "$CHANGELOG_FILE"
-          echo "" >> "$CHANGELOG_FILE"
-          echo "# 或者单独拉取镜像" >> "$CHANGELOG_FILE"
-          if [[ "${{ steps.detect.outputs.has-console-frontend }}" == "true" ]]; then
-            echo "docker pull ghcr.io/${{ github.repository }}/console-frontend:$CURRENT_TAG" >> "$CHANGELOG_FILE"
-          fi
-          if [[ "${{ steps.detect.outputs.has-console-hub }}" == "true" ]]; then
-            echo "docker pull ghcr.io/${{ github.repository }}/console-hub:$CURRENT_TAG" >> "$CHANGELOG_FILE"
-          fi
-          echo '```' >> "$CHANGELOG_FILE"
-          
-          # 输出到GitHub Output
+          # Output to GitHub Output
           {
             echo "changelog<<EOF"
             cat "$CHANGELOG_FILE"
             echo "EOF"
           } >> $GITHUB_OUTPUT
-          
-          echo "📄 变更日志已生成"
+
+          echo "📄 Changelog generated successfully"
 
   # ============================================================================
   # Stage 2: 构建Docker镜像 (复用build-push的逻辑)
@@ -417,6 +368,8 @@ jobs:
           name: "Astron Agent ${{ needs.prepare-release.outputs.version }}"
           body: ${{ needs.prepare-release.outputs.changelog }}
           prerelease: ${{ needs.prepare-release.outputs.is-prerelease }}
+          generate_release_notes: true
+          append_body: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 发布总结

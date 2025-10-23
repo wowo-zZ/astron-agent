@@ -9,7 +9,7 @@ from unittest.mock import Mock
 
 from jsonschema import ValidationError  # type: ignore
 
-from workflow.utils.json_schema.json_schema_cn import (
+from common.utils.json_schema.json_schema_cn import (
     CNValidator,
     cn_all_of_validator,
     cn_any_of_validator,

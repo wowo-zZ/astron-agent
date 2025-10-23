@@ -1,3 +1,4 @@
+import json
 from typing import Optional
 from urllib.parse import urlencode
 
@@ -11,6 +12,7 @@ from common.exceptions.errs import OssServiceException
 from common.service.base import Service, ServiceType
 from common.service.oss.base_oss import BaseOSSService
 from common.utils.hmac_auth import HMACAuth
+
 
 class S3Service(BaseOSSService, Service):
     """
@@ -64,9 +66,32 @@ class S3Service(BaseOSSService, Service):
         except ClientError as e:
             error_code = int(e.response["Error"]["Code"])
             if error_code == 404:
+
                 logger.debug(f"⚠️ Bucket '{bucket_name}' not found. Creating...")
                 self.client.create_bucket(Bucket=bucket_name)
                 logger.debug(f"✅ Bucket '{bucket_name}' created successfully.")
+
+                # Set the bucket policy to allow public reads
+                bucket_policy = {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Sid": "PublicReadGetObject",
+                            "Effect": "Allow",
+                            "Principal": "*",
+                            "Action": "s3:GetObject",
+                            "Resource": f"arn:aws:s3:::{bucket_name}/*",
+                        }
+                    ],
+                }
+                # Apply the bucket strategy
+                self.client.put_bucket_policy(
+                    Bucket=bucket_name, Policy=json.dumps(bucket_policy)
+                )
+                logger.debug(
+                    f"✅ Public read policy applied to bucket '{bucket_name}'."
+                )
+
             else:
                 raise
 
@@ -92,9 +117,7 @@ class S3Service(BaseOSSService, Service):
             )
             return f"{self.oss_download_host}/{bucket_name}/{filename}"
         except Exception as e:
-            raise OssServiceException(*c9010)(
-                str(e)
-            ) from e
+            raise OssServiceException(*c9010)(str(e)) from e
 
 
 class IFlyGatewayStorageClient(BaseOSSService, Service):
@@ -162,19 +185,13 @@ class IFlyGatewayStorageClient(BaseOSSService, Service):
             logger.error(e)
             return ""
         if resp.status_code != 200:
-            raise OssServiceException(*c9010)(
-                str(e)
-            ) from e
+            raise OssServiceException(*c9010)(str(e)) from e
 
         ret = resp.json()
         if ret["code"] != 0:
-            raise OssServiceException(*c9010)(
-                str(e)
-            ) from e
+            raise OssServiceException(*c9010)(str(e)) from e
         try:
             link = ret["data"]["link"]
         except Exception as e:
-            raise OssServiceException(*c9010)(
-                str(e)
-            ) from e
+            raise OssServiceException(*c9010)(str(e)) from e
         return link

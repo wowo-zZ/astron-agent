@@ -199,7 +199,8 @@ async def _reset_uid(
 
         cur = create_uid_res[0][0]
         if not isinstance(cur, str):
-            new_uid = str(cur)
+            cur = str(cur)
+        new_uid = cur
 
     return new_uid, None
 
