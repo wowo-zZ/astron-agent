@@ -45,6 +45,7 @@ interface MultiModeCpnProps {
   moreParams?: any;
   workflowId?: number;
   agentMaasId?: string | null;
+  isVirtual?: boolean;
 }
 
 const WxModal: React.FC<MultiModeCpnProps> = ({
@@ -65,6 +66,7 @@ const WxModal: React.FC<MultiModeCpnProps> = ({
   moreParams,
   workflowId,
   agentMaasId,
+  isVirtual
 }) => {
   const i = 0;
   const flag = false;
@@ -417,7 +419,8 @@ const WxModal: React.FC<MultiModeCpnProps> = ({
                       : t('releaseModal.release')}
                   </div>
                 </div>
-                {(agentType == 'workflow' ||
+                {!isVirtual &&
+                (agentType == 'workflow' ||
                   window.location.pathname.includes('work_flow')) && (
                   <div
                     className={cls(styles.wx_fabu, {
