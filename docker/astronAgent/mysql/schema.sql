@@ -16478,7 +16478,7 @@ CREATE TABLE `personality_config`
     `scene_info`  text COMMENT 'Scene information',
     `config_type` int          NOT NULL COMMENT 'dConfiguration type (distinguish between debug and market)',
     `deleted`     int          NOT NULL DEFAULT '0' COMMENT 'Deletion status 0: normal 1: deleted',
-    `enabled`     int          NOT NULL DEFAULT '0' COMMENT 'Whether enabled',
+    `enabled`     int          NOT NULL DEFAULT '1' COMMENT 'Whether enabled',
     `create_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Create time',
     `update_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
     PRIMARY KEY (`id`),
