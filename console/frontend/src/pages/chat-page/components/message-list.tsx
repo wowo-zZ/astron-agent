@@ -28,6 +28,7 @@ import { formatFileSize, getFileIcon } from '@/utils';
 import FilePreview from './file-preview';
 import ResqBottomButtons from './resq-bottom-buttons';
 import { useTranslation } from 'react-i18next';
+import FileGridDisplay from './file-grid-display';
 //渲染全新开始
 const renderRestart = (): ReactElement => {
   return (
@@ -163,42 +164,11 @@ const MessageList = (props: {
       >
         <img src={user?.avatar} alt="" className="h-9 w-9 rounded-full ml-4" />
         <div className="bg-[#275eff] rounded-[12px_0px_12px_12px] p-[14px_19px] relative max-w-full">
-          <div className="text-base font-normal text-white leading-[25px] whitespace-pre-wrap w-auto break-words">
+          <div className="text-base font-normal text-white leading-[25px] whitespace-pre-wrap w-auto break-words mb-1">
             {item.message}
           </div>
-          {item?.chatFileList && item?.chatFileList?.length > 0 && (
-            <div className={'w-48 h-auto mt-2.5 rounded-xl'}>
-              {item?.chatFileList?.map((file: any, index: number) => (
-                <div
-                  key={index}
-                  className={
-                    'flex items-center justify-between p-2.5 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer'
-                  }
-                  onClick={() => {
-                    setPreviewFile(file);
-                  }}
-                >
-                  <img src={getFileIcon(file)} alt="" className="w-6 h-8" />
-                  <div className={'flex-1 ml-2 min-w-0'}>
-                    <div
-                      title={file?.fileName}
-                      className={
-                        'text-xs text-[#939393] truncate block max-w-[120px]'
-                      }
-                    >
-                      {file?.fileName}
-                    </div>
-                    <div
-                      className={
-                        'text-xs text-[#939393] truncate block max-w-full'
-                      }
-                    >
-                      <span>{formatFileSize(file.fileSize)}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+          {item?.chatFileList && (
+            <FileGridDisplay files={item?.chatFileList} autoAdjustCols />
           )}
         </div>
       </div>

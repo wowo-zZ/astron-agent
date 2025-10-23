@@ -474,12 +474,13 @@ function index() {
                               (res: any) => {
                                 // 合并不支持对话的条件
                                 if (
-                                  (res.length === 2 &&
-                                    res[1].fileType === 'file' &&
-                                    res[1].schema.type === 'array-string') ||
-                                  (res.length === 2 &&
-                                    res[1].fileType !== 'file') ||
-                                  res.length > 2
+                                  res.length > 1 &&
+                                  res
+                                    .slice(1)
+                                    .some(
+                                      (item: { fileType?: string }) =>
+                                        item.fileType !== 'file'
+                                    )
                                 ) {
                                   return message.info(
                                     t('agentPage.agentPage.notSupported')

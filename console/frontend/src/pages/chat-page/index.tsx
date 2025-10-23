@@ -100,7 +100,6 @@ const ChatPage = (): ReactElement => {
   //发送消息
   const handleRecomendClick = (params: {
     item: string;
-    fileUrl?: string;
     callback?: () => void;
   }) => {
     if (streamId || isDataLoading || isLoading) {
@@ -109,7 +108,6 @@ const ChatPage = (): ReactElement => {
     }
     onSendMsg({
       msg: params.item,
-      fileUrl: params.fileUrl,
       onSendCallback: params.callback,
     });
   };

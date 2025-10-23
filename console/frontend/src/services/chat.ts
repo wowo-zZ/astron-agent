@@ -217,6 +217,7 @@ export const uploadFileBindChat = (
     fileName: string;
     fileUrl: string;
     fileBusinessKey: string;
+    paramName?: string;
   },
   signal?: AbortSignal
 ): Promise<string> => {
