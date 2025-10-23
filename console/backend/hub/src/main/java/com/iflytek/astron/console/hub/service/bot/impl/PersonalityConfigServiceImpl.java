@@ -168,6 +168,7 @@ public class PersonalityConfigServiceImpl implements PersonalityConfigService {
         PersonalityConfig config = personalityConfigMapper.selectOne(
                 new LambdaQueryWrapper<PersonalityConfig>()
                         .eq(PersonalityConfig::getBotId, botId)
+                        .eq(PersonalityConfig::getEnabled, 1)
                         .eq(PersonalityConfig::getConfigType, ConfigTypeEnum.DEBUG.getValue())
                         .eq(PersonalityConfig::getDeleted, 0));
         if (config == null) {
