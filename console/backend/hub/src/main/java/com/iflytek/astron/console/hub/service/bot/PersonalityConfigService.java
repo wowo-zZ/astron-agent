@@ -105,4 +105,12 @@ public interface PersonalityConfigService {
      * @return Page of PersonalityRole with pagination
      */
     PageResponse<PersonalityRole> getPersonalityRoles(Long categoryId, int pageNum, int pageSize);
+    
+    
+    /**
+     * Copy personality config from source bot to target bot
+     * @param sourceBotId the ID of the source bot
+     * @param targetBotId the ID of the target bot
+     */
+    void copyPersonalityConfig(Integer sourceBotId, Integer targetBotId);
 }

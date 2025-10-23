@@ -201,6 +201,24 @@ public class PersonalityConfigServiceImpl implements PersonalityConfigService {
         return PageResponse.of((int) result.getCurrent(), (int) result.getSize(), result.getTotal(), result.getRecords());
     }
 
+    @Override
+    public void copyPersonalityConfig(Integer sourceBotId, Integer targetBotId) {
+        PersonalityConfig config = personalityConfigMapper.selectOne(
+                new LambdaQueryWrapper<PersonalityConfig>()
+                        .eq(PersonalityConfig::getBotId, sourceBotId)
+                        .eq(PersonalityConfig::getConfigType, ConfigTypeEnum.DEBUG.getValue())
+                        .eq(PersonalityConfig::getEnabled, 1)
+                        .eq(PersonalityConfig::getDeleted, 0));
+        if (config == null) {
+            return;
+        }
+        insertOrUpdate(new PersonalityConfigDto() {{
+            setPersonality(config.getPersonality());
+            setSceneType(config.getSceneType());
+            setSceneInfo(config.getSceneInfo());
+        }}, targetBotId.longValue(), ConfigTypeEnum.DEBUG);
+    }
+
     public String getChatPrompt(PersonalityConfig personalityConfig, String originalPrompt) {
         if (personalityConfig == null) {
             return originalPrompt;
