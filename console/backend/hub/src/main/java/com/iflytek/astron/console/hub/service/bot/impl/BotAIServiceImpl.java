@@ -15,7 +15,7 @@ import com.iflytek.astron.console.hub.dto.bot.PromptStructDTO;
 import com.iflytek.astron.console.hub.entity.AiPromptTemplate;
 import com.iflytek.astron.console.hub.mapper.AiPromptTemplateMapper;
 import com.iflytek.astron.console.hub.service.bot.BotAIService;
-import com.iflytek.astron.console.hub.util.BotAIServiceClient;
+import com.iflytek.astron.console.commons.util.BotAIServiceClient;
 import com.iflytek.astron.console.hub.util.ImageUtil;
 import com.iflytek.astron.console.toolkit.util.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -269,6 +269,8 @@ public class BotAIServiceImpl implements BotAIService {
             log.info("User [{}] avatar generated and uploaded successfully: {}", uid, avatarUrl);
             return avatarUrl;
 
+        } catch (BusinessException e) {
+            throw e;
         } catch (Exception e) {
             log.error("Exception occurred during AI avatar generation for user [{}]", uid, e);
             return "Should return fallback content";
