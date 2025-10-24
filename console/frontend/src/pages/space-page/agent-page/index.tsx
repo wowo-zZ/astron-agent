@@ -306,7 +306,6 @@ function index() {
                 { label: t('agentPage.agentPage.allTypes'), value: 0 },
                 { label: t('agentPage.agentPage.instructionType'), value: 1 },
                 { label: t('agentPage.agentPage.workflowType'), value: 3 },
-                { label: '虚拟人', value: 4 },
               ]}
             />
             <Select
@@ -481,7 +480,6 @@ function index() {
                             {k.version === 1 &&
                               t('agentPage.agentPage.instructionType')}
                             {k.version === 3 && '工作流'}
-                            {k.version === 4 && '虚拟人'}
                           </div>
                         </div>
                       </span>
@@ -594,14 +592,10 @@ function index() {
                             />
                             {operationId === k.botId && (
                               <div
-                                className={`absolute top-[28px] right-0 bg-white rounded p-1 shadow-md flex flex-col gap-1 ${k.version === 3 ? 'w-[155px]' : 'w-[48px]'}`}
+                                className={`absolute top-[28px] right-0 bg-white rounded p-1 shadow-md flex flex-col gap-1  w-[48px]`}
                                 style={{
                                   zIndex: 1,
                                 }}
-                                // onMouseLeave={(e) => {
-                                //   e.stopPropagation();
-                                //   setOperationId(null);
-                                // }}
                               >
                                 <div
                                   className="p-1 rounded hover:bg-[#F2F5FE] block"
