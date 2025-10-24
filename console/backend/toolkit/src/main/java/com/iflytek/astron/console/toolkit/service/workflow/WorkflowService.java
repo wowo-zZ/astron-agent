@@ -2010,7 +2010,18 @@ public class WorkflowService extends ServiceImpl<WorkflowMapper, Workflow> {
                 chatBotBase.setBotType(saveReq.getCategory());
             }
             chatBotBase.setUpdateTime(LocalDateTime.now());
+            setVnc(chatBotBase, saveReq.getAdvancedConfig());
             chatBotBaseMapper.updateById(chatBotBase);
+        }
+    }
+
+    private void setVnc(ChatBotBase chatBotBase, Map<String,Object> advancedConfig) {
+        if (advancedConfig != null) {
+            JSONObject jsonObject = new JSONObject(advancedConfig);
+            if(jsonObject.getJSONObject("textToSpeech") != null) {
+                chatBotBase.setVcnCn(jsonObject.getJSONObject("textToSpeech").getString("vcn_cn"));
+                chatBotBase.setVcnEn(jsonObject.getJSONObject("textToSpeech").getString("vcn_en"));
+            }
         }
     }
 
