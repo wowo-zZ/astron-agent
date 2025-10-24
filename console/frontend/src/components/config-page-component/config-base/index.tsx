@@ -70,6 +70,8 @@ import {
   KnowledgeLeaf,
   Knowledge,
 } from './types';
+import { VcnItem } from '@/components/speaker-modal';
+import { getVcnList } from '@/services/chat';
 
 const { Option } = Select;
 
@@ -147,12 +149,8 @@ const BaseConfig: React.FC<ChatProps> = ({
   const modelPromptTryRefs = useRef<(PromptTryRef | null)[]>([]);
   const [botCreateActiveV, setBotCreateActiveV] = useState<{
     cn: string;
-    en: string;
-    speed: number;
   }>({
-    cn: 'x4_lingxiaoqi',
-    en: 'x4_EnUs_Luna',
-    speed: 50,
+    cn: '',
   });
   const [modelList, setModelList]: any = useState([
     {
@@ -204,17 +202,12 @@ const BaseConfig: React.FC<ChatProps> = ({
   const isMounted = useRef(false);
   const [isChanged, setIsChanged] = useState(false);
   const [promptData, setPromptData] = useState('');
-  const [speechToText, setSpeechToText] = useState(false);
   const [suggest, setSuggest] = useState(false);
   const [resource, setResource] = useState(false);
   const [conversationStarter, setConversationStarter] = useState('');
   const [conversation, setConversation] = useState(false);
   const [presetQuestion, setPresetQuestion] = useState(['']);
   const [feedback, setFeedback] = useState(false);
-  const [textToSpeech, setTextToSpeech] = useState({
-    enabled: false,
-    vcn: '',
-  });
 
   // 人设相关状态
   const [personalityData, setPersonalityData] = useState({
@@ -278,7 +271,7 @@ const BaseConfig: React.FC<ChatProps> = ({
     flows: true,
   });
   const [publishModalShow, setPublishModalShow] = useState(false);
-  const [vcnList, setVcnList] = useState<{ vcn: string }[]>([]);
+  const [vcnList, setVcnList] = useState<VcnItem[]>([]);
   const [form] = Form.useForm();
   const [model, setModel] = useState('spark');
   const [modelOptions, setModelOptions] = useState<ModelListData[]>([]);
@@ -443,9 +436,7 @@ const BaseConfig: React.FC<ChatProps> = ({
       inputExample: inputExample,
       [datasetKey]: dataList,
       avatar: coverUrl,
-      vcnCn: botCreateActiveV.cn,
-      vcnEn: botCreateActiveV.en,
-      vcnSpeed: botCreateActiveV.speed,
+      vcnCn: botCreateActiveV?.cn || vcnList[0]?.voiceType,
       isSentence: 0,
       openedTool: Object.keys(choosedAlltool)
         .filter((key: any) => choosedAlltool[key])
@@ -607,6 +598,9 @@ const BaseConfig: React.FC<ChatProps> = ({
     setShowTipPk(false);
     setShowModelPk(0);
     getModelListData();
+    getVcnList().then((res: VcnItem[]) => {
+      setVcnList(res);
+    });
   }, []);
 
   // 监听 modelOptions 加载完成，处理待回显的模型数据
@@ -667,8 +661,6 @@ const BaseConfig: React.FC<ChatProps> = ({
           setBotInfo(res);
           setBotCreateActiveV({
             cn: save == 'true' ? configPageData?.vcnCn : res.vcnCn,
-            en: save == 'true' ? configPageData?.vcnEn : res.vcnEn,
-            speed: save == 'true' ? configPageData?.vcnSpeed : res.vcnSpeed,
           });
           const obj: any = {};
           if (
@@ -885,14 +877,12 @@ const BaseConfig: React.FC<ChatProps> = ({
   }, [
     promptData,
     tree,
-    speechToText,
     suggest,
     resource,
     conversationStarter,
     conversation,
     presetQuestion,
     feedback,
-    textToSpeech,
     repoConfig,
     tools,
     flows,
@@ -915,13 +905,6 @@ const BaseConfig: React.FC<ChatProps> = ({
       },
       feedback: {
         enabled: feedback,
-      },
-      textToSpeech: {
-        ...textToSpeech,
-        vcn: textToSpeech?.vcn || vcnList[0]?.vcn,
-      },
-      speechToText: {
-        enabled: speechToText,
       },
       models: {},
       repoConfigs: {
@@ -1245,9 +1228,7 @@ const BaseConfig: React.FC<ChatProps> = ({
                       promptStructList: [],
                       datasetList: datasetList,
                       avatar: coverUrl,
-                      vcnCn: botCreateActiveV.cn,
-                      vcnEn: botCreateActiveV.en,
-                      vcnSpeed: botCreateActiveV.speed,
+                      vcnCn: botCreateActiveV?.cn || vcnList[0]?.voiceType,
                       isSentence: 0,
                       openedTool: Object.keys(choosedAlltool)
                         .filter((key: any) => choosedAlltool[key])
@@ -1307,9 +1288,7 @@ const BaseConfig: React.FC<ChatProps> = ({
                       promptStructList: [],
                       maasDatasetList: maasDatasetList,
                       avatar: coverUrl,
-                      vcnCn: botCreateActiveV.cn,
-                      vcnEn: botCreateActiveV.en,
-                      vcnSpeed: botCreateActiveV.speed,
+                      vcnCn: botCreateActiveV?.cn || vcnList[0]?.voiceType,
                       isSentence: 0,
                       openedTool: Object.keys(choosedAlltool)
                         .filter((key: any) => choosedAlltool[key])
@@ -1396,9 +1375,7 @@ const BaseConfig: React.FC<ChatProps> = ({
                     promptStructList: [],
                     datasetList: datasetList,
                     avatar: coverUrl,
-                    vcnCn: botCreateActiveV.cn,
-                    vcnEn: botCreateActiveV.en,
-                    vcnSpeed: botCreateActiveV.speed,
+                    vcnCn: botCreateActiveV?.cn || vcnList[0]?.voiceType,
                     isSentence: sentence,
                     openedTool: Object.keys(choosedAlltool)
                       .filter((key: any) => choosedAlltool[key])
@@ -1447,9 +1424,7 @@ const BaseConfig: React.FC<ChatProps> = ({
                     promptStructList: [],
                     maasDatasetList: maasDatasetList,
                     avatar: coverUrl,
-                    vcnCn: botCreateActiveV.cn,
-                    vcnEn: botCreateActiveV.en,
-                    vcnSpeed: botCreateActiveV.speed,
+                    vcnCn: botCreateActiveV?.cn || vcnList[0]?.voiceType,
                     isSentence: sentence,
                     openedTool: Object.keys(choosedAlltool)
                       .filter((key: any) => choosedAlltool[key])
@@ -1755,13 +1730,13 @@ const BaseConfig: React.FC<ChatProps> = ({
                       setTools={setTools}
                       conversation={conversation}
                       setConversation={setConversation}
-                      textToSpeech={textToSpeech}
                       multiModelDebugging={multiModelDebugging}
                       growOrShrinkConfig={growOrShrinkConfig}
                       setGrowOrShrinkConfig={setGrowOrShrinkConfig}
                       personalityData={personalityData}
                       setPersonalityData={handlePersonalityChange}
                       model={model}
+                      vcnList={vcnList}
                     />
                   </Tabs.TabPane>
                 </Tabs>

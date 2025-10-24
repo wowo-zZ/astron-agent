@@ -125,6 +125,8 @@ export interface BotInfoType {
   inputExample: string[];
   supportContext: boolean;
   isFavorite: number;
+  vcnCn: string;
+  advancedConfig?: string;
   openedTool?: string;
   config?: string[];
 }
@@ -210,6 +212,7 @@ export interface ChatData {
 
 // web bot 信息
 export interface WebBotInfo {
+  advancedConfig?: string;
   openedTool: string;
   config: string[];
 }

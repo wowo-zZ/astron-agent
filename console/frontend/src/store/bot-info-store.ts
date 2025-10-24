@@ -25,6 +25,8 @@ const useBotInfoStore = create<BotInfoStore>(set => ({
     supportContext: false,
     isFavorite: 0,
     openedTool: '',
+    advancedConfig: '',
+    vcnCn: '',
     config: [],
   },
   setBotInfo: newBotInfo =>
