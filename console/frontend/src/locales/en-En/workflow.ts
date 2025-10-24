@@ -35,7 +35,7 @@ const translation = {
       parameters: 'Parameters',
       add: 'Add',
       noRobot: 'No Robot',
-      noRpaTool: 'No Rpa tool',
+      noRpaTool: 'No RPA tool, create one now~',
       noMore: 'No more',
       createRpa: 'Create RPA',
     },
