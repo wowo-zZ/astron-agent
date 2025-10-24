@@ -318,4 +318,8 @@ export interface UploadFileInfo {
   status: 'uploading' | 'completed' | 'error' | 'pending';
   /** 错误信息 */
   error?: string;
+  /** 参数名称（用于绑定接口） */
+  paramName?: string;
+  /** 输入名称（对应 config.name，用于区分不同输入类型） */
+  inputName?: string;
 }

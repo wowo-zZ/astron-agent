@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Input,
   Tooltip,
@@ -22,6 +22,7 @@ import { useLocaleStore } from '@/store/spark-store/locale-store';
 import SpeakerModal from '@/components/speaker-modal';
 import { vcnCnJson } from '@/components/speaker-modal/vcn';
 import UploadBackgroundModal from '@/components/upload-background';
+import Personality from './personality-component';
 import { RightOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 
 import settingFile from '@/assets/imgs/sparkImg/icon_bot_setting_file.png';
@@ -50,8 +51,6 @@ interface CapabilityDevelopmentProps {
   baseinfo: any;
   detailInfo: any;
   prompt: any;
-  supportSystemFlag: any;
-  setSupportSystemFlag: (v: any) => void;
   prologue: any;
   setPrologue: (v: any) => void;
   inputExample: string[];
@@ -62,49 +61,29 @@ interface CapabilityDevelopmentProps {
   setSelectSource: (v: any[]) => void;
   supportContextFlag: boolean;
   setSupportContextFlag: (v: boolean) => void;
-  currentRobot: any;
   tools: any[];
   setTools: (v: any[]) => void;
-  flows: any[];
-  setFlows: (v: any[]) => void;
-  repoConfig: any;
-  setRepoConfig: (v: any) => void;
   files: any[];
-  setFiles: (v: any[]) => void;
   tree: any[];
   setTree: (v: any[]) => void;
   conversation: boolean;
   setConversation: (v: boolean) => void;
-  conversationStarter: any;
-  setConversationStarter: (v: any) => void;
-  presetQuestion: any;
-  setPresetQuestion: (v: any) => void;
-  resource: any;
-  setResource: (v: any) => void;
-  suggest: any;
-  setSuggest: (v: any) => void;
-  speechToText: any;
-  setSpeechToText: (v: any) => void;
-  feedback: any;
-  setFeedback: (v: any) => void;
   textToSpeech: any;
-  setTextToSpeech: (v: any) => void;
   multiModelDebugging: boolean;
   growOrShrinkConfig: any;
   setGrowOrShrinkConfig: (v: any) => void;
-  knowledges: any;
-  vcnList: any;
+  personalityData: any;
+  setPersonalityData: (v: any) => void;
+  model: string;
 }
 
-function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
+const CapabilityDevelopment: React.FC<CapabilityDevelopmentProps> = props => {
   const {
     botCreateActiveV,
     setBotCreateActiveV,
     baseinfo,
     detailInfo,
     prompt,
-    supportSystemFlag,
-    setSupportSystemFlag,
     prologue,
     setPrologue,
     inputExample,
@@ -115,38 +94,20 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
     setSelectSource,
     supportContextFlag,
     setSupportContextFlag,
-    currentRobot,
     tools,
     setTools,
-    flows,
-    setFlows,
-    repoConfig,
-    setRepoConfig,
     files,
-    setFiles,
     tree,
     setTree,
     conversation,
     setConversation,
-    conversationStarter,
-    setConversationStarter,
-    presetQuestion,
-    setPresetQuestion,
-    resource,
-    setResource,
-    suggest,
-    setSuggest,
-    speechToText,
-    setSpeechToText,
-    feedback,
-    setFeedback,
     textToSpeech,
-    setTextToSpeech,
     multiModelDebugging,
     growOrShrinkConfig,
     setGrowOrShrinkConfig,
-    knowledges,
-    vcnList,
+    personalityData,
+    setPersonalityData,
+    model,
   } = props;
 
   const backgroundImg = useSparkCommonStore(state => state.backgroundImg);
@@ -1041,6 +1002,17 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
                 </>
               )}
             </div>
+
+            <Personality
+              enablePersonality={personalityData.enablePersonality}
+              personalityConfig={personalityData.personalityConfig}
+              onPersonalityChange={setPersonalityData}
+              botName={baseinfo.botName}
+              botType={baseinfo.botType}
+              botDesc={baseinfo.botDesc}
+              prompt={prompt}
+            />
+
             <div
               className="flex justify-between items-center border-b border-[#E9EFF6]"
               style={{
@@ -1206,6 +1178,6 @@ function CapabilityDevelopment(props: CapabilityDevelopmentProps) {
       />
     </div>
   );
-}
+};
 
 export default CapabilityDevelopment;

@@ -120,6 +120,32 @@ Based on the given note topic, write a creative Xiaohongshu-style product recomm
     xunfeiOpenPlatformServiceAgreement:
       'Xunfei Open Platform Service Agreement',
     privacyAgreement: 'Privacy Agreement',
+    personality: 'Character Personality',
+    personalityInfo: 'Personality Info',
+    scenarioInfo: 'Scenario Info',
+    personalityLibrary: 'Premium Personality Library',
+    personalityDescription: 'Please enter character personality',
+    aiGenerate: 'AI Generate',
+    aiPolish: 'AI Polish',
+    companionScenario: 'Companion Scenario',
+    trainingScenario: 'Training Scenario',
+    companionScenarioDesc:
+      'Suitable for casual companionship and entertainment',
+    trainingScenarioDesc:
+      'Suitable for interviews, work, and learning practice',
+    scenarioDescription: 'Content should be within 500 words',
+    personalityLibraryTitle: 'Premium Personality Library',
+    personalityDetail: 'Detail',
+    back: 'Back',
+    select: 'Select',
+    imageLoadError: 'Image load failed',
+    // AI personality parameter validation prompts
+    aiPersonalityBotNameRequired: 'Please fill in the agent name',
+    aiPersonalityBotTypeRequired: 'Please select the agent category',
+    aiPersonalityBotDescRequired: 'Please fill in the agent description',
+    aiPersonalityPromptRequired: 'Please fill in the agent prompt',
+    personalityRequired: 'Please enter character personality information',
+    sceneInfoRequired: 'Please enter scene description information',
   },
   promptTry: {
     promptTry: 'Please complete the verification',
