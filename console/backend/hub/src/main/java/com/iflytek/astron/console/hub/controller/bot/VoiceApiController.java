@@ -31,7 +31,7 @@ public class VoiceApiController {
         return ApiResult.success(voiceService.getTtsSign());
     }
 
-    @GetMapping(value = "/getPronunciationPerson")
+    @GetMapping(value = "/get-pronunciation-person")
     public ApiResult<List<PronunciationPersonConfig>> getPronunciationPerson() {
         return ApiResult.success(voiceService.getPronunciationPerson());
     }
