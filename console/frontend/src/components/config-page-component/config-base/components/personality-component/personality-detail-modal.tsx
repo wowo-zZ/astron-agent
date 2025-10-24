@@ -62,7 +62,7 @@ const PersonalityDetailModal: React.FC<PersonalityDetailModalProps> = ({
                   zIndex: 1,
                 }}
               >
-                <Spin size="large" />
+                <Spin />
               </div>
             )}
             {imageError ? (
