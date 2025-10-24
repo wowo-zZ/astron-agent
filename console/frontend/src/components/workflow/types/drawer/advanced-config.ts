@@ -85,7 +85,9 @@ export interface CommonComponentProps {
 
 export interface ConversationStarterProps extends CommonComponentProps {
   setOpeningRemarksModal: (value: boolean) => void;
-  updateAdvancedConfigParamsDebounce: (updateParams: AdvancedConfigUpdate) => void;
+  updateAdvancedConfigParamsDebounce: (
+    updateParams: AdvancedConfigUpdate
+  ) => void;
   handlePresetQuestionChange: (index: number, value: string) => void;
 }
 
@@ -99,7 +101,9 @@ export interface UseAdvancedConfigurationReturn {
   advancedConfig: AdvancedConfigType;
   handleAdvancedConfigChange: (callback: () => void) => void;
   updateAdvancedConfigParams: (updateParams: AdvancedConfigUpdate) => void;
-  updateAdvancedConfigParamsDebounce: (updateParams: AdvancedConfigUpdate) => void;
+  updateAdvancedConfigParamsDebounce: (
+    updateParams: AdvancedConfigUpdate
+  ) => void;
   handlePresetQuestionChange: (index: number, value: string) => void;
   openingRemarksModal: boolean;
   setOpeningRemarksModal: (value: boolean) => void;
