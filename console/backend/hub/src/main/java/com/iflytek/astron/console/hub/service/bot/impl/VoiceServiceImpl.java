@@ -7,6 +7,7 @@ import com.iflytek.astron.console.hub.entity.PronunciationPersonConfig;
 import com.iflytek.astron.console.hub.mapper.PronunciationPersonConfigMapper;
 import com.iflytek.astron.console.hub.service.bot.VoiceService;
 import com.iflytek.astron.console.toolkit.tool.http.HeaderAuthHttpTool;
+import com.iflytek.astron.console.toolkit.tool.http.HttpAuthTool;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,18 +45,11 @@ public class VoiceServiceImpl implements VoiceService {
 
     @Override
     public Map<String, String> getTtsSign() {
-        try {
-            Map<String, String> resultMap = new HashMap<>();
-            String url = HeaderAuthHttpTool.get(ttsApiUrl, apiKey, apiSecret);
-            resultMap.put("appId", appId);
-            resultMap.put("apiKey", apiKey);
-            resultMap.put("apiSecret", apiSecret);
-            resultMap.put("url", url);
-            return resultMap;
-        } catch (NoSuchAlgorithmException | IOException | InvalidKeyException e) {
-            log.error("get tts sign error:{}", e.getMessage());
-            throw new BusinessException(ResponseEnum.BUSINESS_ERROR);
-        }
+        Map<String, String> resultMap = new HashMap<>();
+        String url = HttpAuthTool.assembleRequestUrl(ttsApiUrl, apiKey, apiSecret);
+        resultMap.put("appId", appId);
+        resultMap.put("url", url);
+        return resultMap;
     }
 
     @Override
