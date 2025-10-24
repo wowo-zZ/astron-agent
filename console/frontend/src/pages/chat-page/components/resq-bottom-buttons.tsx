@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import TtsModule from '@/components/tts-module';
 import useChat from '@/hooks/use-chat';
 import useVoicePlayStore from '@/store/voice-play-store';
+import useBotInfoStore from '@/store/bot-info-store';
 
 /**
  * 每个回复内容下面的按钮
@@ -27,7 +28,23 @@ const ResqBottomButtons = ({
   const setCurrentPlayingId = useVoicePlayStore(
     state => state.setCurrentPlayingId
   );
+  const botInfo = useBotInfoStore(state => state.botInfo); //  智能体信息
 
+  const getVoiceName = () => {
+    if (botInfo?.vcnCn) {
+      return botInfo?.vcnCn;
+    } else {
+      if (botInfo?.advancedConfig) {
+        try {
+          const advancedConfig = JSON.parse(botInfo?.advancedConfig);
+          return advancedConfig?.textToSpeech?.vcn_cn;
+        } catch (error) {
+          return '';
+        }
+      }
+    }
+    return '';
+  };
   // 播放按钮点击
   const handlePlayAudio = () => {
     if (isPlaying) {
@@ -49,6 +66,7 @@ const ResqBottomButtons = ({
       <TtsModule
         text={message.message}
         language="cn"
+        voiceName={getVoiceName()}
         isPlaying={isPlaying}
         setIsPlaying={setIsPlaying}
       />
@@ -75,7 +93,7 @@ const ResqBottomButtons = ({
           <ReactSVG wrapper="span" src={copyIcon} />
         </div>
       </Tooltip>
-      {/* <Tooltip
+      <Tooltip
         title={
           isPlaying
             ? t('chatPage.chatBottom.stopReading')
@@ -89,7 +107,7 @@ const ResqBottomButtons = ({
         >
           <AudioAnimate isPlaying={isPlaying} />
         </div>
-      </Tooltip> */}
+      </Tooltip>
     </div>
   );
 };

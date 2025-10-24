@@ -88,6 +88,7 @@ const useChat = () => {
     let ans: string = '';
     let nodeChat: boolean = false;
     let nodeChatContent: string = '';
+    let messageContent: string = '';
     const controller = new AbortController();
     controllerRef.current = controller;
     setControllerRef(controllerRef.current);
@@ -156,6 +157,7 @@ const useChat = () => {
           reqId,
           message,
         } = deCodedData;
+        message && (messageContent = message);
         sseId && setStreamId(sseId);
         id && (sidRef.current = id.toString());
         reqId && (reqIdRef.current = reqId);
@@ -210,13 +212,17 @@ const useChat = () => {
         }
         if (!error && !ERROR_CODE.includes(code || 0)) {
           if (end) {
+            if (ans.length === 0) {
+              ans = messageContent;
+              updateStreamingMessage(ans);
+            }
             // 完成流式消息，添加sid和id
             finishStreamingMessage(sidRef.current, reqIdRef.current);
             controller.abort('结束');
             return;
           }
           // 更新流式消息内容
-          ans = `${ans}${choices?.[0]?.delta?.content || message}`;
+          ans = `${ans}${choices?.[0]?.delta?.content || ''}`;
           updateStreamingMessage(ans);
         } else {
           //统一的报错处理

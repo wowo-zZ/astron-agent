@@ -19,8 +19,7 @@ import { placeholderText } from '@/components/bot-center/edit-bot/placeholder';
 import { localeConfig } from '@/locales/localeConfig';
 import { useSparkCommonStore } from '@/store/spark-store/spark-common';
 import { useLocaleStore } from '@/store/spark-store/locale-store';
-import SpeakerModal from '@/components/speaker-modal';
-import { vcnCnJson } from '@/components/speaker-modal/vcn';
+import SpeakerModal, { VcnItem } from '@/components/speaker-modal';
 import UploadBackgroundModal from '@/components/upload-background';
 import Personality from './personality-component';
 import { RightOutlined, QuestionCircleOutlined } from '@ant-design/icons';
@@ -42,6 +41,8 @@ import { useTranslation } from 'react-i18next';
 
 import styles from './CapabilityDevelopment.module.scss';
 import cls from 'classnames';
+import { getVcnList } from '@/services/chat';
+import { CheckboxChangeEvent } from 'antd/es/checkbox';
 
 const { TextArea } = Input;
 
@@ -68,13 +69,13 @@ interface CapabilityDevelopmentProps {
   setTree: (v: any[]) => void;
   conversation: boolean;
   setConversation: (v: boolean) => void;
-  textToSpeech: any;
   multiModelDebugging: boolean;
   growOrShrinkConfig: any;
   setGrowOrShrinkConfig: (v: any) => void;
   personalityData: any;
   setPersonalityData: (v: any) => void;
   model: string;
+  vcnList: VcnItem[];
 }
 
 const CapabilityDevelopment: React.FC<CapabilityDevelopmentProps> = props => {
@@ -101,13 +102,13 @@ const CapabilityDevelopment: React.FC<CapabilityDevelopmentProps> = props => {
     setTree,
     conversation,
     setConversation,
-    textToSpeech,
     multiModelDebugging,
     growOrShrinkConfig,
     setGrowOrShrinkConfig,
     personalityData,
     setPersonalityData,
     model,
+    vcnList,
   } = props;
 
   const backgroundImg = useSparkCommonStore(state => state.backgroundImg);
@@ -122,7 +123,6 @@ const CapabilityDevelopment: React.FC<CapabilityDevelopmentProps> = props => {
   const [xieyi, setXieyi] = useState(true);
   const [showSpeakerModal, setShowSpeakerModal] = useState(false);
   const [inputExampFlag, setInputExampFlag] = useState(false);
-  const audioRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [openingRemarksModal, setOpeningRemarksModal] = useState(false);
   const [playing, setPlaying] = useState(false);
@@ -152,17 +152,16 @@ const CapabilityDevelopment: React.FC<CapabilityDevelopmentProps> = props => {
   const botDesc = 'wode';
   const name = '123';
 
-  const [mySpeaker, setMySpeaker]: any = useState([]); //我的发音人数组
 
   /**
    * 设置助手发音人
    */
-  const setBotCreateVcn = (vcn: any) => {
+  const setBotCreateVcn = (vcn: { cn: string }) => {
     setBotCreateActiveV({
-      ...vcn,
+      cn: vcn.cn,
     });
   };
-  const onChecked = (e: any) => {
+  const onChecked = (e: CheckboxChangeEvent) => {
     setXieyi(e.target.checked);
   };
 
@@ -170,42 +169,23 @@ const CapabilityDevelopment: React.FC<CapabilityDevelopmentProps> = props => {
    * 渲染助手发音人
    */
   const renderBotVcn = () => {
-    let vcnObj = vcnCnJson.find(
-      (item: any) => item.vcn === botCreateActiveV.cn
-    );
-    let isCustomVcn = false;
-    if (!vcnObj) {
-      vcnObj = mySpeaker.find(
-        (item: any) => item.vcnCode === botCreateActiveV.cn
-      );
-      if (vcnObj) {
-        isCustomVcn = true;
-      }
-    }
+    const vcnObj =
+      vcnList.find((item: VcnItem) => item.voiceType === botCreateActiveV.cn) ||
+      vcnList[0];
 
     return (
       <>
         {vcnObj ? (
           <>
             <img
-              style={{
-                width: '16px',
-                height: '16px',
-                marginRight: '3px',
-                marginTop: '3px',
-              }}
-              className={styles.vcn_icon}
-              src={
-                isCustomVcn
-                  ? 'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16906018510400728%2F%E7%BC%96%E7%BB%84%204%402x.png'
-                  : vcnObj?.imgUrl
-              }
+              className="w-7 h-7 mr-1 rounded-full"
+              src={vcnObj?.coverUrl}
               alt=""
             />
             <span title={vcnObj?.name}>
               {localeNow === 'en'
-                ? vcnObj?.en_name
-                  ? vcnObj?.en_name
+                ? vcnObj?.modelManufacturer
+                  ? vcnObj?.modelManufacturer
                   : vcnObj?.name
                 : vcnObj?.name}
             </span>
@@ -329,12 +309,12 @@ const CapabilityDevelopment: React.FC<CapabilityDevelopmentProps> = props => {
         return setInputExampFlag(true);
       }
     });
-  }, []);
-
-  useEffect(() => {
     if (prologue) {
       setConversation(true);
     }
+    listRepos().then((res: any) => {
+      setDataSource(res?.pageData);
+    });
   }, []);
 
   useEffect(() => {
@@ -346,18 +326,6 @@ const CapabilityDevelopment: React.FC<CapabilityDevelopmentProps> = props => {
     });
     setDisList(arr);
   }, [dataSource]);
-
-  useEffect(() => {
-    listRepos().then((res: any) => {
-      setDataSource(res?.pageData);
-    });
-  }, []);
-  useEffect(() => {
-    if (!textToSpeech?.enabled) {
-      audioRef.current && audioRef.current.pause();
-      setPlaying(false);
-    }
-  }, [textToSpeech?.enabled]);
 
   return (
     <div
@@ -534,7 +502,7 @@ const CapabilityDevelopment: React.FC<CapabilityDevelopmentProps> = props => {
           </div>
           <Modal
             wrapClassName={styles.datasetModalWrap}
-            visible={visible}
+            open={visible}
             centered
             footer={null}
             closable={false}
@@ -1029,10 +997,9 @@ const CapabilityDevelopment: React.FC<CapabilityDevelopmentProps> = props => {
                   display: 'flex',
                   borderRadius: '22px',
                   background: '#F2F5FE',
-                  width: '138px',
                   height: '44px',
                   justifyContent: 'center',
-                  paddingTop: '10px',
+                  padding: '10px 16px',
                   cursor: 'pointer',
                 }}
                 className={`${styles.vcn_choose} ${styles.vcn_choose_banned}`}
@@ -1170,6 +1137,7 @@ const CapabilityDevelopment: React.FC<CapabilityDevelopmentProps> = props => {
         </Checkbox>
       </div>
       <SpeakerModal
+        vcnList={vcnList}
         changeSpeakerModal={setShowSpeakerModal}
         botCreateCallback={setBotCreateVcn}
         setBotCreateActiveV={setBotCreateActiveV}
