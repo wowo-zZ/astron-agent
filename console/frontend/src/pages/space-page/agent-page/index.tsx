@@ -30,6 +30,8 @@ import styles from './index.module.scss';
 import useSpaceStore from '@/store/space-store';
 import { getInputsType } from '@/services/flow';
 import { handleShare } from '@/utils';
+import VirtualConfig from '@/components/virtual-config-modal';
+import { upgradeWorkflow } from '@/services/spark-common';
 
 function index() {
   const typePublished = [1, 2, 4]; // 已发布状态
@@ -58,6 +60,10 @@ function index() {
   const { spaceId } = useSpaceStore();
 
   const { handleToChat } = useChat();
+
+    // 复制成虚拟人需要的参数
+  const [copyParams, setCopyParams] = useState<any>({});
+  const [virtualModal, setVirtualModal] = useState<boolean>(false); //复制成虚拟人
 
   /* statusMap为createList接口查询时参数
   NOTE: 原本为：1 审核中，2 已发布，3 审核不通过，4修改审核中， -9 || 0 未发布 => 后来改为已发布、未发布、发布中、审核不通过；
@@ -288,6 +294,7 @@ function index() {
                 { label: t('agentPage.agentPage.allTypes'), value: 0 },
                 { label: t('agentPage.agentPage.instructionType'), value: 1 },
                 { label: t('agentPage.agentPage.workflowType'), value: 3 },
+                { label: '语音*虚拟人', value: 4 },
               ]}
             />
             <Select
@@ -443,9 +450,9 @@ function index() {
 
                   <div className="flex ml-24 gap-4">
                     <div className={styles.angentType}>
-                      {k.version === 1
-                        ? t('home.instructionType')
-                        : t('home.workflowType')}
+                        {k.version === 1 && t('home.instructionType')}
+                        {k.version === 3 && t('home.workflowType')}
+                        {k.version === 4 && '语音*虚拟人'}
                     </div>
                   </div>
 
@@ -550,7 +557,7 @@ function index() {
                           />
                           {operationId === k.botId && (
                             <div
-                              className="absolute top-[28px] right-0 bg-white rounded p-1 shadow-md flex flex-col gap-1 w-[48px]"
+                              className={`absolute top-[28px] right-0 bg-white rounded p-1 shadow-md flex flex-col gap-1 ${k.version === 3 ? 'w-[155px]' : 'w-[48px]'}`}
                               style={{
                                 zIndex: 1,
                               }}
@@ -577,6 +584,18 @@ function index() {
                                   {t('agentPage.agentPage.export')}
                                 </span>
                               )}
+                              {k?.version === 3 && (
+                                  <div
+                                    className="p-1 rounded hover:bg-[#F2F5FE] text-[#666666]"
+                                    onClick={e => {
+                                      e.stopPropagation();
+                                      setCopyParams({ ...k, name: k.botName });
+                                      setVirtualModal(true);
+                                    }}
+                                  >
+                                    复制为语音·虚拟人智能体
+                                  </div>
+                              )}
                               {![1, 4].includes(k?.botStatus) && (
                                 <div
                                   className="p-1 rounded hover:bg-[#F2F5FE] text-[#F74E43]"
@@ -601,6 +620,27 @@ function index() {
             </div>
           </div>
         </div>
+
+          <VirtualConfig
+            visible={virtualModal}
+            formValues={copyParams}
+            onSubmit={values => {
+              upgradeWorkflow({ sourceId: copyParams?.botId, ...values })
+                .then((res: any) => {
+                  message.success('复制成功');
+                  navigate(
+                    `/work_flow/${res?.flowId}/arrange?botId=${res?.botId}`
+                  );
+                  setVirtualModal(false);
+                })
+                .catch((err: any) => {
+                  message.error(err?.msg || err);
+                });
+            }}
+            onCancel={() => {
+              setVirtualModal(false);
+            }}
+          />
       </div>
     </div>
   );
