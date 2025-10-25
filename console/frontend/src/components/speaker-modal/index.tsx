@@ -65,7 +65,7 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
       if (isPlaying) {
         setIsPlaying(false);
       }
-      
+
       // 使用 setTimeout 确保状态更新完成后再开始新的播放
       setTimeout(() => {
         setPlayActive(vcn.voiceType);
@@ -85,7 +85,7 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
     if (audioRef.current) {
       audioRef.current.pause();
     }
-    
+
     setTimeout(() => {
       changeSpeakerModal(false);
     });

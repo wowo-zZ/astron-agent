@@ -152,7 +152,6 @@ const CapabilityDevelopment: React.FC<CapabilityDevelopmentProps> = props => {
   const botDesc = 'wode';
   const name = '123';
 
-
   /**
    * 设置助手发音人
    */

@@ -175,5 +175,14 @@ const useChatStore = create<ChatState & ChatActions>(set => ({
     option: Option[];
     content?: string;
   }): void => set({ workflowOption }),
+  setVmsInteractiveRef: vmsInteractiveRef => set({ vmsInteractiveRef }),
+  setVmsInteractiveRefPlayer: vmsInteractiveRefPlayer =>
+    set({ vmsInteractiveRefPlayer }),
+  setVmsInteractiveRefStatus: vmsInteractiveRefStatus =>
+    set({ vmsInteractiveRefStatus }),
+  getVmsInteractiveRefPlayer: () => get().vmsInteractiveRefPlayer,
+  getVmsInteractiveRefStatus: () => get().vmsInteractiveRefStatus,
+  setChatType: chatType => set({ chatType }),
+  getChatType: () => get().chatType,
 }));
 export default useChatStore;
