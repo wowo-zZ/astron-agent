@@ -8,7 +8,6 @@ import { isJSON } from '@/utils';
 import { getFixedUrl, getAuthorization } from '@/components/workflow/utils';
 import OpeningRemarks from './opening-remarks';
 import { useTranslation } from 'react-i18next';
-import { vcnCnJson, vcnEnJson } from '@/components/speaker-modal/vcn';
 import {
   FlowType,
   ChatBackgroundInfo,
@@ -24,7 +23,8 @@ import {
 
 // 从统一的图标管理中导入
 import { Icons } from '@/components/workflow/icons';
-import SpeakerModal from '@/components/speaker-modal';
+import SpeakerModal, { VcnItem } from '@/components/speaker-modal';
+import { getVcnList } from '@/services/chat';
 
 // 获取 Advanced Config 模块的图标
 const icons = Icons.advancedConfig;
@@ -231,41 +231,38 @@ const CharacterVoice: React.FC<CommonComponentProps> = ({
   advancedConfig,
   handleAdvancedConfigChange,
   updateAdvancedConfigParams,
+  vcnList,
   t,
 }) => {
   const [showSpeakerModal, setShowSpeakerModal] = useState<boolean>(false);
   const [botCreateActiveV, setBotCreateActiveV] = useState<{
     cn: string;
-    en: string;
   }>({
-    cn: advancedConfig?.textToSpeech?.vcn_cn || 'x4_lingxiaoqi',
-    en: advancedConfig?.textToSpeech?.vcn_en || 'x4_EnUs_Luna',
+    cn: advancedConfig?.textToSpeech?.vcnCn || vcnList[0]?.voiceType || '',
   });
-
-  const handleVoiceChange = (voice: { cn: string; en: string }): void => {
+  console.log(botCreateActiveV, advancedConfig, '6666666666666666666');
+  const handleVoiceChange = (voice: { cn: string }): void => {
     setBotCreateActiveV(voice);
     handleAdvancedConfigChange(() => {
-      advancedConfig.textToSpeech.vcn_cn = voice.cn;
-      advancedConfig.textToSpeech.vcn_en = voice.en;
+      advancedConfig.textToSpeech.vcnCn = voice.cn;
     });
     updateAdvancedConfigParams({
       textToSpeech: {
-        vcn_cn: voice.cn,
-        vcn_en: voice.en,
+        vcnCn: voice.cn,
       },
     });
   };
 
   // 渲染发音人显示
   const renderBotVcn = () => {
-    let vcnObj = vcnCnJson.find(
-      (item: any) => item.vcn === botCreateActiveV.cn
+    let vcnObj = vcnList.find(
+      (item: VcnItem) => item.voiceType === botCreateActiveV.cn
     );
     return (
       <>
         <img
           className="w-[30px] h-[30px] mr-2 rounded-full"
-          src={vcnObj?.imgUrl}
+          src={vcnObj?.coverUrl}
           alt=""
         />
         <span
@@ -326,6 +323,7 @@ const CharacterVoice: React.FC<CommonComponentProps> = ({
         </div>
       )}
       <SpeakerModal
+        vcnList={vcnList}
         showSpeakerModal={showSpeakerModal}
         changeSpeakerModal={setShowSpeakerModal}
         botCreateCallback={handleVoiceChange}
@@ -465,8 +463,7 @@ const useAdvancedConfiguration = (): UseAdvancedConfigurationReturn => {
         },
         textToSpeech: {
           enabled: parsedConfig?.textToSpeech?.enabled ?? true,
-          vcn_cn: parsedConfig?.textToSpeech?.vcn_cn || 'x4_lingxiaoqi',
-          vcn_en: parsedConfig?.textToSpeech?.vcn_en || 'x4_EnUs_Luna',
+          vcnCn: parsedConfig?.textToSpeech?.vcnCn || '',
         },
         suggestedQuestionsAfterAnswer: {
           enabled: parsedConfig?.suggestedQuestionsAfterAnswer?.enabled ?? true,
@@ -488,8 +485,7 @@ const useAdvancedConfiguration = (): UseAdvancedConfigurationReturn => {
         },
         textToSpeech: {
           enabled: true,
-          vcn_cn: 'x4_lingxiaoqi',
-          vcn_en: 'x4_EnUs_Luna',
+          vcnCn: '',
         },
         suggestedQuestionsAfterAnswer: {
           enabled: true,
@@ -655,6 +651,7 @@ function AdvancedConfiguration(): React.ReactElement {
     setChatBackgroundInfo,
     uploadProps,
   } = useAdvancedConfiguration();
+  const [vcnList, setVcnList] = useState<VcnItem[]>([]);
   useEffect(() => {
     const handleAdjustmentDrawerStyle = (): void => {
       setDrawerStyle({
@@ -666,6 +663,11 @@ function AdvancedConfiguration(): React.ReactElement {
     return (): void =>
       window.removeEventListener('resize', handleAdjustmentDrawerStyle);
   }, [drawerStyle]);
+  useEffect(() => {
+    getVcnList().then((res: VcnItem[]) => {
+      setVcnList(res);
+    });
+  }, []);
   return (
     <Drawer
       rootClassName="advanced-configuration-container"
@@ -734,6 +736,7 @@ function AdvancedConfiguration(): React.ReactElement {
             advancedConfig={advancedConfig}
             handleAdvancedConfigChange={handleAdvancedConfigChange}
             updateAdvancedConfigParams={updateAdvancedConfigParams}
+            vcnList={vcnList}
             t={t}
           />
           <ChatBackground

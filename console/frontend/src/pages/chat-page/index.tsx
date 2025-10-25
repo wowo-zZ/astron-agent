@@ -183,6 +183,7 @@ const ChatPage = (): ReactElement => {
       const workflowBotInfo = await getWorkflowBotInfoApi(botId);
       setBotInfo({
         ...botInfo,
+        advancedConfig: workflowBotInfo?.advancedConfig,
         openedTool: workflowBotInfo.openedTool,
         config: workflowBotInfo.config,
       });

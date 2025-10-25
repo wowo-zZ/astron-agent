@@ -18,7 +18,6 @@ interface ExperienceConfig {
   close?: () => void;
   isAIPartner?: boolean;
   useTtsSignV2?: boolean;
-  emotion?: number;
 }
 
 interface SetConfigParams {
@@ -33,7 +32,6 @@ interface SetConfigParams {
   isDialect?: boolean;
   language?: string;
   tte?: string;
-  emotion?: number;
   isAIPartner?: boolean;
   useTtsSignV2?: boolean;
 }
@@ -129,11 +127,11 @@ interface WebSocketResponse {
 
 export interface TtsSignResponse {
   appId: string;
-  authorization: string;
   url: string;
 }
 
 const NOT_SUPPORT_TIP = '当前浏览器不支持该功能，请换个浏览器试试';
+
 // 优化缓冲参数以减少破音
 const START_MIN_FRAMES = 16000 * 0.5; // 至少缓冲 500ms 音频（增加缓冲）
 const MAX_WAIT_MS = 600; // 最多等待 600ms（稍微延长等待时间）
@@ -162,7 +160,6 @@ class Experience {
   private playTimeout: NodeJS.Timeout | undefined;
   private flag: boolean = false;
   private firstBufferWaitStartMs: number | null = null; // 首次播放的预缓冲起始时间
-  private emotion: number | undefined; // 情感参数
 
   constructor({
     speed = 2,
@@ -170,9 +167,8 @@ class Experience {
     pitch = 7,
     text = '',
     engineType = 'intp65',
-    voiceName = 'x4_EnUs_Gavin',
+    voiceName = '',
     isDialect = false,
-    emotion,
     tte = 'UTF8',
     language = 'cn',
     close,
@@ -184,7 +180,6 @@ class Experience {
     this.engineType = engineType;
     this.voiceName = voiceName;
     this.isDialect = isDialect;
-    this.emotion = emotion;
     this.tte = tte;
     this.language = language;
     this.playState = '';
@@ -238,16 +233,10 @@ class Experience {
 
   // 获取音频
   getAudio(): void {
-    const self = this;
-    const form = new FormData();
-    let ttsValue = self.voiceName;
-
-    form.append('text', self.text);
-    form.append('tts', ttsValue);
-    getTtsSign(form)
+    getTtsSign()
       .then((result: TtsSignResponse) => {
         const appId = result.appId;
-        const url = result.url.replace('https://', 'wss://');
+        const url = result.url;
         this.connectWebsocket(url, appId);
       })
       .catch(err => {
@@ -269,8 +258,6 @@ class Experience {
       message.info(NOT_SUPPORT_TIP);
       return;
     }
-    const includesHost =
-      url.includes('ws-api-dx.xfyun.cn') || url.includes('ws-api-hu.xfyun.cn');
     const self = this;
     if (!this.websocket) return;
 
@@ -285,86 +272,25 @@ class Experience {
 
       let params: any = {};
 
-      params = includesHost
-        ? {
-            common: {
-              app_id: appId,
-            },
-            business: {
-              aue: 'raw',
-              auf: 'audio/L16;rate=16000',
-              ent: 'input65',
-              pitch: self.pitch || 50,
-              tte: 'UTF8',
-              vcn: vcnValue,
-              volume: 50,
-              speed: self.speed,
-            },
-            data: {
-              status: 2,
-              text: self.encodeText(self.text),
-            },
-          }
-        : {
-            header: {
-              app_id: appId,
-              uid: '',
-              did: '',
-              imei: '',
-              imsi: '',
-              mac: '',
-              net_type: 'wifi',
-              net_isp: 'CMCC',
-              status: 2,
-              request_id: null,
-              res_id: self.voiceName.includes('x5_once_clone_')
-                ? self.voiceName.replace('x5_once_clone_', '')
-                : '',
-            },
-            parameter: {
-              tts: {
-                vcn: vcnValue,
-                speed: self.speed,
-                volume: 50,
-                pitch: self.pitch || 50,
-                bgs: 0,
-                reg: 0,
-                rdn: 0,
-                rhy: 0,
-                scn: self.voiceName.includes('x5_once_clone_') ? undefined : 0,
-                ...(self.emotion !== undefined
-                  ? { emotion: self.emotion }
-                  : {}),
-                audio: {
-                  encoding: 'raw',
-                  sample_rate: 16000,
-                  channels: 1,
-                  bit_depth: 16,
-                  frame_size: 0,
-                },
-                pybuf: {
-                  encoding: 'utf8',
-                  compress: 'raw',
-                  format: 'plain',
-                },
-              },
-            },
-            payload: {
-              text: {
-                encoding: 'utf8',
-                compress: 'raw',
-                format: 'plain',
-                status: 2,
-                seq: 0,
-                text: self.encodeText(self.text) as string,
-              },
-            },
-          };
-
-      if (self.voiceName.includes('x5_once_clone_') && params?.parameter?.tts) {
-        params.parameter.tts.LanguageID = 0;
-        params.parameter.tts.audio.sample_rate = 16000;
-      }
+      params = {
+        common: {
+          app_id: appId,
+        },
+        business: {
+          aue: 'raw',
+          auf: 'audio/L16;rate=16000',
+          ent: 'input65',
+          pitch: self.pitch || 50,
+          tte: 'UTF8',
+          vcn: self.voiceName,
+          volume: 50,
+          speed: self.speed,
+        },
+        data: {
+          status: 2,
+          text: self.encodeText(self.text),
+        },
+      };
 
       this.websocket?.send(JSON.stringify(params));
       this.playTimeout = setTimeout(() => {
@@ -374,10 +300,7 @@ class Experience {
 
     this.websocket.onmessage = (e: MessageEvent) => {
       const jsonData: WebSocketResponse = JSON.parse(e.data);
-      let audioData = jsonData?.payload?.audio?.audio;
-      if (includesHost) {
-        audioData = jsonData?.data?.audio;
-      }
+      let audioData = jsonData?.data?.audio;
       if (audioData) {
         const s16 = this.base64ToS16(audioData);
         const f32 = this.transS16ToF32(s16);
