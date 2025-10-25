@@ -370,9 +370,9 @@ function EditIconModal(props): React.ReactElement {
 
   function handleOk(): void {
     if (activeTab === 'upload') {
-      setBotIcon(uploadImageObject.downloadLink );
+      setBotIcon(uploadImageObject.downloadLink);
     } else {
-      setBotIcon(generateImageObject.downloadLink );
+      setBotIcon(generateImageObject.downloadLink);
     }
     setShowModal(false);
   }

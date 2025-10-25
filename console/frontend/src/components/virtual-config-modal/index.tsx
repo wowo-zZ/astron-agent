@@ -140,7 +140,6 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
   const [tempSelectedAvatar, setTempSelectedAvatar] = useState<string>('');
   const [tempSelectedVoice, setTempSelectedVoice] = useState<string>('');
 
-
   /** 正在播放的音色 ID（保证单声源） */
   const [playingVoiceId, setPlayingVoiceId] = useState<string | null>(null);
   /** 性别筛选：'male' | 'female' | 'all' */
@@ -191,7 +190,6 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
   const [avatarUrl, setAvatarUrl] = useState(createAvatarParams().avatar);
   const [showModal, setShowModal] = useState(false);
 
-
   useEffect(() => {
     if (formValues) {
       form.setFieldValue('name', formValues.name);
@@ -228,23 +226,26 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
    * 切换播放/暂停，保证同一时间仅一个音源在播
    * @param voice 目标音色
    */
-  const handleTogglePlay = useCallback((voice: VoiceOption) => {
-    // 先停掉当前播放，等待底层 WebAudio 与 WebSocket 完整清理后再启动下一段，避免剪切/不完整
-    setIsAudioPlaying(false);
-    try {
-      const nextVcn = voice.defaultVCN || voice.vcn || voice.id || '';
-      const nextText = voice.previewText || '懂你所言，答你所问，我是你的讯飞星辰小助理';
-      setVocPreviewText(nextText);
-      setVocName(nextVcn);
-      // 给清理留一点时间，避免新旧播放竞态导致首包过短、播放被截断
-      setTimeout(() => {
-        setIsAudioPlaying(true);
-      }, 250);
-    } catch (e) {
-      message.error('试听出现异常');
-    }
-  }, [playingVoiceId]);
-
+  const handleTogglePlay = useCallback(
+    (voice: VoiceOption) => {
+      // 先停掉当前播放，等待底层 WebAudio 与 WebSocket 完整清理后再启动下一段，避免剪切/不完整
+      setIsAudioPlaying(false);
+      try {
+        const nextVcn = voice.defaultVCN || voice.vcn || voice.id || '';
+        const nextText =
+          voice.previewText || '懂你所言，答你所问，我是你的讯飞星辰小助理';
+        setVocPreviewText(nextText);
+        setVocName(nextVcn);
+        // 给清理留一点时间，避免新旧播放竞态导致首包过短、播放被截断
+        setTimeout(() => {
+          setIsAudioPlaying(true);
+        }, 250);
+      } catch (e) {
+        message.error('试听出现异常');
+      }
+    },
+    [playingVoiceId]
+  );
 
   /**
    * 形象摘要点击：打开弹窗（用当前已选初始化临时值）
@@ -262,7 +263,6 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
     setAvatarModalVisible(true);
   }, [sceneMode, selectedAvatar, callSceneId, selectedVoice]);
 
-
   /**
    * 重置“虚拟人形象”弹窗的筛选与临时选择状态
    * - 性别/姿势/场景筛选重置为 'all'
@@ -278,7 +278,6 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
     setVocName('');
     setPlayingVoiceId(null);
   }, []);
-
 
   /**
    * 提交表单
@@ -347,8 +346,8 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
     } catch (err) {
       const msg =
         typeof err === 'object' &&
-          err &&
-          'message' in (err as Record<string, unknown>)
+        err &&
+        'message' in (err as Record<string, unknown>)
           ? String((err as Record<string, unknown>).message)
           : '提交失败';
       message.error(msg);
@@ -444,37 +443,36 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
         typeFilter === 'all'
           ? true
           : (() => {
-            const expected =
-              typeMap[typeFilter as Exclude<typeof typeFilter, 'all'>];
-            const raw = a.type as unknown;
-            if (Array.isArray(raw)) {
-              return (raw as unknown[]).some(
-                x => typeof x === 'string' && x === expected
-              );
-            }
-            if (typeof raw === 'string') {
-              const s = raw.trim();
-              if (s.startsWith('[') && s.endsWith(']')) {
-                try {
-                  const arr = JSON.parse(s);
-                  return (
-                    Array.isArray(arr) &&
-                    arr.some(
-                      (x: unknown) => typeof x === 'string' && x === expected
-                    )
-                  );
-                } catch {
-                  return s === expected;
-                }
+              const expected =
+                typeMap[typeFilter as Exclude<typeof typeFilter, 'all'>];
+              const raw = a.type as unknown;
+              if (Array.isArray(raw)) {
+                return (raw as unknown[]).some(
+                  x => typeof x === 'string' && x === expected
+                );
               }
-              return s === expected;
-            }
-            return false;
-          })();
+              if (typeof raw === 'string') {
+                const s = raw.trim();
+                if (s.startsWith('[') && s.endsWith(']')) {
+                  try {
+                    const arr = JSON.parse(s);
+                    return (
+                      Array.isArray(arr) &&
+                      arr.some(
+                        (x: unknown) => typeof x === 'string' && x === expected
+                      )
+                    );
+                  } catch {
+                    return s === expected;
+                  }
+                }
+                return s === expected;
+              }
+              return false;
+            })();
       return genderOk && postureOk && typeOk;
     });
   }, [avatarList, genderFilter, postureFilter, typeFilter, sceneMode]);
-
 
   useEffect(() => {
     getAvatarList();
@@ -689,9 +687,8 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
                           <img
                             className={styles.summaryAvatar}
                             src={
-                              avatarList.find(
-                                a => a.sceneId === selectedAvatar
-                              )?.avatar || defaultAvatar
+                              avatarList.find(a => a.sceneId === selectedAvatar)
+                                ?.avatar || defaultAvatar
                             }
                             alt=""
                           />
@@ -723,7 +720,6 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
                   </div>
                 )}
               </div>
-
 
               {/* 虚拟人形象弹窗 */}
               {avatarModalVisible && (
@@ -819,13 +815,13 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
                                 onChange={v =>
                                   setTypeFilter(
                                     v as
-                                    | 'ai_host'
-                                    | 'education'
-                                    | 'digital_staff'
-                                    | 'conference_host'
-                                    | 'cartoon'
-                                    | 'historical'
-                                    | 'all'
+                                      | 'ai_host'
+                                      | 'education'
+                                      | 'digital_staff'
+                                      | 'conference_host'
+                                      | 'cartoon'
+                                      | 'historical'
+                                      | 'all'
                                   )
                                 }
                               />
@@ -845,12 +841,12 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
                                   tabIndex={0}
                                   onClick={() => {
                                     setTempSelectedAvatar(a.sceneId);
-                                      setTempSelectedVoice(a.defaultVCN);
+                                    setTempSelectedVoice(a.defaultVCN);
                                   }}
                                   onKeyDown={e => {
                                     if (e.key === 'Enter' || e.key === ' ') {
                                       setTempSelectedAvatar(a.sceneId);
-                                        setTempSelectedVoice(a.defaultVCN);
+                                      setTempSelectedVoice(a.defaultVCN);
                                     }
                                   }}
                                 >
@@ -992,18 +988,27 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
               </Form.Item>
 
               <div className={styles.footerContiner}>
-                {formValues?.flowId && <div className={styles.footerContinerLeft}>
-                  <div className='flex items-center gap-3'>
-                    <p className='text-desc text-[#7F7F7F]'>{t('workflow.nodes.flowModal.flowId')}：{formValues?.flowId}</p>
-                    <img src={flowIdCopyIcon} className='w-[14px] h-[14px] cursor-pointer' alt=""
-                      onClick={() => {
-                        copy(formValues?.flowId || '')
-                        message.success(t('workflow.nodes.flowModal.copySuccess'))
-                      }}
-                    />
+                {formValues?.flowId && (
+                  <div className={styles.footerContinerLeft}>
+                    <div className="flex items-center gap-3">
+                      <p className="text-desc text-[#7F7F7F]">
+                        {t('workflow.nodes.flowModal.flowId')}：
+                        {formValues?.flowId}
+                      </p>
+                      <img
+                        src={flowIdCopyIcon}
+                        className="w-[14px] h-[14px] cursor-pointer"
+                        alt=""
+                        onClick={() => {
+                          copy(formValues?.flowId || '');
+                          message.success(
+                            t('workflow.nodes.flowModal.copySuccess')
+                          );
+                        }}
+                      />
+                    </div>
                   </div>
-                </div>
-                }
+                )}
                 <div className={styles.footerContinerRight}>
                   <div
                     className={styles.cancelBtn}

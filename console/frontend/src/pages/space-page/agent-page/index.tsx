@@ -61,7 +61,7 @@ function index() {
 
   const { handleToChat } = useChat();
 
-    // 复制成虚拟人需要的参数
+  // 复制成虚拟人需要的参数
   const [copyParams, setCopyParams] = useState<any>({});
   const [virtualModal, setVirtualModal] = useState<boolean>(false); //复制成虚拟人
 
@@ -450,9 +450,9 @@ function index() {
 
                   <div className="flex ml-24 gap-4">
                     <div className={styles.angentType}>
-                        {k.version === 1 && t('home.instructionType')}
-                        {k.version === 3 && t('home.workflowType')}
-                        {k.version === 4 && '语音*虚拟人'}
+                      {k.version === 1 && t('home.instructionType')}
+                      {k.version === 3 && t('home.workflowType')}
+                      {k.version === 4 && '语音*虚拟人'}
                     </div>
                   </div>
 
@@ -585,16 +585,16 @@ function index() {
                                 </span>
                               )}
                               {k?.version === 3 && (
-                                  <div
-                                    className="p-1 rounded hover:bg-[#F2F5FE] text-[#666666]"
-                                    onClick={e => {
-                                      e.stopPropagation();
-                                      setCopyParams({ ...k, name: k.botName });
-                                      setVirtualModal(true);
-                                    }}
-                                  >
-                                    复制为语音·虚拟人智能体
-                                  </div>
+                                <div
+                                  className="p-1 rounded hover:bg-[#F2F5FE] text-[#666666]"
+                                  onClick={e => {
+                                    e.stopPropagation();
+                                    setCopyParams({ ...k, name: k.botName });
+                                    setVirtualModal(true);
+                                  }}
+                                >
+                                  复制为语音·虚拟人智能体
+                                </div>
                               )}
                               {![1, 4].includes(k?.botStatus) && (
                                 <div
@@ -621,26 +621,26 @@ function index() {
           </div>
         </div>
 
-          <VirtualConfig
-            visible={virtualModal}
-            formValues={copyParams}
-            onSubmit={values => {
-              upgradeWorkflow({ sourceId: copyParams?.botId, ...values })
-                .then((res: any) => {
-                  message.success('复制成功');
-                  navigate(
-                    `/work_flow/${res?.flowId}/arrange?botId=${res?.botId}`
-                  );
-                  setVirtualModal(false);
-                })
-                .catch((err: any) => {
-                  message.error(err?.msg || err);
-                });
-            }}
-            onCancel={() => {
-              setVirtualModal(false);
-            }}
-          />
+        <VirtualConfig
+          visible={virtualModal}
+          formValues={copyParams}
+          onSubmit={values => {
+            upgradeWorkflow({ sourceId: copyParams?.botId, ...values })
+              .then((res: any) => {
+                message.success('复制成功');
+                navigate(
+                  `/work_flow/${res?.flowId}/arrange?botId=${res?.botId}`
+                );
+                setVirtualModal(false);
+              })
+              .catch((err: any) => {
+                message.error(err?.msg || err);
+              });
+          }}
+          onCancel={() => {
+            setVirtualModal(false);
+          }}
+        />
       </div>
     </div>
   );

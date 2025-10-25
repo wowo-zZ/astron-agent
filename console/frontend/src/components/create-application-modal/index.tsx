@@ -72,8 +72,7 @@ const HeaderFeedbackModal: React.FC<HeaderFeedbackModalProps> = ({
             }`}
             onClick={() => handleBoxClick('cueWord')}
           >
-            <div className={styles.cueWord_img}>
-            </div>
+            <div className={styles.cueWord_img}></div>
             <p>{t('createAgent1.promptCreation')}</p>
             <span>{t('createAgent1.promptSetup')}</span>
           </div>
@@ -85,8 +84,7 @@ const HeaderFeedbackModal: React.FC<HeaderFeedbackModalProps> = ({
           >
             <div
               className={classNames(styles.cueWord_img, styles.Workflow_img)}
-            >
-            </div>
+            ></div>
             <p>{t('createAgent1.workflowCreation')}</p>
             <span>{t('createAgent1.workflowDesign')}</span>
           </div>
