@@ -498,3 +498,29 @@ export const getVersionList = (params: any) => {
 export const getHasEditor = () => {
   return http.get(`/bot/api/hasEditor`);
 };
+
+export const getSceneList = () => {
+  return http.post(`/talkAgent/getSceneList`);
+};
+
+export const getSignedUrl = () => {
+  return http.get(`/talkAgent/signature`);
+};
+
+//
+export const getVCNList = () => {
+  return http.post(`/talkAgent/getVCNList`);
+};
+//
+export const createTalkAgent = (params: any) => {
+  return http.post(`/talkAgent/create`, params);
+};
+
+//
+export const updateTalkAgent = (params: any) => {
+  return http.post(`/xingchen-api/talkAgent/updateConfig`, params);
+};
+//
+export const upgradeWorkflow = (params: any) => {
+  return http.post(`/xingchen-api/talkAgent/upgradeWorkflow`, params);
+};

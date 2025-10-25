@@ -310,7 +310,9 @@ const useChatDebuggerContent = ({
     let multiParams = true;
     if (
       outputs?.length === 1 ||
-      outputs?.slice(1).every((item: { fileType: string }) => item.fileType === 'file')
+      outputs
+        ?.slice(1)
+        .every((item: { fileType: string }) => item.fileType === 'file')
     ) {
       multiParams = false;
     }
