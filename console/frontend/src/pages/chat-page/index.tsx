@@ -320,21 +320,18 @@ const ChatPage = (): ReactElement => {
             </div>
           </div>
         )}
-        {/* <div className="w-full mx-auto flex flex-col flex-1 min-h-0 overflow-hidden"> */}
-        <div className={styles.chat_content_wrapper}>
-          <div
-            className={styles.chat_content}
-            style={{ paddingRight: chatType === 'text' ? 0 : '200px' }}
-          >
-            <MessageList
-              messageList={messageList}
-              botInfo={botInfo}
-              isDataLoading={isDataLoading}
-              botNameColor={botNameColor}
-              handleSendMessage={handleRecomendClick}
-            />
-          </div>
-          {/* </div> */}
+        <div
+          className={`w-full mx-auto flex flex-col flex-1 min-h-0 overflow-hidden ${
+            chatType === 'text' ? 'pr-0' : 'pr-52'
+          }`}
+        >
+          <MessageList
+            messageList={messageList}
+            botInfo={botInfo}
+            isDataLoading={isDataLoading}
+            botNameColor={botNameColor}
+            handleSendMessage={handleRecomendClick}
+          />
         </div>
       </div>
       <ChatSide botInfo={botInfo} />

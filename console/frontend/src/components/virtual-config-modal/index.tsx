@@ -739,7 +739,9 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
                   afterClose={resetAvatarModalState}
                   title={null}
                   closable
-                  bodyStyle={{ padding: 0 }}
+                  classNames={{
+                    body: '!p-0',
+                  }}
                 >
                   <div className={styles.avatarModalWrap}>
                     <div className={styles.avatarModalHeader}>

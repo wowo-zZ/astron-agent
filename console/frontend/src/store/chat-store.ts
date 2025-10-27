@@ -6,7 +6,7 @@ import type {
   Option,
   UploadFileInfo,
 } from '@/types/chat';
-const useChatStore = create<ChatState & ChatActions>(set => ({
+const useChatStore = create<ChatState & ChatActions>((set, get) => ({
   // 状态
   messageList: [],
   chatFileListNoReq: [],
@@ -25,6 +25,10 @@ const useChatStore = create<ChatState & ChatActions>(set => ({
     option: [] as Option[],
     content: '',
   },
+  chatType: 'text',
+  vmsInteractiveRef: null,
+  vmsInteractiveRefStatus: '',
+  vmsInteractiveRefPlayer: null,
   // 操作
   initChatStore: (): void => {
     set({
@@ -64,7 +68,7 @@ const useChatStore = create<ChatState & ChatActions>(set => ({
       return { messageList: [...state.messageList, message] };
     }),
 
-  // 流式消息管理 - 性能优化版：直接在messageList中操作
+  // 流式消息管理
   startStreamingMessage: (message: MessageListType): void =>
     set(state => ({
       messageList: [...state.messageList, message],

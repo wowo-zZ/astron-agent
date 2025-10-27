@@ -56,7 +56,7 @@ const Prologue = ({
                   background: `url(${currentFlow?.avatarIcon}) no-repeat center / cover`,
                 }}
               ></div>
-              <div className="bg-[#F7F7FA] rounded-xl p-4 relative w-fit bg-[#f7f7fa]">
+              <div className="bg-[#F7F7FA] rounded-xl p-4 relative w-fit">
                 <MarkdownRender
                   content={advancedConfig?.prologue?.prologueText}
                   isSending={false}
