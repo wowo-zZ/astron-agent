@@ -47,7 +47,7 @@ const SourceInfoBox: FC<{ traceSource?: string }> = ({ traceSource }) => {
             count: renderTraceSource.length,
           })}
         </span>
-        <img  
+        <img
           src="https://openres.xfyun.cn/xfyundoc/2024-04-11/22f3b4aa-daab-4b0c-a4d7-c42a7aff03d6/1712803618079/aaaaaa.png"
           alt="展开/收起"
           className={`w-[10px] h-[6px] ml-[30px] transition-transform duration-300 ${

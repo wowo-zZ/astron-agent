@@ -56,7 +56,7 @@ const Prologue = ({
                   background: `url(${currentFlow?.avatarIcon}) no-repeat center / cover`,
                 }}
               ></div>
-              <div className="bg-[#F7F7FA] rounded-xl p-4 relative w-fit bg-[#f7f7fa]">
+              <div className="bg-[#F7F7FA] rounded-xl p-4 relative w-fit">
                 <MarkdownRender
                   content={advancedConfig?.prologue?.prologueText}
                   isSending={false}
@@ -241,21 +241,21 @@ const MessageActions = ({
   // 播放语音
   const playAudio = useCallback(
     async (item: any) => {
-      console.log(item, '111111');
       if (playingStates[item.id]) {
         // 如果当前正在播放，则停止
         setCurrentPlayingId(null);
       } else {
-        // 开始播放
-        const formData = new FormData();
-        formData.append('text', item.content);
-        // const { language } = await detectText(formData);
-        // useLanguage.current = language;
-        setCurrentPlayingId(item.id);
-        // 检测语言
+        // 切换播放：先停止当前播放
+        if (currentPlayingId) {
+          setCurrentPlayingId(null);
+        }
+        // 使用 setTimeout 确保状态更新完成后再开始新的播放
+        setTimeout(() => {
+          setCurrentPlayingId(item.id);
+        }, 50);
       }
     },
-    [playingStates, setCurrentPlayingId]
+    [playingStates, setCurrentPlayingId, currentPlayingId]
   );
   useEffect(() => {
     const newPlayingStates: Record<string, boolean> = {};
@@ -264,6 +264,7 @@ const MessageActions = ({
     });
     setPlayingStates(newPlayingStates);
   }, [currentPlayingId, chatList]);
+
   return (
     <>
       {(index !== chatList?.length - 1 || !debuggering) && (
@@ -283,6 +284,7 @@ const MessageActions = ({
                 <TtsModule
                   text={chat.content}
                   language={useLanguage.current}
+                  voiceName={advancedConfig?.textToSpeech?.vcn_cn}
                   isPlaying={playingStates[chat.id] || false}
                   setIsPlaying={playing => {
                     if (!playing) {
@@ -590,6 +592,10 @@ const useChatContent = ({ chatList, setChatList }): UseChatContentProps => {
         },
         feedback: {
           enabled: parsedConfig?.feedback?.enabled ?? true,
+        },
+        textToSpeech: {
+          enabled: parsedConfig?.textToSpeech?.enabled ?? true,
+          vcn_cn: parsedConfig?.textToSpeech?.vcn_cn || '',
         },
         suggestedQuestionsAfterAnswer: {
           enabled: parsedConfig?.suggestedQuestionsAfterAnswer?.enabled ?? true,

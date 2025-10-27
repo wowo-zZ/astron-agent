@@ -103,6 +103,7 @@ const MessageList = (props: {
             />
           </div>
           {botInfo.inputExample
+            ?.filter(item => item.length > 0)
             ?.slice(0, 3)
             .map((item: string, index: number) => (
               <div

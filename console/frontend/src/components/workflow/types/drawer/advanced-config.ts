@@ -1,13 +1,7 @@
 // Advanced Configuration 模块的类型定义
 
 import { TFunction } from 'i18next';
-
-// VCN语音配置类型定义
-export interface VcnItem {
-  id: string;
-  name: string;
-  vcn: string;
-}
+import { VcnItem } from '@/components/speaker-modal';
 
 // 聊天背景信息类型定义
 export interface ChatBackgroundInfo {
@@ -30,8 +24,7 @@ export interface AdvancedConfigType {
   };
   textToSpeech: {
     enabled: boolean;
-    vcn_cn?: string;
-    vcn_en?: string;
+    vcnCn?: string;
   };
   suggestedQuestionsAfterAnswer: {
     enabled: boolean;
@@ -80,12 +73,15 @@ export interface CommonComponentProps {
   advancedConfig: AdvancedConfigType;
   handleAdvancedConfigChange: (callback: () => void) => void;
   updateAdvancedConfigParams: (updateParams: AdvancedConfigUpdate) => void;
+  vcnList: VcnItem[];
   t: TFunction;
 }
 
 export interface ConversationStarterProps extends CommonComponentProps {
   setOpeningRemarksModal: (value: boolean) => void;
-  updateAdvancedConfigParamsDebounce: (updateParams: AdvancedConfigUpdate) => void;
+  updateAdvancedConfigParamsDebounce: (
+    updateParams: AdvancedConfigUpdate
+  ) => void;
   handlePresetQuestionChange: (index: number, value: string) => void;
 }
 
@@ -99,7 +95,9 @@ export interface UseAdvancedConfigurationReturn {
   advancedConfig: AdvancedConfigType;
   handleAdvancedConfigChange: (callback: () => void) => void;
   updateAdvancedConfigParams: (updateParams: AdvancedConfigUpdate) => void;
-  updateAdvancedConfigParamsDebounce: (updateParams: AdvancedConfigUpdate) => void;
+  updateAdvancedConfigParamsDebounce: (
+    updateParams: AdvancedConfigUpdate
+  ) => void;
   handlePresetQuestionChange: (index: number, value: string) => void;
   openingRemarksModal: boolean;
   setOpeningRemarksModal: (value: boolean) => void;
