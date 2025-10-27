@@ -488,6 +488,7 @@ function index() {
                             {k.version === 1 &&
                               t('agentPage.agentPage.instructionType')}
                             {k.version === 3 && '工作流'}
+                            {k.version === 4 && '语音*虚拟人'}
                           </div>
                         </div>
                       </span>
