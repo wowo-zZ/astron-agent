@@ -158,7 +158,7 @@ const AppListPage: React.FC<AppListProps> = () => {
   }, []);
 
   return (
-    <div className={styles.appListPage}>
+    <div className={`${styles.appListPage} page-container-inner-UI`}>
       <div className={styles.title}>
         <div className={styles.aff}>{t('sidebar.appManagement')}</div>
       </div>
@@ -167,7 +167,7 @@ const AppListPage: React.FC<AppListProps> = () => {
           <Button
             type="primary"
             onClick={() => setIsShowCreateAppModal(true)}
-            style={{ height: '36px' }}
+            style={{ height: '32px' }}
           >
             <PlusOutlined style={{ fontSize: '16px', color: '#fff' }} />{' '}
             {t('botApi.createApp')}

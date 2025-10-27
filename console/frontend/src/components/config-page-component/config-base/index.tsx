@@ -1885,7 +1885,7 @@ const BaseConfig: React.FC<ChatProps> = ({
                               questionTipActive == index ? '#f6f9ff' : '',
                             border:
                               questionTipActive == index
-                                ? '1px solid #275eff'
+                                ? '1px solid #6356EA'
                                 : '',
                           } as React.CSSProperties
                         }

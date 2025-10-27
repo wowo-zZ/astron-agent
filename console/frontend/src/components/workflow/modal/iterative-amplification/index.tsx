@@ -46,7 +46,7 @@ const ConnectionLineComponent = ({
   fromY,
   toX,
   toY,
-  connectionLineStyle = { strokeWidth: 2, stroke: '#275EFF' }, // provide a default value for connectionLineStyle
+  connectionLineStyle = { strokeWidth: 2, stroke: '#6356EA' }, // provide a default value for connectionLineStyle
 }: ConnectionLineProps): React.ReactElement => {
   return (
     <g>

@@ -366,7 +366,7 @@ function index({ setCreateModal }: CreateBotProps): React.ReactElement {
                 <div
                   className="w-[18px] h-[18px] rounded-full text-center text-sm"
                   style={{
-                    background: step === 1 ? '#275EFF' : '#F6F6FD',
+                    background: step === 1 ? '#6356EA' : '#F6F6FD',
                     color: step === 1 ? '#fff' : '#a4a4a4',
                   }}
                 >
@@ -391,7 +391,7 @@ function index({ setCreateModal }: CreateBotProps): React.ReactElement {
                 <div
                   className="w-[18px] h-[18px] rounded-full text-center text-sm"
                   style={{
-                    background: step === 2 ? '#275EFF' : '#F6F6FD',
+                    background: step === 2 ? '#6356EA' : '#F6F6FD',
                     color: step === 2 ? '#fff' : '#a4a4a4',
                   }}
                 >

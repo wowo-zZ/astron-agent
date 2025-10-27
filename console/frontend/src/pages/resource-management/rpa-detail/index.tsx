@@ -52,7 +52,7 @@ export const RpaDetail = () => {
       render: (_, record) => {
         return (
           <div
-            className="text-[#275EFF] cursor-pointer"
+            className="text-[#6356EA] cursor-pointer"
             onClick={() => modalDetailRef.current?.showModal(record)}
           >
             {t('rpa.detail')}

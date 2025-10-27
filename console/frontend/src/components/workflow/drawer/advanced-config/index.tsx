@@ -80,7 +80,7 @@ const ConversationStarter: React.FC<ConversationStarterProps> = ({
         <>
           <div className="relative">
             <div
-              className="absolute bottom-2 right-2.5 inline-flex items-center rounded-md gap-1 cursor-pointer  py-1 px-2.5 text-[#275EFF] text-sm bg-[#ececfb] z-20"
+              className="absolute bottom-2 right-2.5 inline-flex items-center rounded-md gap-1 cursor-pointer  py-1 px-2.5 text-[#6356EA] text-sm bg-[#ececfb] z-20"
               onClick={() => setOpeningRemarksModal(true)}
             >
               <img src={icons.promptOptimization} className="w-4 h-4" alt="" />
@@ -115,7 +115,7 @@ const ConversationStarter: React.FC<ConversationStarterProps> = ({
             </div>
             {advancedConfig?.prologue?.inputExample?.length < 3 && (
               <div
-                className="flex items-center gap-2 text-[#275EFF] text-xs font-medium cursor-pointer"
+                className="flex items-center gap-2 text-[#6356EA] text-xs font-medium cursor-pointer"
                 onClick={() => {
                   handleAdvancedConfigChange(
                     () =>
@@ -385,7 +385,7 @@ const ChatBackground: React.FC<ChatBackgroundProps> = ({
             <img src={icons.uploadAct} className="w-8 h-8" alt="" />
             <div className="font-medium mt-6">
               {t('workflow.advancedConfiguration.dragFileHere')}
-              <span className="text-[#275EFF]">
+              <span className="text-[#6356EA]">
                 {t('workflow.advancedConfiguration.selectFile')}
               </span>
             </div>

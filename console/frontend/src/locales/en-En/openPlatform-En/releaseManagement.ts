@@ -5,6 +5,7 @@ const translation = {
     APIKey: 'API Key',
     instructional: 'Command',
     workflow: 'Workflow',
+    virtual: 'Virtual',
     agentId: 'Agent ID',
     agentName: 'Agent Name',
     platform: 'Platform',
@@ -138,6 +139,9 @@ const translation = {
     unBindTipDesc2: 'If you wish to complete the unbinding, you need to go to',
     unBindTipDesc3: 'WeChat Service Number',
     unBindTipDesc4: 'Platform for cancellation of authorization',
+    virtualPlatformPublishTitle:
+      'Publish to Virtual Person Interaction Platform',
+    virtualPlatformPublishTip: 'Publish Success',
   },
 };
 

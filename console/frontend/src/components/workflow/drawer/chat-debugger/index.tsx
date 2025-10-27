@@ -169,7 +169,7 @@ const useChatDebuggerEffect = (
           ...edge,
           animated: false,
           style: {
-            stroke: '#275EFF',
+            stroke: '#6356EA',
             strokeWidth: 2,
           },
         }))
@@ -438,7 +438,7 @@ export function ChatDebuggerContent({
                 className="w-[18px] h-[18px]"
                 alt=""
               />
-              <span className="text-[#275EFF]">
+              <span className="text-[#6356EA]">
                 {t('workflow.nodes.chatDebugger.switchToUserDialoguePage')}
               </span>
             </div>

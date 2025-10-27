@@ -117,7 +117,6 @@ const DetailOverview = () => {
     {
       dataIndex: 'action',
       title: t('releaseDetail.DetailOverviewPage.operation'),
-      align: 'center',
       render: (_: any, record: { publishResult: any }) => {
         return (
           <div className={styles.actionBtnBox}>

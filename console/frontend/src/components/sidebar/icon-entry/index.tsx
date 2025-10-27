@@ -9,14 +9,14 @@ import styles from './index.module.scss';
 import useUserStore from '@/store/user-store';
 
 interface IconEntryProps {
+  isCollapsed: boolean;
   onMessageClick?: () => void;
-  isCollapsed?: boolean;
   unreadCount?: number;
 }
 
 const IconEntry: React.FC<IconEntryProps> = ({
-  onMessageClick,
   isCollapsed,
+  onMessageClick,
   unreadCount = 0,
 }) => {
   const { t } = useTranslation();
@@ -42,9 +42,7 @@ const IconEntry: React.FC<IconEntryProps> = ({
 
   return (
     <div
-      className={`flex items-center justify-center gap-8 mt-4 ${styles.toolsIcon} ${
-        isCollapsed ? 'flex-col' : ''
-      }`}
+      className={`flex items-center justify-center gap-8 ${isCollapsed ? 'flex-col' : ''} ${styles.toolsIcon}`}
     >
       <Tooltip
         title={t('sidebar.documentCenter')}
