@@ -53,7 +53,7 @@ const HeaderFeedbackModal: React.FC<HeaderFeedbackModalProps> = ({
   return (
     <Modal
       wrapClassName={styles.open_source_modal}
-      width={1118}
+      width='auto'
       open={visible}
       centered
       onCancel={handleCancel}
@@ -99,8 +99,8 @@ const HeaderFeedbackModal: React.FC<HeaderFeedbackModalProps> = ({
             <div
               className={classNames(styles.cueWord_img, styles.virtual_img)}
             ></div>
-            <p>虚拟人创建</p>
-            <span>面向实时虚拟人驱动的多模态场景</span>
+            <p>语音/虚拟人创建</p>
+            <span>面向实时语音交互&虚拟人驱动的多模态场景</span>
           </div>
         </div>
       </div>
