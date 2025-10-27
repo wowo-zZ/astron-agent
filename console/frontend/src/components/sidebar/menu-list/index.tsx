@@ -205,7 +205,7 @@ const RecentList: FC<RecentListProps> = ({
   if (isCollapsed) return null;
 
   return (
-    <div className="flex flex-col pt-4 mt-1 flex-1 h-full overflow-hidden border-t border-[#E7E7F0]">
+    <div className="flex flex-col pt-4 pb-1 mt-1 flex-shrink-0 overflow-hidden border-t border-[#E7E7F0]">
       {/* 最近使用标题 */}
       <div
         className="flex items-center justify-between cursor-pointer px-3 py-[10px] pr-2.5 flex-shrink-0 mb-1"
