@@ -5,21 +5,42 @@
       padding: 0 !important;
     }
   }
+
+  :global {
+    --width-modal: 800px;
+    --p-fs: 18px;
+  }
+
+  @media (min-width: 1024px) {
+    :global {
+      --width-modal: 900px;
+      --p-fs: 22px;
+    }
+  }
+
+  @media (min-width: 1920px) {
+    :global {
+      --width-modal: 1280px;
+      --p-fs: 28px;
+    }
+  }
   :global {
     .ant-modal-close-x {
       font-size: 14px;
       color: #333333;
     }
+
     .ant-modal-content {
+      width: var(--width-modal);
       padding: 0 !important;
     }
   }
+
   .modal_content {
-    width: 100%;
     padding: 24px;
     display: flex;
     flex-direction: column;
-    height: 458px;
+    padding-bottom: 40px;
 
     .title {
       font-size: 16px;
@@ -29,17 +50,34 @@
       align-items: center;
       letter-spacing: 0px;
       color: #333333;
+
+      .activeDesc {
+        display: flex;
+        justify-content: space-between;
+        height: 26px;
+        width: 550px;
+        line-height: 26px;
+        background: url('@/assets/imgs/activity-third/create-desc.jpg')
+          no-repeat;
+        background-size: cover;
+        border-radius: 13px 17px 17px 0px;
+        margin-left: 15px;
+        margin-bottom: 3px;
+        cursor: pointer;
+        position: relative;
+        z-index: 1;
+      }
     }
 
     .intelligentAgents {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      display: grid;
       margin-top: 20px;
+      gap: 20px;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: 1fr;
 
       .cueWord {
-        width: 346px;
-        height: 354px;
+        width: 100%;
         border-radius: 16px;
         opacity: 1;
         background: #ffffff;
@@ -88,8 +126,8 @@
         background-size: cover;
         // background-position: center;
         background-repeat: no-repeat;
-        width: 326px;
-        height: 220px;
+        width: 100%;
+        aspect-ratio: 326 / 220;
         position: relative;
       }
 
@@ -110,7 +148,7 @@
 
       .cueWord p {
         font-family: 苹方-简;
-        font-size: 24px;
+        font-size: var(--p-fs);
         font-weight: 500;
         line-height: 36px;
         text-align: center;
@@ -133,8 +171,7 @@
       }
 
       .Workflow {
-        width: 346px;
-        height: 354px;
+        width: 100%;
         border-radius: 16px;
         opacity: 1;
         background: #ffffff;
@@ -157,14 +194,13 @@
         background-size: cover;
         // background-position: center;
         background-repeat: no-repeat;
-        width: 326px;
-        height: 220px;
+        width: 100%;
         position: relative;
       }
 
       .Workflow p {
         font-family: 苹方-简;
-        font-size: 24px;
+        font-size: var(--p-fs);
         font-weight: 500;
         line-height: 36px;
         text-align: center;
@@ -185,9 +221,9 @@
         letter-spacing: normal;
         color: #676773;
       }
+
       .virtual {
-        width: 346px;
-        height: 354px;
+        width: 100%;
         border-radius: 16px;
         opacity: 1;
         background: #ffffff;
@@ -210,14 +246,13 @@
         background-size: cover;
         // background-position: center;
         background-repeat: no-repeat;
-        width: 326px;
-        height: 220px;
+        width: 100%;
         position: relative;
       }
 
       .virtual p {
         font-family: 苹方-简;
-        font-size: 24px;
+        font-size: var(--p-fs);
         font-weight: 500;
         line-height: 36px;
         text-align: center;
@@ -237,11 +272,11 @@
         align-items: center;
         letter-spacing: normal;
         color: #676773;
-      }      
+      }
 
       .selected {
         border: none;
-        outline: 2px solid #6356EA;
+        outline: 2px solid #6356ea;
       }
     }
   }

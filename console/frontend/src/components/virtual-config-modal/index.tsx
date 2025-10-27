@@ -24,12 +24,13 @@ import defaultAvatar from '@/assets/imgs/virtual-config-modal/default-avatar.png
 import summaryIcon from '@/assets/imgs/virtual-config-modal/summary-icon.svg';
 import summaryActionIcon from '@/assets/imgs/virtual-config-modal/summary-action-icon.svg';
 import voiceIcon from '@/assets/imgs/virtual-config-modal/voice-icon.svg';
-import voiceActionIcon from '@/assets/imgs/virtual-config-modal/voice-action-icon.svg';
+import voiceActionIcon from '@/assets/imgs/workflow/edit-voice.svg';
 import trumpet from '@/assets/imgs/virtual-config-modal/trumpet.svg';
 import trumpetActive from '@/assets/imgs/virtual-config-modal/trumpet-active.svg';
 import defaultModalAvatar from '@/assets/imgs/virtual-config-modal/default-modal-avatar.png';
 import defaultModalAvatarPreview from '@/assets/imgs/virtual-config-modal/default-modal-avatar-preview.png';
 import avatarTrumpet from '@/assets/imgs/virtual-config-modal/avatar-trumpet.svg';
+import avatarTrumpetOpen from '@/assets/imgs/virtual-config-modal/avatar-trumpet-open.gif';
 import {
   getBotType,
   getSceneList,
@@ -47,7 +48,10 @@ import EditIconModal from './component/iconModal';
 import flowIdCopyIcon from '@/assets/imgs/workflow/flowId-copy-icon.svg';
 import copy from 'copy-to-clipboard';
 import { useTranslation } from 'react-i18next';
-
+import { saveFlowAPI } from '@/services/flow';
+import SpeakerModal from '../speaker-modal';
+// import { vcnCnJson, vcnEnJson } from '@/components/speaker-modal/vcn';
+import useVoicePlayStore from '@/store/voice-play-store';
 interface HeaderFeedbackModalProps {
   visible: boolean;
   formValues?: FormValues;
@@ -90,8 +94,7 @@ interface VoiceOption {
   vcn?: string;
   /** 默认形象（后端字段 defaultVCN） */
   defaultVCN?: string;
-  /** 演示文本（后端字段 previewText） */
-  previewText?: string;
+  sampleAvatar?: string;
 }
 
 /** 形象项（后端归一化后的前端结构） */
@@ -104,7 +107,7 @@ interface SceneItem {
   type?: string | string[];
   avatar?: string;
   defaultVCN?: string;
-  previewText: string;
+  sampleAvatar: string;
 }
 
 const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
@@ -134,11 +137,20 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
   const [sceneMode, setSceneMode] = useState<number>(0);
   const [sceneVcn, setSceneVcn] = useState<string>('');
 
+  // 折叠状态
+  const [voiceExpanded, setVoiceExpanded] = useState<boolean>(false);
+
   // 形象选择弹窗与尺寸
   const [avatarModalVisible, setAvatarModalVisible] = useState<boolean>(false);
   // 弹窗内的临时选择（未点击“使用”前不提交到正式状态）
   const [tempSelectedAvatar, setTempSelectedAvatar] = useState<string>('');
   const [tempSelectedVoice, setTempSelectedVoice] = useState<string>('');
+
+  const [botCreateActiveV, setBotCreateActiveV] = useState<any>({
+    cn: '',
+    en: '',
+    emotion: '',
+  });
 
   /** 正在播放的音色 ID（保证单声源） */
   const [playingVoiceId, setPlayingVoiceId] = useState<string | null>(null);
@@ -161,6 +173,7 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
     | 'all'
   >('all');
   const [vocName, setVocName] = useState<string>('');
+  const [vocLanguage, setVocLanguage] = useState<string>('cn');
   const [vocPreviewText, setVocPreviewText] = useState<string>('');
   const [isAudioPlaying, setIsAudioPlaying] = useState<boolean>(false);
   const genId = () => {
@@ -170,9 +183,15 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
   const avatarIcon = globalStore((state: any) => state.avatarIcon);
   const avatarColor = globalStore((state: any) => state.avatarColor);
   const getAvatarConfig = globalStore((state: any) => state.getAvatarConfig);
-  const createAvatarParams = (): { avatar: string; avatarColor: string } => {
+  const createAvatarParams = (): {
+    avatarUrl: string;
+    avatar: string;
+    avatarColor: string;
+  } => {
     if (!avatarIcon?.length || !avatarColor?.length) {
       return {
+        avatarUrl:
+          'https://oss-beijing-m8.openstorage.cn/SparkBotProd/icon/common/emojiitem_00_10@2x.png',
         avatar:
           'https://oss-beijing-m8.openstorage.cn/SparkBotProd/icon/common/emojiitem_00_10@2x.png',
         avatarColor: '#FFEAD5',
@@ -183,13 +202,53 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
     const { name, value } = avatarIcon[avatarIconIndex];
     const avatarColorItem = avatarColor[avatarColorIndex];
     return {
+      avatarUrl: value,
       avatar: name + value,
       avatarColor: avatarColorItem.name,
     };
   };
-  const [avatarUrl, setAvatarUrl] = useState(createAvatarParams().avatar);
+  const [avatarUrl, setAvatarUrl] = useState(createAvatarParams().avatarUrl);
   const [showModal, setShowModal] = useState(false);
+  // const officialVcnList = useVoicePlayStore(state => state.officialVcnList);
+  // const setOfficialVcnList = useVoicePlayStore(
+  //   state => state.setOfficialVcnList
+  // );
 
+  const [officialVcnList, setOfficialVcnList] = useState<VoiceOption[]>([]);
+  const defVcnList = [
+    {
+      avatar:
+        'https://openres.xfyun.cn/xfyundoc/2024-10-21/0969f0d7-519b-45c0-b006-2765fa8f79f7/1729496233283/lingxiaoyue.jpg',
+      defaultVCN: 'x5_lingxiaoyue_flow',
+      gender: '女',
+      name: '林思语',
+      posture: '大半身',
+      sceneId: 'avatar_wmy001',
+      type: ['教育学习'],
+      sampleAvatar:
+        'https://openres.xfyun.cn/xfyundoc/2024-10-21/0969f0d7-519b-45c0-b006-2765fa8f79f7/1729496233283/lingxiaoyue.jpg',
+    },
+    {
+      avatar:
+        'https://openres.xfyun.cn/xfyundoc/2025-01-10/072d1c04-b23b-4feb-9728-091207773145/1736479064040/20250110-111727.jpg',
+      defaultVCN: 'x5_lingfeiyi_flow',
+      gender: '男',
+      name: '林晨星',
+      posture: '大半身',
+      sceneId: 'avatar_lfy',
+      type: ['教育学习'],
+      sampleAvatar:
+        'https://openres.xfyun.cn/xfyundoc/2025-01-10/072d1c04-b23b-4feb-9728-091207773145/1736479064040/20250110-111727.jpg',
+    },
+  ];
+  const currentAvatarList = useMemo(
+    () => (sceneMode === 0 ? avatarList : defVcnList),
+    [sceneMode, avatarList, defVcnList]
+  );
+  const currentType = useMemo(
+    () => (sceneMode === 0 ? selectedAvatar : callSceneId),
+    [sceneMode, avatarList, defVcnList]
+  );
   useEffect(() => {
     if (formValues) {
       form.setFieldValue('name', formValues.name);
@@ -210,6 +269,10 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
         setSceneMode(formValues.talkAgentConfig.sceneMode);
         setSelectedVoice(formValues.talkAgentConfig.vcn);
         setSceneVcn(formValues.talkAgentConfig.sceneVcn);
+        setBotCreateActiveV({
+          ...botCreateActiveV,
+          cn: formValues.talkAgentConfig.vcn,
+        });
       }
     }
   }, [formValues]);
@@ -232,10 +295,19 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
       setIsAudioPlaying(false);
       try {
         const nextVcn = voice.defaultVCN || voice.vcn || voice.id || '';
-        const nextText =
-          voice.previewText || '懂你所言，答你所问，我是你的讯飞星辰小助理';
-        setVocPreviewText(nextText);
+        const nextText = '懂你所言，答你所问，我是你的讯飞星辰小助理';
+        const nextEnText =
+          'Understand what you say and Answer  your questions. I am your iFlytek Astron Assistant.';
+
         setVocName(nextVcn);
+        // 判断nextVcn是否包含EnUs
+        if (nextVcn.includes('EnUs')) {
+          setVocLanguage('en');
+          setVocPreviewText(nextEnText);
+        } else {
+          setVocLanguage('cn');
+          setVocPreviewText(nextText);
+        }
         // 给清理留一点时间，避免新旧播放竞态导致首包过短、播放被截断
         setTimeout(() => {
           setIsAudioPlaying(true);
@@ -258,10 +330,18 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
     setTempSelectedAvatar('');
     setTempSelectedVoice('');
     // 用当前已选初始化临时值，供用户快速确认
-    setTempSelectedAvatar(selectedAvatar || '');
+    setTempSelectedAvatar(currentType || '');
     setTempSelectedVoice(selectedVoice);
     setAvatarModalVisible(true);
   }, [sceneMode, selectedAvatar, callSceneId, selectedVoice]);
+
+  /**
+   * 切换语音折叠
+   */
+  const toggleVoiceExpanded = useCallback(() => {
+    setVoiceExpanded(prev => !prev);
+    setBotCreateActiveV({ ...botCreateActiveV, cn: selectedVoice });
+  }, [sceneMode, selectedVoice]);
 
   /**
    * 重置“虚拟人形象”弹窗的筛选与临时选择状态
@@ -278,6 +358,9 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
     setVocName('');
     setPlayingVoiceId(null);
   }, []);
+
+  /** 音色列表（来源后端） */
+  const [voiceOptions, setVoiceOptions] = useState<VoiceOption[]>([]);
 
   /**
    * 提交表单
@@ -302,8 +385,8 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
       return;
     }
 
-    if (!enableAvatar) {
-      message.error('请选择交互方式');
+    if (!enableVoice && !enableAvatar) {
+      message.error('请至少选择一个交互方式');
       return;
     }
 
@@ -398,7 +481,7 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
         message.info('暂无形象数据');
       }
     } catch (e) {
-      message.error('获取形象列表失败');
+      // message.error('获取形象列表失败');
       setAvatarList([]);
     }
   };
@@ -432,7 +515,7 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
       cartoon: '卡通形象',
       historical: '历史人物',
     };
-    return avatarList.filter(a => {
+    return currentAvatarList.filter(a => {
       const genderOk =
         genderFilter === 'all' ? true : a.gender === genderMap[genderFilter];
       const postureOk =
@@ -475,6 +558,12 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
   }, [avatarList, genderFilter, postureFilter, typeFilter, sceneMode]);
 
   useEffect(() => {
+    getVCNList()
+      .then((res: any) => {
+        setOfficialVcnList(res);
+        setSelectedVoice(res[0]?.vcn || '');
+      })
+      .catch(err => {});
     getAvatarList();
     getBotTypeList();
     if (!avatarIcon?.length) {
@@ -482,6 +571,29 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
     }
   }, []);
 
+  const setBotCreateVcn = (vcn: any) => {
+    setBotCreateActiveV(vcn);
+    setSelectedVoice(vcn.cn);
+  };
+  /**
+   * 渲染助手发音人
+   */
+  const renderBotVcn = useCallback(() => {
+    let vcnObj = [...officialVcnList].find(
+      (item: any) => item.vcn === selectedVoice
+    );
+    let isCustomVcn = false;
+    if (!vcnObj) {
+      vcnObj = mySpeaker.find(
+        (item: any) => item.vcnCode === botCreateActiveV.cn
+      );
+      if (vcnObj) {
+        isCustomVcn = true;
+      }
+    }
+    return <>{vcnObj ? vcnObj.name || vcnObj.vcnName : '未选择'}</>;
+  }, [officialVcnList, selectedVoice]);
+  const [mySpeaker, setMySpeaker]: any = useState([]); //我的发音人数组
   return (
     <Modal
       wrapClassName={styles.open_source_modal}
@@ -542,8 +654,6 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
                           onClick={() => setShowModal(true)}
                           style={{
                             objectFit: 'cover',
-                            opacity: avatarLoaded ? 1 : 0,
-                            transition: 'opacity 0.2s ease-in-out',
                           }}
                         />
                       </div>
@@ -622,7 +732,7 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
 
               {/* 声音和形象 */}
               <div className={styles.sectionHeader}>
-                <div className={styles.sectionTitle}>形象</div>
+                <div className={styles.sectionTitle}>声音和形象</div>
                 <Tooltip
                   title="启用后可在对话结束后生成引导对话，辅助更好的交流"
                   overlayStyle={{ maxWidth: 220, whiteSpace: 'normal' }}
@@ -661,6 +771,32 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
                 <div className={styles.sectionHeaderHelp}>
                   选择与应用角色设定匹配的虚拟人形象
                 </div>
+                {/* 播报通话开关 */}
+
+                <div className={styles.toggleSwitch}>
+                  <div
+                    className={`${styles.toggleSwitchItem} ${sceneMode === 0 ? styles.toggleSwitchItemActive : ''}`}
+                    onClick={() => {
+                      setSceneMode(0);
+                      setSelectedAvatar(
+                        selectedAvatar || avatarList[0].sceneId
+                      );
+                      setSceneVcn(avatarList[0].defaultVCN || '');
+                    }}
+                  >
+                    虚拟人播报
+                  </div>
+                  <div
+                    className={`${styles.toggleSwitchItem} ${sceneMode === 1 ? styles.toggleSwitchItemActive : ''}`}
+                    onClick={() => {
+                      setSceneMode(1);
+                      setCallSceneId(callSceneId || defVcnList[0].sceneId);
+                      setSceneVcn(defVcnList[0].defaultVCN || '');
+                    }}
+                  >
+                    虚拟人通话
+                  </div>
+                </div>
 
                 {/* 形象选择 */}
                 {enableAvatar && (
@@ -687,33 +823,116 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
                           <img
                             className={styles.summaryAvatar}
                             src={
-                              avatarList.find(a => a.sceneId === selectedAvatar)
-                                ?.avatar || defaultAvatar
+                              currentAvatarList.find(
+                                a => a.sceneId === currentType
+                              )?.sampleAvatar || defaultAvatar
                             }
                             alt=""
                           />
                           <div className={styles.summaryName}>
                             <div className={styles.summaryNameText}>
-                              {avatarList.find(
-                                a => a.sceneId === selectedAvatar
+                              {currentAvatarList.find(
+                                a => a.sceneId === currentType
                               )?.name ?? '未选择'}
                             </div>
-                            <div className={styles.summaryNameSub}>
+                            {/* <div className={styles.summaryNameSub}>
                               <img src={summaryIcon} alt="" />
-                              <span>
-                                {
-                                  avatarList.find(
-                                    a => a.sceneId === selectedAvatar
-                                  )?.defaultVCN
-                                }
-                              </span>
-                            </div>
+                              <span>{selectedVoice}</span>
+                            </div> */}
                           </div>
                         </div>
                       </div>
                       <img
                         className={styles.summaryAction}
                         src={summaryActionIcon}
+                        alt=""
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* 语音互动 */}
+
+              <div className={`${styles.configSection} ${styles.voiceSection}`}>
+                <div className={styles.toggleRow}>
+                  <span className={styles.toggleLabel}>角色声音</span>
+                  <Tooltip title="选择与应用角色匹配的播报音色">
+                    <img className={styles.sectionHelp} src={helpIcon} />
+                  </Tooltip>
+                  {/* <Switch
+                    checked={enableVoice}
+                    onChange={checked => {
+                      setEnableVoice(checked);
+                      if (checked) {
+                        if (!enableAvatar) {
+                          form.setFieldValue('interactType', 0);
+                        } else {
+                          form.setFieldValue('interactType', 2);
+                        }
+                        setEnableVoice(checked);
+                      } else {
+                        if (!enableAvatar) {
+                          message.warning('请保证虚拟人和角色声音至少选择一种');
+                          form.setFieldValue('interactType', 0);
+                          setEnableVoice(true);
+                        } else {
+                          form.setFieldValue('interactType', 2);
+                          setEnableVoice(checked);
+                        }
+                      }
+                    }}
+                  /> */}
+                </div>
+                <div className={styles.sectionHeaderHelp}>
+                  选择与应用角色设定匹配的播报音色
+                </div>
+
+                {enableVoice && (
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 12,
+                    }}
+                  >
+                    {/* 摘要胶囊：当前音色 */}
+                    <span className={styles.toggleLabel}>声音</span>
+
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      onClick={toggleVoiceExpanded}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter' || e.key === ' ')
+                          toggleVoiceExpanded();
+                      }}
+                      className={styles.summaryRow}
+                      style={{
+                        cursor: sceneMode === 1 ? 'not-allowed' : 'pointer',
+                      }}
+                    >
+                      <div className={styles.summaryLeft}>
+                        <div className={styles.voicePill}>
+                          <div className={styles.voiceIcon} aria-hidden="true">
+                            <img
+                              src={voiceIcon}
+                              alt=""
+                              loading="lazy"
+                              onError={e => {
+                                e.currentTarget.onerror = null;
+                                e.currentTarget.src = voiceIcon;
+                              }}
+                            />
+                          </div>
+                          <span className={styles.summaryName}>
+                            {renderBotVcn()}
+                          </span>
+                        </div>
+                      </div>
+                      <img
+                        className={styles.summaryActionVcn}
+                        src={voiceActionIcon}
                         alt=""
                       />
                     </div>
@@ -834,7 +1053,7 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
                             {filteredAvatarList.map(a => {
                               const active =
                                 a.sceneId ===
-                                (tempSelectedAvatar || selectedAvatar);
+                                (tempSelectedAvatar || currentType);
                               return (
                                 <div
                                   key={a.sceneId}
@@ -843,12 +1062,26 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
                                   tabIndex={0}
                                   onClick={() => {
                                     setTempSelectedAvatar(a.sceneId);
-                                    setTempSelectedVoice(a.defaultVCN);
+                                    if (
+                                      a.defaultVCN &&
+                                      voiceOptions.some(
+                                        v => v.id === a.defaultVCN
+                                      )
+                                    ) {
+                                      setTempSelectedVoice(a.defaultVCN);
+                                    }
                                   }}
                                   onKeyDown={e => {
                                     if (e.key === 'Enter' || e.key === ' ') {
                                       setTempSelectedAvatar(a.sceneId);
-                                      setTempSelectedVoice(a.defaultVCN);
+                                      if (
+                                        a.defaultVCN &&
+                                        voiceOptions.some(
+                                          v => v.id === a.defaultVCN
+                                        )
+                                      ) {
+                                        setTempSelectedVoice(a.defaultVCN);
+                                      }
                                     }
                                   }}
                                 >
@@ -857,7 +1090,11 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
                                     aria-hidden="true"
                                   >
                                     <img
-                                      src={a.avatar || defaultModalAvatar}
+                                      src={
+                                        a.sampleAvatar ||
+                                        a.avatar ||
+                                        defaultModalAvatar
+                                      }
                                       alt=""
                                     />
                                   </div>
@@ -875,47 +1112,47 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
                             <div className={styles.avatarPreviewHeader}>
                               <div className={styles.previewName}>
                                 {
-                                  avatarList.find(
+                                  currentAvatarList.find(
                                     a =>
                                       a.sceneId ===
-                                      (tempSelectedAvatar || selectedAvatar)
+                                      (tempSelectedAvatar || currentType)
                                   )?.name
                                 }
                                 <span>
-                                  ·{' '}
-                                  {
-                                    avatarList.find(
-                                      a =>
-                                        a.sceneId ===
-                                        (tempSelectedAvatar || selectedAvatar)
-                                    )?.previewText
-                                  }
+                                  · 懂你所言，答你所问，我是你的讯飞星辰小助理
                                 </span>
                               </div>
-                              <div
+                              {/* <div
                                 className={`${styles.avatarPreviewPlay}`}
                                 onClick={() =>
                                   handleTogglePlay(
-                                    avatarList.find(
+                                    currentAvatarList.find(
                                       a =>
                                         a.sceneId ===
-                                        (tempSelectedAvatar || selectedAvatar)
+                                        (tempSelectedAvatar || currentType)
                                     ) as unknown as VoiceOption
                                   )
                                 }
                               >
-                                <img src={avatarTrumpet} alt="" />
+                                <img
+                                  src={
+                                    isAudioPlaying
+                                      ? avatarTrumpetOpen
+                                      : avatarTrumpet
+                                  }
+                                  alt=""
+                                />
                                 <span>试听</span>
-                              </div>
+                              </div> */}
                             </div>
 
                             <img
                               className={`${styles.avatarPreviewImage} ${sceneMode === 0 ? '' : styles.avatarPreviewImageXuniren}`}
                               src={
-                                avatarList.find(
+                                currentAvatarList.find(
                                   a =>
                                     a.sceneId ===
-                                    (tempSelectedAvatar || selectedAvatar)
+                                    (tempSelectedAvatar || currentType)
                                 )?.avatar || defaultModalAvatarPreview
                               }
                               alt=""
@@ -952,6 +1189,15 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
                         }
                         if (tempSelectedVoice) {
                           setSelectedVoice(tempSelectedVoice);
+                        } else {
+                          // 若未选临时音色但形象有默认音色且在可选列表中，则应用之
+                          const cur = avatarList.find(
+                            a => a.sceneId === tempSelectedAvatar
+                          );
+                          const vcn = cur?.defaultVCN;
+                          if (vcn && voiceOptions.some(v => v.id === vcn)) {
+                            setSelectedVoice(vcn);
+                          }
                         }
                         setAvatarModalVisible(false);
                       }}
@@ -975,6 +1221,7 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
                     </Tooltip>
                   </div>
                 }
+                style={{ display: 'none' }}
                 name="interactType"
                 initialValue={2}
                 layout="vertical"
@@ -983,8 +1230,10 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
                   suffixIcon={<img src={formSelect} className="w-4 h-4 " />}
                   className={styles.form_select}
                   options={[
+                    { label: '语音通话', value: 0 },
                     { label: '文字对话', value: 1 },
                     { label: '虚拟人播报', value: 2 },
+                    { label: '虚拟人通话', value: 3 },
                   ]}
                 />
               </Form.Item>
@@ -1032,7 +1281,7 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
       {/* <TtsModule
         text={vocPreviewText}
         voiceName={vocName}
-        language="cn"
+        language={vocLanguage}
         isPlaying={isAudioPlaying}
         setIsPlaying={setIsAudioPlaying}
       /> */}
@@ -1047,6 +1296,15 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
           setShowModal={setShowModal}
         />
       )}
+      {/* <SpeakerModal
+        changeSpeakerModal={setVoiceExpanded}
+        botCreateCallback={setBotCreateVcn}
+        setBotCreateActiveV={setBotCreateActiveV}
+        botCreateActiveV={botCreateActiveV}
+        showSpeakerModal={voiceExpanded}
+        mySpeaker={mySpeaker}
+        setMySpeaker={setMySpeaker}
+      /> */}
     </Modal>
   );
 };
