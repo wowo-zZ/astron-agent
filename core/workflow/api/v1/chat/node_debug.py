@@ -80,10 +80,14 @@ async def node_debug(node_debug_vo: NodeDebugVo) -> JSONResponse:
     span = Span()
     with span.start(attributes={"flow_id": node_debug_vo.id}) as span_context:
         try:
-            if node_debug_vo.data.nodes[0].id.split("::")[0] in NodeType.DATABASE.value:
+            if (
+                node_debug_vo.data.nodes
+                and node_debug_vo.data.nodes[0].id.split("::")[0]
+                in NodeType.DATABASE.value
+            ):
                 span.uid = node_debug_vo.data.nodes[0].data.nodeParam.get("uid", "")
             node_debug_resp_vo = await flow_service.node_debug(
-                node_debug_vo.data, span_context
+                node_debug_vo.data, node_debug_vo.id, span_context
             )
 
         except CustomException as err:

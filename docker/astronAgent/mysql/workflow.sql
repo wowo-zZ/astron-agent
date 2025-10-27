@@ -57,7 +57,6 @@ CREATE TABLE `flow` (
   `release_data` mediumtext COMMENT '发布后的数据',
   `description` varchar(1024) DEFAULT NULL,
   `version` varchar(128) DEFAULT '' COMMENT '协议版本',
-  `status` tinyint(1) NOT NULL COMMENT 'flow的状态，0是草稿，1是发布',
   `release_status` tinyint(4) DEFAULT NULL COMMENT '发布状态或值',
   `app_id` varchar(255) DEFAULT NULL COMMENT 'app_id',
   `source` tinyint(4) DEFAULT '0' COMMENT '来源',

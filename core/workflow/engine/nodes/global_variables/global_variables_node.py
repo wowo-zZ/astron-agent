@@ -11,7 +11,7 @@ from typing import Any, Literal
 
 from pydantic import Field
 
-from workflow.engine.entities.variable_pool import VariablePool
+from workflow.engine.entities.variable_pool import ParamKey, VariablePool
 from workflow.engine.nodes.base_node import BaseNode
 from workflow.engine.nodes.entities.node_run_result import (
     NodeRunResult,
@@ -126,7 +126,6 @@ class GlobalVariablesNode(BaseNode):
     """
 
     method: Literal["set", "get"] = Field(...)  # Operation method: "set" or "get"
-    flowId: str = Field(...)  # Flow identifier for variable scope
 
     async def async_execute(
         self,
@@ -151,10 +150,10 @@ class GlobalVariablesNode(BaseNode):
         try:
             inputs: dict = {}
             outputs: dict = {}
-
+            flow_id: str = variable_pool.system_params.get(ParamKey.FlowId)
             # Build Redis key components for cache operations
             redis_key = {
-                "flow_id": self.flowId,
+                "flow_id": flow_id,
                 "uid": span.uid,
                 "app_id": span.app_id,
                 "chat_id": variable_pool.chat_id,
@@ -165,7 +164,7 @@ class GlobalVariablesNode(BaseNode):
 
             # Initialize variable manager for cache operations
             var_manager = VariablesManage(
-                flow_id=self.flowId,
+                flow_id=flow_id,
                 uid=span.uid,
                 app_id=span.app_id,
                 chat_id=variable_pool.chat_id,

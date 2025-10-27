@@ -162,7 +162,8 @@ class ParamKey(str, Enum):
     Enumeration of system parameter keys.
     """
 
-    FlowOutputMode = "flowOutputMode"
+    FlowId = "flow_id"
+    FlowOutputMode = "flow_output_mode"
     IsRelease = "is_release"
 
 

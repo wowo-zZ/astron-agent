@@ -1,6 +1,3 @@
-include:
-  - docker-compose-with-auth.yml
-
 services:
   # ============================================================================
   # Infrastructure Services
@@ -204,6 +201,7 @@ services:
       SERVICE_PORT: "${CORE_RPA_PORT:-17198}"
       OTLP_ENDPOINT: "${OTLP_ENDPOINT:-127.0.0.1:4317}"
       OTLP_ENABLE: "${OTLP_ENABLE:-0}"
+      KAFKA_ENABLE: "${KAFKA_ENABLE:-0}"
       KAFKA_SERVERS: "${KAFKA_SERVERS:-kafka:29092}"
       XIAOWU_RPA_TASK_CREATE_URL: "${XIAOWU_RPA_TASK_CREATE_URL:-https://newapi.iflyrpa.com/api/rpa-openapi/workflows/execute-async}"
       XIAOWU_RPA_TASK_QUERY_URL: "${XIAOWU_RPA_TASK_QUERY_URL:-https://newapi.iflyrpa.com/api/rpa-openapi/executions}"
@@ -240,6 +238,7 @@ services:
       REDIS_PASSWORD: "${REDIS_PASSWORD}"
       OTLP_ENDPOINT: "${OTLP_ENDPOINT:-127.0.0.1:4317}"
       OTLP_ENABLE: "${OTLP_ENABLE:-0}"
+      KAFKA_ENABLE: "${KAFKA_ENABLE:-0}"
       KAFKA_SERVERS: "${KAFKA_SERVERS:-kafka:29092}"
     depends_on:
       postgres:
@@ -270,6 +269,7 @@ services:
       OSS_BUCKET_NAME: "${OSS_BUCKET_NAME}"
       OSS_DOWNLOAD_HOST: "${OSS_REMOTE_ENDPOINT}"
       OSS_TTL: "${OSS_TTL:-157788000}"
+      KAFKA_ENABLE: "${KAFKA_ENABLE:-0}"
       KAFKA_SERVERS: "${KAFKA_SERVERS:-kafka:29092}"
       AI_APP_ID: "${PLATFORM_APP_ID}"
       AI_API_KEY: "${PLATFORM_API_KEY}"
@@ -322,6 +322,7 @@ services:
       OTLP_TRACE_SCHEDULE_DELAY_MILLIS: "${OTLP_TRACE_SCHEDULE_DELAY_MILLIS:-3000}"
       OTLP_TRACE_MAX_EXPORT_BATCH_SIZE: "${OTLP_TRACE_MAX_EXPORT_BATCH_SIZE:-2048}"
       OTLP_TRACE_EXPORT_TIMEOUT_MILLIS: "${OTLP_TRACE_EXPORT_TIMEOUT_MILLIS:-3000}"
+      KAFKA_ENABLE: "${KAFKA_ENABLE:-0}"
       KAFKA_SERVERS: "${KAFKA_SERVERS:-kafka:29092}"
       KAFKA_TIMEOUT: "${KAFKA_TIMEOUT:-60}"
       KAFKA_TOPIC: "${AGENT_KAFKA_TOPIC:-spark-agent-builder}"
@@ -415,6 +416,7 @@ services:
       OSS_BUCKET_NAME: "${OSS_BUCKET_NAME}"
       OSS_DOWNLOAD_HOST: "${OSS_REMOTE_ENDPOINT}"
       OSS_TTL: "${OSS_TTL:-157788000}"
+      KAFKA_ENABLE: "${KAFKA_ENABLE:-0}"
       KAFKA_SERVERS: "${KAFKA_SERVERS:-kafka:29092}"
       KAFKA_TIMEOUT: "${KAFKA_TIMEOUT:-60}"
       KAFKA_TOPIC: "${WORKFLOW_KAFKA_TOPIC:-spark-agent-builder}"
@@ -478,8 +480,6 @@ services:
       CONSOLE_CASDOOR_ORG: "${CONSOLE_CASDOOR_ORG:-}"
     expose:
       - "1881"
-    depends_on:
-      - casdoor
     networks:
       - astron-agent-network
     restart: always
@@ -567,8 +567,6 @@ services:
     expose:
       - "8080"
     depends_on:
-      casdoor:
-        condition: service_started
       postgres:
         condition: service_healthy
       mysql:

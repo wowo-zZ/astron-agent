@@ -2,7 +2,7 @@ services:
   casdoor:
     image: casbin/casdoor:latest
     container_name: astron-agent-casdoor
-    restart: unless-stopped
+    restart: always
     user: root
     ports:
       - "${CASDOOR_PORT:-8000}:8000"
@@ -37,6 +37,13 @@ services:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
       retries: 10
+
+# ============================================================================
+# Network Configuration
+# ============================================================================
+networks:
+  astron-agent-network:
+    driver: bridge
 
 volumes:
   casdoor-logs:
