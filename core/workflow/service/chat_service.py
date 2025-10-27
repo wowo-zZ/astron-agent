@@ -4,18 +4,7 @@ import json
 import time
 from asyncio import Queue
 from datetime import datetime
-from typing import (
-    Any,
-    AsyncGenerator,
-    AsyncIterator,
-    Awaitable,
-    Callable,
-    Dict,
-    List,
-    Optional,
-    Tuple,
-    cast,
-)
+from typing import Any, AsyncGenerator, AsyncIterator, Dict, List, Optional, Tuple, cast
 
 from loguru import logger
 
@@ -535,6 +524,9 @@ async def _run(
             structured_data: dict[Any, Any] = {}
             support_stream_node_id_queue: asyncio.Queue[Any] = asyncio.Queue()
 
+            sparkflow_engine.engine_ctx.variable_pool.system_params.set(
+                ParamKey.FlowId, chat_vo.flow_id
+            )
             # Initialize model content output queues
             await _init_stream_q(
                 sparkflow_engine.engine_ctx.msg_or_end_node_deps,
@@ -689,20 +681,6 @@ def change_dsl_triplets(
     return dsl
 
 
-async def _get_response_or_ping(
-    sid: str,
-    node_info: NodeInfo,
-    getter: Callable[[], Awaitable[LLMGenerate]],
-    timeout: float = 30.0,
-) -> LLMGenerate:
-    response: LLMGenerate
-    try:
-        response = await asyncio.wait_for(getter(), timeout=timeout)
-    except asyncio.TimeoutError:
-        response = LLMGenerate._ping(sid=sid, node_info=node_info)
-    return response
-
-
 async def _get_response(
     app_audit_policy: AppAuditPolicy,
     audit_strategy: Optional[AuditStrategy],
@@ -726,21 +704,22 @@ async def _get_response(
         last_response.workflow_step if last_response else None
     )
     node: Optional[NodeInfo] = step.node if step else None
-    if last_response and node and node.id.startswith(NodeType.RPA.value):
-        response = await _get_response_or_ping(
-            sid=last_response.id, node_info=node, getter=lambda: response_queue.get()
-        )
-    elif app_audit_policy == AppAuditPolicy.AGENT_PLATFORM and audit_strategy:
-        frame_audit_result: FrameAuditResult = await asyncio.wait_for(
-            audit_strategy.context.output_queue.get(),
-            timeout=QueueTimeout.AsyncQT.value,
-        )
-        if frame_audit_result.error:
-            raise frame_audit_result.error
-        response = cast(LLMGenerate, frame_audit_result.source_frame)
-    else:
-        response = await asyncio.wait_for(
-            response_queue.get(), timeout=QueueTimeout.AsyncQT.value
+    try:
+        if app_audit_policy == AppAuditPolicy.AGENT_PLATFORM and audit_strategy:
+            frame_audit_result: FrameAuditResult = await asyncio.wait_for(
+                audit_strategy.context.output_queue.get(),
+                timeout=QueueTimeout.PingQT.value,
+            )
+            if frame_audit_result.error:
+                raise frame_audit_result.error
+            response = cast(LLMGenerate, frame_audit_result.source_frame)
+        else:
+            response = await asyncio.wait_for(
+                response_queue.get(), timeout=QueueTimeout.PingQT.value
+            )
+    except asyncio.TimeoutError:
+        response = LLMGenerate._ping(
+            sid=last_response.id if last_response else "", node_info=node
         )
     return response
 
@@ -954,11 +933,7 @@ async def _chat_response_stream(
                 node: Optional[NodeInfo] = (
                     response.workflow_step.node if response.workflow_step else None
                 )
-                last_response = (
-                    response
-                    if node and node.id.startswith(NodeType.RPA.value)
-                    else last_response
-                )
+                last_response = response if node else last_response
 
                 response = _filter_response_frame(
                     response_frame=response,
@@ -1089,7 +1064,7 @@ async def _forward_queue_messages(
             node: Optional[NodeInfo] = (
                 response.workflow_step.node if response.workflow_step else None
             )
-            if node and node.id.startswith(NodeType.RPA.value):
+            if node:
                 last_response = response
             event = EventRegistry().get_event(event_id=event_id)
             data = json.dumps(response.dict(), ensure_ascii=False)

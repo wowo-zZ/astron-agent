@@ -73,18 +73,78 @@
 ```bash
 # 克隆项目
 git clone https://github.com/iflytek/astron-agent.git
-cd astron-agent
 
-# 启动 Casdoor 身份认证服务
-cd docker/casdoor
-docker-compose up -d
+# 进入 astronAgent 目录
+cd docker/astronAgent
 
-# 启动 AstronAgent 核心服务
-cd ../astronAgent
-docker compose up -d
+# 复制环境变量配置
+cp .env.example .env
+
+# 编辑环境变量配置
+vim .env
 ```
 
-访问平台：http://localhost/
+#### 配置 讯飞开放平台 相关 APP_ID API_KEY 等信息
+
+获取文档详见：https://www.xfyun.cn/doc/platform/quickguide.html
+
+创建应用完成后可能需要购买或领取相应能力的API授权服务量
+- 星火大模型API: https://xinghuo.xfyun.cn/sparkapi
+  (对于大模型API会有额外的SPARK_API_PASSWORD需要在页面上获取)
+  (指令型助手对应的文本AI生成/优化功能需要开通Spark Ultra能力，页面地址为https://console.xfyun.cn/services/bm4)
+- 实时语音转写API: https://console.xfyun.cn/services/rta
+- 图片生成API: https://www.xfyun.cn/services/wtop
+
+编辑 docker/astronAgent/.env 文件，更新相关环境变量：
+```env
+PLATFORM_APP_ID=your-app-id
+PLATFORM_API_KEY=your-api-key
+PLATFORM_API_SECRET=your-api-secret
+
+SPARK_API_PASSWORD=your-api-password
+SPARK_RTASR_API_KEY=your-rtasr-api-key
+```
+
+#### 配置服务主机地址
+
+编辑 docker/astronAgent/.env 文件，配置 AstronAgent 服务的主机地址：
+
+```env
+HOST_BASE_ADDRESS=http://localhost
+```
+
+**说明：**
+- 如果您使用域名访问，请将 `localhost` 替换为您的域名
+- 确保 nginx 和 minio 的端口已正确开放
+
+#### 启动项目
+
+```bash
+# 进入 astronAgent 目录
+cd docker/astronAgent
+
+# 启动所有服务（包含 Casdoor）
+docker compose -f docker-compose-with-auth.yaml up -d
+
+# 查看服务状态
+docker compose ps
+
+# 查看服务日志
+docker compose logs -f
+```
+
+#### 📊 服务访问地址
+
+启动完成后，您可以通过以下地址访问各项服务：
+
+**认证服务**
+- **Casdoor 管理界面**：http://localhost:8000
+
+**AstronAgent**
+- **应用前端(nginx代理)**：http://localhost/
+
+**说明**
+- Casdoor默认的登录账户名：`admin`，密码：`123`
 
 ### 方式二：Helm（适用于 Kubernetes 环境）
 

@@ -246,7 +246,9 @@ def gen_mcp_input_schema(flow: Flow) -> dict:
     }
 
 
-async def node_debug(workflow_dsl: WorkflowDSL, span: Span) -> NodeDebugRespVo:
+async def node_debug(
+    workflow_dsl: WorkflowDSL, flow_id: str, span: Span
+) -> NodeDebugRespVo:
     """
     Execute node debugging for a single workflow node.
 
@@ -271,6 +273,8 @@ async def node_debug(workflow_dsl: WorkflowDSL, span: Span) -> NodeDebugRespVo:
 
     # Disable retry mechanism for node debugging to get immediate feedback
     node_instance.retry_config.should_retry = False
+
+    variable_pool.system_params.set(ParamKey.FlowId, flow_id)
 
     if node_instance.node_id.startswith(NodeType.FLOW.value):
         set_flow_node_output_mode(

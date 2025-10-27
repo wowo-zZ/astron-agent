@@ -162,4 +162,33 @@
         SELECT COUNT(*) FROM knowledge WHERE file_id = #{fileId} AND enabled = #{enabled}
     </select>
 
+    <!--
+        Count the number of knowledge entries by fileIds and content like (fuzzy query)
+        @param fileIds list of file IDs
+        @param query query string for fuzzy matching
+        @return Long count
+    -->
+    <select id="countByFileIdInAndContentLike" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM knowledge WHERE file_id IN
+        <foreach collection="fileIds" item="fileId" open="(" separator="," close=")">
+            #{fileId}
+        </foreach>
+        AND (JSON_EXTRACT(content, '$.knowledge') LIKE CONCAT('%', #{query}, '%')
+        OR JSON_EXTRACT(content, '$.content') LIKE CONCAT('%', #{query}, '%'))
+    </select>
+
+    <!--
+        Count the number of knowledge entries by fileIds and audit type (block/review)
+        @param fileIds list of file IDs
+        @param auditType audit type (1 for blocked/review items)
+        @return Long count
+    -->
+    <select id="countByFileIdInAndAuditType" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM knowledge WHERE file_id IN
+        <foreach collection="fileIds" item="fileId" open="(" separator="," close=")">
+            #{fileId}
+        </foreach>
+        AND JSON_EXTRACT(content, '$.auditSuggest') IN ('block', 'review')
+    </select>
+
 </mapper>
