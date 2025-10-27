@@ -359,7 +359,7 @@ function ModelCardFooter({
                 </button>
                 {model.status === LocalModelStatus.FAILED && (
                   <button
-                    className="block w-full text-left px-3 py-1 hover:bg-gray-100 text-sm text-blue-600"
+                    className="block w-full text-left px-3 py-1 hover:bg-gray-100 text-sm text-[#6356ea]"
                     onClick={e => {
                       e.stopPropagation();
                       setMenuVisible(false);

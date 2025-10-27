@@ -714,7 +714,7 @@ const MenuList: FC<MenuListProps> = ({
           : isShowSpacePopover
             ? 'overflow-hidden'
             : 'overflow-auto'
-      } scrollbar-none`}
+      } scroll-bar-hide-UI scrollbar-none`}
     >
       {getDynamicMenuList.map((item, index) => (
         <div
