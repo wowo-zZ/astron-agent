@@ -35,6 +35,9 @@ import { getInputsType } from '@/services/flow';
 import { handleShare } from '@/utils';
 import { PlusOutlined } from '@ant-design/icons';
 
+import VirtualConfig from '@/components/virtual-config-modal';
+import { upgradeWorkflow } from '@/services/spark-common';
+
 function index() {
   const [showbotNo, setShowbotNo] = useState(false);
   const typePublished = [1, 2, 4]; // 已发布状态
@@ -369,7 +372,7 @@ function index() {
               className={styles.addBot}
               onClick={() => {
                 if (!user?.login && !user?.uid) {
-                  return jumpTologin();
+                  return jumpToLogin();
                 }
                 setCreateModalVisible(true);
               }}
@@ -598,7 +601,7 @@ function index() {
                             />
                             {operationId === k.botId && (
                               <div
-                                className={`absolute top-[28px] right-0 bg-white rounded p-1 shadow-md flex flex-col gap-1  w-[48px]`}
+                                className={`absolute top-[28px] right-0 bg-white rounded p-1 shadow-md flex flex-col gap-1  ${k.version === 3 ? 'w-[155px]' : 'w-[48px]'}`}
                                 style={{
                                   zIndex: 1,
                                 }}
@@ -629,6 +632,19 @@ function index() {
                                   >
                                     {t('agentPage.agentPage.export')}
                                   </a>
+                                )}
+
+                                {k?.version === 3 && (
+                                  <div
+                                    className="p-1 rounded hover:bg-[#F2F5FE] text-[#666666]"
+                                    onClick={e => {
+                                      e.stopPropagation();
+                                      setCopyParams({ ...k, name: k.botName });
+                                      setVirtualModal(true);
+                                    }}
+                                  >
+                                    复制为语音·虚拟人智能体
+                                  </div>
                                 )}
                                 {![1, 4].includes(k?.botStatus) && (
                                   <div
@@ -680,7 +696,7 @@ function index() {
                 className={styles.addBot}
                 onClick={() => {
                   if (!user?.login && !user?.uid) {
-                    return jumpTologin();
+                    return jumpToLogin();
                   }
                   setCreateModalVisible(true);
                 }}
@@ -692,6 +708,28 @@ function index() {
             </div>
           </>
         )}
+
+
+          <VirtualConfig
+          visible={virtualModal}
+          formValues={copyParams}
+          onSubmit={values => {
+            upgradeWorkflow({ sourceId: copyParams?.botId, ...values })
+              .then((res: any) => {
+                message.success('复制成功');
+                navigate(
+                  `/work_flow/${res?.flowId}/arrange?botId=${res?.botId}`
+                );
+                setVirtualModal(false);
+              })
+              .catch((err: any) => {
+                message.error(err?.msg || err);
+              });
+          }}
+          onCancel={() => {
+            setVirtualModal(false);
+          }}
+        />
       </div>
     </div>
   );
