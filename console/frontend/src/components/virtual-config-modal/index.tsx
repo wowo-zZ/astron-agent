@@ -186,9 +186,10 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
   const avatarIcon = globalStore((state: any) => state.avatarIcon);
   const avatarColor = globalStore((state: any) => state.avatarColor);
   const getAvatarConfig = globalStore((state: any) => state.getAvatarConfig);
-  const createAvatarParams = (): { avatar: string; avatarColor: string } => {
+  const createAvatarParams = (): {avatarUrl:string; avatar: string; avatarColor: string } => {
     if (!avatarIcon?.length || !avatarColor?.length) {
       return {
+        avatarUrl:'https://oss-beijing-m8.openstorage.cn/SparkBotProd/icon/common/emojiitem_00_10@2x.png',
         avatar:
           'https://oss-beijing-m8.openstorage.cn/SparkBotProd/icon/common/emojiitem_00_10@2x.png',
         avatarColor: '#FFEAD5',
@@ -199,11 +200,12 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
     const { name, value } = avatarIcon[avatarIconIndex];
     const avatarColorItem = avatarColor[avatarColorIndex];
     return {
+      avatarUrl:value,
       avatar: name + value,
       avatarColor: avatarColorItem.name,
     };
   };
-  const [avatarUrl, setAvatarUrl] = useState(createAvatarParams().avatar);
+  const [avatarUrl, setAvatarUrl] = useState(createAvatarParams().avatarUrl);
   const [showModal, setShowModal] = useState(false);
   // const officialVcnList = useVoicePlayStore(state => state.officialVcnList);
   // const setOfficialVcnList = useVoicePlayStore(
@@ -685,7 +687,7 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
                     className={styles.inputField}
                     placeholder="请选择类型"
                     options={botTypeList}
-                    fieldNames={{ label: 'name', value: 'key' }}
+                    fieldNames={{ label: 'typeName', value: 'typeKey' }}
                     allowClear
                     showSearch
                     optionFilterProp="label"

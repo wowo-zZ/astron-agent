@@ -127,7 +127,7 @@ const HeaderFeedbackModal: React.FC<HeaderFeedbackModalProps> = ({
               .then((res: any) => {
                 message.success('创建成功');
                 navigate(
-                  `/work_flow/${res?.flowId}/arrange?botId=${res?.botId}`
+                  `/work_flow/${res?.maasId}/arrange?botId=${res?.botId}`
                 );
                 setVirtualModal(false);
               })
