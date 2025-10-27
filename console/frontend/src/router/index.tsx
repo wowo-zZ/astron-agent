@@ -17,6 +17,9 @@ const PersonalModel = lazy(
 const ModelDetail = lazy(() => import('@/pages/model-management/model-detail'));
 const ResourceManagement = lazy(() => import('@/pages/resource-management'));
 const WorkFlow = lazy(() => import('@/pages/workflow'));
+const WorkFlowAnalysis = lazy(
+  () => import('@/pages/workflow/workflow-analysis')
+);
 
 const ChatPage = lazy(() => import('@/pages/chat-page'));
 const PersonalSpace = lazy(() => import('@/pages/space/personal'));
@@ -235,6 +238,14 @@ const routes = [
     element: (
       <Suspense fallback={<Loading />}>
         <WorkFlow />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/work_flow/:id/overview',
+    element: (
+      <Suspense fallback={<Loading />}>
+        <WorkFlowAnalysis />
       </Suspense>
     ),
   },

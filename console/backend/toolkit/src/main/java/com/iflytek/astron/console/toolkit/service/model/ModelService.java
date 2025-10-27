@@ -295,12 +295,15 @@ public class ModelService extends ServiceImpl<ModelMapper, Model> {
         Model model;
         if (isNew) {
             // Duplicate name validation
-            Model exist =
-                    this.getOne(
-                            new LambdaQueryWrapper<Model>()
-                                    .eq(Model::getUid, request.getUid())
-                                    .eq(Model::getName, request.getModelName())
-                                    .eq(Model::getIsDeleted, 0));
+            LambdaQueryWrapper<Model> lqw = new LambdaQueryWrapper<Model>()
+                    .eq(Model::getName, request.getModelName())
+                    .eq(Model::getIsDeleted, 0);
+            if(spaceId != null){
+                lqw.eq(Model::getSpaceId, spaceId);
+            }else{
+                lqw.eq(Model::getUid, request.getUid()).isNull(Model::getSpaceId);
+            }
+            Model exist = this.getOne(lqw);
             if (exist != null) {
                 throw new BusinessException(ResponseEnum.MODEL_NAME_EXISTED);
             }
@@ -1292,6 +1295,8 @@ public class ModelService extends ServiceImpl<ModelMapper, Model> {
         model.setAcceleratorCount(dto.getAcceleratorCount());
         model.setReplicaCount(dto.getReplicaCount());
         model.setEnable(false);
+        // Placeholder, in order to use pysdk
+        model.setApiKey("sk-personal");
         model.setConfig(
                 Optional.ofNullable(dto.getConfig()).map(JSON::toJSONString).orElse(null));
     }

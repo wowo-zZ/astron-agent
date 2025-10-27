@@ -14,7 +14,8 @@ import WxModal from '@/components/wx-modal';
 import wechatIcon from '@/assets/imgs/workflow/wechat-icon.png';
 import mcpIcon from '@/assets/imgs/workflow/mcp-icon.png';
 import iflytekCloudIcon from '@/assets/imgs/workflow/iflytekCloud-icon.png';
-import iflytekIcon from '@/assets/imgs/workflow/iflytek-icon.png';
+// import iflytekIcon from '@/assets/imgs/workflow/iflytek-icon.png';
+import agentHubIcon from '@/assets/imgs/workflow/agent-hub-icon.svg';
 import { useTranslation } from 'react-i18next';
 
 import styles from './index.module.scss';
@@ -172,7 +173,7 @@ const DetailOverview = () => {
       case 1:
         return (
           <img
-            src={iflytekIcon}
+            src={agentHubIcon}
             alt={t('releaseDetail.DetailOverviewPage.iFlytek')}
             className="w-5 h-5"
           />

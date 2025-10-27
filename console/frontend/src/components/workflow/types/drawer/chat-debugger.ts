@@ -226,7 +226,7 @@ export interface ChatContentAdvancedConfig {
   };
   textToSpeech: {
     enabled: boolean;
-    vcn?: string;
+    vcn_cn?: string;
   };
   speechToText: {
     enabled: boolean;

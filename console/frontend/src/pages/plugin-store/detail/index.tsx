@@ -261,11 +261,7 @@ const PluginStoreDetail: React.FC = (): ReactElement => {
         <div className="h-full pr-6 overflow-scroll">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-5">
-              <img
-                src={toolInfo.address + toolInfo.icon}
-                className="w-[72px] h-[72px]"
-                alt=""
-              />
+              <img src={toolInfo.icon} className="w-[72px] h-[72px]" alt="" />
               <div className="flex flex-col gap-6">
                 <span className="text-2xl font-semibold">{toolInfo?.name}</span>
                 <div className="flex items-center gap-8">

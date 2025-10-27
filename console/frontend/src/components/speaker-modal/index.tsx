@@ -1,229 +1,187 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { message, Modal, Popover } from 'antd';
-import { useSparkCommonStore } from '@/store/spark-store/spark-common';
-import { useLocaleStore } from '@/store/spark-store/locale-store';
-import { vcnCnJson, vcnCnJsonEn, vcnEnJson, vcnOther } from './vcn';
-import { localeConfig } from '@/locales/localeConfig';
-
-import closeIcon from '@/assets/imgs/config-components/close-feedback.png';
+import React, { useState, useRef, useEffect, MouseEvent } from 'react';
+import closeIcon from '@/assets/svgs/close-speaker.svg';
 import listenImg from '@/assets/svgs/listen_play.svg';
 import listenStopImg from '@/assets/svgs/listen_stop.svg';
-
-import styles from './index.module.scss';
-import { ReactSVG } from 'react-svg';
+import { Modal } from 'antd';
 import { useTranslation } from 'react-i18next';
+import { useLocaleStore } from '@/store/spark-store/locale-store';
+import TtsModule from '../tts-module';
+const VOICE_TEXT_CN = '答你所言，懂你所问，我是你的智能体助手，很高兴认识你';
+const VOICE_TEXT_EN =
+  'I understand what you say and answer what you ask. I am your intelligent assistant, glad to meet you';
+
+export interface VcnItem {
+  id: number;
+  name: string;
+  modelManufacturer: string;
+  voiceType: string;
+  coverUrl: string;
+}
 
 interface SpeakerModalProps {
-  changeSpeakerModal: any;
-  botCreateMode?: boolean;
-  botCreateCallback?: any;
-  botCreateActiveV?: any;
-  setBotCreateActiveV?: any;
+  vcnList: VcnItem[];
+  changeSpeakerModal: (show: boolean) => void;
+  botCreateCallback: (voice: { cn: string }) => void;
+  botCreateActiveV: {
+    cn: string;
+  };
+  setBotCreateActiveV: (voice: { cn: string }) => void;
+  showSpeakerModal: boolean;
 }
 
 const SpeakerModal: React.FC<SpeakerModalProps> = ({
+  vcnList,
   changeSpeakerModal,
-  botCreateMode,
   botCreateCallback,
   botCreateActiveV,
   setBotCreateActiveV,
+  showSpeakerModal,
 }) => {
-  const activeV = useSparkCommonStore(state => state.activeVcn); // 选中的发音人
-  const setActiveV = useSparkCommonStore(state => state.setActiveVcn);
-  const { locale: localeNow } = useLocaleStore();
-  const currentActiveV = botCreateMode ? botCreateActiveV : activeV;
-  const [vcnDisplay, setVcnDisplay] = useState<any[]>([]);
-  const [playActive, setPlayActive]: any = useState(''); // 播放中的发音人
-  const [audioInfo, setAudioInfo] = useState<any>({ assignVcn: '' });
-  const [isAudioPlaying, setIsAudioPlaying] = useState<boolean>(false);
   const { t } = useTranslation();
-  const audioRef: any = useRef(null);
+  const currentActiveV = botCreateActiveV;
+  const [playActive, setPlayActive] = useState<string>(''); // 播放中的发音人
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [currentVoiceName, setCurrentVoiceName] = useState<string>('');
+  const { locale: localeNow } = useLocaleStore();
+  const audioRef = useRef<HTMLAudioElement>(null);
 
-  useEffect(() => {
-    if (localeNow === 'en') {
-      setVcnDisplay(vcnCnJsonEn);
-    } else {
-      setVcnDisplay(vcnCnJson);
-    }
-  }, []);
-
-  const setSpeaker = () => {
-    message.success(localeConfig?.[localeNow]?.setSuccess);
-    botCreateCallback && botCreateCallback(botCreateActiveV);
+  const setSpeaker = (): void => {
+    botCreateCallback(botCreateActiveV);
     changeSpeakerModal(false);
   };
 
   /**
-   *
-   * @param url
-   * @param vcn
-   * @param status
-   * @returns
+   * 试听音频
+   * @param vcn - 发音人标识
    */
-  const audition = (url: string, vcn: string, status?: number) => {
-    if (playActive === vcn) {
-      //正在播放中，暂停当前的内容
-      audioRef.current.pause();
-      setIsAudioPlaying(false);
+  const handlePlay = (vcn: VcnItem): void => {
+    // 如果点击的是正在播放的，则停止播放
+    if (playActive === vcn.voiceType && isPlaying) {
+      setIsPlaying(false);
       setPlayActive('');
-      return;
-    }
-    if (isAudioPlaying) {
-      //先暂停
-      setIsAudioPlaying(false);
-      setPlayActive('');
-    }
-    if (status === 5) {
-      //x5clone
-      audioRef.current.pause(); //无论如何，先停掉
-      setTimeout(() => {
-        setAudioInfo({
-          assignVcn: `x5_once_clone_${vcn}`,
-        });
-        setIsAudioPlaying(true);
-      }, 100);
+      setCurrentVoiceName('');
     } else {
-      //
-      audioRef.current.src = url;
-      audioRef.current.play();
+      // 切换到新的语音：先停止当前播放
+      if (isPlaying) {
+        setIsPlaying(false);
+      }
+
+      // 使用 setTimeout 确保状态更新完成后再开始新的播放
+      setTimeout(() => {
+        setPlayActive(vcn.voiceType);
+        setCurrentVoiceName(vcn.voiceType);
+        setIsPlaying(true);
+      }, 50);
     }
-    setTimeout(() => {
-      setPlayActive(vcn);
-    }, 100);
   };
 
   // 关闭发音人时，播放暂停
-  const closeSpeakerModal = () => {
-    setIsAudioPlaying(false);
+  const closeSpeakerModal = (): void => {
+    // 停止播放
+    setIsPlaying(false);
+    setPlayActive('');
+    setCurrentVoiceName('');
+
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+
     setTimeout(() => {
       changeSpeakerModal(false);
     });
   };
-
   return (
-    <div className={styles.speaker_modal}>
-      <audio src="" ref={audioRef} onEnded={() => setPlayActive('')} />
-      <div className={styles.speaker_modal_content}>
-        <div className={styles.modal_header}>
-          {t('chooseVoice')}
-          <img src={closeIcon} alt="" onClick={closeSpeakerModal} />
-        </div>
-        <div className={styles.speaker_type}>{t('Chinese')}</div>
-        <div className={styles.speaker_container}>
-          {vcnDisplay.map((item: any) => (
-            <div
-              className={`${styles.speaker_item} ${
-                currentActiveV?.cn === item.vcn ? styles.speaker_active : ''
-              }`}
-              key={item.vcn}
-              onClick={() => {
-                setBotCreateActiveV({ ...botCreateActiveV, cn: item.vcn });
-              }}
-            >
-              <div className={styles.vcn_info}>
-                <img className={styles.speaker_img} src={item.imgUrl} alt="" />
-                <span className={styles.vcn_name} title={item.name}>
-                  {item.name}
-                </span>
-              </div>
-              <div
-                className={styles.try_listen}
-                onClick={(e: any) => {
-                  e.stopPropagation();
-                  audition(item.audioUrl, item.vcn);
-                }}
-                style={{ color: playActive === item?.vcn ? '#6178FF' : '' }}
-              >
-                <img
-                  src={playActive === item?.vcn ? listenStopImg : listenImg}
-                  alt=""
-                />
-                {playActive === item?.vcn ? t('playing') : t('voiceTry')}
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className={styles.speaker_type}>{t('English')}</div>
-        <div className={styles.speaker_container}>
-          {vcnEnJson.map((item: any) => (
-            <div
-              key={item.vcn}
-              className={`${styles.speaker_item} ${
-                currentActiveV?.en === item.vcn ? styles.speaker_active : ''
-              }`}
-              onClick={() => {
-                if (!botCreateMode) setActiveV({ ...activeV, en: item.vcn });
-                else setBotCreateActiveV({ ...botCreateActiveV, en: item.vcn });
-              }}
-            >
-              <div>
-                <img className={styles.speaker_img} src={item.imgUrl} alt="" />
-                {item.name}
-              </div>
-              <div
-                className={styles.try_listen}
-                onClick={(e: any) => {
-                  e.stopPropagation();
-                  audition(item.audioUrl, item.vcn);
-                }}
-                style={{ color: playActive === item?.vcn ? '#6178FF' : '' }}
-              >
-                <img
-                  src={playActive === item?.vcn ? listenStopImg : listenImg}
-                  alt=""
-                />
-                {playActive === item?.vcn ? t('playing') : t('voiceTry')}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className={styles.speaker_type}>
-          {t('Multilingual')}
-          <Popover
-            color="#626366"
-            overlayClassName="spearker-modal-type-tip-pop"
-            title={null}
-            content={t('MultilingualTip')}
+    <Modal
+      open={showSpeakerModal}
+      title={t('characterVoice')}
+      onCancel={closeSpeakerModal}
+      width={769}
+      centered
+      maskClosable={false}
+      closeIcon={<img src={closeIcon} alt="close" />}
+      className="[&_.ant-modal-close]:rounded-full [&_.ant-modal-close]:w-[22px] [&_.ant-modal-close]:h-[22px] [&_.ant-modal-close]:mt-2 [&_.ant-modal-close]:mr-2 [&_.ant-modal-close:hover]:opacity-80 [&_.ant-modal-close:hover]:transition-opacity [&_.ant-modal-close:hover]:duration-300 [&_.ant-modal-content]:p-5 [&_.ant-modal-title]:text-black/80 [&_.ant-modal-footer]:flex [&_.ant-modal-footer]:justify-end [&_.ant-modal-footer]:items-center [&_.ant-modal-footer]:p-4"
+      footer={
+        <div className="flex items-center gap-3">
+          <div
+            className="w-20 h-9 rounded-lg bg-white text-center border border-[#e7e7f0] leading-9 text-[#676773] select-none cursor-pointer hover:opacity-90"
+            onClick={closeSpeakerModal}
           >
-            <div className={styles.icon_wrap}>
-              <ReactSVG
-                src="https://openres.xfyun.cn/xfyundoc/2024-07-10/e8398ed7-f019-419a-8004-41824306c41e/1720598757573/aaaaa.svg"
-                wrapper="span"
-              />
-            </div>
-          </Popover>
+            {t('btnCancel')}
+          </div>
+          <div
+            className="w-20 h-9 rounded-lg bg-[#6356ea] text-center leading-9 text-white select-none cursor-pointer hover:opacity-90"
+            onClick={setSpeaker}
+          >
+            {t('btnChoose')}
+          </div>
         </div>
-
-        <div className={styles.speaker_container}>
-          {vcnOther.map((item: any) => (
-            <div key={item.vcn} className={`${styles.speaker_item}`}>
-              <div>
-                <img className={styles.speaker_img} src={item.imgUrl} alt="" />
-                {item.name}
-              </div>
-              <div
-                className={styles.try_listen}
-                onClick={(e: any) => {
-                  e.stopPropagation();
-                  audition(item.audioUrl, item.vcn);
-                }}
-                style={{ color: playActive === item?.vcn ? '#6178FF' : '' }}
-              >
-                <img
-                  src={playActive === item?.vcn ? listenStopImg : listenImg}
-                  alt=""
-                />
-                {playActive === item?.vcn ? t('playing') : t('voiceTry')}
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className={styles.confirm_btn} onClick={() => setSpeaker()}>
-          {t('btnOk')}
-        </div>
+      }
+    >
+      <div className="text-[#676773] text-sm mb-[15px] mt-4">
+        {t('ChineseSpeaker')}
       </div>
-    </div>
+      <div className="w-full flex flex-wrap justify-start h-auto gap-4 mb-3">
+        {vcnList.map((item: VcnItem) => (
+          <div
+            className={`w-[230px] h-[50px] rounded-[10px] bg-white flex items-center justify-between px-3 border cursor-pointer ${
+              currentActiveV?.cn === item.voiceType
+                ? 'border-[#6356ea] bg-[url(@/assets/svgs/choose-voice-bg.svg)] bg-no-repeat bg-center bg-cover relative before:content-[""] before:absolute before:top-[5px] before:right-[5px] before:w-[19px] before:h-[18px] before:z-[1] before:bg-[url(@/assets/svgs/choose-voice-icon.svg)] before:bg-no-repeat'
+                : 'border-[#dedede]'
+            }`}
+            key={item.voiceType}
+            onClick={() => {
+              setBotCreateActiveV({
+                cn: item.voiceType,
+              });
+            }}
+          >
+            <div className="flex items-center">
+              <img
+                className="w-[30px] h-[30px] mr-2 rounded-full"
+                src={item.coverUrl}
+                alt=""
+              />
+              <span
+                className="inline-block w-[100px] overflow-hidden text-ellipsis whitespace-nowrap"
+                title={item.name}
+              >
+                {item.name}
+              </span>
+            </div>
+            <div
+              className={`text-xs select-none cursor-pointer flex items-center ${
+                playActive === item.voiceType
+                  ? 'text-[#6178FF]'
+                  : 'text-[#676773]'
+              }`}
+              onClick={(e: MouseEvent<HTMLDivElement>) => {
+                e.stopPropagation();
+                handlePlay(item);
+              }}
+            >
+              <img
+                className="w-3 h-auto mr-1"
+                src={playActive === item.voiceType ? listenStopImg : listenImg}
+                alt=""
+              />
+              {playActive === item.voiceType ? t('playing') : t('voiceTry')}
+            </div>
+          </div>
+        ))}
+      </div>
+      <TtsModule
+        text={localeNow === 'en' ? VOICE_TEXT_EN : VOICE_TEXT_CN}
+        voiceName={currentVoiceName}
+        isPlaying={isPlaying}
+        setIsPlaying={playing => {
+          setIsPlaying(playing);
+          if (!playing) {
+            setPlayActive('');
+            setCurrentVoiceName('');
+          }
+        }}
+      />
+    </Modal>
   );
 };
 

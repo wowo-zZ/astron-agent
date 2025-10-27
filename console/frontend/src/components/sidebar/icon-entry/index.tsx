@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Tooltip, Popover } from 'antd';
 import { useTranslation } from 'react-i18next';
 import documentationCenter from '@/assets/imgs/sidebar/documentation_center.svg';
@@ -7,27 +7,20 @@ import weChatShare from '@/assets/imgs/sidebar/we_chat_share.svg';
 import joinChatGroup from '@/assets/imgs/sidebar/join-chat-group.png';
 import styles from './index.module.scss';
 import useUserStore from '@/store/user-store';
-import { getMessageCountApi } from '@/services/notification';
 
 interface IconEntryProps {
   isCollapsed: boolean;
   onMessageClick?: () => void;
-  onNotLogin?: () => void;
+  unreadCount?: number;
 }
 
 const IconEntry: React.FC<IconEntryProps> = ({
   isCollapsed,
   onMessageClick,
-  onNotLogin,
+  unreadCount = 0,
 }) => {
   const { t } = useTranslation();
   const isLogin = useUserStore(state => state.getIsLogin());
-  const [unreadCount, setUnreadCount] = useState<number>(0);
-
-  const getMessageCount = async () => {
-    const res = await getMessageCountApi();
-    setUnreadCount(res);
-  };
 
   const handleDocumentClick = () => {
     window.open(
@@ -38,8 +31,6 @@ const IconEntry: React.FC<IconEntryProps> = ({
   const handleMessageClick = () => {
     if (isLogin) {
       onMessageClick?.();
-    } else {
-      onNotLogin?.();
     }
   };
 
@@ -48,10 +39,6 @@ const IconEntry: React.FC<IconEntryProps> = ({
   //     <img src={joinChatGroup} style={{ width: '110px' }} alt="" />
   //   </div>
   // );
-
-  useEffect(() => {
-    getMessageCount();
-  }, []);
 
   return (
     <div

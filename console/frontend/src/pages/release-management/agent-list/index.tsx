@@ -11,18 +11,12 @@ import {
 import {
   getAgentDetail,
   handleAgentStatus,
-  getMCPServiceDetail,
-  getAgentTimeSeriesData,
-  getAgentSummaryData,
   getPreparationData,
-  type AgentInputParam,
 } from '@/services/release-management';
 import {
   getBotInfo,
   cancelBindWx,
-  publish,
-  getChainInfo,
-  getInputsType,
+  // getChainInfo,
 } from '@/services/spark-common';
 import WxModal from '@/components/wx-modal';
 import { useBotStateStore } from '@/store/spark-store/bot-state';
@@ -33,7 +27,7 @@ import { debounce } from 'lodash';
 
 import weixinghaoImg from '@/assets/imgs/release/weixin-release.svg';
 import apiImg from '@/assets/imgs/release/api-release.svg';
-import sparkImg from '@/assets/imgs/release/spark-release.svg';
+import agentHubIcon from '@/assets/imgs/workflow/agent-hub-icon.svg';
 import mcpImg from '@/assets/imgs/release/mcp-release.svg';
 import formSelect from '@/assets/imgs/main/icon_nav_dropdown.svg';
 import { useTranslation } from 'react-i18next';
@@ -281,8 +275,8 @@ const AgentList: React.FC<AgentListProps> = ({ AgentType }) => {
                     return (
                       <img
                         style={{ width: '20px', height: '20px' }}
-                        src={sparkImg}
-                        alt="讯飞星火"
+                        src={agentHubIcon}
+                        alt="Agent Hub"
                       />
                     );
                   } else if (item == 2) {
@@ -298,7 +292,7 @@ const AgentList: React.FC<AgentListProps> = ({ AgentType }) => {
                       <img
                         style={{ width: '20px', height: '20px' }}
                         src={weixinghaoImg}
-                        alt="微信"
+                        alt="WeChat"
                       />
                     );
                   } else if (item == 4) {
@@ -399,11 +393,13 @@ const AgentList: React.FC<AgentListProps> = ({ AgentType }) => {
                     'MCP'
                   ).then((res: any) => {
                     if (
-                      (res.length === 2 &&
-                        res[1]?.fileType === 'file' &&
-                        res[1]?.schema?.type === 'array-string') ||
-                      (res.length === 2 && res[1]?.fileType !== 'file') ||
-                      res.length > 2
+                      res.length > 1 &&
+                      res
+                        .slice(1)
+                        .some(
+                          (item: { fileType: string }) =>
+                            item.fileType !== 'file'
+                        )
                     ) {
                       setMoreParams(true);
                     } else {
@@ -543,8 +539,8 @@ const AgentList: React.FC<AgentListProps> = ({ AgentType }) => {
     getAgentDetail(botId as unknown as number)
       .then(data => {
         setBotDetailInfo({
-          ...data,
-          name: data?.botName,
+          ...(data as BotData),
+          name: (data as BotData)?.botName,
         });
       })
       .catch(err => {
@@ -615,7 +611,7 @@ const AgentList: React.FC<AgentListProps> = ({ AgentType }) => {
                     { label: t('releaseManagement.unreleased'), value: -9 },
                     // { label: t('releaseManagement.releasing'), value: 1 },
                     { label: t('releaseManagement.released'), value: 2 },
-                    { label: t('releaseManagement.auditFailed'), value: 3 },
+                    // { label: t('releaseManagement.auditFailed'), value: 3 },
                   ]}
                 />
               </div>

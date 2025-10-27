@@ -308,13 +308,11 @@ const useChatDebuggerContent = ({
     const startNode = nodes?.find(node => node?.nodeType === 'node-start');
     const outputs = startNode?.data?.outputs;
     let multiParams = true;
-    if (outputs?.length === 1) {
-      multiParams = false;
-    }
     if (
-      outputs?.length === 2 &&
-      outputs?.[1]?.fileType &&
-      outputs?.[1]?.schema?.type === 'string'
+      outputs?.length === 1 ||
+      outputs
+        ?.slice(1)
+        .every((item: { fileType: string }) => item.fileType === 'file')
     ) {
       multiParams = false;
     }

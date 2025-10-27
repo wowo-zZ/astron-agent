@@ -13,91 +13,31 @@ import { getFavoriteList } from '@/services/agent-square';
 import { PostChatItem, FavoriteEntry } from '@/types/chat';
 import eventBus from '@/utils/event-bus';
 import CreateApplicationModal from '@/components/create-application-modal';
+import { getMessageCountApi } from '@/services/notification';
 
-interface User {
-  nickname?: string;
-  login?: string;
-  avatar?: string;
-  uid?: string;
-}
+const PAGE_SIZE = 45;
+const DEFAULT_PAGE_INFO = {
+  searchValue: '',
+  pageIndex: 1,
+  pageSize: PAGE_SIZE,
+  botType: '',
+};
 
-interface SidebarProps {
-  className?: string;
-
-  // Logo props
-  isEnterprise?: boolean;
-  enterpriseLogo?: string;
-  languageCode?: string;
-
-  // Create button props
-  isLogin?: boolean;
-  onCreateClick?: () => void;
-  onCreateAnalytics?: () => void;
-  onNotLogin?: () => void;
-
-  // Bottom login props
-  user?: User;
-  OrderTypeComponent?: ReactElement;
-
-  // Icon entry props
-  myMessage?: {
-    total?: number;
-    messages?: Array<{
-      messageCenter: {
-        id: number;
-        title: string;
-        summary: string;
-        updateTime: string;
-        messageType: number;
-        baseId?: string;
-        outLink?: string;
-        coverImage?: string;
-        jumpType?: number;
-      };
-      isRead: number;
-    }>;
-  };
-}
-
-const Sidebar = ({
-  className = '',
-
-  // Logo props
-  isEnterprise = false,
-  enterpriseLogo,
-  languageCode = 'zh',
-
-  // Create button props
-  onCreateClick,
-  onCreateAnalytics,
-  onNotLogin,
-
-  // Bottom login props
-  user,
-  OrderTypeComponent,
-}: SidebarProps): ReactElement => {
+const Sidebar = (): ReactElement => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isPersonCenterOpen, setIsPersonCenterOpen] = useState(false);
   const [noticeModalVisible, setNoticeModalVisible] = useState(false);
-  const [ApplicationModalVisible, setCreateModalVisible] =
-    useState<boolean>(false); //创建应用
-
-  // Shared chat data state
+  const [applicationModalVisible, setApplicationModalVisible] = useState(false);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
   const [mixedChatList, setMixedChatList] = useState<PostChatItem[]>([]);
   const [favoriteBotList, setFavoriteBotList] = useState<FavoriteEntry[]>([]);
-
   const getIsLogin = useUserStore.getState().getIsLogin;
 
-  // Page info for favorites
-  const PAGE_SIZE = 45;
-  const pageInfo = {
-    searchValue: '',
-    pageIndex: 1,
-    pageSize: PAGE_SIZE,
-    botType: '',
+  const getMessageCount = async () => {
+    const res = await getMessageCountApi();
+    setUnreadCount(res);
   };
 
-  // Fetch chat list
   const getChatList = async () => {
     try {
       const res = await postChatList();
@@ -107,27 +47,24 @@ const Sidebar = ({
     }
   };
 
-  // Fetch favorite bot list
   const getFavoriteBotListLocal = async () => {
     try {
-      const res = await getFavoriteList(pageInfo);
+      const res = await getFavoriteList(DEFAULT_PAGE_INFO);
       setFavoriteBotList(res.pageList);
     } catch (error) {
       console.log(error);
     }
   };
 
-  // Create bot
   const createBot = () => {
-    setCreateModalVisible(true);
+    setApplicationModalVisible(true);
   };
 
-  // Effect to fetch data on mount and setup event listeners
   useEffect(() => {
     getChatList();
     getFavoriteBotListLocal();
+    getMessageCount();
 
-    // Setup event bus listeners for data changes
     eventBus.on('chatListChange', getChatList);
     eventBus.on('favoriteChange', getFavoriteBotListLocal);
     eventBus.on('createBot', createBot);
@@ -145,10 +82,8 @@ const Sidebar = ({
         relative bg-white flex flex-col flex-shrink-0 h-full
         pt-[22px] px-4 pb-4
         ${isCollapsed ? 'w-[76px] items-center justify-between' : 'w-[220px]'}
-        ${className}
       `}
     >
-      {/* Collapse Icon */}
       <div
         className="
           absolute -right-4 top-1/2 -translate-y-1/2 z-[997] 
@@ -170,54 +105,29 @@ const Sidebar = ({
           `}
         />
       </div>
-
-      {/* Main Content */}
-      <div className="flex flex-col flex-1">
-        {/* Logo Section */}
-        <SidebarLogo
-          isCollapsed={isCollapsed}
-          isEnterprise={isEnterprise}
-          enterpriseLogo={enterpriseLogo}
-          languageCode={languageCode}
-        />
-
-        {/* Create Button */}
-        <CreateButton
-          isCollapsed={isCollapsed}
-          isLogin={getIsLogin()}
-          onClick={onCreateClick}
-          onAnalytics={onCreateAnalytics}
-          onNotLogin={onNotLogin}
-        />
-
+      <div className="flex flex-col h-full">
+        <SidebarLogo isCollapsed={isCollapsed} />
+        <CreateButton isCollapsed={isCollapsed} />
         <MenuList
           isCollapsed={isCollapsed}
           mixedChatList={mixedChatList}
-          favoriteBotList={favoriteBotList}
           onRefreshData={() => {
             getChatList();
             getFavoriteBotListLocal();
           }}
         />
-
-        {/* Icon Entry */}
         <IconEntry
-          isCollapsed={isCollapsed}
           onMessageClick={() => {
             setNoticeModalVisible(true);
           }}
-          onNotLogin={onNotLogin}
+          isCollapsed={isCollapsed}
+          unreadCount={unreadCount}
         />
-
-        {/* Bottom Login */}
         <BottomLogin
           isCollapsed={isCollapsed}
-          user={user}
-          OrderTypeComponent={OrderTypeComponent}
           isPersonCenterOpen={isPersonCenterOpen}
           setIsPersonCenterOpen={setIsPersonCenterOpen}
         />
-
         <PersonalCenter
           open={isPersonCenterOpen}
           onCancel={() => {
@@ -232,18 +142,17 @@ const Sidebar = ({
           onRefreshRecentData={getChatList}
           onRefreshFavoriteData={getFavoriteBotListLocal}
         />
-
-        {/* Notice Modal */}
         <NoticeModal
           open={noticeModalVisible}
           onClose={() => {
             setNoticeModalVisible(false);
           }}
+          onMessageRead={getMessageCount}
         />
         <CreateApplicationModal
-          visible={ApplicationModalVisible}
+          visible={applicationModalVisible}
           onCancel={() => {
-            setCreateModalVisible(false);
+            setApplicationModalVisible(false);
           }}
         />
       </div>

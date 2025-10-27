@@ -38,6 +38,8 @@ import i18n from '@/locales/i18n/index';
 import gallery from '@/assets/imgs/main/icon_tabs_pic_normal.png';
 import upload from '@/assets/imgs/main/icon_tabs_pc_normal.png';
 import chat from '@/assets/imgs/common/icon_tabs_botcreat_normal.png';
+import video from '@/assets/imgs/common/file-video-icon.svg';
+import subtitle from '@/assets/imgs/common/file-srt-icon.svg';
 
 export const tagTypeClass = new Map([
   [1, 'tag-knowledge'],
@@ -161,6 +163,8 @@ export const typeList = new Map([
   ['audio', audio],
   ['html', link],
   ['link', link],
+  ['video', video],
+  ['subtitle', subtitle],
 ]);
 
 export const compareOperators = [

@@ -1678,3 +1678,9 @@ a.ant-typography,
     color: var(--primary-color);
   }
 }
+// Speaker modal popover styles
+.spearker-modal-type-tip-pop {
+  .ant-popover-inner-content {
+    color: #fff;
+  }
+}

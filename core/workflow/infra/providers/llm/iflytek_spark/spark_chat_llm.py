@@ -14,7 +14,6 @@ from typing import Any, AsyncIterator, Dict, Tuple
 import websockets
 from tenacity import retry, retry_if_exception_type, stop_after_attempt
 
-from workflow.consts.engine.chat_status import SparkLLMStatus
 from workflow.engine.nodes.entities.llm_response import LLMResponse
 from workflow.exception.e import CustomException
 from workflow.exception.errors.err_code import CodeEnum
@@ -141,14 +140,10 @@ class SparkChatAi(ChatAI):
         code = msg["header"]["code"]
         status = msg["header"]["status"]
         resp_payload = msg["payload"]
-        text = resp_payload["choices"]["text"][0]
+        text = resp_payload.get("choices", {}).get("text", [{}])[0]
         content = text.get("content", "")
         reasoning_content = text.get("reasoning_content", "")
-        token_usage = (
-            {}
-            if status != SparkLLMStatus.END.value
-            else msg["payload"]["usage"]["text"]
-        )
+        token_usage = resp_payload.get("usage", {}).get("text", {})
         return code, status, content, reasoning_content, token_usage
 
     async def _recv_messages(

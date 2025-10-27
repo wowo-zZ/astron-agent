@@ -32,11 +32,11 @@ import { handleLoginRedirect } from './auth';
 export const getLanguageCode = (): string => {
   const lang = i18n.language || 'zh';
 
-  // 已经是简化的格式了，直接使用
+  // 返回Accept-Language标准格式
   if (lang.toLowerCase().startsWith('zh')) {
-    return 'zh';
+    return 'zh-CN';
   } else if (lang.toLowerCase().startsWith('en')) {
-    return 'en';
+    return 'en-US';
   }
 
   return lang;
@@ -318,11 +318,11 @@ axios.defaults.headers.common['Content-Type'] = 'application/json';
 axios.defaults.headers.common['web-v'] = packageJson?.version ?? '0.0.1';
 
 // 设置初始语言头部
-axios.defaults.headers.common['Lang-Code'] = getLanguageCode();
+axios.defaults.headers.common['Accept-Language'] = getLanguageCode();
 
 // 监听语言变化，更新请求头
 i18n.on('languageChanged', () => {
-  axios.defaults.headers.common['Lang-Code'] = getLanguageCode();
+  axios.defaults.headers.common['Accept-Language'] = getLanguageCode();
 });
 
 const pendingRequest = new Map(); // 请求对象
@@ -405,7 +405,7 @@ axios.interceptors.request.use(
       config.headers['Authorization'] = 'Bearer ' + latestAccessToken;
     }
     // 确保每个请求都使用最新的语言设置
-    config.headers['Lang-Code'] = getLanguageCode();
+    config.headers['Accept-Language'] = getLanguageCode();
 
     return config;
   },
@@ -438,6 +438,10 @@ axios.interceptors.response.use(
 //根据环境设置baseURL：本地localhost走 /xingchen-api，dev环境和test环境分别对应不同服务器
 const getBaseURL = (): string => {
   const mode = import.meta.env.MODE;
+  const VITE_TEST_URL = import.meta.env.VITE_TEST_URL;
+  const VITE_DEV_URL = import.meta.env.VITE_DEV_URL;
+  console.log('VITE_TEST_URL', VITE_TEST_URL);
+  console.log('VITE_DEV_URL', VITE_DEV_URL);
 
   if (mode === 'production') {
     return '/console-api';

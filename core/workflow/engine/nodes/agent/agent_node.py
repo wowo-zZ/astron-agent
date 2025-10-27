@@ -79,7 +79,7 @@ class Knowledge(BaseModel):
     name: str = Field(min_length=1, max_length=128)
     description: str = Field(min_length=0, max_length=1024)
     topK: int = Field(ge=1, le=5)
-    repoType: int = Field(..., ge=1, le=2)
+    repoType: int = Field(..., ge=1, le=3)
     match: Match
 
     @model_validator(mode="after")
@@ -227,7 +227,7 @@ class AgentNode(BaseNode):
         if event_log_node_trace:
             event_log_node_trace.append_config_data(
                 {
-                    "url": os.getenv("AGENT_API_URL"),
+                    "url": f"{os.getenv('AGENT_BASE_URL')}/agent/v1/custom/chat/completions",
                     "req_headers": headers,
                     "req_body": json.dumps(req_body, ensure_ascii=False),
                 }
@@ -244,7 +244,9 @@ class AgentNode(BaseNode):
 
             async with aiohttp.ClientSession(timeout=timeout_config) as session:
                 async with session.post(
-                    url=os.getenv("AGENT_API_URL", ""), headers=headers, json=req_body
+                    url=f"{os.getenv('AGENT_BASE_URL')}/agent/v1/custom/chat/completions",
+                    headers=headers,
+                    json=req_body,
                 ) as response:
                     content_list, reasoning_content_list, token_usage = (
                         await self._process_stream_response(

@@ -1229,7 +1229,7 @@ function generateDefaultObject(schemaList: unknown[]): Record<string, unknown> {
 
   schemaList.forEach(item => {
     defaultValues[item.name] = getDefaultValueForType(
-      item.schema?.type,
+      item?.type || item?.schema?.type,
       item.schema
     );
   });
@@ -1293,15 +1293,17 @@ function getDefaultValueForType(type: string, schema: unknown): unknown {
     object: () => handleObjectSchema(schema),
     'array-object': () => handleArrayObjectSchema(schema),
   };
-
-  return typeHandlers[type]?.() || '';
+  return typeHandlers[type]?.();
 }
 
 function handleObjectSchema(schema: unknown): Record<string, unknown> {
   const obj: Record<string, unknown> = {};
 
   (schema.properties || []).forEach((prop: unknown) => {
-    obj[prop.name] = getDefaultValueForType(prop.type, prop);
+    obj[prop.name] = getDefaultValueForType(
+      prop.type || prop.schema?.type,
+      prop
+    );
   });
 
   return obj;

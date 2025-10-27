@@ -56,6 +56,7 @@ export interface ModelListData {
   modelName: string;
   modelId: string;
   modelIcon: string;
+  model?: string;
 }
 // 获取模型列表
 export const getModelList = (): Promise<ModelListData[]> => {
@@ -69,51 +70,6 @@ export const uploadBotImg = (formData: FormData): Promise<any> => {
       'Content-Type': 'multipart/form-data',
     },
   });
-};
-
-// 获取登录二维码
-export const getLoginQrcode = (params: any) => {
-  return http.post(`/login/scan/qrcode?fd=${params}`);
-};
-
-//获取用户是否扫码并确认
-export const getAppSacnCode = (params: any) => {
-  return http.post(`/login/scan/uids?fd=${params}`);
-};
-
-export const getLoginCaptcha = () => {
-  return http.get(`/plug/validate`);
-};
-
-//获取手机验证码
-export const getVerifyCode = (params: any) => {
-  return http.post(`/login/mobile/send-verify-code`, params, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
-};
-
-//手机号登录
-export const phoneLogin = (params: any) => {
-  return http.post(`/login/phone-quick-login`, params, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
-};
-
-//账号密码登录(默认有极验)
-export const passwordlogin = (params: any) => {
-  return http({
-    url: `/login/check-account`,
-    method: 'POST',
-    data: params,
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-  });
-  // return http.post(`/login/check-account`, params);
 };
 
 // 检查用户信息
@@ -386,7 +342,6 @@ export const generateInputExample = (params: any) => {
       'Content-Type': 'multipart/form-data',
     },
   });
-  // return http.post(`/login/check-account`, params);
 };
 
 /**
@@ -420,7 +375,7 @@ export const getBotTemplate = (botId?: any) => {
 
 // 生成开场白
 export const generatePrologue = (params: { name: string; botDesc: string }) => {
-  return http.post(`/bot/aiGenPrologue`, params);
+  return http.post(`/bot/ai-prologue-gen`, params);
 };
 
 // 编辑已上架bot
@@ -542,4 +497,30 @@ export const getVersionList = (params: any) => {
 ///是否有权限在api页面进行修改
 export const getHasEditor = () => {
   return http.get(`/bot/api/hasEditor`);
+};
+
+export const getSceneList = () => {
+  return http.post(`/talkAgent/getSceneList`);
+};
+
+export const getSignedUrl = () => {
+  return http.get(`/talkAgent/signature`);
+};
+
+//
+export const getVCNList = () => {
+  return http.post(`/talkAgent/getVCNList`);
+};
+//
+export const createTalkAgent = (params: any) => {
+  return http.post(`/talkAgent/create`, params);
+};
+
+//
+export const updateTalkAgent = (params: any) => {
+  return http.post(`/talkAgent/updateConfig`, params);
+};
+//
+export const upgradeWorkflow = (params: any) => {
+  return http.post(`/talkAgent/upgradeWorkflow`, params);
 };

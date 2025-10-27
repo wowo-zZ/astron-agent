@@ -17,13 +17,17 @@ import com.iflytek.astron.console.hub.mapper.AiPromptTemplateMapper;
 import com.iflytek.astron.console.hub.service.bot.BotAIService;
 import com.iflytek.astron.console.hub.util.BotAIServiceClient;
 import com.iflytek.astron.console.hub.util.ImageUtil;
+import com.iflytek.astron.console.toolkit.util.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.iflytek.astron.console.commons.constant.ResponseEnum.PARAMETER_ERROR;
 
@@ -46,11 +50,20 @@ public class BotAIServiceImpl implements BotAIService {
     @Autowired
     private AiPromptTemplateMapper promptTemplateMapper;
 
+    @Autowired
+    private RedisUtil redisUtil;
+
     /**
-     * Get prompt template from database
+     * Get prompt template from database with Redis cache
      */
     private String getPromptTemplate(String promptKey) {
         String languageCode = I18nUtil.getLanguage();
+        String cacheKey = "prompt_template:" + promptKey + ":" + languageCode;
+
+        String cached = redisUtil.getStr(cacheKey);
+        if (cached != null) {
+            return cached;
+        }
 
         AiPromptTemplate template = promptTemplateMapper.selectOne(
                 new LambdaQueryWrapper<AiPromptTemplate>()
@@ -58,24 +71,31 @@ public class BotAIServiceImpl implements BotAIService {
                         .eq(AiPromptTemplate::getLanguageCode, languageCode)
                         .eq(AiPromptTemplate::getIsActive, 1));
 
+        String result = null;
         if (template != null) {
-            return template.getPromptContent();
+            result = template.getPromptContent();
         }
 
         // Fallback to English if not found
-        if (!"en".equals(languageCode)) {
+        if (result == null && !"en".equals(languageCode)) {
             template = promptTemplateMapper.selectOne(
                     new LambdaQueryWrapper<AiPromptTemplate>()
                             .eq(AiPromptTemplate::getPromptKey, promptKey)
                             .eq(AiPromptTemplate::getLanguageCode, "en")
                             .eq(AiPromptTemplate::getIsActive, 1));
             if (template != null) {
-                return template.getPromptContent();
+                result = template.getPromptContent();
             }
         }
 
         // Fallback to default template
-        return getDefaultPromptTemplate(promptKey);
+        if (result == null) {
+            result = getDefaultPromptTemplate(promptKey);
+        }
+
+        redisUtil.put(cacheKey, result, 86400);
+
+        return result;
     }
 
     /**
@@ -85,13 +105,44 @@ public class BotAIServiceImpl implements BotAIService {
         try {
             String template = getPromptTemplate(promptKey);
 
-            // Clean and normalize the template
-            template = template.trim()
-                    .replace("%n", System.lineSeparator())
-                    .replaceAll("\\s+", " ");
+            // Always trim and expand %n to newline
+            template = template.trim().replace("%n", System.lineSeparator());
 
-            // Use MessageFormat for parameter substitution
-            return java.text.MessageFormat.format(template.replace("%s", "{0}"), params);
+            // Special adaptation for generate input example: keep structure/newlines, support %s or {i}
+            boolean isGenInputExample =
+                    "input_example_generation".equals(promptKey)
+                            || "generate-input-example".equals(promptKey)
+                            || "generate_input_example".equals(promptKey);
+
+            if (isGenInputExample) {
+                if (template.contains("%s")) {
+                    // Use classic formatter to support templates like {{%s}}
+                    return String.format(template, params);
+                }
+                return MessageFormat.format(template, params);
+            }
+
+            // Default behavior (backward compatible): normalize spaces to one line
+            template = template.replaceAll("\\s+", " ");
+
+            // Keep compatibility with legacy %s templates by converting to MessageFormat
+            if (template.contains("%s")) {
+                StringBuilder buf = new StringBuilder();
+                int from = 0;
+                int idx = 0;
+                while (true) {
+                    int pos = template.indexOf("%s", from);
+                    if (pos < 0) {
+                        buf.append(template, from, template.length());
+                        break;
+                    }
+                    buf.append(template, from, pos).append('{').append(idx++).append('}');
+                    from = pos + 2;
+                }
+                template = buf.toString();
+            }
+
+            return MessageFormat.format(template, params);
         } catch (Exception e) {
             log.error("Failed to format prompt template: {}, error: {}", promptKey, e.getMessage());
             throw new BusinessException(ResponseEnum.SYSTEM_ERROR);
@@ -296,99 +347,213 @@ public class BotAIServiceImpl implements BotAIService {
         BotGenerationDTO botDetail = new BotGenerationDTO();
 
         try {
-            // Get field mappings from database
             Map<String, List<String>> fieldMappings = getFieldMappings();
-
-            // Parse structured response
             String[] lines = response.split("\n");
-            String botName = null, botTypeName = null, botDesc = null;
-            String roleDesc = null, targetTask = null, requirement = null, inputExample = null;
 
-            for (String line : lines) {
-                line = line.trim();
-
-                // Check each field mapping
-                if (matchesFieldMapping(line, fieldMappings.get("assistant_name"))) {
-                    botName = extractValue(line);
-                } else if (matchesFieldMapping(line, fieldMappings.get("assistant_category"))) {
-                    botTypeName = extractValue(line);
-                } else if (matchesFieldMapping(line, fieldMappings.get("assistant_description"))) {
-                    botDesc = extractValue(line);
-                } else if (matchesFieldMapping(line, fieldMappings.get("role_setting"))) {
-                    roleDesc = extractValue(line);
-                } else if (matchesFieldMapping(line, fieldMappings.get("target_task"))) {
-                    targetTask = extractValue(line);
-                } else if (matchesFieldMapping(line, fieldMappings.get("requirement_description"))) {
-                    requirement = extractValue(line);
-                } else if (matchesFieldMapping(line, fieldMappings.get("input_examples"))) {
-                    inputExample = extractValue(line);
-                }
-            }
+            // Parse fields from response
+            ParsedBotFields fields = parseFieldsFromLines(lines, fieldMappings);
 
             // Map assistant category to numeric type
-            int botType = mapBotType(botTypeName);
+            int botType = mapBotType(fields.botTypeName);
 
-            // Build return data
-            botDetail.setBotName(StringUtils.isNotBlank(botName) ? botName : "AI Assistant");
-            botDetail.setBotDesc(StringUtils.isNotBlank(botDesc) ? botDesc : "Intelligent Assistant");
-            botDetail.setBotType(botType);
-            botDetail.setPromptType(1);
-            botDetail.setSupportContext(0);
-            botDetail.setSupportSystem(0);
-            botDetail.setVersion(1);
-            botDetail.setBotStatus(-9);
+            // Build basic bot details
+            populateBotBasicInfo(botDetail, fields, botType);
 
             // Build prompt structure
-            List<PromptStructDTO> promptStructList = new ArrayList<>();
-            Map<String, String> labels = getPromptStructLabels();
-
-            if (StringUtils.isNotBlank(roleDesc)) {
-                PromptStructDTO roleStruct = new PromptStructDTO();
-                roleStruct.setPromptKey(labels.get("role_setting"));
-                roleStruct.setPromptValue(roleDesc);
-                promptStructList.add(roleStruct);
-            }
-            if (StringUtils.isNotBlank(targetTask)) {
-                PromptStructDTO targetStruct = new PromptStructDTO();
-                targetStruct.setPromptKey(labels.get("target_task"));
-                targetStruct.setPromptValue(targetTask);
-                promptStructList.add(targetStruct);
-            }
-            if (StringUtils.isNotBlank(requirement)) {
-                PromptStructDTO reqStruct = new PromptStructDTO();
-                reqStruct.setPromptKey(labels.get("requirement_description"));
-                reqStruct.setPromptValue(requirement);
-                promptStructList.add(reqStruct);
-            }
+            List<PromptStructDTO> promptStructList = buildPromptStructList(fields);
             botDetail.setPromptStructList(promptStructList);
 
             // Process input examples
-            if (StringUtils.isNotBlank(inputExample)) {
-                String[] examples = inputExample.replace("||", "|").split("\\|");
-                List<String> exampleList = new ArrayList<>();
-                for (String example : examples) {
-                    if (StringUtils.isNotBlank(example.trim()) && exampleList.size() < 3) {
-                        exampleList.add(example.trim());
-                    }
-                }
-                botDetail.setInputExample(exampleList);
-            } else {
-                botDetail.setInputExample(new ArrayList<>());
-            }
+            List<String> examples = processInputExamples(fields.inputExample);
+            botDetail.setInputExample(examples);
 
-            log.info("Successfully parsed assistant configuration: botName={}, botType={}", botName, botType);
+            log.info("Successfully parsed assistant configuration: botName={}, botType={}",
+                    fields.botName, botType);
 
         } catch (Exception e) {
             log.error("Failed to parse assistant configuration", e);
-            // Return basic configuration as fallback
-            botDetail.setBotName("AI Assistant");
-            botDetail.setBotDesc("Intelligent Assistant");
-            botDetail.setBotType(1);
-            botDetail.setPromptStructList(new ArrayList<>());
-            botDetail.setInputExample(new ArrayList<>());
+            setDefaultBotDetails(botDetail);
         }
 
         return botDetail;
+    }
+
+    /**
+     * Parse fields from response lines
+     */
+    private ParsedBotFields parseFieldsFromLines(String[] lines, Map<String, List<String>> fieldMappings) {
+        ParsedBotFields fields = new ParsedBotFields();
+
+        for (int i = 0; i < lines.length; i++) {
+            String line = lines[i].trim();
+
+            if (matchesFieldMapping(line, fieldMappings.get("assistant_name"))) {
+                fields.botName = extractValue(line);
+            } else if (matchesFieldMapping(line, fieldMappings.get("assistant_category"))) {
+                fields.botTypeName = extractValue(line);
+            } else if (matchesFieldMapping(line, fieldMappings.get("assistant_description"))) {
+                fields.botDesc = extractValue(line);
+            } else if (matchesFieldMapping(line, fieldMappings.get("role_setting"))) {
+                fields.roleDesc = extractValue(line);
+            } else if (matchesFieldMapping(line, fieldMappings.get("target_task"))) {
+                fields.targetTask = extractValue(line);
+            } else if (matchesFieldMapping(line, fieldMappings.get("requirement_description"))) {
+                fields.requirement = extractValue(line);
+            } else if (matchesFieldMapping(line, fieldMappings.get("input_examples"))) {
+                fields.inputExample = extractMultiLineExample(lines, i, fieldMappings);
+                // Skip processed lines
+                i = findNextFieldIndex(lines, i + 1, fieldMappings) - 1;
+            }
+        }
+
+        return fields;
+    }
+
+    /**
+     * Extract multi-line example text
+     */
+    private String extractMultiLineExample(String[] lines, int startIndex,
+            Map<String, List<String>> fieldMappings) {
+        StringBuilder exampleBuilder = new StringBuilder(extractValue(lines[startIndex].trim()));
+
+        for (int j = startIndex + 1; j < lines.length; j++) {
+            String nextLine = lines[j].trim();
+            if (StringUtils.isBlank(nextLine)) {
+                continue;
+            }
+
+            if (isAnyFieldMapping(nextLine, fieldMappings)) {
+                break;
+            }
+
+            if (exampleBuilder.length() > 0) {
+                exampleBuilder.append("\n");
+            }
+            exampleBuilder.append(nextLine);
+        }
+
+        return exampleBuilder.toString();
+    }
+
+    /**
+     * Find next field index
+     */
+    private int findNextFieldIndex(String[] lines, int startIndex,
+            Map<String, List<String>> fieldMappings) {
+        for (int i = startIndex; i < lines.length; i++) {
+            if (isAnyFieldMapping(lines[i].trim(), fieldMappings)) {
+                return i;
+            }
+        }
+        return lines.length;
+    }
+
+    /**
+     * Check if line matches any field mapping
+     */
+    private boolean isAnyFieldMapping(String line, Map<String, List<String>> fieldMappings) {
+        for (List<String> patterns : fieldMappings.values()) {
+            if (matchesFieldMapping(line, patterns)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Populate basic bot information
+     */
+    private void populateBotBasicInfo(BotGenerationDTO botDetail, ParsedBotFields fields, int botType) {
+        botDetail.setBotName(StringUtils.isNotBlank(fields.botName) ? fields.botName : "AI Assistant");
+        botDetail.setBotDesc(StringUtils.isNotBlank(fields.botDesc) ? fields.botDesc : "Intelligent Assistant");
+        botDetail.setBotType(botType);
+        botDetail.setPromptType(1);
+        botDetail.setSupportContext(0);
+        botDetail.setSupportSystem(0);
+        botDetail.setVersion(1);
+        botDetail.setBotStatus(-9);
+    }
+
+    /**
+     * Build prompt structure list
+     */
+    private List<PromptStructDTO> buildPromptStructList(ParsedBotFields fields) {
+        List<PromptStructDTO> promptStructList = new ArrayList<>();
+        Map<String, String> labels = getPromptStructLabels();
+
+        addPromptStruct(promptStructList, labels.get("role_setting"), fields.roleDesc);
+        addPromptStruct(promptStructList, labels.get("target_task"), fields.targetTask);
+        addPromptStruct(promptStructList, labels.get("requirement_description"), fields.requirement);
+
+        return promptStructList;
+    }
+
+    /**
+     * Add prompt struct if value is not blank
+     */
+    private void addPromptStruct(List<PromptStructDTO> list, String key, String value) {
+        if (StringUtils.isNotBlank(value)) {
+            PromptStructDTO struct = new PromptStructDTO();
+            struct.setPromptKey(key);
+            struct.setPromptValue(value);
+            list.add(struct);
+        }
+    }
+
+    /**
+     * Process input examples
+     */
+    private List<String> processInputExamples(String inputExample) {
+        if (StringUtils.isBlank(inputExample)) {
+            return new ArrayList<>();
+        }
+
+        List<String> exampleList;
+        if (inputExample.contains("|")) {
+            exampleList = parsePipeDelimitedExamples(inputExample);
+        } else {
+            exampleList = parseNumberedExamples(inputExample);
+        }
+
+        return exampleList.size() > 3 ? exampleList.subList(0, 3) : exampleList;
+    }
+
+    /**
+     * Parse pipe-delimited examples
+     */
+    private List<String> parsePipeDelimitedExamples(String inputExample) {
+        String[] examples = inputExample.replace("||", "|").split("\\|");
+        List<String> exampleList = new ArrayList<>();
+        for (String example : examples) {
+            if (StringUtils.isNotBlank(example.trim()) && exampleList.size() < 3) {
+                exampleList.add(example.trim());
+            }
+        }
+        return exampleList;
+    }
+
+    /**
+     * Set default bot details
+     */
+    private void setDefaultBotDetails(BotGenerationDTO botDetail) {
+        botDetail.setBotName("AI Assistant");
+        botDetail.setBotDesc("Intelligent Assistant");
+        botDetail.setBotType(1);
+        botDetail.setPromptStructList(new ArrayList<>());
+        botDetail.setInputExample(new ArrayList<>());
+    }
+
+    /**
+     * Inner class to hold parsed bot fields
+     */
+    private static class ParsedBotFields {
+        String botName;
+        String botTypeName;
+        String botDesc;
+        String roleDesc;
+        String targetTask;
+        String requirement;
+        String inputExample;
     }
 
     /**
@@ -523,31 +688,60 @@ public class BotAIServiceImpl implements BotAIService {
      * Get default prompt template
      */
     private String getDefaultPromptTemplate(String promptKey) {
-        switch (promptKey) {
-            case "avatar_generation":
-                return """
-                        Please generate a professional avatar for an AI assistant named "{0}". Description: {1}. \
-                        Requirements: 1.Modern and clean style 2.Harmonious color scheme 3.Professional AI assistant image \
-                        4.Suitable for application interface display""";
-            case "sentence_bot_generation":
-                return """
-                        Based on the user description: "{0}", please generate a complete AI assistant configuration. \
-                        Please output strictly in the following format: Assistant Name: [Concise and clear assistant name] \
-                        Assistant Category: [Choose from: Workplace/Learning/Writing/Programming/Lifestyle/Health] \
-                        Assistant Description: [One sentence describing the main function] \
-                        Role Setting: [Detailed description of role identity and professional background] \
-                        Target Task: [Clearly state the main tasks to be completed] \
-                        Requirement Description: [Detailed functional requirements and usage scenarios] \
-                        Input Examples: [Provide 2-3 possible user input examples, separated by |] \
-                        Note: Please ensure each field has specific content, do not use placeholders.""";
-            case "prologue_generation":
-                return """
-                        Please generate a friendly and professional opening message for an AI assistant named "{0}". \
-                        Requirements: 1.Friendly and natural tone 2.Highlight professional capabilities \
-                        3.Guide users to start conversation 4.Keep within 50 words""";
-            default:
-                throw new BusinessException(ResponseEnum.SYSTEM_ERROR);
-        }
+        return switch (promptKey) {
+            case "avatar_generation" -> """
+                    Please generate a professional avatar for an AI assistant named "{0}". Description: {1}. \
+                    Requirements: 1.Modern and clean style 2.Harmonious color scheme 3.Professional AI assistant image \
+                    4.Suitable for application interface display""";
+            case "sentence_bot_generation" -> """
+                    Based on the user description: "{0}", please generate a complete AI assistant configuration. \
+                    Please output strictly in the following format: Assistant Name: [Concise and clear assistant name] \
+                    Assistant Category: [Choose from: Workplace/Learning/Writing/Programming/Lifestyle/Health] \
+                    Assistant Description: [One sentence describing the main function] \
+                    Role Setting: [Detailed description of role identity and professional background] \
+                    Target Task: [Clearly state the main tasks to be completed] \
+                    Requirement Description: [Detailed functional requirements and usage scenarios] \
+                    Input Examples: [Provide 2-3 possible user input examples, separated by |] \
+                    Note: Please ensure each field has specific content, do not use placeholders.""";
+            case "prologue_generation" -> """
+                    Please generate a friendly and professional opening message for an AI assistant named "{0}". \
+                    Requirements: 1.Friendly and natural tone 2.Highlight professional capabilities \
+                    3.Guide users to start conversation 4.Keep within 50 words""";
+            case "input_example_generation" ->
+                """
+                        Assistant name as follows:
+                        ```
+                        {0}
+                        ```
+                        Assistant description as follows:
+                        ```
+                        {1}
+                        ```
+                        Assistant instructions as follows:
+                        ```
+                        {2}
+                        ```
+                        Note:
+                        An assistant sends an instruction template together with the user's detailed input to a large language model to complete a specific task.
+                        The assistant description states what the assistant should accomplish and what the user needs to provide.
+                        The assistant instructions are the template sent to the model; the template plus the user's detailed input enable the model to complete the task.
+
+                        Please follow these steps:
+                        1. Carefully read the assistant name, description, and instructions to understand the intended task.
+                        2. Based on the above, generate three short task descriptions that a user would input when using this assistant.
+                        3. Ensure each output matches the assistant task and does not repeat.
+                        4. Be specific; avoid vague dimensions only.
+                        5. Return results line by line, one description per line.
+                        6. Each description must be no more than 20 words. [VERY IMPORTANT!!]
+                        7. Be concise and avoid verbosity; use short phrases.
+
+                        Ensure the three user input task descriptions are appropriate for this assistant.
+                        Return results in the following format:
+                        1.context1
+                        2.context2
+                        3.context3""";
+            default -> throw new BusinessException(ResponseEnum.SYSTEM_ERROR);
+        };
     }
 
     /**
@@ -588,5 +782,124 @@ public class BotAIServiceImpl implements BotAIService {
         mappings.put("target_task", "Target Task");
         mappings.put("requirement_description", "Requirement Description");
         return mappings;
+    }
+
+    @Override
+    public List<String> generateInputExample(String botName, String botDesc, String prompt) {
+        if (StringUtils.isBlank(botName) || StringUtils.length(botName) > 128) {
+            throw new BusinessException(PARAMETER_ERROR);
+        }
+        botDesc = StringUtils.defaultString(StringUtils.left(botDesc, 1000));
+        prompt = StringUtils.defaultString(StringUtils.left(prompt, 2000));
+
+        try {
+            String question = formatPrompt("input_example_generation", botName, botDesc, prompt);
+            String answer = aiServiceClient.generateText(question, "gpt4", 60);
+            List<String> examples = parseNumberedExamples(answer);
+            return examples.size() > 3 ? examples.subList(0, 3) : examples;
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Failed to generate input examples, botName=[{}]", botName, e);
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Parse text content and extract up to 3 numbered examples. Supports patterns like: 1. xxx\n2.
+     * yyy\n3. zzz (optional 4. ... will be ignored) Fallback: take first 3 non-empty lines.
+     */
+    private List<String> parseNumberedExamples(String text) {
+        List<String> result = new ArrayList<>();
+        if (StringUtils.isBlank(text)) {
+            return result;
+        }
+
+        // Try pattern-based extraction first
+        result = tryPatternBasedExtraction(text);
+
+        // Fallback to line-based extraction if needed
+        if (result.isEmpty()) {
+            result = tryLineBasedExtraction(text);
+        }
+
+        return result;
+    }
+
+    /**
+     * Try to extract examples using pattern matching
+     */
+    private List<String> tryPatternBasedExtraction(String text) {
+        List<String> result = new ArrayList<>();
+
+        // Non-greedy capture between markers; DOTALL for multi-line
+        Pattern p = Pattern.compile("(?s)1\\.\\s*(.*?)(?:\\n|\r|$)\\s*2\\.\\s*(.*?)(?:\\n|\r|$)\\s*3\\.\\s*(.*?)(?:(?:\\n|\r)\\s*4\\.|$)");
+        Matcher m = p.matcher(text);
+
+        if (m.find()) {
+            for (int i = 1; i <= 3; i++) {
+                String seg = cleanExtractedSegment(m.group(i));
+                if (StringUtils.isNotBlank(seg)) {
+                    result.add(seg);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Clean extracted segment by removing unwanted patterns
+     */
+    private String cleanExtractedSegment(String segment) {
+        String seg = StringUtils.trimToEmpty(segment);
+        seg = seg.replaceAll("(?s)\\n\\s*[1-9]\\.\\s*.*$", "").trim();
+        return removeQuotes(seg);
+    }
+
+    /**
+     * Remove surrounding quotes from string
+     */
+    private String removeQuotes(String text) {
+        if (text.startsWith("\"") && text.endsWith("\"") && text.length() > 1) {
+            return text.substring(1, text.length() - 1).trim();
+        }
+        if (text.startsWith("'") && text.endsWith("'") && text.length() > 1) {
+            return text.substring(1, text.length() - 1).trim();
+        }
+        return text;
+    }
+
+    /**
+     * Try to extract examples using line-based approach
+     */
+    private List<String> tryLineBasedExtraction(String text) {
+        List<String> result = new ArrayList<>();
+        String[] lines = text.split("\r?\n");
+
+        for (String line : lines) {
+            String s = cleanLineForExtraction(line);
+            if (!s.isEmpty()) {
+                result.add(s);
+            }
+            if (result.size() == 3) {
+                break;
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Clean line for extraction
+     */
+    private String cleanLineForExtraction(String line) {
+        String s = StringUtils.trimToEmpty(line);
+        if (s.isEmpty()) {
+            return "";
+        }
+
+        s = s.replaceFirst("^\\s*(?:[0-9]+[\\.)]|[-•])\\s*", "").trim();
+        return removeQuotes(s);
     }
 }

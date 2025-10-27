@@ -236,7 +236,7 @@ const RecentList: FC<RecentListProps> = ({
         <div
           className={`flex flex-col w-full overflow-x-hidden transition-[height,max-height] duration-300 ease-out  ${
             showRecent
-              ? 'min-h-[50px] max-h-[calc(50vh-135px)] overflow-y-auto scrollbar-hide'
+              ? 'min-h-[50px] max-h-[300px] overflow-y-auto scrollbar-hide'
               : 'h-0 max-h-0 overflow-hidden'
           }`}
           style={{

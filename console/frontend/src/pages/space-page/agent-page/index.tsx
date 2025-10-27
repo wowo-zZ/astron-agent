@@ -63,6 +63,10 @@ function index() {
   const { spaceId } = useSpaceStore();
   const { handleToChat } = useChat();
 
+  // 复制成虚拟人需要的参数
+  const [copyParams, setCopyParams] = useState<any>({});
+  const [virtualModal, setVirtualModal] = useState<boolean>(false); //复制成虚拟人
+
   /* statusMap为createList接口查询时参数
   NOTE: 原本为：1 审核中，2 已发布，3 审核不通过，4修改审核中， -9 || 0 未发布 => 后来改为已发布、未发布、发布中、审核不通过；
   最新版本改为(09.01): 不传 全部状态, [1,2,4] 已发布(含发布中), [0] 未发布, [3] 已下架(原审核不通过)
@@ -306,6 +310,7 @@ function index() {
                 { label: t('agentPage.agentPage.allTypes'), value: 0 },
                 { label: t('agentPage.agentPage.instructionType'), value: 1 },
                 { label: t('agentPage.agentPage.workflowType'), value: 3 },
+                { label: '语音*虚拟人', value: 4 },
               ]}
             />
             <Select
@@ -470,8 +475,8 @@ function index() {
                       className="flex justify-between items-center "
                       style={{
                         padding: '0px 24px 0 24px',
-                        scrollbarWidth: 'none', 
-                        msOverflowStyle: 'none', 
+                        scrollbarWidth: 'none',
+                        msOverflowStyle: 'none',
                       }}
                     >
                       <span className="text-[#7F7F7F] text-xs flex items-center">
@@ -493,31 +498,32 @@ function index() {
                             borderRadius: '6px',
                             textAlign: 'center',
                           }}
-                        onClick={e => {
-                          e.stopPropagation();
-                          if (k.version === 3) {
-                            getInputsType({ botId: k.botId }).then(
-                              (res: any) => {
-                                // 合并不支持对话的条件
-                                if (
-                                  (res.length === 2 &&
-                                    res[1].fileType === 'file' &&
-                                    res[1].schema.type === 'array-string') ||
-                                  (res.length === 2 &&
-                                    res[1].fileType !== 'file') ||
-                                  res.length > 2
-                                ) {
-                                  return message.info(
-                                    t('agentPage.agentPage.notSupported')
-                                  );
+                          onClick={e => {
+                            e.stopPropagation();
+                            if (k.version === 3) {
+                              getInputsType({ botId: k.botId }).then(
+                                (res: any) => {
+                                  // 合并不支持对话的条件
+                                  if (
+                                    res.length > 1 &&
+                                    res
+                                      .slice(1)
+                                      .some(
+                                        (item: { fileType?: string }) =>
+                                          item.fileType !== 'file'
+                                      )
+                                  ) {
+                                    return message.info(
+                                      t('agentPage.agentPage.notSupported')
+                                    );
+                                  }
+                                  handleToChat(k.botId);
                                 }
-                                handleToChat(k.botId);
-                              }
-                            );
-                          } else {
-                            handleToChat(k.botId);
-                          }
-                        }}
+                              );
+                            } else {
+                              handleToChat(k.botId);
+                            }
+                          }}
                         >
                           <img src={chatIcon} alt="" />
                           <span
@@ -549,7 +555,7 @@ function index() {
                             }}
                           >
                             <img src={shareIcon} alt="" />
-             
+
                             <span
                               className="ml-1 whitespace-nowrap"
                               style={{

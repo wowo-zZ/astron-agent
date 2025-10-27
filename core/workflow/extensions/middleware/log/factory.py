@@ -35,8 +35,10 @@ class LogServiceFactory(ServiceFactory):
 
         :return: Configured LogService instance
         """
-        current_dir = os.getenv("LOG_PATH", "../..")
-        log_dir = os.path.join(current_dir, "logs")
+        log_dir = os.path.join(
+            "./",
+            os.getenv("LOG_PATH", "logs"),
+        )
         os.makedirs(log_dir, exist_ok=True)  # Ensure log directory exists
 
         # Configure log storage path and log level
@@ -46,7 +48,7 @@ class LogServiceFactory(ServiceFactory):
         # Initialize loguru
         logger.remove()  # Remove default logger configuration
 
-        log_format = "{level} | {time:YYYY-MM-DD HH:mm:ss} | {file} - {function}: {line} {message}"
+        log_format = "{time:YYYY-MM-DD HH:mm:ss.SSS} | {level} | {name}:{function}:{line} | {message}"
 
         # Add file handler with log level and relative path
         logger.add(
@@ -67,7 +69,7 @@ class LogServiceFactory(ServiceFactory):
                 colorize=True,
             )
 
-        logger.debug(
-            f"Loguru initialized successfully. Log file: {log_path}, Log level: {log_level}"
+        logger.info(
+            f"✅ Loguru initialized successfully. Log file: {log_path}, Log level: {log_level}",
         )
         return LogService()

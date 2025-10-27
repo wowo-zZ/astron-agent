@@ -4,7 +4,6 @@ import cn.hutool.core.util.IdUtil;
 import com.alibaba.fastjson2.JSON;
 import com.iflytek.astron.console.commons.constant.ResponseEnum;
 import com.iflytek.astron.console.commons.exception.BusinessException;
-import com.iflytek.astron.console.toolkit.config.properties.CommonConfig;
 import com.iflytek.astron.console.toolkit.entity.spark.SparkApiProtocol;
 import com.iflytek.astron.console.toolkit.entity.spark.Text;
 import com.iflytek.astron.console.toolkit.entity.spark.chat.ChatResponse;
@@ -16,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import okio.ByteString;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -44,8 +43,14 @@ public class SparkApiTool {
 
     public static final String CODE_DOMAIN = "iflycode.ge7btest";
 
-    @Autowired
-    private CommonConfig commonConfig;
+    @Value("${spark.app-id}")
+    private String appId;
+
+    @Value("${spark.api-key}")
+    private String apiKey;
+
+    @Value("${spark.api-secret}")
+    private String apiSecret;
 
     /**
      * Send a chat message and return the complete response via WebSocket.
@@ -59,7 +64,7 @@ public class SparkApiTool {
         CountDownLatch latch = new CountDownLatch(1);
 
         // Authentication and encryption
-        String signedSparkUrl = HttpAuthTool.assembleRequestUrl(sparkMaxUrl, HttpMethod.GET.name(), commonConfig.getApiKey(), commonConfig.getApiSecret());
+        String signedSparkUrl = HttpAuthTool.assembleRequestUrl(sparkMaxUrl, HttpMethod.GET.name(), apiKey, apiSecret);
         Request request = (new Request.Builder()).url(signedSparkUrl).build();
         WebSocket webSocket = OkHttpUtil.getHttpClient().newWebSocket(request, new WebSocketListener() {
             @Override
@@ -112,7 +117,7 @@ public class SparkApiTool {
 
         });
 
-        String message = MessageBuilder.buildSparkApiRequest(content, commonConfig.getAppId());
+        String message = MessageBuilder.buildSparkApiRequest(content, appId);
         log.info("send msg = {}", message);
         webSocket.send(message);
         latch.await();
@@ -149,7 +154,7 @@ public class SparkApiTool {
 
         // Authentication and encryption
         String signedSparkUrl = null;
-        signedSparkUrl = HttpAuthTool.assembleRequestUrl(url, HttpMethod.GET.name(), commonConfig.getApiKey(), commonConfig.getApiSecret());
+        signedSparkUrl = HttpAuthTool.assembleRequestUrl(url, HttpMethod.GET.name(), apiKey, apiSecret);
 
         Request request = (new Request.Builder()).url(signedSparkUrl).build();
         WebSocket webSocket = OkHttpUtil.getHttpClient().newWebSocket(request, new WebSocketListener() {
@@ -208,7 +213,7 @@ public class SparkApiTool {
             }
         });
         String message;
-        message = MessageBuilder.buildSparkApiRequest(content, commonConfig.getAppId(), domain);
+        message = MessageBuilder.buildSparkApiRequest(content, appId, domain);
         log.info("send msg = {}", message);
         webSocket.send(message);
 
@@ -228,7 +233,7 @@ public class SparkApiTool {
         SseEmitter sseEmitter = new SseEmitter(180000L);
 
         // Authentication and encryption
-        String signedSparkUrl = HttpAuthTool.assembleRequestUrl(sparkMaxUrl, HttpMethod.GET.name(), commonConfig.getApiKey(), commonConfig.getApiSecret());
+        String signedSparkUrl = HttpAuthTool.assembleRequestUrl(sparkMaxUrl, HttpMethod.GET.name(), apiKey, apiSecret);
         Request request = (new Request.Builder()).url(signedSparkUrl).build();
         WebSocket webSocket = OkHttpUtil.getHttpClient().newWebSocket(request, new WebSocketListener() {
             @Override
@@ -281,7 +286,7 @@ public class SparkApiTool {
             }
         });
 
-        String message = MessageBuilder.buildSparkApiRequest(content, commonConfig.getAppId());
+        String message = MessageBuilder.buildSparkApiRequest(content, appId);
         log.info("send msg = {}", message);
         webSocket.send(message);
 

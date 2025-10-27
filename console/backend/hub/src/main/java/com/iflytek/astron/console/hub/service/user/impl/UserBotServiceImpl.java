@@ -15,6 +15,7 @@ import com.iflytek.astron.console.commons.service.bot.BotService;
 import com.iflytek.astron.console.commons.service.data.UserLangChainDataService;
 import com.iflytek.astron.console.commons.service.mcp.McpDataService;
 import com.iflytek.astron.console.commons.util.BotUtil;
+import com.iflytek.astron.console.commons.util.I18nUtil;
 import com.iflytek.astron.console.commons.util.RequestContextUtil;
 import com.iflytek.astron.console.commons.util.space.SpaceInfoUtil;
 import com.iflytek.astron.console.hub.dto.user.MyBotPageDTO;
@@ -27,7 +28,6 @@ import com.iflytek.astron.console.hub.service.wechat.BotOffiaccountService;
 import com.iflytek.astron.console.hub.service.chat.ChatBotApiService;
 import com.iflytek.astron.console.hub.service.user.UserBotService;
 import com.iflytek.astron.console.hub.util.BotPermissionUtil;
-import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
@@ -240,11 +240,7 @@ public class UserBotServiceImpl implements UserBotService {
 
     private void processHotNumber(Map<String, Object> map) {
         int hotNum = Convert.toInt(map.get("hotNum") == null ? 0 : map.get("hotNum"), 0);
-        String langCode = "";
-        HttpServletRequest request = RequestContextUtil.getCurrentRequest();
-        if (request != null && request.getHeader("Lang-Code") != null) {
-            langCode = request.getHeader("Lang-Code");
-        }
+        String langCode = I18nUtil.getLanguage();
         map.put("hotNum", BotUtil.convertNumToStr(hotNum, langCode));
     }
 

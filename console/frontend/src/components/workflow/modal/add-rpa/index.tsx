@@ -17,14 +17,20 @@ import { useFlowCommon } from '@/components/workflow/hooks/use-flow-common';
 
 import { Icons } from '@/components/workflow/icons';
 
-import knowledgeListEmpty from '@/assets/imgs/workflow/knowledge-list-empty.png';
+import resourceEmpty from '@/assets/svgs/resource-empty.svg';
 import { RpaInfo, RpaNode, RpaRobot } from '@/types/rpa';
-import { SearchOutlined } from '@ant-design/icons';
+import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { ModalDetail } from '../modal-detail';
+import { useNavigate } from 'react-router-dom';
+import { ModalRpaRun } from '../modal-rpa-run';
 
 export default function index(): React.ReactElement {
   const { handleAddRpaNode, resetBeforeAndWillNode } = useFlowCommon();
   const { t } = useTranslation();
+  const modalRpaRunRef = useRef<{ showModal: (values?: RpaRobot) => void }>(
+    null
+  );
+  const navigate = useNavigate();
   const getCurrentStore = useFlowsManager(state => state.getCurrentStore);
   const currentStore = getCurrentStore();
   const currentFlow = useFlowsManager(state => state.currentFlow);
@@ -154,7 +160,7 @@ export default function index(): React.ReactElement {
                       <div className="flex flex-col pt-6">
                         {rpaDetailLoading ? (
                           <Spin />
-                        ) : rpaDetail?.robots?.length || 0 > 0 ? (
+                        ) : rpaDetail?.robots?.length || 0 < 0 ? (
                           <div className="flex flex-col">
                             {rpaDetail?.robots?.map(item => (
                               <div
@@ -186,6 +192,17 @@ export default function index(): React.ReactElement {
                                   >
                                     {t('workflow.nodes.rpaNode.parameters')}
                                   </Button>
+                                  <button
+                                    onClick={() => {
+                                      modalRpaRunRef.current?.showModal({
+                                        ...(item || {}),
+                                        apiKey: rpaDetail?.fields?.apiKey,
+                                      });
+                                    }}
+                                    className="w-[100px] text-center px-[16px] py-[4px] bg-white rounded-lg box-border border border-gray-200 shadow-sm font-normal text-[14px] text-[#275EFF]"
+                                  >
+                                    {t('rpa.run')}
+                                  </button>
                                   <button
                                     onClick={() => {
                                       handleRpaChangeThrottle({
@@ -225,11 +242,20 @@ export default function index(): React.ReactElement {
                         ) : (
                           <div className="mt-3 flex flex-col justify-center items-center gap-[30px] text-desc h-full">
                             <img
-                              src={knowledgeListEmpty}
+                              src={resourceEmpty}
                               className="w-[124px] h-[122px]"
                               alt=""
                             />
                             <p>{t('workflow.nodes.rpaNode.noRobot')}</p>
+                            <Button
+                              type="primary"
+                              icon={<PlusOutlined />}
+                              onClick={() => {
+                                navigate('/resource/rpa');
+                              }}
+                            >
+                              {t('workflow.nodes.rpaNode.createRpa')}
+                            </Button>
                           </div>
                         )}
                       </div>
@@ -237,11 +263,20 @@ export default function index(): React.ReactElement {
                   ) : (
                     <div className="mt-3 flex flex-col justify-center items-center gap-[30px] text-desc h-full">
                       <img
-                        src={knowledgeListEmpty}
+                        src={resourceEmpty}
                         className="w-[124px] h-[122px]"
                         alt=""
                       />
                       <p>{t('workflow.nodes.rpaNode.noRpaTool')}</p>
+                      <Button
+                        type="primary"
+                        icon={<PlusOutlined />}
+                        onClick={() => {
+                          navigate('/resource/rpa');
+                        }}
+                      >
+                        {t('workflow.nodes.rpaNode.createRpa')}
+                      </Button>
                     </div>
                   )}
                 </div>
@@ -251,6 +286,7 @@ export default function index(): React.ReactElement {
           )
         : null}
       <ModalDetail ref={modalDetailRef} />
+      <ModalRpaRun ref={modalRpaRunRef} />
     </>
   );
 }

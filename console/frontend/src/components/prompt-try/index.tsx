@@ -14,6 +14,7 @@ import { getLanguageCode } from '@/utils/http';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 import eventBus from '@/utils/event-bus';
 import { baseURL } from '@/utils/http';
+import { ModelListData } from '@/services/spark-common';
 
 // PromptTry组件暴露的方法接口
 export interface PromptTryRef {
@@ -43,7 +44,6 @@ interface SSEData {
 const PromptTry = forwardRef<
   PromptTryRef,
   {
-    newModel?: string;
     newPrompt?: string;
     baseinfo?: any;
     inputExample?: string[];
@@ -56,11 +56,18 @@ const PromptTry = forwardRef<
     choosedAlltool?: {
       [key: string]: boolean;
     };
+    findModelOptionByUniqueKey: (
+      uniqueKey: string
+    ) => ModelListData | undefined;
+    personalityConfig?: {
+      personality?: string;
+      sceneType?: 1 | 2;
+      sceneInfo?: string;
+    } | null;
   }
 >(
   (
     {
-      newModel,
       newPrompt,
       baseinfo,
       inputExample,
@@ -70,6 +77,8 @@ const PromptTry = forwardRef<
       model,
       supportContext,
       choosedAlltool,
+      findModelOptionByUniqueKey,
+      personalityConfig,
     },
     ref
   ) => {
@@ -141,11 +150,11 @@ const PromptTry = forwardRef<
     const getAnswer = (question: string) => {
       const esURL = `${baseURL}/chat-message/bot-debug`;
       const form = new FormData();
-      if (model) {
-        form.append('model', newModel ? newModel : model);
-      } else {
-        form.append('model', newModel ? newModel : 'spark');
+      const useModel = findModelOptionByUniqueKey(model || '');
+      if (useModel?.isCustom) {
+        form.append('modelId', useModel.modelId);
       }
+      form.append('model', useModel?.modelDomain || 'spark');
 
       form.append('text', question);
       const datasetList: string[] = [];
@@ -172,6 +181,12 @@ const PromptTry = forwardRef<
             .join(',')
         );
       }
+
+      // 添加人设配置信息
+      if (personalityConfig) {
+        form.append('personalityConfig', JSON.stringify(personalityConfig));
+      }
+
       handleFetchSSE(esURL, form);
     };
     const handleFetchSSE = (esURL: string, form: FormData) => {
@@ -181,7 +196,7 @@ const PromptTry = forwardRef<
       const controller = new AbortController();
       controllerRef.current = controller;
       const headerConfig = {
-        'Lang-Code': getLanguageCode(),
+        'Accept-Language': getLanguageCode(),
         authorization: `Bearer ${localStorage.getItem('accessToken')}`,
       };
       setIsLoading(true);
@@ -218,11 +233,12 @@ const PromptTry = forwardRef<
         },
         onmessage(event: { data: string }): void {
           const data: SSEData = JSON.parse(event.data);
-          const { id, type, choices, end, content, message, code } = data;
+          const { error, id, type, choices, end, content, message, code } =
+            data;
           id && (currentSid.current = id.toString());
           if (type === 'start') return;
           setIsLoading(false);
-          if (code) {
+          if (code || error) {
             const errorMsg = (message as string) || '发生未知错误';
             setMessageList(prev => {
               const updated = [...prev];

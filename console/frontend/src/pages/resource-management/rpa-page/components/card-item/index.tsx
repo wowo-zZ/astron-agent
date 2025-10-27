@@ -49,13 +49,9 @@ export const CardItem: FC<CardItemProps> = ({
           title: t('rpa.deleteRpa'),
           content: t('rpa.deleteRpaConfirm'),
           onOk: () =>
-            deleteRpa(record.id)
-              .then(() => {
-                refresh?.();
-              })
-              .catch(error => {
-                message.error(error.message);
-              }),
+            deleteRpa(record.id).then(() => {
+              refresh?.();
+            }),
         });
       },
     ],

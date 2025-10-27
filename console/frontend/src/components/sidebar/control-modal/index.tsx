@@ -9,7 +9,6 @@ import logoutIcon from '@/assets/imgs/sidebar/logout.svg';
 // import HeaderFeedbackModal from '@/components/header-feedback-modal';
 import spaceChooseIcon from '@/assets/imgs/sidebar/space-choosed.png';
 // import config from '@/config/index';
-// import SSO from '@/lib/sso.min.js';
 import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import classNames from 'classnames';
@@ -21,6 +20,7 @@ import { useEnterprise } from '@/hooks/use-enterprise';
 import { useTranslation } from 'react-i18next';
 import { visitSpace } from '@/services/space';
 import { handleLogout } from '@/utils/auth';
+import LanguageSwitcher from '@/components/language-switcher';
 
 const spaceRole = {
   '1': '超级管理者',
@@ -58,8 +58,14 @@ const ControlModal = ({
         ? '个人版'
         : info?.serviceType === 3
           ? '定制版'
-          : '团队/企业版',
-      oppositeType: isPersonal ? '团队/企业版' : '个人版',
+          : info?.serviceType === 2
+            ? '企业版'
+            : '团队版',
+      oppositeType: isPersonal
+        ? info?.serviceType === 2
+          ? '企业版'
+          : '团队版'
+        : '个人版',
       oppositeIcon: isPersonal ? teamIcon : personalIcon,
       oppositeSpaceType: isPersonal ? 'team' : 'personal', // 相反的spaceType值
       chooseSpaceId: isPersonal ? spaceId : enterpriseId,
@@ -167,7 +173,11 @@ const ControlModal = ({
                   </div>
                 </div>
                 <div className={styles.text_sub}>
-                  {item.serviceType === 3 ? '定制版' : '团队/企业版'}
+                  {item.serviceType === 3
+                    ? '定制版'
+                    : item.serviceType === 2
+                      ? '企业版'
+                      : '团队版'}
                 </div>
               </div>
               {/* {item.id === Number(spaceConfig.chooseSpaceId) && (
@@ -200,19 +210,6 @@ const ControlModal = ({
     setFeedbackModalVisible(true);
     onClose?.();
   };
-
-  //退出登录点击
-  // const handleLogout = async () => {
-  //   const SSONeed = {
-  //     passportOrigin: config.PASSPORT,
-  //     ssoOrigin: config.AUTH_SITE,
-  //   };
-  //   await SSO.setOrigin(SSONeed);
-  //   await SSO.logout();
-  //   localStorage.removeItem('registerFrom');
-  //   // window.location.reload();
-  //   window.location.href = '/home';
-  // };
 
   useEffect(() => {
     if (enterpriseId) {
@@ -285,6 +282,11 @@ const ControlModal = ({
           <img src={feedbackIcon} alt="" />
           <div>{t('sidebar.feedback')}</div>
         </div> */}
+
+        <div className={styles.content_item}>
+          <LanguageSwitcher />
+        </div>
+
         <div
           className={classNames(styles.content_item, styles.logout)}
           onClick={handleLogout}

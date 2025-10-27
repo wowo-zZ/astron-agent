@@ -3,23 +3,17 @@ package com.iflytek.astron.console.hub.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * Bot Conversation Statistics Entity
+ * Bot Conversation Statistics Entity Corresponds to bot_conversation_stats table
  *
  * @author Omuigix
  */
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @TableName("bot_conversation_stats")
 public class BotConversationStats {
 
@@ -32,17 +26,17 @@ public class BotConversationStats {
     private String uid;
 
     /**
-     * Space ID, NULL for personal bots
+     * Space ID, NULL for personal agents
      */
     private Long spaceId;
 
     /**
-     * Bot ID
+     * Agent ID
      */
     private Integer botId;
 
     /**
-     * Chat ID
+     * Conversation ID
      */
     private Long chatId;
 
@@ -52,14 +46,9 @@ public class BotConversationStats {
     private String sid;
 
     /**
-     * Number of tokens consumed in this conversation
+     * Token count consumed in this conversation
      */
     private Integer tokenConsumed;
-
-    /**
-     * Number of message rounds in this conversation
-     */
-    private Integer messageRounds;
 
     /**
      * Conversation date
@@ -67,23 +56,84 @@ public class BotConversationStats {
     private LocalDate conversationDate;
 
     /**
-     * Create time
+     * Creation time
      */
     private LocalDateTime createTime;
 
     /**
-     * Delete status: 0=not deleted, 1=deleted
+     * Whether deleted: 0=not deleted, 1=deleted
      */
     private Integer isDelete;
 
     /**
-     * Convenient method to create Builder with preset default values
+     * Builder pattern for creating instances
      */
-    public static BotConversationStatsBuilder createBuilder() {
-        return BotConversationStats.builder()
-                .conversationDate(LocalDate.now())
-                .createTime(LocalDateTime.now())
-                .isDelete(0);
+    public static Builder createBuilder() {
+        return new Builder();
     }
 
+    public static class Builder {
+        private final BotConversationStats instance = new BotConversationStats();
+
+        public Builder uid(String uid) {
+            instance.uid = uid;
+            return this;
+        }
+
+        public Builder spaceId(Long spaceId) {
+            instance.spaceId = spaceId;
+            return this;
+        }
+
+        public Builder botId(Integer botId) {
+            instance.botId = botId;
+            return this;
+        }
+
+        public Builder chatId(Long chatId) {
+            instance.chatId = chatId;
+            return this;
+        }
+
+        public Builder sid(String sid) {
+            instance.sid = sid;
+            return this;
+        }
+
+        public Builder tokenConsumed(Integer tokenConsumed) {
+            instance.tokenConsumed = tokenConsumed;
+            return this;
+        }
+
+        public Builder conversationDate(LocalDate conversationDate) {
+            instance.conversationDate = conversationDate;
+            return this;
+        }
+
+        public Builder createTime(LocalDateTime createTime) {
+            instance.createTime = createTime;
+            return this;
+        }
+
+        public Builder isDelete(Integer isDelete) {
+            instance.isDelete = isDelete;
+            return this;
+        }
+
+        public BotConversationStats build() {
+            if (instance.conversationDate == null) {
+                instance.conversationDate = LocalDate.now();
+            }
+            if (instance.createTime == null) {
+                instance.createTime = LocalDateTime.now();
+            }
+            if (instance.isDelete == null) {
+                instance.isDelete = 0;
+            }
+            if (instance.tokenConsumed == null) {
+                instance.tokenConsumed = 0;
+            }
+            return instance;
+        }
+    }
 }

@@ -6,36 +6,15 @@ import CreateApplicationModal from '@/components/create-application-modal';
 interface CreateButtonProps {
   isCollapsed: boolean;
   isLogin?: boolean;
-  onClick?: (() => void) | undefined;
-  onAnalytics?: (() => void) | undefined;
-  onNotLogin?: (() => void) | undefined;
 }
 
-const CreateButton = ({
-  isCollapsed,
-  isLogin = false,
-  onClick,
-  onAnalytics,
-  onNotLogin,
-}: CreateButtonProps): ReactElement => {
-  const { t, i18n } = useTranslation();
+const CreateButton = ({ isCollapsed }: CreateButtonProps): ReactElement => {
+  const { t } = useTranslation();
   const [ApplicationModalVisible, setCreateModalVisible] =
     useState<boolean>(false); //创建应用
 
   const handleClick = (): void => {
     setCreateModalVisible(true); // TODO: 之后看需不需要判断登录
-    // 统计事件
-    if (onAnalytics) {
-      onAnalytics();
-    }
-
-    // 检查登录状态
-    if (!isLogin) {
-      if (onNotLogin) {
-        onNotLogin();
-      }
-      return;
-    }
 
     // 处理 bd_vid 参数
     const bdVid = sessionStorage.getItem('bd_vid');
@@ -44,11 +23,6 @@ const CreateButton = ({
     if (bdVid) {
       currentUrl.searchParams.set('bd_vid', bdVid);
       window.history.pushState({}, '', currentUrl.toString());
-    }
-
-    // 执行点击回调
-    if (onClick) {
-      onClick();
     }
   };
 
