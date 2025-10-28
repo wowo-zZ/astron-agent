@@ -178,7 +178,7 @@ if __name__ == "__main__":
         workers=(
             None
             if sys.platform in ["win", "win32", "darwin"]
-            else int(os.getenv("WORKERS", "20"))
+            else int(os.getenv("WORKERS", "1"))
         ),
         reload=False,
         log_level="error",

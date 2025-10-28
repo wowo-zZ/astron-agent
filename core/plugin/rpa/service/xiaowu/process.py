@@ -24,6 +24,7 @@ async def task_monitoring(
     sid: Optional[str],
     access_token: str,
     project_id: str,
+    version: Optional[int],
     exec_position: Optional[str],
     params: Optional[dict],
 ) -> AsyncGenerator[str, None]:
@@ -58,6 +59,7 @@ async def task_monitoring(
             task_id = await create_task(
                 access_token=access_token,
                 project_id=project_id,
+                version=version,
                 exec_position=exec_position,
                 params=params,
             )  # Create task

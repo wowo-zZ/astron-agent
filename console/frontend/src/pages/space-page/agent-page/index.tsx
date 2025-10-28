@@ -710,8 +710,7 @@ function index() {
           </>
         )}
 
-
-          <VirtualConfig
+        <VirtualConfig
           visible={virtualModal}
           formValues={copyParams}
           onSubmit={values => {

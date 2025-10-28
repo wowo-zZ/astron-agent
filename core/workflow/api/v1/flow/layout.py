@@ -20,7 +20,6 @@ from starlette.responses import JSONResponse, StreamingResponse
 
 from workflow.cache.flow import del_flow_by_id
 from workflow.consts.comparisons import Tag
-from workflow.consts.flow import FlowStatus
 from workflow.domain.entities.compare_flow import DeleteComparisonVo, SaveComparisonVo
 from workflow.domain.entities.flow import FlowRead, FlowUpdate
 from workflow.domain.entities.response import Resp, Streaming
@@ -33,7 +32,7 @@ from workflow.extensions.middleware.cache.base import BaseCacheService
 from workflow.extensions.middleware.getters import get_cache_service, get_session
 from workflow.extensions.otlp.metric.meter import Meter
 from workflow.extensions.otlp.trace.span import Span
-from workflow.service import app_service, flow_service, license_service
+from workflow.service import app_service, flow_service
 
 router = APIRouter(tags=["Flows"])
 
@@ -56,12 +55,6 @@ def add(
     ) as current_span:
         try:
             current_span.add_info_event(f"add flow vo: {flow.json()}")
-            if flow.status not in [FlowStatus.DRAFT.value, FlowStatus.PUBLISHED.value]:
-                raise CustomException(
-                    err_code=CodeEnum.PROTOCOL_CREATE_ERROR,
-                    err_msg=f"status value can only be 0 or 1, "
-                    f"current value is {flow.status}",
-                )
 
             app_info = app_service.get_info(flow.app_id, session, current_span)
             db_flow = flow_service.save(flow, app_info, session, current_span)
@@ -164,13 +157,6 @@ def update(
             if not db_flow:
                 raise CustomException(CodeEnum.FLOW_NOT_FOUND_ERROR)
 
-            # Register app_id to App table for published workflows
-            # and bind in license table
-            if db_flow.status > 0 or (flow.status is not None and flow.status > 0):
-                if not db_flow.app_id:
-                    raise CustomException(CodeEnum.FLOW_NO_APP_ID_ERROR)
-                db_app = app_service.get_info(db_flow.app_id, session, current_span)
-                license_service.bind(session, db_app, db_flow.group_id)
             flow_service.update(session, db_flow, flow, flow_id, current_span)
             m.in_success_count()
             return Resp.success(None, span.sid)
@@ -337,7 +323,6 @@ def save_comparisons(
                 name=db_flow.name,
                 data=chat_input.data,
                 description=db_flow.description,
-                status=db_flow.status,
                 app_id=db_flow.app_id,
                 source=db_flow.source,
                 version=chat_input.version,

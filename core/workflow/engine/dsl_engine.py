@@ -35,7 +35,6 @@ from workflow.engine.entities.variable_pool import VariablePool
 from workflow.engine.entities.workflow_dsl import Edge, Node, NodeRef, WorkflowDSL
 from workflow.engine.node import NodeFactory, SparkFlowEngineNode
 from workflow.engine.nodes.base_node import BaseNode
-from workflow.engine.nodes.cache_node import tool_classes
 from workflow.engine.nodes.entities.node_run_result import (
     NodeRunResult,
     WorkflowNodeExecutionStatus,
@@ -1169,8 +1168,9 @@ class WorkflowEngine(BaseModel):
         error: CustomException | None = None
         try:
             strategy = self.strategy_manager.get_strategy(node.node_id.split("::")[0])
-            run_result = await strategy.execute_node(
-                node, self.engine_ctx, span_context
+            run_result = await asyncio.wait_for(
+                strategy.execute_node(node, self.engine_ctx, span_context),
+                timeout=node.node_instance._private_config.timeout,
             )
             return run_result, False
         except Exception as err:
@@ -2025,6 +2025,9 @@ class WorkflowEngineBuilder:
         :return: None
         :raises CustomException: If node validation fails
         """
+
+        from workflow.engine.nodes.cache_node import tool_classes
+
         node_type = node_id.split(":")[0]
         node_class = tool_classes.get(node_type)
 

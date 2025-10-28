@@ -29,13 +29,25 @@ const Sidebar = (): ReactElement => {
   const [noticeModalVisible, setNoticeModalVisible] = useState(false);
   const [applicationModalVisible, setApplicationModalVisible] = useState(false);
   const [unreadCount, setUnreadCount] = useState<number>(0);
+
+  // Shared chat data state
   const [mixedChatList, setMixedChatList] = useState<PostChatItem[]>([]);
   const [favoriteBotList, setFavoriteBotList] = useState<FavoriteEntry[]>([]);
   const getIsLogin = useUserStore.getState().getIsLogin;
 
+  // 获取消息数量
   const getMessageCount = async () => {
     const res = await getMessageCountApi();
     setUnreadCount(res);
+  };
+
+  // Page info for favorites
+  const PAGE_SIZE = 45;
+  const pageInfo = {
+    searchValue: '',
+    pageIndex: 1,
+    pageSize: PAGE_SIZE,
+    botType: '',
   };
 
   const getChatList = async () => {

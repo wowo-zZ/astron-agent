@@ -9,6 +9,7 @@ validation and audit policies and should not be used in production environments.
 import json
 from typing import Annotated, Optional, Union
 
+from common.utils.snowfake import get_id
 from fastapi import APIRouter, Header
 from starlette.responses import JSONResponse, StreamingResponse
 
@@ -24,7 +25,6 @@ from workflow.extensions.middleware.getters import get_session
 from workflow.extensions.otlp.metric.meter import Meter
 from workflow.extensions.otlp.trace.span import Span
 from workflow.service import app_service, audit_service, chat_service, flow_service
-from workflow.utils.snowfake import get_id
 
 router = APIRouter(tags=["SSE_DEBUG_CHAT"])
 

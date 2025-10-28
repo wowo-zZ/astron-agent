@@ -29,7 +29,7 @@ from memory.database.domain.models.database_meta import DatabaseMeta
 from memory.database.domain.models.schema_meta import SchemaMeta
 from memory.database.exceptions.error_code import CodeEnum
 from memory.database.repository.middleware.getters import get_session
-from memory.database.utils.snowfake import get_id
+from common.utils.snowfake import get_id
 from pydantic import BaseModel
 from sqlalchemy import text
 from sqlmodel.ext.asyncio.session import AsyncSession

@@ -9,6 +9,7 @@ import json
 import time
 from typing import Any, cast
 
+from common.utils.snowfake import get_id
 from sqlmodel import Session
 
 from workflow.cache import flow as flow_cache
@@ -38,7 +39,6 @@ from workflow.extensions.otlp.log_trace.workflow_log import WorkflowLog
 from workflow.extensions.otlp.trace.span import Span
 from workflow.repository import flow_dao, license_dao
 from workflow.service import audit_service, ops_service
-from workflow.utils.snowfake import get_id
 
 
 def save(flow: Flow, app_info: App, session: Session, span: Span) -> Flow:
@@ -57,7 +57,6 @@ def save(flow: Flow, app_info: App, session: Session, span: Span) -> Flow:
         name=flow.name,
         data=flow.data,
         description=flow.description,
-        status=flow.status,
         app_id=flow.app_id,
         source=app_info.actual_source,
         version="-1",  # Initial version for new flows
@@ -95,11 +94,6 @@ def update(
             db_flow.app_id = flow.app_id
         if flow.data:
             db_flow.data = flow.data
-        if flow.status:
-            db_flow.status = flow.status
-            # Set release data when status is published (status > 0)
-            if flow.status > 0:
-                db_flow.release_data = db_flow.data
 
         session.add(db_flow)
         session.commit()
@@ -252,7 +246,9 @@ def gen_mcp_input_schema(flow: Flow) -> dict:
     }
 
 
-async def node_debug(workflow_dsl: WorkflowDSL, span: Span) -> NodeDebugRespVo:
+async def node_debug(
+    workflow_dsl: WorkflowDSL, flow_id: str, span: Span
+) -> NodeDebugRespVo:
     """
     Execute node debugging for a single workflow node.
 
@@ -277,6 +273,8 @@ async def node_debug(workflow_dsl: WorkflowDSL, span: Span) -> NodeDebugRespVo:
 
     # Disable retry mechanism for node debugging to get immediate feedback
     node_instance.retry_config.should_retry = False
+
+    variable_pool.system_params.set(ParamKey.FlowId, flow_id)
 
     if node_instance.node_id.startswith(NodeType.FLOW.value):
         set_flow_node_output_mode(
