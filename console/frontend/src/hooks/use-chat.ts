@@ -48,6 +48,7 @@ const useChat = () => {
   const messageList = useChatStore(state => state.messageList); //消息列表
   const currentChatId = useChatStore(state => state.currentChatId); //当前聊天id
   const chatFileListNoReq = useChatStore(state => state.chatFileListNoReq); //文件列表
+  const deepThinkText = useChatStore(state => state.deepThinkText); //深度思考文本
   const setStreamId = useChatStore(state => state.setStreamId); //对话流id
   const setAnswerPercent = useChatStore(state => state.setAnswerPercent); //进度条
   const setControllerRef = useChatStore(state => state.setControllerRef); //sse请求控制器
@@ -179,6 +180,7 @@ const useChat = () => {
         }
         // x1思考链
         if (choices?.[0]?.delta?.reasoning_content) {
+          messageContent = '';
           setDeepThinkText(choices?.[0]?.delta?.reasoning_content);
           updateStreamingMessage(ans);
           return;
