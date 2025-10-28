@@ -6,6 +6,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.iflytek.astron.console.commons.constant.ResponseEnum;
 import com.iflytek.astron.console.commons.dto.bot.ChatBotReqDto;
+import com.iflytek.astron.console.commons.dto.bot.DebugChatBotReqDto;
 import com.iflytek.astron.console.commons.dto.chat.ChatListCreateResponse;
 import com.iflytek.astron.console.commons.dto.llm.SparkChatRequest;
 import com.iflytek.astron.console.commons.entity.bot.ChatBotBase;
@@ -177,47 +178,39 @@ public class BotChatServiceImpl implements BotChatService {
     /**
      * Debug chat bot messages
      *
-     * @param text User input text
-     * @param prompt Prompt text
-     * @param messages Chat message list
-     * @param uid User ID
-     * @param openedTool Opened tools
-     * @param model Model to use
-     * @param modelId Model ID
-     * @param maasDatasetList MaaS dataset list
+     * @param request Debug chat bot request parameters
      * @param sseEmitter SSE emitter
      * @param sseId SSE ID
-     * @param personalityConfig Personality configuration string
      */
     @Override
-    public void debugChatMessageBot(String text, String prompt, List<String> messages, String uid, String openedTool, String model, Long modelId, List<String> maasDatasetList, SseEmitter sseEmitter, String sseId, String personalityConfig) {
+    public void debugChatMessageBot(DebugChatBotReqDto request, SseEmitter sseEmitter, String sseId) {
         try {
             int maxInputTokens = this.maxInputTokens;
             List<SparkChatRequest.MessageDto> messageList;
             // get personality config prompt
-            prompt = personalityConfigService.getChatPrompt(personalityConfig, prompt);
-            if (modelId == null) {
-                messageList = buildDebugMessageList(text, prompt, messages, maxInputTokens, maasDatasetList);
+            String prompt = personalityConfigService.getChatPrompt(request.getPersonalityConfig(), request.getPrompt());
+            if (request.getModelId() == null) {
+                messageList = buildDebugMessageList(request.getText(), prompt, request.getMessages(), maxInputTokens, request.getMaasDatasetList());
                 SparkChatRequest sparkChatRequest = new SparkChatRequest();
-                sparkChatRequest.setModel(model);
+                sparkChatRequest.setModel(request.getModel());
                 sparkChatRequest.setMessages(messageList);
                 sparkChatRequest.setChatId(null);
-                sparkChatRequest.setUserId(uid);
-                sparkChatRequest.setEnableWebSearch(enableWebSearch(openedTool));
+                sparkChatRequest.setUserId(request.getUid());
+                sparkChatRequest.setEnableWebSearch(enableWebSearch(request.getOpenedTool()));
                 sparkChatService.chatStream(sparkChatRequest, sseEmitter, sseId, null, false, true);
             } else {
-                ModelConfigResult modelConfig = getModelConfiguration(modelId, sseEmitter);
-                messageList = buildDebugMessageList(text, prompt, messages, modelConfig.maxInputTokens(), maasDatasetList);
+                ModelConfigResult modelConfig = getModelConfiguration(request.getModelId(), sseEmitter);
+                messageList = buildDebugMessageList(request.getText(), prompt, request.getMessages(), modelConfig.maxInputTokens(), request.getMaasDatasetList());
                 Long spaceId = SpaceInfoUtil.getSpaceId();
                 if (!modelService.checkModelBase(LLMService.generate9DigitRandomFromId(modelConfig.llmInfoVo.getLlmId()),
-                        modelConfig.llmInfoVo().getServiceId(), modelConfig.llmInfoVo.getUrl(), uid, spaceId)) {
+                        modelConfig.llmInfoVo().getServiceId(), modelConfig.llmInfoVo.getUrl(), request.getUid(), spaceId)) {
                     throw new BusinessException(ResponseEnum.MODEL_CHECK_FAILED);
                 }
                 JSONObject jsonObject = buildPromptChatRequest(modelConfig.llmInfoVo(), messageList);
                 promptChatService.chatStream(jsonObject, sseEmitter, sseId, null, false, true);
             }
         } catch (Exception e) {
-            log.error("Bot debug error for sseId: {}, uid: {}", sseId, uid, e);
+            log.error("Bot debug error for sseId: {}, uid: {}", sseId, request.getUid(), e);
             SseEmitterUtil.completeWithError(sseEmitter, "Failed to process chat request: " + e.getMessage());
         }
     }
