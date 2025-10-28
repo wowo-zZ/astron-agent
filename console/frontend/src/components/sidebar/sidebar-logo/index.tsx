@@ -71,7 +71,7 @@ const SidebarLogo = ({
             : agentLogoTextEn
       }
       className="w-[190px] cursor-pointer mx-auto"
-      alt="讯飞星辰Agent"
+      alt="Astron Agent"
       style={{ height: isCollapsed ? '34px' : 'auto' }}
       onClick={handleLogoClick}
     />
