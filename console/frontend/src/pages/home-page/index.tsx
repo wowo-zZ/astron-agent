@@ -352,77 +352,75 @@ const HomePage: React.FC = () => {
                   )}
                 >
                   {agentList.map((item: Bot, index: number) => (
-                      <div
-                        className={styles.recent_card_item}
-                        key={index}
-                        onClick={() => handleNavigateToChat(item?.bot)}
-                      >
-                        <div className={styles.info}>
-                          <div className={styles.bot_info}>
-                            <img
-                              src={item?.botCoverUrl}
-                              alt=""
-                              className={styles.bot_avatar}
-                            />
-                            <div className={styles.bot_info_content}>
-                              <div className={styles.title}>
-                                <span>{item?.botName}</span>
-                                <div onClick={e => e.stopPropagation()}>
-                                          <div onClick={() => handleShareAgent(item)} />
-                                  <div
-                                   className={classnames({
-                                [styles.collect as string]: !!item?.isFavorite,
-                              })}
-                                    onClick={e => {
-                                      handleCollect(item, e);
-                                    }}
-                                  />
-                                </div>
+                    <div
+                      className={styles.recent_card_item}
+                      key={index}
+                      onClick={() => handleNavigateToChat(item?.bot)}
+                    >
+                      <div className={styles.info}>
+                        <div className={styles.bot_info}>
+                          <img
+                            src={item?.botCoverUrl}
+                            alt=""
+                            className={styles.bot_avatar}
+                          />
+                          <div className={styles.bot_info_content}>
+                            <div className={styles.title}>
+                              <span>{item?.botName}</span>
+                              <div onClick={e => e.stopPropagation()}>
+                                <div onClick={() => handleShareAgent(item)} />
+                                <div
+                                  className={classnames({
+                                    [styles.collect as string]:
+                                      !!item?.isFavorite,
+                                  })}
+                                  onClick={e => {
+                                    handleCollect(item, e);
+                                  }}
+                                />
                               </div>
-                              <Tooltip
-                                placement="bottomLeft"
-                                title={item?.botDesc}
-                                arrow={false}
-                                overlayClassName="black-tooltip"
-                              >
-                                <div className={styles.desc}>
-                                  {item?.botDesc}
-                                </div>
-                              </Tooltip>
                             </div>
+                            <Tooltip
+                              placement="bottomLeft"
+                              title={item?.botDesc}
+                              arrow={false}
+                              overlayClassName="black-tooltip"
+                            >
+                              <div className={styles.desc}>{item?.botDesc}</div>
+                            </Tooltip>
                           </div>
+                        </div>
 
-                          <div className={styles.author}>
-                            <div className={styles.author_info}>
-                              <img
-                                src={require('@/assets/imgs/home/author.svg')}
-                                alt=""
-                              />
-                              <span>
-                                {item?.creator ||
-                                  t('home.officialAssistant')}
-                              </span>
-                              {/* <img
+                        <div className={styles.author}>
+                          <div className={styles.author_info}>
+                            <img
+                              src={require('@/assets/imgs/home/author.svg')}
+                              alt=""
+                            />
+                            <span>
+                              {item?.creator || t('home.officialAssistant')}
+                            </span>
+                            {/* <img
                                 src={require('@/assets/imgs/home/fire.svg')}
                                 alt=""
                               />
                               <span>{item?.hotNum}</span> */}
-                            </div>
-                            <div className={styles.tags}>
-                              {[1, 5].includes(item?.version) && (
-                                <div className={styles.itag}>
-                                  {t('home.instructionType')}
-                                </div>
-                              )}
-                              {[2, 3, 4].includes(item?.version) && (
-                                <div className={styles.itag}>
-                                  {t('home.workflowType')}
-                                </div>
-                              )}
-                            </div>
+                          </div>
+                          <div className={styles.tags}>
+                            {[1, 5].includes(item?.version) && (
+                              <div className={styles.itag}>
+                                {t('home.instructionType')}
+                              </div>
+                            )}
+                            {[2, 3, 4].includes(item?.version) && (
+                              <div className={styles.itag}>
+                                {t('home.workflowType')}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
+                    </div>
                   ))}
                 </div>
               </div>

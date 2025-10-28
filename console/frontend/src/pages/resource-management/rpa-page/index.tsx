@@ -58,6 +58,6 @@ const RpaPage: FC = () => {
       <ModalForm ref={modalFormRef} refresh={refresh} />
     </div>
   );
-}
+};
 
 export default memo(RpaPage);

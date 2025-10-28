@@ -38,7 +38,7 @@ export default function Index() {
     if (isAgentListPage) setActiveKey('1');
     else if (isAPIPage) setActiveKey('2');
   }, [location.pathname]);
-  return  (
+  return (
     <div className={styles.releasePage}>
       <div className={styles.releasePageTop}>
         <div className={styles.content}>

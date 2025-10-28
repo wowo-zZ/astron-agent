@@ -36,4 +36,3 @@ export function useScrollbar<T extends HTMLElement>(
 
   return hasScrollbar;
 }
-

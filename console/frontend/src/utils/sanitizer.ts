@@ -47,38 +47,6 @@ export const sanitizeHTML = (
 };
 
 /**
- * 清理HTML标签 - 方案2: 使用循环递归清理（不依赖第三方库的备用方案）
- * @param html - 需要清理的HTML字符串
- * @returns 清理后的纯文本
- */
-export const stripHTMLTags = (html: string): string => {
-  if (!html) return '';
-
-  let text = html;
-  let previousText = '';
-
-  // 循环清理直到没有更多的HTML标签
-  // 这可以防止嵌套标签绕过，例如: <<script>script>alert('xss')<</script>/script>
-  while (text !== previousText) {
-    previousText = text;
-    text = text.replace(/<[^>]*>/g, '');
-  }
-
-  // 解码HTML实体，防止通过实体编码绕过
-  text = text
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#x27;/g, "'")
-    .replace(/&amp;/g, '&');
-
-  // 再次清理一次以防解码后出现新的标签
-  text = text.replace(/<[^>]*>/g, '');
-
-  return text.trim();
-};
-
-/**
  * 为 dangerouslySetInnerHTML 创建安全的HTML内容 - 方案3
  * @param html - 需要渲染的HTML字符串
  * @returns 清理后可以安全渲染的对象
