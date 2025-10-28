@@ -538,6 +538,7 @@ public class BotServiceImpl implements BotService {
      * @param userLangChainInfo User language chain information object
      */
     private void processFileUploadConfig(BotInfoDto botInfo, UserLangChainInfo userLangChainInfo) {
+        // Change String to JSONObject
         JSONObject extraInputs = JSON.parseObject(userLangChainInfo.getExtraInputs());
         if (ObjectUtil.isEmpty(extraInputs)) {
             botInfo.setSupportUpload(new ArrayList<>());
@@ -545,6 +546,7 @@ public class BotServiceImpl implements BotService {
             botInfo.setSupportUpload(BotFileParamUtil.getOldExtraInputsConfig(userLangChainInfo));
         }
 
+        // Change String to JSONArray
         JSONArray extraInputsConfig = JSON.parseArray(userLangChainInfo.getExtraInputsConfig());
         if (ObjectUtil.isEmpty(extraInputsConfig)) {
             botInfo.setSupportUploadConfig(BotFileParamUtil.mergeSupportUploadFields(botInfo.getSupportUpload(), new ArrayList<>()));
