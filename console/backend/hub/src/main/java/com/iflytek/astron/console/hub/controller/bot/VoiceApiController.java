@@ -34,5 +34,5 @@ public class VoiceApiController {
     public ApiResult<List<PronunciationPersonConfig>> getPronunciationPerson() {
         return ApiResult.success(voiceService.getPronunciationPerson());
     }
-    
+
 }

@@ -33,8 +33,8 @@ public class PronunciationPersonConfig {
      * Pronunciation person parameters
      */
     private String voiceType;
-    
-    
+
+
     /**
      * Pronunciation person sort
      */
@@ -45,26 +45,26 @@ public class PronunciationPersonConfig {
      * Pronunciation person model manufacturer
      */
     private ModelManufacturerEnum modelManufacturer;
-    
-    
+
+
     public enum ModelManufacturerEnum {
         /**
          * Xfyun
          */
         XFYUN
     }
-    
-     /**
+
+    /**
      * Exquisite pronunciation person (0 = not exquisite, 1 = exquisite)
      */
     private Integer exquisite;
-    
+
     /**
      * Pronunciation person deleted status
      */
     private Integer deleted;
-    
-    
+
+
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime createTime;
