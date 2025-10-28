@@ -319,7 +319,7 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
                       <div
                         className={`w-[216px] h-[50px] rounded-[10px] bg-white flex items-center justify-between px-[11px_11px_0_17px] border cursor-pointer ${
                           currentActiveV?.cn === item.vcnCode
-                            ? 'border-[#6356ea] bg-[url(@/assets/images/voicetraining/choose-voice-bg.svg)] bg-no-repeat bg-center bg-cover relative before:content-[""] before:absolute before:top-[5px] before:right-[5px] before:w-[19px] before:h-[18px] before:z-[1] before:bg-[url(@/assets/images/voicetraining/choose-voice-icon.svg)] before:bg-no-repeat'
+                            ? 'border-[#6356ea] bg-[url(@/assets/svgs/choose-voice-bg.svg)] bg-no-repeat bg-center bg-cover relative before:content-[""] before:absolute before:top-[5px] before:right-[5px] before:w-[19px] before:h-[18px] before:z-[1] before:bg-[url(@/assets/svgs/choose-voice-icon.svg)] before:bg-no-repeat'
                             : 'border-[#dedede]'
                         }`}
                         key={item.vcnCode || 'unuse_' + item.vcnId}
