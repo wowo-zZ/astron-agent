@@ -1,9 +1,6 @@
+import React from 'react';
 import useChatStore from '@/store/chat-store';
-import {
-  type BotInfoType,
-  type MessageListType,
-  type UploadFileInfo,
-} from '@/types/chat';
+import { type BotInfoType, type MessageListType } from '@/types/chat';
 import TextArea from 'antd/es/input/TextArea';
 import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import newChatIcon from '@/assets/imgs/chat/new-chat.svg';

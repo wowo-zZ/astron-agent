@@ -1,4 +1,4 @@
-import { memo, useRef } from 'react';
+import React, { memo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import back from '@/assets/imgs/common/back.png';
 import { useNavigate } from 'react-router-dom';

@@ -40,11 +40,11 @@ interface SceneItem {
 
 let vmsInter: any = null;
 //虚拟人形象参数
-let sdkAvatarInfo = {
+const sdkAvatarInfo = {
   avatar_id: '',
 };
 //虚拟人发言人参数
-let sdkTTSInfo = {
+const sdkTTSInfo = {
   vcn: '',
 };
 
@@ -229,7 +229,7 @@ const ChatPage = (): ReactElement => {
 
   //设置颜色
   const getBotNameColor = (imgUrl: string) => {
-    const img = new Image();
+    const img = new window.Image();
     img.crossOrigin = 'Anonymous'; // 处理跨域问题
     img.src = imgUrl;
     img.onload = () => {

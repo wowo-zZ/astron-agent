@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, JSX } from 'react';
 import clsx from 'clsx';
 import { Spin } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';

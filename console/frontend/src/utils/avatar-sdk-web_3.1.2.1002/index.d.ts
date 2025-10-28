@@ -284,7 +284,7 @@ declare class IAvatarPlatform extends IEventEmitter {
   stop(): void;
   destroy(): void;
   // TODO wx
-  createRecorder(options?: IRecorderOptions): Recorder;
+  createRecorder(options?: IRecorderOptions$1): Recorder;
   destroyRecorder(): void;
   createPlayer(): IPlayer;
 }

@@ -311,7 +311,7 @@ class Experience {
           clearTimeout(this.playTimeout);
 
           if (this.firstBufferWaitStartMs == null) {
-            this.firstBufferWaitStartMs = performance.now();
+            this.firstBufferWaitStartMs = Date.now();
           }
           const tryStart = () => {
             // 计算当前可用的帧数
@@ -324,8 +324,7 @@ class Experience {
               const chunk = this.audioDatas[i];
               if (chunk) frames += chunk.length;
             }
-            const waited =
-              performance.now() - (this.firstBufferWaitStartMs || 0);
+            const waited = Date.now() - (this.firstBufferWaitStartMs || 0);
 
             //缓冲判断，确保有足够数据再开始
             const hasEnoughBuffer = frames >= START_MIN_FRAMES;
@@ -583,7 +582,7 @@ class Experience {
   }
 
   base64ToS16(base64AudioData: string): Int16Array {
-    const decodedData = atob(base64AudioData);
+    const decodedData = window.atob(base64AudioData);
     const outputArray = new Uint8Array(decodedData.length);
 
     for (let i = 0; i < decodedData.length; ++i) {

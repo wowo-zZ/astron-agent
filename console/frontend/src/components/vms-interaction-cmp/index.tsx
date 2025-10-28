@@ -4,19 +4,24 @@ import AvatarPlatform, {
 import useChatStore from '@/store/chat-store';
 import { getSignedUrl } from '@/services/spark-common';
 import { message } from 'antd';
-import { useImperativeHandle, forwardRef, useRef, useEffect } from 'react';
+import React, {
+  useImperativeHandle,
+  forwardRef,
+  useRef,
+  useEffect,
+} from 'react';
 
-let appId = '0e6a2c87';
+const appId = '0e6a2c87';
 
 // 虚拟人初始化鉴权参数
-let sdkInitAppInfoDefault: any = {
+const sdkInitAppInfoDefault: any = {
   serverUrl: 'wss://avatar.cn-huadong-1.xf-yun.com/v1/interact',
   appId: appId,
   sceneId: '',
   signedUrl: '',
 };
 // 虚拟人形象参数
-let sdkAvatarInfoDefault = {
+const sdkAvatarInfoDefault = {
   avatar_id: '',
   width: 1080,
   height: 1920,
@@ -33,7 +38,7 @@ let sdkAvatarInfoDefault = {
   // pixel_format: 6,
 };
 // 虚拟人发言人参数
-let sdkTTSInfoDefault = {
+const sdkTTSInfoDefault = {
   vcn: '',
   speed: 50,
   pitch: 50,
