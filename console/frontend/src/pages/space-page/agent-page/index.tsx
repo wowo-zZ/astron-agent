@@ -724,7 +724,7 @@ function index() {
                 setVirtualModal(false);
               })
               .catch((err: any) => {
-                message.error(err?.msg || err);
+                message.error(err?.message || err);
               });
           }}
           onCancel={() => {

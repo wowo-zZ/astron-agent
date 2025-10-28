@@ -130,7 +130,7 @@ const HeaderFeedbackModal: React.FC<HeaderFeedbackModalProps> = ({
                 setVirtualModal(false);
               })
               .catch((err: any) => {
-                message.error(err?.msg || err);
+                // message.error(err?.message || err);
               });
           }}
           onCancel={() => {

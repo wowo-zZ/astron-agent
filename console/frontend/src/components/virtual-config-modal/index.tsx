@@ -34,9 +34,9 @@ import avatarTrumpetOpen from '@/assets/imgs/virtual-config-modal/avatar-trumpet
 import {
   getBotType,
   getSceneList,
-  getVCNList,
   createTalkAgent,
 } from '@/services/spark-common';
+import { getVcnList } from '@/services/chat';
 import styles from './index.module.scss';
 import { aiGenPrologue } from '@/services/spark-common';
 import { useNavigate } from 'react-router-dom';
@@ -49,7 +49,7 @@ import flowIdCopyIcon from '@/assets/imgs/workflow/flowId-copy-icon.svg';
 import copy from 'copy-to-clipboard';
 import { useTranslation } from 'react-i18next';
 import { saveFlowAPI } from '@/services/flow';
-import SpeakerModal from '../speaker-modal';
+import SpeakerModal,{VcnItem} from '@/components/speaker-modal';
 // import { vcnCnJson, vcnEnJson } from '@/components/speaker-modal/vcn';
 import useVoicePlayStore from '@/store/voice-play-store';
 interface HeaderFeedbackModalProps {
@@ -214,7 +214,7 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
   //   state => state.setOfficialVcnList
   // );
 
-  const [officialVcnList, setOfficialVcnList] = useState<VoiceOption[]>([]);
+  const [officialVcnList, setOfficialVcnList] = useState<VcnItem[]>([]);
   const defVcnList = [
     {
       avatar:
@@ -558,10 +558,10 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
   }, [avatarList, genderFilter, postureFilter, typeFilter, sceneMode]);
 
   useEffect(() => {
-    getVCNList()
-      .then((res: any) => {
+    getVcnList()
+      .then((res: VcnItem[]) => {
         setOfficialVcnList(res);
-        setSelectedVoice(res[0]?.vcn || '');
+        setSelectedVoice(res[0]?.voiceType || '');
       })
       .catch(err => {});
     getAvatarList();
@@ -580,18 +580,9 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
    */
   const renderBotVcn = useCallback(() => {
     let vcnObj = [...officialVcnList].find(
-      (item: any) => item.vcn === selectedVoice
+      (item: any) => item.voiceType === selectedVoice
     );
-    let isCustomVcn = false;
-    if (!vcnObj) {
-      vcnObj = mySpeaker.find(
-        (item: any) => item.vcnCode === botCreateActiveV.cn
-      );
-      if (vcnObj) {
-        isCustomVcn = true;
-      }
-    }
-    return <>{vcnObj ? vcnObj.name || vcnObj.vcnName : '未选择'}</>;
+    return <>{vcnObj ? vcnObj.name  : '未选择'}</>;
   }, [officialVcnList, selectedVoice]);
   const [mySpeaker, setMySpeaker]: any = useState([]); //我的发音人数组
   return (
@@ -1296,15 +1287,14 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
           setShowModal={setShowModal}
         />
       )}
-      {/* <SpeakerModal
+      <SpeakerModal
+        vcnList={officialVcnList}
+        showSpeakerModal={voiceExpanded}
         changeSpeakerModal={setVoiceExpanded}
         botCreateCallback={setBotCreateVcn}
-        setBotCreateActiveV={setBotCreateActiveV}
         botCreateActiveV={botCreateActiveV}
-        showSpeakerModal={voiceExpanded}
-        mySpeaker={mySpeaker}
-        setMySpeaker={setMySpeaker}
-      /> */}
+        setBotCreateActiveV={setBotCreateActiveV}
+      />
     </Modal>
   );
 };
