@@ -21,7 +21,6 @@ import com.iflytek.astron.console.toolkit.entity.table.repo.HitTestHistory;
 import com.iflytek.astron.console.toolkit.entity.table.repo.FileDirectoryTree;
 import com.iflytek.astron.console.toolkit.entity.dto.RepoDto;
 import com.iflytek.astron.console.toolkit.entity.dto.SparkBotVO;
-import com.iflytek.astron.console.toolkit.entity.dto.RelatedDocDto;
 import com.iflytek.astron.console.toolkit.entity.common.PageData;
 import com.iflytek.astron.console.toolkit.entity.core.knowledge.QueryRequest;
 import com.iflytek.astron.console.toolkit.entity.core.knowledge.KnowledgeResponse;
@@ -39,7 +38,6 @@ import com.iflytek.astron.console.toolkit.mapper.repo.FileInfoV2Mapper;
 import com.iflytek.astron.console.toolkit.mapper.repo.RepoMapper;
 import com.iflytek.astron.console.toolkit.service.bot.BotRepoRelService;
 import com.iflytek.astron.console.toolkit.service.bot.BotRepoSubscriptService;
-import com.iflytek.astron.console.toolkit.service.extra.AppService;
 import com.iflytek.astron.console.toolkit.service.extra.OpenPlatformService;
 import com.iflytek.astron.console.toolkit.service.group.GroupVisibilityService;
 import com.iflytek.astron.console.toolkit.service.repo.FileDirectoryTreeService;
@@ -57,7 +55,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -164,8 +161,8 @@ class RepoServiceTest {
     private MockHttpServletRequest mockRequest;
 
     /**
-     * Set up test fixtures before each test method.
-     * Initializes common test data including mock repository objects and request context.
+     * Set up test fixtures before each test method. Initializes common test data including mock
+     * repository objects and request context.
      */
     @BeforeEach
     void setUp() {
@@ -182,7 +179,7 @@ class RepoServiceTest {
         mockRepoVO = new RepoVO();
         mockRepoVO.setName("Test Repository");
         mockRepoVO.setDesc("Test Description");
-        mockRepoVO.setTag("AIUI-RAG2");  // Use correct tag value for validation
+        mockRepoVO.setTag("AIUI-RAG2"); // Use correct tag value for validation
         mockRepoVO.setAvatarIcon("icon-url");
         mockRepoVO.setAvatarColor("#FF0000");
         mockRepoVO.setVisibility(0);
@@ -195,7 +192,7 @@ class RepoServiceTest {
         mockRepo.setId(1L);
         mockRepo.setName("Test Repository");
         mockRepo.setDescription("Test Description");
-        mockRepo.setTag("AIUI-RAG2");  // Use correct tag value for validation
+        mockRepo.setTag("AIUI-RAG2"); // Use correct tag value for validation
         mockRepo.setUserId("user-001");
         mockRepo.setCoreRepoId("core-repo-001");
         mockRepo.setOuterRepoId("outer-repo-001");
@@ -210,8 +207,8 @@ class RepoServiceTest {
     }
 
     /**
-     * Clean up after each test method.
-     * Clears the RequestContextHolder to avoid side effects between tests.
+     * Clean up after each test method. Clears the RequestContextHolder to avoid side effects between
+     * tests.
      */
     @AfterEach
     void tearDown() {
@@ -219,8 +216,8 @@ class RepoServiceTest {
     }
 
     /**
-     * Test cases for the createRepo method.
-     * Validates repository creation functionality including success scenarios and error handling.
+     * Test cases for the createRepo method. Validates repository creation functionality including
+     * success scenarios and error handling.
      */
     @Nested
     @DisplayName("createRepo Tests")
@@ -233,7 +230,7 @@ class RepoServiceTest {
         @DisplayName("Create repository successfully with AIUI tag")
         void testCreateRepo_Success_WithAIUI() {
             try (MockedStatic<UserInfoManagerHandler> userMock = mockStatic(UserInfoManagerHandler.class);
-                 MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class)) {
+                    MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class)) {
 
                 // Setup static mocks
                 userMock.when(UserInfoManagerHandler::getUserId).thenReturn("user-001");
@@ -271,7 +268,7 @@ class RepoServiceTest {
         @DisplayName("Create repository successfully with CBG tag")
         void testCreateRepo_Success_WithCBG() {
             try (MockedStatic<UserInfoManagerHandler> userMock = mockStatic(UserInfoManagerHandler.class);
-                 MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class)) {
+                    MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class)) {
 
                 // Setup static mocks
                 userMock.when(UserInfoManagerHandler::getUserId).thenReturn("user-001");
@@ -305,7 +302,7 @@ class RepoServiceTest {
         @DisplayName("Create repository - duplicate name")
         void testCreateRepo_DuplicateName() {
             try (MockedStatic<UserInfoManagerHandler> userMock = mockStatic(UserInfoManagerHandler.class);
-                 MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class)) {
+                    MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class)) {
 
                 // Setup static mocks
                 userMock.when(UserInfoManagerHandler::getUserId).thenReturn("user-001");
@@ -335,7 +332,7 @@ class RepoServiceTest {
         @DisplayName("Create repository - invalid tag")
         void testCreateRepo_InvalidTag() {
             try (MockedStatic<UserInfoManagerHandler> userMock = mockStatic(UserInfoManagerHandler.class);
-                 MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class)) {
+                    MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class)) {
 
                 // Setup static mocks
                 userMock.when(UserInfoManagerHandler::getUserId).thenReturn("user-001");
@@ -363,7 +360,7 @@ class RepoServiceTest {
         @DisplayName("Create repository - with custom outer repo ID")
         void testCreateRepo_WithCustomOuterRepoId() {
             try (MockedStatic<UserInfoManagerHandler> userMock = mockStatic(UserInfoManagerHandler.class);
-                 MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class)) {
+                    MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class)) {
 
                 // Setup static mocks
                 userMock.when(UserInfoManagerHandler::getUserId).thenReturn("user-001");
@@ -398,7 +395,7 @@ class RepoServiceTest {
         @DisplayName("Create repository - with visibility set")
         void testCreateRepo_WithVisibility() {
             try (MockedStatic<UserInfoManagerHandler> userMock = mockStatic(UserInfoManagerHandler.class);
-                 MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class)) {
+                    MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class)) {
 
                 // Setup static mocks
                 userMock.when(UserInfoManagerHandler::getUserId).thenReturn("user-001");
@@ -433,7 +430,7 @@ class RepoServiceTest {
         @DisplayName("Create repository - null source defaults to 0")
         void testCreateRepo_NullSource_DefaultsToZero() {
             try (MockedStatic<UserInfoManagerHandler> userMock = mockStatic(UserInfoManagerHandler.class);
-                 MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class)) {
+                    MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class)) {
 
                 // Setup static mocks
                 userMock.when(UserInfoManagerHandler::getUserId).thenReturn("user-001");
@@ -462,8 +459,8 @@ class RepoServiceTest {
     }
 
     /**
-     * Test cases for the getOnly methods.
-     * Validates repository query functionality with different wrapper types.
+     * Test cases for the getOnly methods. Validates repository query functionality with different
+     * wrapper types.
      */
     @Nested
     @DisplayName("getOnly Tests")
@@ -577,7 +574,7 @@ class RepoServiceTest {
         @DisplayName("Create repository - empty name")
         void testCreateRepo_EmptyName() {
             try (MockedStatic<UserInfoManagerHandler> userMock = mockStatic(UserInfoManagerHandler.class);
-                 MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class)) {
+                    MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class)) {
 
                 // Setup static mocks
                 userMock.when(UserInfoManagerHandler::getUserId).thenReturn("user-001");
@@ -610,7 +607,7 @@ class RepoServiceTest {
         @DisplayName("Create repository - very long name")
         void testCreateRepo_VeryLongName() {
             try (MockedStatic<UserInfoManagerHandler> userMock = mockStatic(UserInfoManagerHandler.class);
-                 MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class)) {
+                    MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class)) {
 
                 // Setup static mocks
                 userMock.when(UserInfoManagerHandler::getUserId).thenReturn("user-001");
@@ -643,7 +640,7 @@ class RepoServiceTest {
         @DisplayName("Create repository - null tag")
         void testCreateRepo_NullTag() {
             try (MockedStatic<UserInfoManagerHandler> userMock = mockStatic(UserInfoManagerHandler.class);
-                 MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class)) {
+                    MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class)) {
 
                 // Setup static mocks
                 userMock.when(UserInfoManagerHandler::getUserId).thenReturn("user-001");
@@ -677,7 +674,7 @@ class RepoServiceTest {
         @DisplayName("Create repository - database insert fails")
         void testCreateRepo_DatabaseInsertFails() {
             try (MockedStatic<UserInfoManagerHandler> userMock = mockStatic(UserInfoManagerHandler.class);
-                 MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class)) {
+                    MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class)) {
 
                 // Setup static mocks
                 userMock.when(UserInfoManagerHandler::getUserId).thenReturn("user-001");
@@ -703,7 +700,7 @@ class RepoServiceTest {
         @DisplayName("Create repository - visibility service fails")
         void testCreateRepo_VisibilityServiceFails() {
             try (MockedStatic<UserInfoManagerHandler> userMock = mockStatic(UserInfoManagerHandler.class);
-                 MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class)) {
+                    MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class)) {
 
                 // Setup static mocks
                 userMock.when(UserInfoManagerHandler::getUserId).thenReturn("user-001");
@@ -713,7 +710,7 @@ class RepoServiceTest {
                 when(repoMapper.selectOne(any(), anyBoolean())).thenReturn(null);
                 when(repoMapper.insert(any(Repo.class))).thenAnswer(invocation -> {
                     Repo repo = invocation.getArgument(0);
-                    repo.setId(1L);  // Must set ID for visibility service call
+                    repo.setId(1L); // Must set ID for visibility service call
                     return 1;
                 });
                 doThrow(new RuntimeException("Visibility service error"))
@@ -1149,14 +1146,14 @@ class RepoServiceTest {
         }
 
         /**
-         * Test deleteRepo - delete Spark platform repository.
-         * Tests the Spark-compatible tag branch that delegates to deleteXinghuoDataset.
+         * Test deleteRepo - delete Spark platform repository. Tests the Spark-compatible tag branch that
+         * delegates to deleteXinghuoDataset.
          */
         @Test
         @DisplayName("deleteRepo - Spark platform repository")
         void testDeleteRepo_SparkRepository() {
             try (MockedStatic<com.iflytek.astron.console.toolkit.util.OkHttpUtil> okHttpMock =
-                     mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
+                    mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
 
                 // Given
                 when(apiUrl.getDeleteXinghuoDatasetUrl()).thenReturn("https://api.example.com/delete");
@@ -1167,7 +1164,7 @@ class RepoServiceTest {
 
                 okHttpMock.when(() -> com.iflytek.astron.console.toolkit.util.OkHttpUtil.post(
                         anyString(), any(Map.class), any(Map.class), any()))
-                          .thenReturn(mockResponse.toJSONString());
+                        .thenReturn(mockResponse.toJSONString());
 
                 // When - Use Spark-compatible tag to trigger Spark deletion path
                 Object result = repoService.deleteRepo(100L, "SparkDesk-RAG", mockRequest);
@@ -1412,9 +1409,9 @@ class RepoServiceTest {
         @DisplayName("list - basic pagination without filters")
         void testList_BasicPagination() {
             try (MockedStatic<UserInfoManagerHandler> userMock = mockStatic(UserInfoManagerHandler.class);
-                 MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class);
-                 MockedStatic<com.iflytek.astron.console.toolkit.util.OkHttpUtil> okHttpMock =
-                     mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
+                    MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class);
+                    MockedStatic<com.iflytek.astron.console.toolkit.util.OkHttpUtil> okHttpMock =
+                            mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
 
                 // Setup
                 userMock.when(UserInfoManagerHandler::getUserId).thenReturn("user-001");
@@ -1423,7 +1420,7 @@ class RepoServiceTest {
                 // Mock external API call to prevent NullPointerException
                 when(apiUrl.getDatasetUrl()).thenReturn("https://api.example.com/dataset");
                 okHttpMock.when(() -> com.iflytek.astron.console.toolkit.util.OkHttpUtil.get(anyString(), any(Map.class)))
-                          .thenReturn("{\"data\":null}");
+                        .thenReturn("{\"data\":null}");
 
                 List<RepoDto> mockRepos = createMockRepoDtoList();
                 when(groupVisibilityService.getRepoVisibilityList()).thenReturn(new ArrayList<>());
@@ -1448,9 +1445,9 @@ class RepoServiceTest {
         @DisplayName("list - with content filter")
         void testList_WithContentFilter() {
             try (MockedStatic<UserInfoManagerHandler> userMock = mockStatic(UserInfoManagerHandler.class);
-                 MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class);
-                 MockedStatic<com.iflytek.astron.console.toolkit.util.OkHttpUtil> okHttpMock =
-                     mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
+                    MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class);
+                    MockedStatic<com.iflytek.astron.console.toolkit.util.OkHttpUtil> okHttpMock =
+                            mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
 
                 userMock.when(UserInfoManagerHandler::getUserId).thenReturn("user-001");
                 spaceMock.when(SpaceInfoUtil::getSpaceId).thenReturn(null);
@@ -1458,7 +1455,7 @@ class RepoServiceTest {
                 // Mock external API call
                 when(apiUrl.getDatasetUrl()).thenReturn("https://api.example.com/dataset");
                 okHttpMock.when(() -> com.iflytek.astron.console.toolkit.util.OkHttpUtil.get(anyString(), any(Map.class)))
-                          .thenReturn("{\"data\":null}");
+                        .thenReturn("{\"data\":null}");
 
                 List<RepoDto> mockRepos = createMockRepoDtoList();
                 when(groupVisibilityService.getRepoVisibilityList()).thenReturn(new ArrayList<>());
@@ -1481,9 +1478,9 @@ class RepoServiceTest {
         @DisplayName("list - with tag filter")
         void testList_WithTagFilter() {
             try (MockedStatic<UserInfoManagerHandler> userMock = mockStatic(UserInfoManagerHandler.class);
-                 MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class);
-                 MockedStatic<com.iflytek.astron.console.toolkit.util.OkHttpUtil> okHttpMock =
-                     mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
+                    MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class);
+                    MockedStatic<com.iflytek.astron.console.toolkit.util.OkHttpUtil> okHttpMock =
+                            mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
 
                 userMock.when(UserInfoManagerHandler::getUserId).thenReturn("user-001");
                 spaceMock.when(SpaceInfoUtil::getSpaceId).thenReturn(null);
@@ -1491,7 +1488,7 @@ class RepoServiceTest {
                 // Mock external API call
                 when(apiUrl.getDatasetUrl()).thenReturn("https://api.example.com/dataset");
                 okHttpMock.when(() -> com.iflytek.astron.console.toolkit.util.OkHttpUtil.get(anyString(), any(Map.class)))
-                          .thenReturn("{\"data\":null}");
+                        .thenReturn("{\"data\":null}");
 
                 List<RepoDto> mockRepos = createMockRepoDtoList();
                 when(groupVisibilityService.getRepoVisibilityList()).thenReturn(new ArrayList<>());
@@ -1515,9 +1512,9 @@ class RepoServiceTest {
         @DisplayName("list - with visibility permissions")
         void testList_WithVisibilityPermissions() {
             try (MockedStatic<UserInfoManagerHandler> userMock = mockStatic(UserInfoManagerHandler.class);
-                 MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class);
-                 MockedStatic<com.iflytek.astron.console.toolkit.util.OkHttpUtil> okHttpMock =
-                     mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
+                    MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class);
+                    MockedStatic<com.iflytek.astron.console.toolkit.util.OkHttpUtil> okHttpMock =
+                            mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
 
                 userMock.when(UserInfoManagerHandler::getUserId).thenReturn("user-001");
                 spaceMock.when(SpaceInfoUtil::getSpaceId).thenReturn(null);
@@ -1525,7 +1522,7 @@ class RepoServiceTest {
                 // Mock external API call
                 when(apiUrl.getDatasetUrl()).thenReturn("https://api.example.com/dataset");
                 okHttpMock.when(() -> com.iflytek.astron.console.toolkit.util.OkHttpUtil.get(anyString(), any(Map.class)))
-                          .thenReturn("{\"data\":null}");
+                        .thenReturn("{\"data\":null}");
 
                 List<GroupVisibility> visibilityList = new ArrayList<>();
                 GroupVisibility gv = new GroupVisibility();
@@ -1553,7 +1550,7 @@ class RepoServiceTest {
         @DisplayName("list - with spaceId set")
         void testList_WithSpaceId() {
             try (MockedStatic<UserInfoManagerHandler> userMock = mockStatic(UserInfoManagerHandler.class);
-                 MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class)) {
+                    MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class)) {
 
                 userMock.when(UserInfoManagerHandler::getUserId).thenReturn("user-001");
                 spaceMock.when(SpaceInfoUtil::getSpaceId).thenReturn(100L);
@@ -1589,7 +1586,7 @@ class RepoServiceTest {
         @DisplayName("createRepo - with spaceId set")
         void testCreateRepo_WithSpaceId() {
             try (MockedStatic<UserInfoManagerHandler> userMock = mockStatic(UserInfoManagerHandler.class);
-                 MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class)) {
+                    MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class)) {
 
                 userMock.when(UserInfoManagerHandler::getUserId).thenReturn("user-001");
                 spaceMock.when(SpaceInfoUtil::getSpaceId).thenReturn(100L);
@@ -1619,7 +1616,7 @@ class RepoServiceTest {
         @DisplayName("createRepo - spaceId duplicate name check")
         void testCreateRepo_SpaceIdDuplicateCheck() {
             try (MockedStatic<UserInfoManagerHandler> userMock = mockStatic(UserInfoManagerHandler.class);
-                 MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class)) {
+                    MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class)) {
 
                 userMock.when(UserInfoManagerHandler::getUserId).thenReturn("user-001");
                 spaceMock.when(SpaceInfoUtil::getSpaceId).thenReturn(100L);
@@ -1791,7 +1788,7 @@ class RepoServiceTest {
 
             FileInfoV2 file1 = new FileInfoV2();
             file1.setId(1L);
-            file1.setEnabled(0);  // Disabled file
+            file1.setEnabled(0); // Disabled file
 
             when(repoMapper.selectById(1L)).thenReturn(mockRepo);
             doNothing().when(dataPermissionCheckTool).checkRepoBelong(any(Repo.class));
@@ -1822,7 +1819,7 @@ class RepoServiceTest {
             file1.setEnabled(1);
 
             KnowledgeResponse knowledgeResponse = new KnowledgeResponse();
-            knowledgeResponse.setCode(1);  // Error code
+            knowledgeResponse.setCode(1); // Error code
             knowledgeResponse.setMessage("Query failed");
 
             when(repoMapper.selectById(1L)).thenReturn(mockRepo);
@@ -1925,7 +1922,7 @@ class RepoServiceTest {
                 file.setId(1L);
                 file.setUuid("file-uuid-001");
                 file.setEnabled(1);
-                file.setAddress("files/test-file.txt");  // Set address to avoid null
+                file.setAddress("files/test-file.txt"); // Set address to avoid null
 
                 // Create multiple chunks from the same file
                 JSONObject chunk1 = new JSONObject();
@@ -1979,26 +1976,26 @@ class RepoServiceTest {
         @DisplayName("listRepos - basic pagination")
         void testListRepos_BasicPagination() {
             try (MockedStatic<UserInfoManagerHandler> userMock = mockStatic(UserInfoManagerHandler.class);
-                 MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class);
-                 MockedStatic<cn.hutool.core.thread.ThreadUtil> threadMock = mockStatic(cn.hutool.core.thread.ThreadUtil.class);
-                 MockedStatic<com.iflytek.astron.console.toolkit.util.OkHttpUtil> okHttpMock =
-                     mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
+                    MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class);
+                    MockedStatic<cn.hutool.core.thread.ThreadUtil> threadMock = mockStatic(cn.hutool.core.thread.ThreadUtil.class);
+                    MockedStatic<com.iflytek.astron.console.toolkit.util.OkHttpUtil> okHttpMock =
+                            mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
 
                 userMock.when(UserInfoManagerHandler::getUserId).thenReturn("user-001");
                 spaceMock.when(SpaceInfoUtil::getSpaceId).thenReturn(null);
 
                 // Mock thread execution to run synchronously
                 threadMock.when(() -> cn.hutool.core.thread.ThreadUtil.execute(any(Runnable.class)))
-                         .thenAnswer(invocation -> {
-                             Runnable task = invocation.getArgument(0);
-                             task.run();
-                             return null;
-                         });
+                        .thenAnswer(invocation -> {
+                            Runnable task = invocation.getArgument(0);
+                            task.run();
+                            return null;
+                        });
 
                 // Mock external API
                 when(apiUrl.getDatasetUrl()).thenReturn("https://api.example.com/dataset");
                 okHttpMock.when(() -> com.iflytek.astron.console.toolkit.util.OkHttpUtil.get(anyString(), any(Map.class)))
-                          .thenReturn("{\"data\":null}");
+                        .thenReturn("{\"data\":null}");
 
                 // Mock Page response
                 com.github.pagehelper.Page<RepoDto> mockPage = new com.github.pagehelper.Page<>();
@@ -2027,19 +2024,19 @@ class RepoServiceTest {
         @DisplayName("listRepos - with spaceId")
         void testListRepos_WithSpaceId() {
             try (MockedStatic<UserInfoManagerHandler> userMock = mockStatic(UserInfoManagerHandler.class);
-                 MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class);
-                 MockedStatic<cn.hutool.core.thread.ThreadUtil> threadMock = mockStatic(cn.hutool.core.thread.ThreadUtil.class)) {
+                    MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class);
+                    MockedStatic<cn.hutool.core.thread.ThreadUtil> threadMock = mockStatic(cn.hutool.core.thread.ThreadUtil.class)) {
 
                 userMock.when(UserInfoManagerHandler::getUserId).thenReturn("user-001");
                 spaceMock.when(SpaceInfoUtil::getSpaceId).thenReturn(100L);
 
                 // Mock thread execution
                 threadMock.when(() -> cn.hutool.core.thread.ThreadUtil.execute(any(Runnable.class)))
-                         .thenAnswer(invocation -> {
-                             Runnable task = invocation.getArgument(0);
-                             task.run();
-                             return null;
-                         });
+                        .thenAnswer(invocation -> {
+                            Runnable task = invocation.getArgument(0);
+                            task.run();
+                            return null;
+                        });
 
                 com.github.pagehelper.Page<RepoDto> mockPage = new com.github.pagehelper.Page<>();
                 mockPage.addAll(createMockRepoDtoList());
@@ -2066,24 +2063,24 @@ class RepoServiceTest {
         @DisplayName("listRepos - with content filter")
         void testListRepos_WithContentFilter() {
             try (MockedStatic<UserInfoManagerHandler> userMock = mockStatic(UserInfoManagerHandler.class);
-                 MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class);
-                 MockedStatic<cn.hutool.core.thread.ThreadUtil> threadMock = mockStatic(cn.hutool.core.thread.ThreadUtil.class);
-                 MockedStatic<com.iflytek.astron.console.toolkit.util.OkHttpUtil> okHttpMock =
-                     mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
+                    MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class);
+                    MockedStatic<cn.hutool.core.thread.ThreadUtil> threadMock = mockStatic(cn.hutool.core.thread.ThreadUtil.class);
+                    MockedStatic<com.iflytek.astron.console.toolkit.util.OkHttpUtil> okHttpMock =
+                            mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
 
                 userMock.when(UserInfoManagerHandler::getUserId).thenReturn("user-001");
                 spaceMock.when(SpaceInfoUtil::getSpaceId).thenReturn(null);
 
                 threadMock.when(() -> cn.hutool.core.thread.ThreadUtil.execute(any(Runnable.class)))
-                         .thenAnswer(invocation -> {
-                             Runnable task = invocation.getArgument(0);
-                             task.run();
-                             return null;
-                         });
+                        .thenAnswer(invocation -> {
+                            Runnable task = invocation.getArgument(0);
+                            task.run();
+                            return null;
+                        });
 
                 when(apiUrl.getDatasetUrl()).thenReturn("https://api.example.com/dataset");
                 okHttpMock.when(() -> com.iflytek.astron.console.toolkit.util.OkHttpUtil.get(anyString(), any(Map.class)))
-                          .thenReturn("{\"data\":null}");
+                        .thenReturn("{\"data\":null}");
 
                 com.github.pagehelper.Page<RepoDto> mockPage = new com.github.pagehelper.Page<>();
                 mockPage.addAll(createMockRepoDtoList());
@@ -2118,7 +2115,7 @@ class RepoServiceTest {
         @DisplayName("getStarFireData - success with data")
         void testGetStarFireData_Success() {
             try (MockedStatic<com.iflytek.astron.console.toolkit.util.OkHttpUtil> okHttpMock =
-                     mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
+                    mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
 
                 when(apiUrl.getDatasetUrl()).thenReturn("https://api.example.com/dataset");
 
@@ -2132,7 +2129,7 @@ class RepoServiceTest {
                 response.put("data", mockData);
 
                 okHttpMock.when(() -> com.iflytek.astron.console.toolkit.util.OkHttpUtil.get(anyString(), any(Map.class)))
-                          .thenReturn(response.toJSONString());
+                        .thenReturn(response.toJSONString());
 
                 mockRequest.addHeader("Authorization", "Bearer test-token");
 
@@ -2149,7 +2146,7 @@ class RepoServiceTest {
         @DisplayName("getStarFireData - null data")
         void testGetStarFireData_NullData() {
             try (MockedStatic<com.iflytek.astron.console.toolkit.util.OkHttpUtil> okHttpMock =
-                     mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
+                    mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
 
                 when(apiUrl.getDatasetUrl()).thenReturn("https://api.example.com/dataset");
 
@@ -2157,7 +2154,7 @@ class RepoServiceTest {
                 response.put("data", null);
 
                 okHttpMock.when(() -> com.iflytek.astron.console.toolkit.util.OkHttpUtil.get(anyString(), any(Map.class)))
-                          .thenReturn(response.toJSONString());
+                        .thenReturn(response.toJSONString());
 
                 // When
                 JSONArray result = repoService.getStarFireData(mockRequest);
@@ -2171,13 +2168,13 @@ class RepoServiceTest {
         @DisplayName("getStarFireData - with authorization header")
         void testGetStarFireData_WithAuthHeader() {
             try (MockedStatic<com.iflytek.astron.console.toolkit.util.OkHttpUtil> okHttpMock =
-                     mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
+                    mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
 
                 when(apiUrl.getDatasetUrl()).thenReturn("https://api.example.com/dataset");
                 mockRequest.addHeader("Authorization", "Bearer test-token");
 
                 okHttpMock.when(() -> com.iflytek.astron.console.toolkit.util.OkHttpUtil.get(anyString(), any(Map.class)))
-                          .thenReturn("{\"data\":null}");
+                        .thenReturn("{\"data\":null}");
 
                 // When
                 repoService.getStarFireData(mockRequest);
@@ -2199,7 +2196,7 @@ class RepoServiceTest {
         @DisplayName("deleteXinghuoDataset - success")
         void testDeleteXinghuoDataset_Success() {
             try (MockedStatic<com.iflytek.astron.console.toolkit.util.OkHttpUtil> okHttpMock =
-                     mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
+                    mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
 
                 when(apiUrl.getDeleteXinghuoDatasetUrl()).thenReturn("https://api.example.com/delete");
 
@@ -2208,7 +2205,7 @@ class RepoServiceTest {
                 response.put("message", "success");
 
                 okHttpMock.when(() -> com.iflytek.astron.console.toolkit.util.OkHttpUtil.post(anyString(), any(Map.class), any(Map.class), any()))
-                          .thenReturn(response.toJSONString());
+                        .thenReturn(response.toJSONString());
 
                 mockRequest.addHeader("Authorization", "Bearer test-token");
 
@@ -2225,13 +2222,13 @@ class RepoServiceTest {
         @DisplayName("deleteXinghuoDataset - with authorization")
         void testDeleteXinghuoDataset_WithAuth() {
             try (MockedStatic<com.iflytek.astron.console.toolkit.util.OkHttpUtil> okHttpMock =
-                     mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
+                    mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
 
                 when(apiUrl.getDeleteXinghuoDatasetUrl()).thenReturn("https://api.example.com/delete");
                 mockRequest.addHeader("Authorization", "Bearer test-token");
 
                 okHttpMock.when(() -> com.iflytek.astron.console.toolkit.util.OkHttpUtil.post(anyString(), any(Map.class), any(Map.class), any()))
-                          .thenReturn("{\"code\":0}");
+                        .thenReturn("{\"code\":0}");
 
                 // When
                 repoService.deleteXinghuoDataset(mockRequest, "123");
@@ -2357,7 +2354,7 @@ class RepoServiceTest {
         @DisplayName("getDetail - Spark RAG with API success and file list")
         void testGetDetail_SparkRag_ApiSuccess() {
             try (MockedStatic<com.iflytek.astron.console.toolkit.util.OkHttpUtil> okHttpMock =
-                     mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
+                    mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
 
                 // Mock dataset file API response
                 String fileApiResponse = "{\"flag\":true,\"code\":0,\"data\":[" +
@@ -2378,11 +2375,11 @@ class RepoServiceTest {
 
                 okHttpMock.when(() -> com.iflytek.astron.console.toolkit.util.OkHttpUtil.get(
                         contains("datasetId=100"), any(Map.class)))
-                          .thenReturn(fileApiResponse);
+                        .thenReturn(fileApiResponse);
 
                 okHttpMock.when(() -> com.iflytek.astron.console.toolkit.util.OkHttpUtil.get(
                         eq("https://api.example.com/dataset"), any(Map.class)))
-                          .thenReturn(datasetResponse);
+                        .thenReturn(datasetResponse);
 
                 // When
                 RepoDto result = repoService.getDetail(100L, "SparkDesk-RAG", mockRequest);
@@ -2401,7 +2398,7 @@ class RepoServiceTest {
         @DisplayName("getDetail - Spark RAG with API failure")
         void testGetDetail_SparkRag_ApiFailure() {
             try (MockedStatic<com.iflytek.astron.console.toolkit.util.OkHttpUtil> okHttpMock =
-                     mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
+                    mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
 
                 // Mock failed API response
                 String failedResponse = "{\"flag\":false,\"code\":500,\"data\":null}";
@@ -2412,11 +2409,11 @@ class RepoServiceTest {
 
                 okHttpMock.when(() -> com.iflytek.astron.console.toolkit.util.OkHttpUtil.get(
                         contains("datasetId=100"), any(Map.class)))
-                          .thenReturn(failedResponse);
+                        .thenReturn(failedResponse);
 
                 okHttpMock.when(() -> com.iflytek.astron.console.toolkit.util.OkHttpUtil.get(
                         eq("https://api.example.com/dataset"), any(Map.class)))
-                          .thenReturn(datasetResponse);
+                        .thenReturn(datasetResponse);
 
                 // When
                 RepoDto result = repoService.getDetail(100L, "SparkDesk-RAG", mockRequest);
@@ -2433,7 +2430,7 @@ class RepoServiceTest {
         @DisplayName("getDetail - Spark RAG with authorization header")
         void testGetDetail_SparkRag_WithAuth() {
             try (MockedStatic<com.iflytek.astron.console.toolkit.util.OkHttpUtil> okHttpMock =
-                     mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
+                    mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
 
                 // Create a request with Authorization header
                 MockHttpServletRequest requestWithAuth = new MockHttpServletRequest();
@@ -2447,7 +2444,7 @@ class RepoServiceTest {
 
                 okHttpMock.when(() -> com.iflytek.astron.console.toolkit.util.OkHttpUtil.get(
                         anyString(), any(Map.class)))
-                          .thenReturn(apiResponse, datasetResponse);
+                        .thenReturn(apiResponse, datasetResponse);
 
                 // When
                 RepoDto result = repoService.getDetail(100L, "SparkDesk-RAG", requestWithAuth);
@@ -2694,16 +2691,16 @@ class RepoServiceTest {
         @DisplayName("list - repository with no files")
         void testList_RepoWithNoFiles() {
             try (MockedStatic<UserInfoManagerHandler> userMock = mockStatic(UserInfoManagerHandler.class);
-                 MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class);
-                 MockedStatic<com.iflytek.astron.console.toolkit.util.OkHttpUtil> okHttpMock =
-                     mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
+                    MockedStatic<SpaceInfoUtil> spaceMock = mockStatic(SpaceInfoUtil.class);
+                    MockedStatic<com.iflytek.astron.console.toolkit.util.OkHttpUtil> okHttpMock =
+                            mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
 
                 userMock.when(UserInfoManagerHandler::getUserId).thenReturn("user-001");
                 spaceMock.when(SpaceInfoUtil::getSpaceId).thenReturn(null);
 
                 when(apiUrl.getDatasetUrl()).thenReturn("https://api.example.com/dataset");
                 okHttpMock.when(() -> com.iflytek.astron.console.toolkit.util.OkHttpUtil.get(anyString(), any(Map.class)))
-                          .thenReturn("{\"data\":null}");
+                        .thenReturn("{\"data\":null}");
 
                 RepoDto repo = new RepoDto();
                 repo.setId(1L);
@@ -2743,7 +2740,7 @@ class RepoServiceTest {
         @DisplayName("getStarFireData - without authorization header")
         void testGetStarFireData_NoAuth() {
             try (MockedStatic<com.iflytek.astron.console.toolkit.util.OkHttpUtil> okHttpMock =
-                     mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
+                    mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
 
                 // Create a request without Authorization header
                 MockHttpServletRequest requestWithoutAuth = new MockHttpServletRequest();
@@ -2752,7 +2749,7 @@ class RepoServiceTest {
                 String response = "{\"data\":null}";
                 okHttpMock.when(() -> com.iflytek.astron.console.toolkit.util.OkHttpUtil.get(
                         eq("https://api.example.com/dataset"), any(Map.class)))
-                          .thenReturn(response);
+                        .thenReturn(response);
 
                 // When
                 JSONArray result = repoService.getStarFireData(requestWithoutAuth);
@@ -2771,7 +2768,7 @@ class RepoServiceTest {
         @DisplayName("getStarFireData - with empty string authorization")
         void testGetStarFireData_EmptyAuth() {
             try (MockedStatic<com.iflytek.astron.console.toolkit.util.OkHttpUtil> okHttpMock =
-                     mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
+                    mockStatic(com.iflytek.astron.console.toolkit.util.OkHttpUtil.class)) {
 
                 // Create a request with empty Authorization header
                 MockHttpServletRequest requestWithEmptyAuth = new MockHttpServletRequest();
@@ -2781,7 +2778,7 @@ class RepoServiceTest {
                 String response = "{\"data\":null}";
                 okHttpMock.when(() -> com.iflytek.astron.console.toolkit.util.OkHttpUtil.get(
                         anyString(), any(Map.class)))
-                          .thenReturn(response);
+                        .thenReturn(response);
 
                 // When
                 JSONArray result = repoService.getStarFireData(requestWithEmptyAuth);

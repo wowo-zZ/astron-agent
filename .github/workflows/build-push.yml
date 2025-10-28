@@ -76,23 +76,23 @@ jobs:
           # Set platforms (multi-arch builds for better compatibility)
           PLATFORMS="linux/amd64,linux/arm64"
 
-          # 智能缓存策略：根据场景设置缓存suffix和fallback
+          # Smart cache strategy: set cache suffix and fallback based on scenario
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            # PR场景：使用pr-NUMBER作为缓存后缀，fallback到base分支
+            # PR scenario: use pr-NUMBER as cache suffix, fallback to base branch
             CACHE_SUFFIX="pr-${{ github.event.pull_request.number }}"
             BASE_BRANCH="${{ github.event.pull_request.base.ref }}"
-            # 替换斜杠为连字符，避免特殊字符问题
+            # Replace slashes with hyphens to avoid special characters
             BASE_BRANCH_SAFE="${BASE_BRANCH//\//-}"
             CACHE_FALLBACK="branch-${BASE_BRANCH_SAFE}"
             COMMIT_SHA="${{ github.event.pull_request.head.sha }}"
             echo "📌 PR #${{ github.event.pull_request.number }} -> base: ${BASE_BRANCH}"
           else
-            # 分支push场景：使用branch-{分支名}作为缓存后缀
+            # Branch push scenario: use branch-{branch_name} as cache suffix
             BRANCH_NAME="${{ github.ref_name }}"
-            # 替换斜杠为连字符
+            # Replace slashes with hyphens
             BRANCH_NAME_SAFE="${BRANCH_NAME//\//-}"
             CACHE_SUFFIX="branch-${BRANCH_NAME_SAFE}"
-            # 分支构建fallback到main（如果不是main的话）
+            # Branch build fallback to main (if not main)
             if [[ "${BRANCH_NAME}" == "main" || "${BRANCH_NAME}" == "master" ]]; then
               CACHE_FALLBACK=""
             else

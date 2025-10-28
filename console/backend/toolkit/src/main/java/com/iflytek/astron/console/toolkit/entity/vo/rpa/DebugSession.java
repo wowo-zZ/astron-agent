@@ -17,16 +17,16 @@ public class DebugSession {
 
 
     private volatile String apiToken;
-    // Returned by RPA
+    // RPA return
     private volatile String executionId;
     private volatile DebugStatus status = DebugStatus.CREATED;
-    // Error or informational message
+    // Error or prompt message
     private volatile String message;
-    // Remains 0 if not provided by third party
+    // If the third party does not provide, keep 0
     private volatile int progress = 0;
     private volatile Instant createdAt = Instant.now();
     private volatile Instant updatedAt = Instant.now();
-    // Lifecycle duration (ms)
+    // Lifecycle (ms)
     private final long expireAtEpochMilli;
     private final AtomicInteger retries = new AtomicInteger(0);
     // Current polling interval (ms)

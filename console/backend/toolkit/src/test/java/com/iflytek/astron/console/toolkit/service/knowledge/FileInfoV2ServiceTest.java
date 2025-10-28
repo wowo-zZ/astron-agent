@@ -3,7 +3,6 @@ package com.iflytek.astron.console.toolkit.service.knowledge;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.iflytek.astron.console.commons.constant.ResponseEnum;
 import com.iflytek.astron.console.commons.exception.BusinessException;
 import com.iflytek.astron.console.commons.util.ChatFileHttpClient;
@@ -60,7 +59,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
@@ -157,8 +155,8 @@ class FileInfoV2ServiceTest {
     private MockedStatic<SpringUtils> springUtilsMock;
 
     /**
-     * Set up test fixtures before each test method.
-     * Initializes common test data including mock file and repository objects.
+     * Set up test fixtures before each test method. Initializes common test data including mock file
+     * and repository objects.
      */
     @BeforeEach
     void setUp() {
@@ -212,16 +210,14 @@ class FileInfoV2ServiceTest {
                 "file",
                 "test-file.txt",
                 "text/plain",
-                fileContent.getBytes(StandardCharsets.UTF_8)
-        );
+                fileContent.getBytes(StandardCharsets.UTF_8));
 
         // Set field values using ReflectionTestUtils
         ReflectionTestUtils.setField(fileInfoV2Service, "cbgRagMaxCharCount", 1000000L);
     }
 
     /**
-     * Clean up after each test method.
-     * Closes static mocks to avoid side effects between tests.
+     * Clean up after each test method. Closes static mocks to avoid side effects between tests.
      */
     @AfterEach
     void tearDown() {
@@ -238,8 +234,8 @@ class FileInfoV2ServiceTest {
     }
 
     /**
-     * Test cases for the uploadFile method.
-     * Validates file upload functionality including success scenarios and error handling.
+     * Test cases for the uploadFile method. Validates file upload functionality including success
+     * scenarios and error handling.
      */
     @Nested
     @DisplayName("uploadFile Tests")
@@ -322,8 +318,7 @@ class FileInfoV2ServiceTest {
                     "file",
                     "test-file.html",
                     "text/html",
-                    "Test content".getBytes(StandardCharsets.UTF_8)
-            );
+                    "Test content".getBytes(StandardCharsets.UTF_8));
 
             // When & Then
             assertThatThrownBy(() -> fileInfoV2Service.uploadFile(htmlFile, parentId, repoId, tag, request))
@@ -349,8 +344,7 @@ class FileInfoV2ServiceTest {
                     "file",
                     "test-file.svg",
                     "image/svg+xml",
-                    "Test content".getBytes(StandardCharsets.UTF_8)
-            );
+                    "Test content".getBytes(StandardCharsets.UTF_8));
 
             // When & Then
             assertThatThrownBy(() -> fileInfoV2Service.uploadFile(svgFile, parentId, repoId, tag, request))
@@ -375,7 +369,8 @@ class FileInfoV2ServiceTest {
             when(repoService.getById(anyLong())).thenReturn(null);
             // When repo is null, checkRepoBelong should throw exception
             doThrow(new BusinessException(ResponseEnum.REPO_NOT_EXIST))
-                    .when(dataPermissionCheckTool).checkRepoBelong(null);
+                    .when(dataPermissionCheckTool)
+                    .checkRepoBelong(null);
 
             // When & Then
             assertThatThrownBy(() -> fileInfoV2Service.uploadFile(mockFile, parentId, repoId, tag, request))
@@ -452,8 +447,7 @@ class FileInfoV2ServiceTest {
                     "file",
                     "",
                     "text/plain",
-                    "Test content".getBytes(StandardCharsets.UTF_8)
-            );
+                    "Test content".getBytes(StandardCharsets.UTF_8));
 
             when(repoService.getById(anyLong())).thenReturn(mockRepo);
             doNothing().when(dataPermissionCheckTool).checkRepoBelong(any(Repo.class));
@@ -482,8 +476,7 @@ class FileInfoV2ServiceTest {
                     "file",
                     null,
                     "text/plain",
-                    "Test content".getBytes(StandardCharsets.UTF_8)
-            );
+                    "Test content".getBytes(StandardCharsets.UTF_8));
 
             when(repoService.getById(anyLong())).thenReturn(mockRepo);
             doNothing().when(dataPermissionCheckTool).checkRepoBelong(any(Repo.class));
@@ -499,8 +492,7 @@ class FileInfoV2ServiceTest {
     }
 
     /**
-     * Test cases for the getOnly method.
-     * Validates file query functionality with QueryWrapper.
+     * Test cases for the getOnly method. Validates file query functionality with QueryWrapper.
      */
     @Nested
     @DisplayName("getOnly Tests")
@@ -698,7 +690,8 @@ class FileInfoV2ServiceTest {
             when(repoService.getById(999L)).thenReturn(null);
             // When repo is null, checkRepoBelong should throw exception
             doThrow(new BusinessException(ResponseEnum.REPO_NOT_EXIST))
-                    .when(dataPermissionCheckTool).checkRepoBelong(null);
+                    .when(dataPermissionCheckTool)
+                    .checkRepoBelong(null);
 
             // When & Then
             assertThatThrownBy(() -> fileInfoV2Service.createHtmlFile(htmlFileVO))
@@ -797,7 +790,7 @@ class FileInfoV2ServiceTest {
 
             FileDirectoryTree tree = new FileDirectoryTree();
             tree.setId(id);
-            tree.setIsFile(0);  // It's a folder
+            tree.setIsFile(0); // It's a folder
 
             when(fileDirectoryTreeService.getById(id)).thenReturn(tree);
 
@@ -928,7 +921,7 @@ class FileInfoV2ServiceTest {
 
             FileDirectoryTree tree = new FileDirectoryTree();
             tree.setId(folderId);
-            tree.setIsFile(1);  // It's a file
+            tree.setIsFile(1); // It's a file
 
             when(fileDirectoryTreeService.getById(folderId)).thenReturn(tree);
 
@@ -1032,8 +1025,7 @@ class FileInfoV2ServiceTest {
                     "file",
                     "large-file.txt",
                     "text/plain",
-                    largeContent
-            );
+                    largeContent);
 
             when(repoService.getById(anyLong())).thenReturn(mockRepo);
             doNothing().when(dataPermissionCheckTool).checkRepoBelong(any(Repo.class));
@@ -1065,8 +1057,7 @@ class FileInfoV2ServiceTest {
                     "file",
                     "large-image.jpg",
                     "image/jpeg",
-                    largeContent
-            );
+                    largeContent);
 
             when(repoService.getById(anyLong())).thenReturn(mockRepo);
             doNothing().when(dataPermissionCheckTool).checkRepoBelong(any(Repo.class));
@@ -1095,8 +1086,7 @@ class FileInfoV2ServiceTest {
                     "file",
                     "测试文件@#$%^&*().txt",
                     "text/plain",
-                    "Test content".getBytes(StandardCharsets.UTF_8)
-            );
+                    "Test content".getBytes(StandardCharsets.UTF_8));
 
             when(repoService.getById(anyLong())).thenReturn(mockRepo);
             doNothing().when(dataPermissionCheckTool).checkRepoBelong(any(Repo.class));
@@ -1225,8 +1215,8 @@ class FileInfoV2ServiceTest {
         @DisplayName("getRequestCookies - with cookies")
         void testGetRequestCookies_WithCookies() {
             Cookie[] cookies = {
-                new Cookie("cookie1", "value1"),
-                new Cookie("cookie2", "value2")
+                    new Cookie("cookie1", "value1"),
+                    new Cookie("cookie2", "value2")
             };
             when(request.getCookies()).thenReturn(cookies);
 
@@ -2044,9 +2034,9 @@ class FileInfoV2ServiceTest {
         }
 
         /**
-         * Test getIndexingStatus - success with Spark tag.
-         * Note: Removed this test because ProjectContent.isSparkRagCompatible() needs proper configuration
-         * and the actual tag format used by Spark RAG in production.
+         * Test getIndexingStatus - success with Spark tag. Note: Removed this test because
+         * ProjectContent.isSparkRagCompatible() needs proper configuration and the actual tag format used
+         * by Spark RAG in production.
          */
         // Test removed - Spark RAG compatibility check requires specific tag format
 
@@ -2324,7 +2314,7 @@ class FileInfoV2ServiceTest {
             SliceConfig sliceConfig = new SliceConfig();
             Integer backEmbedding = 0;
 
-            mockFileInfo.setType("xyz");  // Unsupported type
+            mockFileInfo.setType("xyz"); // Unsupported type
             mockFileInfo.setSource("CBG-RAG");
 
             ReflectionTestUtils.setField(fileInfoV2Service, "configInfoService", configInfoService);
@@ -2793,8 +2783,8 @@ class FileInfoV2ServiceTest {
         }
 
         /**
-         * Test sliceFiles - with space ID (skip permission check).
-         * Note: This test needs to ensure apiUrl is properly injected to avoid SpringUtils.beanFactory NPE.
+         * Test sliceFiles - with space ID (skip permission check). Note: This test needs to ensure apiUrl
+         * is properly injected to avoid SpringUtils.beanFactory NPE.
          */
         @Test
         @DisplayName("Slice files - with space ID")
@@ -3601,8 +3591,7 @@ class FileInfoV2ServiceTest {
                 }
 
                 @Override
-                public void setWriteListener(jakarta.servlet.WriteListener writeListener) {
-                }
+                public void setWriteListener(jakarta.servlet.WriteListener writeListener) {}
             };
 
             lenient().when(response.getOutputStream()).thenReturn(servletOutputStream);

@@ -105,8 +105,8 @@ class KnowledgeServiceTest {
     private ExtractKnowledgeTask mockExtractTask;
 
     /**
-     * Set up test fixtures before each test method.
-     * Initializes common test data including mock knowledge and file objects.
+     * Set up test fixtures before each test method. Initializes common test data including mock
+     * knowledge and file objects.
      */
     @BeforeEach
     void setUp() {
@@ -189,8 +189,8 @@ class KnowledgeServiceTest {
     }
 
     /**
-     * Test cases for the createKnowledge method.
-     * Validates knowledge creation functionality including success scenarios and error handling.
+     * Test cases for the createKnowledge method. Validates knowledge creation functionality including
+     * success scenarios and error handling.
      */
     @Nested
     @DisplayName("createKnowledge Tests")
@@ -243,7 +243,7 @@ class KnowledgeServiceTest {
             mockFileInfo.setSource("CBG-RAG");
 
             when(fileInfoV2Service.getById(anyLong())).thenReturn(mockFileInfo);
-            when(repoService.getById(anyLong())).thenReturn(mockRepo);  // Add mock for preCheck
+            when(repoService.getById(anyLong())).thenReturn(mockRepo); // Add mock for preCheck
             when(repoService.getOnly(any(LambdaQueryWrapper.class))).thenReturn(mockRepo);
             doNothing().when(dataPermissionCheckTool).checkRepoBelong(any(Repo.class));
             when(fileInfoV2Mapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(mockFileInfo);
@@ -281,7 +281,7 @@ class KnowledgeServiceTest {
             mockRepo.setEnableAudit(true);
 
             when(fileInfoV2Service.getById(anyLong())).thenReturn(mockFileInfo);
-            when(repoService.getById(anyLong())).thenReturn(mockRepo);  // Add mock for preCheck
+            when(repoService.getById(anyLong())).thenReturn(mockRepo); // Add mock for preCheck
             when(repoService.getOnly(any(LambdaQueryWrapper.class))).thenReturn(mockRepo);
             doNothing().when(dataPermissionCheckTool).checkRepoBelong(any(Repo.class));
             when(fileInfoV2Mapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(mockFileInfo);
@@ -311,7 +311,7 @@ class KnowledgeServiceTest {
             mockKnowledgeVO.setContent("违规内容");
 
             when(fileInfoV2Service.getById(anyLong())).thenReturn(mockFileInfo);
-            when(repoService.getById(anyLong())).thenReturn(mockRepo);  // Add mock for preCheck
+            when(repoService.getById(anyLong())).thenReturn(mockRepo); // Add mock for preCheck
             when(repoService.getOnly(any(LambdaQueryWrapper.class))).thenReturn(mockRepo);
             doNothing().when(dataPermissionCheckTool).checkRepoBelong(any(Repo.class));
             when(fileInfoV2Mapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(mockFileInfo);
@@ -355,8 +355,8 @@ class KnowledgeServiceTest {
     }
 
     /**
-     * Test cases for the updateKnowledge method.
-     * Validates knowledge update functionality including success scenarios and error handling.
+     * Test cases for the updateKnowledge method. Validates knowledge update functionality including
+     * success scenarios and error handling.
      */
     @Nested
     @DisplayName("updateKnowledge Tests")
@@ -374,8 +374,8 @@ class KnowledgeServiceTest {
 
             when(knowledgeMapper.selectById(anyString())).thenReturn(mockMysqlKnowledge);
             when(fileInfoV2Service.getById(anyLong())).thenReturn(mockFileInfo);
-            when(repoService.getById(anyLong())).thenReturn(mockRepo);  // Add mock for preCheck
-            when(fileInfoV2Service.getOnly(any(QueryWrapper.class))).thenReturn(mockFileInfo);  // Mock for updateKnowledge internal call
+            when(repoService.getById(anyLong())).thenReturn(mockRepo); // Add mock for preCheck
+            when(fileInfoV2Service.getOnly(any(QueryWrapper.class))).thenReturn(mockFileInfo); // Mock for updateKnowledge internal call
             when(repoService.getOnly(any(LambdaQueryWrapper.class))).thenReturn(mockRepo);
             doNothing().when(dataPermissionCheckTool).checkRepoBelong(any(Repo.class));
 
@@ -406,7 +406,7 @@ class KnowledgeServiceTest {
 
             when(knowledgeMapper.selectById(anyString())).thenReturn(mockMysqlKnowledge);
             when(fileInfoV2Service.getById(anyLong())).thenReturn(mockFileInfo);
-            when(repoService.getById(anyLong())).thenReturn(mockRepo);  // Add mock for preCheck
+            when(repoService.getById(anyLong())).thenReturn(mockRepo); // Add mock for preCheck
 
             // When
             Knowledge result = knowledgeService.updateKnowledge(mockKnowledgeVO);
@@ -446,8 +446,8 @@ class KnowledgeServiceTest {
 
             when(knowledgeMapper.selectById(anyString())).thenReturn(mockMysqlKnowledge);
             when(fileInfoV2Service.getById(anyLong())).thenReturn(mockFileInfo);
-            when(repoService.getById(anyLong())).thenReturn(mockRepo);  // Add mock for preCheck
-            when(fileInfoV2Service.getOnly(any(QueryWrapper.class))).thenReturn(mockFileInfo);  // Mock for updateKnowledge internal call
+            when(repoService.getById(anyLong())).thenReturn(mockRepo); // Add mock for preCheck
+            when(fileInfoV2Service.getOnly(any(QueryWrapper.class))).thenReturn(mockFileInfo); // Mock for updateKnowledge internal call
             when(repoService.getOnly(any(LambdaQueryWrapper.class))).thenReturn(mockRepo);
             doNothing().when(dataPermissionCheckTool).checkRepoBelong(any(Repo.class));
 
@@ -468,8 +468,7 @@ class KnowledgeServiceTest {
     }
 
     /**
-     * Test cases for the enableKnowledge method.
-     * Validates knowledge enable/disable functionality.
+     * Test cases for the enableKnowledge method. Validates knowledge enable/disable functionality.
      */
     @Nested
     @DisplayName("enableKnowledge Tests")
@@ -645,8 +644,7 @@ class KnowledgeServiceTest {
     }
 
     /**
-     * Test cases for the enableDoc method.
-     * Validates document enable/disable functionality.
+     * Test cases for the enableDoc method. Validates document enable/disable functionality.
      */
     @Nested
     @DisplayName("enableDoc Tests")
@@ -786,8 +784,7 @@ class KnowledgeServiceTest {
     }
 
     /**
-     * Test cases for the deleteKnowledge method.
-     * Validates knowledge deletion functionality.
+     * Test cases for the deleteKnowledge method. Validates knowledge deletion functionality.
      */
     @Nested
     @DisplayName("deleteKnowledge Tests")
@@ -874,8 +871,8 @@ class KnowledgeServiceTest {
     }
 
     /**
-     * Test cases for the storagePreviewKnowledge method.
-     * Validates preview knowledge storage functionality.
+     * Test cases for the storagePreviewKnowledge method. Validates preview knowledge storage
+     * functionality.
      */
     @Nested
     @DisplayName("storagePreviewKnowledge Tests")
@@ -1049,8 +1046,8 @@ class KnowledgeServiceTest {
     }
 
     /**
-     * Test cases for the embeddingKnowledgeAndStorage method.
-     * Validates knowledge embedding functionality.
+     * Test cases for the embeddingKnowledgeAndStorage method. Validates knowledge embedding
+     * functionality.
      */
     @Nested
     @DisplayName("embeddingKnowledgeAndStorage Tests")
@@ -1204,8 +1201,7 @@ class KnowledgeServiceTest {
     }
 
     /**
-     * Test cases for the deleteDoc method.
-     * Validates document deletion functionality.
+     * Test cases for the deleteDoc method. Validates document deletion functionality.
      */
     @Nested
     @DisplayName("deleteDoc Tests")
@@ -1347,8 +1343,8 @@ class KnowledgeServiceTest {
     }
 
     /**
-     * Test cases for the updateTaskAndFileStatus method.
-     * Validates task and file status update functionality.
+     * Test cases for the updateTaskAndFileStatus method. Validates task and file status update
+     * functionality.
      */
     @Nested
     @DisplayName("updateTaskAndFileStatus Tests")
@@ -1402,8 +1398,7 @@ class KnowledgeServiceTest {
     }
 
     /**
-     * Test cases for helper methods.
-     * Validates utility and helper method functionality.
+     * Test cases for helper methods. Validates utility and helper method functionality.
      */
     @Nested
     @DisplayName("Helper Methods Tests")
@@ -1608,8 +1603,8 @@ class KnowledgeServiceTest {
     }
 
     /**
-     * Test cases for async and task-related methods.
-     * Validates asynchronous operations and task handling.
+     * Test cases for async and task-related methods. Validates asynchronous operations and task
+     * handling.
      */
     @Nested
     @DisplayName("Async and Task Methods Tests")
@@ -1664,8 +1659,8 @@ class KnowledgeServiceTest {
     }
 
     /**
-     * Test cases for the dealTaskForKnowledgeExtract method.
-     * Validates callback handling for knowledge extraction tasks.
+     * Test cases for the dealTaskForKnowledgeExtract method. Validates callback handling for knowledge
+     * extraction tasks.
      */
     @Nested
     @DisplayName("dealTaskForKnowledgeExtract Tests")
@@ -1764,8 +1759,8 @@ class KnowledgeServiceTest {
     }
 
     /**
-     * Test cases for the knowledgeExtractAsync method.
-     * Validates asynchronous knowledge extraction functionality.
+     * Test cases for the knowledgeExtractAsync method. Validates asynchronous knowledge extraction
+     * functionality.
      */
     @Nested
     @DisplayName("knowledgeExtractAsync Tests")
@@ -1915,7 +1910,7 @@ class KnowledgeServiceTest {
         @DisplayName("Extract knowledge with empty chunks for image")
         void testKnowledgeExtractAsync_EmptyChunks_Image() {
             // Given
-            String contentType = "jpeg";  // Using file extension, not MIME type
+            String contentType = "jpeg"; // Using file extension, not MIME type
             String url = "http://example.com/image.jpg";
             mockFileInfo.setSource("AIUI-RAG2");
 
@@ -2023,8 +2018,8 @@ class KnowledgeServiceTest {
     }
 
     /**
-     * Test cases for the knowledgeEmbeddingExtractAsync method.
-     * Validates asynchronous knowledge extraction with embedding.
+     * Test cases for the knowledgeEmbeddingExtractAsync method. Validates asynchronous knowledge
+     * extraction with embedding.
      */
     @Nested
     @DisplayName("knowledgeEmbeddingExtractAsync Tests")

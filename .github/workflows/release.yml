@@ -3,8 +3,8 @@ name: Release Astron Agent
 on:
   push:
     tags:
-      - 'v*.*.*'      # 匹配语义版本号 (v1.0.0, v2.1.3, etc.)
-      - 'v*.*.*-*'    # 匹配预发布版本 (v1.0.0-beta.1, v2.1.0-rc.1, etc.)
+      - 'v*.*.*'      # Match semantic version tags (v1.0.0, v2.1.3, etc.)
+      - 'v*.*.*-*'    # Match pre-release version tags (v1.0.0-beta.1, v2.1.0-rc.1, etc.)
   workflow_dispatch:
     inputs:
       tag:
@@ -32,10 +32,10 @@ env:
 
 jobs:
   # ============================================================================
-  # Stage 1: 验证和准备
+  # Stage 1: Validation and Preparation
   # ============================================================================
   prepare-release:
-    name: 🚀 准备发布
+    name: 🚀 Prepare Release
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.meta.outputs.version }}
@@ -52,30 +52,30 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.tag || github.ref }}
-          fetch-depth: 0  # 获取完整历史记录用于生成changelog
+          fetch-depth: 0  # Fetch full history for changelog generation
 
-      - name: 验证Tag存在性(仅手动触发)
+      - name: Validate tag existence (manual trigger only)
         if: github.event_name == 'workflow_dispatch'
         run: |
           TAG="${{ github.event.inputs.tag }}"
-          echo "🔍 验证Tag是否存在: $TAG"
+          echo "🔍 Validating tag existence: $TAG"
 
-          # 获取所有tags
+          # Fetch all tags
           git fetch --tags --force
 
-          # 检查tag是否存在
+          # Check if tag exists
           if ! git rev-parse "$TAG" >/dev/null 2>&1; then
-            echo "❌ 错误: Tag '$TAG' 不存在！"
-            echo "📋 可用的tags:"
+            echo "❌ Error: Tag '$TAG' does not exist!"
+            echo "📋 Available tags:"
             git tag --sort=-version:refname | head -10
             exit 1
           fi
 
-          # 确保checkout到正确的tag
+          # Ensure checkout to correct tag
           git checkout "$TAG"
-          echo "✅ Tag '$TAG' 验证成功"
+          echo "✅ Tag '$TAG' validated successfully"
 
-      - name: 验证标签格式
+      - name: Validate tag format
         id: meta
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
@@ -84,7 +84,7 @@ jobs:
             GIT_REF="${{ github.event.inputs.tag }}"
           else
             VERSION=${GITHUB_REF#refs/tags/}
-            # 检查是否为预发布版本 (包含 -, alpha, beta, rc 等)
+            # Check if pre-release version (contains -, alpha, beta, rc, etc.)
             if [[ "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
               IS_PRERELEASE="false"
             else
@@ -93,20 +93,20 @@ jobs:
             GIT_REF="${{ github.ref }}"
           fi
 
-          # 验证版本号格式
+          # Validate version format
           if [[ ! "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
-            echo "❌ 错误的版本号格式: $VERSION"
-            echo "✅ 正确格式: v1.0.0, v1.0.0-beta.1, v1.0.0-rc.1"
+            echo "❌ Invalid version format: $VERSION"
+            echo "✅ Valid format: v1.0.0, v1.0.0-beta.1, v1.0.0-rc.1"
             exit 1
           fi
 
-          # 获取准确的commit SHA (checkout后的实际commit)
+          # Get accurate commit SHA (actual commit after checkout)
           COMMIT_SHA=$(git rev-parse HEAD)
 
-          # 为release构建设置缓存scope
-          # 简化命名: v1.0.0 -> tag-v1-0-0, v1.0.0-beta.1 -> tag-v1-0-0-beta-1
-          VERSION_SAFE="${VERSION//\./-}"       # 替换点号为连字符
-          VERSION_SAFE="${VERSION_SAFE//\//-}"  # 替换斜杠为连字符(如果有)
+          # Set cache scope for release build
+          # Simplified naming: v1.0.0 -> tag-v1-0-0, v1.0.0-beta.1 -> tag-v1-0-0-beta-1
+          VERSION_SAFE="${VERSION//\./-}"       # Replace dots with hyphens
+          VERSION_SAFE="${VERSION_SAFE//\//-}"  # Replace slashes with hyphens (if any)
           CACHE_SCOPE="tag-${VERSION_SAFE}"
 
           echo "version=$VERSION" >> $GITHUB_OUTPUT
@@ -115,44 +115,44 @@ jobs:
           echo "commit-sha=$COMMIT_SHA" >> $GITHUB_OUTPUT
           echo "cache-scope=$CACHE_SCOPE" >> $GITHUB_OUTPUT
 
-          echo "🏷️ 发布版本: $VERSION"
-          echo "🔖 预发布版本: $IS_PRERELEASE"
+          echo "🏷️ Release version: $VERSION"
+          echo "🔖 Pre-release: $IS_PRERELEASE"
           echo "📝 Git Ref: $GIT_REF"
           echo "📝 Commit SHA: $COMMIT_SHA"
           echo "💾 Cache Scope: $CACHE_SCOPE"
 
-      - name: 智能项目检测
+      - name: Smart project detection
         id: detect
         run: |
-          echo "🔍 检测 Astron Agent 组件..."
+          echo "🔍 Detecting Astron Agent components..."
 
           HAS_CORE_SERVICES="false"
           HAS_CONSOLE_HUB="false"
           HAS_CONSOLE_FRONTEND="false"
 
-          # 检测Core服务组件 (基于build-push.yml的结构)
+          # Detect Core service components (based on build-push.yml structure)
           CORE_COMPONENTS=("tenant" "memory/database" "plugin/rpa" "plugin/link" "plugin/aitools" "agent" "knowledge" "workflow")
           CORE_COUNT=0
 
           for component in "${CORE_COMPONENTS[@]}"; do
             if [[ -f "core/${component}/Dockerfile" ]]; then
               CORE_COUNT=$((CORE_COUNT + 1))
-              echo "✅ Core组件: core/${component}/"
+              echo "✅ Core component: core/${component}/"
             fi
           done
 
           if [[ $CORE_COUNT -gt 0 ]]; then
             HAS_CORE_SERVICES="true"
-            echo "✅ 检测到 $CORE_COUNT 个Core服务组件"
+            echo "✅ Detected $CORE_COUNT Core service components"
           fi
 
-          # 检测Console Hub (Java)
+          # Detect Console Hub (Java)
           if [[ -f "console/backend/hub/pom.xml" && -f "console/backend/hub/Dockerfile" ]]; then
             HAS_CONSOLE_HUB="true"
             echo "✅ Console Hub: console/backend/hub/ (Java Spring Boot)"
           fi
 
-          # 检测Console Frontend (React)
+          # Detect Console Frontend (React)
           if [[ -f "console/frontend/package.json" && -f "console/frontend/Dockerfile" ]]; then
             HAS_CONSOLE_FRONTEND="true"
             echo "✅ Console Frontend: console/frontend/ (React)"
@@ -169,8 +169,8 @@ jobs:
 
           CURRENT_TAG="${{ steps.meta.outputs.version }}"
 
-          # 获取前一个tag (更可靠的方法)
-          # 方法: 获取所有tags，按版本排序，找到当前tag的前一个
+          # Get previous tag (more reliable method)
+          # Method: Get all tags, sort by version, find the one before current tag
           PREVIOUS_TAG=$(git tag --sort=-version:refname | grep -v "^${CURRENT_TAG}$" | head -1)
 
           if [[ -z "$PREVIOUS_TAG" ]]; then
@@ -178,7 +178,7 @@ jobs:
             COMMIT_RANGE="HEAD"
           else
             echo "📊 Comparing: $PREVIOUS_TAG...$CURRENT_TAG"
-            # 使用tag之间的commit范围
+            # Use commit range between tags
             COMMIT_RANGE="${PREVIOUS_TAG}..${CURRENT_TAG}"
           fi
 
@@ -227,10 +227,10 @@ jobs:
           cat "$CHANGELOG_FILE"
 
   # ============================================================================
-  # Stage 2: 构建Docker镜像 (复用build-push的逻辑)
+  # Stage 2: Build Docker Images (reuse build-push logic)
   # ============================================================================
   build-core-services:
-    name: 🏗️ 构建Core服务
+    name: 🏗️ Build Core Services
     runs-on: ubuntu-latest
     needs: prepare-release
     if: needs.prepare-release.outputs.has-core-services == 'true'
@@ -245,7 +245,7 @@ jobs:
           - { name: "agent", path: "core/agent", emoji: "🤖" }
           - { name: "knowledge", path: "core/knowledge", emoji: "📚" }
           - { name: "workflow", path: "core/workflow", emoji: "⚡" }
-      fail-fast: false  # 允许部分服务失败，不影响其他服务
+      fail-fast: false  # Allow partial service failure without affecting others
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -253,17 +253,17 @@ jobs:
           ref: ${{ needs.prepare-release.outputs.git-ref }}
           fetch-depth: 0
 
-      - name: 验证Dockerfile存在
+      - name: Validate Dockerfile existence
         id: validate
         run: |
           DOCKERFILE_PATH="./${{ matrix.service.path }}/Dockerfile"
           if [[ ! -f "$DOCKERFILE_PATH" ]]; then
-            echo "⚠️ Dockerfile不存在: $DOCKERFILE_PATH"
-            echo "⏭️ 跳过此服务构建"
+            echo "⚠️ Dockerfile does not exist: $DOCKERFILE_PATH"
+            echo "⏭️ Skipping this service build"
             echo "skip=true" >> $GITHUB_OUTPUT
             exit 0
           fi
-          echo "✅ Dockerfile存在: $DOCKERFILE_PATH"
+          echo "✅ Dockerfile exists: $DOCKERFILE_PATH"
           echo "skip=false" >> $GITHUB_OUTPUT
 
       - name: Set up QEMU
@@ -315,7 +315,7 @@ jobs:
           cache-to: type=gha,scope=core-${{ matrix.service.name }}-${{ needs.prepare-release.outputs.cache-scope }},mode=max
 
   build-console-hub:
-    name: ☕ 构建Console Hub
+    name: ☕ Build Console Hub
     runs-on: ubuntu-latest
     needs: prepare-release
     if: needs.prepare-release.outputs.has-console-hub == 'true'
@@ -372,7 +372,7 @@ jobs:
           sbom: false
 
   build-console-frontend:
-    name: 🌐 构建Console Frontend
+    name: 🌐 Build Console Frontend
     runs-on: ubuntu-latest
     needs: prepare-release
     if: needs.prepare-release.outputs.has-console-frontend == 'true'
@@ -429,10 +429,10 @@ jobs:
           cache-to: type=gha,mode=max,scope=console-frontend-${{ needs.prepare-release.outputs.cache-scope }}
 
   # ============================================================================
-  # Stage 3: 创建GitHub Release
+  # Stage 3: Create GitHub Release
   # ============================================================================
   create-release:
-    name: 🎉 创建GitHub Release
+    name: 🎉 Create GitHub Release
     runs-on: ubuntu-latest
     needs:
       - prepare-release
@@ -452,26 +452,26 @@ jobs:
           append_body: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 发布总结
+      - name: Release summary
         run: |
-          echo "=== 🎉 Astron Agent 发布总结 ==="
+          echo "=== 🎉 Astron Agent Release Summary ==="
           echo ""
-          echo "🏷️ 版本: ${{ needs.prepare-release.outputs.version }}"
-          echo "🔖 预发布: ${{ needs.prepare-release.outputs.is-prerelease }}"
-          echo "📦 发布页面: https://github.com/${{ github.repository }}/releases/tag/${{ needs.prepare-release.outputs.version }}"
+          echo "🏷️ Version: ${{ needs.prepare-release.outputs.version }}"
+          echo "🔖 Pre-release: ${{ needs.prepare-release.outputs.is-prerelease }}"
+          echo "📦 Release page: https://github.com/${{ github.repository }}/releases/tag/${{ needs.prepare-release.outputs.version }}"
           echo ""
 
-          echo "🐳 Docker镜像构建状态:"
-          echo "  🏗️ Core服务: ${{ needs.build-core-services.result }}"
+          echo "🐳 Docker image build status:"
+          echo "  🏗️ Core services: ${{ needs.build-core-services.result }}"
           echo "  ☕ Console Hub: ${{ needs.build-console-hub.result }}"
           echo "  🌐 Console Frontend: ${{ needs.build-console-frontend.result }}"
           echo ""
 
-          echo "🎯 快速开始:"
+          echo "🎯 Quick start:"
           echo "git clone https://github.com/${{ github.repository }}.git"
           echo "cd astron-agent"
           echo "git checkout ${{ needs.prepare-release.outputs.version }}"
           echo "docker-compose up -d"
           echo ""
 
-          echo "✅ 🚀 Astron Agent 发布完成!"
+          echo "✅ 🚀 Astron Agent release completed!"
