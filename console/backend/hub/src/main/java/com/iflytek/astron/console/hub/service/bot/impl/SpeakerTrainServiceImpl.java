@@ -7,6 +7,8 @@ import cn.xfyun.config.SexEnum;
 import cn.xfyun.model.voiceclone.request.AudioAddParam;
 import cn.xfyun.model.voiceclone.request.CreateTaskParam;
 import com.alibaba.fastjson2.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.iflytek.astron.console.commons.constant.ResponseEnum;
 import com.iflytek.astron.console.commons.exception.BusinessException;
@@ -23,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
@@ -33,16 +36,16 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 public class SpeakerTrainServiceImpl implements SpeakerTrainService {
-    
+
     private static final Set<String> SUPPORTED_LANGUAGES = Set.of("zh", "en", "jp", "ko", "ru");
-    
+
     @Value("${spark.app-id}")
     private String appId;
 
     @Value("${spark.api-key}")
     private String apiKey;
-    
-    
+
+
     private final CustomSpeakerService customSpeakerService;
 
     @Override
@@ -68,7 +71,7 @@ public class SpeakerTrainServiceImpl implements SpeakerTrainService {
     }
 
     @Override
-    public String create(MultipartFile file, String language, Integer sex, Long segId, Long botId) throws IOException {
+    public String create(MultipartFile file, String language, Integer sex, Long segId, Long spaceId, String uid) throws IOException {
         if (StringUtils.isNotBlank(language) && !SUPPORTED_LANGUAGES.contains(language)) {
             throw new BusinessException(ResponseEnum.OPERATION_FAILED);
         }
@@ -88,7 +91,7 @@ public class SpeakerTrainServiceImpl implements SpeakerTrainService {
             JSONObject taskObj = JSONObject.parseObject(taskResp);
             String taskId = taskObj.getString("data");
             log.info("创建任务：{}，返回taskId：{}", taskResp, taskId);
-            
+
             AudioAddParam audioAddParam2 = AudioAddParam.builder()
                     .file(tempFile)
                     .taskId(taskId)
@@ -97,14 +100,15 @@ public class SpeakerTrainServiceImpl implements SpeakerTrainService {
                     .build();
             String submitWithAudio = client.submitWithAudio(audioAddParam2);
             log.info("提交任务返回: {}", submitWithAudio);
-            
+
             // 保存custom_speaker
             CustomSpeaker customSpeaker = new CustomSpeaker();
-            customSpeaker.setBotId(botId);
-            customSpeaker.setName("my_speaker" + RandomUtil.randomString(5));
+            customSpeaker.setCreateUid(uid);
+            customSpeaker.setSpaceId(spaceId);
+            customSpeaker.setName("my_speaker_" + RandomUtil.randomString(5));
             customSpeaker.setTaskId(taskId);
             customSpeakerService.save(customSpeaker);
-            
+
             return taskId;
         } catch (Exception e) {
             log.error("create task failed", e);
@@ -119,18 +123,28 @@ public class SpeakerTrainServiceImpl implements SpeakerTrainService {
     }
 
     @Override
-    public JSONObject trainStatus(String taskId) {
-        CustomSpeaker customSpeaker = customSpeakerService.getOne(Wrappers.lambdaQuery(CustomSpeaker.class)
-                .eq(CustomSpeaker::getTaskId, taskId));
+    public JSONObject trainStatus(String taskId, Long spaceId, String uid) {
         
+        LambdaQueryWrapper<CustomSpeaker> queryWrapper = Wrappers.lambdaQuery(CustomSpeaker.class)
+                .eq(CustomSpeaker::getTaskId, taskId)
+                .eq(CustomSpeaker::getDeleted, 0);
+        if (spaceId == null) {
+            queryWrapper.eq(CustomSpeaker::getCreateUid, uid);
+            queryWrapper.isNull(CustomSpeaker::getSpaceId);
+        } else {
+            queryWrapper.eq(CustomSpeaker::getSpaceId, spaceId);
+        }
+        
+        CustomSpeaker customSpeaker = customSpeakerService.getOne(queryWrapper);
         if (customSpeaker == null) {
             throw new BusinessException(ResponseEnum.OPERATION_FAILED);
         }
+        
         try {
             VoiceTrainClient client = new VoiceTrainClient.Builder(appId, apiKey).build();
             String trainStatus = client.result(taskId);
             if (StringUtils.isBlank(trainStatus)) {
-               throw new BusinessException(ResponseEnum.OPERATION_FAILED);
+                throw new BusinessException(ResponseEnum.OPERATION_FAILED);
             }
             JSONObject object = JSONObject.parseObject(trainStatus);
             if (object == null || !Integer.valueOf(0).equals(object.get("code"))) {
@@ -138,7 +152,12 @@ public class SpeakerTrainServiceImpl implements SpeakerTrainService {
             }
             JSONObject data = object.getJSONObject("data");
             if (Integer.valueOf(1).equals(data.getInteger("trainStatus"))) {
-               
+                LambdaUpdateWrapper<CustomSpeaker> updateWrapper = new LambdaUpdateWrapper<>();
+                updateWrapper.eq(CustomSpeaker::getId, customSpeaker.getId());
+                updateWrapper.set(CustomSpeaker::getTrainStatus, 1);
+                updateWrapper.set(CustomSpeaker::getAssetId, data.getString("assetId"));
+                updateWrapper.set(CustomSpeaker::getUpdateTime, LocalDateTime.now());
+                customSpeakerService.update(null, updateWrapper);
             }
             return data;
         } catch (Exception e) {

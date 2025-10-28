@@ -9,7 +9,7 @@ public interface SpeakerTrainService {
 
     JSONObject getText();
 
-    String create(MultipartFile file, String language, Integer sex, Long segId, Long botId) throws IOException;
+    String create(MultipartFile file, String language, Integer sex, Long segId, Long spaceId, String uid) throws IOException;
 
-    JSONObject trainStatus(String taskId);
+    JSONObject trainStatus(String taskId, Long spaceId, String uid);
 }
