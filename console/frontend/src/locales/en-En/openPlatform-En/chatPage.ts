@@ -73,6 +73,7 @@ const transition = {
     networkError: 'Network error',
     getSignedUrlFailed: 'Failed to get signed URL',
     uploadCancelled: 'Upload cancelled',
+    download: 'Download',
     expand: 'Expand',
     fold: 'Fold',
     deleteFile: 'Delete File',

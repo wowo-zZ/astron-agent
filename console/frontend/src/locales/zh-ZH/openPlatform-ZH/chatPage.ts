@@ -72,6 +72,7 @@ const transition = {
     networkError: '网络错误',
     getSignedUrlFailed: '获取签名URL失败',
     uploadCancelled: '上传已取消',
+    download: '下载',
     expand: '展开',
     fold: '收起',
     deleteFile: '删除文件',
