@@ -54,6 +54,11 @@ public class PronunciationPersonConfig {
         XFYUN
     }
     
+     /**
+     * Exquisite pronunciation person (0 = not exquisite, 1 = exquisite)
+     */
+    private Integer exquisite;
+    
     /**
      * Pronunciation person deleted status
      */

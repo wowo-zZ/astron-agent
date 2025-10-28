@@ -1,12 +1,9 @@
 package com.iflytek.astron.console.hub.service.bot.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.iflytek.astron.console.commons.constant.ResponseEnum;
-import com.iflytek.astron.console.commons.exception.BusinessException;
 import com.iflytek.astron.console.hub.entity.PronunciationPersonConfig;
 import com.iflytek.astron.console.hub.mapper.PronunciationPersonConfigMapper;
 import com.iflytek.astron.console.hub.service.bot.VoiceService;
-import com.iflytek.astron.console.toolkit.tool.http.HeaderAuthHttpTool;
 import com.iflytek.astron.console.toolkit.tool.http.HttpAuthTool;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,9 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
