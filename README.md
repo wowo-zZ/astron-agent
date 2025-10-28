@@ -15,11 +15,10 @@ English | [简体中文](README-zh.md)
 ## 📑 Table of Contents
 
 - [🔭 What is Astron Agent?](#-What-is-Astron-Agent)
-- [🛠️ Tech Stack](#%EF%B8%8F-tech-stack)
 - [🚀 Quick Start](#-quick-start)
   - [Option 1: Docker Compose](#option-1-docker-compose-recommended-for-quick-start)
   - [Option 2: Helm](#option-2-helm-for-kubernetes-environments)
-- [📖 Usage Guide](#-usage-guide)
+- [📖 Using Astron](#-using-astron)
 - [📚 Documentation](#-documentation)
 - [🤝 Contributing](#-contributing)
 - [🌟 Star History](#-star-history)
@@ -45,16 +44,6 @@ The platform supports **high-availability** deployment, enabling organizations t
 - **Multi-language Backend:** Supports mainstream languages such as Java, Go, and Python; frontend adapted to TypeScript + React stack.  
 - **Comprehensive Toolchain:** Provides API documentation, deployment guides, and troubleshooting manuals to reduce learning and maintenance costs.  
 - **One-Click Deployment:** Built-in Dockerized environment for out-of-the-box setup and rapid project launch.  
-
-## 🛠️ Tech Stack
-
-- **Backend**: Java 21, Spring Boot 3, Go, Python 3.11
-- **Frontend**: TypeScript 5, React 18
-- **Database**: MySQL 8
-- **Cache**: Redis
-- **Message Queue**: Apache Kafka
-- **Infrastructure**: Docker, MinIO
-- **Quality Tools**: Checkstyle, PMD, SpotBugs, ESLint, gocyclo, staticcheck, golangci-lint, black, isort, flake8, mypy, pylint
 
 ## Architecture Overview
 
@@ -156,7 +145,9 @@ After startup, you can access the services at the following addresses:
 
 > 📖 For complete deployment instructions and configuration details, see [Deployment Guide](docs/DEPLOYMENT_GUIDE.md)
 
-## 📖 Usage Guide
+## 📖 Using Astron
+
+Astron Cloud provides a ready-to-use environment for creating and managing Agents.Free quick access [https://agent.xfyun.cn](https://agent.xfyun.cn)
 
 For detailed usage instructions, please refer to [Quick Start Guide](https://www.xfyun.cn/doc/spark/Agent03-%E5%BC%80%E5%8F%91%E6%8C%87%E5%8D%97.html)
 
