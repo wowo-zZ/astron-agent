@@ -15,11 +15,10 @@
 ## 📑 目录
 
 - [🔭 星辰 Agent 是什么](#-星辰-agent-是什么)
-- [🛠️ 技术栈](#%EF%B8%8F-技术栈)
 - [🚀 快速开始](#-快速开始)
   - [方式一：Docker Compose](#方式一docker-compose推荐快速体验)
   - [方式二：Helm](#方式二helm适用于-kubernetes-环境)
-- [📖 使用指南](#-使用指南)
+- [📖 使用星辰](#-使用星辰)
 - [📚 文档](#-文档)
 - [🤝 参与贡献](#-参与贡献)
 - [🌟 Star 历史](#-star-历史)
@@ -46,16 +45,6 @@
 - **多语言后端**：支持 Java、Go、Python 等主流语言，前端适配 TypeScript + React 技术栈。
 - **完整工具链**：提供 API 文档、部署指南、故障排查手册，降低学习与维护成本。
 - **一键部署**：内置 Docker 化环境，开箱即用，快速启动项目。
-
-## 🛠️ 技术栈
-
-- **后端技术**: Java 21, Spring Boot 3, Go, Python 3.11
-- **前端技术**: TypeScript 5, React 18
-- **数据库**: MySQL 8
-- **缓存**: Redis
-- **消息队列**: Apache Kafka
-- **基础设施**: Docker, MinIO
-- **代码质量工具**: Checkstyle, PMD, SpotBugs, ESLint, gocyclo, staticcheck, golangci-lint, black, isort, flake8, mypy, pylint
 
 ## 架构概览
 
@@ -157,9 +146,11 @@ docker compose logs -f
 
 > 📖 完整的部署说明和配置详情，请查看[部署指南](docs/DEPLOYMENT_GUIDE_zh.md)
 
-## 📖 使用指南
+## 📖 使用星辰
 
-详细使用说明请参考 [快速开始](https://www.xfyun.cn/doc/spark/Agent03-%E5%BC%80%E5%8F%91%E6%8C%87%E5%8D%97.html)
+**快速体验**：星辰Agent提供一个即开即用的云服务环境，用于创建和管理智能体。免费快速体验地址： [https://agent.xfyun.cn](https://agent.xfyun.cn)。
+
+**使用手册**：详细使用请参考 [快速开始](https://www.xfyun.cn/doc/spark/Agent03-%E5%BC%80%E5%8F%91%E6%8C%87%E5%8D%97.html)。
 
 ## 📚 文档
 
