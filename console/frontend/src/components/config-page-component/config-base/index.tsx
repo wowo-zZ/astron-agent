@@ -1625,133 +1625,149 @@ const BaseConfig: React.FC<ChatProps> = ({
                 }
               </Form>
               <div className={styles.tipBox}>
-                <Tabs defaultActiveKey="1" className={styles.tipBoxTab}>
-                  <Tabs.TabPane tab={t('configBase.commonConfig')} key="1">
-                    <div className={styles.tipTitle}>
-                      <div className={styles.tipLabel}>
-                        {t('configBase.promptEdit')}
-                      </div>
-                      <div className={styles.tipBotton}>
-                        <div
-                          className={styles.leftBotton}
-                          onClick={() => handleShowTipPk('show')}
-                        >
-                          <img
-                            className={styles.leftImg}
-                            src={promptIcon}
-                            alt=""
-                          />
-                          <div>{t('configBase.promptComparison')}</div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className={styles.TextArea}>
-                      <Spin spinning={loadingPrompt}>
-                        <div
-                          style={{
-                            border: '1px solid #e4eaff',
-                            marginBottom: '20px',
-                            borderRadius: '6px',
-                          }}
-                        >
-                          <Input.TextArea
-                            className={styles.textField}
-                            onChange={(e: any) => setPrompt(e.target.value)}
-                            value={prompt}
-                            autoSize={{ minRows: 10, maxRows: 10 }}
-                            style={{ marginBottom: '50px' }}
-                          />
-                          <div
-                            className={styles.rightBotton}
-                            onClick={() => {
-                              aiGen();
-                            }}
+                <Tabs
+                  defaultActiveKey="1"
+                  className={styles.tipBoxTab}
+                  items={[
+                    {
+                      key: '1',
+                      label: t('configBase.commonConfig'),
+                      children: (
+                        <>
+                          <div className={styles.tipTitle}>
+                            <div className={styles.tipLabel}>
+                              {t('configBase.promptEdit')}
+                            </div>
+                            <div className={styles.tipBotton}>
+                              <div
+                                className={styles.leftBotton}
+                                onClick={() => handleShowTipPk('show')}
+                              >
+                                <img
+                                  className={styles.leftImg}
+                                  src={promptIcon}
+                                  alt=""
+                                />
+                                <div>{t('configBase.promptComparison')}</div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className={styles.TextArea}>
+                            <Spin spinning={loadingPrompt}>
+                              <div
+                                style={{
+                                  border: '1px solid #e4eaff',
+                                  marginBottom: '20px',
+                                  borderRadius: '6px',
+                                }}
+                              >
+                                <Input.TextArea
+                                  className={styles.textField}
+                                  onChange={(e: any) =>
+                                    setPrompt(e.target.value)
+                                  }
+                                  value={prompt}
+                                  autoSize={{ minRows: 10, maxRows: 10 }}
+                                  style={{ marginBottom: '50px' }}
+                                />
+                                <div
+                                  className={styles.rightBotton}
+                                  onClick={() => {
+                                    aiGen();
+                                  }}
+                                >
+                                  <img
+                                    className={styles.rightBottonIcon}
+                                    src={starIcon}
+                                    alt=""
+                                  />
+                                  {t('configBase.AIoptimization')}
+                                </div>
+                              </div>
+                            </Spin>
+                          </div>
+                          <div className={styles.tipTitle}>
+                            <div className={styles.tipLabel}>
+                              {t('configBase.modelSelection')}
+                            </div>
+                            <div className={styles.tipBotton}>
+                              <div
+                                className={styles.leftBotton}
+                                onClick={() => setShowModelPk(2)}
+                              >
+                                <img
+                                  className={styles.leftImg}
+                                  src={tipIcon}
+                                  alt=""
+                                />
+                                <div>{t('configBase.modelComparison')}</div>
+                              </div>
+                            </div>
+                          </div>
+                          <Select
+                            value={model}
+                            onChange={handleModelChange}
+                            style={{ width: '100%' }}
+                            placeholder={t('configBase.pleaseSelectModel')}
                           >
-                            <img
-                              className={styles.rightBottonIcon}
-                              src={starIcon}
-                              alt=""
-                            />
-                            {t('configBase.AIoptimization')}
-                          </div>
-                        </div>
-                      </Spin>
-                    </div>
-                    <div className={styles.tipTitle}>
-                      <div className={styles.tipLabel}>
-                        {t('configBase.modelSelection')}
-                      </div>
-                      <div className={styles.tipBotton}>
-                        <div
-                          className={styles.leftBotton}
-                          onClick={() => setShowModelPk(2)}
-                        >
-                          <img
-                            className={styles.leftImg}
-                            src={tipIcon}
-                            alt=""
-                          />
-                          <div>{t('configBase.modelComparison')}</div>
-                        </div>
-                      </div>
-                    </div>
-                    <Select
-                      value={model}
-                      onChange={handleModelChange}
-                      style={{ width: '100%' }}
-                      placeholder={t('configBase.pleaseSelectModel')}
-                    >
-                      {modelOptions.map((option, index) => (
-                        <Option
-                          key={getModelUniqueKey(option, index)}
-                          value={getModelUniqueKey(option, index)}
-                        >
-                          <div className="flex items-center">
-                            <img
-                              className="w-[20px] h-[20px]"
-                              src={option.modelIcon}
-                              alt={option.modelName}
-                            />
-                            <span>{option.modelName}</span>
-                          </div>
-                        </Option>
-                      ))}
-                    </Select>
-                  </Tabs.TabPane>
-                  <Tabs.TabPane tab={t('configBase.highOrderConfig')} key="2">
-                    <CapabilityDevelopment
-                      botCreateActiveV={botCreateActiveV}
-                      setBotCreateActiveV={setBotCreateActiveV}
-                      baseinfo={baseinfo}
-                      detailInfo={detailInfo}
-                      prompt={prompt}
-                      prologue={prologue}
-                      setPrologue={setPrologue}
-                      inputExample={inputExample}
-                      setInputExample={setInputExample}
-                      choosedAlltool={choosedAlltool}
-                      setChoosedAlltool={setChoosedAlltool}
-                      supportContextFlag={supportContextFlag}
-                      setSupportContextFlag={setSupportContextFlag}
-                      selectSource={selectSource}
-                      setSelectSource={setSelectSource}
-                      files={files}
-                      tree={tree}
-                      setTree={setTree}
-                      tools={tools}
-                      setTools={setTools}
-                      conversation={conversation}
-                      setConversation={setConversation}
-                      multiModelDebugging={multiModelDebugging}
-                      growOrShrinkConfig={growOrShrinkConfig}
-                      setGrowOrShrinkConfig={setGrowOrShrinkConfig}
-                      personalityData={personalityData}
-                      setPersonalityData={handlePersonalityChange}
-                      model={model}
-                      vcnList={vcnList}
-                    />
-                  </Tabs.TabPane>
-                </Tabs>
+                            {modelOptions.map((option, index) => (
+                              <Option
+                                key={getModelUniqueKey(option, index)}
+                                value={getModelUniqueKey(option, index)}
+                              >
+                                <div className="flex items-center">
+                                  <img
+                                    className="w-[20px] h-[20px]"
+                                    src={option.modelIcon}
+                                    alt={option.modelName}
+                                  />
+                                  <span>{option.modelName}</span>
+                                </div>
+                              </Option>
+                            ))}
+                          </Select>
+                        </>
+                      ),
+                    },
+                    {
+                      key: '2',
+                      label: t('configBase.highOrderConfig'),
+                      children: (
+                        <CapabilityDevelopment
+                          botCreateActiveV={botCreateActiveV}
+                          setBotCreateActiveV={setBotCreateActiveV}
+                          baseinfo={baseinfo}
+                          detailInfo={detailInfo}
+                          prompt={prompt}
+                          prologue={prologue}
+                          setPrologue={setPrologue}
+                          inputExample={inputExample}
+                          setInputExample={setInputExample}
+                          choosedAlltool={choosedAlltool}
+                          setChoosedAlltool={setChoosedAlltool}
+                          supportContextFlag={supportContextFlag}
+                          setSupportContextFlag={setSupportContextFlag}
+                          selectSource={selectSource}
+                          setSelectSource={setSelectSource}
+                          files={files}
+                          tree={tree}
+                          setTree={setTree}
+                          tools={tools}
+                          setTools={setTools}
+                          conversation={conversation}
+                          setConversation={setConversation}
+                          multiModelDebugging={multiModelDebugging}
+                          growOrShrinkConfig={growOrShrinkConfig}
+                          setGrowOrShrinkConfig={setGrowOrShrinkConfig}
+                          personalityData={personalityData}
+                          setPersonalityData={handlePersonalityChange}
+                          model={model}
+                          vcnList={vcnList}
+                        />
+                      ),
+                    },
+                  ]}
+                />
               </div>
             </>
           ) : (

@@ -135,18 +135,8 @@ export default function useChatFileUpload(
     const processingCount = processingCountRef.current.get(inputName) || 0;
     const totalCount = currentTypeCount + processingCount;
 
-    // 检查是否超出该类型的限制
-    if (limit > 0 && totalCount + files.length > limit) {
-      message.warning(
-        t('chatPage.chatWindow.fileLimitTip', {
-          name: config.name,
-          limit,
-        })
-      );
-      return;
-    }
-
-    // 检查文件大小限制
+    // 第一步：过滤文件大小
+    let validFiles: File[] = files;
     if (uploadMaxMB) {
       const maxSize = uploadMaxMB * 1024 * 1024; // 转换为字节
       const oversizedFiles = files.filter(file => file.size > maxSize);
@@ -159,18 +149,66 @@ export default function useChatFileUpload(
             size: uploadMaxMB,
           })
         );
-        return;
       }
+      // 只保留符合大小要求的文件
+      validFiles = files.filter(file => file.size <= maxSize);
     }
 
-    // 标记这些文件正在处理中
-    processingCountRef.current.set(inputName, processingCount + files.length);
+    // 第二步：根据数量限制过滤
+    if (limit > 0 && totalCount + validFiles.length > limit) {
+      const allowedCount = Math.max(0, limit - totalCount);
+      if (allowedCount === 0) {
+        message.warning(
+          t('chatPage.chatWindow.fileLimitTip', {
+            name: config.name,
+            limit,
+          })
+        );
+        return;
+      }
+      // 只保留允许的数量
+      const exceededFiles = validFiles.slice(allowedCount);
+      if (exceededFiles.length > 0) {
+        message.warning(
+          t('chatPage.chatWindow.fileLimitTip', {
+            name: config.name,
+            limit,
+          }) + `，已忽略 ${exceededFiles.length} 个文件`
+        );
+      }
+      validFiles = validFiles.slice(0, allowedCount);
+    }
 
-    const validFiles: File[] = [];
-    files.forEach(file => {
+    // 第三步：验证文件类型
+    const finalValidFiles: File[] = [];
+    const invalidFiles: { file: File; error: string }[] = [];
+
+    validFiles.forEach(file => {
       const validationError = validateFile(file, config);
-      if (!validationError) validFiles.push(file);
+      if (!validationError) {
+        finalValidFiles.push(file);
+      } else {
+        invalidFiles.push({ file, error: validationError });
+      }
     });
+
+    // 显示不符合要求的文件提示
+    if (invalidFiles.length > 0) {
+      invalidFiles.forEach(({ file, error }) => {
+        message.error(error);
+      });
+    }
+
+    // 如果没有任何有效文件，直接返回
+    if (finalValidFiles.length === 0) {
+      return;
+    }
+
+    // 标记符合要求的文件正在处理中
+    processingCountRef.current.set(
+      inputName,
+      processingCount + finalValidFiles.length
+    );
 
     // 验证文件后，无论成功与否，都清除该类型的处理中计数
     // 使用 setTimeout 确保在下一个事件循环中清除，给 setFileList 时间执行
@@ -178,8 +216,8 @@ export default function useChatFileUpload(
       processingCountRef.current.set(inputName, 0);
     }, 0);
 
-    if (validFiles.length > 0) {
-      const newFiles: UploadFileInfo[] = validFiles.map(file => ({
+    if (finalValidFiles.length > 0) {
+      const newFiles: UploadFileInfo[] = finalValidFiles.map(file => ({
         uid: generateFileBusinessKey(),
         file,
         fileName: file.name,
