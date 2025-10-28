@@ -56,14 +56,20 @@ async def parse_and_exec_sql(
 
 
 @retry_on_invalid_cached_statement(max_retries=3)
-async def exec_sql_statement(session: AsyncSession, statement: str) -> Any:
-    """Execute raw SQL statement
+async def exec_sql_statement(
+    session: AsyncSession, statement: str, params: Optional[Dict[str, Any]] = None
+) -> Any:
+    """Execute SQL statement with optional parameter binding
 
     Args:
         session: SQLAlchemy AsyncSession
         statement: SQL statement to execute
+        params: Optional parameter dictionary for binding
 
     Returns:
         SQL execution result
     """
-    return await session.execute(text(statement))
+    if params:
+        return await session.execute(text(statement), params)
+    else:
+        return await session.execute(text(statement))
