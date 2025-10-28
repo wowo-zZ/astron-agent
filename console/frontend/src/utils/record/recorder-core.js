@@ -1,7 +1,5 @@
-/* eslint-disable */
 (function (factory) {
   factory(window);
-  //umd returnExports.js
   if (typeof define == 'function' && define.amd) {
     define(function () {
       return Recorder;
@@ -11,8 +9,6 @@
     module.exports = Recorder;
   }
 })(function (window) {
-  'use strict';
-
   var NOOP = function () {};
 
   var Recorder = function (set) {

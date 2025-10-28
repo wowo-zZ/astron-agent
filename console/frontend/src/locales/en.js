@@ -167,6 +167,10 @@ export const en = {
   voiceTry: 'Start',
   EnglishSpeaker: 'English Speaker',
   playing: 'Playing',
+  basicVoice: 'Basic Voice',
+  officialVoice: 'Official Voice',
+  mySpeaker: 'My Speaker',
+  noSpeakerTip: "You haven't created any speakers yet",
   chatBeforeNew: 'Please enter a topic to start a chat',
   emptyBotTip:
     "You haven't created any assistants yet. Go to the Creation Center and creat one.",

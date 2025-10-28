@@ -240,7 +240,7 @@ const CharacterVoice: React.FC<CommonComponentProps> = ({
   }>({
     cn: advancedConfig?.textToSpeech?.vcnCn || vcnList[0]?.voiceType || '',
   });
-  console.log(botCreateActiveV, advancedConfig, '6666666666666666666');
+
   const handleVoiceChange = (voice: { cn: string }): void => {
     setBotCreateActiveV(voice);
     handleAdvancedConfigChange(() => {

@@ -41,7 +41,7 @@ const FileGridDisplay: React.FC<FileGridDisplayProps> = ({
     return (
       <div
         key={file.fileId || file.uid || index}
-        className="flex items-start gap-2 bg-[#fafafa] border border-[#e8e8e8] rounded-lg cursor-pointer p-2 hover:border-[#d3dbf8] hover:bg-[#f5f5f5] transition-all relative min-w-[190px]"
+        className="flex items-start gap-2 bg-[#fafafa] border border-[#e8e8e8] rounded-lg cursor-pointer p-2 hover:border-[#d3dbf8] hover:bg-[#f5f5f5] transition-all relative min-w-0"
         onClick={() => setPreviewFile(file)}
       >
         {/* 文件图标 */}
