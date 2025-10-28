@@ -64,7 +64,7 @@ const ResqBottomButtons = ({
   return (
     <div className="flex items-center ml-14 w-fit px-2 py-1 h-7">
       <TtsModule
-        text={message.message}
+        text={message?.reasoning + message?.message}
         language="cn"
         voiceName={getVoiceName()}
         isPlaying={isPlaying}
