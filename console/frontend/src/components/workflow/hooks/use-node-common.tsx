@@ -974,7 +974,8 @@ const useNodeInputRender = ({ id, data }): UseNodeInputRenderReturn => {
           }));
           const iteratorStartNode = nodes?.find(
             node =>
-              node?.data?.parentId === id && node?.nodeType === 'iteration-node-start'
+              node?.data?.parentId === id &&
+              node?.nodeType === 'iteration-node-start'
           );
           setNode(iteratorStartNode?.id, old => {
             old.data.outputs = outputs;

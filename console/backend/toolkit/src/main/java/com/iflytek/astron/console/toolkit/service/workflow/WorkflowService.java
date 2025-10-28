@@ -26,6 +26,7 @@ import com.iflytek.astron.console.commons.entity.bot.ChatBotBase;
 import com.iflytek.astron.console.commons.entity.bot.UserLangChainInfo;
 import com.iflytek.astron.console.commons.entity.user.UserInfo;
 import com.iflytek.astron.console.commons.entity.workflow.Workflow;
+import com.iflytek.astron.console.commons.enums.bot.BotTypeEnum;
 import com.iflytek.astron.console.commons.exception.BusinessException;
 import com.iflytek.astron.console.commons.mapper.UserLangChainInfoMapper;
 import com.iflytek.astron.console.commons.mapper.bot.ChatBotBaseMapper;
@@ -55,6 +56,7 @@ import com.iflytek.astron.console.toolkit.entity.core.workflow.sse.ChatSysReq;
 import com.iflytek.astron.console.toolkit.entity.dto.*;
 import com.iflytek.astron.console.toolkit.entity.dto.eval.NodeSimpleDto;
 import com.iflytek.astron.console.toolkit.entity.dto.eval.WorkflowComparisonSaveReq;
+import com.iflytek.astron.console.toolkit.entity.dto.talkagent.TalkAgentConfigDto;
 import com.iflytek.astron.console.toolkit.entity.table.ConfigInfo;
 import com.iflytek.astron.console.toolkit.entity.table.database.DbTable;
 import com.iflytek.astron.console.toolkit.entity.table.eval.EvalSet;
@@ -270,6 +272,8 @@ public class WorkflowService extends ServiceImpl<WorkflowMapper, Workflow> {
     private RpaUserAssistantFieldMapper rpaUserAssistantFieldMapper;
     @Autowired
     private RpaHandler rpaHandler;
+    @Autowired
+    private WorkflowConfigMapper workflowConfigMapper;
 
     /**
      * Query workflow list with pagination (in-memory pagination, can be replaced with database
@@ -491,7 +495,14 @@ public class WorkflowService extends ServiceImpl<WorkflowMapper, Workflow> {
         vo.setAddress(s3Util.getS3Prefix());
         vo.setColor(workflow.getAvatarColor());
         vo.setSourceCode(String.valueOf(CommonConst.PlatformCode.COMMON));
-
+        // Is it a voice intelligent agent
+        if (Objects.equals(workflow.getType(), BotTypeEnum.TALK.getType())) {
+            WorkflowConfig workflowConfig = workflowConfigMapper.selectOne(new LambdaQueryWrapper<WorkflowConfig>()
+                    .eq(WorkflowConfig::getFlowId, workflow.getFlowId())
+                    .eq(WorkflowConfig::getVersionNum, "-1")
+                    .eq(WorkflowConfig::getDeleted, false));
+            vo.setFlowConfig(workflowConfig.getConfig());
+        }
         if (StringUtils.isBlank(workflow.getExt())) {
             UserLangChainInfo userLangChainInfo = userLangChainInfoDao.selectOne(new LambdaQueryWrapper<UserLangChainInfo>().eq(UserLangChainInfo::getFlowId, workflow.getFlowId()));
             if (userLangChainInfo != null) {
@@ -1047,6 +1058,25 @@ public class WorkflowService extends ServiceImpl<WorkflowMapper, Workflow> {
             workflow.setData(init.getValue());
         }
         workflow.setOrder(DEFAULT_ORDER);
+        // Add voice intelligent agent configuration
+        if (createReq.getFlowConfig() != null) {
+            WorkflowConfig config = new WorkflowConfig();
+            config.setFlowId(workflow.getFlowId());
+            config.setBotId(createReq.getExt().getInteger("botId"));
+            config.setVersionNum("-1");
+            config.setConfig(JSON.toJSONString(createReq.getFlowConfig()));
+            workflowConfigMapper.insert(config);
+        }
+        ConfigInfo initDataConfig = configInfoMapper.getByCategoryAndCode("WORKFLOW_INIT_DATA", "workflow");
+        if (StringUtils.isBlank(workflow.getData()) && initDataConfig != null) {
+            workflow.setData(initDataConfig.getValue());
+        }
+        // Default Advanced Configuration
+        ConfigInfo initAdvanceConfig = configInfoMapper.getByCategoryAndCode("WORKFLOW_INIT_DATA", "config");
+        if (initAdvanceConfig != null) {
+            workflow.setAdvancedConfig(initAdvanceConfig.getValue());
+        }
+        workflow.setType(createReq.getFlowType());
         save(workflow);
 
         // Sync to Spark database
@@ -1121,6 +1151,18 @@ public class WorkflowService extends ServiceImpl<WorkflowMapper, Workflow> {
             replica.setName(result.getString("botName"));
             replica.setExt(ext.toJSONString());
             updateById(replica);
+            if (Objects.equals(src.getType(), BotTypeEnum.TALK.getType())) {
+                WorkflowConfig workflowConfig = workflowConfigMapper.selectOne(new LambdaQueryWrapper<WorkflowConfig>()
+                        .eq(WorkflowConfig::getFlowId, src.getFlowId())
+                        .eq(WorkflowConfig::getVersionNum, "-1")
+                        .eq(WorkflowConfig::getDeleted, false));
+                workflowConfig.setId(null);
+                workflowConfig.setFlowId(replica.getFlowId());
+                workflowConfig.setBotId(botId);
+                workflowConfig.setCreatedTime(new Date());
+                workflowConfig.setUpdatedTime(new Date());
+                workflowConfigMapper.insert(workflowConfig);
+            }
         }
         return replica;
     }
@@ -1134,7 +1176,10 @@ public class WorkflowService extends ServiceImpl<WorkflowMapper, Workflow> {
      * @return Cloned workflow
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
-    public Workflow cloneForXfYun(Long id, Long spaceId, HttpServletRequest request) {
+    public Workflow cloneForXfYun(Long id, Long spaceId, Integer flowType, Integer botId, TalkAgentConfigDto flowConfig, HttpServletRequest request) {
+        if (flowType == null) {
+            flowType = BotTypeEnum.WORKFLOW_BOT.getType();
+        }
         String uid = RequestContextUtil.getUID();
         log.info("cloneForXfYun uid = {}", uid);
         Workflow src = getById(id);
@@ -1155,14 +1200,10 @@ public class WorkflowService extends ServiceImpl<WorkflowMapper, Workflow> {
         String nFlowId = addResult.data();
 
         BizWorkflowData data = handleDataClone(nFlowId, src.getData());
-        if (data != null) {
-            BizWorkflowData copy = JSON.parseObject(JSON.toJSONString(data), BizWorkflowData.class);
-            flowReq.setData(copy);
-            saveRemote(flowReq, nFlowId);
-        }
 
         Workflow replica = new Workflow();
-        org.springframework.beans.BeanUtils.copyProperties(src, replica);
+        BeanUtils.copyProperties(src, replica);
+        replica.setType(flowType);
         String cloneName = nextCloneName(src.getName());
 
         replica.setId(null);
@@ -1181,8 +1222,30 @@ public class WorkflowService extends ServiceImpl<WorkflowMapper, Workflow> {
         }
         replica.setAppUpdatable(false);
         replica.setOrder(DEFAULT_ORDER);
+        JSONObject jsonData = new JSONObject();
+        jsonData.put("botId", botId);
+        // Update botId
+        replica.setExt(jsonData.toJSONString());
         save(replica);
+        // New configuration information for voice intelligent agents
+        if (Objects.equals(BotTypeEnum.TALK.getType(), flowType)) {
+            WorkflowConfig config = new WorkflowConfig();
+            // Obtain the configuration of the source intelligent agent
+            if (flowConfig == null) {
+                config = workflowConfigMapper.selectOne(new LambdaQueryWrapper<WorkflowConfig>()
+                        .eq(WorkflowConfig::getFlowId, src.getFlowId())
+                        .eq(WorkflowConfig::getVersionNum, "-1")
+                        .eq(WorkflowConfig::getDeleted, false));
+                config.setId(null);
+            } else {
+                config.setConfig(JSON.toJSONString(flowConfig));
+            }
+            config.setFlowId(replica.getFlowId());
+            config.setBotId(botId);
+            config.setVersionNum("-1");
+            workflowConfigMapper.insert(config);
 
+        }
         // Fix appId
         if (!commonConfig.getAppId().equals(replica.getAppId())) {
             replaceAppId(commonConfig.getAppId(), replica.getFlowId());
@@ -1660,11 +1723,29 @@ public class WorkflowService extends ServiceImpl<WorkflowMapper, Workflow> {
         Workflow workflow = loadAndCheckWorkflow(saveReq);
 
         // 2) Sync bot basic info & basic field updates
-        syncBaseBotAndPatchBasics(saveReq, workflow);
+        Integer botId = syncBaseBotAndPatchBasics(saveReq, workflow);
 
         // 3) Merge/validate advanced configuration
         mergeAdvancedConfigSafe(saveReq, workflow);
+        if (saveReq.getFlowConfig() != null) {
+            WorkflowConfig workflowConfig = workflowConfigMapper.selectOne(new LambdaQueryWrapper<WorkflowConfig>()
+                    .eq(WorkflowConfig::getFlowId, workflow.getFlowId())
+                    .eq(WorkflowConfig::getVersionNum, "-1")
+                    .eq(WorkflowConfig::getDeleted, false));
+            if (workflowConfig != null) {
+                workflowConfig.setConfig(JSON.toJSONString(saveReq.getFlowConfig()));
+                workflowConfig.setUpdatedTime(new Date());
+                workflowConfigMapper.updateById(workflowConfig);
+            } else {
+                WorkflowConfig config = new WorkflowConfig();
+                config.setFlowId(workflow.getFlowId());
+                config.setBotId(botId);
+                config.setVersionNum("-1");
+                config.setConfig(JSON.toJSONString(saveReq.getFlowConfig()));
+                workflowConfigMapper.insert(config);
+            }
 
+        }
         // 4) Validate & write protocol data (nodes/edges & length limit & merge write)
         BizWorkflowData bizWorkflowData = saveReq.getData();
         writeProtocolDataIfPresent(workflow, bizWorkflowData);
@@ -1697,9 +1778,9 @@ public class WorkflowService extends ServiceImpl<WorkflowMapper, Workflow> {
     }
 
     // ========== 2. Sync bot basic info & basic field updates ==========
-    private void syncBaseBotAndPatchBasics(WorkflowReq saveReq, Workflow workflow) {
+    private Integer syncBaseBotAndPatchBasics(WorkflowReq saveReq, Workflow workflow) {
         // Sync bot basic info (name/description/avatar/category)
-        updateBaseBot(saveReq, workflow.getExt());
+        Integer botId = updateBaseBot(saveReq, workflow.getExt());
 
         // ---- Update basic info ----
         if (StringUtils.isNotBlank(saveReq.getName())) {
@@ -1714,6 +1795,7 @@ public class WorkflowService extends ServiceImpl<WorkflowMapper, Workflow> {
         if (StringUtils.isNotBlank(saveReq.getAvatarIcon())) {
             workflow.setAvatarIcon(saveReq.getAvatarIcon());
         }
+        return botId;
     }
 
     // ========== 3. Merge/validate advanced configuration ==========
@@ -1984,7 +2066,7 @@ public class WorkflowService extends ServiceImpl<WorkflowMapper, Workflow> {
     }
 
 
-    private void updateBaseBot(WorkflowReq saveReq, String ext) {
+    private Integer updateBaseBot(WorkflowReq saveReq, String ext) {
         Integer botId = null;
         if (!StringUtils.isBlank(ext)) {
             JSONObject jsonObject = JSON.parseObject(ext);
@@ -2012,6 +2094,7 @@ public class WorkflowService extends ServiceImpl<WorkflowMapper, Workflow> {
             chatBotBase.setUpdateTime(LocalDateTime.now());
             chatBotBaseMapper.updateById(chatBotBase);
         }
+        return botId;
     }
 
     private void saveFlowProtocolTemp(String flowId, String bizProtocol, String sysProtocol) {
@@ -2891,6 +2974,16 @@ public class WorkflowService extends ServiceImpl<WorkflowMapper, Workflow> {
                 .set(Workflow::getCanPublish, false)
         // .set(Workflow::getStatus, WorkflowConst.Status.UNPUBLISHED)
         );
+    }
+
+    public Object canPublishSet(Long id) {
+        Workflow workflow = getById(id);
+        dataPermissionCheckTool.checkWorkflowVisible(workflow, SpaceInfoUtil.getSpaceId());
+        WorkflowReq req = new WorkflowReq();
+        req.setAppId(workflow.getAppId());
+        return update(Wrappers.lambdaUpdate(Workflow.class)
+                .eq(Workflow::getId, id)
+                .set(Workflow::getCanPublish, true));
     }
 
     public boolean isSimpleIo(Long id) {

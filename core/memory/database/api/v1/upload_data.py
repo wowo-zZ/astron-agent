@@ -6,13 +6,13 @@ from typing import Dict, List, Tuple
 import pandas as pd
 from common.otlp.trace.span import Span
 from common.service import get_otlp_metric_service, get_otlp_span_service
+from common.utils.snowfake import get_id
 from fastapi import APIRouter, Depends, File, Form, UploadFile
 from memory.database.api.schemas.upload_data_types import UploadDataInput
 from memory.database.domain.entity.views.http_resp import format_response
 from memory.database.exceptions.e import CustomException
 from memory.database.exceptions.error_code import CodeEnum
 from memory.database.repository.middleware.getters import get_session
-from common.utils.snowfake import get_id
 from sqlalchemy import text
 from sqlmodel.ext.asyncio.session import AsyncSession
 from starlette.responses import JSONResponse
