@@ -238,17 +238,17 @@ const CharacterVoice: React.FC<CommonComponentProps> = ({
   const [botCreateActiveV, setBotCreateActiveV] = useState<{
     cn: string;
   }>({
-    cn: advancedConfig?.textToSpeech?.vcnCn || vcnList[0]?.voiceType || '',
+    cn: advancedConfig?.textToSpeech?.vcn_cn || '',
   });
-  console.log(botCreateActiveV, advancedConfig, '6666666666666666666');
+
   const handleVoiceChange = (voice: { cn: string }): void => {
     setBotCreateActiveV(voice);
     handleAdvancedConfigChange(() => {
-      advancedConfig.textToSpeech.vcnCn = voice.cn;
+      advancedConfig.textToSpeech.vcn_cn = voice.cn;
     });
     updateAdvancedConfigParams({
       textToSpeech: {
-        vcnCn: voice.cn,
+        vcn_cn: voice.cn,
       },
     });
   };
@@ -463,7 +463,7 @@ const useAdvancedConfiguration = (): UseAdvancedConfigurationReturn => {
         },
         textToSpeech: {
           enabled: parsedConfig?.textToSpeech?.enabled ?? true,
-          vcnCn: parsedConfig?.textToSpeech?.vcnCn || '',
+          vcn_cn: parsedConfig?.textToSpeech?.vcn_cn || '',
         },
         suggestedQuestionsAfterAnswer: {
           enabled: parsedConfig?.suggestedQuestionsAfterAnswer?.enabled ?? true,
@@ -651,6 +651,7 @@ function AdvancedConfiguration(): React.ReactElement {
     setChatBackgroundInfo,
     uploadProps,
   } = useAdvancedConfiguration();
+
   const [vcnList, setVcnList] = useState<VcnItem[]>([]);
   useEffect(() => {
     const handleAdjustmentDrawerStyle = (): void => {

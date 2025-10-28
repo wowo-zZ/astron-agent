@@ -1,7 +1,16 @@
 import useAntModal from '@/hooks/use-ant-modal';
 import { forwardRef, useImperativeHandle, useState } from 'react';
 
-import { Button, Form, Input, InputNumber, Modal, Switch, Table } from 'antd';
+import {
+  Button,
+  Form,
+  Input,
+  InputNumber,
+  Modal,
+  Switch,
+  Table,
+  Tooltip,
+} from 'antd';
 import { RpaParameter, RpaRobot } from '@/types/rpa';
 import { ColumnsType, TableProps } from 'antd/es/table';
 import { useTranslation } from 'react-i18next';
@@ -9,6 +18,7 @@ import { fetchEventSource } from '@microsoft/fetch-event-source';
 import JsonMonacoEditor from '@/components/monaco-editor/json-monaco-editor';
 import { getAuthorization, getFixedUrl } from '../../utils';
 import { isJSON } from '@/utils';
+import { QuestionCircleOutlined } from '@ant-design/icons';
 
 const filterUndefined = (obj: Record<string, any>) => {
   return Object.entries(obj || {}).reduce(
@@ -49,6 +59,20 @@ export const ModalRpaRun = forwardRef<{
       title: t('rpa.parameterName'),
       dataIndex: 'varName',
       width: 160,
+      render: (text: string, record: RpaParameter) => {
+        return (
+          <div className="text-base font-medium text=[#333] flex items-center">
+            {text}
+            {record?.varDescribe && (
+              <Tooltip title={record?.varDescribe}>
+                <span className="ml-2">
+                  <QuestionCircleOutlined />
+                </span>
+              </Tooltip>
+            )}
+          </div>
+        );
+      },
     },
 
     {
@@ -156,10 +180,10 @@ export const ModalRpaRun = forwardRef<{
       >
         <div className="pt-[24px]">
           <Table
+            bordered={false}
             components={{
               body: { cell: EditableCell },
             }}
-            bordered
             dataSource={(currentRobot?.parameters || []).filter(
               item => item.varDirection === 0
             )}
@@ -195,7 +219,7 @@ interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
   editing: boolean;
   dataIndex: string;
   title: any;
-  inputType: 'number' | 'string' | 'boolean' | 'object';
+  inputType: 'number' | 'string' | 'boolean' | 'object' | 'integer';
   record: RpaParameter;
   index: number;
 }
@@ -214,7 +238,14 @@ export const EditableCell: React.FC<
 }) => {
   const { t } = useTranslation();
   const INPUT_MAP = new Map<string, React.ReactNode>([
-    ['number', <InputNumber placeholder={t('common.inputPlaceholder')} />],
+    [
+      'number',
+      <InputNumber
+        step={1}
+        precision={0}
+        placeholder={t('common.inputPlaceholder')}
+      />,
+    ],
     ['string', <Input placeholder={t('common.inputPlaceholder')} />],
     [
       'boolean',
@@ -224,6 +255,7 @@ export const EditableCell: React.FC<
       />,
     ],
     ['object', <JsonMonacoEditor />],
+    ['integer', <InputNumber placeholder={t('common.inputPlaceholder')} />],
   ]);
 
   const inputNode = INPUT_MAP.get(inputType) || <JsonMonacoEditor />;

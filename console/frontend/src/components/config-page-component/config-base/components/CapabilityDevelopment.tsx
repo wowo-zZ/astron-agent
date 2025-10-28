@@ -41,7 +41,6 @@ import { useTranslation } from 'react-i18next';
 
 import styles from './CapabilityDevelopment.module.scss';
 import cls from 'classnames';
-import { getVcnList } from '@/services/chat';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
 
 const { TextArea } = Input;
