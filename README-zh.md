@@ -1,10 +1,6 @@
-# 星辰Agent - 智能体开发平台
+[![Astron_Readme](./docs/imgs/Astron_Readme.png)](https://agent.xfyun.cn)
 
 <div align="center">
-
-![Logo](docs/logo.svg)
-
-**星辰Agent是一款专为AI开发者和各类组织打造的企业级Agent开发平台。**
 
 [![License](https://img.shields.io/badge/license-apache2.0-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/github/v/release/iflytek/astron-agent)](https://github.com/iflytek/astron-agent/releases)
@@ -32,18 +28,19 @@
 
 ## 🔭 星辰 Agent 是什么
 
-星辰 Agent 是一款面向**AI开发者与各类组织**的企业级 Agent 开发平台。它不仅提供从**模型托管、应用开发、效果优化到权限管控**的全链路能力，更创新性地融合了**智能RPA**，让 Agent 不仅能“思考”，还能真正“执行”，在跨数字系统与桌面环境中完成复杂任务链。
+星辰Agent是一个**企业级、商业友好**的 Agentic Workflow开发平台，融合了 AI 工作流编排、模型管理、AI 与 MCP 工具集、RPA 自动化和团队空间等特性。
+平台支持**高可用部署**，帮助企业快速构建**可规模化落地**的智能体应用，打造面向未来的 AI 基座。
 
 ### 为什么选择 星辰 Agent？
 - **内外同源，稳定可信**：技术内核与[讯飞星辰Agent平台](https://agent.xfyun.cn)保持一致，继承其成熟的企业级稳定性。
 - **思考 + 行动的闭环**：智能RPA深度融合，让Agent从“生成答案”走向“自动完成任务”。
-- **面向开发者与企业的双重价值**：开发者能快速上手并扩展，中小企业能高效落地数字化流程。
+- **面向开发者与企业的双重价值**：开发者能快速上手并扩展，企业能高效落地数字化流程。
 
 ### 关键特性
-- **企业级高可用**：全链路能力覆盖开发、构建、优化与管控，支持一键部署，稳定可靠。
+- **企业级高可用**：全链路能力覆盖开发、构建、优化与管控，支持高可用集群，一键部署，稳定可靠。
 - **智能RPA融合**：跨系统流程自动化，让Agent具备高可控执行力，实现“从决策到动作”的完整闭环。
 - **即用工具生态**：集成[讯飞开放平台](https://www.xfyun.cn)海量AI能力与工具，历经数百万开发者验证，免开发快速接入。
-- **灵活模型支持**：多种接入方式，支持模型API快速接入验证到企业级MaaS本地集群一键部署，满足不同规模需求。
+- **灵活模型支持**：多种接入方式，支持大模型API快速接入验证到企业级MaaS本地集群一键部署，满足不同规模需求。
 
 ### 开发支持
 - **多语言后端**：支持 Java、Go、Python 等主流语言，前端适配 TypeScript + React 技术栈。

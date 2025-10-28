@@ -288,6 +288,4 @@ services:
 
 networks:
   astron-agent-network:
-    # In integrated mode (via include), this network is created by docker-compose-with-auth.yaml
-    # Docker Compose will automatically use the same network without needing 'external: true'
-    name: astron-agent-network
+    driver: bridge

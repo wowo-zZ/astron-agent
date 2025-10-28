@@ -1,14 +1,14 @@
-# astronAgent Complete Deployment Guide
+# AstronAgent Complete Deployment Guide
 
-This guide will help you start all components of the astronAgent project in the correct order, including authentication, knowledge base, and core services.
+This guide will help you start all components of the AstronAgent project in the correct order, including authentication, knowledge base, and core services.
 
 ## 📋 Project Architecture Overview
 
-The astronAgent project consists of the following three main components:
+The AstronAgent project consists of the following three main components:
 
 1. **Casdoor** - Identity authentication and single sign-on service (required component, provides SSO functionality)
 2. **RagFlow** - Knowledge base and document retrieval service (optional component, deploy as needed)
-3. **astronAgent** - Core business service cluster (required component)
+3. **AstronAgent** - Core business service cluster (required component)
 
 ## 🚀 Deployment Steps
 
@@ -24,26 +24,7 @@ The astronAgent project consists of the following three main components:
 - RAM >= 16 GB
 - Disk >= 50 GB
 
-### Step 1: Start Casdoor Identity Authentication Service
-
-Casdoor is an open-source identity and access management platform that provides support for multiple authentication protocols including OAuth 2.0, OIDC, and SAML.
-
-To start the Casdoor service, run our [docker-compose-with-auth.yaml](/docker/astronAgent/docker-compose-with-auth.yaml) file. Before running the installation commands, please ensure that Docker and Docker Compose are installed on your machine.
-
-```bash
-# Navigate to astronAgent directory
-cd docker/astronAgent
-
-# Start Casdoor service
-docker compose -f docker-compose-auth.yml up -d
-```
-
-**Service Information:**
-- Access Address: http://localhost:8000
-- Container Name: casdoor
-- Default Configuration: Production mode (GIN_MODE=release)
-
-### Step 2: Start RagFlow Knowledge Base Service (Optional)
+### Step 1: Start RagFlow Knowledge Base Service (Optional, deploy as needed)
 
 RagFlow is an open-source RAG (Retrieval-Augmented Generation) engine that provides accurate question-answering services using deep document understanding technology.
 
@@ -58,6 +39,12 @@ chmod +x *.sh
 
 # Start RagFlow service (including all dependencies)
 docker compose up -d
+
+# Check service status
+docker compose ps
+
+# View service logs
+docker compose logs -f ragflow
 ```
 
 **Access Address:**
@@ -72,9 +59,9 @@ docker compose up -d
 - Elasticsearch is used by default. To use opensearch or infinity, modify the DOC_ENGINE configuration in .env
 - GPU acceleration is supported, start with `docker-compose-gpu.yml`
 
-### Step 3: Integrate Casdoor and RagFlow Services Configuration (Configure as needed)
+### Step 2: Configure AstronAgent Environment Variables
 
-Before starting astronAgent services, configure the relevant connection information to integrate Casdoor and RagFlow.
+Before starting AstronAgent services, you need to configure the relevant connection information.
 
 ```bash
 # Navigate to astronAgent directory
@@ -84,7 +71,7 @@ cd docker/astronAgent
 cp .env.example .env
 ```
 
-#### 3.1 Configure Knowledge Base Service Connection (Optional)
+#### 2.1 Configure Knowledge Base Service Connection (If RagFlow is deployed)
 
 Edit the docker/astronAgent/.env file to configure RagFlow connection information:
 
@@ -112,53 +99,7 @@ RAGFLOW_DEFAULT_GROUP=星辰知识库
 3. Click API to generate an API KEY
 4. Update the generated API KEY to RAGFLOW_API_TOKEN in the .env file
 
-#### 3.2 Configure Casdoor Authentication Integration (Required)
-
-Edit the docker/astronAgent/.env file to configure Casdoor connection information:
-
-**Key Configuration Items:**
-
-```env
-# Casdoor Configuration
-CONSOLE_CASDOOR_URL=http://your-casdoor-server:8000
-CONSOLE_CASDOOR_ID=your-casdoor-client-id
-CONSOLE_CASDOOR_APP=your-casdoor-app-name
-CONSOLE_CASDOOR_ORG=your-casdoor-org-name
-```
-
-**Obtaining Casdoor Configuration Information:**
-1. Visit the Casdoor management console: [http://localhost:8000](http://localhost:8000)
-2. Log in with the default administrator account: `admin / 123`
-3. **Create Organization**
-   Go to the [http://localhost:8000/organizations](http://localhost:8000/organizations) page, click "Add", fill in the organization name, save and exit.
-4. **Create Application and Bind Organization**
-   Go to the [http://localhost:8000/applications](http://localhost:8000/applications) page, click "Add".
-
-   When creating the application, fill in the following information:
-   - **Name**: Custom application name, e.g., `agent`
-   - **Redirect URL**: Set to the project's callback address. If the Nginx exposed port is `80`, use `http://your-local-ip/callback`; if it's another port (e.g., `888`), use `http://your-local-ip:888/callback`
-   - **Organization**: Select the organization name you just created
-5. After saving the application, record the following information and map it to the project configuration items:
-
-| Casdoor Information Item | Example Value | Corresponding `.env` Configuration Item |
-|--------------------------|---------------|------------------------------------------|
-| Casdoor Service Address (URL) | `http://localhost:8000` | `CONSOLE_CASDOOR_URL=http://localhost:8000` |
-| Client ID | `your-casdoor-client-id` | `CONSOLE_CASDOOR_ID=your-casdoor-client-id` |
-| Application Name (Name) | `your-casdoor-app-name` | `CONSOLE_CASDOOR_APP=your-casdoor-app-name` |
-| Organization Name (Organization) | `your-casdoor-org-name` | `CONSOLE_CASDOOR_ORG=your-casdoor-org-name` |
-
-6. Fill in the above configuration information into the project's environment variable file:
-```bash
-# Navigate to astronAgent directory
-cd docker/astronAgent
-
-# Edit environment variable configuration
-vim .env
-```
-
-### Step 4: Start astronAgent Core Services (Required Deployment Step)
-
-#### 4.1 Configure iFLYTEK Open Platform APP_ID, API_KEY, and Related Information
+#### 2.2 Configure iFLYTEK Open Platform APP_ID, API_KEY, and Related Information
 
 For documentation, see: https://www.xfyun.cn/doc/platform/quickguide.html
 
@@ -179,7 +120,7 @@ SPARK_API_PASSWORD=your-api-password
 SPARK_RTASR_API_KEY=your-rtasr-api-key
 ```
 
-#### 4.2 If You Want to Use Spark RAG Cloud Service, Configure as Follows (Optional)
+#### 2.3 Configure Spark RAG Cloud Service (Optional)
 
 Spark RAG cloud service provides two usage methods:
 
@@ -211,30 +152,81 @@ After obtaining the dataset ID, please update it in the docker/astronAgent/.env 
 XINGHUO_DATASET_ID=
 ```
 
-#### 4.3 Start astronAgent Services
+#### 2.4 Configure Service Host Address
 
-Before starting, please configure some required environment variables and ensure nginx and minio ports are exposed
+Edit the docker/astronAgent/.env file to configure the AstronAgent service host address:
+
+```env
+HOST_BASE_ADDRESS=http://localhost
+```
+
+**Note:**
+- If you're using a domain name for access, replace `localhost` with your domain name
+- Ensure nginx and minio ports are properly exposed
+
+### Step 3: Start AstronAgent Core Services (Including Casdoor Authentication Service)
+
+To start AstronAgent services, run our [docker-compose-with-auth.yaml](/docker/astronAgent/docker-compose-with-auth.yaml) file. **This file has integrated the Casdoor authentication service through the `include` mechanism** and will automatically start Casdoor.
 
 ```bash
 # Navigate to astronAgent directory
 cd docker/astronAgent
 
-# Modify configuration as needed
+# Start all services (including Casdoor)
+docker compose -f docker-compose-with-auth.yaml up -d
+```
+
+**Note:**
+- Default Casdoor login credentials: username: `admin`, password: `123`
+
+### Step 4: Modify Casdoor Authentication (Optional)
+
+You can create new applications and organizations in Casdoor as needed, and update the configuration information in the `.env` file (default organization and application already exist).
+
+#### 4.1 Configure Casdoor Application
+
+**Obtaining Casdoor Configuration Information:**
+1. Visit the Casdoor management console: [http://localhost:8000](http://localhost:8000)
+2. Log in with the default administrator account: `admin / 123`
+3. **Create Organization**
+   Go to the [http://localhost:8000/organizations](http://localhost:8000/organizations) page, click "Add", fill in the organization name, save and exit.
+4. **Create Application and Bind Organization**
+   Go to the [http://localhost:8000/applications](http://localhost:8000/applications) page, click "Add".
+
+   When creating the application, fill in the following information:
+   - **Name**: Custom application name, e.g., `agent`
+   - **Redirect URL**: Set to the project's callback address. If the Nginx exposed port is `80`, use `http://your-local-ip/callback`; if it's another port (e.g., `888`), use `http://your-local-ip:888/callback`
+   - **Organization**: Select the organization name you just created
+5. After saving the application, record the following information and map it to the project configuration items:
+
+| Casdoor Information Item | Example Value | Corresponding `.env` Configuration Item |
+|--------------------------|---------------|------------------------------------------|
+| Casdoor Service Address (URL) | `http://localhost:8000` | `CONSOLE_CASDOOR_URL=http://localhost:8000` |
+| Client ID | `your-casdoor-client-id` | `CONSOLE_CASDOOR_ID=your-casdoor-client-id` |
+| Application Name (Name) | `your-casdoor-app-name` | `CONSOLE_CASDOOR_APP=your-casdoor-app-name` |
+| Organization Name (Organization) | `your-casdoor-org-name` | `CONSOLE_CASDOOR_ORG=your-casdoor-org-name` |
+
+6. Fill in the above configuration information into the project's environment variable file:
+```bash
+# Navigate to astronAgent directory
+cd docker/astronAgent
+
+# Edit environment variable configuration
 vim .env
 ```
 
+**Add or update the following configuration items in the .env file:**
 ```env
-HOST_BASE_ADDRESS=http://localhost (astronAgent service host address)
+# Casdoor Configuration
+CONSOLE_CASDOOR_URL=http://localhost:8000
+CONSOLE_CASDOOR_ID=your-casdoor-client-id
+CONSOLE_CASDOOR_APP=your-casdoor-app-name
+CONSOLE_CASDOOR_ORG=your-casdoor-org-name
 ```
 
-To start astronAgent services, run our [docker-compose.yaml](/docker/astronAgent/docker-compose.yaml) file. Before running the installation commands, please ensure that Docker and Docker Compose are installed on your machine.
-
+7. Restart AstronAgent services to apply the new configuration:
 ```bash
-# Navigate to astronAgent directory
-cd docker/astronAgent
-
-# Start all services
-docker compose up -d
+docker compose restart console-frontend console-hub
 ```
 
 ## 📊 Service Access Addresses
