@@ -21,6 +21,7 @@ import com.iflytek.astron.console.commons.mapper.bot.ChatBotBaseMapper;
 import com.iflytek.astron.console.commons.service.bot.ChatBotTagService;
 import com.iflytek.astron.console.commons.service.data.UserLangChainDataService;
 import com.iflytek.astron.console.commons.service.workflow.impl.WorkflowBotParamServiceImpl;
+import com.iflytek.astron.console.commons.util.space.SpaceInfoUtil;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -397,7 +398,8 @@ public class MaasUtil {
      */
     private JSONObject createApiInternal(String flowId, String appid, String version, JSONObject data) {
         log.info("----- Publishing maas workflow flowId: {}", flowId);
-        MaasApi maasApi = new MaasApi(flowId, appid, version, data);
+        // Create MaasApi without data parameter for publish request
+        MaasApi maasApi = new MaasApi(flowId, appid, version);
 
         // Execute publish request
         String publishResponse = executeRequest(publishApi, maasApi);
@@ -476,6 +478,7 @@ public class MaasUtil {
                 .url(httpUrl)
                 .addHeader("X-Consumer-Username", consumerId)
                 .addHeader("Lang-Code", I18nUtil.getLanguage())
+                .addHeader("space-id", String.valueOf(SpaceInfoUtil.getSpaceId()))
                 .addHeader(AUTHORIZATION_HEADER, MaasUtil.getAuthorizationHeader(request))
                 .addHeader(X_AUTH_SOURCE_HEADER, X_AUTH_SOURCE_VALUE)
                 .get()
@@ -623,11 +626,7 @@ public class MaasUtil {
      */
     public static boolean isFileArray(JSONObject param) {
         try {
-            if ("array-string".equalsIgnoreCase(param.getJSONObject("schema").getString("type"))) {
-                return true;
-            } else {
-                return false;
-            }
+            return "array-string".equalsIgnoreCase(param.getJSONObject("schema").getString("type"));
         } catch (Exception e) {
             log.error("Exception determining if parameter is array type: {}", e.getMessage());
             return false;

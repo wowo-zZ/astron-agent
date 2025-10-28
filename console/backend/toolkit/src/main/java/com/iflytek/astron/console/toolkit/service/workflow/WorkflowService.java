@@ -153,6 +153,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
+@SuppressWarnings({"PMD.NcssCount", "PMD.CyclomaticComplexity"})
 public class WorkflowService extends ServiceImpl<WorkflowMapper, Workflow> {
 
     public static final String PROTOCOL_ADD_PATH = "/workflow/v1/protocol/add";
@@ -523,7 +524,7 @@ public class WorkflowService extends ServiceImpl<WorkflowMapper, Workflow> {
     }
 
     /**
-     * 判断rpa是否是最新的版本
+     * Check if RPA is the latest version
      *
      * @param data
      * @return
@@ -2226,77 +2227,127 @@ public class WorkflowService extends ServiceImpl<WorkflowMapper, Workflow> {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void checkAndEditData(BizNodeData bizNodeData, String prefix) {
-        if (bizNodeData == null || bizNodeData.getNodeMeta() == null) {
-            return;
-        }
-        if (!WorkflowConst.NodeType.AGENT.equals(prefix)) {
+        if (!isAgentNode(bizNodeData, prefix)) {
             return;
         }
 
         JSONObject nodeParam = bizNodeData.getNodeParam();
-        JSONObject modelConfig = nodeParam.getJSONObject("modelConfig");
-        if (modelConfig != null) {
-            String serviceId = nodeParam.getString("serviceId");
-            dealWithUrl(modelConfig, serviceId);
-        }
-        // Configure model corresponding URL
-        // checkAndChangeConfig(bizNodeData, modelConfig);
 
+        // 1 Handle model address - adjust modelConfig.api according to serviceId
+        handleModelConfigUrl(nodeParam);
+        // 2 Handle plugin info - includes MCP address and knowledge docIds
         JSONObject plugin = nodeParam.getJSONObject("plugin");
         if (plugin == null) {
-            log.warn("plugin config is missing");
+            log.warn("Plugin configuration is missing for node: {}", prefix);
             return;
         }
-        JSONArray mcpServerIds = plugin.getJSONArray("mcpServerIds");
-        if (mcpServerIds != null || !mcpServerIds.isEmpty()) {
-            JSONArray mcpServerUrls = plugin.getJSONArray("mcpServerUrls");
-            for (Object mcpServerId : mcpServerIds) {
-                String server = (String) mcpServerId;
-                mcpServerUrls.add(server);
-            }
-        }
+
+        // (2.1) MCP: copy mcpServerIds to mcpServerUrls
+        copyMcpServerIdsToUrls(plugin);
+
+        // (2.2) Knowledge: aggregate docIds based on repoIds
         JSONArray knowledgeArray = plugin.getJSONArray("knowledge");
         if (knowledgeArray == null || knowledgeArray.isEmpty()) {
             return;
         }
+        enrichKnowledgeDocIds(knowledgeArray);
+    }
+
+    /** Check whether it is an AGENT node and has valid metadata */
+    private boolean isAgentNode(BizNodeData bizNodeData, String prefix) {
+        if (bizNodeData == null || bizNodeData.getNodeMeta() == null) {
+            return false;
+        }
+        return WorkflowConst.NodeType.AGENT.equals(prefix);
+    }
+
+    /** Handle the modelConfig.api field based on the serviceId */
+    private void handleModelConfigUrl(JSONObject nodeParam) {
+        if (nodeParam == null)
+            return;
+        JSONObject modelConfig = nodeParam.getJSONObject("modelConfig");
+        if (modelConfig == null)
+            return;
+        String serviceId = nodeParam.getString("serviceId");
+        dealWithUrl(modelConfig, serviceId); // reuse existing method
+    }
+
+    /** MCP: copy mcpServerIds to mcpServerUrls safely (null & empty check included) */
+    private void copyMcpServerIdsToUrls(JSONObject plugin) {
+        JSONArray mcpServerIds = plugin.getJSONArray("mcpServerIds");
+        if (mcpServerIds == null || mcpServerIds.isEmpty()) {
+            return;
+        }
+        JSONArray mcpServerUrls = plugin.getJSONArray("mcpServerUrls");
+        if (mcpServerUrls == null) {
+            mcpServerUrls = new JSONArray();
+            plugin.put("mcpServerUrls", mcpServerUrls);
+        }
+        for (int i = 0; i < mcpServerIds.size(); i++) {
+            String server = mcpServerIds.getString(i);
+            if (StringUtils.isNotBlank(server)) {
+                mcpServerUrls.add(server);
+            }
+        }
+    }
+
+    /** Knowledge: fill docIds for each knowledge.match section */
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private void enrichKnowledgeDocIds(JSONArray knowledgeArray) {
         for (int i = 0; i < knowledgeArray.size(); i++) {
             Object obj = knowledgeArray.get(i);
             if (!(obj instanceof Map)) {
                 continue;
             }
-
             Map knowledgeObj = (Map) obj;
             Object matchObj = knowledgeObj.get("match");
             if (!(matchObj instanceof Map)) {
                 continue;
             }
-
             Map match = (Map) matchObj;
-            Object repoIdsObj = match.get("repoIds");
-            if (!(repoIdsObj instanceof List)) {
-                continue;
-            }
-
-            List<String> repoIds = (List<String>) repoIdsObj;
+            List<String> repoIds = extractRepoIds(match.get("repoIds"));
             if (repoIds.isEmpty()) {
                 continue;
             }
-
-            List<String> allDocIds = new ArrayList<>();
-            for (String repoId : repoIds) {
-                List<FileInfoV2> fileInfoList = fileInfoV2Mapper.getFileInfoV2ByCoreRepoId(repoId);
-                if (CollUtil.isNotEmpty(fileInfoList)) {
-                    List<String> docIds = CollUtil.getFieldValues(fileInfoList, "uuid", String.class);
-                    allDocIds.addAll(docIds);
-                    log.info("Found docIds for repoId {}: {}", repoId, docIds);
-                }
-            }
-
+            List<String> allDocIds = getDocIdsForRepos(repoIds);
             if (!allDocIds.isEmpty()) {
                 match.put("docIds", allDocIds);
             }
         }
+    }
+
+    /** Extract repoIds only if it is a List<String> */
+    @SuppressWarnings("rawtypes")
+    private List<String> extractRepoIds(Object repoIdsObj) {
+        if (!(repoIdsObj instanceof List)) {
+            return Collections.emptyList();
+        }
+        List list = (List) repoIdsObj;
+        List<String> repoIds = new ArrayList<>(list.size());
+        for (Object o : list) {
+            if (o instanceof String s && StringUtils.isNotBlank(s)) {
+                repoIds.add(s);
+            }
+        }
+        return repoIds;
+    }
+
+    /** Retrieve all docIds by repoIds -using existing fileInfoV2Mapper query */
+    private List<String> getDocIdsForRepos(List<String> repoIds) {
+        List<String> allDocIds = new ArrayList<>();
+        for (String repoId : repoIds) {
+            List<FileInfoV2> fileInfoList = fileInfoV2Mapper.getFileInfoV2ByCoreRepoId(repoId);
+            if (CollUtil.isNotEmpty(fileInfoList)) {
+                List<String> docIds = CollUtil.getFieldValues(fileInfoList, "uuid", String.class);
+                allDocIds.addAll(docIds);
+                log.info("Found docIds for repoId {} -> {}", repoId, docIds);
+            } else {
+                log.debug("No file info found for repoId {}", repoId);
+            }
+        }
+        return allDocIds;
     }
 
     private void dealWithUrl(JSONObject modelConfig, String serviceId) {
@@ -2542,7 +2593,7 @@ public class WorkflowService extends ServiceImpl<WorkflowMapper, Workflow> {
         return vo;
     }
 
-    private JSONObject getIoTrans(List<BizWorkflowNode> nodes) {
+    public JSONObject getIoTrans(List<BizWorkflowNode> nodes) {
         if (nodes.isEmpty()) {
             return null;
         }

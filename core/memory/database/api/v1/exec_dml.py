@@ -22,7 +22,7 @@ from memory.database.domain.entity.views.http_resp import format_response
 from memory.database.exceptions.e import CustomException
 from memory.database.exceptions.error_code import CodeEnum
 from memory.database.repository.middleware.getters import get_session
-from memory.database.utils.snowfake import get_id
+from common.utils.snowfake import get_id
 from sqlglot import exp, parse_one
 from sqlmodel.ext.asyncio.session import AsyncSession
 from starlette.responses import JSONResponse

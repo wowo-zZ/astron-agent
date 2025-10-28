@@ -14,7 +14,6 @@ from workflow.engine.entities.retry_config import RetryConfig
 from workflow.engine.entities.variable_pool import VariablePool
 from workflow.engine.entities.workflow_dsl import InputItem, Node, OutputItem
 from workflow.engine.nodes.base_node import BaseNode
-from workflow.engine.nodes.cache_node import tool_classes
 from workflow.engine.nodes.entities.node_run_result import (
     NodeRunResult,
     WorkflowNodeExecutionStatus,
@@ -654,6 +653,9 @@ class NodeFactory:
         :return: Created node instance
         :raises CustomException: When node type is not supported
         """
+
+        from workflow.engine.nodes.cache_node import tool_classes
+
         node_class = tool_classes.get(node.get_node_type())
         if not node_class:
             raise CustomException(

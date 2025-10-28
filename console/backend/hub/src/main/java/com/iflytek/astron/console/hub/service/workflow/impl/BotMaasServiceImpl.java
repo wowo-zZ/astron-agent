@@ -74,7 +74,7 @@ public class BotMaasServiceImpl implements BotMaasService {
         }
         Integer botId = botInfoDto.getBotId();
         botService.addMaasInfo(uid, res, botId, spaceId);
-        botInfoDto.setFlowId((Long) res.getByPath("data.id"));
+        botInfoDto.setFlowId(res.getJSONObject("data").getLong("id"));
         return botInfoDto;
     }
 
