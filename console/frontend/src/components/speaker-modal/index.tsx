@@ -209,10 +209,9 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
           rootClassName="speaker-segment"
         />
         <div className="w-full flex flex-wrap justify-start h-auto gap-4 mb-3">
-          {/* 官方精品音色 */}
           {activeTab === 'official' && (
             <div className="w-full">
-              <div className="w-full flex flex-wrap justify-start h-auto gap-4 mt-3.5">
+              <div className="w-full flex flex-wrap justify-start h-auto gap-4">
                 {officialVoiceList.map((item: VcnItem) => (
                   <div
                     className={`w-[230px] h-[50px] rounded-[10px] bg-white flex items-center justify-between px-3 border cursor-pointer ${
@@ -270,11 +269,9 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
             </div>
           )}
 
-          {/* 基础音色 */}
           {activeTab === 'basic' && (
             <div className="w-full">
-              {/*  我的发音人 */}
-              <div className="rounded-[10px] mt-3.5 bg-[url(@/assets/svgs/my-speaker-bg.png)] bg-no-repeat bg-center bg-cover pt-[17px] pr-[17px] pb-3 pl-5">
+              {/* <div className="rounded-[10px] mt-3.5 bg-[url(@/assets/svgs/my-speaker-bg.png)] bg-no-repeat bg-center bg-cover pt-[17px] pr-[17px] pb-3 pl-5">
                 <div className="flex justify-between mb-3.5">
                   <span className="text-base font-bold text-[#222529]">
                     {t('mySpeaker')}
@@ -325,12 +322,10 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
                         key={item.vcnCode || 'unuse_' + item.vcnId}
                         onClick={() => {
                           setBotCreateActiveV({
-                            ...botCreateActiveV,
                             cn: item.vcnCode,
                           });
                         }}
                       >
-                        {/* 标题或编辑输入框 */}
                         {editVCNId === item.vcnId ? (
                           <div className="h-[35px] w-[300px] mr-2">
                             <input
@@ -365,7 +360,6 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
                           </div>
                         )}
 
-                        {/* 操作按钮 */}
                         <div className="flex">
                           {editVCNId === item.vcnId ? (
                             // 编辑模式：显示确认按钮
@@ -481,7 +475,7 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
                     ))
                   )}
                 </div>
-              </div>
+              </div> */}
 
               {/* 普通音色 */}
               {basicVoiceList.length > 0 && (

@@ -16,9 +16,9 @@ const VoiceTraining: React.FC<VoiceTrainingProps> = ({
 }) => {
   const [recordStatus, setRecordStatus] = useState(0);
   const [recObj, setRecObj] = useState<any>();
-  const [sex, setSex] = useState(2);
-  const [createStep, setCreateStep] = useState(1);
-  const [sampleIndex, setSampleIndex] = useState(0);
+  const [sex, setSex] = useState<0 | 1 | 2>(2); // 0: 男生, 1: 女生, 2: 未选择
+  const [createStep, setCreateStep] = useState<1 | 2>(1);
+  const [sampleIndex, setSampleIndex] = useState<number>(0);
   const { t } = useTranslation();
 
   const trainingText = [
@@ -105,7 +105,6 @@ const VoiceTraining: React.FC<VoiceTrainingProps> = ({
       sampleRate: 24000,
       bitRate: 16,
     });
-    console.log(rec, 'rec111');
     setRecObj(rec);
   }, []);
 
@@ -116,6 +115,14 @@ const VoiceTraining: React.FC<VoiceTrainingProps> = ({
     }
     setCreateStep(2);
     setSampleIndex(Math.floor(Math.random() * 9) + 1);
+  };
+
+  //关闭弹窗
+  const closeModal = () => {
+    recObj?.close();
+    setCreateStep(1);
+    setSex(2);
+    changeTrainModal();
   };
 
   return (
@@ -136,10 +143,7 @@ const VoiceTraining: React.FC<VoiceTrainingProps> = ({
         <div className="bg-white rounded-[10px] pt-2.5">
           <div
             className="font-semibold pt-5 h-[50px] leading-[10px] text-xl text-[#43436b] bg-[url(@/assets/imgs/voicetraining/v-arrow-left.svg)] bg-[length:auto] bg-[25px_center] bg-no-repeat pl-[55px] cursor-pointer"
-            onClick={() => {
-              recObj?.close();
-              changeTrainModal();
-            }}
+            onClick={closeModal}
           >
             一句话创建
           </div>
@@ -186,10 +190,7 @@ const VoiceTraining: React.FC<VoiceTrainingProps> = ({
         <div className="bg-[url(@/assets/imgs/voicetraining/pop-bg.png)] bg-left-bottom bg-no-repeat bg-cover rounded-[10px] pt-2.5">
           <div
             className="font-semibold pt-5 h-[50px] leading-[10px] text-xl text-[#43436b] bg-[url(@/assets/imgs/voicetraining/v-arrow-left.svg)] bg-[length:auto] bg-[25px_center] bg-no-repeat pl-[55px] cursor-pointer"
-            onClick={() => {
-              recObj?.close();
-              changeTrainModal();
-            }}
+            onClick={closeModal}
           >
             一句话创建
           </div>
