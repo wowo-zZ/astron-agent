@@ -18,7 +18,7 @@ on:
         type: boolean
 
 concurrency:
-  group: release-${{ github.ref }}
+  group: release-${{ github.event.inputs.tag || github.ref }}
   cancel-in-progress: false
 
 permissions:
@@ -44,11 +44,36 @@ jobs:
       has-console-hub: ${{ steps.detect.outputs.has-console-hub }}
       has-console-frontend: ${{ steps.detect.outputs.has-console-frontend }}
       changelog: ${{ steps.changelog.outputs.changelog }}
+      git-ref: ${{ steps.meta.outputs.git-ref }}
+      commit-sha: ${{ steps.meta.outputs.commit-sha }}
+      cache-scope: ${{ steps.meta.outputs.cache-scope }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
           fetch-depth: 0  # 获取完整历史记录用于生成changelog
+
+      - name: 验证Tag存在性(仅手动触发)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          TAG="${{ github.event.inputs.tag }}"
+          echo "🔍 验证Tag是否存在: $TAG"
+
+          # 获取所有tags
+          git fetch --tags --force
+
+          # 检查tag是否存在
+          if ! git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "❌ 错误: Tag '$TAG' 不存在！"
+            echo "📋 可用的tags:"
+            git tag --sort=-version:refname | head -10
+            exit 1
+          fi
+
+          # 确保checkout到正确的tag
+          git checkout "$TAG"
+          echo "✅ Tag '$TAG' 验证成功"
 
       - name: 验证标签格式
         id: meta
@@ -56,6 +81,7 @@ jobs:
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             VERSION="${{ github.event.inputs.tag }}"
             IS_PRERELEASE="${{ github.event.inputs.prerelease }}"
+            GIT_REF="${{ github.event.inputs.tag }}"
           else
             VERSION=${GITHUB_REF#refs/tags/}
             # 检查是否为预发布版本 (包含 -, alpha, beta, rc 等)
@@ -64,20 +90,36 @@ jobs:
             else
               IS_PRERELEASE="true"
             fi
+            GIT_REF="${{ github.ref }}"
           fi
-          
+
           # 验证版本号格式
           if [[ ! "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
             echo "❌ 错误的版本号格式: $VERSION"
             echo "✅ 正确格式: v1.0.0, v1.0.0-beta.1, v1.0.0-rc.1"
             exit 1
           fi
-          
+
+          # 获取准确的commit SHA (checkout后的实际commit)
+          COMMIT_SHA=$(git rev-parse HEAD)
+
+          # 为release构建设置缓存scope
+          # 简化命名: v1.0.0 -> tag-v1-0-0, v1.0.0-beta.1 -> tag-v1-0-0-beta-1
+          VERSION_SAFE="${VERSION//\./-}"       # 替换点号为连字符
+          VERSION_SAFE="${VERSION_SAFE//\//-}"  # 替换斜杠为连字符(如果有)
+          CACHE_SCOPE="tag-${VERSION_SAFE}"
+
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "is-prerelease=$IS_PRERELEASE" >> $GITHUB_OUTPUT
-          
+          echo "git-ref=$GIT_REF" >> $GITHUB_OUTPUT
+          echo "commit-sha=$COMMIT_SHA" >> $GITHUB_OUTPUT
+          echo "cache-scope=$CACHE_SCOPE" >> $GITHUB_OUTPUT
+
           echo "🏷️ 发布版本: $VERSION"
           echo "🔖 预发布版本: $IS_PRERELEASE"
+          echo "📝 Git Ref: $GIT_REF"
+          echo "📝 Commit SHA: $COMMIT_SHA"
+          echo "💾 Cache Scope: $CACHE_SCOPE"
 
       - name: 智能项目检测
         id: detect
@@ -125,16 +167,19 @@ jobs:
         run: |
           echo "📝 Generating changelog..."
 
-          # Get previous tag
-          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
           CURRENT_TAG="${{ steps.meta.outputs.version }}"
+
+          # 获取前一个tag (更可靠的方法)
+          # 方法: 获取所有tags，按版本排序，找到当前tag的前一个
+          PREVIOUS_TAG=$(git tag --sort=-version:refname | grep -v "^${CURRENT_TAG}$" | head -1)
 
           if [[ -z "$PREVIOUS_TAG" ]]; then
             echo "🆕 This is the first release"
             COMMIT_RANGE="HEAD"
           else
             echo "📊 Comparing: $PREVIOUS_TAG...$CURRENT_TAG"
-            COMMIT_RANGE="$PREVIOUS_TAG..HEAD"
+            # 使用tag之间的commit范围
+            COMMIT_RANGE="${PREVIOUS_TAG}..${CURRENT_TAG}"
           fi
 
           # Create changelog
@@ -146,7 +191,7 @@ jobs:
 
           # Collect and categorize commits
           echo "### ✨ New Features" >> "$CHANGELOG_FILE"
-          FEATURES=$(git log --pretty=format:"%s" $COMMIT_RANGE | grep "^feat" | sed 's/^feat[^:]*: /- /')
+          FEATURES=$(git log --pretty=format:"%s" $COMMIT_RANGE | grep "^feat" | sed 's/^feat[^:]*: /- /' || true)
           if [[ -n "$FEATURES" ]]; then
             echo "$FEATURES" >> "$CHANGELOG_FILE"
           else
@@ -155,7 +200,7 @@ jobs:
 
           echo "" >> "$CHANGELOG_FILE"
           echo "### 🐛 Fixes" >> "$CHANGELOG_FILE"
-          FIXES=$(git log --pretty=format:"%s" $COMMIT_RANGE | grep "^fix" | sed 's/^fix[^:]*: /- /')
+          FIXES=$(git log --pretty=format:"%s" $COMMIT_RANGE | grep "^fix" | sed 's/^fix[^:]*: /- /' || true)
           if [[ -n "$FIXES" ]]; then
             echo "$FIXES" >> "$CHANGELOG_FILE"
           else
@@ -164,7 +209,7 @@ jobs:
 
           echo "" >> "$CHANGELOG_FILE"
           echo "### 🔧 Improvements" >> "$CHANGELOG_FILE"
-          IMPROVEMENTS=$(git log --pretty=format:"%s" $COMMIT_RANGE | grep -E "^(chore|docs|refactor|test|ci|perf|style)" | sed 's/^[^:]*: /- /')
+          IMPROVEMENTS=$(git log --pretty=format:"%s" $COMMIT_RANGE | grep -E "^(chore|docs|refactor|test|ci|perf|style)" | sed 's/^[^:]*: /- /' || true)
           if [[ -n "$IMPROVEMENTS" ]]; then
             echo "$IMPROVEMENTS" >> "$CHANGELOG_FILE"
           else
@@ -179,6 +224,7 @@ jobs:
           } >> $GITHUB_OUTPUT
 
           echo "📄 Changelog generated successfully"
+          cat "$CHANGELOG_FILE"
 
   # ============================================================================
   # Stage 2: 构建Docker镜像 (复用build-push的逻辑)
@@ -199,17 +245,37 @@ jobs:
           - { name: "agent", path: "core/agent", emoji: "🤖" }
           - { name: "knowledge", path: "core/knowledge", emoji: "📚" }
           - { name: "workflow", path: "core/workflow", emoji: "⚡" }
+      fail-fast: false  # 允许部分服务失败，不影响其他服务
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare-release.outputs.git-ref }}
+          fetch-depth: 0
+
+      - name: 验证Dockerfile存在
+        id: validate
+        run: |
+          DOCKERFILE_PATH="./${{ matrix.service.path }}/Dockerfile"
+          if [[ ! -f "$DOCKERFILE_PATH" ]]; then
+            echo "⚠️ Dockerfile不存在: $DOCKERFILE_PATH"
+            echo "⏭️ 跳过此服务构建"
+            echo "skip=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          echo "✅ Dockerfile存在: $DOCKERFILE_PATH"
+          echo "skip=false" >> $GITHUB_OUTPUT
 
       - name: Set up QEMU
+        if: steps.validate.outputs.skip != 'true'
         uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
+        if: steps.validate.outputs.skip != 'true'
         uses: docker/setup-buildx-action@v3
 
       - name: Login to GitHub Container Registry
+        if: steps.validate.outputs.skip != 'true'
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY_GHCR }}
@@ -217,6 +283,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract metadata
+        if: steps.validate.outputs.skip != 'true'
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -229,6 +296,7 @@ jobs:
             type=raw,value=${{ needs.prepare-release.outputs.version }}
 
       - name: Build and push ${{ matrix.service.emoji }} ${{ matrix.service.name }} image
+        if: steps.validate.outputs.skip != 'true'
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -239,10 +307,12 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VERSION=${{ needs.prepare-release.outputs.version }}
-            GIT_COMMIT=${{ github.sha }}
+            GIT_COMMIT=${{ needs.prepare-release.outputs.commit-sha }}
             BUILD_TIME=${{ github.run_id }}
-          cache-from: type=gha,scope=core-${{ matrix.service.name }}
-          cache-to: type=gha,scope=core-${{ matrix.service.name }},mode=max
+          cache-from: |
+            type=gha,scope=core-${{ matrix.service.name }}-${{ needs.prepare-release.outputs.cache-scope }}
+            type=gha,scope=core-${{ matrix.service.name }}-branch-main
+          cache-to: type=gha,scope=core-${{ matrix.service.name }}-${{ needs.prepare-release.outputs.cache-scope }},mode=max
 
   build-console-hub:
     name: ☕ 构建Console Hub
@@ -252,6 +322,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare-release.outputs.git-ref }}
+          fetch-depth: 0
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -289,10 +362,12 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VERSION=${{ needs.prepare-release.outputs.version }}
-            GIT_COMMIT=${{ github.sha }}
+            GIT_COMMIT=${{ needs.prepare-release.outputs.commit-sha }}
             BUILD_TIME=${{ github.run_id }}
-          cache-from: type=gha,scope=console-hub
-          cache-to: type=gha,scope=console-hub,mode=max
+          cache-from: |
+            type=gha,scope=console-hub-${{ needs.prepare-release.outputs.cache-scope }}
+            type=gha,scope=console-hub-branch-main
+          cache-to: type=gha,scope=console-hub-${{ needs.prepare-release.outputs.cache-scope }},mode=max
           provenance: false
           sbom: false
 
@@ -304,6 +379,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare-release.outputs.git-ref }}
+          fetch-depth: 0
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -343,10 +421,12 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VERSION=${{ needs.prepare-release.outputs.version }}
-            GIT_COMMIT=${{ github.sha }}
+            GIT_COMMIT=${{ needs.prepare-release.outputs.commit-sha }}
             BUILD_TIME=${{ github.run_id }}
-          cache-from: type=gha,scope=console-frontend
-          cache-to: type=gha,mode=max,scope=console-frontend
+          cache-from: |
+            type=gha,scope=console-frontend-${{ needs.prepare-release.outputs.cache-scope }}
+            type=gha,scope=console-frontend-branch-main
+          cache-to: type=gha,mode=max,scope=console-frontend-${{ needs.prepare-release.outputs.cache-scope }}
 
   # ============================================================================
   # Stage 3: 创建GitHub Release
