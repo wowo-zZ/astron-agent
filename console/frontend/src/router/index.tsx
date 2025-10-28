@@ -17,7 +17,9 @@ const PersonalModel = lazy(
 const ModelDetail = lazy(() => import('@/pages/model-management/model-detail'));
 const ResourceManagement = lazy(() => import('@/pages/resource-management'));
 const WorkFlow = lazy(() => import('@/pages/workflow'));
-const WorkFlowAnalysis = lazy(() => import ('@/pages/workflow/workflow-analysis'))
+const WorkFlowAnalysis = lazy(
+  () => import('@/pages/workflow/workflow-analysis')
+);
 
 const ChatPage = lazy(() => import('@/pages/chat-page'));
 const PersonalSpace = lazy(() => import('@/pages/space/personal'));
