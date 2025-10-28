@@ -24,7 +24,7 @@ export interface AdvancedConfigType {
   };
   textToSpeech: {
     enabled: boolean;
-    vcnCn?: string;
+    vcn_cn?: string;
   };
   suggestedQuestionsAfterAnswer: {
     enabled: boolean;
