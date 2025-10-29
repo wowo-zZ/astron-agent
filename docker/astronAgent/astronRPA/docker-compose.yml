@@ -20,6 +20,7 @@ services:
       - ./volumes/mysql/init_app_market_dict_data.sql:/docker-entrypoint-initdb.d/02-init_data.sql
       - ./volumes/mysql/init_c_atom_meta_data.sql:/docker-entrypoint-initdb.d/03-init_data.sql
       - ./volumes/mysql/init_his_data_enum_data.sql:/docker-entrypoint-initdb.d/04-init_data.sql
+      - ./volumes/mysql/init_sample_template_data.sql:/docker-entrypoint-initdb.d/05-init_data.sql
     healthcheck:
       test:
         [
@@ -191,9 +192,7 @@ services:
       - astron-agent-network
 
   ai-service:
-    build:
-      context: ..
-      dockerfile: backend/ai-service/Dockerfile
+    image: ghcr.io/iflytek/astron-rpa/ai-service:latest
     container_name: rpa-opensource-ai-service
     restart: always
     env_file: *env_file
@@ -217,9 +216,7 @@ services:
       - astron-agent-network
 
   openapi-service:
-    build:
-      context: ..
-      dockerfile: backend/openapi-service/Dockerfile
+    image: ghcr.io/iflytek/astron-rpa/openapi-service:latest
     container_name: rpa-opensource-openapi-service
     restart: always
     env_file: *env_file
@@ -243,9 +240,7 @@ services:
       - astron-agent-network
 
   resource-service:
-    build:
-      context: ..
-      dockerfile: backend/resource-service/Dockerfile
+    image: ghcr.io/iflytek/astron-rpa/resource-service:latest
     container_name: rpa-opensource-resource-service
     restart: always
     env_file: *env_file
@@ -266,9 +261,7 @@ services:
       - astron-agent-network
 
   robot-service:
-    build:
-      context: ..
-      dockerfile: backend/robot-service/Dockerfile
+    image: ghcr.io/iflytek/astron-rpa/robot-service:latest
     container_name: rpa-opensource-robot-service
     restart: always
     env_file: *env_file
