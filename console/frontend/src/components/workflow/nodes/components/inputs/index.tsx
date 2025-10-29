@@ -267,7 +267,7 @@ function index({ id, data }): React.ReactElement {
           </div>
           {!canvasesDisabled && !stringSplitMode && (
             <div
-              className="text-[#275EFF] text-xs font-medium mt-1 inline-flex items-center cursor-pointer gap-1.5"
+              className="text-[#6356EA] text-xs font-medium mt-1 inline-flex items-center cursor-pointer gap-1.5"
               onClick={() => handleAddInputLine()}
             >
               <img src={inputAddIcon} className="w-3 h-3" alt="" />

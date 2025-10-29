@@ -10,6 +10,7 @@ from typing import Any, List
 import sqlparse
 from common.otlp.trace.span import Span
 from common.service import get_otlp_metric_service, get_otlp_span_service
+from common.utils.snowfake import get_id
 from fastapi import APIRouter, Depends
 from memory.database.api.schemas.exec_dml_types import ExecDMLInput
 from memory.database.api.v1.common import (
@@ -22,7 +23,6 @@ from memory.database.domain.entity.views.http_resp import format_response
 from memory.database.exceptions.e import CustomException
 from memory.database.exceptions.error_code import CodeEnum
 from memory.database.repository.middleware.getters import get_session
-from common.utils.snowfake import get_id
 from sqlglot import exp, parse_one
 from sqlmodel.ext.asyncio.session import AsyncSession
 from starlette.responses import JSONResponse

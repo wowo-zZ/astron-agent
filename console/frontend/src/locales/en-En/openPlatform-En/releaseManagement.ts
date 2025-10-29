@@ -5,6 +5,7 @@ const translation = {
     APIKey: 'API Key',
     instructional: 'Command',
     workflow: 'Workflow',
+    virtual: 'Virtual',
     agentId: 'Agent ID',
     agentName: 'Agent Name',
     platform: 'Platform',
@@ -91,9 +92,8 @@ const translation = {
     releasePlatform: 'Release Platform',
     releasePlatformTip:
       'Please select the platform where your agent needs to be released, Spark will push the final configuration to your selected platform, and the effective time will refer to the audit process of each platform.',
-    sparkAgent: 'Release to iFlytek Spark and iFlytek Xingchen Agent platforms',
-    sparkAgentTip:
-      'After release and audit pass, you can experience the agent on iFlytek Spark and iFlytek Xingchen Agent platforms',
+    agentHub: 'Release to Agent Hub',
+    agentHubTip: 'After release, you can experience the agent on Agent Hub',
     release: 'Release',
     updateRelease: 'Update Release',
     releasePlatformWx:
@@ -139,6 +139,9 @@ const translation = {
     unBindTipDesc2: 'If you wish to complete the unbinding, you need to go to',
     unBindTipDesc3: 'WeChat Service Number',
     unBindTipDesc4: 'Platform for cancellation of authorization',
+    virtualPlatformPublishTitle:
+      'Publish to Virtual Person Interaction Platform',
+    virtualPlatformPublishTip: 'Publish Success',
   },
 };
 

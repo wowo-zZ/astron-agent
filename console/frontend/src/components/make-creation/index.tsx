@@ -174,7 +174,7 @@ const MakeCreateModal: React.FC<MakeCreateModalProps> = ({
                         {modalList.slice(isEnglish ? 5 : 8).map(item => (
                           <div
                             key={item.id}
-                            className={`cursor-pointer font-medium text-[14px] leading-4 transition duration-75 font-[苹方-简] px-4 py-2 ${activeTab == item.id ? 'text-[#275EFF] bg-[#fff]' : ''}`}
+                            className={`cursor-pointer font-medium text-[14px] leading-4 transition duration-75 font-[苹方-简] px-4 py-2 ${activeTab == item.id ? 'text-[#6356EA] bg-[#fff]' : ''}`}
                             onClick={() => {
                               handleTabChange(item.id);
                             }}
@@ -220,7 +220,7 @@ const MakeCreateModal: React.FC<MakeCreateModalProps> = ({
                   className="w-[14px] h-[14px]"
                   alt=""
                 />
-                <span className="text-sm text-[#275EFF]">
+                <span className="text-sm text-[#6356EA]">
                   {t('createAgent1.importWorkflow')}
                 </span>
               </div>
@@ -238,7 +238,7 @@ const MakeCreateModal: React.FC<MakeCreateModalProps> = ({
                         style={{
                           width: '48px',
                           height: '48px',
-                          backgroundColor: '#275EFF',
+                          backgroundColor: '#6356EA',
                           borderRadius: '50%',
                           display: 'flex',
                           justifyContent: 'center',

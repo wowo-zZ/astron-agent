@@ -24,19 +24,58 @@ import { useSpaceType } from '@/hooks/use-space-type';
 
 import { defaultEnterpriseAvatar, roleToRoleType } from '@/pages/space/config';
 import { useSpaceI18n } from '@/pages/space/hooks/use-space-i18n';
-import { RoleType, SpaceType } from '@/types/permission';
+import { RoleType, SpaceType, EnterpriseServiceType } from '@/types/permission';
 
 export default function Index() {
   const navigate = useNavigate();
   const { enterpriseId } = useParams();
-  const { setUserRole } = useUserStore();
+  const { setUserRole, user } = useUserStore();
   const { setEnterpriseId, setSpaceStore } = useSpaceStore();
-  const { certificationType, setEnterpriseInfo } = useEnterpriseStore();
+  const { certificationType, setEnterpriseInfo, clearEnterpriseData } =
+    useEnterpriseStore();
   const { switchToPersonal, isTeamSpace, handleTeamSwitch } =
     useSpaceType(navigate);
   const { roleTextMap } = useSpaceI18n();
+
+  // 检查用户权限 - 个人版用户不能访问企业空间
+  useEffect(() => {
+    if (user?.enterpriseServiceType === EnterpriseServiceType.NONE) {
+      console.warn('个人版用户无权访问企业空间，正在重定向...');
+
+      // 清空企业相关数据
+      clearEnterpriseData();
+
+      // 清空 sessionStorage 中的企业空间数据
+      try {
+        const storageKey = 'space-storage';
+        const storageData = sessionStorage.getItem(storageKey);
+        if (storageData) {
+          const parsedData = JSON.parse(storageData);
+          if (parsedData?.state) {
+            parsedData.state.enterpriseId = '';
+            parsedData.state.enterpriseName = '';
+            parsedData.state.spaceType = 'personal';
+            sessionStorage.setItem(storageKey, JSON.stringify(parsedData));
+          }
+        }
+      } catch (error) {
+        console.error('清空 sessionStorage 失败:', error);
+      }
+
+      // 切换到个人空间并重定向
+      switchToPersonal({ isJump: true });
+
+      message.warning('您当前为个人版，无权访问企业空间');
+      return;
+    }
+  }, [user?.enterpriseServiceType, clearEnterpriseData, switchToPersonal]);
   // 初始化获取团队信息
   const getEnterpriseDetailFn = useCallback(async () => {
+    // 个人版用户不执行企业信息获取
+    if (user?.enterpriseServiceType === EnterpriseServiceType.NONE) {
+      return;
+    }
+
     if (certificationType) {
       return;
     }
@@ -85,7 +124,18 @@ export default function Index() {
     } catch (err: any) {
       message.error(err?.msg || err?.desc);
     }
-  }, [setEnterpriseId, setEnterpriseInfo]);
+  }, [
+    user?.enterpriseServiceType,
+    certificationType,
+    enterpriseId,
+    isTeamSpace,
+    setSpaceStore,
+    handleTeamSwitch,
+    setUserRole,
+    roleTextMap,
+    setEnterpriseInfo,
+    switchToPersonal,
+  ]);
 
   useEffect(() => {
     getEnterpriseDetailFn();

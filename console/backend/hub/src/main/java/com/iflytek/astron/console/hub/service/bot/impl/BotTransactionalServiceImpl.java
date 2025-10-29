@@ -4,6 +4,7 @@ import com.iflytek.astron.console.commons.entity.bot.ChatBotBase;
 import com.iflytek.astron.console.commons.service.bot.BotService;
 import com.iflytek.astron.console.commons.util.MaasUtil;
 import com.iflytek.astron.console.hub.service.bot.BotTransactionalService;
+import com.iflytek.astron.console.hub.service.bot.PersonalityConfigService;
 import com.iflytek.astron.console.hub.service.workflow.BotChainService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,9 @@ public class BotTransactionalServiceImpl implements BotTransactionalService {
     @Autowired
     private RedissonClient redissonClient;
 
+    @Autowired
+    private PersonalityConfigService personalityConfigService;
+
     /**
      * Copy bot
      *
@@ -43,6 +47,7 @@ public class BotTransactionalServiceImpl implements BotTransactionalService {
     public void copyBot(String uid, Integer botId, HttpServletRequest request, Long spaceId) {
         ChatBotBase base = botService.copyBot(uid, botId, spaceId);
         log.info("copy bot : new bot : {}", base);
+        personalityConfigService.copyPersonalityConfig(botId, base.getId());
         // The botId of the new assistant is the target id
         Long targetId = Long.valueOf(base.getId());
         if (base.getVersion() == 2) {

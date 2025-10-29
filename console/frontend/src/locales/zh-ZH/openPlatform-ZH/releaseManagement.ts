@@ -5,6 +5,7 @@ const translation = {
     APIKey: 'API密钥',
     instructional: '指令型',
     workflow: '工作流',
+    virtual: '虚拟人',
     agentId: '智能体编号',
     agentName: '智能体名称',
     platform: '发布平台',
@@ -93,8 +94,8 @@ const translation = {
     releasePlatform: '发布平台',
     releasePlatformTip:
       '请选择您的智能体需要发布的平台，星火将把智能体的最终配置推送到您选择的平台，具体生效时间参考各平台审核流程。',
-    sparkAgent: '发布至讯飞星火、讯飞星辰Agent平台',
-    sparkAgentTip: '发布并审核通过后，可在讯飞星火、讯飞星辰Agent体验该智能体',
+    agentHub: '发布到智能体广场',
+    agentHubTip: '发布后，可在智能体广场体验该智能体',
     release: '发布',
     updateRelease: '更新发布',
     releasePlatformWx: '发布平台配置微信公众号（服务号）',
@@ -138,6 +139,8 @@ const translation = {
     unBindTipDesc2: '如需彻底完成解绑，您还需要前往',
     unBindTipDesc3: '微信服务号',
     unBindTipDesc4: '平台进行取消授权操作',
+    virtualPlatformPublishTitle: '发布到虚拟人交互平台',
+    virtualPlatformPublishTip: '发布成功',
   },
 };
 

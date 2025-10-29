@@ -10,7 +10,7 @@ public class StartReq {
     @NotBlank
     private String projectId;
     private String execPosition = "EXECUTOR";
-    // Nullable, defaults to current active RPA version
+    // Can be empty, default RPA currently enabled version
     private Integer version;
     private Map<String, Object> params = Map.of();
 }

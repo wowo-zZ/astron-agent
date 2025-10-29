@@ -169,7 +169,7 @@ const useChatDebuggerEffect = (
           ...edge,
           animated: false,
           style: {
-            stroke: '#275EFF',
+            stroke: '#6356EA',
             strokeWidth: 2,
           },
         }))
@@ -308,13 +308,11 @@ const useChatDebuggerContent = ({
     const startNode = nodes?.find(node => node?.nodeType === 'node-start');
     const outputs = startNode?.data?.outputs;
     let multiParams = true;
-    if (outputs?.length === 1) {
-      multiParams = false;
-    }
     if (
-      outputs?.length === 2 &&
-      outputs?.[1]?.fileType &&
-      outputs?.[1]?.schema?.type === 'string'
+      outputs?.length === 1 ||
+      outputs
+        ?.slice(1)
+        .every((item: { fileType: string }) => item.fileType === 'file')
     ) {
       multiParams = false;
     }
@@ -440,7 +438,7 @@ export function ChatDebuggerContent({
                 className="w-[18px] h-[18px]"
                 alt=""
               />
-              <span className="text-[#275EFF]">
+              <span className="text-[#6356EA]">
                 {t('workflow.nodes.chatDebugger.switchToUserDialoguePage')}
               </span>
             </div>

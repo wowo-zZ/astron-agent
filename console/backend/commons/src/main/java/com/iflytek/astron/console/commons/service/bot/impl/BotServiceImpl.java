@@ -5,6 +5,8 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.PhoneUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.iflytek.astron.console.commons.constant.ResponseEnum;
@@ -536,13 +538,17 @@ public class BotServiceImpl implements BotService {
      * @param userLangChainInfo User language chain information object
      */
     private void processFileUploadConfig(BotInfoDto botInfo, UserLangChainInfo userLangChainInfo) {
-        if (ObjectUtil.isEmpty(userLangChainInfo.getExtraInputs())) {
+        // Change String to JSONObject
+        JSONObject extraInputs = JSON.parseObject(userLangChainInfo.getExtraInputs());
+        if (ObjectUtil.isEmpty(extraInputs)) {
             botInfo.setSupportUpload(new ArrayList<>());
         } else {
             botInfo.setSupportUpload(BotFileParamUtil.getOldExtraInputsConfig(userLangChainInfo));
         }
 
-        if (ObjectUtil.isEmpty(userLangChainInfo.getExtraInputsConfig())) {
+        // Change String to JSONArray
+        JSONArray extraInputsConfig = JSON.parseArray(userLangChainInfo.getExtraInputsConfig());
+        if (ObjectUtil.isEmpty(extraInputsConfig)) {
             botInfo.setSupportUploadConfig(BotFileParamUtil.mergeSupportUploadFields(botInfo.getSupportUpload(), new ArrayList<>()));
         } else {
             botInfo.setSupportUploadConfig(BotFileParamUtil.mergeSupportUploadFields(botInfo.getSupportUpload(), BotFileParamUtil.getExtraInputsConfig(userLangChainInfo)));
@@ -701,14 +707,12 @@ public class BotServiceImpl implements BotService {
     }
 
     public String getFlowAdvancedConfig(Integer botId, String authorizationHeaderValue) {
-        RequestBody formBody = new FormBody.Builder()
-                .add("botId", String.valueOf(botId))
-                .build();
+        String urlWithParams = workflowConfigUrl + "?botId=" + botId;
 
         Request request = new Request.Builder()
-                .url(workflowConfigUrl)
+                .url(urlWithParams)
                 .addHeader("Authorization", authorizationHeaderValue)
-                .post(formBody)
+                .get()
                 .build();
 
         String response = null;

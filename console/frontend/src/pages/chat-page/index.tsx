@@ -1,4 +1,4 @@
-import { ReactElement, useEffect, useState } from 'react';
+import { ReactElement, useEffect, useRef, useState } from 'react';
 import { message, Spin } from 'antd';
 import useBotInfoStore from '@/store/bot-info-store';
 import ChatHeader from './components/chat-header';
@@ -20,6 +20,36 @@ import ChatSide from './components/chat-side';
 import useChat from '@/hooks/use-chat';
 import { formatHistoryToMessages } from '@/utils';
 import { useTranslation } from 'react-i18next';
+import styles from './index.module.scss';
+import vmsIcon from '@/assets/svgs/icon-user-filled.svg';
+import messageIcon from '@/assets/svgs/icon-message-filled.svg';
+import VmsInteractionCmp from '@/components/vms-interaction-cmp';
+import { getSceneList } from '@/services/spark-common';
+import { getTalkAgentConfig } from '@/services/agent-square';
+
+/** 形象项（后端归一化后的前端结构） */
+interface SceneItem {
+  sceneId: string;
+  name: string;
+  gender?: string;
+  posture?: string;
+  type?: string;
+  avatar?: string;
+  defaultVCN?: string;
+}
+
+let vmsInter: any = null;
+//虚拟人形象参数
+const sdkAvatarInfo = {
+  avatar_id: '',
+};
+//虚拟人发言人参数
+const sdkTTSInfo = {
+  vcn: '',
+};
+
+let prevTempAns = '';
+let tempAnsBak = '';
 
 const ChatPage = (): ReactElement => {
   const botInfo = useBotInfoStore(state => state.botInfo); //  智能体信息
@@ -44,10 +74,36 @@ const ChatPage = (): ReactElement => {
   const [botNameColor, setBotNameColor] = useState<string>('#000000'); //设置字体颜色
   const { onSendMsg } = useChat();
   const { t } = useTranslation();
-
+  const [showVmsPermissionTip, setShowVmsPermissionTip] =
+    useState<boolean>(false); //是否展示虚拟人播报权限提示
+  const vmsInteractionCmpRef = useRef<any>(null);
+  const [talkAgentConfig, setTalkAgentConfig] = useState<any>({});
+  const chatType = useChatStore(state => state.chatType); //  聊天类型
+  const setChatType = useChatStore((state: any) => state.setChatType);
   useEffect(() => {
     initializeChatPage();
+    return () => {
+      vmsInteractionCmpRef.current?.instance &&
+        vmsInteractionCmpRef?.current?.dispose();
+    };
   }, []);
+
+  const handleChatTypeChange = (type: string) => {
+    setChatType(type);
+    if (type === 'vms') {
+      vmsInteractionCmpRef?.current?.initAvatar({
+        sdkAvatarInfo,
+        sdkTTSInfo,
+      });
+    } else {
+      vmsInteractionCmpRef?.current?.instance &&
+        vmsInteractionCmpRef?.current?.dispose();
+      tempAnsBak = '';
+      prevTempAns = '';
+      vmsInter && clearInterval(vmsInter);
+      vmsInter = null;
+    }
+  };
 
   // 初始化聊天页面
   const initializeChatPage = async (): Promise<void> => {
@@ -73,9 +129,61 @@ const ChatPage = (): ReactElement => {
       if (botInfo?.pc_background) {
         getBotNameColor(botInfo?.pc_background);
       }
+      //如果是语音智能体工作流，加载配置信息
+      if (botInfo?.version === 4) {
+        const talkAgentConfigRes: any = await getTalkAgentConfig(
+          version === 'debugger' || botInfo?.botStatus === -9
+            ? 'debug'
+            : 'chat',
+          botId,
+          version !== 'debugger' ? version : undefined
+        );
+
+        //设置聊天类型:1、文本 2、语音通话 3、虚拟人播报 4、语音虚拟人
+        setChatType(
+          talkAgentConfigRes?.interactType === 2
+            ? 'vms'
+            : talkAgentConfigRes?.interactType === 1
+              ? 'text'
+              : talkAgentConfigRes?.interactType === 0
+                ? 'phone'
+                : 'phoneVms'
+        );
+
+        setTalkAgentConfig(talkAgentConfigRes);
+        //如果是虚拟人播报或者语音通话虚拟人，初始化虚拟人sdk信息，并写入开场白
+        if (talkAgentConfigRes?.sceneEnable === 1) {
+          sdkAvatarInfo.avatar_id = talkAgentConfigRes?.sceneId;
+          //根据id获取vcn
+          const res = await getSceneList();
+          const list: SceneItem[] = Array.isArray(res)
+            ? (res as SceneItem[])
+            : [];
+          list.find(
+            (item: SceneItem) => item.sceneId === talkAgentConfigRes?.sceneId
+          )?.defaultVCN &&
+            (sdkTTSInfo.vcn =
+              list.find(
+                (item: SceneItem) =>
+                  item.sceneId === talkAgentConfigRes?.sceneId
+              )?.defaultVCN || '');
+
+          talkAgentConfigRes?.interactType === 2 &&
+            vmsInteractionCmpRef?.current?.initAvatar({
+              sdkAvatarInfo,
+              sdkTTSInfo,
+            });
+          botInfo?.prologue &&
+            !showVmsPermissionTip &&
+            vmsInteractionCmpRef?.current?.instance?.writeText(
+              botInfo?.prologue
+            );
+        }
+      }
       const workflowBotInfo = await getWorkflowBotInfoApi(botId);
       setBotInfo({
         ...botInfo,
+        advancedConfig: workflowBotInfo?.advancedConfig,
         openedTool: workflowBotInfo.openedTool,
         config: workflowBotInfo.config,
       });
@@ -100,7 +208,6 @@ const ChatPage = (): ReactElement => {
   //发送消息
   const handleRecomendClick = (params: {
     item: string;
-    fileUrl?: string;
     callback?: () => void;
   }) => {
     if (streamId || isDataLoading || isLoading) {
@@ -109,7 +216,6 @@ const ChatPage = (): ReactElement => {
     }
     onSendMsg({
       msg: params.item,
-      fileUrl: params.fileUrl,
       onSendCallback: params.callback,
     });
   };
@@ -123,7 +229,7 @@ const ChatPage = (): ReactElement => {
 
   //设置颜色
   const getBotNameColor = (imgUrl: string) => {
-    const img = new Image();
+    const img = new window.Image();
     img.crossOrigin = 'Anonymous'; // 处理跨域问题
     img.src = imgUrl;
     img.onload = () => {
@@ -176,7 +282,49 @@ const ChatPage = (): ReactElement => {
         isDataLoading={isDataLoading}
       />
       <div className="overflow-scroll flex flex-1 flex-col pt-20">
-        <div className="w-full mx-auto flex flex-col flex-1 min-h-0 overflow-hidden">
+        <div className="flex items-center justify-end gap-4">
+          {talkAgentConfig?.sceneEnable === 1 && (
+            <>
+              {chatType !== 'vms' && (
+                <img
+                  src={vmsIcon}
+                  alt=""
+                  className="cursor-pointer"
+                  onClick={() => handleChatTypeChange('vms')}
+                />
+              )}
+              {chatType !== 'text' && (
+                <img
+                  src={messageIcon}
+                  alt=""
+                  className="cursor-pointer"
+                  onClick={() => handleChatTypeChange('text')}
+                />
+              )}
+            </>
+          )}
+        </div>
+        {chatType === 'vms' && showVmsPermissionTip && (
+          <div className={styles.avatar_permission_tip_wrapper}>
+            <div className={styles.avatar_permission_tip}>
+              <span>虚拟人播报需要浏览器权限</span>
+              <a
+                href="javascript:void(0)"
+                onClick={() => {
+                  vmsInteractionCmpRef?.current?.player?.resume();
+                  setShowVmsPermissionTip(false);
+                }}
+              >
+                授权
+              </a>
+            </div>
+          </div>
+        )}
+        <div
+          className={`w-full mx-auto flex flex-col flex-1 min-h-0 overflow-hidden ${
+            chatType === 'text' ? 'pr-0' : 'pr-52'
+          }`}
+        >
           <MessageList
             messageList={messageList}
             botInfo={botInfo}
@@ -192,6 +340,30 @@ const ChatPage = (): ReactElement => {
         botInfo={botInfo}
         stopAnswer={stopAnswer}
       />
+      {chatType === 'vms' && (
+        <div className={styles.vms_container}>
+          <div className={styles.vms_container_inner}>
+            {/* {showResetOperation && <div>虚拟人已离开，是否恢复</div>} */}
+            <VmsInteractionCmp
+              ref={vmsInteractionCmpRef}
+              notAllowedPlayCallback={() => {
+                setShowVmsPermissionTip(true);
+              }}
+              playerResumeCallback={() => {
+                setShowVmsPermissionTip(false);
+              }}
+              avatarDom={document.getElementById('avatarDom') as HTMLDivElement}
+              styles={{
+                width: '380px',
+                height: '100%',
+                zIndex: 10,
+                position: 'absolute',
+                right: '-150px',
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

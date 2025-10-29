@@ -498,3 +498,61 @@ export const getVersionList = (params: any) => {
 export const getHasEditor = () => {
   return http.get(`/bot/api/hasEditor`);
 };
+
+export const getSceneList = () => {
+  return http.post(`/talkAgent/getSceneList`);
+};
+
+export const getSignedUrl = () => {
+  return http.get(`/talkAgent/signature`);
+};
+
+//
+export const getVCNList = () => {
+  return http.post(`/talkAgent/getVCNList`);
+};
+//
+export const createTalkAgent = (params: any) => {
+  return http.post(`/talkAgent/create`, params);
+};
+
+//
+export const updateTalkAgent = (params: any) => {
+  return http.post(`/talkAgent/updateConfig`, params);
+};
+//
+export const upgradeWorkflow = (params: any) => {
+  return http.post(`/talkAgent/upgradeWorkflow`, params);
+};
+
+/**
+ * @description 创建一句话复刻任务
+ */
+export const createOnceTrainTask = (params: {
+  sex: number;
+  sampleIndex: number;
+  formData: FormData;
+}): Promise<{ taskId: string }> => {
+  return http({
+    url: `/xingchen-api/customVCN/v2/create?sex=${params.sex}&index=${params.sampleIndex}`,
+    method: 'POST',
+    data: params.formData,
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+  });
+};
+
+/**
+ * @description 获取V2一户话自训练发音人列表
+ */
+export const getV2CustomVCNList = (params?: any): Promise<any> => {
+  return http.post(`/xingchen-api/customVCN/v2/getVcnList`, params);
+};
+
+/**
+ * @description 删除自训练发音人
+ */
+export const deleteCustomVCN = (params: any): Promise<any> => {
+  return http.post(`/xingchen-api/customVCN/deleteCustomVCN`, params);
+};

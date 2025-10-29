@@ -15,7 +15,7 @@ import {
   cancelFavorite,
 } from '@/services/agent-square';
 import styles from './index.module.scss';
-import { Input, message, Spin, Tooltip } from 'antd';
+import { Input, message, Popover, Spin, Tooltip } from 'antd';
 import classnames from 'classnames';
 import eventBus from '@/utils/event-bus';
 import { debounce } from 'lodash';
@@ -355,63 +355,69 @@ const HomePage: React.FC = () => {
                     <div
                       className={styles.recent_card_item}
                       key={index}
-                      onClick={() => handleNavigateToChat(item.botId)}
+                      onClick={() => handleNavigateToChat(item?.bot)}
                     >
-                      <img
-                        src={item?.botCoverUrl}
-                        alt=""
-                        className={styles.bot_avatar}
-                      />
                       <div className={styles.info}>
-                        <div className={styles.title}>
-                          <Tooltip
-                            placement="bottomLeft"
-                            title={item?.botName}
-                            arrow={false}
-                            overlayClassName="black-tooltip"
-                          >
-                            <span>{item?.botName}</span>
-                          </Tooltip>
-                          <div onClick={e => e.stopPropagation()}>
-                            <div onClick={() => handleShareAgent(item)} />
-                            <div
-                              className={classnames({
-                                [styles.collect as string]: !!item?.isFavorite,
-                              })}
-                              onClick={e => {
-                                handleCollect(item, e);
-                              }}
-                            />
+                        <div className={styles.bot_info}>
+                          <img
+                            src={item?.botCoverUrl}
+                            alt=""
+                            className={styles.bot_avatar}
+                          />
+                          <div className={styles.bot_info_content}>
+                            <div className={styles.title}>
+                              <span>{item?.botName}</span>
+                              <div onClick={e => e.stopPropagation()}>
+                                <div onClick={() => handleShareAgent(item)} />
+                                <div
+                                  className={classnames({
+                                    [styles.collect as string]:
+                                      !!item?.isFavorite,
+                                  })}
+                                  onClick={e => {
+                                    handleCollect(item, e);
+                                  }}
+                                />
+                              </div>
+                            </div>
+                            <Tooltip
+                              placement="bottomLeft"
+                              title={item?.botDesc}
+                              arrow={false}
+                              overlayClassName="black-tooltip"
+                            >
+                              <div className={styles.desc}>{item?.botDesc}</div>
+                            </Tooltip>
                           </div>
                         </div>
-                        <Tooltip
-                          placement="bottomLeft"
-                          title={item?.botDesc}
-                          arrow={false}
-                          overlayClassName="black-tooltip"
-                        >
-                          <div className={styles.desc}>{item?.botDesc}</div>
-                        </Tooltip>
-                        <div className={styles.tags}>
-                          {[1, 5].includes(item?.version as number) && (
-                            <div className={styles.itag}>
-                              {t('home.instructionType')}
-                            </div>
-                          )}
-                          {[2, 3, 4].includes(item?.version as number) && (
-                            <div className={styles.itag}>
-                              {t('home.workflowType')}
-                            </div>
-                          )}
-                        </div>
+
                         <div className={styles.author}>
-                          <img
-                            src={require('@/assets/svgs/author.svg')}
-                            alt=""
-                          />
-                          <span>{item?.creator || '@讯飞星火'}</span>
-                          {/* <img src={require('@/assets/svgs/fire.svg')} alt="" />
-                          <span>{item?.hotNum}</span> */}
+                          <div className={styles.author_info}>
+                            <img
+                              src={require('@/assets/imgs/home/author.svg')}
+                              alt=""
+                            />
+                            <span>
+                              {item?.creator || t('home.officialAssistant')}
+                            </span>
+                            {/* <img
+                                src={require('@/assets/imgs/home/fire.svg')}
+                                alt=""
+                              />
+                              <span>{item?.hotNum}</span> */}
+                          </div>
+                          <div className={styles.tags}>
+                            {[1, 5].includes(item?.version) && (
+                              <div className={styles.itag}>
+                                {t('home.instructionType')}
+                              </div>
+                            )}
+                            {[2, 3, 4].includes(item?.version) && (
+                              <div className={styles.itag}>
+                                {t('home.workflowType')}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
