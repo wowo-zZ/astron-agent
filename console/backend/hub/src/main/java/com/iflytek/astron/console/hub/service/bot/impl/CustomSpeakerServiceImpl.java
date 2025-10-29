@@ -7,13 +7,29 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.iflytek.astron.console.hub.entity.CustomSpeaker;
 import com.iflytek.astron.console.hub.mapper.CustomSpeakerMapper;
 import com.iflytek.astron.console.hub.service.bot.CustomSpeakerService;
+import com.iflytek.astron.console.toolkit.tool.http.HttpAuthTool;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Service
 public class CustomSpeakerServiceImpl extends ServiceImpl<CustomSpeakerMapper, CustomSpeaker> implements CustomSpeakerService {
+
+    @Value("${spark.app-id}")
+    private String appId;
+
+    @Value("${spark.api-key}")
+    private String apiKey;
+
+    @Value("${spark.api-secret}")
+    private String apiSecret;
+
+    @Value("${spark.clone-api-url}")
+    private String cloneApiUrl;
 
     @Override
     public List<CustomSpeaker> getTrainSpeaker(Long spaceId, String uid) {
@@ -57,5 +73,24 @@ public class CustomSpeakerServiceImpl extends ServiceImpl<CustomSpeakerMapper, C
             updateWrapper.eq(CustomSpeaker::getSpaceId, spaceId);
         }
         baseMapper.update(null, updateWrapper);
+    }
+
+    @Override
+    public boolean existsByAssetId(String assetId) {
+        if (assetId == null || assetId.trim().isEmpty()) {
+            return false;
+        }
+        LambdaQueryWrapper<CustomSpeaker> queryWrapper = Wrappers.lambdaQuery(CustomSpeaker.class)
+                .eq(CustomSpeaker::getAssetId, assetId);
+        return baseMapper.selectCount(queryWrapper) > 0;
+    }
+
+    @Override
+    public Map<String, String> getCloneSign() {
+        Map<String, String> resultMap = new HashMap<>();
+        String url = HttpAuthTool.assembleRequestUrl(cloneApiUrl, apiKey, apiSecret);
+        resultMap.put("appId", appId);
+        resultMap.put("url", url);
+        return resultMap;
     }
 }
