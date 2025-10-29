@@ -50,8 +50,6 @@ const transition = {
     uploadingInProgress: 'Uploading in progress...',
     stopFailed: 'Stop failed!',
     cancelFailed: 'Cancel failed!',
-    maxImageUpload: 'Maximum {{limit}} images allowed',
-    maxFileUpload: 'Maximum {{limit}} files allowed',
     deleteErrorFileFirst: 'Please delete the error file first',
     uploadFileFirst: 'Please upload a file first',
     fileUploadFailed: 'File upload failed',
@@ -65,16 +63,22 @@ const transition = {
     selectOptionFirst: 'Please select an option first',
     uploadTooltip:
       'Supports uploading {{accept}}, max {{size}}MB, up to {{count}} file',
-    image: 'Image',
-    pdf: 'pdf',
+    fileLimitTip: '{{name}} type file can only upload {{limit}} files',
+    fileSizeExceeded:
+      'File {{name}} exceeds size limit, maximum supported {{size}}MB',
+    unsupportedFileType: '{{name}} is an unsupported file type',
+    bindingCancelled: 'Binding cancelled',
+    bindingFailed: 'Binding failed',
+    uploadFailed: 'Upload failed',
+    networkError: 'Network error',
+    getSignedUrlFailed: 'Failed to get signed URL',
+    uploadCancelled: 'Upload cancelled',
+    download: 'Download',
+    expand: 'Expand',
+    fold: 'Fold',
+    deleteFile: 'Delete File',
+    cancelUpload: 'Cancel Upload',
     pleaseSelectOption: 'Please select an option~',
-    doc: 'doc',
-    ppt: 'ppt',
-    excel: 'excel',
-    txt: 'txt',
-    file: 'File',
-    mb: 'MB',
-    audio: 'Audio',
   },
   feedbackPopover: {
     feedbackTitle: 'Your feedback helps us improve',
@@ -94,6 +98,9 @@ const transition = {
   MathThinkProgress: {
     thinking: 'Thinking in progress',
     waitingAnswer: 'Generating answer...',
+  },
+  sourceInfoBox: {
+    sourceReference: 'Source: {{count}} articles were obtained as references.',
   },
 };
 

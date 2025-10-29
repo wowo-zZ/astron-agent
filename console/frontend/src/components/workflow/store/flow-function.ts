@@ -682,7 +682,7 @@ const onConnect = (connection: Connection, get): void => {
         type: 'customEdge',
         markerEnd: {
           type: MarkerType.Arrow,
-          color: '#275EFF',
+          color: '#6356EA',
         },
         data: {
           edgeType: useFlowsManager.getState().edgeType,

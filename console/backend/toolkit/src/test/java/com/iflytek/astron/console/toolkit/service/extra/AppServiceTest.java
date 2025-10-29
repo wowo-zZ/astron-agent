@@ -33,7 +33,7 @@ class AppServiceTest {
     // RedisTemplate not directly used, keep default Mock
     @Mock
     private CommonConfig commonConfig;
-    // ↑ Add this import at the top
+    // Add this import at the top
 
     @Test
     @DisplayName("getAkSk - Remote returns empty array: Should throw BusinessException (containing APPID hint)")
@@ -86,7 +86,7 @@ class AppServiceTest {
         }
     }
 
-    // ================= getAkSk: HTTP throws checked exception → Wrapped as RuntimeException
+    // ================= getAkSk: HTTP throws checked exception Wrapped as RuntimeException
     // =================
 
     @Test

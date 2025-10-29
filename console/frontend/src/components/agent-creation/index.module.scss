@@ -26,7 +26,7 @@
         text-align: center;
         line-height: 28px;
         cursor: pointer;
-        background: linear-gradient(270deg, #275eff 0%, #c927ff 100%);
+        background: linear-gradient(270deg, #6356EA 0%, #c927ff 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -75,7 +75,7 @@
         overflow: hidden;
 
         &:hover {
-          color: #275eff;
+          color: #6356EA;
         }
       }
     }
@@ -184,7 +184,7 @@
         width: 590px;
         height: 40px;
         text-align: center;
-        background: #275eff !important;
+        background: #6356EA !important;
         border-radius: 8px;
         color: #fff;
         cursor: pointer;
@@ -197,8 +197,8 @@
         filter: brightness(1.2);
       }
       .cancelBtn:hover {
-        border: 1px solid #275eff;
-        color: #275eff;
+        border: 1px solid #6356EA;
+        color: #6356EA;
       }
     }
   }

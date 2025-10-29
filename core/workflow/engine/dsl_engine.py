@@ -35,7 +35,6 @@ from workflow.engine.entities.variable_pool import VariablePool
 from workflow.engine.entities.workflow_dsl import Edge, Node, NodeRef, WorkflowDSL
 from workflow.engine.node import NodeFactory, SparkFlowEngineNode
 from workflow.engine.nodes.base_node import BaseNode
-from workflow.engine.nodes.cache_node import tool_classes
 from workflow.engine.nodes.entities.node_run_result import (
     NodeRunResult,
     WorkflowNodeExecutionStatus,
@@ -2026,6 +2025,9 @@ class WorkflowEngineBuilder:
         :return: None
         :raises CustomException: If node validation fails
         """
+
+        from workflow.engine.nodes.cache_node import tool_classes
+
         node_type = node_id.split(":")[0]
         node_class = tool_classes.get(node_type)
 

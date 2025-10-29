@@ -9,8 +9,6 @@ import asyncio
 import json
 from typing import Any, AsyncIterator, Dict, Tuple
 
-from openai import AsyncOpenAI  # type: ignore
-
 from workflow.consts.engine.chat_status import ChatStatus
 from workflow.engine.nodes.entities.llm_response import LLMResponse
 from workflow.exception.e import CustomException
@@ -110,6 +108,8 @@ class OpenAIChatAI(ChatAI):
         :raises CustomException: If request times out or fails
         """
         # Initialize OpenAI async client
+        from openai import AsyncOpenAI  # type: ignore
+
         aclient = AsyncOpenAI(
             api_key=self.api_key,
             base_url=url,

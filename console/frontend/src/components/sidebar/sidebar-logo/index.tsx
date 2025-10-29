@@ -4,20 +4,21 @@ import agentLog from '@/assets/imgs/sidebar/agentLog.svg';
 import agentLogoText from '@/assets/imgs/sidebar/agentLogoText.svg';
 import agentLogoTextEn from '@/assets/imgs/sidebar/agentLogoTextEn.svg';
 import textLogo from '@/assets/imgs/sidebar/logoText.png';
+import { getLanguageCode } from '@/utils/http';
 
 interface SidebarLogoProps {
   isCollapsed: boolean;
   isEnterprise?: boolean;
   enterpriseLogo?: string | undefined;
-  languageCode?: string;
 }
 
 const SidebarLogo = ({
   isCollapsed,
+  // TODO:
   isEnterprise = false,
   enterpriseLogo,
-  languageCode = 'zh',
 }: SidebarLogoProps): ReactElement => {
+  const languageCode = getLanguageCode();
   const navigate = useNavigate();
 
   const handleLogoClick = (): void => {
@@ -70,7 +71,7 @@ const SidebarLogo = ({
             : agentLogoTextEn
       }
       className="w-[190px] cursor-pointer mx-auto"
-      alt="讯飞星辰Agent"
+      alt="Astron Agent"
       style={{ height: isCollapsed ? '34px' : 'auto' }}
       onClick={handleLogoClick}
     />

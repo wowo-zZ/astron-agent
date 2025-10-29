@@ -158,7 +158,7 @@ const FlowHeader: React.FC<FlowHeaderProps> = ({ children, currentFlow }) => {
                   />
                 )}
                 {historyVersion && (
-                  <span className="bg-[#E9EEFF] w-[30px] h-[18px] text-[#275EFF] text-[10px] rounded-[4px] flex items-center justify-center rounded-[7px]">
+                  <span className="bg-[#E9EEFF] w-[30px] h-[18px] text-[#6356EA] text-[10px] rounded-[4px] flex items-center justify-center rounded-[7px]">
                     {historyVersionData?.name}
                   </span>
                 )}

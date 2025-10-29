@@ -261,7 +261,7 @@ class PromptServiceTest {
             AiCode req = new AiCode();
             req.setPrompt("P");
             req.setVar("V");
-            // req.setCode("") remains empty → action=create
+            // req.setCode("") remains empty action=create
 
             SseEmitter out = service.aiCode(req);
 
@@ -274,12 +274,12 @@ class PromptServiceTest {
         @Test
         @DisplayName("aiCode: For fix branch, should extract error fragment from after 2nd '(' to second-to-last character, and use default URL/Domain")
         void aiCode_fix_shouldExtractError_andUseDefaults() {
-            // Template（fix）
+            // Template fix
             ConfigInfo cfg = new ConfigInfo();
             cfg.setValue("ERR={errMsg}");
             when(configInfoMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(cfg);
 
-            // URL/domain missing → use SparkApiTool default constants
+            // URL/domain missing use SparkApiTool default constants
             when(configInfoMapper.getByCategoryAndCode("AI_CODE", "DS_V3_url")).thenReturn(null);
             when(configInfoMapper.getByCategoryAndCode("AI_CODE", "DS_V3_domain")).thenReturn(null);
 
@@ -292,9 +292,9 @@ class PromptServiceTest {
 
             // Construct error message that satisfies secLBracketIdx extraction logic
             // From after the second '(' to the second-to-last character:
-            // "prefix (first) (ValueError: bad)X" → expect to extract "ValueError: bad"
+            // "prefix first ValueError: bad)X" expect to extract "ValueError: bad"
             AiCode req = new AiCode();
-            req.setErrMsg("prefix (first) (ValueError: bad)X"); // Leave 1 extra character at the end + subtract 1 at the very end → remove ')'
+            req.setErrMsg("prefix (first) (ValueError: bad)X");
 
             SseEmitter out = service.aiCode(req);
 

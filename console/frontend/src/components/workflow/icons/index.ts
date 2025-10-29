@@ -156,7 +156,8 @@ import selectedPointIcon from '@/assets/imgs/workflow/select-dot-icon.png';
 import wechatIcon from '@/assets/imgs/workflow/wechat-icon.png';
 import mcpIcon from '@/assets/imgs/workflow/mcp-icon.png';
 import iflytekCloudIcon from '@/assets/imgs/workflow/iflytekCloud-icon.png';
-import iflytekIcon from '@/assets/imgs/workflow/iflytek-icon.png';
+// import iflytekIcon from '@/assets/imgs/workflow/iflytek-icon.png';
+import agentHubIcon from '@/assets/imgs/workflow/agent-hub-icon.svg';
 
 // Add Plugin 模块图标
 import addPluginFormSelect from '@/assets/imgs/main/icon_nav_dropdown.svg';
@@ -204,6 +205,7 @@ interface AdvancedConfigIcons {
   likeAndDislike: string;
   characterVoice: string;
   settingBackground: string;
+  editVcn: string;
 }
 
 interface ChatContentIcons {
@@ -390,6 +392,7 @@ import mouseBigPng from '@/assets/imgs/workflow/mouse-big.svg';
 import keyboardBigPng from '@/assets/imgs/workflow/keyboard-big.svg';
 import mouseBigActivePng from '@/assets/imgs/workflow/mouse-big-active.svg';
 import keyboardBigActivePng from '@/assets/imgs/workflow/keyboard-big-active.svg';
+import editVcnIcon from '@/assets/imgs/workflow/edit-voice.svg';
 
 interface PanelIcons {
   zoomOut: string;
@@ -415,6 +418,7 @@ interface PanelIcons {
   keyboardBig: string;
   mouseBigActive: string;
   keyboardBigActive: string;
+  editVcn: string;
 }
 
 // 工作流图标集合接口
@@ -464,6 +468,7 @@ export const Icons: WorkflowIcons = {
     likeAndDislike: likeAndDislikeIcon,
     characterVoice: characterVoiceIcon,
     settingBackground: settingBackgroundIcon,
+    editVcn: editVcnIcon,
   },
   chatDebugger: {
     close: closeIcon,
@@ -537,7 +542,8 @@ export const Icons: WorkflowIcons = {
     wechat: wechatIcon,
     mcp: mcpIcon,
     iflytekCloud: iflytekCloudIcon,
-    iflytek: iflytekIcon,
+    // iflytek: iflytekIcon,
+    iflytek: agentHubIcon,
   },
   addPlugin: {
     formSelect: addPluginFormSelect,
@@ -625,6 +631,7 @@ export const Icons: WorkflowIcons = {
     keyboardBig: keyboardBigPng,
     mouseBigActive: mouseBigActivePng,
     keyboardBigActive: keyboardBigActivePng,
+    editVcn: editVcnIcon,
   },
   nodeOperation: {
     nodeEdit: nodeEditPng,

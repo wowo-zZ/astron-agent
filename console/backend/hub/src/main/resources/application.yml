@@ -18,9 +18,9 @@ spring:
     # HikariCP connection pool configuration
     hikari:
       # Maximum pool size
-      maximum-pool-size: 30
+      maximum-pool-size: 10
       # Minimum idle connections
-      minimum-idle: 5
+      minimum-idle: 2
       # Connection timeout (ms)
       connection-timeout: 30000
       # Idle timeout (ms)
@@ -42,6 +42,13 @@ spring:
       host: ${REDIS_HOST:redis}
       port: ${REDIS_PORT:6379}
       database: ${REDIS_DATABASE_CONSOLE:0}
+      # Lettuce connection pool configuration for reduced memory usage
+      lettuce:
+        pool:
+          max-active: 8      # Maximum number of active connections
+          max-idle: 4        # Maximum number of idle connections
+          min-idle: 1        # Minimum number of idle connections
+          max-wait: 3000ms   # Maximum wait time when pool is exhausted
   security:
     oauth2:
       resourceserver:
@@ -89,7 +96,8 @@ mybatis-plus:
 
 # S3(MinIO) basic configuration
 s3:
-  endpoint: ${OSS_REMOTE_ENDPOINT:http://minio:9000}
+  endpoint: ${OSS_ENDPOINT:http://minio:9000}
+  remoteEndpoint: ${OSS_REMOTE_ENDPOINT:http://your-host-domain:9000}
   accessKey: ${OSS_ACCESS_KEY_ID:astron-uploader}
   secretKey: ${OSS_ACCESS_KEY_SECRET:astron-uploader-secret}
   bucket: ${OSS_BUCKET_CONSOLE:astron-agent}
@@ -108,6 +116,7 @@ spark:
   image-appId: ${SPARK_IMAGE_APP_ID:xxx}
   image-apiKey: ${SPARK_IMAGE_API_KEY:xxx}
   image-apiSecret: ${SPARK_IMAGE_API_SECRET:xxx}
+  tts-api-url: wss://tts-api.xfyun.cn/v2/tts
 
 # Workflow configuration
 workflow:

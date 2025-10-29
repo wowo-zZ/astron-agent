@@ -86,6 +86,8 @@ public enum ResponseEnum {
 
     BOT_TYPE_NOT_SUPPORT(60038, "error.bot.type.temporarily.not.support"),
     USER_APP_ID_NOT_EXISTE(60039, "error.app.not.exists"),
+    PERSONALITY_AI_GENERATE_PARAM_EMPTY(60040, "error.personality.ai.generate.param.empty"),
+    PERSONALITY_AI_GENERATE_ERROR(60041, "error.personality.ai.generate.failed"),
 
     // Spark API errors 60040-60080
     SPARK_API_PARAM_ERROR(60040, "error.spark.api.param.error"),

@@ -37,6 +37,7 @@ export default [
         clearInterval: 'readonly',
         IFlyCollector: 'readonly',
         fetch: 'readonly',
+        NodeJS: 'readonly',
       },
     },
     plugins: {

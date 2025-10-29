@@ -438,7 +438,7 @@ export const useFlowCommon = (): UseFlowCommonReturn => {
         type: 'customEdge',
         markerEnd: {
           type: 'arrow',
-          color: '#275EFF',
+          color: '#6356EA',
         },
         data: {
           edgeType: edgeType,

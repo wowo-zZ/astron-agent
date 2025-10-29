@@ -266,7 +266,6 @@ def _handle_version(
                 release_data=db_flow.release_data,
                 description=db_flow.description,
                 version=publish_input.version,
-                status=db_flow.status,
                 release_status=db_flow.release_status,
                 app_id=db_flow.app_id,
                 source=db_flow.source,

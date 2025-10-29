@@ -10,10 +10,8 @@ import json
 import multiprocessing
 import os
 import sys
-from pathlib import Path
 
 import uvicorn
-from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.routing import APIRoute
@@ -22,7 +20,6 @@ from starlette.middleware.cors import CORSMiddleware
 
 from workflow.api.v1.router import old_auth_router, sparkflow_router, workflow_router
 from workflow.cache.event_registry import EventRegistry
-from workflow.consts.runtime_env import RuntimeEnv
 from workflow.extensions.fastapi.handler.validation import validation_exception_handler
 from workflow.extensions.fastapi.middleware.auth import AuthMiddleware
 from workflow.extensions.fastapi.middleware.otlp import OtlpMiddleware
@@ -134,36 +131,6 @@ def create_app() -> FastAPI:
     return app
 
 
-def set_env() -> None:
-    """
-    Set environment variables by loading configuration from environment files.
-
-    This function determines the appropriate configuration file based on the
-    runtime environment (local vs production) and loads the environment
-    variables from the corresponding .env file.
-
-    :raises ValueError: If no configuration file is found
-    :raises Exception: Re-raises any other exceptions that occur during loading
-    """
-    # Determine the runtime environment (defaults to Local)
-    running_env = os.getenv("RUNTIME_ENV", "")
-
-    # Select the appropriate configuration file based on environment
-    if running_env == RuntimeEnv.Local.value:
-        env_file = Path(__file__).parent.parent / "workflow/config.local.env"
-    else:
-        env_file = Path(__file__).parent.parent / "workflow/config.env"
-
-    logger.debug(f"🔍 Loading config.env file: {env_file}")
-
-    # Load environment variables from the configuration file
-    if os.path.exists(env_file):
-        load_dotenv(env_file, override=False)
-        logger.debug("✅ Using config.env file.")
-    else:
-        raise ValueError("❌ No config.env file found.")
-
-
 def _get_worker_count() -> int:
     """
     Get the number of workers to use for the application.
@@ -190,7 +157,7 @@ if __name__ == "__main__":
         port=int(os.getenv("SERVICE_PORT", "7880")),  # Default port 7880
         workers=_get_worker_count(),
         reload=(
-            bool(os.getenv("RELOAD", "False"))
+            os.getenv("RELOAD", "false").lower() == "true"
         ),  # Enable auto-reload for development
         log_level=os.getenv(
             "LOG_LEVEL", "error"

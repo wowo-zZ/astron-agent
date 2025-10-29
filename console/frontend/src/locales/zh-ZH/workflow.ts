@@ -70,7 +70,7 @@ const translation = {
       parameters: '参数',
       add: '添加',
       noRobot: '暂无机器人',
-      noRpaTool: '暂无RPA工具',
+      noRpaTool: '暂无RPA工具，快去新建RPA工具吧~',
       noMore: '没有更多了',
       createRpa: '新建RPA',
     },

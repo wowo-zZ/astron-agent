@@ -1,7 +1,6 @@
 import json
 import os
 
-import requests  # type: ignore
 from common.utils.hmac_auth import HMACAuth
 from sqlmodel import Session  # type: ignore
 
@@ -50,6 +49,9 @@ def get_app_source_id(app_id: str, span: Span) -> str:
     url = f"{os.getenv('APP_MANAGE_PLAT_BASE_URL')}/v2/app/list"
 
     # Make authenticated request to get application list
+
+    import requests  # type: ignore
+
     resp = requests.get(
         url, headers=_gen_app_auth_header(url), params={"app_ids": app_id}
     )
@@ -92,6 +94,9 @@ def get_app_source_detail(app_id: str, span: Span) -> tuple[str, str, str, str]:
     url = f"{os.getenv('APP_MANAGE_PLAT_BASE_URL')}/v2/app/details"
 
     # Make authenticated request to get application details
+
+    import requests  # type: ignore
+
     resp = requests.get(
         url, headers=_gen_app_auth_header(url), params={"app_ids": app_id}
     )

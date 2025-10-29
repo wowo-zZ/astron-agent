@@ -32,10 +32,10 @@ env:
 
 jobs:
   # ============================================================================
-  # Stage 1: 验证和准备
+  # Stage 1: Validation and Preparation
   # ============================================================================
   prepare-release:
-    name: 🚀 准备发布
+    name: 🚀 Prepare Release
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.meta.outputs.version }}
@@ -48,9 +48,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # 获取完整历史记录用于生成changelog
+          fetch-depth: 0  # Fetch complete history for changelog generation
 
-      - name: 验证标签格式
+      - name: Validate tag format
         id: meta
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
@@ -58,59 +58,59 @@ jobs:
             IS_PRERELEASE="${{ github.event.inputs.prerelease }}"
           else
             VERSION=${GITHUB_REF#refs/tags/}
-            # 检查是否为预发布版本 (包含 -, alpha, beta, rc 等)
+            # Check if it's a pre-release version (contains -, alpha, beta, rc, etc.)
             if [[ "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
               IS_PRERELEASE="false"
             else
               IS_PRERELEASE="true"
             fi
           fi
-          
-          # 验证版本号格式
+
+          # Validate version format
           if [[ ! "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
-            echo "❌ 错误的版本号格式: $VERSION"
-            echo "✅ 正确格式: v1.0.0, v1.0.0-beta.1, v1.0.0-rc.1"
+            echo "❌ Invalid version format: $VERSION"
+            echo "✅ Correct format: v1.0.0, v1.0.0-beta.1, v1.0.0-rc.1"
             exit 1
           fi
-          
+
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "is-prerelease=$IS_PRERELEASE" >> $GITHUB_OUTPUT
-          
-          echo "🏷️ 发布版本: $VERSION"
-          echo "🔖 预发布版本: $IS_PRERELEASE"
 
-      - name: 智能项目检测
+          echo "🏷️ Release version: $VERSION"
+          echo "🔖 Pre-release: $IS_PRERELEASE"
+
+      - name: Smart project detection
         id: detect
         run: |
-          echo "🔍 检测 Astron Agent 组件..."
+          echo "🔍 Detecting Astron Agent components..."
 
           HAS_CORE_SERVICES="false"
           HAS_CONSOLE_HUB="false"
           HAS_CONSOLE_FRONTEND="false"
 
-          # 检测Core服务组件 (基于build-push.yml的结构)
+          # Detect Core service components (based on build-push.yml structure)
           CORE_COMPONENTS=("tenant" "memory/database" "plugin/rpa" "plugin/link" "plugin/aitools" "agent" "knowledge" "workflow")
           CORE_COUNT=0
 
           for component in "${CORE_COMPONENTS[@]}"; do
             if [[ -f "core/${component}/Dockerfile" ]]; then
               CORE_COUNT=$((CORE_COUNT + 1))
-              echo "✅ Core组件: core/${component}/"
+              echo "✅ Core component: core/${component}/"
             fi
           done
 
           if [[ $CORE_COUNT -gt 0 ]]; then
             HAS_CORE_SERVICES="true"
-            echo "✅ 检测到 $CORE_COUNT 个Core服务组件"
+            echo "✅ Detected $CORE_COUNT Core service components"
           fi
 
-          # 检测Console Hub (Java)
+          # Detect Console Hub (Java)
           if [[ -f "console/backend/hub/pom.xml" && -f "console/backend/hub/Dockerfile" ]]; then
             HAS_CONSOLE_HUB="true"
             echo "✅ Console Hub: console/backend/hub/ (Java Spring Boot)"
           fi
 
-          # 检测Console Frontend (React)
+          # Detect Console Frontend (React)
           if [[ -f "console/frontend/package.json" && -f "console/frontend/Dockerfile" ]]; then
             HAS_CONSOLE_FRONTEND="true"
             echo "✅ Console Frontend: console/frontend/ (React)"
@@ -181,10 +181,10 @@ jobs:
           echo "📄 Changelog generated successfully"
 
   # ============================================================================
-  # Stage 2: 构建Docker镜像 (复用build-push的逻辑)
+  # Stage 2: Build Docker Images (reuse build-push logic)
   # ============================================================================
   build-core-services:
-    name: 🏗️ 构建Core服务
+    name: 🏗️ Build Core Services
     runs-on: ubuntu-latest
     needs: prepare-release
     if: needs.prepare-release.outputs.has-core-services == 'true'
@@ -241,11 +241,10 @@ jobs:
             VERSION=${{ needs.prepare-release.outputs.version }}
             GIT_COMMIT=${{ github.sha }}
             BUILD_TIME=${{ github.run_id }}
-          cache-from: type=gha,scope=core-${{ matrix.service.name }}
-          cache-to: type=gha,scope=core-${{ matrix.service.name }},mode=max
+          no-cache: true
 
   build-console-hub:
-    name: ☕ 构建Console Hub
+    name: ☕ Build Console Hub
     runs-on: ubuntu-latest
     needs: prepare-release
     if: needs.prepare-release.outputs.has-console-hub == 'true'
@@ -291,13 +290,12 @@ jobs:
             VERSION=${{ needs.prepare-release.outputs.version }}
             GIT_COMMIT=${{ github.sha }}
             BUILD_TIME=${{ github.run_id }}
-          cache-from: type=gha,scope=console-hub
-          cache-to: type=gha,scope=console-hub,mode=max
+          no-cache: true
           provenance: false
           sbom: false
 
   build-console-frontend:
-    name: 🌐 构建Console Frontend
+    name: 🌐 Build Console Frontend
     runs-on: ubuntu-latest
     needs: prepare-release
     if: needs.prepare-release.outputs.has-console-frontend == 'true'
@@ -345,14 +343,13 @@ jobs:
             VERSION=${{ needs.prepare-release.outputs.version }}
             GIT_COMMIT=${{ github.sha }}
             BUILD_TIME=${{ github.run_id }}
-          cache-from: type=gha,scope=console-frontend
-          cache-to: type=gha,mode=max,scope=console-frontend
+          no-cache: true
 
   # ============================================================================
-  # Stage 3: 创建GitHub Release
+  # Stage 3: Create GitHub Release
   # ============================================================================
   create-release:
-    name: 🎉 创建GitHub Release
+    name: 🎉 Create GitHub Release
     runs-on: ubuntu-latest
     needs:
       - prepare-release
@@ -372,26 +369,26 @@ jobs:
           append_body: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 发布总结
+      - name: Release Summary
         run: |
-          echo "=== 🎉 Astron Agent 发布总结 ==="
+          echo "=== 🎉 Astron Agent Release Summary ==="
           echo ""
-          echo "🏷️ 版本: ${{ needs.prepare-release.outputs.version }}"
-          echo "🔖 预发布: ${{ needs.prepare-release.outputs.is-prerelease }}"
-          echo "📦 发布页面: https://github.com/${{ github.repository }}/releases/tag/${{ needs.prepare-release.outputs.version }}"
+          echo "🏷️ Version: ${{ needs.prepare-release.outputs.version }}"
+          echo "🔖 Pre-release: ${{ needs.prepare-release.outputs.is-prerelease }}"
+          echo "📦 Release page: https://github.com/${{ github.repository }}/releases/tag/${{ needs.prepare-release.outputs.version }}"
           echo ""
 
-          echo "🐳 Docker镜像构建状态:"
-          echo "  🏗️ Core服务: ${{ needs.build-core-services.result }}"
+          echo "🐳 Docker Image Build Status:"
+          echo "  🏗️ Core Services: ${{ needs.build-core-services.result }}"
           echo "  ☕ Console Hub: ${{ needs.build-console-hub.result }}"
           echo "  🌐 Console Frontend: ${{ needs.build-console-frontend.result }}"
           echo ""
 
-          echo "🎯 快速开始:"
+          echo "🎯 Quick Start:"
           echo "git clone https://github.com/${{ github.repository }}.git"
           echo "cd astron-agent"
           echo "git checkout ${{ needs.prepare-release.outputs.version }}"
           echo "docker-compose up -d"
           echo ""
 
-          echo "✅ 🚀 Astron Agent 发布完成!"
+          echo "✅ 🚀 Astron Agent Release Complete!"
