@@ -662,7 +662,8 @@ public class BotChatServiceImpl implements BotChatService {
         return jsonObject;
     }
 
-    private record BotConfiguration(String prompt, boolean supportContext, String model, String openedTool, Integer version, Long modelId, boolean supportDocument) {}
+    private record BotConfiguration(String prompt, boolean supportContext, String model, String openedTool,
+            Integer version, Long modelId, boolean supportDocument) {}
 
     private record TokenStatistics(int systemTokens, int currentUserTokens, int reservedTokens, int availableTokens) {}
 

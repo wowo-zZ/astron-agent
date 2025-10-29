@@ -178,7 +178,7 @@ public class BotCreateController {
 
     /**
      * AI generate input examples
-     *
+     * <p>
      * Path: /bot/generateInputExample
      */
     @PostMapping(value = "/generate-input-example")
