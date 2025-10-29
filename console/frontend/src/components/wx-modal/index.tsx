@@ -66,7 +66,7 @@ const WxModal: React.FC<MultiModeCpnProps> = ({
   moreParams,
   workflowId,
   agentMaasId,
-  isVirtual
+  isVirtual,
 }) => {
   // const i = 0;
   // const flag = false;

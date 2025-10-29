@@ -321,7 +321,8 @@ export const en = {
   thinkingProblem: 'Thinking the Problem',
   solvingProblem: 'Solving the Problem',
   checkAll: 'Check All...',
-  networkError: 'The web seems to go wrong, so please refresh the page for a try.',
+  networkError:
+    'The web seems to go wrong, so please refresh the page for a try.',
 
   // Sidebar translations
   sidebar: {

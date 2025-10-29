@@ -75,9 +75,7 @@ export const initialStatus = {
   chatIdRef: uuid().replace(/-/g, ''),
 };
 
-export const handleChatTypeChange = (type: string,set) => {
-
-};
+export const handleChatTypeChange = (type: string, set) => {};
 
 const getDialogues = (id: string, set, shouldAddDivider = false): void => {
   getDialogueAPI(id, 1).then((data: unknown[]) => {

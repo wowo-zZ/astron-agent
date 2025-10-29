@@ -130,9 +130,9 @@ export interface TalkAgentConfig {
   vcn: string;
   scene: string;
   sceneMode: string;
-  sceneEnable:number;
-  vcnEnable:number;
-  callSceneId:string;
+  sceneEnable: number;
+  vcnEnable: number;
+  callSceneId: string;
 }
 
 // 对话API参数类型定义

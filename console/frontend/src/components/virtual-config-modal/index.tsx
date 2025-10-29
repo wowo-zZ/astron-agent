@@ -49,7 +49,7 @@ import flowIdCopyIcon from '@/assets/imgs/workflow/flowId-copy-icon.svg';
 import copy from 'copy-to-clipboard';
 import { useTranslation } from 'react-i18next';
 import { saveFlowAPI } from '@/services/flow';
-import SpeakerModal,{VcnItem} from '@/components/speaker-modal';
+import SpeakerModal, { VcnItem } from '@/components/speaker-modal';
 // import { vcnCnJson, vcnEnJson } from '@/components/speaker-modal/vcn';
 import useVoicePlayStore from '@/store/voice-play-store';
 interface HeaderFeedbackModalProps {
@@ -582,7 +582,7 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
     let vcnObj = [...officialVcnList].find(
       (item: any) => item.voiceType === selectedVoice
     );
-    return <>{vcnObj ? vcnObj.name  : '未选择'}</>;
+    return <>{vcnObj ? vcnObj.name : '未选择'}</>;
   }, [officialVcnList, selectedVoice]);
   const [mySpeaker, setMySpeaker]: any = useState([]); //我的发音人数组
   return (

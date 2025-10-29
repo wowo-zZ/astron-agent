@@ -217,7 +217,7 @@ const useChatDebuggerEffect = (
             required: input?.required,
             validationSchema:
               input?.schema?.type === 'object' ||
-                (input?.schema?.type.includes('array') && !input?.fileType)
+              (input?.schema?.type.includes('array') && !input?.fileType)
                 ? generateValidationSchema(input)
                 : null,
             errorMsg: errorMsg,
@@ -365,14 +365,15 @@ export function ChatDebuggerContent({
   const handleStopConversation = useChatStore(
     state => state.handleStopConversation
   );
-  const handleChatTypeChange = useChatStore(state => state.handleChatTypeChange);
+  const handleChatTypeChange = useChatStore(
+    state => state.handleChatTypeChange
+  );
   const [showChatDebuggerPage, setShowChatDebuggerPage] =
     useState<boolean>(true);
-  const { startNode, trialRun, multiParams, xfYunBot, talkAgentConfig } = useChatDebuggerContent(
-    {
+  const { startNode, trialRun, multiParams, xfYunBot, talkAgentConfig } =
+    useChatDebuggerContent({
       currentFlow,
-    }
-  );
+    });
   useChatDebuggerEffect(
     currentFlow,
     open,

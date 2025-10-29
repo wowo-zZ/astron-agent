@@ -5,7 +5,7 @@ import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import FlowEdit from '@/components/workflow/modal/flow-edit';
 import VirtualConfig from '@/components/virtual-config-modal';
 import dayjs from 'dayjs';
-import { isJSON } from "@/utils";
+import { isJSON } from '@/utils';
 import { saveFlowAPI } from '@/services/flow';
 
 import arrowLeft from '@/assets/imgs/knowledge/workflow-back.png';
@@ -94,8 +94,9 @@ const FlowTabs: React.FC<FlowTabsProps> = ({ currentTab, id, t, navigate }) => (
     {['arrange', 'overview'].map(tab => (
       <div
         key={tab}
-        className={`flex items-center justify-center py-2.5 px-8 rounded-xl font-medium cursor-pointer ${currentTab === tab ? 'config-tabs-active' : 'config-tabs-normal'
-          }`}
+        className={`flex items-center justify-center py-2.5 px-8 rounded-xl font-medium cursor-pointer ${
+          currentTab === tab ? 'config-tabs-active' : 'config-tabs-normal'
+        }`}
         onClick={() => navigate(`/work_flow/${id}/${tab}`, { replace: true })}
       >
         <span className={`${tab}-icon`}></span>
