@@ -59,7 +59,3 @@ public class CustomSpeakerServiceImpl extends ServiceImpl<CustomSpeakerMapper, C
         baseMapper.update(null, updateWrapper);
     }
 }
-
-
-
-

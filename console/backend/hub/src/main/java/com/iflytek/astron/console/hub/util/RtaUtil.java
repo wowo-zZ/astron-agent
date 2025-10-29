@@ -23,7 +23,7 @@ import java.util.concurrent.CountDownLatch;
 public class RtaUtil {
 
     private final RtasrClient rtaClient;
-    
+
     public String getRtaResult(FileInputStream audioInputStream) {
         StringBuffer finalResult = new StringBuffer();
         CountDownLatch latch = new CountDownLatch(1);
@@ -58,7 +58,7 @@ public class RtaUtil {
             // Handle exceptions appropriately
             return "Error: " + e.getMessage();
         }
-        
+
         return finalResult.toString();
     }
 

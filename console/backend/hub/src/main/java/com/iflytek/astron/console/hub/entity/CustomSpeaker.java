@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  */
 @TableName(value = "custom_speaker")
 @Data
-@JsonInclude(JsonInclude.Include.NON_EMPTY)  // 跳
+@JsonInclude(JsonInclude.Include.NON_EMPTY) // 跳
 public class CustomSpeaker {
 
     @TableId(value = "id", type = IdType.AUTO)
@@ -31,7 +31,7 @@ public class CustomSpeaker {
 
 
     private String assetId;
-    
+
 
     private Integer deleted;
 

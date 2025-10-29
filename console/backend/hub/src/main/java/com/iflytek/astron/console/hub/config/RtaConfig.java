@@ -14,13 +14,13 @@ public class RtaConfig {
 
     @Value("${spark.rtasr-key}")
     private String rtasrApikey;
-    
-    
+
+
     @Bean
     public RtasrClient rtaClient() {
         return new RtasrClient.Builder()
                 .signature("appId", "rtasrApikey")
                 .build();
     }
-    
+
 }

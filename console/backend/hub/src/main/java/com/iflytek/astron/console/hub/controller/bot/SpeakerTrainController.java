@@ -10,6 +10,7 @@ import com.iflytek.astron.console.hub.entity.CustomSpeaker;
 import com.iflytek.astron.console.hub.service.bot.CustomSpeakerService;
 import com.iflytek.astron.console.hub.service.bot.SpeakerTrainService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +25,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/speaker/train")
+@Tag(name = "Speaker Training")
 @RequiredArgsConstructor
 public class SpeakerTrainController {
 
@@ -51,7 +53,7 @@ public class SpeakerTrainController {
         return ApiResult.success(speakerTrainService.getText());
     }
 
-    
+
     @Operation(summary = "get train speaker")
     @GetMapping("/train-speaker")
     @SpacePreAuth(key = "SpeakerTrainController_trainSpeaker_GET")

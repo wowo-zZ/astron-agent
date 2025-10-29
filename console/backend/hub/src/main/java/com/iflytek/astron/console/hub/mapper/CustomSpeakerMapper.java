@@ -6,7 +6,3 @@ import com.iflytek.astron.console.hub.entity.CustomSpeaker;
 public interface CustomSpeakerMapper extends BaseMapper<CustomSpeaker> {
 
 }
-
-
-
-
