@@ -39,3 +39,6 @@ http { \
 }" > /etc/nginx/nginx.conf
 EXPOSE ${port}
 ADD /console/frontend/dist /var/www
+COPY /console/frontend/docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+ENTRYPOINT ["/docker-entrypoint.sh"]
