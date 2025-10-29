@@ -48,9 +48,13 @@ cd docker/astronAgent
 # Copy environment configuration
 cp .env.example .env
 
-# Edit environment configuration (refer to docs/DEPLOYMENT_GUIDE_WITH_AUTH.md for details)
+# Configure environment variables
 vim .env
+```
 
+For environment variable configuration, please refer to the documentation:[DEPLOYMENT_GUIDE_WITH_AUTH.md](https://github.com/iflytek/astron-agent/blob/main/docs/DEPLOYMENT_GUIDE_WITH_AUTH.md#step-2-configure-astronagent-environment-variables)
+
+```bash
 # Start all services (including Casdoor)
 docker compose -f docker-compose-with-auth.yaml up -d
 ```
