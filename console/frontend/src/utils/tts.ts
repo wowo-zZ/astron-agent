@@ -486,7 +486,11 @@ class Experience {
     for (let i = this.audioDatasIndex; i < dataLength; i++) {
       const audioData = this.audioDatas[i];
       if (audioData) {
-        audioBuffer.copyToChannel(audioData, 0, offset);
+        audioBuffer.copyToChannel(
+          audioData as unknown as Float32Array<ArrayBuffer>,
+          0,
+          offset
+        );
         offset += audioData.length;
         this.audioDatasIndex++;
       }

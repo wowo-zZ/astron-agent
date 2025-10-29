@@ -43,7 +43,7 @@ const ResqBottomButtons = ({
         }
       }
     }
-    return '';
+    return 'x4_lingbosong';
   };
   // 播放按钮点击
   const handlePlayAudio = () => {
@@ -60,11 +60,13 @@ const ResqBottomButtons = ({
   useEffect(() => {
     setIsPlaying(currentPlayingId === message?.id);
   }, [currentPlayingId, message?.id]);
+  
+  const playText = message?.reasoning ? message?.reasoning + message?.message : message?.message;
 
   return (
     <div className="flex items-center ml-14 w-fit px-2 py-1 h-7">
       <TtsModule
-        text={message?.reasoning + message?.message}
+        text={playText}
         language="cn"
         voiceName={getVoiceName()}
         isPlaying={isPlaying}
