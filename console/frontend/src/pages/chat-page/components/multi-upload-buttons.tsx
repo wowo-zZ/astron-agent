@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, JSX } from 'react';
 import { Tooltip, Popover } from 'antd';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';

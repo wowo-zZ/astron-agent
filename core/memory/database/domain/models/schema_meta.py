@@ -3,8 +3,8 @@
 from datetime import datetime
 from typing import Optional
 
-from memory.database.domain.models.base import SQLModelSerializable
 from common.utils.snowfake import get_id
+from memory.database.domain.models.base import SQLModelSerializable
 from sqlalchemy import BigInteger, Column
 from sqlmodel import Field
 

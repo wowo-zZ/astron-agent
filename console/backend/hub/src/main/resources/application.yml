@@ -116,6 +116,7 @@ spark:
   image-appId: ${SPARK_IMAGE_APP_ID:xxx}
   image-apiKey: ${SPARK_IMAGE_API_KEY:xxx}
   image-apiSecret: ${SPARK_IMAGE_API_SECRET:xxx}
+  tts-api-url: wss://tts-api.xfyun.cn/v2/tts
 
 # Workflow configuration
 workflow:

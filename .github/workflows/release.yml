@@ -3,8 +3,8 @@ name: Release Astron Agent
 on:
   push:
     tags:
-      - 'v*.*.*'      # Match semantic version tags (v1.0.0, v2.1.3, etc.)
-      - 'v*.*.*-*'    # Match pre-release version tags (v1.0.0-beta.1, v2.1.0-rc.1, etc.)
+      - 'v*.*.*'      # 匹配语义版本号 (v1.0.0, v2.1.3, etc.)
+      - 'v*.*.*-*'    # 匹配预发布版本 (v1.0.0-beta.1, v2.1.0-rc.1, etc.)
   workflow_dispatch:
     inputs:
       tag:
@@ -18,7 +18,7 @@ on:
         type: boolean
 
 concurrency:
-  group: release-${{ github.event.inputs.tag || github.ref }}
+  group: release-${{ github.ref }}
   cancel-in-progress: false
 
 permissions:
@@ -44,36 +44,11 @@ jobs:
       has-console-hub: ${{ steps.detect.outputs.has-console-hub }}
       has-console-frontend: ${{ steps.detect.outputs.has-console-frontend }}
       changelog: ${{ steps.changelog.outputs.changelog }}
-      git-ref: ${{ steps.meta.outputs.git-ref }}
-      commit-sha: ${{ steps.meta.outputs.commit-sha }}
-      cache-scope: ${{ steps.meta.outputs.cache-scope }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.tag || github.ref }}
-          fetch-depth: 0  # Fetch full history for changelog generation
-
-      - name: Validate tag existence (manual trigger only)
-        if: github.event_name == 'workflow_dispatch'
-        run: |
-          TAG="${{ github.event.inputs.tag }}"
-          echo "🔍 Validating tag existence: $TAG"
-
-          # Fetch all tags
-          git fetch --tags --force
-
-          # Check if tag exists
-          if ! git rev-parse "$TAG" >/dev/null 2>&1; then
-            echo "❌ Error: Tag '$TAG' does not exist!"
-            echo "📋 Available tags:"
-            git tag --sort=-version:refname | head -10
-            exit 1
-          fi
-
-          # Ensure checkout to correct tag
-          git checkout "$TAG"
-          echo "✅ Tag '$TAG' validated successfully"
+          fetch-depth: 0  # Fetch complete history for changelog generation
 
       - name: Validate tag format
         id: meta
@@ -81,45 +56,28 @@ jobs:
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             VERSION="${{ github.event.inputs.tag }}"
             IS_PRERELEASE="${{ github.event.inputs.prerelease }}"
-            GIT_REF="${{ github.event.inputs.tag }}"
           else
             VERSION=${GITHUB_REF#refs/tags/}
-            # Check if pre-release version (contains -, alpha, beta, rc, etc.)
+            # Check if it's a pre-release version (contains -, alpha, beta, rc, etc.)
             if [[ "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
               IS_PRERELEASE="false"
             else
               IS_PRERELEASE="true"
             fi
-            GIT_REF="${{ github.ref }}"
           fi
 
           # Validate version format
           if [[ ! "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
             echo "❌ Invalid version format: $VERSION"
-            echo "✅ Valid format: v1.0.0, v1.0.0-beta.1, v1.0.0-rc.1"
+            echo "✅ Correct format: v1.0.0, v1.0.0-beta.1, v1.0.0-rc.1"
             exit 1
           fi
 
-          # Get accurate commit SHA (actual commit after checkout)
-          COMMIT_SHA=$(git rev-parse HEAD)
-
-          # Set cache scope for release build
-          # Simplified naming: v1.0.0 -> tag-v1-0-0, v1.0.0-beta.1 -> tag-v1-0-0-beta-1
-          VERSION_SAFE="${VERSION//\./-}"       # Replace dots with hyphens
-          VERSION_SAFE="${VERSION_SAFE//\//-}"  # Replace slashes with hyphens (if any)
-          CACHE_SCOPE="tag-${VERSION_SAFE}"
-
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "is-prerelease=$IS_PRERELEASE" >> $GITHUB_OUTPUT
-          echo "git-ref=$GIT_REF" >> $GITHUB_OUTPUT
-          echo "commit-sha=$COMMIT_SHA" >> $GITHUB_OUTPUT
-          echo "cache-scope=$CACHE_SCOPE" >> $GITHUB_OUTPUT
 
           echo "🏷️ Release version: $VERSION"
           echo "🔖 Pre-release: $IS_PRERELEASE"
-          echo "📝 Git Ref: $GIT_REF"
-          echo "📝 Commit SHA: $COMMIT_SHA"
-          echo "💾 Cache Scope: $CACHE_SCOPE"
 
       - name: Smart project detection
         id: detect
@@ -167,19 +125,16 @@ jobs:
         run: |
           echo "📝 Generating changelog..."
 
+          # Get previous tag
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
           CURRENT_TAG="${{ steps.meta.outputs.version }}"
-
-          # Get previous tag (more reliable method)
-          # Method: Get all tags, sort by version, find the one before current tag
-          PREVIOUS_TAG=$(git tag --sort=-version:refname | grep -v "^${CURRENT_TAG}$" | head -1)
 
           if [[ -z "$PREVIOUS_TAG" ]]; then
             echo "🆕 This is the first release"
             COMMIT_RANGE="HEAD"
           else
             echo "📊 Comparing: $PREVIOUS_TAG...$CURRENT_TAG"
-            # Use commit range between tags
-            COMMIT_RANGE="${PREVIOUS_TAG}..${CURRENT_TAG}"
+            COMMIT_RANGE="$PREVIOUS_TAG..HEAD"
           fi
 
           # Create changelog
@@ -191,7 +146,7 @@ jobs:
 
           # Collect and categorize commits
           echo "### ✨ New Features" >> "$CHANGELOG_FILE"
-          FEATURES=$(git log --pretty=format:"%s" $COMMIT_RANGE | grep "^feat" | sed 's/^feat[^:]*: /- /' || true)
+          FEATURES=$(git log --pretty=format:"%s" $COMMIT_RANGE | grep "^feat" | sed 's/^feat[^:]*: /- /')
           if [[ -n "$FEATURES" ]]; then
             echo "$FEATURES" >> "$CHANGELOG_FILE"
           else
@@ -200,7 +155,7 @@ jobs:
 
           echo "" >> "$CHANGELOG_FILE"
           echo "### 🐛 Fixes" >> "$CHANGELOG_FILE"
-          FIXES=$(git log --pretty=format:"%s" $COMMIT_RANGE | grep "^fix" | sed 's/^fix[^:]*: /- /' || true)
+          FIXES=$(git log --pretty=format:"%s" $COMMIT_RANGE | grep "^fix" | sed 's/^fix[^:]*: /- /')
           if [[ -n "$FIXES" ]]; then
             echo "$FIXES" >> "$CHANGELOG_FILE"
           else
@@ -209,7 +164,7 @@ jobs:
 
           echo "" >> "$CHANGELOG_FILE"
           echo "### 🔧 Improvements" >> "$CHANGELOG_FILE"
-          IMPROVEMENTS=$(git log --pretty=format:"%s" $COMMIT_RANGE | grep -E "^(chore|docs|refactor|test|ci|perf|style)" | sed 's/^[^:]*: /- /' || true)
+          IMPROVEMENTS=$(git log --pretty=format:"%s" $COMMIT_RANGE | grep -E "^(chore|docs|refactor|test|ci|perf|style)" | sed 's/^[^:]*: /- /')
           if [[ -n "$IMPROVEMENTS" ]]; then
             echo "$IMPROVEMENTS" >> "$CHANGELOG_FILE"
           else
@@ -224,7 +179,6 @@ jobs:
           } >> $GITHUB_OUTPUT
 
           echo "📄 Changelog generated successfully"
-          cat "$CHANGELOG_FILE"
 
   # ============================================================================
   # Stage 2: Build Docker Images (reuse build-push logic)
@@ -245,37 +199,17 @@ jobs:
           - { name: "agent", path: "core/agent", emoji: "🤖" }
           - { name: "knowledge", path: "core/knowledge", emoji: "📚" }
           - { name: "workflow", path: "core/workflow", emoji: "⚡" }
-      fail-fast: false  # Allow partial service failure without affecting others
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.prepare-release.outputs.git-ref }}
-          fetch-depth: 0
-
-      - name: Validate Dockerfile existence
-        id: validate
-        run: |
-          DOCKERFILE_PATH="./${{ matrix.service.path }}/Dockerfile"
-          if [[ ! -f "$DOCKERFILE_PATH" ]]; then
-            echo "⚠️ Dockerfile does not exist: $DOCKERFILE_PATH"
-            echo "⏭️ Skipping this service build"
-            echo "skip=true" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-          echo "✅ Dockerfile exists: $DOCKERFILE_PATH"
-          echo "skip=false" >> $GITHUB_OUTPUT
 
       - name: Set up QEMU
-        if: steps.validate.outputs.skip != 'true'
         uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
-        if: steps.validate.outputs.skip != 'true'
         uses: docker/setup-buildx-action@v3
 
       - name: Login to GitHub Container Registry
-        if: steps.validate.outputs.skip != 'true'
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY_GHCR }}
@@ -283,7 +217,6 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract metadata
-        if: steps.validate.outputs.skip != 'true'
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -296,7 +229,6 @@ jobs:
             type=raw,value=${{ needs.prepare-release.outputs.version }}
 
       - name: Build and push ${{ matrix.service.emoji }} ${{ matrix.service.name }} image
-        if: steps.validate.outputs.skip != 'true'
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -307,12 +239,9 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VERSION=${{ needs.prepare-release.outputs.version }}
-            GIT_COMMIT=${{ needs.prepare-release.outputs.commit-sha }}
+            GIT_COMMIT=${{ github.sha }}
             BUILD_TIME=${{ github.run_id }}
-          cache-from: |
-            type=gha,scope=core-${{ matrix.service.name }}-${{ needs.prepare-release.outputs.cache-scope }}
-            type=gha,scope=core-${{ matrix.service.name }}-branch-main
-          cache-to: type=gha,scope=core-${{ matrix.service.name }}-${{ needs.prepare-release.outputs.cache-scope }},mode=max
+          no-cache: true
 
   build-console-hub:
     name: ☕ Build Console Hub
@@ -322,9 +251,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.prepare-release.outputs.git-ref }}
-          fetch-depth: 0
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -362,12 +288,9 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VERSION=${{ needs.prepare-release.outputs.version }}
-            GIT_COMMIT=${{ needs.prepare-release.outputs.commit-sha }}
+            GIT_COMMIT=${{ github.sha }}
             BUILD_TIME=${{ github.run_id }}
-          cache-from: |
-            type=gha,scope=console-hub-${{ needs.prepare-release.outputs.cache-scope }}
-            type=gha,scope=console-hub-branch-main
-          cache-to: type=gha,scope=console-hub-${{ needs.prepare-release.outputs.cache-scope }},mode=max
+          no-cache: true
           provenance: false
           sbom: false
 
@@ -379,9 +302,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.prepare-release.outputs.git-ref }}
-          fetch-depth: 0
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -421,12 +341,9 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VERSION=${{ needs.prepare-release.outputs.version }}
-            GIT_COMMIT=${{ needs.prepare-release.outputs.commit-sha }}
+            GIT_COMMIT=${{ github.sha }}
             BUILD_TIME=${{ github.run_id }}
-          cache-from: |
-            type=gha,scope=console-frontend-${{ needs.prepare-release.outputs.cache-scope }}
-            type=gha,scope=console-frontend-branch-main
-          cache-to: type=gha,mode=max,scope=console-frontend-${{ needs.prepare-release.outputs.cache-scope }}
+          no-cache: true
 
   # ============================================================================
   # Stage 3: Create GitHub Release
@@ -452,7 +369,7 @@ jobs:
           append_body: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Release summary
+      - name: Release Summary
         run: |
           echo "=== 🎉 Astron Agent Release Summary ==="
           echo ""
@@ -461,17 +378,17 @@ jobs:
           echo "📦 Release page: https://github.com/${{ github.repository }}/releases/tag/${{ needs.prepare-release.outputs.version }}"
           echo ""
 
-          echo "🐳 Docker image build status:"
-          echo "  🏗️ Core services: ${{ needs.build-core-services.result }}"
+          echo "🐳 Docker Image Build Status:"
+          echo "  🏗️ Core Services: ${{ needs.build-core-services.result }}"
           echo "  ☕ Console Hub: ${{ needs.build-console-hub.result }}"
           echo "  🌐 Console Frontend: ${{ needs.build-console-frontend.result }}"
           echo ""
 
-          echo "🎯 Quick start:"
+          echo "🎯 Quick Start:"
           echo "git clone https://github.com/${{ github.repository }}.git"
           echo "cd astron-agent"
           echo "git checkout ${{ needs.prepare-release.outputs.version }}"
           echo "docker-compose up -d"
           echo ""
 
-          echo "✅ 🚀 Astron Agent release completed!"
+          echo "✅ 🚀 Astron Agent Release Complete!"

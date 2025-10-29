@@ -15,7 +15,7 @@ import {
   cancelFavorite,
 } from '@/services/agent-square';
 import styles from './index.module.scss';
-import { Input, message, Spin, Tooltip } from 'antd';
+import { Input, message, Popover, Spin, Tooltip } from 'antd';
 import classnames from 'classnames';
 import eventBus from '@/utils/event-bus';
 import { debounce } from 'lodash';
@@ -419,16 +419,18 @@ const HomePage: React.FC = () => {
                             </span>
                           </div>
                           <div className={styles.tags}>
-                            {[1, 5].includes(item?.version || 0) && (
-                              <div className={styles.itag}>
-                                {t('home.instructionType')}
-                              </div>
-                            )}
-                            {[2, 3, 4].includes(item?.version || 0) && (
-                              <div className={styles.itag}>
-                                {t('home.workflowType')}
-                              </div>
-                            )}
+                            {item?.version &&
+                              [1, 5].includes(item?.version) && (
+                                <div className={styles.itag}>
+                                  {t('home.instructionType')}
+                                </div>
+                              )}
+                            {item?.version &&
+                              [2, 3, 4].includes(item?.version) && (
+                                <div className={styles.itag}>
+                                  {t('home.workflowType')}
+                                </div>
+                              )}
                           </div>
                         </div>
                       </div>
