@@ -88,7 +88,7 @@ const HeaderFeedbackModal: React.FC<HeaderFeedbackModalProps> = ({
             <p>{t('createAgent1.workflowCreation')}</p>
             <span>{t('createAgent1.workflowDesign')}</span>
           </div>
-          {/* <div
+          <div
             className={`${styles.virtual} ${
               selectedBox === 'virtual' ? styles.selected : ''
             }`}
@@ -99,7 +99,7 @@ const HeaderFeedbackModal: React.FC<HeaderFeedbackModalProps> = ({
             ></div>
             <p>语音/虚拟人创建</p>
             <span>面向实时语音交互&虚拟人驱动的多模态场景</span>
-          </div> */}
+          </div>
         </div>
       </div>
       {makeModalVisible && (
