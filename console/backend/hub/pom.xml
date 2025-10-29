@@ -152,6 +152,11 @@
             <artifactId>converter-jackson</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>cn.xfyun</groupId>
+            <artifactId>websdk-java-speech</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

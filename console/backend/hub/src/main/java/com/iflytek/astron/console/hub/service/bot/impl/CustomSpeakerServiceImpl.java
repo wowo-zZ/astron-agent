@@ -19,7 +19,6 @@ public class CustomSpeakerServiceImpl extends ServiceImpl<CustomSpeakerMapper, C
     public List<CustomSpeaker> getTrainSpeaker(Long spaceId, String uid) {
         LambdaQueryWrapper<CustomSpeaker> queryWrapper = Wrappers.lambdaQuery(CustomSpeaker.class)
                 .eq(CustomSpeaker::getDeleted, 0)
-                .eq(CustomSpeaker::getTrainStatus, 1)
                 .select(CustomSpeaker::getId, CustomSpeaker::getName, CustomSpeaker::getAssetId);
         if (spaceId == null) {
             queryWrapper.eq(CustomSpeaker::getCreateUid, uid);
@@ -35,7 +34,21 @@ public class CustomSpeakerServiceImpl extends ServiceImpl<CustomSpeakerMapper, C
         LambdaUpdateWrapper<CustomSpeaker> updateWrapper = Wrappers.lambdaUpdate(CustomSpeaker.class)
                 .set(CustomSpeaker::getName, name)
                 .eq(CustomSpeaker::getId, id)
-                .eq(CustomSpeaker::getTrainStatus, 1)
+                .eq(CustomSpeaker::getDeleted, 0);
+        if (spaceId == null) {
+            updateWrapper.eq(CustomSpeaker::getCreateUid, uid);
+            updateWrapper.isNull(CustomSpeaker::getSpaceId);
+        } else {
+            updateWrapper.eq(CustomSpeaker::getSpaceId, spaceId);
+        }
+        baseMapper.update(null, updateWrapper);
+    }
+
+    @Override
+    public void deleteTrainSpeaker(Long id, Long spaceId, String uid) {
+        LambdaUpdateWrapper<CustomSpeaker> updateWrapper = Wrappers.lambdaUpdate(CustomSpeaker.class)
+                .set(CustomSpeaker::getDeleted, 1)
+                .eq(CustomSpeaker::getId, id)
                 .eq(CustomSpeaker::getDeleted, 0);
         if (spaceId == null) {
             updateWrapper.eq(CustomSpeaker::getCreateUid, uid);

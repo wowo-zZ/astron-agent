@@ -51,16 +51,7 @@ public class SpeakerTrainController {
         return ApiResult.success(speakerTrainService.getText());
     }
 
-
-    @Operation(summary = "train status")
-    @GetMapping("/train-status")
-    @SpacePreAuth(key = "SpeakerTrainController_trainStatus_GET")
-    public ApiResult<JSONObject> trainStatus(String taskId) {
-        Long spaceId = SpaceInfoUtil.getSpaceId();
-        String uid = SpaceInfoUtil.getUidByCurrentSpaceId();
-        return ApiResult.success(speakerTrainService.trainStatus(taskId, spaceId, uid));
-    }
-
+    
     @Operation(summary = "get train speaker")
     @GetMapping("/train-speaker")
     @SpacePreAuth(key = "SpeakerTrainController_trainSpeaker_GET")
@@ -80,6 +71,17 @@ public class SpeakerTrainController {
         customSpeakerService.updateTrainSpeaker(id, name, spaceId, uid);
         return ApiResult.success();
     }
-    
+
+    @Operation(summary = "delete train speaker")
+    @PostMapping("/delete-speaker")
+    @SpacePreAuth(key = "SpeakerTrainController_deleteTrainSpeaker_POST")
+    public ApiResult<Void> deleteTrainSpeaker(@RequestParam Long id) {
+        Long spaceId = SpaceInfoUtil.getSpaceId();
+        String uid = SpaceInfoUtil.getUidByCurrentSpaceId();
+        customSpeakerService.deleteTrainSpeaker(id, spaceId, uid);
+        return ApiResult.success();
+    }
+
+
 
 }

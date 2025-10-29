@@ -10,4 +10,6 @@ public interface CustomSpeakerService extends IService<CustomSpeaker> {
     List<CustomSpeaker> getTrainSpeaker(Long spaceId, String uid);
 
     void updateTrainSpeaker(Long id, String name, Long spaceId, String uid);
+
+    void deleteTrainSpeaker(Long id, Long spaceId, String uid);
 }

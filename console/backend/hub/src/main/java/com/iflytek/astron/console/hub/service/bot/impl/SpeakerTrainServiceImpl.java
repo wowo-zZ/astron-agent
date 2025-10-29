@@ -7,9 +7,6 @@ import cn.xfyun.config.SexEnum;
 import cn.xfyun.model.voiceclone.request.AudioAddParam;
 import cn.xfyun.model.voiceclone.request.CreateTaskParam;
 import com.alibaba.fastjson2.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.iflytek.astron.console.commons.constant.ResponseEnum;
 import com.iflytek.astron.console.commons.exception.BusinessException;
 import com.iflytek.astron.console.hub.entity.CustomSpeaker;
@@ -25,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
@@ -38,6 +34,16 @@ import java.util.UUID;
 public class SpeakerTrainServiceImpl implements SpeakerTrainService {
 
     private static final Set<String> SUPPORTED_LANGUAGES = Set.of("zh", "en", "jp", "ko", "ru");
+
+    // API response constants
+    private static final Integer SUCCESS_CODE = 0;
+    private static final Integer TRAIN_STATUS_SUCCESS = 1;
+    private static final Integer TRAIN_STATUS_FAILED = 0;
+    private static final Integer TRAIN_STATUS_DRAFT = 2;
+
+    // Training timeout constants
+    private static final int MAX_RETRIES = 15;
+    private static final int RETRY_INTERVAL_MS = 2000;
 
     @Value("${spark.app-id}")
     private String appId;
@@ -59,7 +65,7 @@ public class SpeakerTrainServiceImpl implements SpeakerTrainService {
                 return null;
             }
             JSONObject object = JSONObject.parseObject(trainText);
-            if (object == null || !Integer.valueOf(0).equals(object.get("code"))) {
+            if (object == null || !SUCCESS_CODE.equals(object.get("code"))) {
                 log.error("train text parse failed");
                 return null;
             }
@@ -75,13 +81,12 @@ public class SpeakerTrainServiceImpl implements SpeakerTrainService {
         if (StringUtils.isNotBlank(language) && !SUPPORTED_LANGUAGES.contains(language)) {
             throw new BusinessException(ResponseEnum.OPERATION_FAILED);
         }
-        log.info("java.io.tmpdir: {}", System.getProperty("java.io.tmpdir"));
         File tempFile = File.createTempFile(UUID.randomUUID().toString(), "_" + file.getOriginalFilename());
         file.transferTo(tempFile);
         try {
             VoiceTrainClient client = new VoiceTrainClient.Builder(appId, apiKey).build();
-            // create task
-            SexEnum sexEnum = Integer.valueOf(1).equals(sex) ? SexEnum.MALE : SexEnum.FEMALE;
+            // Create task
+            SexEnum sexEnum = sex.equals(1) ? SexEnum.MALE : SexEnum.FEMALE;
             CreateTaskParam createTaskParam = CreateTaskParam.builder()
                     .sex(sexEnum.getValue())
                     .ageGroup(AgeGroupEnum.YOUTH.getValue())
@@ -90,8 +95,8 @@ public class SpeakerTrainServiceImpl implements SpeakerTrainService {
             String taskResp = client.createTask(createTaskParam);
             JSONObject taskObj = JSONObject.parseObject(taskResp);
             String taskId = taskObj.getString("data");
-            log.info("创建任务：{}，返回taskId：{}", taskResp, taskId);
 
+            // add audio
             AudioAddParam audioAddParam2 = AudioAddParam.builder()
                     .file(tempFile)
                     .taskId(taskId)
@@ -99,47 +104,23 @@ public class SpeakerTrainServiceImpl implements SpeakerTrainService {
                     .textSegId(segId)
                     .build();
             String submitWithAudio = client.submitWithAudio(audioAddParam2);
-            log.info("提交任务返回: {}", submitWithAudio);
+            log.info("Task submission response: {}", submitWithAudio);
 
-            // 保存custom_speaker
-            CustomSpeaker customSpeaker = new CustomSpeaker();
-            customSpeaker.setCreateUid(uid);
-            customSpeaker.setSpaceId(spaceId);
-            customSpeaker.setName("my_speaker_" + RandomUtil.randomString(5));
-            customSpeaker.setTaskId(taskId);
-            customSpeakerService.save(customSpeaker);
-
+            // wait for training completion
+            waitForTrainingCompletion(taskId, spaceId, uid);
             return taskId;
         } catch (Exception e) {
             log.error("create task failed", e);
             return null;
         } finally {
-            if (tempFile.exists()) {
-                if (!tempFile.delete()) {
-                    log.error("Failed to delete temporary file: {}", tempFile.getAbsolutePath());
-                }
+            if (tempFile.exists() && !tempFile.delete()) {
+                log.error("Failed to delete temporary file: {}", tempFile.getAbsolutePath());
             }
         }
     }
 
     @Override
     public JSONObject trainStatus(String taskId, Long spaceId, String uid) {
-        
-        LambdaQueryWrapper<CustomSpeaker> queryWrapper = Wrappers.lambdaQuery(CustomSpeaker.class)
-                .eq(CustomSpeaker::getTaskId, taskId)
-                .eq(CustomSpeaker::getDeleted, 0);
-        if (spaceId == null) {
-            queryWrapper.eq(CustomSpeaker::getCreateUid, uid);
-            queryWrapper.isNull(CustomSpeaker::getSpaceId);
-        } else {
-            queryWrapper.eq(CustomSpeaker::getSpaceId, spaceId);
-        }
-        
-        CustomSpeaker customSpeaker = customSpeakerService.getOne(queryWrapper);
-        if (customSpeaker == null) {
-            throw new BusinessException(ResponseEnum.OPERATION_FAILED);
-        }
-        
         try {
             VoiceTrainClient client = new VoiceTrainClient.Builder(appId, apiKey).build();
             String trainStatus = client.result(taskId);
@@ -147,22 +128,74 @@ public class SpeakerTrainServiceImpl implements SpeakerTrainService {
                 throw new BusinessException(ResponseEnum.OPERATION_FAILED);
             }
             JSONObject object = JSONObject.parseObject(trainStatus);
-            if (object == null || !Integer.valueOf(0).equals(object.get("code"))) {
+            if (object == null || !SUCCESS_CODE.equals(object.get("code"))) {
                 throw new BusinessException(ResponseEnum.OPERATION_FAILED);
             }
             JSONObject data = object.getJSONObject("data");
-            if (Integer.valueOf(1).equals(data.getInteger("trainStatus"))) {
-                LambdaUpdateWrapper<CustomSpeaker> updateWrapper = new LambdaUpdateWrapper<>();
-                updateWrapper.eq(CustomSpeaker::getId, customSpeaker.getId());
-                updateWrapper.set(CustomSpeaker::getTrainStatus, 1);
-                updateWrapper.set(CustomSpeaker::getAssetId, data.getString("assetId"));
-                updateWrapper.set(CustomSpeaker::getUpdateTime, LocalDateTime.now());
-                customSpeakerService.update(null, updateWrapper);
+            if (TRAIN_STATUS_SUCCESS.equals(data.getInteger("trainStatus"))) {
+                // Save custom speaker
+                CustomSpeaker customSpeaker = new CustomSpeaker();
+                customSpeaker.setCreateUid(uid);
+                customSpeaker.setSpaceId(spaceId);
+                customSpeaker.setName("my_speaker_" + RandomUtil.randomString(5));
+                customSpeaker.setAssetId(data.getString("assetId"));
+                customSpeaker.setTaskId(taskId);
+                customSpeakerService.save(customSpeaker);
             }
             return data;
         } catch (Exception e) {
             log.error("train status failed, taskId: {}", taskId, e);
         }
         return null;
+    }
+
+    /**
+     * Wait for training completion by polling task status
+     */
+    private void waitForTrainingCompletion(String taskId, Long spaceId, String uid) {
+        log.info("Waiting for training completion, taskId: {}", taskId);
+
+        for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+            try {
+                JSONObject statusResult = trainStatus(taskId, spaceId, uid);
+                if (statusResult != null) {
+                    Integer trainStatus = statusResult.getInteger("trainStatus");
+                    log.info("Training status check attempt {}, taskId: {}, status: {}", attempt, taskId, trainStatus);
+
+                    if (TRAIN_STATUS_SUCCESS.equals(trainStatus)) {
+                        log.info("Training completed successfully, taskId: {}", taskId);
+                        return;
+                    } else if (TRAIN_STATUS_FAILED.equals(trainStatus) || TRAIN_STATUS_DRAFT.equals(trainStatus)) {
+                        log.warn("Training failed, taskId: {}, status: {}", taskId, trainStatus);
+                        throw new BusinessException(ResponseEnum.OPERATION_FAILED, "Training failed");
+                    }
+                }
+
+                if (attempt < MAX_RETRIES) {
+                    Thread.sleep(RETRY_INTERVAL_MS);
+                }
+
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.error("Training wait interrupted, taskId: {}", taskId, e);
+                throw new BusinessException(ResponseEnum.OPERATION_FAILED, "Training interrupted");
+            } catch (BusinessException e) {
+                throw e;
+            } catch (Exception e) {
+                log.warn("Status check failed attempt {}, taskId: {}, error: {}", attempt, taskId, e.getMessage());
+                if (attempt < MAX_RETRIES) {
+                    try {
+                        Thread.sleep(RETRY_INTERVAL_MS);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        log.error("Training wait interrupted, taskId: {}", taskId, ie);
+                        throw new BusinessException(ResponseEnum.OPERATION_FAILED, "Training interrupted");
+                    }
+                }
+            }
+        }
+
+        log.error("Training timeout, taskId: {}", taskId);
+        throw new BusinessException(ResponseEnum.OPERATION_FAILED, "Training timeout");
     }
 }

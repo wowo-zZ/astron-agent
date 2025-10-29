@@ -9,38 +9,34 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
- * 
  * @TableName custom_speaker
  */
-@TableName(value ="custom_speaker")
+@TableName(value = "custom_speaker")
 @Data
 @JsonInclude(JsonInclude.Include.NON_EMPTY)  // 跳
 public class CustomSpeaker {
 
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
-    
+
     private String createUid;
-    
+
     private Long spaceId;
 
-   
+
     private String name;
 
-   
+
     private String taskId;
 
-   
+
     private String assetId;
+    
 
-   
-    private Integer trainStatus;
-
-   
     private Integer deleted;
 
-    
+
     private LocalDateTime createTime;
-    
+
     private LocalDateTime updateTime;
 }
