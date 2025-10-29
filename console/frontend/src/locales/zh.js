@@ -306,6 +306,7 @@ export const zh = {
   thinkingProblem: '思考中',
   solvingProblem: '解题中',
   checkAll: '查看全部...',
+  networkError: '网络出小差了，请稍后再试~',
 
   // 侧边栏相关翻译
   sidebar: {
