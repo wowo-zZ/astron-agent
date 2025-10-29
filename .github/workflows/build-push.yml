@@ -20,7 +20,7 @@ on:
         type: boolean
 
 concurrency:
-  group: build-push-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: build-push-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -43,14 +43,10 @@ jobs:
       version: ${{ steps.meta.outputs.version }}
       should-push: ${{ steps.meta.outputs.should-push }}
       platforms: ${{ steps.meta.outputs.platforms }}
-      cache-suffix: ${{ steps.meta.outputs.cache-suffix }}
-      cache-fallback: ${{ steps.meta.outputs.cache-fallback }}
-      commit-sha: ${{ steps.meta.outputs.commit-sha }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
 
       - name: Extract metadata
@@ -76,45 +72,13 @@ jobs:
           # Set platforms (multi-arch builds for better compatibility)
           PLATFORMS="linux/amd64,linux/arm64"
 
-          # Smart cache strategy: set cache suffix and fallback based on scenario
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            # PR scenario: use pr-NUMBER as cache suffix, fallback to base branch
-            CACHE_SUFFIX="pr-${{ github.event.pull_request.number }}"
-            BASE_BRANCH="${{ github.event.pull_request.base.ref }}"
-            # Replace slashes with hyphens to avoid special characters
-            BASE_BRANCH_SAFE="${BASE_BRANCH//\//-}"
-            CACHE_FALLBACK="branch-${BASE_BRANCH_SAFE}"
-            COMMIT_SHA="${{ github.event.pull_request.head.sha }}"
-            echo "📌 PR #${{ github.event.pull_request.number }} -> base: ${BASE_BRANCH}"
-          else
-            # Branch push scenario: use branch-{branch_name} as cache suffix
-            BRANCH_NAME="${{ github.ref_name }}"
-            # Replace slashes with hyphens
-            BRANCH_NAME_SAFE="${BRANCH_NAME//\//-}"
-            CACHE_SUFFIX="branch-${BRANCH_NAME_SAFE}"
-            # Branch build fallback to main (if not main)
-            if [[ "${BRANCH_NAME}" == "main" || "${BRANCH_NAME}" == "master" ]]; then
-              CACHE_FALLBACK=""
-            else
-              CACHE_FALLBACK="branch-main"
-            fi
-            COMMIT_SHA="${{ github.sha }}"
-            echo "📌 Branch: ${BRANCH_NAME}"
-          fi
-
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "should-push=$SHOULD_PUSH" >> $GITHUB_OUTPUT
           echo "platforms=$PLATFORMS" >> $GITHUB_OUTPUT
-          echo "cache-suffix=$CACHE_SUFFIX" >> $GITHUB_OUTPUT
-          echo "cache-fallback=$CACHE_FALLBACK" >> $GITHUB_OUTPUT
-          echo "commit-sha=$COMMIT_SHA" >> $GITHUB_OUTPUT
 
           echo "🏷️ Version: $VERSION"
           echo "📤 Should push: $SHOULD_PUSH"
           echo "🏗️ Platforms: $PLATFORMS"
-          echo "💾 Cache suffix: $CACHE_SUFFIX"
-          echo "🔄 Cache fallback: ${CACHE_FALLBACK:-none}"
-          echo "📝 Commit SHA: $COMMIT_SHA"
 
   # ============================================================================
   # Stage 2: Build astron Agent Docker Images (Parallel Jobs)
@@ -126,9 +90,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          fetch-depth: 0
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -164,12 +125,9 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VERSION=${{ needs.detect-and-prepare.outputs.version }}
-            GIT_COMMIT=${{ needs.detect-and-prepare.outputs.commit-sha }}
+            GIT_COMMIT=${{ github.sha }}
             BUILD_TIME=${{ github.run_id }}
-          cache-from: |
-            type=gha,scope=core-tenant-${{ needs.detect-and-prepare.outputs.cache-suffix }}
-            ${{ needs.detect-and-prepare.outputs.cache-fallback && format('type=gha,scope=core-tenant-{0}', needs.detect-and-prepare.outputs.cache-fallback) || '' }}
-          cache-to: type=gha,scope=core-tenant-${{ needs.detect-and-prepare.outputs.cache-suffix }},mode=max
+          no-cache: true
 
   build-core-database:
     name: 🧠 Build Core Database
@@ -178,9 +136,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          fetch-depth: 0
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -216,12 +171,9 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VERSION=${{ needs.detect-and-prepare.outputs.version }}
-            GIT_COMMIT=${{ needs.detect-and-prepare.outputs.commit-sha }}
+            GIT_COMMIT=${{ github.sha }}
             BUILD_TIME=${{ github.run_id }}
-          cache-from: |
-            type=gha,scope=core-database-${{ needs.detect-and-prepare.outputs.cache-suffix }}
-            ${{ needs.detect-and-prepare.outputs.cache-fallback && format('type=gha,scope=core-database-{0}', needs.detect-and-prepare.outputs.cache-fallback) || '' }}
-          cache-to: type=gha,scope=core-database-${{ needs.detect-and-prepare.outputs.cache-suffix }},mode=max
+          no-cache: true
 
   build-core-rpa:
     name: 🤖 Build Core RPA
@@ -230,9 +182,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          fetch-depth: 0
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -268,12 +217,9 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VERSION=${{ needs.detect-and-prepare.outputs.version }}
-            GIT_COMMIT=${{ needs.detect-and-prepare.outputs.commit-sha }}
+            GIT_COMMIT=${{ github.sha }}
             BUILD_TIME=${{ github.run_id }}
-          cache-from: |
-            type=gha,scope=core-rpa-${{ needs.detect-and-prepare.outputs.cache-suffix }}
-            ${{ needs.detect-and-prepare.outputs.cache-fallback && format('type=gha,scope=core-rpa-{0}', needs.detect-and-prepare.outputs.cache-fallback) || '' }}
-          cache-to: type=gha,scope=core-rpa-${{ needs.detect-and-prepare.outputs.cache-suffix }},mode=max
+          no-cache: true
 
   build-core-link:
     name: 🔗 Build Core Link
@@ -282,9 +228,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          fetch-depth: 0
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -320,12 +263,9 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VERSION=${{ needs.detect-and-prepare.outputs.version }}
-            GIT_COMMIT=${{ needs.detect-and-prepare.outputs.commit-sha }}
+            GIT_COMMIT=${{ github.sha }}
             BUILD_TIME=${{ github.run_id }}
-          cache-from: |
-            type=gha,scope=core-link-${{ needs.detect-and-prepare.outputs.cache-suffix }}
-            ${{ needs.detect-and-prepare.outputs.cache-fallback && format('type=gha,scope=core-link-{0}', needs.detect-and-prepare.outputs.cache-fallback) || '' }}
-          cache-to: type=gha,scope=core-link-${{ needs.detect-and-prepare.outputs.cache-suffix }},mode=max
+          no-cache: true
 
   build-core-aitools:
     name: 🛠️ Build Core AI Tools
@@ -334,9 +274,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          fetch-depth: 0
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -372,12 +309,9 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VERSION=${{ needs.detect-and-prepare.outputs.version }}
-            GIT_COMMIT=${{ needs.detect-and-prepare.outputs.commit-sha }}
+            GIT_COMMIT=${{ github.sha }}
             BUILD_TIME=${{ github.run_id }}
-          cache-from: |
-            type=gha,scope=core-aitools-${{ needs.detect-and-prepare.outputs.cache-suffix }}
-            ${{ needs.detect-and-prepare.outputs.cache-fallback && format('type=gha,scope=core-aitools-{0}', needs.detect-and-prepare.outputs.cache-fallback) || '' }}
-          cache-to: type=gha,scope=core-aitools-${{ needs.detect-and-prepare.outputs.cache-suffix }},mode=max
+          no-cache: true
 
   build-core-agent:
     name: 🤖 Build Core Agent
@@ -386,9 +320,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          fetch-depth: 0
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -424,12 +355,9 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VERSION=${{ needs.detect-and-prepare.outputs.version }}
-            GIT_COMMIT=${{ needs.detect-and-prepare.outputs.commit-sha }}
+            GIT_COMMIT=${{ github.sha }}
             BUILD_TIME=${{ github.run_id }}
-          cache-from: |
-            type=gha,scope=core-agent-${{ needs.detect-and-prepare.outputs.cache-suffix }}
-            ${{ needs.detect-and-prepare.outputs.cache-fallback && format('type=gha,scope=core-agent-{0}', needs.detect-and-prepare.outputs.cache-fallback) || '' }}
-          cache-to: type=gha,scope=core-agent-${{ needs.detect-and-prepare.outputs.cache-suffix }},mode=max
+          no-cache: true
 
   build-core-knowledge:
     name: 📚 Build Core Knowledge
@@ -438,9 +366,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          fetch-depth: 0
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -476,12 +401,9 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VERSION=${{ needs.detect-and-prepare.outputs.version }}
-            GIT_COMMIT=${{ needs.detect-and-prepare.outputs.commit-sha }}
+            GIT_COMMIT=${{ github.sha }}
             BUILD_TIME=${{ github.run_id }}
-          cache-from: |
-            type=gha,scope=core-knowledge-${{ needs.detect-and-prepare.outputs.cache-suffix }}
-            ${{ needs.detect-and-prepare.outputs.cache-fallback && format('type=gha,scope=core-knowledge-{0}', needs.detect-and-prepare.outputs.cache-fallback) || '' }}
-          cache-to: type=gha,scope=core-knowledge-${{ needs.detect-and-prepare.outputs.cache-suffix }},mode=max
+          no-cache: true
 
   build-core-workflow:
     name: ⚡ Build Core Workflow
@@ -490,9 +412,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          fetch-depth: 0
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -528,12 +447,9 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VERSION=${{ needs.detect-and-prepare.outputs.version }}
-            GIT_COMMIT=${{ needs.detect-and-prepare.outputs.commit-sha }}
+            GIT_COMMIT=${{ github.sha }}
             BUILD_TIME=${{ github.run_id }}
-          cache-from: |
-            type=gha,scope=core-workflow-${{ needs.detect-and-prepare.outputs.cache-suffix }}
-            ${{ needs.detect-and-prepare.outputs.cache-fallback && format('type=gha,scope=core-workflow-{0}', needs.detect-and-prepare.outputs.cache-fallback) || '' }}
-          cache-to: type=gha,scope=core-workflow-${{ needs.detect-and-prepare.outputs.cache-suffix }},mode=max
+          no-cache: true
 
   build-console-frontend:
     name: 🌐 Build Console Frontend
@@ -542,9 +458,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          fetch-depth: 0
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -582,12 +495,9 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VERSION=${{ needs.detect-and-prepare.outputs.version }}
-            GIT_COMMIT=${{ needs.detect-and-prepare.outputs.commit-sha }}
+            GIT_COMMIT=${{ github.sha }}
             BUILD_TIME=${{ github.run_id }}
-          cache-from: |
-            type=gha,scope=console-frontend-${{ needs.detect-and-prepare.outputs.cache-suffix }}
-            ${{ needs.detect-and-prepare.outputs.cache-fallback && format('type=gha,scope=console-frontend-{0}', needs.detect-and-prepare.outputs.cache-fallback) || '' }}
-          cache-to: type=gha,mode=max,scope=console-frontend-${{ needs.detect-and-prepare.outputs.cache-suffix }}
+          no-cache: true
 
   build-console-hub:
     name: 🎯 Build Console Hub
@@ -596,9 +506,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          fetch-depth: 0
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -634,12 +541,9 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VERSION=${{ needs.detect-and-prepare.outputs.version }}
-            GIT_COMMIT=${{ needs.detect-and-prepare.outputs.commit-sha }}
+            GIT_COMMIT=${{ github.sha }}
             BUILD_TIME=${{ github.run_id }}
-          cache-from: |
-            type=gha,scope=console-hub-${{ needs.detect-and-prepare.outputs.cache-suffix }}
-            ${{ needs.detect-and-prepare.outputs.cache-fallback && format('type=gha,scope=console-hub-{0}', needs.detect-and-prepare.outputs.cache-fallback) || '' }}
-          cache-to: type=gha,scope=console-hub-${{ needs.detect-and-prepare.outputs.cache-suffix }},mode=max
+          no-cache: true
           provenance: false
           sbom: false
 
