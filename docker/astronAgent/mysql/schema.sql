@@ -16513,3 +16513,21 @@ INSERT INTO astron_console.pronunciation_person_config (name, cover_url, voice_t
 INSERT INTO astron_console.pronunciation_person_config (name, cover_url, voice_type, sort, model_manufacturer, exquisite, deleted, create_time, update_time) VALUES ('许小宝', 'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16824985943709826%2Flxq.png', 'aisbabyxu', 0, 'XFYUN', 0, 0, NOW(), NOW());
 INSERT INTO astron_console.pronunciation_person_config (name, cover_url, voice_type, sort, model_manufacturer, exquisite, deleted, create_time, update_time) VALUES ('聆伯松', 'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16824985943686779%2Flfc.png', 'x4_lingbosong', 0, 'XFYUN', 1, 0, NOW(), NOW());
 INSERT INTO astron_console.pronunciation_person_config (name, cover_url, voice_type, sort, model_manufacturer, exquisite, deleted, create_time, update_time) VALUES ('聆飞哲', 'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16824985943686779%2Flfc.png', 'x4_lingfeizhe_zl', 0, 'XFYUN', 1, 0, NOW(), NOW());
+
+ALTER TABLE astron_console.workflow ADD `type` INT NULL COMMENT '工作流类型';
+
+
+ALTER TABLE astron_console.workflow_version ADD advanced_config text NULL COMMENT '工作流高级配置';
+
+CREATE TABLE `workflow_config` (
+                                   `id` bigint(20) NOT NULL AUTO_INCREMENT,
+                                   `name` varchar(100) DEFAULT NULL COMMENT '版本名称，冗余字段',
+                                   `version_num` varchar(100) NOT NULL DEFAULT '-1' COMMENT '版本号',
+                                   `flow_id` varchar(19) NOT NULL COMMENT 'flowId',
+                                   `bot_id` int(11) DEFAULT NULL,
+                                   `config` mediumtext COMMENT '语音智能体配置',
+                                   `created_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                   `updated_time` datetime DEFAULT CURRENT_TIMESTAMP,
+                                   `deleted` tinyint(1) DEFAULT '0' COMMENT '是否删除：1-删除，0-未删除',
+                                   PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5805 DEFAULT CHARSET=utf8mb4;

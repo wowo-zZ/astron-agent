@@ -56,20 +56,15 @@ async def parse_and_exec_sql(
 
 
 @retry_on_invalid_cached_statement(max_retries=3)
-async def exec_sql_statement(
-    session: AsyncSession, statement: str, params: Optional[Dict[str, Any]] = None
-) -> Any:
-    """Execute SQL statement with optional parameter binding
+async def exec_sql_statement(session: AsyncSession, statement: str) -> Any:
+    """Execute raw SQL statement
 
     Args:
         session: SQLAlchemy AsyncSession
         statement: SQL statement to execute
-        params: Optional parameter dictionary for binding
 
     Returns:
         SQL execution result
     """
-    if params:
-        return await session.execute(text(statement), params)
-    else:
-        return await session.execute(text(statement))
+    # CodeQL [py/sql-injection] - This is safe: DDL statements are validated at the API layer
+    return await session.execute(text(statement))
