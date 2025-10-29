@@ -244,7 +244,7 @@ docker compose restart console-frontend console-hub
 
 ## 📚 更多资源
 
-- [AstronAgent 官方文档](https://docs.astronAgent.cn)
+- [AstronAgent 官方文档](https://www.xfyun.cn/doc/spark/Agent01-%E5%B9%B3%E5%8F%B0%E4%BB%8B%E7%BB%8D.html)
 - [Casdoor 官方文档](https://casdoor.org/docs/overview)
 - [RagFlow 官方文档](https://ragflow.io/docs)
 - [Docker Compose 官方文档](https://docs.docker.com/compose/)

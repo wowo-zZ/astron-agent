@@ -358,6 +358,9 @@ services:
   core-knowledge:
     image: ghcr.io/iflytek/astron-agent/core-knowledge:${ASTRON_AGENT_VERSION:-latest}
     container_name: astron-agent-core-knowledge
+    # Map container's localhost to host machine, to access services on the host
+    extra_hosts:
+      - "localhost:host-gateway"
     environment:
       SERVICE_PORT: "${CORE_KNOWLEDGE_PORT:-20010}"
       OTLP_ENABLE: "${OTLP_ENABLE:-0}"

@@ -5,10 +5,14 @@
 # All services run in the same Docker network: astron-agent-network
 
 include:
-  # Include astronAgent core services with Casdoor authentication
-  # This includes: docker-compose-auth.yml + docker-compose.yaml
-  # Uses: docker/astronAgent/.env + .env.with-rpa (overrides RPA_URL)
-  - path: docker-compose-with-auth.yaml
+  # Include Casdoor authentication service
+  - path: docker-compose-auth.yml
+    env_file:
+      - .env
+      - .env.with-rpa
+
+  # Include astronAgent core services
+  - path: docker-compose.yaml
     env_file:
       - .env
       - .env.with-rpa
