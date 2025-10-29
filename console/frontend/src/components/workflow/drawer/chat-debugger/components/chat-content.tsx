@@ -1,4 +1,10 @@
-import React, { useEffect, useRef, useMemo, useState } from 'react';
+import React, {
+  useEffect,
+  useRef,
+  useMemo,
+  useState,
+  useCallback,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image } from 'antd';
 import useFlowsManager from '@/components/workflow/store/use-flows-manager';
@@ -23,6 +29,8 @@ import {
 
 // 从统一的图标管理中导入
 import { Icons } from '@/components/workflow/icons';
+import useVoicePlayStore from '@/store/voice-play-store';
+import TtsModule from '@/components/tts-module';
 
 // 获取 Chat Content 模块的图标
 const icons = Icons.chatDebugger.chatContent;
@@ -48,7 +56,7 @@ const Prologue = ({
                   background: `url(${currentFlow?.avatarIcon}) no-repeat center / cover`,
                 }}
               ></div>
-              <div className="bg-[#F7F7FA] rounded-xl p-4 relative w-fit bg-[#f7f7fa]">
+              <div className="bg-[#F7F7FA] rounded-xl p-4 relative w-fit">
                 <MarkdownRender
                   content={advancedConfig?.prologue?.prologueText}
                   isSending={false}
@@ -104,7 +112,7 @@ const MessageDivider = ({ chat, t }): React.ReactElement => {
         className="w-[151px] h-[7px]"
         alt=""
       />
-      <span className="text-[#275EFF] font-medium">
+      <span className="text-[#6356EA] font-medium">
         {t('workflow.nodes.chatDebugger.startNewConversation')}
       </span>
       <img
@@ -122,7 +130,7 @@ const MessageAsk = ({ chat, renderInputElement }): React.ReactElement => {
       <div className="flex items-center gap-4">
         <img src={icons.chatUser} className="w-9 h-9" alt="" />
       </div>
-      <div className="w-fit min-w-[50px] bg-[#275EFF] p-3 flex flex-col gap-2.5 rounded-xl overflow-hidden">
+      <div className="w-fit min-w-[50px] bg-[#6356EA] p-3 flex flex-col gap-2.5 rounded-xl overflow-hidden">
         {chat?.inputs?.map((input, index) => (
           <div key={index}>
             {renderInputElement(chat as ChatListItemExtended, input)}
@@ -221,6 +229,42 @@ const MessageActions = ({
   copyData,
   advancedConfig,
 }): React.ReactElement => {
+  // 为每个消息创建播放状态映射
+  const [playingStates, setPlayingStates] = useState<Record<string, boolean>>(
+    {}
+  );
+  const useLanguage = useRef<string>('cn');
+  const currentPlayingId = useVoicePlayStore(state => state.currentPlayingId);
+  const setCurrentPlayingId = useVoicePlayStore(
+    state => state.setCurrentPlayingId
+  );
+  // 播放语音
+  const playAudio = useCallback(
+    async (item: any) => {
+      if (playingStates[item.id]) {
+        // 如果当前正在播放，则停止
+        setCurrentPlayingId(null);
+      } else {
+        // 切换播放：先停止当前播放
+        if (currentPlayingId) {
+          setCurrentPlayingId(null);
+        }
+        // 使用 setTimeout 确保状态更新完成后再开始新的播放
+        setTimeout(() => {
+          setCurrentPlayingId(item.id);
+        }, 50);
+      }
+    },
+    [playingStates, setCurrentPlayingId, currentPlayingId]
+  );
+  useEffect(() => {
+    const newPlayingStates: Record<string, boolean> = {};
+    chatList.forEach((chat: any) => {
+      newPlayingStates[chat.id] = currentPlayingId === chat.id;
+    });
+    setPlayingStates(newPlayingStates);
+  }, [currentPlayingId, chatList]);
+
   return (
     <>
       {(index !== chatList?.length - 1 || !debuggering) && (
@@ -229,6 +273,27 @@ const MessageActions = ({
             className="inline-flex items-center justify-end gap-1.5 ml-6 shrink-0"
             onClick={e => e.stopPropagation()}
           >
+            {advancedConfig?.textToSpeech?.enabled && (
+              <>
+                <span
+                  onClick={() => playAudio(chat)}
+                  className={`${
+                    playingStates[chat.id] ? 'play-active' : 'play-normal'
+                  }`}
+                ></span>
+                <TtsModule
+                  text={chat.content}
+                  language={useLanguage.current}
+                  voiceName={advancedConfig?.textToSpeech?.vcn_cn}
+                  isPlaying={playingStates[chat.id] || false}
+                  setIsPlaying={playing => {
+                    if (!playing) {
+                      setCurrentPlayingId(null);
+                    }
+                  }}
+                />
+              </>
+            )}
             <img
               src={icons.feedback}
               className="w-[16px] cursor-pointer"
@@ -335,7 +400,7 @@ const MessageRegenerate = ({
         <div className="flex items-center gap-2 ml-[52px]">
           {!needReply && (
             <div
-              className="px-4 py-1.5 text-[#7F7F7F] border border-[transparent] rounded-[16px] hover:bg-[#F8FAFF] hover:text-[#275EFF] cursor-pointer flex items-center gap-1 group"
+              className="px-4 py-1.5 text-[#7F7F7F] border border-[transparent] rounded-[16px] hover:bg-[#F8FAFF] hover:text-[#6356EA] cursor-pointer flex items-center gap-1 group"
               onClick={() => handleResumeChat('')}
             >
               <img
@@ -443,7 +508,7 @@ const MessageReply = ({
               <span>{t('workflow.nodes.chatDebugger.deepThinking')}</span>
             </div>
           )}
-          <div className="rounded-xl p-4  relative flex-1 bg-[#f7f7fa]">
+          <div className="rounded-xl p-4 relative flex-1 bg-[#f7f7fa]">
             <MessageReplyContent
               chat={chat}
               debuggering={debuggering}
@@ -527,6 +592,10 @@ const useChatContent = ({ chatList, setChatList }): UseChatContentProps => {
         },
         feedback: {
           enabled: parsedConfig?.feedback?.enabled ?? true,
+        },
+        textToSpeech: {
+          enabled: parsedConfig?.textToSpeech?.enabled ?? true,
+          vcn_cn: parsedConfig?.textToSpeech?.vcn_cn || '',
         },
         suggestedQuestionsAfterAnswer: {
           enabled: parsedConfig?.suggestedQuestionsAfterAnswer?.enabled ?? true,

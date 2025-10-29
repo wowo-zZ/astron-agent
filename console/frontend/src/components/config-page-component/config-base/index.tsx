@@ -70,6 +70,8 @@ import {
   KnowledgeLeaf,
   Knowledge,
 } from './types';
+import { VcnItem } from '@/components/speaker-modal';
+import { getVcnList } from '@/services/chat';
 
 const { Option } = Select;
 
@@ -147,12 +149,8 @@ const BaseConfig: React.FC<ChatProps> = ({
   const modelPromptTryRefs = useRef<(PromptTryRef | null)[]>([]);
   const [botCreateActiveV, setBotCreateActiveV] = useState<{
     cn: string;
-    en: string;
-    speed: number;
   }>({
-    cn: 'x4_lingxiaoqi',
-    en: 'x4_EnUs_Luna',
-    speed: 50,
+    cn: '',
   });
   const [modelList, setModelList]: any = useState([
     {
@@ -204,17 +202,39 @@ const BaseConfig: React.FC<ChatProps> = ({
   const isMounted = useRef(false);
   const [isChanged, setIsChanged] = useState(false);
   const [promptData, setPromptData] = useState('');
-  const [speechToText, setSpeechToText] = useState(false);
   const [suggest, setSuggest] = useState(false);
   const [resource, setResource] = useState(false);
   const [conversationStarter, setConversationStarter] = useState('');
   const [conversation, setConversation] = useState(false);
   const [presetQuestion, setPresetQuestion] = useState(['']);
   const [feedback, setFeedback] = useState(false);
-  const [textToSpeech, setTextToSpeech] = useState({
-    enabled: false,
-    vcn: '',
+
+  // 人设相关状态
+  const [personalityData, setPersonalityData] = useState({
+    enablePersonality: false,
+    personalityConfig: null as {
+      personality?: string;
+      sceneType?: 1 | 2;
+      sceneInfo?: string;
+    } | null,
   });
+
+  // 处理人设数据变化，保持enablePersonality的用户选择状态
+  const handlePersonalityChange = useCallback(
+    (data: {
+      enablePersonality: boolean;
+      personalityConfig: {
+        personality?: string;
+        sceneType?: 1 | 2;
+        sceneInfo?: string;
+      } | null;
+    }) => {
+      // 直接保存用户选择的enablePersonality状态，不根据内容自动改变
+      setPersonalityData(data);
+    },
+    []
+  );
+
   const [files, setFiles] = useState<any[]>([]);
   const [repoConfig, setRepoConfig] = useState({
     topK: 5,
@@ -251,7 +271,7 @@ const BaseConfig: React.FC<ChatProps> = ({
     flows: true,
   });
   const [publishModalShow, setPublishModalShow] = useState(false);
-  const [vcnList, setVcnList] = useState<{ vcn: string }[]>([]);
+  const [vcnList, setVcnList] = useState<VcnItem[]>([]);
   const [form] = Form.useForm();
   const [model, setModel] = useState('星火大模型 Spark X1');
   const [modelOptions, setModelOptions] = useState<ModelListData[]>([]);
@@ -416,9 +436,7 @@ const BaseConfig: React.FC<ChatProps> = ({
       inputExample: inputExample,
       [datasetKey]: dataList,
       avatar: coverUrl,
-      vcnCn: botCreateActiveV.cn,
-      vcnEn: botCreateActiveV.en,
-      vcnSpeed: botCreateActiveV.speed,
+      vcnCn: botCreateActiveV?.cn || vcnList[0]?.voiceType,
       isSentence: 0,
       openedTool: Object.keys(choosedAlltool)
         .filter((key: any) => choosedAlltool[key])
@@ -434,8 +452,31 @@ const BaseConfig: React.FC<ChatProps> = ({
       })(),
       isCustom: findModelOptionByUniqueKey(model)?.isCustom,
       prompt: prompt,
+      // 人设相关字段
+      enablePersonality: personalityData.enablePersonality,
+      personalityConfig: personalityData.personalityConfig,
       ...(!useFormValues && { promptStructList: [] }),
     };
+  };
+
+  // 验证人设信息
+  const validatePersonality = () => {
+    if (personalityData.enablePersonality) {
+      // 验证人设信息必填
+      if (!personalityData.personalityConfig?.personality?.trim()) {
+        message.info(t('configBase.CapabilityDevelopment.personalityRequired'));
+        return false;
+      }
+      // 验证场景描述（如果选择了场景类型）
+      if (
+        personalityData.personalityConfig?.sceneType &&
+        !personalityData.personalityConfig?.sceneInfo?.trim()
+      ) {
+        message.info(t('configBase.CapabilityDevelopment.sceneInfoRequired'));
+        return false;
+      }
+    }
+    return true;
   };
 
   const savebot = (e: any) => {
@@ -557,6 +598,9 @@ const BaseConfig: React.FC<ChatProps> = ({
     setShowTipPk(false);
     setShowModelPk(0);
     getModelListData();
+    getVcnList().then((res: VcnItem[]) => {
+      setVcnList(res);
+    });
   }, []);
 
   // 监听 modelOptions 加载完成，处理待回显的模型数据
@@ -629,8 +673,6 @@ const BaseConfig: React.FC<ChatProps> = ({
           setBotInfo(res);
           setBotCreateActiveV({
             cn: save == 'true' ? configPageData?.vcnCn : res.vcnCn,
-            en: save == 'true' ? configPageData?.vcnEn : res.vcnEn,
-            speed: save == 'true' ? configPageData?.vcnSpeed : res.vcnSpeed,
           });
           const obj: any = {};
           if (
@@ -691,6 +733,18 @@ const BaseConfig: React.FC<ChatProps> = ({
           form.setFieldsValue(save == 'true' ? configPageData : res);
           setDetailInfo(save == 'true' ? { ...res, ...configPageData } : res);
           setCoverUrl(save == 'true' ? configPageData?.avatar : res.avatar);
+
+          // 回显人设数据
+          setPersonalityData({
+            enablePersonality:
+              save == 'true'
+                ? (configPageData?.enablePersonality as boolean) || false
+                : res?.personalityConfig !== null || false,
+            personalityConfig:
+              save == 'true'
+                ? configPageData?.personalityConfig || null
+                : res.personalityConfig || null,
+          });
 
           // 处理模型回显逻辑
           const currentModelData = save == 'true' ? configPageData : res;
@@ -835,14 +889,12 @@ const BaseConfig: React.FC<ChatProps> = ({
   }, [
     promptData,
     tree,
-    speechToText,
     suggest,
     resource,
     conversationStarter,
     conversation,
     presetQuestion,
     feedback,
-    textToSpeech,
     repoConfig,
     tools,
     flows,
@@ -865,13 +917,6 @@ const BaseConfig: React.FC<ChatProps> = ({
       },
       feedback: {
         enabled: feedback,
-      },
-      textToSpeech: {
-        ...textToSpeech,
-        vcn: textToSpeech?.vcn || vcnList[0]?.vcn,
-      },
-      speechToText: {
-        enabled: speechToText,
       },
       models: {},
       repoConfigs: {
@@ -1195,9 +1240,7 @@ const BaseConfig: React.FC<ChatProps> = ({
                       promptStructList: [],
                       datasetList: datasetList,
                       avatar: coverUrl,
-                      vcnCn: botCreateActiveV.cn,
-                      vcnEn: botCreateActiveV.en,
-                      vcnSpeed: botCreateActiveV.speed,
+                      vcnCn: botCreateActiveV?.cn || vcnList[0]?.voiceType,
                       isSentence: 0,
                       openedTool: Object.keys(choosedAlltool)
                         .filter((key: any) => choosedAlltool[key])
@@ -1215,6 +1258,9 @@ const BaseConfig: React.FC<ChatProps> = ({
                       })(),
                       isCustom: findModelOptionByUniqueKey(model)?.isCustom,
                       prompt: prompt,
+                      // 人设相关字段
+                      enablePersonality: personalityData.enablePersonality,
+                      personalityConfig: personalityData.personalityConfig,
                     };
                     updateBot(obj)
                       .then(() => {
@@ -1254,9 +1300,7 @@ const BaseConfig: React.FC<ChatProps> = ({
                       promptStructList: [],
                       maasDatasetList: maasDatasetList,
                       avatar: coverUrl,
-                      vcnCn: botCreateActiveV.cn,
-                      vcnEn: botCreateActiveV.en,
-                      vcnSpeed: botCreateActiveV.speed,
+                      vcnCn: botCreateActiveV?.cn || vcnList[0]?.voiceType,
                       isSentence: 0,
                       openedTool: Object.keys(choosedAlltool)
                         .filter((key: any) => choosedAlltool[key])
@@ -1274,6 +1318,9 @@ const BaseConfig: React.FC<ChatProps> = ({
                       })(),
                       isCustom: findModelOptionByUniqueKey(model)?.isCustom,
                       prompt: prompt,
+                      // 人设相关字段
+                      enablePersonality: personalityData.enablePersonality,
+                      personalityConfig: personalityData.personalityConfig,
                     };
                     updateBot(obj)
                       .then(() => {
@@ -1340,9 +1387,7 @@ const BaseConfig: React.FC<ChatProps> = ({
                     promptStructList: [],
                     datasetList: datasetList,
                     avatar: coverUrl,
-                    vcnCn: botCreateActiveV.cn,
-                    vcnEn: botCreateActiveV.en,
-                    vcnSpeed: botCreateActiveV.speed,
+                    vcnCn: botCreateActiveV?.cn || vcnList[0]?.voiceType,
                     isSentence: sentence,
                     openedTool: Object.keys(choosedAlltool)
                       .filter((key: any) => choosedAlltool[key])
@@ -1350,6 +1395,9 @@ const BaseConfig: React.FC<ChatProps> = ({
                     prologue: prologue,
                     model: model,
                     prompt: prompt,
+                    // 人设相关字段
+                    enablePersonality: personalityData.enablePersonality,
+                    personalityConfig: personalityData.personalityConfig,
                   };
 
                   insertBot(obj)
@@ -1388,9 +1436,7 @@ const BaseConfig: React.FC<ChatProps> = ({
                     promptStructList: [],
                     maasDatasetList: maasDatasetList,
                     avatar: coverUrl,
-                    vcnCn: botCreateActiveV.cn,
-                    vcnEn: botCreateActiveV.en,
-                    vcnSpeed: botCreateActiveV.speed,
+                    vcnCn: botCreateActiveV?.cn || vcnList[0]?.voiceType,
                     isSentence: sentence,
                     openedTool: Object.keys(choosedAlltool)
                       .filter((key: any) => choosedAlltool[key])
@@ -1398,6 +1444,9 @@ const BaseConfig: React.FC<ChatProps> = ({
                     prologue: prologue,
                     model: model,
                     prompt: prompt,
+                    // 人设相关字段
+                    enablePersonality: personalityData.enablePersonality,
+                    personalityConfig: personalityData.personalityConfig,
                   };
 
                   insertBot(obj)
@@ -1576,153 +1625,149 @@ const BaseConfig: React.FC<ChatProps> = ({
                 }
               </Form>
               <div className={styles.tipBox}>
-                <Tabs defaultActiveKey="1" className={styles.tipBoxTab}>
-                  <Tabs.TabPane tab={t('configBase.commonConfig')} key="1">
-                    <div className={styles.tipTitle}>
-                      <div className={styles.tipLabel}>
-                        {t('configBase.promptEdit')}
-                      </div>
-                      <div className={styles.tipBotton}>
-                        <div
-                          className={styles.leftBotton}
-                          onClick={() => handleShowTipPk('show')}
-                        >
-                          <img
-                            className={styles.leftImg}
-                            src={promptIcon}
-                            alt=""
-                          />
-                          <div>{t('configBase.promptComparison')}</div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className={styles.TextArea}>
-                      <Spin spinning={loadingPrompt}>
-                        <div
-                          style={{
-                            border: '1px solid #e4eaff',
-                            marginBottom: '20px',
-                            borderRadius: '6px',
-                          }}
-                        >
-                          <Input.TextArea
-                            className={styles.textField}
-                            onChange={(e: any) => setPrompt(e.target.value)}
-                            value={prompt}
-                            autoSize={{ minRows: 10, maxRows: 10 }}
-                            style={{ marginBottom: '50px' }}
-                          />
-                          <div
-                            className={styles.rightBotton}
-                            onClick={() => {
-                              aiGen();
-                            }}
+                <Tabs
+                  defaultActiveKey="1"
+                  className={styles.tipBoxTab}
+                  items={[
+                    {
+                      key: '1',
+                      label: t('configBase.commonConfig'),
+                      children: (
+                        <>
+                          <div className={styles.tipTitle}>
+                            <div className={styles.tipLabel}>
+                              {t('configBase.promptEdit')}
+                            </div>
+                            <div className={styles.tipBotton}>
+                              <div
+                                className={styles.leftBotton}
+                                onClick={() => handleShowTipPk('show')}
+                              >
+                                <img
+                                  className={styles.leftImg}
+                                  src={promptIcon}
+                                  alt=""
+                                />
+                                <div>{t('configBase.promptComparison')}</div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className={styles.TextArea}>
+                            <Spin spinning={loadingPrompt}>
+                              <div
+                                style={{
+                                  border: '1px solid #e4eaff',
+                                  marginBottom: '20px',
+                                  borderRadius: '6px',
+                                }}
+                              >
+                                <Input.TextArea
+                                  className={styles.textField}
+                                  onChange={(e: any) =>
+                                    setPrompt(e.target.value)
+                                  }
+                                  value={prompt}
+                                  autoSize={{ minRows: 10, maxRows: 10 }}
+                                  style={{ marginBottom: '50px' }}
+                                />
+                                <div
+                                  className={styles.rightBotton}
+                                  onClick={() => {
+                                    aiGen();
+                                  }}
+                                >
+                                  <img
+                                    className={styles.rightBottonIcon}
+                                    src={starIcon}
+                                    alt=""
+                                  />
+                                  {t('configBase.AIoptimization')}
+                                </div>
+                              </div>
+                            </Spin>
+                          </div>
+                          <div className={styles.tipTitle}>
+                            <div className={styles.tipLabel}>
+                              {t('configBase.modelSelection')}
+                            </div>
+                            <div className={styles.tipBotton}>
+                              <div
+                                className={styles.leftBotton}
+                                onClick={() => setShowModelPk(2)}
+                              >
+                                <img
+                                  className={styles.leftImg}
+                                  src={tipIcon}
+                                  alt=""
+                                />
+                                <div>{t('configBase.modelComparison')}</div>
+                              </div>
+                            </div>
+                          </div>
+                          <Select
+                            value={model}
+                            onChange={handleModelChange}
+                            style={{ width: '100%' }}
+                            placeholder={t('configBase.pleaseSelectModel')}
                           >
-                            <img
-                              className={styles.rightBottonIcon}
-                              src={starIcon}
-                              alt=""
-                            />
-                            {t('configBase.AIoptimization')}
-                          </div>
-                        </div>
-                      </Spin>
-                    </div>
-                    <div className={styles.tipTitle}>
-                      <div className={styles.tipLabel}>
-                        {t('configBase.modelSelection')}
-                      </div>
-                      <div className={styles.tipBotton}>
-                        <div
-                          className={styles.leftBotton}
-                          onClick={() => setShowModelPk(2)}
-                        >
-                          <img
-                            className={styles.leftImg}
-                            src={tipIcon}
-                            alt=""
-                          />
-                          <div>{t('configBase.modelComparison')}</div>
-                        </div>
-                      </div>
-                    </div>
-                    <Select
-                      value={model}
-                      onChange={handleModelChange}
-                      style={{ width: '100%' }}
-                      placeholder={t('configBase.pleaseSelectModel')}
-                    >
-                      {modelOptions.map((option, index) => (
-                        <Option
-                          key={getModelUniqueKey(option, index)}
-                          value={getModelUniqueKey(option, index)}
-                        >
-                          <div className="flex items-center">
-                            <img
-                              className="w-[20px] h-[20px]"
-                              src={option.modelIcon}
-                              alt={option.modelName}
-                            />
-                            <span>{option.modelName}</span>
-                          </div>
-                        </Option>
-                      ))}
-                    </Select>
-                  </Tabs.TabPane>
-                  <Tabs.TabPane tab={t('configBase.highOrderConfig')} key="2">
-                    <CapabilityDevelopment
-                      botCreateActiveV={botCreateActiveV}
-                      setBotCreateActiveV={setBotCreateActiveV}
-                      baseinfo={baseinfo}
-                      detailInfo={detailInfo}
-                      prompt={prompt}
-                      supportSystemFlag={supportSystemFlag}
-                      setSupportSystemFlag={setSupportSystemFlag}
-                      prologue={prologue}
-                      setPrologue={setPrologue}
-                      inputExample={inputExample}
-                      setInputExample={setInputExample}
-                      choosedAlltool={choosedAlltool}
-                      setChoosedAlltool={setChoosedAlltool}
-                      supportContextFlag={supportContextFlag}
-                      setSupportContextFlag={setSupportContextFlag}
-                      selectSource={selectSource}
-                      setSelectSource={setSelectSource}
-                      currentRobot={currentRobot}
-                      repoConfig={repoConfig}
-                      setRepoConfig={setRepoConfig}
-                      files={files}
-                      setFiles={setFiles}
-                      tree={tree}
-                      setTree={setTree}
-                      tools={tools}
-                      setTools={setTools}
-                      flows={flows}
-                      setFlows={setFlows}
-                      conversation={conversation}
-                      setConversation={setConversation}
-                      conversationStarter={conversationStarter}
-                      setConversationStarter={setConversationStarter}
-                      presetQuestion={presetQuestion}
-                      setPresetQuestion={setPresetQuestion}
-                      resource={resource}
-                      setResource={setResource}
-                      suggest={suggest}
-                      setSuggest={setSuggest}
-                      speechToText={speechToText}
-                      setSpeechToText={setSpeechToText}
-                      feedback={feedback}
-                      setFeedback={setFeedback}
-                      textToSpeech={textToSpeech}
-                      setTextToSpeech={setTextToSpeech}
-                      multiModelDebugging={multiModelDebugging}
-                      growOrShrinkConfig={growOrShrinkConfig}
-                      setGrowOrShrinkConfig={setGrowOrShrinkConfig}
-                      knowledges={knowledges}
-                      vcnList={vcnList}
-                    />
-                  </Tabs.TabPane>
-                </Tabs>
+                            {modelOptions.map((option, index) => (
+                              <Option
+                                key={getModelUniqueKey(option, index)}
+                                value={getModelUniqueKey(option, index)}
+                              >
+                                <div className="flex items-center">
+                                  <img
+                                    className="w-[20px] h-[20px]"
+                                    src={option.modelIcon}
+                                    alt={option.modelName}
+                                  />
+                                  <span>{option.modelName}</span>
+                                </div>
+                              </Option>
+                            ))}
+                          </Select>
+                        </>
+                      ),
+                    },
+                    {
+                      key: '2',
+                      label: t('configBase.highOrderConfig'),
+                      children: (
+                        <CapabilityDevelopment
+                          botCreateActiveV={botCreateActiveV}
+                          setBotCreateActiveV={setBotCreateActiveV}
+                          baseinfo={baseinfo}
+                          detailInfo={detailInfo}
+                          prompt={prompt}
+                          prologue={prologue}
+                          setPrologue={setPrologue}
+                          inputExample={inputExample}
+                          setInputExample={setInputExample}
+                          choosedAlltool={choosedAlltool}
+                          setChoosedAlltool={setChoosedAlltool}
+                          supportContextFlag={supportContextFlag}
+                          setSupportContextFlag={setSupportContextFlag}
+                          selectSource={selectSource}
+                          setSelectSource={setSelectSource}
+                          files={files}
+                          tree={tree}
+                          setTree={setTree}
+                          tools={tools}
+                          setTools={setTools}
+                          conversation={conversation}
+                          setConversation={setConversation}
+                          multiModelDebugging={multiModelDebugging}
+                          growOrShrinkConfig={growOrShrinkConfig}
+                          setGrowOrShrinkConfig={setGrowOrShrinkConfig}
+                          personalityData={personalityData}
+                          setPersonalityData={handlePersonalityChange}
+                          model={model}
+                          vcnList={vcnList}
+                        />
+                      ),
+                    },
+                  ]}
+                />
               </div>
             </>
           ) : (
@@ -1838,6 +1883,11 @@ const BaseConfig: React.FC<ChatProps> = ({
                       supportContext={supportContextFlag ? 1 : 0}
                       choosedAlltool={choosedAlltool}
                       findModelOptionByUniqueKey={findModelOptionByUniqueKey}
+                      personalityConfig={
+                        personalityData.enablePersonality
+                          ? personalityData.personalityConfig
+                          : null
+                      }
                     />
                   )}
                   {showTipPk &&
@@ -1851,7 +1901,7 @@ const BaseConfig: React.FC<ChatProps> = ({
                               questionTipActive == index ? '#f6f9ff' : '',
                             border:
                               questionTipActive == index
-                                ? '1px solid #275eff'
+                                ? '1px solid #6356EA'
                                 : '',
                           } as React.CSSProperties
                         }
@@ -1877,6 +1927,11 @@ const BaseConfig: React.FC<ChatProps> = ({
                           choosedAlltool={choosedAlltool}
                           findModelOptionByUniqueKey={
                             findModelOptionByUniqueKey
+                          }
+                          personalityConfig={
+                            personalityData.enablePersonality
+                              ? personalityData.personalityConfig
+                              : null
                           }
                         />
                       </div>
@@ -1944,6 +1999,11 @@ const BaseConfig: React.FC<ChatProps> = ({
                         supportContext={supportContextFlag ? 1 : 0}
                         choosedAlltool={choosedAlltool}
                         findModelOptionByUniqueKey={findModelOptionByUniqueKey}
+                        personalityConfig={
+                          personalityData.enablePersonality
+                            ? personalityData.personalityConfig
+                            : null
+                        }
                       />
                     </div>
                   ))}

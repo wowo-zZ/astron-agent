@@ -15,6 +15,7 @@ import {
 import Compressor from 'compressorjs';
 import { getShareAgentKey } from '@/services/chat';
 import { fileIconConfig } from '@/config/file-icon-config';
+import { t } from 'i18next';
 // 将对象转换为URL参数字符串
 const objectToQueryString = (params: Record<string, any>): string => {
   if (!params || Object.keys(params).length === 0) {
@@ -109,7 +110,7 @@ const copyText = async (options: {
     await navigator.clipboard.writeText(decodedText);
 
     if (!props.successText) {
-      message.info(localeConfig?.[languageCode]?.copyDone);
+      message.info(t('copyDone'));
     } else {
       message.info(props.successText);
     }
@@ -124,7 +125,7 @@ const copyText = async (options: {
     try {
       document.execCommand('copy');
       if (!props.successText) {
-        message.info(localeConfig?.[languageCode]?.copyDone);
+        message.info(t('copyDone'));
       } else {
         message.info(props.successText);
       }

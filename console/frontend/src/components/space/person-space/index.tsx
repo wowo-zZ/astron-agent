@@ -51,7 +51,6 @@ export const PersonSpace = ({
 
   //添加空间
   const handleAddSpace = () => {
-    console.log('song add space');
     setIsShowSpacePopover(false);
     setIsShowAddSpace(true);
   };

@@ -18,12 +18,8 @@ interface User {
 
 interface BottomLoginProps {
   isCollapsed: boolean;
-  isLogin?: boolean;
-  user?: User | undefined;
   isPersonCenterOpen: boolean;
   setIsPersonCenterOpen: (visible: boolean) => void;
-  // Components
-  OrderTypeComponent?: ReactElement | undefined;
 }
 
 // Extracted components to reduce complexity
@@ -110,7 +106,6 @@ const getUserAvatar = (user?: User): string => {
 
 const BottomLogin = ({
   isCollapsed,
-  OrderTypeComponent,
   isPersonCenterOpen,
   setIsPersonCenterOpen,
 }: BottomLoginProps): ReactElement => {
