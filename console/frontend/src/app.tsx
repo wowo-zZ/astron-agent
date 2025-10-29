@@ -14,6 +14,8 @@ export default function App(): ReactElement {
     useSpaceType();
   const [initDone, setInitDone] = useState<boolean>(false);
 
+  console.log('__APP_CONFIG__', window.__APP_CONFIG__);
+
   const initSpaceInfo = useCallback(async () => {
     try {
       const pathname = window.location.pathname.replace(/\/+$/, '');

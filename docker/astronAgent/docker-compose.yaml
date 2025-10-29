@@ -479,6 +479,7 @@ services:
       CONSOLE_CASDOOR_ID: "${CONSOLE_CASDOOR_ID:-}"
       CONSOLE_CASDOOR_APP: "${CONSOLE_CASDOOR_APP:-}"
       CONSOLE_CASDOOR_ORG: "${CONSOLE_CASDOOR_ORG:-}"
+      SPARK_APP_ID: "${SPARK_APP_ID:-}"
     expose:
       - "1881"
     networks:
