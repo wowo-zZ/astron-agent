@@ -252,7 +252,7 @@ After startup, you can access the services at the following addresses:
 
 ## 📚 Additional Resources
 
-- [AstronAgent Official Documentation](https://docs.astronAgent.cn)
+- [AstronAgent Official Documentation](https://www.xfyun.cn/doc/spark/Agent01-%E5%B9%B3%E5%8F%B0%E4%BB%8B%E7%BB%8D.html)
 - [Casdoor Official Documentation](https://casdoor.org/docs/overview)
 - [RagFlow Official Documentation](https://ragflow.io/docs)
 - [Docker Compose Official Documentation](https://docs.docker.com/compose/)
