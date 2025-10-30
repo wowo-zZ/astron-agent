@@ -39,7 +39,7 @@ public class SpeakerTrainController {
     @SpacePreAuth(key = "SpeakerTrainController_create_POST")
     public ApiResult<String> create(
             @RequestParam MultipartFile file,
-            @RequestParam String language,
+            @RequestParam(required = false) String language,
             @RequestParam Long segId,
             @RequestParam Integer sex) throws IOException {
         Long spaceId = SpaceInfoUtil.getSpaceId();
