@@ -38,7 +38,7 @@ export default function useChatFileUpload(
   const { t } = useTranslation();
   const generateFileBusinessKey = (): string => {
     const randomBytes = new Uint8Array(10);
-    crypto.getRandomValues(randomBytes);
+    window.crypto.getRandomValues(randomBytes);
     const randomStr = Array.from(randomBytes, byte => byte.toString(36))
       .join('')
       .substring(2, 15);
