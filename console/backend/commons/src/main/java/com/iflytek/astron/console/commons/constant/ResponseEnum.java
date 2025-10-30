@@ -94,6 +94,7 @@ public enum ResponseEnum {
     AUDIO_SAMPLE_RATE_TOO_LOW(60045, "error.audio.sample.rate.too.low"),
     AUDIO_BIT_DEPTH_INVALID(60046, "error.audio.bit.depth.invalid"),
     AUDIO_DURATION_TOO_LONG(60047, "error.audio.duration.too.long"),
+    SPEAKER_TRAIN_FAILED(60048, "error.speaker.train.failed"),
 
     // Space application related errors
     SPACE_APPLICATION_PLEASE_JOIN_ENTERPRISE_FIRST(61001, "space.application.please.join.enterprise.first"),

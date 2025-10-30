@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
 
@@ -71,7 +70,7 @@ public class SpeakerTrainServiceImpl implements SpeakerTrainService {
     }
 
     @Override
-    public String create(MultipartFile file, String language, Integer sex, Long segId, Long spaceId, String uid) throws IOException {
+    public String create(MultipartFile file, String language, Integer sex, Long segId, Long spaceId, String uid) throws Exception {
         if (StringUtils.isNotBlank(language) && !SUPPORTED_LANGUAGES.contains(language)) {
             throw new BusinessException(ResponseEnum.OPERATION_FAILED);
         }
@@ -80,8 +79,8 @@ public class SpeakerTrainServiceImpl implements SpeakerTrainService {
         AudioValidator.validateAudioFile(file);
 
         File tempFile = File.createTempFile(UUID.randomUUID().toString(), "_" + file.getOriginalFilename());
-        file.transferTo(tempFile);
         try {
+            file.transferTo(tempFile);
             // Create task
             SexEnum sexEnum = sex.equals(1) ? SexEnum.MALE : SexEnum.FEMALE;
             CreateTaskParam createTaskParam = CreateTaskParam.builder()
@@ -91,6 +90,9 @@ public class SpeakerTrainServiceImpl implements SpeakerTrainService {
                     .build();
             String taskResp = voiceTrainClient.createTask(createTaskParam);
             JSONObject taskObj = JSONObject.parseObject(taskResp);
+            if (taskObj == null || !SUCCESS_CODE.equals(taskObj.get("code"))) {
+                throw new BusinessException(ResponseEnum.SPEAKER_TRAIN_FAILED);
+            }
             String taskId = taskObj.getString("data");
 
             // add audio
@@ -108,7 +110,7 @@ public class SpeakerTrainServiceImpl implements SpeakerTrainService {
             return taskId;
         } catch (Exception e) {
             log.error("create task failed", e);
-            return null;
+            throw e;
         } finally {
             if (tempFile.exists() && !tempFile.delete()) {
                 log.error("Failed to delete temporary file: {}", tempFile.getAbsolutePath());
@@ -163,7 +165,7 @@ public class SpeakerTrainServiceImpl implements SpeakerTrainService {
                         return;
                     } else if (TRAIN_STATUS_FAILED.equals(trainStatus) || TRAIN_STATUS_DRAFT.equals(trainStatus)) {
                         log.warn("Training failed, taskId: {}, status: {}", taskId, trainStatus);
-                        throw new BusinessException(ResponseEnum.OPERATION_FAILED, "Training failed");
+                        throw new BusinessException(ResponseEnum.SPEAKER_TRAIN_FAILED, "Training failed");
                     }
                 }
 

@@ -16,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -41,7 +40,7 @@ public class SpeakerTrainController {
             @RequestParam MultipartFile file,
             @RequestParam(required = false) String language,
             @RequestParam Long segId,
-            @RequestParam Integer sex) throws IOException {
+            @RequestParam Integer sex) throws Exception {
         Long spaceId = SpaceInfoUtil.getSpaceId();
         String uid = SpaceInfoUtil.getUidByCurrentSpaceId();
         return ApiResult.success(speakerTrainService.create(file, language, sex, segId, spaceId, uid));
