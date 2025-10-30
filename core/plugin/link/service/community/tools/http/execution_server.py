@@ -27,7 +27,7 @@ from plugin.link.api.schemas.community.tools.http.execution_schema import (
     ToolDebugResponseHeader,
 )
 from plugin.link.consts import const
-from plugin.link.domain.models.manager import get_db_engine, get_redis_engine
+from plugin.link.domain.models.manager import get_db_engine
 from plugin.link.exceptions.sparklink_exceptions import SparkLinkBaseException
 from plugin.link.infra.tool_crud.process import ToolCrudOperation
 from plugin.link.infra.tool_exector.process import HttpRun
@@ -219,16 +219,13 @@ def process_authentication(
         raise Exception(f"Security type {security_type} not found in security schema")
 
     api_key_info = operation_id_schema["security"].get(security_type)
-    redis_engine = get_redis_engine()
-    redis_cache = redis_engine.get(f"spark_bot:tool_config:{tool_id}")
-    if redis_cache is None:
-        raise Exception("security: get redis_cache is none!")
-    auth_info = redis_cache.get("authentication", {})
-    if auth_info is None:
-        raise Exception("security: redis_cache get authentication is none!")
+    auth_name = api_key_info.get("name", None)
+    auth_value = api_key_info.get("value", None)
+    if not auth_name or not auth_value:
+        raise Exception(f"auth name:{auth_name}, auth value:{auth_value}")
 
     if api_key_info.get("type") == "apiKey":
-        api_key_dict = auth_info.get("apiKey")
+        api_key_dict = {auth_name: auth_value}
         if api_key_info.get("in") == "header":
             message_header.update(api_key_dict)
         elif api_key_info.get("in") == "query":
