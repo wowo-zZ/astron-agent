@@ -374,14 +374,6 @@ jobs:
             java)
               echo "✅ Java Coverage Report:"
               echo "================================================"
-              echo "🔍 Searching for coverage files in $(pwd)..."
-              # Debug: List all jacoco related files
-              echo "Debug - All jacoco directories:"
-              find . -type d -name jacoco 2>/dev/null || echo "No jacoco directories found"
-              echo ""
-              echo "Debug - All jacoco.csv files:"
-              find . -name "jacoco.csv" 2>/dev/null || echo "No jacoco.csv files found"
-              echo ""
               # Find all jacoco.csv files in submodules
               CSV_FILES=$(find . -name "jacoco.csv" -path "*/site/jacoco/jacoco.csv" 2>/dev/null)
 
@@ -390,32 +382,22 @@ jobs:
                 awk -F',' '
                   FNR==1 {next}  # Skip header of each file
                   $2 != "" {
-                    instruction_covered += $4;
-                    instruction_missed += $3;
                     branch_covered += $6;
                     branch_missed += $5;
                     line_covered += $8;
                     line_missed += $7;
                     method_covered += $12;
                     method_missed += $11;
-                    class_covered += $14;
-                    class_missed += $13;
                   }
                   END {
-                    if ((instruction_covered + instruction_missed) > 0) {
-                      printf "Instructions: %.1f%% (%d/%d)\n", (instruction_covered/(instruction_covered+instruction_missed))*100, instruction_covered, instruction_covered+instruction_missed;
+                    if ((line_covered + line_missed) > 0) {
+                      printf "Lines:    %.1f%% (%d/%d)\n", (line_covered/(line_covered+line_missed))*100, line_covered, line_covered+line_missed;
                     }
                     if ((branch_covered + branch_missed) > 0) {
-                      printf "Branches:     %.1f%% (%d/%d)\n", (branch_covered/(branch_covered+branch_missed))*100, branch_covered, branch_covered+branch_missed;
-                    }
-                    if ((line_covered + line_missed) > 0) {
-                      printf "Lines:        %.1f%% (%d/%d)\n", (line_covered/(line_covered+line_missed))*100, line_covered, line_covered+line_missed;
+                      printf "Branches: %.1f%% (%d/%d)\n", (branch_covered/(branch_covered+branch_missed))*100, branch_covered, branch_covered+branch_missed;
                     }
                     if ((method_covered + method_missed) > 0) {
-                      printf "Methods:      %.1f%% (%d/%d)\n", (method_covered/(method_covered+method_missed))*100, method_covered, method_covered+method_missed;
-                    }
-                    if ((class_covered + class_missed) > 0) {
-                      printf "Classes:      %.1f%% (%d/%d)\n", (class_covered/(class_covered+class_missed))*100, class_covered, class_covered+class_missed;
+                      printf "Methods:  %.1f%% (%d/%d)\n", (method_covered/(method_covered+method_missed))*100, method_covered, method_covered+method_missed;
                     }
                   }
                 ' $CSV_FILES
@@ -429,23 +411,48 @@ jobs:
               fi
               ;;
             typescript)
+              echo "✅ TypeScript Coverage Report:"
+              echo "================================================"
               if [ -f coverage/lcov-report/index.html ]; then
-                echo "✅ TypeScript coverage report available at: coverage/lcov-report/index.html"
+                echo "Coverage report generated successfully"
+                echo "📄 HTML report: coverage/lcov-report/index.html"
+                if [ -f coverage/lcov.info ]; then
+                  echo "📄 LCOV report: coverage/lcov.info"
+                fi
+                echo ""
+                echo "💡 Coverage summary is displayed above in test output"
+              else
+                echo "⚠️ No coverage report found"
               fi
+              echo "================================================"
               ;;
             go)
               if [ -f coverage.out ]; then
-                echo "✅ Go coverage report:"
+                echo "✅ Go Coverage Report:"
+                echo "================================================"
                 go tool cover -func=coverage.out | tail -n 1
+                echo "================================================"
+                echo "📄 Coverage profile: coverage.out"
+                echo "💡 View HTML report: go tool cover -html=coverage.out"
+              else
+                echo "⚠️ No Go coverage report found"
               fi
               ;;
             python)
+              echo "✅ Python Coverage Report:"
+              echo "================================================"
               if [ -f coverage.xml ]; then
-                echo "✅ Python coverage report available"
+                echo "Coverage report generated successfully"
                 if [ -f htmlcov/index.html ]; then
-                  echo "HTML report: htmlcov/index.html"
+                  echo "📄 HTML report: htmlcov/index.html"
                 fi
+                echo "📄 XML report: coverage.xml"
+                echo ""
+                echo "💡 Coverage summary is displayed above in test output"
+              else
+                echo "⚠️ No coverage report found"
               fi
+              echo "================================================"
               ;;
           esac
 
