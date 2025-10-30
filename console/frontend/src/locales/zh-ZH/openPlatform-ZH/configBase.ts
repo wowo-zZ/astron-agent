@@ -66,6 +66,12 @@ const translation = {
   select: '选这个',
 
   CapabilityDevelopment: {
+    backgroundImage: '背景图',
+    horizontalScreenDisplay: '横屏展示',
+    verticalScreenDisplay: '竖屏展示',
+    viewActualVerticalScreenEffect: '可以在对话后前往app查看实际竖屏效果',
+    modify: '修改',
+    upload: '上传',
     requireCreativeNovelty:
       '要求创意新颖，文案表达符合目标客群的喜好，避免口语化',
     pleaseWriteACreativeCommercialCopywriting:

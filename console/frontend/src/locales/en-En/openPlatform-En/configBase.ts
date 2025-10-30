@@ -74,6 +74,12 @@ Based on the given note topic, write a creative Xiaohongshu-style product recomm
 
   //能力开发
   CapabilityDevelopment: {
+    backgroundImage: 'Background Image',
+    horizontalScreenDisplay: 'Horizontal Screen Display',
+    verticalScreenDisplay: 'Vertical Screen Display',
+    viewActualVerticalScreenEffect: 'View actual vertical screen effect',
+    modify: 'Modify',
+    upload: 'Upload',
     requireCreativeNovelty: 'Require creative novelty',
     pleaseWriteACreativeCommercialCopywriting:
       'Please write a creative commercial copywriting',

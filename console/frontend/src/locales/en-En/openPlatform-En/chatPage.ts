@@ -56,6 +56,7 @@ const transition = {
     uploading: 'Uploading...',
     processing: 'Processing...',
     newChat: 'New Chat',
+    newChatSimple: 'New Conversation',
     clearChatHistory: 'Clear Chat History',
     confirmDeleteChat: 'Confirm delete chat history?',
     stopOutput: 'Stop',

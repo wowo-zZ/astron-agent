@@ -100,12 +100,12 @@ const ChatInput = (props: {
       const startMessage: MessageListType = {
         id: new Date().getTime(),
         reqType: 'START',
-        message: '全新的开始',
+        message: t('chatPage.chatWindow.newChatSimple'),
         updateTime: new Date().toISOString(),
       };
       addMessage(startMessage);
     } catch (error) {
-      console.error('创建新对话失败:', error);
+      console.error(error);
     }
   };
 

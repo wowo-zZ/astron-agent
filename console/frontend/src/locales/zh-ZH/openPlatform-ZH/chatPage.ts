@@ -56,6 +56,7 @@ const transition = {
     uploading: '上传中...',
     processing: '解析中...',
     newChat: '全新对话',
+    newChatSimple: '全新的开始',
     clearChatHistory: '清空聊天记录',
     confirmDeleteChat: '确认删除聊天记录？',
     stopOutput: '停止输出',

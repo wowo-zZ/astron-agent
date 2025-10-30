@@ -1,6 +1,8 @@
 import http from '../utils/http';
 import qs from 'qs';
 import { Base64 } from 'js-base64';
+import { VCNTrainingText } from '@/components/speaker-modal/voice-training';
+import { MyVCNItem } from '@/components/speaker-modal';
 
 /**
  * 更新用户个人资料
@@ -344,13 +346,6 @@ export const generateInputExample = (params: any) => {
   });
 };
 
-/**
- * @description 获取任务状态
- */
-export const updateCustomVCN = (params: any): Promise<any> => {
-  return http.post(`/customVCN/updateCustomVCN`, params);
-};
-
 // 新增bot
 export const insertBot = (params: any) => {
   return http.post(`/bot/create`, params);
@@ -529,12 +524,16 @@ export const upgradeWorkflow = (params: any) => {
  * @description 创建一句话复刻任务
  */
 export const createOnceTrainTask = (params: {
+  language?: string;
   sex: number;
-  sampleIndex: number;
+  segId: number;
   formData: FormData;
-}): Promise<{ taskId: string }> => {
+}): Promise<{ id: string }> => {
+  const filteredParams = Object.fromEntries(
+    Object.entries(params).filter(([_, value]) => value !== undefined)
+  );
   return http({
-    url: `/xingchen-api/customVCN/v2/create?sex=${params.sex}&index=${params.sampleIndex}`,
+    url: `/speaker/train/create?${qs.stringify(filteredParams)}`,
     method: 'POST',
     data: params.formData,
     headers: {
@@ -544,15 +543,31 @@ export const createOnceTrainTask = (params: {
 };
 
 /**
- * @description 获取V2一户话自训练发音人列表
+ * @description get my vcn list
  */
-export const getV2CustomVCNList = (params?: any): Promise<any> => {
-  return http.post(`/xingchen-api/customVCN/v2/getVcnList`, params);
+export const getMySpeakerList = (): Promise<MyVCNItem[]> => {
+  return http.get(`/speaker/train/train-speaker`);
 };
 
 /**
- * @description 删除自训练发音人
+ * @description delete my speaker
  */
-export const deleteCustomVCN = (params: any): Promise<any> => {
-  return http.post(`/xingchen-api/customVCN/deleteCustomVCN`, params);
+export const deleteMySpeaker = ({id}: {id: number}): Promise<{}> => {
+  return http.post(`/speaker/train/delete-speaker?id=${id}`);
+};
+
+/**
+ * @description update my speaker name
+ */
+export const updateMySpeaker = (params: {id: number, name: string}): Promise<{}> => {
+  return http.post(`/speaker/train/update-speaker?id=${params.id}&name=${params.name}`);
+};
+
+/**
+ * @description 获取发音人训练文本
+ */
+export const getVCNTrainingText = (): Promise<{
+  textSegs: VCNTrainingText[];
+}> => {
+  return http.get(`/speaker/train/get-text`);
 };
