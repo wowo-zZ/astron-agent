@@ -31,10 +31,11 @@ import { useTranslation } from 'react-i18next';
 import FileGridDisplay from './file-grid-display';
 //渲染全新开始
 const renderRestart = (): ReactElement => {
+  const { t } = useTranslation();
   return (
     <div className="flex items-center w-full mx-5 text-[#c4c4c8]">
       <div className="flex-1 h-[1px] bg-[#e3e4e9]" />
-      <div className="px-4 py-1.5">全新的开始</div>
+      <div className="px-4 py-1.5">{t('chatPage.chatWindow.newChatSimple')}</div>
       <div className="flex-1 h-[1px] bg-[#e3e4e9]" />
     </div>
   );

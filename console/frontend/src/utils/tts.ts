@@ -39,7 +39,6 @@ interface SetConfigParams {
 interface WebSocketParams {
   common?: {
     app_id: string;
-    uid: string;
   };
   business?: {
     aue: string;
@@ -53,7 +52,7 @@ interface WebSocketParams {
   };
   data?: {
     status: number;
-    text: string;
+    text: string | ArrayBuffer;
   };
   header?: {
     app_id: string;
@@ -78,10 +77,6 @@ interface WebSocketParams {
       reg: number;
       rdn: number;
       rhy: number;
-      scn?: number;
-      emotion?: number;
-      LanguageID?: number;
-      style?: string;
       audio: {
         encoding: string;
         sample_rate: number;
@@ -103,7 +98,7 @@ interface WebSocketParams {
       format: string;
       status: number;
       seq: number;
-      text: string;
+      text: string | ArrayBuffer;
     };
   };
 }
@@ -127,6 +122,7 @@ interface WebSocketResponse {
 
 export interface TtsSignResponse {
   appId: string;
+  type: string;
   url: string;
 }
 
@@ -162,9 +158,9 @@ class Experience {
   private firstBufferWaitStartMs: number | null = null; // 首次播放的预缓冲起始时间
 
   constructor({
-    speed = 2,
+    speed = 50,
     voice = 7,
-    pitch = 7,
+    pitch = 50,
     text = '',
     engineType = 'intp65',
     voiceName = '',
@@ -233,11 +229,12 @@ class Experience {
 
   // 获取音频
   getAudio(): void {
-    getTtsSign()
+    getTtsSign({ code: this.voiceName })
       .then((result: TtsSignResponse) => {
         const appId = result.appId;
         const url = result.url;
-        this.connectWebsocket(url, appId);
+        const type = result.type;
+        this.connectWebsocket(url, appId, type);
       })
       .catch(err => {
         message.info(err?.msg || '合成体验签名获取失败');
@@ -247,7 +244,7 @@ class Experience {
   }
 
   // websocket连接
-  connectWebsocket(url: string, appId: string): void {
+  connectWebsocket(url: string, appId: string, type: string): void {
     if ('WebSocket' in window) {
       this.websocket = new WebSocket(url);
     } else if ('MozWebSocket' in window) {
@@ -267,30 +264,76 @@ class Experience {
         return;
       }
 
-      // 计算正确的 vcn 值
-      const vcnValue = self.voiceName;
-
-      let params: any = {};
-
-      params = {
-        common: {
-          app_id: appId,
-        },
-        business: {
-          aue: 'raw',
-          auf: 'audio/L16;rate=16000',
-          ent: 'input65',
-          pitch: self.pitch || 50,
-          tte: 'UTF8',
-          vcn: self.voiceName,
-          volume: 50,
-          speed: self.speed,
-        },
-        data: {
-          status: 2,
-          text: self.encodeText(self.text),
-        },
-      };
+      const params: WebSocketParams =
+        type !== 'CLONE'
+          ? {
+              common: {
+                app_id: appId,
+              },
+              business: {
+                aue: 'raw',
+                auf: 'audio/L16;rate=16000',
+                ent: 'input65',
+                pitch: self.pitch,
+                tte: 'UTF8',
+                vcn: self.voiceName,
+                volume: 50,
+                speed: self.speed,
+              },
+              data: {
+                status: 2,
+                text: self.encodeText(self.text),
+              },
+            }
+          : {
+              header: {
+                app_id: appId,
+                uid: '',
+                did: '',
+                imei: '',
+                imsi: '',
+                mac: '',
+                net_type: 'wifi',
+                net_isp: 'CMCC',
+                status: 2,
+                request_id: null,
+                res_id: self.voiceName,
+              },
+              parameter: {
+                tts: {
+                  vcn: 'x5_clone',
+                  speed: self.speed,
+                  volume: 50,
+                  pitch: self.pitch,
+                  bgs: 0,
+                  reg: 0,
+                  rdn: 0,
+                  rhy: 0,
+                  audio: {
+                    encoding: 'raw',
+                    sample_rate: 16000,
+                    channels: 1,
+                    bit_depth: 16,
+                    frame_size: 0,
+                  },
+                  pybuf: {
+                    encoding: 'utf8',
+                    compress: 'raw',
+                    format: 'plain',
+                  },
+                },
+              },
+              payload: {
+                text: {
+                  encoding: 'utf8',
+                  compress: 'raw',
+                  format: 'plain',
+                  status: 2,
+                  seq: 0,
+                  text: self.encodeText(self.text),
+                },
+              },
+            };
 
       this.websocket?.send(JSON.stringify(params));
       this.playTimeout = setTimeout(() => {
@@ -301,6 +344,10 @@ class Experience {
     this.websocket.onmessage = (e: MessageEvent) => {
       const jsonData: WebSocketResponse = JSON.parse(e.data);
       let audioData = jsonData?.data?.audio;
+      if (type === 'CLONE') {
+        audioData = jsonData?.payload?.audio?.audio;
+      }
+
       if (audioData) {
         const s16 = this.base64ToS16(audioData);
         const f32 = this.transS16ToF32(s16);

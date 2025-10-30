@@ -3,13 +3,18 @@ import closeIcon from '@/assets/svgs/close-speaker.svg';
 import listenImg from '@/assets/svgs/listen_play.svg';
 import listenStopImg from '@/assets/svgs/listen_stop.svg';
 import createSpeakerIcon from '@/assets/svgs/create-speaker.svg';
+import moreIcon from '@/assets/svgs/my-speaker-more.svg';
 import { Modal, Segmented, Popover, message } from 'antd';
 import { CheckOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useLocaleStore } from '@/store/spark-store/locale-store';
 import TtsModule from '../tts-module';
 import VoiceTraining from './voice-training';
-import { getV2CustomVCNList } from '@/services/spark-common';
+import {
+  deleteMySpeaker,
+  getMySpeakerList,
+  updateMySpeaker,
+} from '@/services/spark-common';
 const VOICE_TEXT_CN = '答你所言，懂你所问，我是你的智能体助手，很高兴认识你';
 const VOICE_TEXT_EN =
   'I understand what you say and answer what you ask. I am your intelligent assistant, glad to meet you';
@@ -23,6 +28,13 @@ export interface VcnItem {
   exquisite?: number; // 0: 普通, 1: 精品
 }
 
+export interface MyVCNItem {
+  assetId: string;
+  name: string;
+  id: number;
+  coverUrl?: string;
+}
+
 interface SpeakerModalProps {
   vcnList: VcnItem[];
   changeSpeakerModal: (show: boolean) => void;
@@ -32,6 +44,7 @@ interface SpeakerModalProps {
   };
   setBotCreateActiveV: (voice: { cn: string }) => void;
   showSpeakerModal: boolean;
+  onMySpeakerChange?: (mySpeaker: MyVCNItem[]) => void;
 }
 
 const SpeakerModal: React.FC<SpeakerModalProps> = ({
@@ -41,18 +54,18 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
   botCreateActiveV,
   setBotCreateActiveV,
   showSpeakerModal,
+  onMySpeakerChange,
 }) => {
   const { t } = useTranslation();
   const currentActiveV = botCreateActiveV;
-  const [playActive, setPlayActive] = useState<any>({ vcn: '' }); // 播放中的发音人
+  const [playActive, setPlayActive] = useState<string>(''); // 播放中的发音人
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [isAudioPlaying, setIsAudioPlaying] = useState<boolean>(false);
   const [currentVoiceName, setCurrentVoiceName] = useState<string>('');
   const { locale: localeNow } = useLocaleStore();
   const audioRef = useRef<HTMLAudioElement>(null);
   const [activeTab, setActiveTab] = useState<'basic' | 'official'>('official');
   const [mySpeaker, setMySpeaker] = useState<any[]>([]);
-  const [editVCNId, setEditVCNId] = useState<string>(''); // 编辑的训练id
+  const [editVCNId, setEditVCNId] = useState<number | null>(null); // 编辑的训练id
   const [editVCNName, setEditVCNName] = useState<string>(''); // 编辑的训练名称
   const [popoverVisible, setPopoverVisible] = useState<string | null>(null);
   const [showVoiceTraining, setShowVoiceTraining] = useState<boolean>(false);
@@ -62,22 +75,47 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
     setShowVoiceTraining(true);
   };
 
-  const updateVCNName = (e: any, item: any) => {
-    console.log('Update VCN name', item);
-    setEditVCNId('');
+  const updateVCNName = (item: MyVCNItem) => {
+    const regex = /^[\u4e00-\u9fa5a-zA-Z0-9\s_]+$/;
+    if (!regex.test(editVCNName)) {
+      message.info(t('speakerNameOnlySupport'));
+      return;
+    }
+    setEditVCNId(null);
+    updateMySpeaker({ id: item.id, name: editVCNName })
+      .then(() => {
+        message.success(t('updateSuccess'));
+        getMyVoicerList();
+      })
+      .catch(err => {
+        message.error(err.msg);
+        console.log(err);
+      });
   };
 
-  const audition = (url: string, vcnCode: string, status: string) => {
-    console.log('Audition', url, vcnCode, status);
-  };
-
-  const editVCN = (e: any, item: any) => {
-    setEditVCNId(item.vcnId);
+  //edit my vcn name
+  const editMySpeaker = (item: MyVCNItem) => {
+    setEditVCNId(item.id);
     setEditVCNName(item.name);
   };
 
-  const deleteMySpeaker = (item: any) => {
-    console.log('Delete speaker', item);
+  // delete my speaker
+  const deleteSpeaker = (item: MyVCNItem) => {
+    Modal.confirm({
+      title: t('deleteSpeaker'),
+      content: t('deleteSpeakerTip'),
+      centered: true,
+      onOk() {
+        deleteMySpeaker({ id: item.id })
+          .then(() => {
+            message.success(t('deleteSuccess'));
+            getMyVoicerList();
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      },
+    });
   };
 
   const setSpeaker = (): void => {
@@ -86,33 +124,32 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
   };
 
   /**
-   * 试听音频
-   * @param vcn - 发音人标识
+   * play voice
+   * @param vcn - voice item
    */
-  const handlePlay = (vcn: VcnItem): void => {
-    // 如果点击的是正在播放的，则停止播放
-    if (playActive === vcn.voiceType && isPlaying) {
+  const handlePlay = (vcn?: VcnItem, myVCN?: MyVCNItem): void => {
+    // if click the voice that is playing, then stop playing
+    if ((playActive === vcn?.voiceType || myVCN?.assetId) && isPlaying) {
       setIsPlaying(false);
       setPlayActive('');
       setCurrentVoiceName('');
     } else {
-      // 切换到新的语音：先停止当前播放
+      // switch to new voice: stop current playing
       if (isPlaying) {
         setIsPlaying(false);
       }
-
-      // 使用 setTimeout 确保状态更新完成后再开始新的播放
+      // use setTimeout to ensure the status is updated before starting the new playing
       setTimeout(() => {
-        setPlayActive(vcn.voiceType);
-        setCurrentVoiceName(vcn.voiceType);
+        setPlayActive(vcn?.voiceType || myVCN?.assetId || '');
+        setCurrentVoiceName(vcn?.voiceType || myVCN?.assetId || '');
         setIsPlaying(true);
       }, 50);
     }
   };
 
-  // 关闭发音人时，播放暂停
+  // close speaker modal
   const closeSpeakerModal = (): void => {
-    // 停止播放
+    // stop playing
     setIsPlaying(false);
     setPlayActive('');
     setCurrentVoiceName('');
@@ -128,14 +165,14 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
 
   const closeTrainModal = () => {
     setShowVoiceTraining(false);
-    setIsAudioPlaying(false);
-    // getMyVoicerList();
+    getMyVoicerList();
   };
 
   const getMyVoicerList = () => {
-    getV2CustomVCNList()
+    getMySpeakerList()
       .then(res => {
         setMySpeaker(res);
+        onMySpeakerChange?.(res)
       })
       .catch(err => {
         message.error(err.msg);
@@ -143,17 +180,15 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
       });
   };
 
-  // 精品音色
+  // official voice
   const officialVoiceList = vcnList.filter(item => item.exquisite === 1);
 
-  // 基础音色
+  // basic voice
   const basicVoiceList = vcnList.filter(item => item.exquisite === 0);
 
-  // 初始化默认选中的发音人
+  // init default voice
   useEffect(() => {
-    // 如果当前没有选中的发音人且vcnList有数据，自动选中第一个
     if (!botCreateActiveV.cn && vcnList.length > 0) {
-      // 优先选择精品音色，如果没有精品音色则选择第一个音色
       const exquisiteList = vcnList.filter(item => item.exquisite === 1);
       const defaultVoice =
         exquisiteList.length > 0 ? exquisiteList[0] : vcnList[0];
@@ -165,6 +200,10 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
       }
     }
   }, [vcnList, botCreateActiveV.cn]);
+
+  useEffect(() => {
+    getMyVoicerList();
+  }, []);
 
   return (
     <>
@@ -210,7 +249,7 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
         />
         <div className="w-full flex flex-wrap justify-start h-auto gap-4 mb-3">
           {activeTab === 'official' && (
-            <div className="w-full">
+            <div className="w-full mt-3.5">
               <div className="w-full flex flex-wrap justify-start h-auto gap-4">
                 {officialVoiceList.map((item: VcnItem) => (
                   <div
@@ -271,7 +310,7 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
 
           {activeTab === 'basic' && (
             <div className="w-full">
-              {/* <div className="rounded-[10px] mt-3.5 bg-[url(@/assets/svgs/my-speaker-bg.png)] bg-no-repeat bg-center bg-cover pt-[17px] pr-[17px] pb-3 pl-5">
+              <div className="rounded-[10px] mt-3.5 bg-[url(@/assets/svgs/my-speaker-bg.png)] bg-no-repeat bg-center bg-cover pt-[17px] pr-[17px] pb-3 pl-5">
                 <div className="flex justify-between mb-3.5">
                   <span className="text-base font-bold text-[#222529]">
                     {t('mySpeaker')}
@@ -296,7 +335,7 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
                       className="-mt-3.5 -mb-3 w-full flex items-center justify-center"
                       onClick={createMyVCN}
                     >
-                      <div className="w-[91px] h-[77px] mr-[5px] bg-[url(@/assets/imgs/voicetraining/no-speaker.svg)] bg-no-repeat bg-cover" />
+                      <div className="w-[91px] h-[77px] mr-[5px] bg-[url(@/assets/imgs/voice-training/no-speaker.svg)] bg-no-repeat bg-cover" />
                       <div>
                         <div className="text-sm font-medium text-[#676773] h-[27px] leading-[27px]">
                           {t('noSpeakerTip')}
@@ -312,31 +351,30 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
                       </div>
                     </div>
                   ) : (
-                    mySpeaker.map((item: any) => (
+                    mySpeaker.map((item: MyVCNItem) => (
                       <div
-                        className={`w-[216px] h-[50px] rounded-[10px] bg-white flex items-center justify-between px-[11px_11px_0_17px] border cursor-pointer ${
-                          currentActiveV?.cn === item.vcnCode
+                        className={`w-[216px] h-[50px] rounded-[10px] bg-white flex items-center justify-between p-[0px_11px_0_17px] border cursor-pointer ${
+                          currentActiveV?.cn === item.assetId
                             ? 'border-[#6356ea] bg-[url(@/assets/svgs/choose-voice-bg.svg)] bg-no-repeat bg-center bg-cover relative before:content-[""] before:absolute before:top-[5px] before:right-[5px] before:w-[19px] before:h-[18px] before:z-[1] before:bg-[url(@/assets/svgs/choose-voice-icon.svg)] before:bg-no-repeat'
                             : 'border-[#dedede]'
                         }`}
-                        key={item.vcnCode || 'unuse_' + item.vcnId}
+                        key={item.assetId || 'unuse_' + item.id}
                         onClick={() => {
                           setBotCreateActiveV({
-                            cn: item.vcnCode,
+                            cn: item.assetId,
                           });
                         }}
                       >
-                        {editVCNId === item.vcnId ? (
+                        {editVCNId === item.id ? (
                           <div className="h-[35px] w-[300px] mr-2">
                             <input
                               className="w-full h-full border border-[#5881ff] rounded-[5px] px-[5px] focus:outline-none"
                               onKeyDown={e => {
-                                // 允许复制粘贴等快捷键
                                 if (e.key === 'Escape') {
-                                  setEditVCNId('');
+                                  setEditVCNId(null);
                                   return;
                                 }
-                                // 阻止事件冒泡，防止被父组件拦截
+
                                 e.stopPropagation();
                               }}
                               maxLength={20}
@@ -361,33 +399,30 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
                         )}
 
                         <div className="flex">
-                          {editVCNId === item.vcnId ? (
-                            // 编辑模式：显示确认按钮
+                          {editVCNId === item.id ? (
+                            // Edit mode: show confirm button
                             <div
                               className="text-[#597dff] text-xs select-none cursor-pointer flex items-center ml-2 hover:text-[#305af4]"
-                              onClick={e => {
-                                updateVCNName(e, item);
+                              onClick={() => {
+                                updateVCNName(item);
                               }}
                             >
                               <CheckOutlined />
                             </div>
                           ) : (
-                            // 正常模式：显示播放、编辑、删除按钮
+                            // Normal mode: show play, edit, delete buttons
                             <>
                               <div
                                 className="text-[#9a9dc4] text-xs select-none cursor-pointer flex items-center ml-2"
-                                onClick={(e: any) => {
+                                onClick={(
+                                  e: React.MouseEvent<HTMLDivElement>
+                                ) => {
                                   e.stopPropagation();
-                                  audition(
-                                    item.tryVCNUrl,
-                                    item.vcnCode,
-                                    item.status
-                                  );
+                                  handlePlay(undefined, item);
                                 }}
                                 style={{
                                   color:
-                                    playActive.vcn === item?.vcnCode &&
-                                    isAudioPlaying
+                                    playActive === item?.assetId
                                       ? '#6178FF'
                                       : '#676773',
                                 }}
@@ -395,23 +430,21 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
                                 <img
                                   className="w-3 h-auto mr-1"
                                   src={
-                                    playActive.vcn === item?.vcnCode &&
-                                    isAudioPlaying
+                                    playActive === item?.assetId
                                       ? listenStopImg
                                       : listenImg
                                   }
                                   alt=""
                                 />
-                                {playActive.vcn === item?.vcnCode &&
-                                isAudioPlaying
+                                {playActive === item?.assetId
                                   ? t('playing')
                                   : t('voiceTry')}
                               </div>
                               <Popover
-                                open={popoverVisible === item.vcnId}
+                                open={popoverVisible === item.assetId}
                                 onOpenChange={visible => {
                                   setPopoverVisible(
-                                    visible ? item.vcnId : null
+                                    visible ? item.assetId : null
                                   );
                                 }}
                                 trigger="click"
@@ -420,10 +453,12 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
                                   <div className="flex flex-col">
                                     <div
                                       className="flex items-center cursor-pointer px-1.5 py-0.5 rounded transition-colors hover:bg-[#f5f5f5]"
-                                      onClick={(e: any) => {
+                                      onClick={(
+                                        e: React.MouseEvent<HTMLDivElement>
+                                      ) => {
                                         e.stopPropagation();
                                         setPopoverVisible(null);
-                                        editVCN(e, item);
+                                        editMySpeaker(item);
                                       }}
                                     >
                                       <img
@@ -440,7 +475,7 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
                                       onClick={(e: any) => {
                                         e.stopPropagation();
                                         setPopoverVisible(null);
-                                        deleteMySpeaker(item);
+                                        deleteSpeaker(item);
                                       }}
                                     >
                                       <img
@@ -463,7 +498,7 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
                                 >
                                   <img
                                     className="w-3 h-auto mr-1"
-                                    src="https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16906079388745520%2F%E6%9B%B4%E5%A4%9A%E5%A4%87%E4%BB%BD%202%402x.png"
+                                    src={moreIcon}
                                     alt="more"
                                   />
                                 </div>
@@ -475,9 +510,7 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
                     ))
                   )}
                 </div>
-              </div> */}
-
-              {/* 普通音色 */}
+              </div>
               {basicVoiceList.length > 0 && (
                 <div className="mt-4">
                   <div className="text-base font-bold text-[#222529] mb-3.5">

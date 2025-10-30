@@ -247,8 +247,10 @@ export const unBindChatFile = (params: {
  * 获取合成websocket签名
  * @returns
  */
-export const getTtsSign = (): Promise<TtsSignResponse> => {
-  return http.get(`/voice/tts-sign`);
+export const getTtsSign = (params: {
+  code?: string;
+}): Promise<TtsSignResponse> => {
+  return http.get(`/voice/tts-sign?code=${params.code}`);
 };
 
 /**
