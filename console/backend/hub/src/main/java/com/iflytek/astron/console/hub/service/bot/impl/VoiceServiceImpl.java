@@ -2,6 +2,7 @@ package com.iflytek.astron.console.hub.service.bot.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.iflytek.astron.console.hub.entity.PronunciationPersonConfig;
+import com.iflytek.astron.console.hub.enums.TtsTypeEnum;
 import com.iflytek.astron.console.hub.mapper.PronunciationPersonConfigMapper;
 import com.iflytek.astron.console.hub.service.bot.VoiceService;
 import com.iflytek.astron.console.toolkit.tool.http.HttpAuthTool;
@@ -43,6 +44,7 @@ public class VoiceServiceImpl implements VoiceService {
         String url = HttpAuthTool.assembleRequestUrl(ttsApiUrl, apiKey, apiSecret);
         resultMap.put("appId", appId);
         resultMap.put("url", url);
+        resultMap.put("type", TtsTypeEnum.ORIGINAL.name());
         return resultMap;
     }
 
