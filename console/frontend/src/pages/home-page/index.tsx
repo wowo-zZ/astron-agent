@@ -26,6 +26,7 @@ import { getLanguageCode } from '@/utils/http';
 import { BotType, Bot, SearchBotParam, Banner } from '@/types/agent-square';
 import type { ResponseResultPage } from '@/types/global';
 import { handleShare } from '@/utils';
+import { useLocaleStore } from '@/store/spark-store/locale-store';
 
 const PAGE_SIZE = 10;
 
@@ -87,7 +88,6 @@ const HomePage: React.FC = () => {
     searchInputValue,
     setBotType,
     setBotOrigin,
-    setScrollTop,
     setLoadingPage,
     setSearchInputValue,
   } = useHomeStore();
@@ -105,6 +105,7 @@ const HomePage: React.FC = () => {
   >(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const { locale: localeNow } = useLocaleStore();
 
   // filter banner by language
   const filteredBanners: Banner[] = bannerList
@@ -485,7 +486,7 @@ const HomePage: React.FC = () => {
                     handleBotTypeChange(item.typeKey);
                   }}
                 >
-                  {item.typeName}
+                  {localeNow === 'en' ? item.typeNameEn : item.typeName}
                 </div>
               ))}
             </div>

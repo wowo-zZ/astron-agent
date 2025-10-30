@@ -16,6 +16,7 @@ import systemMessage from './openPlatform-En/systemMessage';
 import createAgent1 from './openPlatform-En/createAgent';
 import configBase from './openPlatform-En/configBase';
 import loginModal from './openPlatform-En/loginModal';
+import space from './openPlatform-En/space';
 
 /** ## 开放平台的翻译配置 -- en
  * @description 注意模块名称不要跟星辰的重复
@@ -39,4 +40,5 @@ export default {
   chatPage,
   commonModal,
   loginModal,
+  space,
 };
