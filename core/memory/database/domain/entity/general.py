@@ -66,5 +66,5 @@ async def exec_sql_statement(session: AsyncSession, statement: str) -> Any:
     Returns:
         SQL execution result
     """
-    # CodeQL [py/sql-injection] - This is safe: DDL statements are validated at the API layer
+    # codeql[py/sql-injection] - This is safe: DDL statements are validated at the API layer
     return await session.execute(text(statement))
