@@ -49,9 +49,13 @@ cd docker/astronAgent
 # 复制环境变量配置
 cp .env.example .env
 
-# 编辑环境变量配置（参考 docs/DEPLOYMENT_GUIDE_WITH_AUTH_zh.md 文档）
+# 环境变量配置
 vim .env
+```
 
+环境变量配置请参考文档：[DEPLOYMENT_GUIDE_WITH_AUTH_zh.md](https://github.com/iflytek/astron-agent/blob/main/docs/DEPLOYMENT_GUIDE_WITH_AUTH_zh.md#%E7%AC%AC%E4%BA%8C%E6%AD%A5%E9%85%8D%E7%BD%AE-astronagent-%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F)
+
+```bash
 # 启动所有服务（包含 Casdoor）
 docker compose -f docker-compose-with-auth.yaml up -d
 ```
