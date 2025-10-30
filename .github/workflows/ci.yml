@@ -374,6 +374,14 @@ jobs:
             java)
               echo "✅ Java Coverage Report:"
               echo "================================================"
+              echo "🔍 Searching for coverage files in $(pwd)..."
+              # Debug: List all jacoco related files
+              echo "Debug - All jacoco directories:"
+              find . -type d -name jacoco 2>/dev/null || echo "No jacoco directories found"
+              echo ""
+              echo "Debug - All jacoco.csv files:"
+              find . -name "jacoco.csv" 2>/dev/null || echo "No jacoco.csv files found"
+              echo ""
               # Find all jacoco.csv files in submodules
               CSV_FILES=$(find . -name "jacoco.csv" -path "*/site/jacoco/jacoco.csv" 2>/dev/null)
 
