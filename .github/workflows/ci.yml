@@ -357,12 +357,13 @@ jobs:
         with:
           name: coverage-${{ matrix.name }}
           path: |
-            ${{ matrix.path }}/target/site/jacoco/
+            ${{ matrix.path }}/**/target/site/jacoco/
             ${{ matrix.path }}/coverage/
             ${{ matrix.path }}/coverage.out
             ${{ matrix.path }}/coverage.xml
             ${{ matrix.path }}/htmlcov/
           retention-days: 30
+          include-hidden-files: false
 
       - name: Display coverage summary
         if: always()
@@ -371,8 +372,52 @@ jobs:
           echo "📊 Coverage Summary for ${{ matrix.name }}"
           case "${{ matrix.type }}" in
             java)
-              if [ -f target/site/jacoco/index.html ]; then
-                echo "✅ Java coverage report available at: target/site/jacoco/index.html"
+              echo "✅ Java Coverage Report:"
+              echo "================================================"
+              # Find all jacoco.csv files in submodules
+              CSV_FILES=$(find . -name "jacoco.csv" -path "*/site/jacoco/jacoco.csv" 2>/dev/null)
+
+              if [ -n "$CSV_FILES" ]; then
+                # Aggregate coverage from all modules
+                awk -F',' '
+                  FNR==1 {next}  # Skip header of each file
+                  $2 != "" {
+                    instruction_covered += $4;
+                    instruction_missed += $3;
+                    branch_covered += $6;
+                    branch_missed += $5;
+                    line_covered += $8;
+                    line_missed += $7;
+                    method_covered += $12;
+                    method_missed += $11;
+                    class_covered += $14;
+                    class_missed += $13;
+                  }
+                  END {
+                    if ((instruction_covered + instruction_missed) > 0) {
+                      printf "Instructions: %.1f%% (%d/%d)\n", (instruction_covered/(instruction_covered+instruction_missed))*100, instruction_covered, instruction_covered+instruction_missed;
+                    }
+                    if ((branch_covered + branch_missed) > 0) {
+                      printf "Branches:     %.1f%% (%d/%d)\n", (branch_covered/(branch_covered+branch_missed))*100, branch_covered, branch_covered+branch_missed;
+                    }
+                    if ((line_covered + line_missed) > 0) {
+                      printf "Lines:        %.1f%% (%d/%d)\n", (line_covered/(line_covered+line_missed))*100, line_covered, line_covered+line_missed;
+                    }
+                    if ((method_covered + method_missed) > 0) {
+                      printf "Methods:      %.1f%% (%d/%d)\n", (method_covered/(method_covered+method_missed))*100, method_covered, method_covered+method_missed;
+                    }
+                    if ((class_covered + class_missed) > 0) {
+                      printf "Classes:      %.1f%% (%d/%d)\n", (class_covered/(class_covered+class_missed))*100, class_covered, class_covered+class_missed;
+                    }
+                  }
+                ' $CSV_FILES
+                echo "================================================"
+                echo "📄 Module reports:"
+                find . -name "index.html" -path "*/site/jacoco/index.html" | while read report; do
+                  echo "  - ${report#./}"
+                done
+              else
+                echo "⚠️ No coverage reports found"
               fi
               ;;
             typescript)
