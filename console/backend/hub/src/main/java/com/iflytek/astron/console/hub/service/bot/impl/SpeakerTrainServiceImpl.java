@@ -9,13 +9,13 @@ import cn.xfyun.model.voiceclone.request.CreateTaskParam;
 import com.alibaba.fastjson2.JSONObject;
 import com.iflytek.astron.console.commons.constant.ResponseEnum;
 import com.iflytek.astron.console.commons.exception.BusinessException;
+import com.iflytek.astron.console.commons.util.AudioValidator;
 import com.iflytek.astron.console.hub.entity.CustomSpeaker;
 import com.iflytek.astron.console.hub.service.bot.CustomSpeakerService;
 import com.iflytek.astron.console.hub.service.bot.SpeakerTrainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -45,21 +45,15 @@ public class SpeakerTrainServiceImpl implements SpeakerTrainService {
     private static final int MAX_RETRIES = 15;
     private static final int RETRY_INTERVAL_MS = 2000;
 
-    @Value("${spark.app-id}")
-    private String appId;
-
-    @Value("${spark.api-key}")
-    private String apiKey;
-
-
     private final CustomSpeakerService customSpeakerService;
+
+    private final VoiceTrainClient voiceTrainClient;
 
     @Override
     @Cacheable(value = "speakerTrain", key = "#root.methodName", unless = "#result == null", cacheManager = "cacheManager5min")
     public JSONObject getText() {
         try {
-            VoiceTrainClient client = new VoiceTrainClient.Builder(appId, apiKey).build();
-            String trainText = client.trainText(5001L);
+            String trainText = voiceTrainClient.trainText(5001L);
             if (StringUtils.isBlank(trainText)) {
                 log.error("train text is blank");
                 return null;
@@ -81,10 +75,13 @@ public class SpeakerTrainServiceImpl implements SpeakerTrainService {
         if (StringUtils.isNotBlank(language) && !SUPPORTED_LANGUAGES.contains(language)) {
             throw new BusinessException(ResponseEnum.OPERATION_FAILED);
         }
+
+        // validate audio file
+        AudioValidator.validateAudioFile(file);
+
         File tempFile = File.createTempFile(UUID.randomUUID().toString(), "_" + file.getOriginalFilename());
         file.transferTo(tempFile);
         try {
-            VoiceTrainClient client = new VoiceTrainClient.Builder(appId, apiKey).build();
             // Create task
             SexEnum sexEnum = sex.equals(1) ? SexEnum.MALE : SexEnum.FEMALE;
             CreateTaskParam createTaskParam = CreateTaskParam.builder()
@@ -92,7 +89,7 @@ public class SpeakerTrainServiceImpl implements SpeakerTrainService {
                     .ageGroup(AgeGroupEnum.YOUTH.getValue())
                     .language(language)
                     .build();
-            String taskResp = client.createTask(createTaskParam);
+            String taskResp = voiceTrainClient.createTask(createTaskParam);
             JSONObject taskObj = JSONObject.parseObject(taskResp);
             String taskId = taskObj.getString("data");
 
@@ -103,7 +100,7 @@ public class SpeakerTrainServiceImpl implements SpeakerTrainService {
                     .textId(5001L)
                     .textSegId(segId)
                     .build();
-            String submitWithAudio = client.submitWithAudio(audioAddParam2);
+            String submitWithAudio = voiceTrainClient.submitWithAudio(audioAddParam2);
             log.info("Task submission response: {}", submitWithAudio);
 
             // wait for training completion
@@ -122,8 +119,7 @@ public class SpeakerTrainServiceImpl implements SpeakerTrainService {
     @Override
     public JSONObject trainStatus(String taskId, Long spaceId, String uid) {
         try {
-            VoiceTrainClient client = new VoiceTrainClient.Builder(appId, apiKey).build();
-            String trainStatus = client.result(taskId);
+            String trainStatus = voiceTrainClient.result(taskId);
             if (StringUtils.isBlank(trainStatus)) {
                 throw new BusinessException(ResponseEnum.OPERATION_FAILED);
             }
