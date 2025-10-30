@@ -277,24 +277,27 @@ jobs:
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
 
-      - name: Run tests
+      - name: Run tests with coverage
         working-directory: ${{ matrix.path }}
         run: |
-          echo "🧪 Running tests for ${{ matrix.name }} (${{ matrix.type }})"
+          echo "🧪 Running tests with coverage for ${{ matrix.name }} (${{ matrix.type }})"
           case "${{ matrix.type }}" in
             java)
-              echo "🧪 Running Java tests..."
-              mvn test
+              echo "🧪 Running Java tests with JaCoCo coverage..."
+              mvn org.jacoco:jacoco-maven-plugin:0.8.12:prepare-agent test org.jacoco:jacoco-maven-plugin:0.8.12:report
+              echo "📊 Coverage report generated at target/site/jacoco/index.html"
               ;;
             typescript)
               echo "📦 Installing dependencies..."
               npm ci --legacy-peer-deps
-              echo "🧪 Running TypeScript tests..."
+              echo "🧪 Running TypeScript tests with coverage..."
               if [ -f package.json ] && grep -q '"test"' package.json; then
                 # Check if test script is actually for unit testing (not dev server)
                 if grep -q '"test":.*vite.*--host' package.json || grep -q '"test":.*dev' package.json; then
                   echo "Test script appears to be dev server, skipping"
                 else
+                  npm test -- --coverage --coverageReporters=text --coverageReporters=lcov || \
+                  npm test -- --coverage || \
                   npm test
                 fi
               else
@@ -302,28 +305,32 @@ jobs:
               fi
               ;;
             go)
-              echo "🧪 Running Go tests..."
-              go test ./...
+              echo "🧪 Running Go tests with coverage..."
+              go test -coverprofile=coverage.out -covermode=atomic ./...
+              echo "📊 Generating coverage report..."
+              go tool cover -func=coverage.out
               ;;
             python)
               echo "📦 Installing dependencies..."
               if [ -f "uv.lock" ]; then
                 echo "Installing dependencies with uv..."
                 uv sync
-                echo "🧪 Running Python tests..."
+                echo "🛠️ Installing coverage tools..."
+                uv pip install pytest-cov
+                echo "🧪 Running Python tests with coverage..."
                 if [ -d "tests" ]; then
-                  uv run python -m pytest tests/ -v
+                  uv run python -m pytest tests/ -v --cov=. --cov-report=term --cov-report=xml --cov-report=html
                 else
                   echo "No tests directory found"
                 fi
               elif [ -f "requirements.txt" ]; then
                 echo "Installing from requirements.txt..."
                 python3 -m pip install -r requirements.txt
-                echo "🛠️ Installing pytest..."
-                python3 -m pip install pytest==8.0.0
-                echo "🧪 Running Python tests..."
+                echo "🛠️ Installing pytest and coverage tools..."
+                python3 -m pip install pytest==8.0.0 pytest-cov
+                echo "🧪 Running Python tests with coverage..."
                 if [ -d "tests" ]; then
-                  python3 -m pytest tests/ -v
+                  python3 -m pytest tests/ -v --cov=. --cov-report=term --cov-report=xml --cov-report=html
                 else
                   echo "No tests directory found"
                 fi
@@ -332,13 +339,58 @@ jobs:
                 sed -n '/^dependencies = \[/,/^\]/p' pyproject.toml | grep -E '^\s*"' | sed 's/^\s*"//' | sed 's/",\?$//' > /tmp/deps.txt
                 echo "Installing dependencies..."
                 python3 -m pip install -r /tmp/deps.txt
-                echo "🛠️ Installing pytest..."
-                python3 -m pip install pytest==8.0.0
-                echo "🧪 Running Python tests..."
+                echo "🛠️ Installing pytest and coverage tools..."
+                python3 -m pip install pytest==8.0.0 pytest-cov
+                echo "🧪 Running Python tests with coverage..."
                 if [ -d "tests" ]; then
-                  python3 -m pytest tests/ -v
+                  python3 -m pytest tests/ -v --cov=. --cov-report=term --cov-report=xml --cov-report=html
                 else
                   echo "No tests directory found"
+                fi
+              fi
+              ;;
+          esac
+
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-${{ matrix.name }}
+          path: |
+            ${{ matrix.path }}/target/site/jacoco/
+            ${{ matrix.path }}/coverage/
+            ${{ matrix.path }}/coverage.out
+            ${{ matrix.path }}/coverage.xml
+            ${{ matrix.path }}/htmlcov/
+          retention-days: 30
+
+      - name: Display coverage summary
+        if: always()
+        working-directory: ${{ matrix.path }}
+        run: |
+          echo "📊 Coverage Summary for ${{ matrix.name }}"
+          case "${{ matrix.type }}" in
+            java)
+              if [ -f target/site/jacoco/index.html ]; then
+                echo "✅ Java coverage report available at: target/site/jacoco/index.html"
+              fi
+              ;;
+            typescript)
+              if [ -f coverage/lcov-report/index.html ]; then
+                echo "✅ TypeScript coverage report available at: coverage/lcov-report/index.html"
+              fi
+              ;;
+            go)
+              if [ -f coverage.out ]; then
+                echo "✅ Go coverage report:"
+                go tool cover -func=coverage.out | tail -n 1
+              fi
+              ;;
+            python)
+              if [ -f coverage.xml ]; then
+                echo "✅ Python coverage report available"
+                if [ -f htmlcov/index.html ]; then
+                  echo "HTML report: htmlcov/index.html"
                 fi
               fi
               ;;
