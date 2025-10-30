@@ -23,7 +23,7 @@ import {
 
 // 从统一的图标管理中导入
 import { Icons } from '@/components/workflow/icons';
-import SpeakerModal, { VcnItem } from '@/components/speaker-modal';
+import SpeakerModal, { MyVCNItem, VcnItem } from '@/components/speaker-modal';
 import { getVcnList } from '@/services/chat';
 
 // 获取 Advanced Config 模块的图标
@@ -240,6 +240,7 @@ const CharacterVoice: React.FC<CommonComponentProps> = ({
   }>({
     cn: advancedConfig?.textToSpeech?.vcn_cn || '',
   });
+  const [mySpeaker, setMySpeaker] = useState<MyVCNItem[]>([]);
 
   const handleVoiceChange = (voice: { cn: string }): void => {
     setBotCreateActiveV(voice);
@@ -255,14 +256,17 @@ const CharacterVoice: React.FC<CommonComponentProps> = ({
 
   // 渲染发音人显示
   const renderBotVcn = () => {
-    let vcnObj = vcnList.find(
-      (item: VcnItem) => item.voiceType === botCreateActiveV.cn
-    );
+    let vcnObj =
+      vcnList.find((item: VcnItem) => item.voiceType === botCreateActiveV.cn) ||
+      mySpeaker.find((item: MyVCNItem) => item.assetId === botCreateActiveV.cn);
     return (
       <>
         <img
           className="w-[30px] h-[30px] mr-2 rounded-full"
-          src={vcnObj?.coverUrl}
+          src={
+            vcnObj?.coverUrl ||
+            'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16906018510400728%2F%E7%BC%96%E7%BB%84%204%402x.png'
+          }
           alt=""
         />
         <span
@@ -329,6 +333,7 @@ const CharacterVoice: React.FC<CommonComponentProps> = ({
         botCreateCallback={handleVoiceChange}
         botCreateActiveV={botCreateActiveV}
         setBotCreateActiveV={setBotCreateActiveV}
+        onMySpeakerChange={setMySpeaker}
       />
     </div>
   );
@@ -668,7 +673,7 @@ function AdvancedConfiguration(): React.ReactElement {
     getVcnList().then((res: VcnItem[]) => {
       setVcnList(res);
     });
-  }, []);
+  }, [open]);
   return (
     <Drawer
       rootClassName="advanced-configuration-container"
