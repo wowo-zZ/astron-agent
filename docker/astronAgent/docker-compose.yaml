@@ -204,8 +204,8 @@ services:
       OTLP_ENABLE: "${OTLP_ENABLE:-0}"
       KAFKA_ENABLE: "${KAFKA_ENABLE:-0}"
       KAFKA_SERVERS: "${KAFKA_SERVERS:-kafka:29092}"
-      XIAOWU_RPA_TASK_CREATE_URL: "${XIAOWU_RPA_TASK_CREATE_URL:-https://newapi.iflyrpa.com/api/rpa-openapi/workflows/execute-async}"
-      XIAOWU_RPA_TASK_QUERY_URL: "${XIAOWU_RPA_TASK_QUERY_URL:-https://newapi.iflyrpa.com/api/rpa-openapi/executions}"
+      XIAOWU_RPA_TASK_CREATE_URL: "${XIAOWU_RPA_TASK_CREATE_URL_INTERNAL:-${XIAOWU_RPA_TASK_CREATE_URL}}"
+      XIAOWU_RPA_TASK_QUERY_URL: "${XIAOWU_RPA_TASK_QUERY_URL_INTERNAL:-${XIAOWU_RPA_TASK_QUERY_URL}}"
     depends_on:
       postgres:
         condition: service_healthy
@@ -358,6 +358,9 @@ services:
   core-knowledge:
     image: ghcr.io/iflytek/astron-agent/core-knowledge:${ASTRON_AGENT_VERSION:-latest}
     container_name: astron-agent-core-knowledge
+    # Map container's localhost to host machine, to access services on the host
+    extra_hosts:
+      - "localhost:host-gateway"
     environment:
       SERVICE_PORT: "${CORE_KNOWLEDGE_PORT:-20010}"
       OTLP_ENABLE: "${OTLP_ENABLE:-0}"
@@ -546,7 +549,7 @@ services:
       WORKFLOW_URL: "${WORKFLOW_URL:-}"
       SPARK_DB_URL: "${SPARK_DB_URL:-}"
       LOCAL_MODEL_URL: "${LOCAL_MODEL_URL:-}"
-      RPA_URL: "${RPA_URL:-}"
+      RPA_URL: "${RPA_URL_INTERNAL:-${RPA_URL}}"
       MAAS_APP_ID: "${MAAS_APP_ID:-your-maas-app-id}"
       MAAS_API_KEY: "${MAAS_API_KEY:-your-maas-api-key}"
       MAAS_API_SECRET: "${MAAS_API_SECRET:-your-maas-api-secret}"
