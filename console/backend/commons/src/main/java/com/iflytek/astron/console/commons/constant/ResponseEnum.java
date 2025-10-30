@@ -122,6 +122,11 @@ public enum ResponseEnum {
     SPARK_API_IMAGE_AUDIT_FAILED(60069, "error.spark.api.image.audit.failed"),
     SPARK_API_IMAGE_NOT_AUTH(60070, "error.spark.api.image.not.auth"),
     SPARK_API_IMAGE_PARAM_ERROR(60071, "error.spark.api.image.param.error"),
+    SPARK_API_IMAGE_MESSAGE_FORMAT_ERROR(60072, "error.spark.api.image.message.format"),
+    SPARK_API_IMAGE_SCHEMA_ERROR(60073, "error.spark.api.image.schema.error"),
+    SPARK_API_IMAGE_PARAM_VALUE_ERROR(60074, "error.spark.api.image.param.value.error"),
+    SPARK_API_IMAGE_CAPACITY_INSUFFICIENT(60075, "error.spark.api.image.capacity.insufficient"),
+    SPARK_API_IMAGE_INPUT_AUDIT_FAILED(60076, "error.spark.api.image.input.audit.failed"),
 
     // Space application related errors
     SPACE_APPLICATION_PLEASE_JOIN_ENTERPRISE_FIRST(61001, "space.application.please.join.enterprise.first"),

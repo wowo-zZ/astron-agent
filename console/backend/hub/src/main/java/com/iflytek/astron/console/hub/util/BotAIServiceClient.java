@@ -1,4 +1,4 @@
-package com.iflytek.astron.console.commons.util;
+package com.iflytek.astron.console.hub.util;
 
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson2.JSON;
@@ -43,49 +43,50 @@ public class BotAIServiceClient {
     /**
      * Error code to ResponseEnum mapping for AI service errors
      */
-    private static final Map<Integer, ResponseEnum> ERROR_CODE_MAP = new HashMap<>();
+    private static final Map<Integer, ResponseEnum> TEXT_ERROR_CODE_MAP = new HashMap<>();
+
+    private static final Map<Integer, ResponseEnum> IMAGE_ERROR_CODE_MAP = new HashMap<>();
 
     static {
         // HTTP error codes
-        ERROR_CODE_MAP.put(401, ResponseEnum.SPARK_API_PARAM_ERROR);
-        ERROR_CODE_MAP.put(400, ResponseEnum.SYSTEM_ERROR);
-        ERROR_CODE_MAP.put(403, ResponseEnum.SYSTEM_ERROR);
-        ERROR_CODE_MAP.put(429, ResponseEnum.SYSTEM_ERROR);
-        ERROR_CODE_MAP.put(500, ResponseEnum.SYSTEM_ERROR);
-        ERROR_CODE_MAP.put(502, ResponseEnum.SYSTEM_ERROR);
-        ERROR_CODE_MAP.put(503, ResponseEnum.SYSTEM_ERROR);
-        ERROR_CODE_MAP.put(504, ResponseEnum.SYSTEM_ERROR);
+        TEXT_ERROR_CODE_MAP.put(401, ResponseEnum.SPARK_API_PARAM_ERROR);
 
         // Spark API specific error codes
-        ERROR_CODE_MAP.put(10000, ResponseEnum.SPARK_API_UPGRADE_WS_ERROR);
-        ERROR_CODE_MAP.put(10001, ResponseEnum.SPARK_API_READ_MESSAGE_ERROR);
-        ERROR_CODE_MAP.put(10002, ResponseEnum.SPARK_API_SEND_MESSAGE_ERROR);
-        ERROR_CODE_MAP.put(10003, ResponseEnum.SPARK_API_MESSAGE_FORMAT_ERROR);
-        ERROR_CODE_MAP.put(10004, ResponseEnum.SPARK_API_SCHEMA_ERROR);
-        ERROR_CODE_MAP.put(10005, ResponseEnum.SPARK_API_PARAM_VALUE_ERROR);
-        ERROR_CODE_MAP.put(10006, ResponseEnum.SPARK_API_CONCURRENT_ERROR);
-        ERROR_CODE_MAP.put(10007, ResponseEnum.SPARK_API_FLOW_LIMIT_ERROR);
-        ERROR_CODE_MAP.put(10008, ResponseEnum.SPARK_API_CAPACITY_INSUFFICIENT);
-        ERROR_CODE_MAP.put(10009, ResponseEnum.SPARK_API_ENGINE_CONNECTION_FAILED);
-        ERROR_CODE_MAP.put(10010, ResponseEnum.SPARK_API_ENGINE_RECEIVE_ERROR);
-        ERROR_CODE_MAP.put(10011, ResponseEnum.SPARK_API_ENGINE_SEND_ERROR);
-        ERROR_CODE_MAP.put(10012, ResponseEnum.SPARK_API_ENGINE_INTERNAL_ERROR);
-        ERROR_CODE_MAP.put(10013, ResponseEnum.SPARK_API_INPUT_CONTENT_AUDIT_FAILED);
-        ERROR_CODE_MAP.put(10014, ResponseEnum.SPARK_API_OUTPUT_CONTENT_AUDIT_FAILED);
-        ERROR_CODE_MAP.put(10015, ResponseEnum.SPARK_API_APPID_IN_BLACKLIST);
-        ERROR_CODE_MAP.put(10016, ResponseEnum.SPARK_API_AUTHORIZATION_ERROR);
-        ERROR_CODE_MAP.put(10017, ResponseEnum.SPARK_API_CLEAR_HISTORY_FAILED);
-        ERROR_CODE_MAP.put(10019, ResponseEnum.SPARK_API_INPUT_VIOLATION_TENDENCY);
-        ERROR_CODE_MAP.put(10021, ResponseEnum.SPARK_API_INPUT_AUDIT_FAILED);
-        ERROR_CODE_MAP.put(10022, ResponseEnum.SPARK_API_IMAGE_AUDIT_FAILED);
-        ERROR_CODE_MAP.put(10110, ResponseEnum.SPARK_API_SERVICE_BUSY);
-        ERROR_CODE_MAP.put(10163, ResponseEnum.SPARK_API_ENGINE_PARAM_ERROR);
-        ERROR_CODE_MAP.put(10222, ResponseEnum.SPARK_API_ENGINE_NETWORK_ERROR);
-        ERROR_CODE_MAP.put(10907, ResponseEnum.SPARK_API_TOKEN_LIMIT_EXCEEDED);
-        ERROR_CODE_MAP.put(11200, ResponseEnum.SPARK_API_NO_AUTHORIZATION);
-        ERROR_CODE_MAP.put(11201, ResponseEnum.SPARK_API_DAILY_LIMIT_EXCEEDED);
-        ERROR_CODE_MAP.put(11202, ResponseEnum.SPARK_API_QPS_LIMIT_EXCEEDED);
-        ERROR_CODE_MAP.put(11203, ResponseEnum.SPARK_API_CONCURRENT_LIMIT_EXCEEDED);
+        TEXT_ERROR_CODE_MAP.put(10000, ResponseEnum.SPARK_API_UPGRADE_WS_ERROR);
+        TEXT_ERROR_CODE_MAP.put(10001, ResponseEnum.SPARK_API_READ_MESSAGE_ERROR);
+        TEXT_ERROR_CODE_MAP.put(10002, ResponseEnum.SPARK_API_SEND_MESSAGE_ERROR);
+        TEXT_ERROR_CODE_MAP.put(10003, ResponseEnum.SPARK_API_MESSAGE_FORMAT_ERROR);
+        TEXT_ERROR_CODE_MAP.put(10004, ResponseEnum.SPARK_API_SCHEMA_ERROR);
+        TEXT_ERROR_CODE_MAP.put(10005, ResponseEnum.SPARK_API_PARAM_VALUE_ERROR);
+        TEXT_ERROR_CODE_MAP.put(10006, ResponseEnum.SPARK_API_CONCURRENT_ERROR);
+        TEXT_ERROR_CODE_MAP.put(10007, ResponseEnum.SPARK_API_FLOW_LIMIT_ERROR);
+        TEXT_ERROR_CODE_MAP.put(10008, ResponseEnum.SPARK_API_CAPACITY_INSUFFICIENT);
+        TEXT_ERROR_CODE_MAP.put(10009, ResponseEnum.SPARK_API_ENGINE_CONNECTION_FAILED);
+        TEXT_ERROR_CODE_MAP.put(10010, ResponseEnum.SPARK_API_ENGINE_RECEIVE_ERROR);
+        TEXT_ERROR_CODE_MAP.put(10011, ResponseEnum.SPARK_API_ENGINE_SEND_ERROR);
+        TEXT_ERROR_CODE_MAP.put(10012, ResponseEnum.SPARK_API_ENGINE_INTERNAL_ERROR);
+        TEXT_ERROR_CODE_MAP.put(10013, ResponseEnum.SPARK_API_INPUT_CONTENT_AUDIT_FAILED);
+        TEXT_ERROR_CODE_MAP.put(10014, ResponseEnum.SPARK_API_OUTPUT_CONTENT_AUDIT_FAILED);
+        TEXT_ERROR_CODE_MAP.put(10015, ResponseEnum.SPARK_API_APPID_IN_BLACKLIST);
+        TEXT_ERROR_CODE_MAP.put(10016, ResponseEnum.SPARK_API_AUTHORIZATION_ERROR);
+        TEXT_ERROR_CODE_MAP.put(10017, ResponseEnum.SPARK_API_CLEAR_HISTORY_FAILED);
+        TEXT_ERROR_CODE_MAP.put(10019, ResponseEnum.SPARK_API_INPUT_VIOLATION_TENDENCY);
+        TEXT_ERROR_CODE_MAP.put(10021, ResponseEnum.SPARK_API_INPUT_AUDIT_FAILED);
+        TEXT_ERROR_CODE_MAP.put(10110, ResponseEnum.SPARK_API_SERVICE_BUSY);
+        TEXT_ERROR_CODE_MAP.put(10163, ResponseEnum.SPARK_API_ENGINE_PARAM_ERROR);
+        TEXT_ERROR_CODE_MAP.put(10222, ResponseEnum.SPARK_API_ENGINE_NETWORK_ERROR);
+        TEXT_ERROR_CODE_MAP.put(10907, ResponseEnum.SPARK_API_TOKEN_LIMIT_EXCEEDED);
+        TEXT_ERROR_CODE_MAP.put(11200, ResponseEnum.SPARK_API_NO_AUTHORIZATION);
+        TEXT_ERROR_CODE_MAP.put(11201, ResponseEnum.SPARK_API_DAILY_LIMIT_EXCEEDED);
+        TEXT_ERROR_CODE_MAP.put(11202, ResponseEnum.SPARK_API_QPS_LIMIT_EXCEEDED);
+        TEXT_ERROR_CODE_MAP.put(11203, ResponseEnum.SPARK_API_CONCURRENT_LIMIT_EXCEEDED);
+
+        IMAGE_ERROR_CODE_MAP.put(10003, ResponseEnum.SPARK_API_IMAGE_MESSAGE_FORMAT_ERROR);
+        IMAGE_ERROR_CODE_MAP.put(10004, ResponseEnum.SPARK_API_IMAGE_SCHEMA_ERROR);
+        IMAGE_ERROR_CODE_MAP.put(10005, ResponseEnum.SPARK_API_IMAGE_PARAM_VALUE_ERROR);
+        IMAGE_ERROR_CODE_MAP.put(10008, ResponseEnum.SPARK_API_IMAGE_CAPACITY_INSUFFICIENT);
+        IMAGE_ERROR_CODE_MAP.put(100021, ResponseEnum.SPARK_API_IMAGE_INPUT_AUDIT_FAILED);
+        IMAGE_ERROR_CODE_MAP.put(10022, ResponseEnum.SPARK_API_IMAGE_AUDIT_FAILED);
     }
 
     private final OkHttpClient httpClient = new OkHttpClient().newBuilder()
@@ -170,10 +171,7 @@ public class BotAIServiceClient {
                     log.error("Image generation service returned error, user [{}], error code: {}", uid, responseCode);
 
                     // Convert error code to corresponding ResponseEnum and throw
-                    ResponseEnum responseEnum = convertErrorCodeToResponseEnum(responseCode);
-                    if (responseCode == 11201) {
-                        responseEnum = ResponseEnum.SPARK_API_IMAGE_NOT_AUTH;
-                    }
+                    ResponseEnum responseEnum = convertImageErrorCodeToResponseEnum(responseCode);
                     throw new BusinessException(responseEnum);
                 }
 
@@ -225,7 +223,7 @@ public class BotAIServiceClient {
                 log.error("AI service error: {}", errorMsg);
 
                 // Convert error code to corresponding ResponseEnum and throw
-                ResponseEnum responseEnum = convertErrorCodeToResponseEnum(listener.getErrorCode());
+                ResponseEnum responseEnum = convertTextErrorCodeToResponseEnum(listener.getErrorCode());
                 throw new BusinessException(responseEnum);
             }
 
@@ -265,14 +263,34 @@ public class BotAIServiceClient {
      * @param errorCode Error code returned by AI service
      * @return Corresponding ResponseEnum
      */
-    private ResponseEnum convertErrorCodeToResponseEnum(Integer errorCode) {
+    private ResponseEnum convertTextErrorCodeToResponseEnum(Integer errorCode) {
         if (errorCode == null) {
             return ResponseEnum.SYSTEM_ERROR;
         }
 
-        ResponseEnum responseEnum = ERROR_CODE_MAP.get(errorCode);
+        ResponseEnum responseEnum = TEXT_ERROR_CODE_MAP.get(errorCode);
         if (responseEnum == null) {
-            log.warn("Unknown AI service error code: {}", errorCode);
+            log.warn("Unknown AI text service error code: {}", errorCode);
+            return ResponseEnum.SYSTEM_ERROR;
+        }
+
+        return responseEnum;
+    }
+
+    /**
+     * Convert AI service error code to corresponding ResponseEnum
+     *
+     * @param errorCode Error code returned by AI service
+     * @return Corresponding ResponseEnum
+     */
+    private ResponseEnum convertImageErrorCodeToResponseEnum(Integer errorCode) {
+        if (errorCode == null) {
+            return ResponseEnum.SYSTEM_ERROR;
+        }
+
+        ResponseEnum responseEnum = IMAGE_ERROR_CODE_MAP.get(errorCode);
+        if (responseEnum == null) {
+            log.warn("Unknown AI image service error code: {}", errorCode);
             return ResponseEnum.SYSTEM_ERROR;
         }
 
