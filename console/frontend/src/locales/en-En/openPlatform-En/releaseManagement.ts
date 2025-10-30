@@ -132,7 +132,7 @@ const translation = {
     AppIDEmpty: 'AppID is Empty',
     mcpServerParamsDescEmpty: 'Description is Empty',
     unBindSuccess: 'Unbind Success',
-    submitAuditSuccess: 'Submit Audit Success',
+    submitAuditSuccess: 'Submit Success',
     unBindTip: 'Unbind',
     unBindTipDesc:
       'Unbinding will stop us from processing messages from the WeChat service number',
