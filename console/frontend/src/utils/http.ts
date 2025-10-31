@@ -310,8 +310,8 @@ const removePendingRequest = (config?: AxiosRequestConfig): void => {
   }
 };
 
-// 超时时间60s
-axios.defaults.timeout = 60000;
+// 超时时间30s
+axios.defaults.timeout = 30000;
 // Ajax请求
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 axios.defaults.headers.common['Content-Type'] = 'application/json';
