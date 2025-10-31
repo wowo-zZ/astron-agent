@@ -16498,7 +16498,7 @@ create table pronunciation_person_config
     cover_url          varchar(2048)                      null comment 'Pronunciation person cover image URL',
     voice_type         varchar(64)                        null comment 'Pronunciation person parameters',
     sort               int      default 0                 null comment 'Pronunciation person sort',
-    model_manufacturer varchar(64)                        null comment 'Pronunciation person model manufacturer',
+    speaker_type varchar(64)                        null comment 'Pronunciation person type',
     exquisite          tinyint  default 0                 null comment 'Exquisite pronunciation person (0 = not exquisite, 1 = exquisite)',
     deleted            tinyint  default 0                 null comment 'Deleted status (0 = not deleted, 1 = deleted)',
     create_time        datetime default CURRENT_TIMESTAMP null comment 'Creation time',

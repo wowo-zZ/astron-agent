@@ -51,7 +51,7 @@ public class VoiceServiceImpl implements VoiceService {
     @Cacheable(value = "pronunciationPersonCache", key = "#root.methodName", cacheManager = "cacheManager5min")
     public List<PronunciationPersonConfig> getPronunciationPerson() {
         LambdaQueryWrapper<PronunciationPersonConfig> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(PronunciationPersonConfig::getModelManufacturer, PronunciationPersonConfig.ModelManufacturerEnum.XFYUN);
+        queryWrapper.eq(PronunciationPersonConfig::getSpeakerType, PronunciationPersonConfig.SpeakerTypeEnum.NORMAL);
         queryWrapper.eq(PronunciationPersonConfig::getDeleted, 0);
         queryWrapper.orderByAsc(PronunciationPersonConfig::getSort);
         return pronunciationPersonConfigMapper.selectList(queryWrapper);
