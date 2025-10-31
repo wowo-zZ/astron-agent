@@ -165,7 +165,6 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
 
   const closeTrainModal = () => {
     setShowVoiceTraining(false);
-
     getMyVoicerList();
   };
 
