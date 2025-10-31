@@ -216,6 +216,7 @@ export interface ChatContentProps {
   needReply: boolean;
   handleResumeChat: (content: string) => void;
   handleStopConversation: () => void;
+  chatType: string;
 }
 
 // 语音配置类型定义

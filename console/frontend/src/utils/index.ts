@@ -700,6 +700,51 @@ const getStatusText = (file: UploadFileInfo): string => {
   }
 };
 
+/**
+ * 检测文本是否为纯文本（只包含中文、英文、数字、常见标点符号）
+ * 排除：代码块、emoji、链接、图片、markdown特殊语法等
+ */
+const isPureText = (text: string): boolean => {
+  if (!text || typeof text !== 'string') {
+    return false;
+  }
+
+  // 1. 检测代码块（``` 或 `）
+  if (/```[\s\S]*?```|`[^`]+`/.test(text)) {
+    return false;
+  }
+
+  // 2. 检测 Markdown 图片语法 ![alt](url)
+  if (/!\[.*?\]\(.*?\)/.test(text)) {
+    return false;
+  }
+
+  // 3. 检测链接（http/https/www）
+  if (/(https?:\/\/|www\.)[^\s]+/.test(text)) {
+    return false;
+  }
+
+  // 4. 检测 Markdown 链接语法 [text](url)
+  if (/\[.*?\]\(.*?\)/.test(text)) {
+    return false;
+  }
+
+  // // 5. 检测 Emoji 表情（使用 ES5 兼容的正则）
+  // const emojiRegex =
+  //   /[\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u27BF]|[\u2300-\u23FF]|[\u2B50-\u2B55]/;
+  // if (emojiRegex.test(text)) {
+  //   return false;
+  // }
+
+  // 6. 检测 HTML 标签
+  if (/<[^>]+>/.test(text)) {
+    return false;
+  }
+
+  // 如果通过所有检测，则认为是纯文本
+  return true;
+};
+
 export {
   objectToQueryString,
   imageToBase64,
@@ -721,4 +766,5 @@ export {
   getFileIcon,
   formatFileSize,
   getStatusText,
+  isPureText
 };

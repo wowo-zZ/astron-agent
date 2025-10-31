@@ -11,7 +11,7 @@ import React, {
   useEffect,
 } from 'react';
 
-const appId = '0e6a2c87';
+const appId = '74d17318'; //'0e6a2c87';
 
 // 虚拟人初始化鉴权参数
 const sdkInitAppInfoDefault: any = {

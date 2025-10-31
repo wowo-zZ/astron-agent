@@ -665,10 +665,13 @@ function AdvancedConfiguration(): React.ReactElement {
       window.removeEventListener('resize', handleAdjustmentDrawerStyle);
   }, [drawerStyle]);
   useEffect(() => {
+    if (open) {
     getVcnList().then((res: VcnItem[]) => {
       setVcnList(res);
     });
-  }, []);
+    }
+
+  }, [open]);
   return (
     <Drawer
       rootClassName="advanced-configuration-container"
