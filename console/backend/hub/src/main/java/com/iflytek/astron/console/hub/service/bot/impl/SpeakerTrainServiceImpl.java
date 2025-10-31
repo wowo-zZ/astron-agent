@@ -150,8 +150,8 @@ public class SpeakerTrainServiceImpl implements SpeakerTrainService {
     }
 
     /**
-     * Sanitize filename to prevent path traversal attacks.
-     * Extracts only the filename part (not path) and removes dangerous characters.
+     * Sanitize filename to prevent path traversal attacks. Extracts only the filename part (not path)
+     * and removes dangerous characters.
      *
      * @param originalFilename original filename from user input
      * @return sanitized filename safe for use in file operations
@@ -161,7 +161,12 @@ public class SpeakerTrainServiceImpl implements SpeakerTrainService {
             return "audio";
         }
         // Extract just the filename part (not the path) to prevent path traversal
-        String filename = Paths.get(originalFilename).getFileName().toString();
+        java.nio.file.Path fileNamePath = Paths.get(originalFilename).getFileName();
+        // getFileName() can return null for root paths (e.g., "/", "C:\")
+        if (fileNamePath == null) {
+            return "audio";
+        }
+        String filename = fileNamePath.toString();
         // Remove dangerous characters: path separators, wildcards, and other special chars
         // Keep only alphanumeric, dots, dashes, and underscores
         String sanitized = filename.replaceAll("[^a-zA-Z0-9._-]", "_");
