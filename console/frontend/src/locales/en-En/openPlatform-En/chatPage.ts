@@ -32,6 +32,7 @@ const transition = {
     deepseekV3Model: 'DeepSeek V3 Model',
     gemmaModel: 'Gemma Model',
     qwenModel: 'Qwen Model',
+    rolePlayModel: 'Role Play',
     toolCalling: 'Tool Calling',
   },
   chatBottom: {
@@ -79,6 +80,10 @@ const transition = {
     deleteFile: 'Delete File',
     cancelUpload: 'Cancel Upload',
     pleaseSelectOption: 'Please select an option~',
+    freshStart: 'A Fresh Start',
+    deleteErrorFilesBeforeSend: 'Please delete failed files before sending',
+    vmsPermissionRequired: 'VMS requires browser permission',
+    grantPermission: 'Grant Permission',
   },
   feedbackPopover: {
     feedbackTitle: 'Your feedback helps us improve',

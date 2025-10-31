@@ -5,6 +5,7 @@ import promption from './openPlatform-ZH/promption';
 import shareModal from './openPlatform-ZH/shareModal';
 import chatPage from './openPlatform-ZH/chatPage';
 import commonModal from './openPlatform-ZH/commonModal';
+import space from './openPlatform-ZH/space';
 // 导入其他模块
 import releaseManagement from './openPlatform-ZH/releaseManagement';
 import global from './openPlatform-ZH/global';
@@ -39,4 +40,5 @@ export default {
   chatPage,
   commonModal,
   loginModal,
+  space,
 };

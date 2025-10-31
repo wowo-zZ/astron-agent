@@ -342,7 +342,25 @@ export const zh = {
       professional: '专业版',
       team: '团队版',
       enterprise: '企业版',
+      custom: '定制版',
     },
+
+    // 空间角色翻译
+    spaceRoles: {
+      superAdmin: '超级管理者',
+      admin: '管理员',
+      member: '成员',
+    },
+
+    // 空间版本类型翻译
+    personalEdition: '个人版',
+    customEdition: '定制版',
+    teamEdition: '团队版',
+    enterpriseEdition: '企业版',
+    teamEnterpriseEdition: '团队/企业版',
+
+    // 品牌名称
+    xingchen: '星辰',
   },
 
   // 空间管理相关

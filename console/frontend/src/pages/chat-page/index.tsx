@@ -307,7 +307,7 @@ const ChatPage = (): ReactElement => {
         {chatType === 'vms' && showVmsPermissionTip && (
           <div className={styles.avatar_permission_tip_wrapper}>
             <div className={styles.avatar_permission_tip}>
-              <span>虚拟人播报需要浏览器权限</span>
+              <span>{t('chatPage.chatWindow.vmsPermissionRequired')}</span>
               <a
                 href="javascript:void(0)"
                 onClick={() => {
@@ -315,7 +315,7 @@ const ChatPage = (): ReactElement => {
                   setShowVmsPermissionTip(false);
                 }}
               >
-                授权
+                {t('chatPage.chatWindow.grantPermission')}
               </a>
             </div>
           </div>

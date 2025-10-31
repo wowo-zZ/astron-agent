@@ -203,6 +203,7 @@ const PersonalCenterHeader: FC<{
   showInput: boolean;
   setShowInput: (showInput: boolean) => void;
 }> = ({ showInput, setShowInput }) => {
+  const { t } = useTranslation();
   const userInfo = useUserStore((state: any) => state.user);
   const [infoName, setInfoName] = useState(userInfo.nickname || userInfo.login);
 
@@ -216,7 +217,7 @@ const PersonalCenterHeader: FC<{
               nickname: infoName,
               avatar: url,
             }).then(res => {
-              message.success('修改成功');
+              message.success(t('commonModal.update.success'));
               useUserStore.setState({
                 user: {
                   ...userInfo,
@@ -256,7 +257,7 @@ const PersonalCenterHeader: FC<{
                     avatar: userInfo.avatar,
                   })
                     .then(res => {
-                      message.success('修改成功');
+                      message.success(t('commonModal.update.success'));
                       // 更新用户信息
                       useUserStore.setState({
                         user: {
@@ -339,7 +340,7 @@ const PersonalCenter: FC<PersonalCenterProps> = ({
     cancelFavorite({
       botId,
     }).then(res => {
-      message.success('删除成功');
+      message.success(t('commonModal.agentDelete.success'));
       onRefreshFavoriteData?.();
     });
   }, []);

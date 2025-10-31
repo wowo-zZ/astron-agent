@@ -100,7 +100,7 @@ const ChatInput = (props: {
       const startMessage: MessageListType = {
         id: new Date().getTime(),
         reqType: 'START',
-        message: '全新的开始',
+        message: t('chatPage.chatWindow.freshStart'),
         updateTime: new Date().toISOString(),
       };
       addMessage(startMessage);
@@ -125,7 +125,7 @@ const ChatInput = (props: {
     }
     // 检查是否有错误文件
     if (hasErrorFiles()) {
-      message.error('请先删除上传失败的文件再发送消息');
+      message.error(t('chatPage.chatWindow.deleteErrorFilesBeforeSend'));
       return;
     }
 

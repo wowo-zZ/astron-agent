@@ -25,6 +25,10 @@ const translation = {
   publishSuccess: '发布成功',
   updatePublish: '更新发布',
   publish: '发布',
+  confirmLeavePrompt: '确定离开吗？\\n系统可能不会保存您做的更改。',
+  settingCannotBeEmpty: '设定不能为空！',
+  createAgentBeforePublish: '先创建助手',
+  inputHere: '在此输入内容',
 
   agentCategory: '智能体分类',
   agentIntroduction: '智能体简介',
@@ -38,6 +42,7 @@ const translation = {
   modelComparison: '模型对比',
   sparkModel: '星火大模型 Spark V4.0 Ultra',
   sparkX1Model: '星火大模型 Spark X1',
+  rolePlayModel: '角色扮演',
   pleaseSelectModel: '请选择模型',
   highOrderConfig: '高阶配置',
   defaultPrompt: '默认提示词',

@@ -358,6 +358,23 @@ export const en = {
       team: 'Team',
       enterprise: 'Enterprise',
     },
+
+    // Space role translations
+    spaceRoles: {
+      superAdmin: 'Super Admin',
+      admin: 'Admin',
+      member: 'Member',
+    },
+
+    // Space edition type translations
+    personalEdition: 'Personal',
+    customEdition: 'Custom',
+    teamEdition: 'Team',
+    enterpriseEdition: 'Enterprise',
+    teamEnterpriseEdition: 'Team/Enterprise',
+
+    // Brand name
+    xingchen: 'Stellar',
   },
 
   // Space management related
