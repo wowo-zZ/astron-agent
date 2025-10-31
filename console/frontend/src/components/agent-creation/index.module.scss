@@ -27,7 +27,7 @@
         text-align: center;
         line-height: 28px;
         cursor: pointer;
-        background: linear-gradient(270deg, #6356EA 0%, #c927ff 100%);
+        background: linear-gradient(270deg, #6356ea 0%, #c927ff 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -76,7 +76,7 @@
         overflow: hidden;
 
         &:hover {
-          color: #6356EA;
+          color: #6356ea;
         }
       }
     }
@@ -123,11 +123,17 @@
         color: #7e7e7e;
       }
 
-      .ant-input-status-error:not(.ant-input-disabled):not(.ant-input-borderless).ant-input:focus {
+      .ant-input-status-error:not(.ant-input-disabled):not(
+          .ant-input-borderless
+        ).ant-input:focus {
         box-shadow: none;
       }
-      .ant-input-status-error:not(.ant-input-disabled):not(.ant-input-borderless).ant-input,
-      .ant-input-status-error:not(.ant-input-disabled):not(.ant-input-borderless).ant-input:hover {
+      .ant-input-status-error:not(.ant-input-disabled):not(
+          .ant-input-borderless
+        ).ant-input,
+      .ant-input-status-error:not(.ant-input-disabled):not(
+          .ant-input-borderless
+        ).ant-input:hover {
         border-color: #e4eaff;
       }
 
@@ -185,7 +191,7 @@
         width: 590px;
         height: 40px;
         text-align: center;
-        background: #6356EA !important;
+        background: #6356ea !important;
         border-radius: 8px;
         color: #fff;
         cursor: pointer;
@@ -198,8 +204,8 @@
         filter: brightness(1.2);
       }
       .cancelBtn:hover {
-        border: 1px solid #6356EA;
-        color: #6356EA;
+        border: 1px solid #6356ea;
+        color: #6356ea;
       }
     }
   }
@@ -242,7 +248,7 @@
     width: 130px;
   }
   .aiBottom {
-    width: 120px !important;
+    width: 130px !important;
   }
   .clearBottom {
     line-height: 32px !important;
