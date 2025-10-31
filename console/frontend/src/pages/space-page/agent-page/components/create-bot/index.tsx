@@ -443,7 +443,9 @@ function index({ setCreateModal }: CreateBotProps): React.ReactElement {
                 className="global-input flex-1"
               />
             </div>
-            <div className="mt-6 text-second font-medium text-sm">{t('agentPage.createBot.botDescription')}</div>
+            <div className="mt-6 text-second font-medium text-sm">
+              {t('agentPage.createBot.botDescription')}
+            </div>
             <p className="mt-1.5 text-xs font-medium desc-color max-w-[400px]">
               {t('agentPage.createBot.botDescriptionTip')}
             </p>

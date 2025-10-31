@@ -752,7 +752,7 @@ const translation = {
     debugNode: '调试节点',
     debugPreview: '调试预览',
     nodeInfoChanged:
-      '由于{nodeNames}节点信息发生改变，需将所有对照组中该节点信息重置',
+      '由于{{nodeNames}}节点信息发生改变，需将所有对照组中该节点信息重置',
     addControlGroup: '添加对照组（{{count}}/4）',
     clearHistoryRecords: '清除历史记录',
     benchmarkGroup: '基准组',

@@ -165,7 +165,7 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
 
   const closeTrainModal = () => {
     setShowVoiceTraining(false);
-    
+
     getMyVoicerList();
   };
 
@@ -173,7 +173,7 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
     getMySpeakerList()
       .then(res => {
         setMySpeaker(res);
-        onMySpeakerChange?.(res)
+        onMySpeakerChange?.(res);
       })
       .catch(err => {
         message.error(err.msg);
