@@ -29,9 +29,9 @@ import FilePreview from './file-preview';
 import ResqBottomButtons from './resq-bottom-buttons';
 import { useTranslation } from 'react-i18next';
 import FileGridDisplay from './file-grid-display';
+import { TFunction } from 'i18next';
 //渲染全新开始
-const renderRestart = (): ReactElement => {
-  const { t } = useTranslation();
+const renderRestart = (t: TFunction): ReactElement => {
   return (
     <div className="flex items-center w-full mx-5 text-[#c4c4c8]">
       <div className="flex-1 h-[1px] bg-[#e3e4e9]" />
@@ -267,7 +267,7 @@ const MessageList = (props: {
                 <div className="w-[inherit]" key={actualIndex}>
                   {item?.reqType === 'USER' && renderReq(item)}
                   {item?.reqType === 'BOT' && renderResp(item, actualIndex)}
-                  {item?.reqType === 'START' && renderRestart()}
+                  {item?.reqType === 'START' && renderRestart(t)}
                 </div>
               );
             })}
