@@ -234,8 +234,8 @@ export const en = {
   clickStopRecord: 'Click stop recording',
   complete: 'You have completed the voice collection',
   open: 'Enter',
-  complete:
-    'Image generation completed, welcome your valuable opinions and suggestions to help me improve rapidly',
+  audioUploading: 'Audio is uploading, please wait',
+  complete: 'Recording completed',
   oc: 'Optimize Command',
   oci: 'Question optimization in progress',
   oct: 'Command Content Optimization',

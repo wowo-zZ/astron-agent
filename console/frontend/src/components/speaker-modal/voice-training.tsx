@@ -39,7 +39,7 @@ const VoiceTraining: React.FC<VoiceTrainingProps> = ({
   const { t } = useTranslation();
   const switchrecordStatus = () => {
     if (recordStatus === 3) {
-      message.info('音频上传中，请稍后');
+      message.info(t('audioUploading'));
       return;
     }
     if (recordStatus === 0) {
@@ -118,6 +118,20 @@ const VoiceTraining: React.FC<VoiceTrainingProps> = ({
     setRecObj(rec);
     getTrainingText();
   }, []);
+
+  // 关闭模态框时重置状态
+  useEffect(() => {
+    if (!showVoiceTraining) {
+      setRecordStatus(0);
+      setSex(1);
+      setCreateStep(1);
+      setCurrentTrainingText({
+        segId: 0,
+        segText: '',
+        segTextLan: '',
+      });
+    }
+  }, [showVoiceTraining]);
 
   const completeSexSelect = () => {
     // 根据当前语言筛选对应的训练文本

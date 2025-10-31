@@ -257,6 +257,7 @@ class Experience {
     }
     const self = this;
     if (!this.websocket) return;
+    const voiceValue = type === 'CLONE' ? 'x5_clone' : this.voiceName;
 
     this.websocket.onopen = () => {
       if (this.playState === 'unTTS') {
@@ -264,76 +265,55 @@ class Experience {
         return;
       }
 
-      const params: WebSocketParams =
-        type !== 'CLONE'
-          ? {
-              common: {
-                app_id: appId,
-              },
-              business: {
-                aue: 'raw',
-                auf: 'audio/L16;rate=16000',
-                ent: 'input65',
-                pitch: self.pitch,
-                tte: 'UTF8',
-                vcn: self.voiceName,
-                volume: 50,
-                speed: self.speed,
-              },
-              data: {
-                status: 2,
-                text: self.encodeText(self.text),
-              },
-            }
-          : {
-              header: {
-                app_id: appId,
-                uid: '',
-                did: '',
-                imei: '',
-                imsi: '',
-                mac: '',
-                net_type: 'wifi',
-                net_isp: 'CMCC',
-                status: 2,
-                request_id: null,
-                res_id: self.voiceName,
-              },
-              parameter: {
-                tts: {
-                  vcn: 'x5_clone',
-                  speed: self.speed,
-                  volume: 50,
-                  pitch: self.pitch,
-                  bgs: 0,
-                  reg: 0,
-                  rdn: 0,
-                  rhy: 0,
-                  audio: {
-                    encoding: 'raw',
-                    sample_rate: 16000,
-                    channels: 1,
-                    bit_depth: 16,
-                    frame_size: 0,
-                  },
-                  pybuf: {
-                    encoding: 'utf8',
-                    compress: 'raw',
-                    format: 'plain',
-                  },
-                },
-              },
-              payload: {
-                text: {
-                  encoding: 'utf8',
-                  compress: 'raw',
-                  format: 'plain',
-                  status: 2,
-                  seq: 0,
-                  text: self.encodeText(self.text),
-                },
-              },
-            };
+      const params: WebSocketParams = {
+        header: {
+          app_id: appId,
+          uid: '',
+          did: '',
+          imei: '',
+          imsi: '',
+          mac: '',
+          net_type: 'wifi',
+          net_isp: 'CMCC',
+          status: 2,
+          request_id: null,
+          res_id: type === 'CLONE' ? this.voiceName : '',
+        },
+        parameter: {
+          tts: {
+            vcn: voiceValue,
+            speed: self.speed,
+            volume: 50,
+            pitch: self.pitch,
+            bgs: 0,
+            reg: 0,
+            rdn: 0,
+            rhy: 0,
+            audio: {
+              encoding: 'raw',
+              sample_rate: 16000,
+              channels: 1,
+              bit_depth: 16,
+              frame_size: 0,
+            },
+            pybuf: {
+              encoding: 'utf8',
+              compress: 'raw',
+              format: 'plain',
+            },
+          },
+        },
+        payload: {
+          text: {
+            encoding: 'utf8',
+            compress: 'raw',
+            format: 'plain',
+            status: 2,
+            seq: 0,
+            text: self.encodeText(self.text),
+          },
+        },
+      };
 
       this.websocket?.send(JSON.stringify(params));
       this.playTimeout = setTimeout(() => {
@@ -343,11 +323,7 @@ class Experience {
 
     this.websocket.onmessage = (e: MessageEvent) => {
       const jsonData: WebSocketResponse = JSON.parse(e.data);
-      let audioData = jsonData?.data?.audio;
-      if (type === 'CLONE') {
-        audioData = jsonData?.payload?.audio?.audio;
-      }
-
+      const audioData = jsonData?.payload?.audio?.audio;
       if (audioData) {
         const s16 = this.base64ToS16(audioData);
         const f32 = this.transS16ToF32(s16);
