@@ -23,7 +23,6 @@ import creatorImg from '@/assets/imgs/space/person-space-icon.svg';
 
 import { searchInviteUsers, getUserLimit } from './config';
 import { MEMBER_ROLE } from '@/pages/space/config';
-import { useTranslation } from 'react-i18next';
 
 interface User {
   uid: string;

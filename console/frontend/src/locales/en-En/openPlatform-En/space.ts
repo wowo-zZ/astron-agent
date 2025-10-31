@@ -178,17 +178,38 @@ const translation = {
   createTimesExceeded: 'Create times exceeded',
   allSpace: 'All Space',
   myCreatedSpace: 'My Created Space',
-  enterManagement: 'Enter Management',
-  enterSpace: 'Enter Space',
-  applySpace: 'Apply Space',
-  applying: 'Applying',
-  noPermission: 'No Permission',
   editSpaceInfo: 'Edit Space Info',
   share: 'Share',
   uploading: 'Uploading',
   imageProcessingNotCompleted: 'Image processing not completed, please wait...',
   cannotGetImageFile: 'Cannot get image file',
   uploadSuccess: 'Upload success',
+
+  // ActionList buttons
+  enterManagement: 'Enter Management',
+  enterSpace: 'Enter Space',
+  applyForSpace: 'Apply for Space',
+  applying: 'Applying',
+  noPermission: 'No Permission',
+
+  // InvitationManagement
+  confirmRevoke: 'Confirm Revoke',
+  confirmRevokeInvitation:
+    'Are you sure you want to revoke the invitation to {nickname}?',
+  revokeSuccess: 'Revoked successfully',
+  revoke: 'Revoke',
+  invitationStatus: 'Invitation Status',
+  joinTime: 'Join Time',
+
+  // MemberManagement
+
+  // AddMemberModal
+  pleaseEnterPhoneNumber: 'Please enter phone number',
+  maxMembersReached: 'Maximum number of members reached ({maxMembers})',
+  pleaseSelectAtLeastOneUser: 'Please select at least one user',
+  searchPhoneNumberToAddMembers: 'Search phone number to add new members',
+  searchPhoneNumber: 'Search phone number',
+  all: 'All',
 };
 
 export default translation;

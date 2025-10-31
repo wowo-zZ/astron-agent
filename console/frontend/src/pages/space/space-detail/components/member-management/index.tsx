@@ -210,7 +210,7 @@ const MemberManagement: React.FC<MemberManagementProps> = ({
       },
     },
     {
-      title: '加入时间',
+      title: t('space.joinTime'),
       dataIndex: 'createTime',
       key: 'createTime',
       render: (text: string) => (
@@ -221,7 +221,7 @@ const MemberManagement: React.FC<MemberManagementProps> = ({
 
   // 操作列配置
   const actionColumn: ActionColumnConfig<Member> = {
-    title: '操作',
+    title: t('space.operation'),
     width: 200,
     getActionButtons: (record: Member) => getMemberActionButtons(record),
   };

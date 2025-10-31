@@ -8,6 +8,7 @@ const translation = {
   save: '保存',
   reset: '重置',
   submit: '提交',
+  run: '运行',
   edit: '去编辑',
   delete: '删除',
   add: '添加',
@@ -22,6 +23,24 @@ const translation = {
   conversationRounds: '对话轮数',
   conversationRoundsDescription:
     '设置节点中使用对话历史的对话轮数，轮数越多，多轮对话的相关性越高，但消耗的 Token 也越多',
+  // Common messages
+  submitSuccess: '提交成功',
+  submitFailed: '提交失败',
+  submitFailedRetry: '提交失败，请重试',
+  answeringPleaseTryLater: '回答中，请稍后再试',
+  pleaseEnterQuestion: '请输入询问内容',
+  answering: '回答中...',
+  stopOutput: '停止输出',
+  // Member management
+  roleUpdateSuccess: '角色更新成功',
+  userDeleted: '已删除用户 {{username}}',
+  username: '用户名',
+  role: '角色',
+  joinTime: '加入时间',
+  action: '操作',
+  confirmDelete: '确认删除',
+  confirmDeleteMember: '确定要删除这个成员吗？',
+  totalItems: '共 {{total}} 项数据',
   // Common validation messages
   valueCannotBeEmpty: '值不能为空',
   valueCannotBeRepeated: '值不能重复',

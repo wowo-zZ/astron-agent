@@ -181,6 +181,26 @@ const translation = {
   imageProcessingNotCompleted: '图片处理未完成，请稍候...',
   cannotGetImageFile: '无法获取图片文件',
   uploadSuccess: '上传成功',
+
+  // ActionList buttons
+  applyForSpace: '申请空间',
+
+  // InvitationManagement
+  confirmRevoke: '确认撤回',
+  confirmRevokeInvitation: '确定要撤回对 {nickname} 的邀请吗？',
+  revokeSuccess: '撤回成功',
+  revoke: '撤回',
+  invitationStatus: '邀请状态',
+  joinTime: '加入时间',
+
+  // MemberManagement
+  // AddMemberModal
+  pleaseEnterPhoneNumber: '请输入手机号',
+  maxMembersReached: '成员数量已达到最大值{maxMembers}',
+  pleaseSelectAtLeastOneUser: '请至少选择一个用户',
+  searchPhoneNumberToAddMembers: '搜索手机号以添加新成员',
+  searchPhoneNumber: '搜索手机号',
+  all: '全部',
 };
 
 export default translation;

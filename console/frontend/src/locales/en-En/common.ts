@@ -8,6 +8,7 @@ const translation = {
   save: 'Save',
   reset: 'Reset',
   submit: 'Submit',
+  run: 'Run',
   edit: 'Edit',
   delete: 'Delete',
   add: 'Add',
@@ -22,6 +23,24 @@ const translation = {
   conversationRounds: 'Conversation Rounds',
   conversationRoundsDescription:
     'Set the number of conversation rounds to use chat history in the node. More rounds mean higher relevance in multi-turn conversations, but also consume more tokens',
+  // Common messages
+  submitSuccess: 'Submit Successfully',
+  submitFailed: 'Submit Failed',
+  submitFailedRetry: 'Submit failed, please try again',
+  answeringPleaseTryLater: 'Answering, please try again later',
+  pleaseEnterQuestion: 'Please enter your question',
+  answering: 'Answering...',
+  stopOutput: 'Stop Output',
+  // Member management
+  roleUpdateSuccess: 'Role updated successfully',
+  userDeleted: 'User {{username}} deleted',
+  username: 'Username',
+  role: 'Role',
+  joinTime: 'Join Time',
+  action: 'Action',
+  confirmDelete: 'Confirm Delete',
+  confirmDeleteMember: 'Are you sure you want to delete this member?',
+  totalItems: 'Total {{total}} items',
   // Common validation messages
   valueCannotBeEmpty: 'Value cannot be empty',
   valueCannotBeRepeated: 'Value cannot be repeated',
