@@ -71,7 +71,7 @@ const AddMemberModal: React.FC<AddMemberModalProps> = React.memo(
     const [userList, setUserList] = useState<User[]>(initialUsers);
     const [loading, setLoading] = useState<boolean>(false);
     const [maxMembers, setMaxMembers] = useState<number>(48);
-    const { t } = useTranslation();
+
     useEffect(() => {
       if (open) {
         updateMaxMembers();
