@@ -309,8 +309,7 @@ export const aiGenPrologue = (name: any) => {
 
 // 一句话创建助手
 export const quickCreateBot = (str: string) => {
-  // const params: any = { sentence: str };
-  return http.post(`/bot/ai-sentence-gen?sentence=${str}`);
+  return http.post(`/bot/ai-sentence-gen`, { sentence: str });
 };
 
 // 模板创建
