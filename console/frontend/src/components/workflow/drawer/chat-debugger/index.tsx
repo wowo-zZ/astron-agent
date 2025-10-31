@@ -625,7 +625,7 @@ export function ChatDebuggerContent({
             </div>
           ) : !showChatDebuggerPage ? (
             <div className="text-[#ff9a27] text-sm">
-              当前版本未发布成功，无用户对话页
+              {t('workflow.nodes.chatDebugger.versionNotPublished')}
             </div>
           ) : (
             <div
@@ -670,7 +670,7 @@ export function ChatDebuggerContent({
         >
           <Spin
             spinning={loadingVms}
-            tip={'虚拟人加载中...'}
+            tip={t('workflow.nodes.chatDebugger.virtualLoading')+'...'}
             className="mt-[100px] color-[#6356ea]"
           >
             <div></div>

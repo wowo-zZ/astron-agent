@@ -78,6 +78,9 @@ const transition = {
     deleteFile: '删除文件',
     cancelUpload: '取消上传',
     pleaseSelectOption: '请选择选项~',
+    virtualVoicePermission:'虚拟人播报需要浏览器权限',
+    virtualAuthorization:'授权',
+    virtualLoading:'虚拟人加载中'
   },
   feedbackPopover: {
     feedbackTitle: '你的反馈将帮助我们持续进步',

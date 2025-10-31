@@ -428,7 +428,7 @@ const ChatPage = (): ReactElement => {
           {showVmsPermissionTip && (
             <div className={styles.avatar_permission_tip_wrapper}>
               <div className={styles.avatar_permission_tip}>
-                <span>虚拟人播报需要浏览器权限</span>
+                <span>{t('chatPage.chatWindow.virtualVoicePermission')}</span>
                 <a
                   href="javascript:void(0)"
                   onClick={() => {
@@ -436,7 +436,7 @@ const ChatPage = (): ReactElement => {
                     setShowVmsPermissionTip(false);
                   }}
                 >
-                  授权
+                  {t('chatPage.chatWindow.virtualAuthorization')}
                 </a>
               </div>
             </div>
@@ -453,7 +453,7 @@ const ChatPage = (): ReactElement => {
             >
               <Spin
                 spinning={loadingVms}
-                tip={'虚拟人加载中...'}
+                tip={t('chatPage.chatWindow.virtualLoading')+'...'}
                 className="mt-[100px] color-[#275EFF]"
               >
                 <div></div>

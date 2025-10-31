@@ -79,6 +79,9 @@ const transition = {
     deleteFile: 'Delete File',
     cancelUpload: 'Cancel Upload',
     pleaseSelectOption: 'Please select an option~',
+    virtualVoicePermission:'Virtual voice broadcast requires browser permissions',
+    virtualAuthorization:'Authorization',
+    virtualLoading:'Loading'
   },
   feedbackPopover: {
     feedbackTitle: 'Your feedback helps us improve',
