@@ -57,7 +57,6 @@ const TtsModule: React.FC<TtsModuleProps> = ({
 
   useEffect(() => {
     let timer: NodeJS.Timeout | null = null;
-
     if (isPlaying && voiceName) {
       // 先重置音频，确保之前的播放完全停止
       experienceObj?.resetAudio();

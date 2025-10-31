@@ -318,11 +318,17 @@ const useChatDebuggerContent = ({
     }
     return multiParams;
   }, [nodes]);
+  const talkAgentConfig = useMemo(() => {
+    return isJSON(currentFlow?.flowConfig)
+      ? JSON.parse(currentFlow?.flowConfig)
+      : {};
+  }, [currentFlow?.flowConfig]);
   return {
     startNode,
     trialRun,
     multiParams,
     xfYunBot,
+    talkAgentConfig,
   };
 };
 
@@ -337,6 +343,7 @@ export function ChatDebuggerContent({
   const setUserInput = useChatStore(state => state.setUserInput);
   const historyVersion = useFlowsManager(state => state.historyVersion);
   const historyVersionData = useFlowsManager(state => state.historyVersionData);
+  const chatType = useChatStore(state => state.chatType);
   const startNodeParams = useChatStore(state => state.startNodeParams);
   const setStartNodeParams = useChatStore(state => state.setStartNodeParams);
   const chatList = useChatStore(state => state.chatList);
@@ -358,13 +365,15 @@ export function ChatDebuggerContent({
   const handleStopConversation = useChatStore(
     state => state.handleStopConversation
   );
+  const handleChatTypeChange = useChatStore(
+    state => state.handleChatTypeChange
+  );
   const [showChatDebuggerPage, setShowChatDebuggerPage] =
     useState<boolean>(true);
-  const { startNode, trialRun, multiParams, xfYunBot } = useChatDebuggerContent(
-    {
+  const { startNode, trialRun, multiParams, xfYunBot, talkAgentConfig } =
+    useChatDebuggerContent({
       currentFlow,
-    }
-  );
+    });
   useChatDebuggerEffect(
     currentFlow,
     open,
@@ -392,12 +401,34 @@ export function ChatDebuggerContent({
               : t('workflow.nodes.chatDebugger.runResult')}
           </span>
         </div>
-        <img
-          src={icons.close}
-          className="w-3 h-3 cursor-pointer"
-          alt=""
-          onClick={() => clearData(setOpen)}
-        />
+        <div className="flex items-center gap-3">
+          {talkAgentConfig?.sceneEnable === 1 && (
+            <>
+              {chatType !== 'vms' && (
+                <img
+                  src={icons?.vms}
+                  alt=""
+                  className="cursor-pointer"
+                  onClick={() => handleChatTypeChange('vms')}
+                />
+              )}
+              {chatType !== 'text' && (
+                <img
+                  src={icon?.message}
+                  alt=""
+                  className="cursor-pointer"
+                  onClick={() => handleChatTypeChange('text')}
+                />
+              )}
+            </>
+          )}
+          <img
+            src={icons.close}
+            className="w-3 h-3 cursor-pointer"
+            alt=""
+            onClick={() => clearData()}
+          />
+        </div>
       </div>
       <div className="flex-1 flex flex-col overflow-hidden mt-1">
         <div className="w-full flex items-center justify-between px-5">

@@ -64,11 +64,12 @@
   .generate_btn {
     position: absolute;
     top: 78px;
-    left: 7px;
     margin-top: 10px;
     z-index: 3;
     cursor: pointer;
-    width: 72px;
+    width: auto;
+    min-width: 84px;
+    padding: 0 10px;
     height: 24px;
     // background-image: url('https://aixfyun-cn-bj.xfyun.cn/bbs/45868.54057209624/1.png');
     // background-repeat: no-repeat;

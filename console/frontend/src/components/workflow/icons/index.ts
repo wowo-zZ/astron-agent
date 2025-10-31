@@ -95,6 +95,8 @@ import settingBackgroundIcon from '@/assets/imgs/workflow/setting-background-ico
 import trialRunIcon from '@/assets/imgs/workflow/trial-run-icon.png';
 import chatListTipIcon from '@/assets/imgs/workflow/chat-list-tip.png';
 import switchUserChatPageActiveIcon from '@/assets/imgs/workflow/switchUserChatPageActive.svg';
+import vmsIcon from '@/assets/svgs/icon-user-line.svg';
+import messageIcon from '@/assets/svgs/icon-message-line.svg';
 
 // Chat Content 模块图标
 import chatUserIcon from '@/assets/imgs/workflow/chat-user-icon.png';
@@ -305,6 +307,8 @@ interface ChatDebuggerIcons {
   trialRun: string;
   chatListTip: string;
   switchUserChatPageActive: string;
+  vms: string;
+  message: string;
   chatContent: ChatContentIcons;
   chatInput: ChatInputIcons;
 }
@@ -475,6 +479,8 @@ export const Icons: WorkflowIcons = {
     trialRun: trialRunIcon,
     chatListTip: chatListTipIcon,
     switchUserChatPageActive: switchUserChatPageActiveIcon,
+    vms: vmsIcon,
+    message: messageIcon,
     chatContent: {
       chatUser: chatUserIcon,
       chatLoading: chatLoadingIcon,
