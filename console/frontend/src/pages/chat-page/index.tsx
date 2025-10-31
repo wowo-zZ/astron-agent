@@ -84,7 +84,7 @@ const ChatPage = (): ReactElement => {
   const vmsInteractiveRefStatus = useChatStore(
       (state: any) => state.vmsInteractiveRefStatus
     );
-
+  const [loadingVms, setLoadingVms] = useState<boolean>(false);
   const setVmsInteractiveRefStatus = useChatStore(
     (state: any) => state.setVmsInteractiveRefStatus
   );
@@ -98,14 +98,12 @@ const ChatPage = (): ReactElement => {
 
   const handleChatTypeChange = (type: string) => {
     setChatType(type);
-    setTimeout(()=>{
-      console.log(vmsInteractionCmpRef)
       if (type === 'vms') {
-      // vmsInteractionCmpRef?.current?.initAvatar({
-      //   sdkAvatarInfo,
-      //   sdkTTSInfo,
-      // });
-      initializeChatPage()
+      setTimeout(()=>{
+      vmsInteractionCmpRef?.current?.initAvatar({
+      sdkAvatarInfo,
+       sdkTTSInfo,
+      })})
     } else {
       vmsInteractionCmpRef?.current?.instance &&
       vmsInteractionCmpRef?.current?.dispose();
@@ -114,7 +112,6 @@ const ChatPage = (): ReactElement => {
       vmsInter && clearInterval(vmsInter);
       vmsInter = null;
     }
-    })
   };
 
   // 初始化聊天页面
@@ -406,22 +403,6 @@ const ChatPage = (): ReactElement => {
             </>
           )}
         </div>
-        {chatType === 'vms' && showVmsPermissionTip && (
-          <div className={styles.avatar_permission_tip_wrapper}>
-            <div className={styles.avatar_permission_tip}>
-              <span>虚拟人播报需要浏览器权限</span>
-              <a
-                href="javascript:void(0)"
-                onClick={() => {
-                  vmsInteractionCmpRef?.current?.player?.resume();
-                  setShowVmsPermissionTip(false);
-                }}
-              >
-                授权
-              </a>
-            </div>
-          </div>
-        )}
         <div
           className={`w-full mx-auto flex flex-col flex-1 min-h-0 overflow-hidden z-[1]`}
         >
@@ -444,7 +425,40 @@ const ChatPage = (): ReactElement => {
       />
       {chatType === 'vms' && (
         <div className={styles.vms_container}>
+          {showVmsPermissionTip && (
+            <div className={styles.avatar_permission_tip_wrapper}>
+              <div className={styles.avatar_permission_tip}>
+                <span>虚拟人播报需要浏览器权限</span>
+                <a
+                  href="javascript:void(0)"
+                  onClick={() => {
+                    vmsInteractionCmpRef?.current?.player?.resume();
+                    setShowVmsPermissionTip(false);
+                  }}
+                >
+                  授权
+                </a>
+              </div>
+            </div>
+          )}
           <div className={styles.vms_container_inner}>
+            <div
+              style={{
+                width: '380px',
+                height: '100%',
+                zIndex: 10,
+                position: 'absolute',
+                right: '-150px',
+              }}
+            >
+              <Spin
+                spinning={loadingVms}
+                tip={'虚拟人加载中...'}
+                className="mt-[100px] color-[#275EFF]"
+              >
+                <div></div>
+              </Spin>
+            </div>
             {/* {showResetOperation && <div>虚拟人已离开，是否恢复</div>} */}
             <VmsInteractionCmp
               ref={vmsInteractionCmpRef}
@@ -462,6 +476,7 @@ const ChatPage = (): ReactElement => {
                 position: 'absolute',
                 right: '-150px',
               }}
+              loadingStatusChange={setLoadingVms}
             />
           </div>
         </div>
