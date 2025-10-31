@@ -751,7 +751,6 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
                           form.setFieldValue('interactType', 0);
                           setEnableAvatar(checked);
                         } else {
-                          message.warning('请保证虚拟人和语音互动至少选择一种');
                           form.setFieldValue('interactType', 2);
                           setEnableAvatar(true);
                         }
