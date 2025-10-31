@@ -133,7 +133,7 @@ const translation = {
     AppIDEmpty: 'AppID不能为空',
     mcpServerParamsDescEmpty: '存在输入项未填写！',
     unBindSuccess: '解绑成功',
-    submitAuditSuccess: '提交审核成功！',
+    submitAuditSuccess: '提交成功！',
     unBindTip: '确定解除绑定？',
     unBindTipDesc: '解绑后我们不再处理服务号收到的消息',
     unBindTipDesc2: '如需彻底完成解绑，您还需要前往',
