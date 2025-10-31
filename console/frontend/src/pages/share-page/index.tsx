@@ -225,7 +225,9 @@ function index() {
             </div>
           )}
           {inviteInfo?.status == 4 && (
-            <div className={styles.expire}>{t('spaceManagement.withdrawn')}</div>
+            <div className={styles.expire}>
+              {t('spaceManagement.withdrawn')}
+            </div>
           )}
           {inviteInfo?.status == 5 && (
             <div className={styles.expire}>{t('spaceManagement.expired')}</div>

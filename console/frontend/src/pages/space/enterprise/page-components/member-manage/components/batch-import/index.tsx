@@ -130,7 +130,9 @@ const BatchImport: React.FC<BatchImportProps> = ({
           return;
         }
 
-        message.error(error?.desc || error?.msg || t('spaceManagement.uploadFail'));
+        message.error(
+          error?.desc || error?.msg || t('spaceManagement.uploadFail')
+        );
         setCurrentStep(ImportStep.BEFORE_IMPORT);
       }
     },
@@ -189,7 +191,9 @@ const BatchImport: React.FC<BatchImportProps> = ({
           <p className="ant-upload-drag-icon">
             <UploadOutlined className={styles.uploadIcon} />
           </p>
-          <p className="ant-upload-text">{t('spaceManagement.supportDragOrClickUpload')}</p>
+          <p className="ant-upload-text">
+            {t('spaceManagement.supportDragOrClickUpload')}
+          </p>
           {/* <p className="ant-upload-hint">
             支持Excel文件(.xlsx、.xls)
           </p> */}
@@ -203,7 +207,9 @@ const BatchImport: React.FC<BatchImportProps> = ({
     <div className={styles.uploading}>
       <div className={styles.progressSection}>
         <Spin />
-        <div className={styles.progressText}>{t('spaceManagement.parsingInProgress')}</div>
+        <div className={styles.progressText}>
+          {t('spaceManagement.parsingInProgress')}
+        </div>
       </div>
 
       {/* <div className={styles.cancelSection}>
@@ -223,12 +229,16 @@ const BatchImport: React.FC<BatchImportProps> = ({
   const renderImportResultStep = () => (
     <div className={styles.importResult}>
       <div className={styles.resultSummary}>
-        <div className={styles.resultTitle}>{t('spaceManagement.fileParsedSuccessfully')}</div>
+        <div className={styles.resultTitle}>
+          {t('spaceManagement.fileParsedSuccessfully')}
+        </div>
         {importResult && importResult.success && importResult.data && (
           <div className={styles.resultStats}>
             <div className={styles.successStats}>
               <span className={styles.successCount}>
-                {t('spaceManagement.successfullyParsed')} {importResult.data.userList.length} {t('spaceManagement.members')}
+                {t('spaceManagement.successfullyParsed')}{' '}
+                {importResult.data.userList.length}{' '}
+                {t('spaceManagement.members')}
               </span>
             </div>
           </div>
@@ -288,7 +298,9 @@ const BatchImport: React.FC<BatchImportProps> = ({
         footer={
           currentStep === ImportStep.IMPORT_RESULT && (
             <Space>
-              <Button onClick={handleImportModalClose}>{t('spaceManagement.cancel')}</Button>
+              <Button onClick={handleImportModalClose}>
+                {t('spaceManagement.cancel')}
+              </Button>
               <Button type="primary" onClick={handleConfirmImport}>
                 {t('spaceManagement.confirmImport')}
               </Button>

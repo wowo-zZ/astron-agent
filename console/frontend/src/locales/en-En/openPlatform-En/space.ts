@@ -44,7 +44,7 @@ const translation = {
   // MemberManage
   memberList: 'Member List',
   invitationManagement: 'Invitation Management',
-  batchImportSuccess: 'Batch import successful: {count} members',
+  batchImportSuccess: 'Batch import successful: {{count}} members',
   addMember: 'Add Member',
   selectRole: 'Select role',
   pleaseEnterUsername: 'Please enter username',

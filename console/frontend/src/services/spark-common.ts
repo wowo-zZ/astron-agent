@@ -560,15 +560,20 @@ export const getMySpeakerList = (): Promise<MyVCNItem[]> => {
 /**
  * @description delete my speaker
  */
-export const deleteMySpeaker = ({id}: {id: number}): Promise<{}> => {
+export const deleteMySpeaker = ({ id }: { id: number }): Promise<{}> => {
   return http.post(`/speaker/train/delete-speaker?id=${id}`);
 };
 
 /**
  * @description update my speaker name
  */
-export const updateMySpeaker = (params: {id: number, name: string}): Promise<{}> => {
-  return http.post(`/speaker/train/update-speaker?id=${params.id}&name=${params.name}`);
+export const updateMySpeaker = (params: {
+  id: number;
+  name: string;
+}): Promise<{}> => {
+  return http.post(
+    `/speaker/train/update-speaker?id=${params.id}&name=${params.name}`
+  );
 };
 
 /**

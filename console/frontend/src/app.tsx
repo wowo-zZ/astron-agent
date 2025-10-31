@@ -42,7 +42,6 @@ export default function App(): ReactElement {
       }
     });
     document.documentElement.classList.add(`lang-${language}`);
-
   }, [i18n.language]);
 
   useEffect(() => {
