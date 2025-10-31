@@ -103,8 +103,13 @@ const VmsInteractionCmp = forwardRef((props: VmsInteractiveRefProps, ref) => {
    * 加载虚拟人签名url信息，初始化虚拟人sdk实例
    */
   const loadSignedUrlInfo = async () => {
+     try{
     const res: any = await getSignedUrl();
     sdkInitAppInfoDefault.signedUrl = res;
+    }catch(error){
+      console.error('加载虚拟人签名url信息失败', error);
+      message.error('加载虚拟人签名url信息失败');
+    }
   };
 
   /**
@@ -169,14 +174,14 @@ const VmsInteractionCmp = forwardRef((props: VmsInteractiveRefProps, ref) => {
       setVmsInteractiveRefPlayer(vmsInteractiveRefPlayer);
       setVmsInteractiveRefStatus('init');
     } else {
-      //   message.warning('请勿多次初始化 或先销毁当前实例');
+        message.warning('请勿多次初始化 或先销毁当前实例');
     }
     if (!vmsInteractiveRef.current) {
       return message.warning('虚拟人初始化异常');
     }
     await vmsInteractiveRef.current
       ?.start({
-        wrapper: avatarDom as HTMLDivElement,
+        wrapper: avatarDom as HTMLDivElement || document.getElementById('avatarDom') as HTMLDivElement,
       })
       .then(() => {
         console.info('虚拟人连接成功 & 拉流订阅成功 & 流播放成功');
@@ -235,12 +240,15 @@ const VmsInteractionCmp = forwardRef((props: VmsInteractiveRefProps, ref) => {
   useEffect(() => {
     document.body.addEventListener('click', () => {
       vmsInteractiveRefPlayer?.resume();
+      playerResumeCallback?.();
     });
     document.body.addEventListener('focus', () => {
       vmsInteractiveRefPlayer?.resume();
+      playerResumeCallback?.();
     });
     document.body.addEventListener('keydown', () => {
       vmsInteractiveRefPlayer?.resume();
+      playerResumeCallback?.();
     });
     // 绑定 visibilitychange 事件
     document.addEventListener('visibilitychange', handleWindowTabChange);
