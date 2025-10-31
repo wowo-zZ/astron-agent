@@ -44,7 +44,7 @@ const translation = {
   // MemberManage
   memberList: '成员列表',
   invitationManagement: '邀请管理',
-  batchImportSuccess: '批量导入成功：{count}个成员',
+  batchImportSuccess: '批量导入成功：{{count}}个成员',
   addMember: '添加成员',
   selectRole: '选择角色',
   pleaseEnterUsername: '请输入用户名',
@@ -115,7 +115,7 @@ const translation = {
   // LeaveSpaceModal
   leaveSpaceTitle: '离开空间',
   leaveSpaceSuccess: '离开空间成功',
-  leaveSpaceConfirm: '确认离开 {name} 吗?',
+  leaveSpaceConfirm: '确认离开 {{name}} 吗?',
 
   // TransferOwnershipModal
   transferOwnershipTitle: '转移空间所有权',
@@ -128,14 +128,14 @@ const translation = {
   // AddMemberModal
   addNewMember: '添加新成员',
   enterUsername: '请输入用户名',
-  memberLimitReached: '成员数量已达到最大值{count}',
+  memberLimitReached: '成员数量已达到最大值{{count}}',
   selectAtLeastOneUser: '请至少选择一个用户',
   searchToAddMembers: '搜索用户名以添加新成员',
-  userNotFound: '未找到"{keyword}"相关用户',
+  userNotFound: '未找到{{keyword}}相关用户',
   selectAll: '全部',
   searching: '搜索中...',
   selected: '选定: ',
-  maxValue: '（最大值{count}）',
+  maxValue: '（最大值{{count}}）',
 
   // SpaceList
   applySuccess: '申请成功',
@@ -147,7 +147,7 @@ const translation = {
   getRecentVisitFailed: '获取最近访问列表失败',
 
   // SpaceTable
-  totalDataCount: '共 {total} 项数据',
+  totalDataCount: '共 {{total}} 项数据',
   operation: '操作',
 
   // Enterprise page
@@ -155,7 +155,7 @@ const translation = {
 
   // Member management
   confirmDelete: '确认删除',
-  confirmDeleteMember: '确定要删除成员 "{username}" 吗？',
+  confirmDeleteMember: '确定要删除成员 {{username}} 吗？',
   deleteSuccess: '删除成功',
   roleUpdateSuccess: '角色更新成功',
   delete: '删除',
@@ -187,7 +187,7 @@ const translation = {
 
   // InvitationManagement
   confirmRevoke: '确认撤回',
-  confirmRevokeInvitation: '确定要撤回对 {nickname} 的邀请吗？',
+  confirmRevokeInvitation: '确定要撤回对 {{nickname}} 的邀请吗？',
   revokeSuccess: '撤回成功',
   revoke: '撤回',
   invitationStatus: '邀请状态',
@@ -196,11 +196,27 @@ const translation = {
   // MemberManagement
   // AddMemberModal
   pleaseEnterPhoneNumber: '请输入手机号',
-  maxMembersReached: '成员数量已达到最大值{maxMembers}',
+  maxMembersReached: '成员数量已达到最大值{{maxMembers}}',
   pleaseSelectAtLeastOneUser: '请至少选择一个用户',
   searchPhoneNumberToAddMembers: '搜索手机号以添加新成员',
   searchPhoneNumber: '搜索手机号',
   all: '全部',
+
+  // SpaceSettings
+  deleteSpace: '删除空间',
+  leaveSpace: '离开空间',
+  leaveSpaceWarning: '退出空间后将无法访问空间内容，需要重新邀请才能加入',
+  transferOwnershipFailed: '转让所有权失败',
+  transferSpaceOwnership: '转让空间所有权',
+  transferOwnershipDescription: '将空间所有权转移给其他成员',
+  transferSpace: '转让空间',
+
+  // DetailHeader
+  spaceAvatar: '空间头像',
+
+  // UserItem
+  invited: '已邀请',
+  joined: '已加入',
 };
 
 export default translation;

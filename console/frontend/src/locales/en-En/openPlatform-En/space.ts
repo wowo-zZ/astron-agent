@@ -120,7 +120,7 @@ const translation = {
   // LeaveSpaceModal
   leaveSpaceTitle: 'Leave Space',
   leaveSpaceSuccess: 'Successfully left space',
-  leaveSpaceConfirm: 'Confirm leaving {name}?',
+  leaveSpaceConfirm: 'Confirm leaving {{name}}?',
 
   // TransferOwnershipModal
   transferOwnershipTitle: 'Transfer Space Ownership',
@@ -134,14 +134,14 @@ const translation = {
   // AddMemberModal
   addNewMember: 'Add New Member',
   enterUsername: 'Please enter username',
-  memberLimitReached: 'Member limit reached: {count}',
+  memberLimitReached: 'Member limit reached: {{count}}',
   selectAtLeastOneUser: 'Please select at least one user',
   searchToAddMembers: 'Search username to add new members',
-  userNotFound: 'No users found for "{keyword}"',
+  userNotFound: 'No users found for {{keyword}}',
   selectAll: 'All',
   searching: 'Searching...',
   selected: 'Selected: ',
-  maxValue: '(Max {count})',
+  maxValue: '(Max {{count}})',
 
   // SpaceList
   applySuccess: 'Application successful',
@@ -153,7 +153,7 @@ const translation = {
   getRecentVisitFailed: 'Failed to get recent visit list',
 
   // SpaceTable
-  totalDataCount: 'Total {total} items',
+  totalDataCount: 'Total {{total}} items',
   operation: 'Actions',
 
   // Enterprise page
@@ -162,7 +162,7 @@ const translation = {
 
   // Member management
   confirmDelete: 'Confirm Delete',
-  confirmDeleteMember: 'Are you sure you want to delete member "{username}"?',
+  confirmDeleteMember: 'Are you sure you want to delete member {{username}}?',
   deleteSuccess: 'Deleted successfully',
   roleUpdateSuccess: 'Role updated successfully',
   delete: 'Delete',
@@ -195,7 +195,7 @@ const translation = {
   // InvitationManagement
   confirmRevoke: 'Confirm Revoke',
   confirmRevokeInvitation:
-    'Are you sure you want to revoke the invitation to {nickname}?',
+    'Are you sure you want to revoke the invitation to {{nickname}}?',
   revokeSuccess: 'Revoked successfully',
   revoke: 'Revoke',
   invitationStatus: 'Invitation Status',
@@ -205,11 +205,28 @@ const translation = {
 
   // AddMemberModal
   pleaseEnterPhoneNumber: 'Please enter phone number',
-  maxMembersReached: 'Maximum number of members reached ({maxMembers})',
+  maxMembersReached: 'Maximum number of members reached ({{maxMembers}})',
   pleaseSelectAtLeastOneUser: 'Please select at least one user',
   searchPhoneNumberToAddMembers: 'Search phone number to add new members',
   searchPhoneNumber: 'Search phone number',
   all: 'All',
+  // SpaceSettings
+  deleteSpace: 'Delete Space',
+  leaveSpace: 'Leave Space',
+
+  leaveSpaceWarning:
+    'You will not be able to access the space content after leaving. You will need to be re-invited to join.',
+  transferOwnershipFailed: 'Failed to transfer ownership',
+  transferSpaceOwnership: 'Transfer Space Ownership',
+  transferOwnershipDescription: 'Transfer space ownership to another member',
+  transferSpace: 'Transfer Space',
+
+  // DetailHeader
+  spaceAvatar: 'Space Avatar',
+
+  // UserItem
+  invited: 'Invited',
+  joined: 'Joined',
 };
 
 export default translation;

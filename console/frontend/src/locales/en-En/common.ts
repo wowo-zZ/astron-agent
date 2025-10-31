@@ -41,6 +41,58 @@ const translation = {
   confirmDelete: 'Confirm Delete',
   confirmDeleteMember: 'Are you sure you want to delete this member?',
   totalItems: 'Total {{total}} items',
+  // Apply management
+  applyIdNotExist: 'Application ID does not exist',
+  confirmReject: 'Confirm Rejection',
+  confirmRejectUser: 'Are you sure you want to reject this user?',
+  rejectSuccess: 'Rejected successfully',
+  rejectFailed: 'Rejection failed',
+  confirmApprove: 'Confirm Approval',
+  confirmApproveApplication:
+    'Are you sure you want to approve this application?',
+  approveSuccess: 'Approved successfully',
+  approveFailed: 'Approval failed',
+  reject: 'Reject',
+  approve: 'Approve',
+  applyTime: 'Apply Time',
+  applyStatus: 'Application Status',
+  // Transfer ownership
+  pleaseSelectMemberToTransfer: 'Please select a member to transfer',
+  transferSuccess: 'Transferred successfully',
+  transferSpaceOwnership: 'Transfer Space Ownership',
+  transferOwnershipWarning:
+    'After transferring ownership, your status will be changed to administrator',
+  transferOwnershipTo: 'Transfer ownership to',
+  pleaseSelectMember: 'Please select a member',
+  // Delete space
+  verificationCodeSent: 'Verification code sent',
+  pleaseEnterVerificationCode: 'Please enter verification code',
+  deleteSpaceSuccess: 'Space deleted successfully',
+  deleteSpace: 'Delete Space',
+  deleteSpaceWarning:
+    'Please delete carefully! After deletion, all data in the space will be lost, and the allocated quota will be deducted.',
+  enterVerificationCodeForMobile:
+    "Please enter the verification code received by the space owner's reserved phone number {{mobile}}",
+  sendVerificationCode: 'Send Code',
+  resendAfterSeconds: 'Resend in {{seconds}}s',
+  // Space detail
+  loadSpaceInfoFailed: 'Failed to load space information',
+  inviteSuccess: 'Invited successfully',
+  selectRole: 'Select role',
+  selectStatus: 'Select status',
+  pleaseEnterUsername: 'Please enter username',
+  // Invitation list
+  invitationStatus: 'Invitation Status',
+  invitationTime: 'Invitation Time',
+  joinSpace: 'Join Space',
+  invitationResentToUser: 'Invitation has been resent to {{username}}',
+  invitationRevokedForUser: 'Invitation for user {{username}} has been revoked',
+  invitationRecordDeleted:
+    'Invitation record for {{username}} has been deleted',
+  revoke: 'Revoke',
+  confirmRevokeInvitation: 'Confirm Revoke Invitation',
+  confirmRevokeInvitationContent:
+    'Are you sure you want to revoke the invitation to this user?',
   // Common validation messages
   valueCannotBeEmpty: 'Value cannot be empty',
   valueCannotBeRepeated: 'Value cannot be repeated',
