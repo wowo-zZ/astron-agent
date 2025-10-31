@@ -4,7 +4,7 @@ import { Drawer, Button, message, Spin } from 'antd';
 import { cloneDeep } from 'lodash';
 import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import useFlowStore from '@/components/workflow/store/use-flow-store';
-import { isJSON } from '@/utils';
+import { getProcessedStr, isJSON, isPureText, splitSentencesBasic } from '@/utils';
 import {
   validateInputJSON,
   generateDefaultInput,
@@ -32,15 +32,17 @@ import './index.scss'
 // 获取 Chat Debugger 模块的图标
 const icons = Icons.chatDebugger;
 
-let chatAnswer = '';
+export let chatAnswer = '';
 //虚拟人形象参数
-let sdkAvatarInfo = {
+export let sdkAvatarInfo = {
   avatar_id: '',
 };
 //虚拟人发言人参数
-let sdkTTSInfo = {
+export let sdkTTSInfo = {
   vcn: '',
 };
+
+export let vmsInteractionCmpRefDome = (null);
 const initInterruptChat: InterruptChatType = {
   eventId: '',
   interrupt: false,
@@ -62,6 +64,7 @@ const ChatFooter = ({
   startNodeParams,
   interruptChat,
   userInput,
+  vmsInteractionCmpRef
 }: {
   trialRun: boolean;
 }): React.ReactElement | null => {
@@ -136,7 +139,9 @@ const useChatDebuggerEffect = (
   open,
   startNode,
   setShowChatDebuggerPage,
-  setStartNodeParams
+  setStartNodeParams,
+  vmsInteractionCmpRef,
+  vmsInteractiveRefStatus
 ): void => {
   const isMounted = useRef<boolean>(false);
   const historyVersion = useFlowsManager(state => state.historyVersion);
@@ -287,6 +292,27 @@ const useChatDebuggerEffect = (
             }
             return [...chatList];
           });
+            if (chatAnswer && vmsInteractiveRefStatus === 'init') {
+            if (chatAnswer.length >= 2000) {
+              let str = chatAnswer.slice(0, 2000);
+              isPureText(str) &&
+                vmsInteractionCmpRef?.current?.instance?.writeText(str, {
+                  tts: sdkTTSInfo,
+                  avatar_dispatch: {
+                    interactive_mode: 0,
+                  },
+                });
+              chatAnswer = chatAnswer.slice(str.length, chatAnswer.length);
+            } else {
+              vmsInteractionCmpRef?.current?.instance?.writeText(chatAnswer, {
+                tts: sdkTTSInfo,
+                avatar_dispatch: {
+                  interactive_mode: 0,
+                },
+              });
+              chatAnswer = '';
+            }
+          }
         }
       }, 10);
     } else {
@@ -407,7 +433,7 @@ export function ChatDebuggerContent({
     //如果开启了虚拟人，可能是语音通话虚拟人，也可能是语音通话，但是都需要初始化虚拟人必要的参数
     if (talkAgentConfig?.sceneEnable === 1 && open) {
      
-setTimeout(()=>{
+    setTimeout(()=>{
         if (
         sdkAvatarInfo.avatar_id !== talkAgentConfig?.sceneId &&
         talkAgentConfig?.sceneId
@@ -468,7 +494,9 @@ setTimeout(()=>{
     open,
     startNode,
     setShowChatDebuggerPage,
-    setStartNodeParams
+    setStartNodeParams,
+    vmsInteractionCmpRef,
+    vmsInteractiveRefStatus
   );
 
   const closeFunction = () => {
@@ -479,6 +507,59 @@ setTimeout(()=>{
     setVmsInteractiveRefStatus('init');
     chatAnswer = '';
   }
+  useEffect(()=>{
+    if(!open) closeFunction()
+  },[open])
+
+  useEffect(()=>{
+    if(chatList.length>0 && chatList[chatList.length-1].type==='answer'){
+      let responseResult = chatList[chatList.length-1];
+      if(responseResult?.showResponse) return;
+        if (vmsInteractiveRefStatus === 'init') {
+          //送文本到虚拟人，不一定是纯文本
+          if (
+            responseResult?.content &&
+            typeof responseResult?.content === 'string'
+          ) {
+            chatAnswer += responseResult?.content;
+            let splitSentencesArr = splitSentencesBasic(chatAnswer);
+            //判断是否可以按照句子来分割
+            if (splitSentencesArr?.length) {
+              const str = getProcessedStr(splitSentencesArr);
+              
+              str &&
+                vmsInteractionCmpRef?.current?.instance
+                  ?.writeText(str, {
+                    tts: sdkTTSInfo,
+                    avatar_dispatch: {
+                      interactive_mode: 0,
+                    },
+                  })
+                  .then(() => {})
+                  .catch((err: any) => {
+                    console.error(err);
+                    message.error('发送失败，可以打开控制台查看信息');
+                  });
+              chatAnswer = chatAnswer.slice(str.length, chatAnswer.length);
+            } else {
+              if (chatAnswer.length >= 2000) {
+                let str = chatAnswer.slice(0, 2000);
+                isPureText(str) &&
+                  vmsInteractionCmpRef?.current?.instance?.writeText(str, {
+                    tts: sdkTTSInfo,
+                    avatar_dispatch: {
+                      interactive_mode: 0,
+                    },
+                  });
+                chatAnswer = chatAnswer.slice(str.length, chatAnswer.length);
+              }else {
+                vmsInteractionCmpRef?.current?.instance?.writeText(chatAnswer)
+              }
+            }
+        }
+      }
+  }
+  },[chatList])
   return (
     <div
       className="w-full h-full py-4 flex flex-col overflow-hidden"
@@ -650,6 +731,7 @@ setTimeout(()=>{
           startNodeParams={startNodeParams}
           interruptChat={interruptChat}
           userInput={userInput}
+          vmsInteractionCmpRef={vmsInteractionCmpRef}
         />
       </div>
     </div>

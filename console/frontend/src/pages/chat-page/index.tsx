@@ -81,9 +81,13 @@ const ChatPage = (): ReactElement => {
   const chatType = useChatStore(state => state.chatType); //  聊天类型
   const setChatType = useChatStore((state: any) => state.setChatType);
 
- const vmsInteractiveRefStatus = useChatStore(
+  const vmsInteractiveRefStatus = useChatStore(
       (state: any) => state.vmsInteractiveRefStatus
     );
+
+  const setVmsInteractiveRefStatus = useChatStore(
+    (state: any) => state.setVmsInteractiveRefStatus
+  );
   useEffect(() => {
     initializeChatPage();
     return () => {
@@ -94,19 +98,23 @@ const ChatPage = (): ReactElement => {
 
   const handleChatTypeChange = (type: string) => {
     setChatType(type);
-    if (type === 'vms') {
-      vmsInteractionCmpRef?.current?.initAvatar({
-        sdkAvatarInfo,
-        sdkTTSInfo,
-      });
+    setTimeout(()=>{
+      console.log(vmsInteractionCmpRef)
+      if (type === 'vms') {
+      // vmsInteractionCmpRef?.current?.initAvatar({
+      //   sdkAvatarInfo,
+      //   sdkTTSInfo,
+      // });
+      initializeChatPage()
     } else {
       vmsInteractionCmpRef?.current?.instance &&
-        vmsInteractionCmpRef?.current?.dispose();
+      vmsInteractionCmpRef?.current?.dispose();
       tempAnsBak = '';
       prevTempAns = '';
       vmsInter && clearInterval(vmsInter);
       vmsInter = null;
     }
+    })
   };
 
   // 初始化聊天页面
@@ -158,30 +166,27 @@ const ChatPage = (): ReactElement => {
         //如果是虚拟人播报或者语音通话虚拟人，初始化虚拟人sdk信息，并写入开场白
         if (talkAgentConfigRes?.sceneEnable === 1) {
           sdkAvatarInfo.avatar_id = talkAgentConfigRes?.sceneId;
-          //根据id获取vcn
-          const res = await getSceneList();
-          const list: SceneItem[] = Array.isArray(res)
-            ? (res as SceneItem[])
-            : [];
-          list.find(
-            (item: SceneItem) => item.sceneId === talkAgentConfigRes?.sceneId
-          )?.defaultVCN &&
-            (sdkTTSInfo.vcn =
-              list.find(
-                (item: SceneItem) =>
-                  item.sceneId === talkAgentConfigRes?.sceneId
-              )?.defaultVCN || '');
-
-          talkAgentConfigRes?.interactType === 2 &&
+          sdkTTSInfo.vcn = talkAgentConfigRes?.vcn;
+          if (talkAgentConfigRes?.interactType === 2) {
+          setTimeout(() => {
             vmsInteractionCmpRef?.current?.initAvatar({
               sdkAvatarInfo,
               sdkTTSInfo,
             });
+          }, 1000);
           botInfo?.prologue &&
             !showVmsPermissionTip &&
             vmsInteractionCmpRef?.current?.instance?.writeText(
-              botInfo?.prologue
+              botInfo?.prologue,
+              {
+                tts: sdkTTSInfo,
+                avatar_dispatch: {
+                  interactive_mode: 0,
+                },
+              }
             );
+
+          }
         }
       }
       const workflowBotInfo = await getWorkflowBotInfoApi(botId);
@@ -427,6 +432,7 @@ const ChatPage = (): ReactElement => {
             botNameColor={botNameColor}
             handleSendMessage={handleRecomendClick}
             chatType={chatType}
+            vmsInteractionCmpRef={vmsInteractionCmpRef}
           />
         </div>
       </div>
