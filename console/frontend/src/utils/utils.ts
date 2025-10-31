@@ -15,7 +15,8 @@ import {
   JsonArray,
 } from '@/types/resource';
 import axios from 'axios';
-
+import { useTranslation } from 'react-i18next';
+const { t } = useTranslation();
 export function downloadExcel(
   fileIds: (string | number)[],
   source: number,
@@ -489,4 +490,14 @@ export const maskMiddleText = (
   const stars = '*'.repeat(finalStarLen); // 生成对应长度的星号
 
   return `${prefix}${stars}${suffix}`;
+};
+
+// 翻译按钮文本（如果文本包含 '.' 且不是纯数字，则认为是 i18n key）
+export const getButtonText = (text: string) => {
+  if (!text) return '';
+  // 如果包含 '.' 且不是 IP 地址或数字，则认为是 i18n key
+  if (text.includes('.') && !/^\d+\.\d+/.test(text)) {
+    return t(text);
+  }
+  return text;
 };

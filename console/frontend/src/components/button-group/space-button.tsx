@@ -9,7 +9,7 @@ import type { ButtonConfig, UserRole } from './types';
 import { ModuleType, OperationType, PermissionFailureBehavior } from './types';
 import styles from './space-button.module.scss';
 import { useUserStoreHook } from '@/hooks/use-user-store';
-
+import { getButtonText } from '@/utils/utils';
 // SpaceButton 组件属性接口
 export interface SpaceButtonProps {
   // 按钮配置
@@ -189,7 +189,7 @@ const SpaceButton: React.FC<SpaceButtonProps> = ({
       className={buttonClassName}
       style={style}
     >
-      {text}
+      {getButtonText(text)}
     </Button>
   );
 
