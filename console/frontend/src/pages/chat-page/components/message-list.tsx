@@ -29,6 +29,7 @@ import FilePreview from './file-preview';
 import ResqBottomButtons from './resq-bottom-buttons';
 import { useTranslation } from 'react-i18next';
 import FileGridDisplay from './file-grid-display';
+import { TFunction } from 'i18next';
 
 const MessageList = (props: {
   messageList: MessageListType[];

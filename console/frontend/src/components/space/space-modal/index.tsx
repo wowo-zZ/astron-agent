@@ -229,7 +229,6 @@ const SpaceModal: React.FC<SpaceModalProps> = ({
         maskClosable={false}
         keyboard={false}
       >
-        {/* 信息横幅 */}
         <div
           className={styles.infoBanner}
           style={{ backgroundImage: `url(${createSpaceBg})` }}

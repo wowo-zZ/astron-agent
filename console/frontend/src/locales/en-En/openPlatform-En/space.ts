@@ -168,6 +168,27 @@ const translation = {
   delete: 'Delete',
   username: 'Username',
   role: 'Role',
+  createSpaceTip:
+    'Through creating spaces, you can collaborate and share projects, agents, plugins, workflows, and knowledge bases within the space',
+  spaceNameCannotExceed50Characters: 'Space name cannot exceed 50 characters',
+  pleaseEnterDescription: 'Please enter space description',
+  descriptionCannotExceed2000Characters:
+    'Description cannot exceed 2000 characters',
+  upgrade: 'Upgrade',
+  createTimesExceeded: 'Create times exceeded',
+  allSpace: 'All Space',
+  myCreatedSpace: 'My Created Space',
+  enterManagement: 'Enter Management',
+  enterSpace: 'Enter Space',
+  applySpace: 'Apply Space',
+  applying: 'Applying',
+  noPermission: 'No Permission',
+  editSpaceInfo: 'Edit Space Info',
+  share: 'Share',
+  uploading: 'Uploading',
+  imageProcessingNotCompleted: 'Image processing not completed, please wait...',
+  cannotGetImageFile: 'Cannot get image file',
+  uploadSuccess: 'Upload success',
 };
 
 export default translation;

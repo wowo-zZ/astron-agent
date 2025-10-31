@@ -19,7 +19,7 @@ import { placeholderText } from '@/components/bot-center/edit-bot/placeholder';
 import { localeConfig } from '@/locales/localeConfig';
 import { useSparkCommonStore } from '@/store/spark-store/spark-common';
 import { useLocaleStore } from '@/store/spark-store/locale-store';
-import SpeakerModal, { VcnItem } from '@/components/speaker-modal';
+import SpeakerModal, { MyVCNItem, VcnItem } from '@/components/speaker-modal';
 import UploadBackgroundModal from '@/components/upload-background';
 import Personality from './personality-component';
 import { RightOutlined, QuestionCircleOutlined } from '@ant-design/icons';
@@ -150,7 +150,7 @@ const CapabilityDevelopment: React.FC<CapabilityDevelopmentProps> = props => {
   );
   const botDesc = 'wode';
   const name = '123';
-
+  const [mySpeaker, setMySpeaker] = useState<MyVCNItem[]>([]);
   /**
    * 设置助手发音人
    */
@@ -169,7 +169,7 @@ const CapabilityDevelopment: React.FC<CapabilityDevelopmentProps> = props => {
   const renderBotVcn = () => {
     const vcnObj =
       vcnList.find((item: VcnItem) => item.voiceType === botCreateActiveV.cn) ||
-      vcnList[0];
+      mySpeaker.find((item: MyVCNItem) => item.assetId === botCreateActiveV.cn);
 
     return (
       <>
@@ -177,16 +177,13 @@ const CapabilityDevelopment: React.FC<CapabilityDevelopmentProps> = props => {
           <>
             <img
               className="w-7 h-7 mr-1 rounded-full"
-              src={vcnObj?.coverUrl}
+              src={
+                vcnObj?.coverUrl ||
+                'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16906018510400728%2F%E7%BC%96%E7%BB%84%204%402x.png'
+              }
               alt=""
             />
-            <span title={vcnObj?.name}>
-              {localeNow === 'en'
-                ? vcnObj?.modelManufacturer
-                  ? vcnObj?.modelManufacturer
-                  : vcnObj?.name
-                : vcnObj?.name}
-            </span>
+            <span title={vcnObj?.name}>{vcnObj?.name}</span>
             <div
               style={{ marginLeft: '3px' }}
               className={styles.right_outline_wrap}
@@ -1036,9 +1033,13 @@ const CapabilityDevelopment: React.FC<CapabilityDevelopmentProps> = props => {
                 }}
               >
                 <div className="flex">
-                  <span className="text-sm font-medium">背景图</span>
+                  <span className="text-sm font-medium">
+                    {t('configBase.CapabilityDevelopment.backgroundImage')}
+                  </span>
                   <Tooltip
-                    title="可以在对话后前往app查看实际竖屏效果"
+                    title={t(
+                      'configBase.CapabilityDevelopment.viewActualVerticalScreenEffect'
+                    )}
                     overlayClassName="black-tooltip config-secret"
                   >
                     <QuestionCircleOutlined
@@ -1051,7 +1052,9 @@ const CapabilityDevelopment: React.FC<CapabilityDevelopmentProps> = props => {
                   type="primary"
                   onClick={() => setUploadBackgroundModalVisible(true)}
                 >
-                  {backgroundImg ? '修改' : '上传'}
+                  {backgroundImg
+                    ? t('configBase.CapabilityDevelopment.modify')
+                    : t('configBase.CapabilityDevelopment.upload')}
                 </Button>
               </div>
               {backgroundImg && (
@@ -1063,7 +1066,11 @@ const CapabilityDevelopment: React.FC<CapabilityDevelopmentProps> = props => {
                       alt=""
                     />
                     <div className={styles.hengping}>
-                      <div className={styles.hengpingText}>横屏展示</div>
+                      <div className={styles.hengpingText}>
+                        {t(
+                          'configBase.CapabilityDevelopment.horizontalScreenDisplay'
+                        )}
+                      </div>
                       <div className={styles.shang}>
                         <div className={styles.left} />
                         <div className={styles.right} />
@@ -1085,7 +1092,11 @@ const CapabilityDevelopment: React.FC<CapabilityDevelopmentProps> = props => {
                       alt=""
                     />
                     <div className={styles.shuping}>
-                      <div className={styles.shupingText}>竖屏展示</div>
+                      <div className={styles.shupingText}>
+                        {t(
+                          'configBase.CapabilityDevelopment.verticalScreenDisplay'
+                        )}
+                      </div>
                       <div className={styles.shang}>
                         <div className={styles.left} />
                       </div>
@@ -1141,6 +1152,7 @@ const CapabilityDevelopment: React.FC<CapabilityDevelopmentProps> = props => {
         setBotCreateActiveV={setBotCreateActiveV}
         botCreateActiveV={botCreateActiveV}
         showSpeakerModal={showSpeakerModal}
+        onMySpeakerChange={setMySpeaker}
       />
     </div>
   );

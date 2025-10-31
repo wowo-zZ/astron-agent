@@ -161,6 +161,26 @@ const translation = {
   delete: '删除',
   username: '用户名',
   role: '角色',
+  createSpaceTip:
+    '通过创建空间,将支持项目、智能体、插件、工作流和知识库在空间内进行协作和共享',
+  spaceNameCannotExceed50Characters: '空间名称不能超过50个字符',
+  pleaseEnterDescription: '请输入空间描述',
+  descriptionCannotExceed2000Characters: '描述不能超过2000个字符',
+  upgrade: '去升级',
+  createTimesExceeded: '创建次数已达上限',
+  allSpace: '全部空间',
+  myCreatedSpace: '我创建的空间',
+  enterManagement: '进入管理',
+  enterSpace: '进入空间',
+  applySpace: '申请空间',
+  applying: '申请中',
+  noPermission: '暂无权限',
+  editSpaceInfo: '编辑空间信息',
+  share: '分享',
+  uploading: '上传中',
+  imageProcessingNotCompleted: '图片处理未完成，请稍候...',
+  cannotGetImageFile: '无法获取图片文件',
+  uploadSuccess: '上传成功',
 };
 
 export default translation;

@@ -23,6 +23,7 @@ import creatorImg from '@/assets/imgs/space/person-space-icon.svg';
 
 import { searchInviteUsers, getUserLimit } from './config';
 import { MEMBER_ROLE } from '@/pages/space/config';
+import { useTranslation } from 'react-i18next';
 
 interface User {
   uid: string;
@@ -56,7 +57,6 @@ interface AddMemberModalProps {
 
 const AddMemberModal: React.FC<AddMemberModalProps> = React.memo(
   ({
-    title = '添加新成员',
     inviteType = 'enterprise',
     open,
     onClose,
@@ -71,7 +71,7 @@ const AddMemberModal: React.FC<AddMemberModalProps> = React.memo(
     const [userList, setUserList] = useState<User[]>(initialUsers);
     const [loading, setLoading] = useState<boolean>(false);
     const [maxMembers, setMaxMembers] = useState<number>(48);
-
+    const { t } = useTranslation();
     useEffect(() => {
       if (open) {
         updateMaxMembers();
@@ -328,7 +328,7 @@ const AddMemberModal: React.FC<AddMemberModalProps> = React.memo(
 
     return (
       <Modal
-        title={title}
+        title={t('space.addMember')}
         open={open}
         onCancel={onClose}
         footer={null}

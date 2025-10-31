@@ -165,7 +165,6 @@ const SpaceTable = forwardRef(function SpaceTable<
         };
 
         const result = await queryData(params);
-        console.log(result, '============= space => loadData ===========');
         if (result.success !== false) {
           setData(result.data);
           setPagination(prev => ({

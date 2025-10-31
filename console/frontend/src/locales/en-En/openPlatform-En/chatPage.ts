@@ -42,6 +42,7 @@ const transition = {
     read: 'Read',
     copy: 'Copy',
     reAnswer: 'Re-answer',
+    textTooLong: 'Text too long, maximum limit 8000 characters',
   },
   chatWindow: {
     clearChatHistoryFailed: 'Failed to clear chat history',
@@ -57,6 +58,7 @@ const transition = {
     uploading: 'Uploading...',
     processing: 'Processing...',
     newChat: 'New Chat',
+    newChatSimple: 'New Conversation',
     clearChatHistory: 'Clear Chat History',
     confirmDeleteChat: 'Confirm delete chat history?',
     stopOutput: 'Stop',

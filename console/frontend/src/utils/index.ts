@@ -547,7 +547,7 @@ const formatHistoryToMessages = (chatHistoryList: ChatHistoryResponse[]) => {
         formattedMessages.push({
           id: new Date().getTime(),
           reqType: 'START',
-          message: '全新的开始',
+          message: t('chatPage.chatWindow.newChatSimple'),
         });
       }
     }

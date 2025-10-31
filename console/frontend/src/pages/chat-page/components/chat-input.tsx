@@ -105,7 +105,7 @@ const ChatInput = (props: {
       };
       addMessage(startMessage);
     } catch (error) {
-      console.error('创建新对话失败:', error);
+      console.error(error);
     }
   };
 

@@ -21,8 +21,9 @@
       justify-content: space-between;
       .aiBottom {
         display: flex;
-        width: 85px;
+        width: auto;
         height: 28px;
+        padding: 0 10px;
         text-align: center;
         line-height: 28px;
         cursor: pointer;

@@ -42,6 +42,7 @@ const transition = {
     read: '朗读',
     copy: '复制',
     reAnswer: '重新回答',
+    textTooLong: '文本过长，最大限制8000字符',
   },
   chatWindow: {
     clearChatHistoryFailed: '清空聊天记录失败',
@@ -57,6 +58,7 @@ const transition = {
     uploading: '上传中...',
     processing: '解析中...',
     newChat: '全新对话',
+    newChatSimple: '全新的开始',
     clearChatHistory: '清空聊天记录',
     confirmDeleteChat: '确认删除聊天记录？',
     stopOutput: '停止输出',

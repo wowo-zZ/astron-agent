@@ -19,6 +19,7 @@ import { useNavigate } from 'react-router-dom';
 import { cancelFavorite } from '@/services/agent-square';
 import { deleteChatList } from '@/services/chat';
 import { useTranslation } from 'react-i18next';
+import eventBus from '@/utils/event-bus';
 
 interface PersonalCenterProps {
   open: boolean;
@@ -341,6 +342,7 @@ const PersonalCenter: FC<PersonalCenterProps> = ({
       botId,
     }).then(res => {
       message.success(t('commonModal.agentDelete.success'));
+      eventBus.emit('favoriteChange', botId);
       onRefreshFavoriteData?.();
     });
   }, []);
