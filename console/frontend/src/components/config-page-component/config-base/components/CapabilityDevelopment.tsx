@@ -169,10 +169,7 @@ const CapabilityDevelopment: React.FC<CapabilityDevelopmentProps> = props => {
   const renderBotVcn = () => {
     const vcnObj =
       vcnList.find((item: VcnItem) => item.voiceType === botCreateActiveV.cn) ||
-      mySpeaker.find(
-        (item: MyVCNItem) => item.assetId === botCreateActiveV.cn
-      ) ||
-      vcnList[0];
+      mySpeaker.find((item: MyVCNItem) => item.assetId === botCreateActiveV.cn);
 
     return (
       <>

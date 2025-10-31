@@ -10,7 +10,7 @@ import TtsModule from '@/components/tts-module';
 import useChat from '@/hooks/use-chat';
 import useVoicePlayStore from '@/store/voice-play-store';
 import useBotInfoStore from '@/store/bot-info-store';
-
+import { message as AntdMessage } from 'antd';
 /**
  * 每个回复内容下面的按钮
  */
@@ -47,6 +47,10 @@ const ResqBottomButtons = ({
   };
   // 播放按钮点击
   const handlePlayAudio = () => {
+    if (message?.message?.length > 8000) {
+      AntdMessage.error(t('chatPage.chatBottom.textTooLong'));
+      return;
+    }
     if (isPlaying) {
       setIsPlaying(false);
       setCurrentPlayingId(null);
@@ -60,8 +64,10 @@ const ResqBottomButtons = ({
   useEffect(() => {
     setIsPlaying(currentPlayingId === message?.id);
   }, [currentPlayingId, message?.id]);
-  
-  const playText = message?.reasoning ? message?.reasoning + message?.message : message?.message;
+
+  const playText = message?.reasoning
+    ? message?.reasoning + message?.message
+    : message?.message;
 
   return (
     <div className="flex items-center ml-14 w-fit px-2 py-1 h-7">

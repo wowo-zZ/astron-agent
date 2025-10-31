@@ -17,6 +17,7 @@ import createAgent1 from './openPlatform-ZH/createAgent';
 import configBase from './openPlatform-ZH/configBase';
 import loginModal from './openPlatform-ZH/loginModal';
 import space from './openPlatform-ZH/space';
+import appManage from './openPlatform-ZH/appManage';
 
 /** ## 开放平台的翻译配置 -- zh
  * @description 注意模块名称不要跟星辰的重复
@@ -41,4 +42,5 @@ export default {
   commonModal,
   loginModal,
   space,
+  appManage,
 };

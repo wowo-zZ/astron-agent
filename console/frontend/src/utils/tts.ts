@@ -237,7 +237,7 @@ class Experience {
         this.connectWebsocket(url, appId, type);
       })
       .catch(err => {
-        message.info(err?.msg || '合成体验签名获取失败');
+        console.log(err);
         this.resetAudio();
         this.close?.();
       });
