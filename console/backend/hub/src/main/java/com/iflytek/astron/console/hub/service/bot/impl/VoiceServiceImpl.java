@@ -1,6 +1,7 @@
 package com.iflytek.astron.console.hub.service.bot.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.iflytek.astron.console.commons.util.I18nUtil;
 import com.iflytek.astron.console.hub.entity.PronunciationPersonConfig;
 import com.iflytek.astron.console.hub.enums.TtsTypeEnum;
 import com.iflytek.astron.console.hub.mapper.PronunciationPersonConfigMapper;
@@ -54,6 +55,13 @@ public class VoiceServiceImpl implements VoiceService {
         queryWrapper.eq(PronunciationPersonConfig::getSpeakerType, PronunciationPersonConfig.SpeakerTypeEnum.NORMAL);
         queryWrapper.eq(PronunciationPersonConfig::getDeleted, 0);
         queryWrapper.orderByAsc(PronunciationPersonConfig::getSort);
-        return pronunciationPersonConfigMapper.selectList(queryWrapper);
+        List<PronunciationPersonConfig> configList = pronunciationPersonConfigMapper.selectList(queryWrapper);
+        // Convert name field from key to internationalized value
+        for (PronunciationPersonConfig config : configList) {
+            if (config.getName() != null) {
+                config.setName(I18nUtil.getMessage(config.getName()));
+            }
+        }
+        return configList;
     }
 }

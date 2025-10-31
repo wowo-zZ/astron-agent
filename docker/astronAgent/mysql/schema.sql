@@ -16513,10 +16513,11 @@ create table pronunciation_person_config
 )
     comment 'Pronunciation person configuration' charset = utf8mb4;
 
-INSERT INTO astron_console.pronunciation_person_config (name, cover_url, voice_type, sort, speaker_type, exquisite, deleted, create_time, update_time) VALUES ('聆飞哲', 'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16824985943686779%2Flfc.png', 'x4_lingfeizhe_oral', 0, 'NORMAL', 0, 0, NOW(), NOW());
-INSERT INTO astron_console.pronunciation_person_config (name, cover_url, voice_type, sort, speaker_type, exquisite, deleted, create_time, update_time) VALUES ('聆小琪', 'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16824985943709826%2Flxq.png', 'x4_lingxiaoqi_oral', 0, 'NORMAL', 0, 0, NOW(), NOW());
-INSERT INTO astron_console.pronunciation_person_config (name, cover_url, voice_type, sort, speaker_type, exquisite, deleted, create_time, update_time) VALUES ('聆小糖', 'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16824985943709826%2Flxq.png', 'x5_lingxiaotang_flow', 0, 'NORMAL', 1, 0, NOW(), NOW());
-INSERT INTO astron_console.pronunciation_person_config (name, cover_url, voice_type, sort, speaker_type, exquisite, deleted, create_time, update_time) VALUES ('聆小玥', 'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16824985943709826%2Flxq.png', 'x5_lingxiaoyue_flow', 0, 'NORMAL', 1, 0, NOW(), NOW());
+INSERT INTO astron_console.pronunciation_person_config (name, cover_url, voice_type, sort, speaker_type, exquisite, deleted, create_time, update_time) VALUES ('speaker.lingFeiZhe', 'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16824985943686779%2Flfc.png', 'x4_lingfeizhe_oral', 0, 'NORMAL', 0, 0, NOW(), NOW());
+INSERT INTO astron_console.pronunciation_person_config (name, cover_url, voice_type, sort, speaker_type, exquisite, deleted, create_time, update_time) VALUES ('speaker.lingXiaoQi', 'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16824985943709826%2Flxq.png', 'x4_lingxiaoqi_oral', 0, 'NORMAL', 0, 0, NOW(), NOW());
+INSERT INTO astron_console.pronunciation_person_config (name, cover_url, voice_type, sort, speaker_type, exquisite, deleted, create_time, update_time) VALUES ('speaker.lingXiaoTang', 'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16824985943709826%2Flxq.png', 'x5_lingxiaotang_flow', 0, 'NORMAL', 1, 0, NOW(), NOW());
+INSERT INTO astron_console.pronunciation_person_config (name, cover_url, voice_type, sort, speaker_type, exquisite, deleted, create_time, update_time) VALUES ('speaker.lingXiaoYue', 'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16824985943709826%2Flxq.png', 'x5_lingxiaoyue_flow', 0, 'NORMAL', 1, 0, NOW(), NOW());
+
 
 ALTER TABLE astron_console.workflow ADD `type` INT NULL COMMENT '工作流类型';
 
