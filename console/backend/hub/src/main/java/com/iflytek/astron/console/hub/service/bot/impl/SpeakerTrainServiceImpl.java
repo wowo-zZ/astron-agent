@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.Set;
 import java.util.UUID;
 
@@ -78,7 +79,8 @@ public class SpeakerTrainServiceImpl implements SpeakerTrainService {
         // validate audio file
         AudioValidator.validateAudioFile(file);
 
-        File tempFile = File.createTempFile(UUID.randomUUID().toString(), "_" + file.getOriginalFilename());
+        String sanitizedFilename = sanitizeFilename(file.getOriginalFilename());
+        File tempFile = File.createTempFile(UUID.randomUUID().toString(), "_" + sanitizedFilename);
         try {
             file.transferTo(tempFile);
             // Create task
@@ -145,6 +147,30 @@ public class SpeakerTrainServiceImpl implements SpeakerTrainService {
             log.error("train status failed, taskId: {}", taskId, e);
         }
         return null;
+    }
+
+    /**
+     * Sanitize filename to prevent path traversal attacks.
+     * Extracts only the filename part (not path) and removes dangerous characters.
+     *
+     * @param originalFilename original filename from user input
+     * @return sanitized filename safe for use in file operations
+     */
+    private String sanitizeFilename(String originalFilename) {
+        if (StringUtils.isBlank(originalFilename)) {
+            return "audio";
+        }
+        // Extract just the filename part (not the path) to prevent path traversal
+        String filename = Paths.get(originalFilename).getFileName().toString();
+        // Remove dangerous characters: path separators, wildcards, and other special chars
+        // Keep only alphanumeric, dots, dashes, and underscores
+        String sanitized = filename.replaceAll("[^a-zA-Z0-9._-]", "_");
+        // Prevent empty result or just dots
+        if (sanitized.isEmpty() || sanitized.matches("^\\.+$")) {
+            return "audio";
+        }
+        // Limit length to prevent excessively long filenames
+        return sanitized.length() > 255 ? sanitized.substring(0, 255) : sanitized;
     }
 
     /**
