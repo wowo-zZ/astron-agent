@@ -20,6 +20,8 @@ import java.util.Map;
 @Service
 public class CustomSpeakerServiceImpl extends ServiceImpl<CustomSpeakerMapper, CustomSpeaker> implements CustomSpeakerService {
 
+    private static final String CLONE_API_URL = "wss://cn-huabei-1.xf-yun.com/v1/private/voice_clone";
+
     @Value("${spark.app-id}")
     private String appId;
 
@@ -28,9 +30,6 @@ public class CustomSpeakerServiceImpl extends ServiceImpl<CustomSpeakerMapper, C
 
     @Value("${spark.api-secret}")
     private String apiSecret;
-
-    @Value("${spark.clone-api-url}")
-    private String cloneApiUrl;
 
     @Override
     public List<CustomSpeaker> getTrainSpeaker(Long spaceId, String uid) {
@@ -89,7 +88,7 @@ public class CustomSpeakerServiceImpl extends ServiceImpl<CustomSpeakerMapper, C
     @Override
     public Map<String, String> getCloneSign() {
         Map<String, String> resultMap = new HashMap<>();
-        String url = HttpAuthTool.assembleRequestUrl(cloneApiUrl, apiKey, apiSecret);
+        String url = HttpAuthTool.assembleRequestUrl(CLONE_API_URL, apiKey, apiSecret);
         resultMap.put("appId", appId);
         resultMap.put("url", url);
         resultMap.put("type", TtsTypeEnum.CLONE.name());

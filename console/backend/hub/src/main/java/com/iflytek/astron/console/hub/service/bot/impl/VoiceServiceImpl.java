@@ -24,6 +24,8 @@ import java.util.Map;
 @Slf4j
 public class VoiceServiceImpl implements VoiceService {
 
+    private static final String TTS_API_URL = "wss://cbm01.cn-huabei-1.xf-yun.com/v1/private/mcd9m97e6";
+
     @Value("${spark.app-id}")
     private String appId;
 
@@ -33,15 +35,12 @@ public class VoiceServiceImpl implements VoiceService {
     @Value("${spark.api-secret}")
     private String apiSecret;
 
-    @Value("${spark.tts-api-url}")
-    private String ttsApiUrl;
-
     private final PronunciationPersonConfigMapper pronunciationPersonConfigMapper;
 
     @Override
     public Map<String, String> getTtsSign() {
         Map<String, String> resultMap = new HashMap<>();
-        String url = HttpAuthTool.assembleRequestUrl(ttsApiUrl, apiKey, apiSecret);
+        String url = HttpAuthTool.assembleRequestUrl(TTS_API_URL, apiKey, apiSecret);
         resultMap.put("appId", appId);
         resultMap.put("url", url);
         resultMap.put("type", TtsTypeEnum.ORIGINAL.name());
