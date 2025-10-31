@@ -58,6 +58,7 @@ const MessageList = (props: {
     botNameColor,
     handleSendMessage,
     chatType,
+    vmsInteractionCmpRef
   } = props;
   const { t } = useTranslation();
   const scrollAnchorRef = useRef<HTMLDivElement>(null);
@@ -128,7 +129,7 @@ const MessageList = (props: {
         </div>
       )}
 
-{chatType === 'text' &&
+       {chatType === 'text' &&
         <div className="flex flex-col items-center justify-center mt-10 min-h-[116px]">
         {isDataLoading ? (
           <>
@@ -247,7 +248,9 @@ const MessageList = (props: {
         </div>
         {item?.sid && <SourceInfoBox traceSource={item?.traceSource} />}
         {item?.sid && (
-          <ResqBottomButtons message={item} isLastMessage={isLastMessage} />
+          <ResqBottomButtons message={item} isLastMessage={isLastMessage} 
+          chatType={chatType}  vmsInteractiveRef={vmsInteractionCmpRef}
+          />
         )}
       </div>
     );
