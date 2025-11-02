@@ -8,6 +8,9 @@ const translation = {
   advanced: 'Advanced',
   workflowCreation: 'Creation Workflow',
   workflowDesign: 'Design workflows to create agents with complex task logic',
+  virtualCreation: 'Voice/Virtual Creation',
+  virtualCreationDesc:
+    'For real-time voice interaction & virtual human-driven multimodal scenarios',
 
   generating: 'Generating...',
   oneSentenceCreateAgent: 'Create an agent in one sentence',

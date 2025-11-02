@@ -4,8 +4,9 @@ from typing import Any, Dict
 
 import aiohttp
 from aiohttp import ClientTimeout
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, PrivateAttr
 
+from workflow.engine.entities.private_config import PrivateConfig
 from workflow.engine.entities.variable_pool import VariablePool
 from workflow.engine.nodes.base_node import BaseNode
 from workflow.engine.nodes.entities.node_run_result import (
@@ -28,6 +29,9 @@ class _StreamResponse(BaseModel):
 
 
 class RPANode(BaseNode):
+    _private_config: PrivateConfig = PrivateAttr(
+        default_factory=lambda: PrivateConfig(timeout=24 * 60 * 60)
+    )
     projectId: str
     header: Dict[str, Any]
     source: str = ""

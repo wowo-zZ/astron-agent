@@ -1,4 +1,3 @@
-/* eslint-disable no-debugger */
 import React, { useState, useEffect } from 'react';
 import {
   getAllMessage,
@@ -15,6 +14,7 @@ import { useSparkCommonStore } from '@/store/spark-store/spark-common';
 import BotCard from './bot-card';
 import { useTranslation } from 'react-i18next';
 import messageSpace from '@/assets/imgs/share-page/message_space.svg';
+import { getTextContent, createSafeHTML } from '@/utils/sanitizer';
 interface NoticeModalProps {
   open: boolean;
   onClose: () => void;
@@ -70,7 +70,7 @@ const renderNotificationItem = (
         <h3 className={styles.ni_title}>{item.title}</h3>
         <span>{item.createdAt.split('T')[0]}</span>
       </div>
-      <p>{item.body.replace(/<[^>]*>/g, '')}</p>
+      <p>{getTextContent(item.body)}</p>
     </div>
     <span
       className={styles.del}
@@ -300,7 +300,7 @@ const NoticeModal: React.FC<NoticeModalProps> = ({
               className={`${styles.notice_detail} ${
                 !messageDetail || messageDetail === '' ? styles.nd_empty : ''
               }`}
-              dangerouslySetInnerHTML={{ __html: messageDetail }}
+              dangerouslySetInnerHTML={createSafeHTML(messageDetail)}
             />
             {renderSpecialMsg(selectMessageObj)}
           </div>

@@ -4,6 +4,7 @@ import { Modal, Button } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
 import { getFileIcon } from '@/utils';
 import closeIcon from '@/assets/imgs/chat/plugin/delete-file.png';
+import { useTranslation } from 'react-i18next';
 
 const FilePreview = ({
   file,
@@ -12,12 +13,11 @@ const FilePreview = ({
   file: UploadFileInfo;
   onClose: () => void;
 }): ReactElement => {
+  const { t } = useTranslation();
   // 根据文件类型渲染预览内容
   const renderFilePreview = () => {
-    const fileType = file.type?.split('/')[0] || '';
     const extension = file.fileName?.split('.').pop()?.toLowerCase();
-
-    switch (fileType || extension) {
+    switch (extension) {
       case 'jpg':
       case 'jpeg':
       case 'png':
@@ -84,7 +84,7 @@ const FilePreview = ({
           icon={<DownloadOutlined />}
           onClick={() => window.open(file.fileUrl, '_blank')}
         >
-          Download
+          {t('chatPage.chatWindow.download')}
         </Button>
       }
       width="50%"

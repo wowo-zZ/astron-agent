@@ -8,9 +8,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.iflytek.astron.console.commons.constant.ResponseEnum;
-import com.iflytek.astron.console.commons.dto.bot.AdvancedConfig;
-import com.iflytek.astron.console.commons.dto.bot.BotCreateForm;
-import com.iflytek.astron.console.commons.dto.bot.BotTag;
+import com.iflytek.astron.console.commons.dto.bot.*;
 import com.iflytek.astron.console.commons.dto.workflow.MaasApi;
 import com.iflytek.astron.console.commons.entity.bot.ChatBotBase;
 import com.iflytek.astron.console.commons.entity.bot.ChatBotTag;
@@ -21,6 +19,7 @@ import com.iflytek.astron.console.commons.mapper.bot.ChatBotBaseMapper;
 import com.iflytek.astron.console.commons.service.bot.ChatBotTagService;
 import com.iflytek.astron.console.commons.service.data.UserLangChainDataService;
 import com.iflytek.astron.console.commons.service.workflow.impl.WorkflowBotParamServiceImpl;
+import com.iflytek.astron.console.commons.util.space.SpaceInfoUtil;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -168,8 +167,8 @@ public class MaasUtil {
     }
 
     public JSONObject synchronizeWorkFlow(UserLangChainInfo userLangChainInfo, BotCreateForm botCreateForm,
-            HttpServletRequest request, Long spaceId) {
-        AdvancedConfig advancedConfig = new AdvancedConfig(botCreateForm.getPrologue(), botCreateForm.getInputExample(), botCreateForm.getAppBackground());
+            HttpServletRequest request, Long spaceId, Integer version, TalkAgentConfigDto talkAgentConfig) {
+        AdvancedConfig advancedConfig = new AdvancedConfig(botCreateForm.getPrologue(), botCreateForm.getInputExample(), botCreateForm.getAppBackground(), new AdvancedConfig.TextToSpeech(true, "aisjiuxu", ""));
         JSONObject param = new JSONObject();
         param.put("avatarIcon", botCreateForm.getAvatar());
         param.put("avatarColor", "");
@@ -182,6 +181,15 @@ public class MaasUtil {
         JSONObject ext = new JSONObject();
         ext.put("botId", botCreateForm.getBotId());
         param.put("ext", ext);
+        param.put("flowType", version);
+        if (Objects.nonNull(talkAgentConfig)) {
+            param.put("flowConfig", talkAgentConfig);
+        }
+        if (botCreateForm.getBotType() != 0) {
+            param.put("category", botCreateForm.getBotType());
+        }
+
+
         String authHeader = getAuthorizationHeader(request);
 
         // Not empty, use PUT request for update
@@ -462,24 +470,29 @@ public class MaasUtil {
     }
 
 
-    public JSONObject copyWorkFlow(Long maasId, HttpServletRequest request) {
+    public JSONObject copyWorkFlow(Long maasId, HttpServletRequest request, Integer version, Long targetId, TalkAgentConfigDto talkAgentConfig) {
         log.info("----- Copying maas workflow id: {}", maasId);
         HttpUrl baseUrl = HttpUrl.parse(cloneWorkFlowUrl);
         if (baseUrl == null) {
             log.error("Failed to parse clone workflow URL: {}", cloneWorkFlowUrl);
             throw new BusinessException(ResponseEnum.CLONE_BOT_FAILED);
         }
-        HttpUrl httpUrl = baseUrl.newBuilder()
-                .addQueryParameter("id", String.valueOf(maasId))
-                .addQueryParameter("password", "xfyun")
-                .build();
+        BotCloneWorkflowDto cloneWorkflowDto = new BotCloneWorkflowDto();
+        cloneWorkflowDto.setMaasId(maasId);
+        cloneWorkflowDto.setFlowType(version);
+        cloneWorkflowDto.setBotId(Math.toIntExact(targetId));
+        cloneWorkflowDto.setPassword("xfyun");
+        cloneWorkflowDto.setFlowConfig(talkAgentConfig);
+        RequestBody requestBody = RequestBody.create(JSONObject.toJSONString(cloneWorkflowDto), MediaType.parse("application/json; charset=utf-8"));
+
         Request httpRequest = new Request.Builder()
-                .url(httpUrl)
+                .url(baseUrl)
                 .addHeader("X-Consumer-Username", consumerId)
                 .addHeader("Lang-Code", I18nUtil.getLanguage())
+                .addHeader("space-id", String.valueOf(SpaceInfoUtil.getSpaceId()))
                 .addHeader(AUTHORIZATION_HEADER, MaasUtil.getAuthorizationHeader(request))
                 .addHeader(X_AUTH_SOURCE_HEADER, X_AUTH_SOURCE_VALUE)
-                .get()
+                .post(requestBody)
                 .build();
         String responseBody;
         try (Response response = client.newCall(httpRequest).execute()) {

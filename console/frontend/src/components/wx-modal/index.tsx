@@ -22,7 +22,7 @@ import { useBotStateStore } from '@/store/spark-store/bot-state';
 // import wxImg from '@/assets/imgs/workflow/wechat-icon.png';
 // import mcpImg from '@/assets/imgs/workflow/mcp-icon.png';
 import apiImg from '@/assets/imgs/workflow/iflytekCloud-icon.png';
-import xinghuoImg from '@/assets/imgs/workflow/iflytek-icon.png';
+import agentHubIcon from '@/assets/imgs/workflow/agent-hub-icon.svg';
 
 import styles from './index.module.scss';
 import cls from 'classnames';
@@ -45,6 +45,7 @@ interface MultiModeCpnProps {
   moreParams?: any;
   workflowId?: number;
   agentMaasId?: string | null;
+  isVirtual?: boolean;
 }
 
 const WxModal: React.FC<MultiModeCpnProps> = ({
@@ -65,6 +66,7 @@ const WxModal: React.FC<MultiModeCpnProps> = ({
   moreParams,
   workflowId,
   agentMaasId,
+  isVirtual,
 }) => {
   // const i = 0;
   // const flag = false;
@@ -386,7 +388,7 @@ const WxModal: React.FC<MultiModeCpnProps> = ({
                   <div className={styles.text_title}>
                     <img
                       className={styles.xinghuoImg}
-                      src={xinghuoImg}
+                      src={agentHubIcon}
                       alt=""
                     />
                     <div>
@@ -395,10 +397,10 @@ const WxModal: React.FC<MultiModeCpnProps> = ({
                           [styles.text_sparktopactive as string]: fabuActive,
                         })}
                       >
-                        {t('releaseModal.sparkAgent')}
+                        {t('releaseModal.agentHub')}
                       </div>
                       <div className={styles.text_sparkbottom}>
-                        {t('releaseModal.sparkAgentTip')}
+                        {t('releaseModal.agentHubTip')}
                       </div>
                     </div>
                   </div>

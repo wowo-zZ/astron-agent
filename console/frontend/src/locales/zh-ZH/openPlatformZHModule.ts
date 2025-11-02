@@ -5,6 +5,7 @@ import promption from './openPlatform-ZH/promption';
 import shareModal from './openPlatform-ZH/shareModal';
 import chatPage from './openPlatform-ZH/chatPage';
 import commonModal from './openPlatform-ZH/commonModal';
+import space from './openPlatform-ZH/space';
 // 导入其他模块
 import releaseManagement from './openPlatform-ZH/releaseManagement';
 import global from './openPlatform-ZH/global';
@@ -16,6 +17,7 @@ import systemMessage from './openPlatform-ZH/systemMessage';
 import createAgent1 from './openPlatform-ZH/createAgent';
 import configBase from './openPlatform-ZH/configBase';
 import loginModal from './openPlatform-ZH/loginModal';
+import appManage from './openPlatform-ZH/appManage';
 
 /** ## 开放平台的翻译配置 -- zh
  * @description 注意模块名称不要跟星辰的重复
@@ -39,4 +41,6 @@ export default {
   chatPage,
   commonModal,
   loginModal,
+  space,
+  appManage,
 };

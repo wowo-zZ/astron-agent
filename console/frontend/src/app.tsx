@@ -5,6 +5,7 @@ import router from '@/router';
 import useUserStore, { UserState } from '@/store/user-store';
 import { useEnterprise } from './hooks/use-enterprise';
 import { useSpaceType } from './hooks/use-space-type';
+import i18n from './i18n';
 
 export default function App(): ReactElement {
   const getUserInfo = useUserStore((state: UserState) => state.getUserInfo);
@@ -30,6 +31,18 @@ export default function App(): ReactElement {
       setInitDone(true);
     }
   }, [getLastVisitSpace, isTeamSpace, switchToPersonal]);
+
+  useEffect(() => {
+    const language = i18n.language || 'zh';
+    // 设置根元素类名及lang
+    document.documentElement.lang = language;
+    document.documentElement.classList.forEach(className => {
+      if (className.startsWith('')) {
+        document.documentElement.classList.remove(className);
+      }
+    });
+    document.documentElement.classList.add(`lang-${language}`);
+  }, [i18n.language]);
 
   useEffect(() => {
     const pathname = window.location.pathname.replace(/\/+$/, '');

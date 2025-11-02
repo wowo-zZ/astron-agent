@@ -267,8 +267,8 @@ class RepoControllerTest {
         }
 
         /**
-         * Tests repository creation with an empty VO object.
-         * Verifies that the controller can handle minimal input.
+         * Tests repository creation with an empty VO object. Verifies that the controller can handle
+         * minimal input.
          */
         @Test
         @DisplayName("Create repository - with empty VO")
@@ -309,8 +309,8 @@ class RepoControllerTest {
         }
 
         /**
-         * Tests repository creation with all optional fields populated.
-         * Verifies that all optional parameters are correctly processed.
+         * Tests repository creation with all optional fields populated. Verifies that all optional
+         * parameters are correctly processed.
          */
         @Test
         @DisplayName("Create repository - with all optional fields")
@@ -341,8 +341,8 @@ class RepoControllerTest {
     class UpdateRepoTests {
 
         /**
-         * Tests successful repository update with valid data.
-         * Verifies that changes are properly applied and reflected in the response.
+         * Tests successful repository update with valid data. Verifies that changes are properly applied
+         * and reflected in the response.
          */
         @Test
         @DisplayName("Update repository - successful flow")
@@ -363,8 +363,8 @@ class RepoControllerTest {
         }
 
         /**
-         * Tests partial update of repository fields.
-         * Verifies that only specified fields are updated while others remain unchanged.
+         * Tests partial update of repository fields. Verifies that only specified fields are updated while
+         * others remain unchanged.
          */
         @Test
         @DisplayName("Update repository - partial update")
@@ -385,8 +385,8 @@ class RepoControllerTest {
         }
 
         /**
-         * Tests update attempt with a non-existent repository ID.
-         * Verifies that appropriate exception is thrown for invalid IDs.
+         * Tests update attempt with a non-existent repository ID. Verifies that appropriate exception is
+         * thrown for invalid IDs.
          */
         @Test
         @DisplayName("Update repository - non-existent ID")
@@ -465,8 +465,8 @@ class RepoControllerTest {
         }
 
         /**
-         * Tests repository status update with different status values.
-         * Verifies that all valid status values are properly handled.
+         * Tests repository status update with different status values. Verifies that all valid status
+         * values are properly handled.
          *
          * @param status the status value to test
          */
@@ -560,8 +560,8 @@ class RepoControllerTest {
         }
 
         /**
-         * Tests listing repositories with various pagination parameters.
-         * Verifies that different page numbers and sizes are correctly handled.
+         * Tests listing repositories with various pagination parameters. Verifies that different page
+         * numbers and sizes are correctly handled.
          *
          * @param pageNo the page number
          * @param pageSize the page size
@@ -593,8 +593,8 @@ class RepoControllerTest {
         }
 
         /**
-         * Tests listing repositories when no results are found.
-         * Verifies that empty result sets are properly handled.
+         * Tests listing repositories when no results are found. Verifies that empty result sets are
+         * properly handled.
          */
         @Test
         @DisplayName("List repositories - empty result")
@@ -668,8 +668,7 @@ class RepoControllerTest {
         }
 
         /**
-         * Tests simplified list with ordering parameter.
-         * Verifies that orderBy field is properly handled.
+         * Tests simplified list with ordering parameter. Verifies that orderBy field is properly handled.
          */
         @Test
         @DisplayName("Simplified list - with order by field")
@@ -707,8 +706,8 @@ class RepoControllerTest {
         }
 
         /**
-         * Tests simplified list with all available parameters.
-         * Verifies that all parameters work together correctly.
+         * Tests simplified list with all available parameters. Verifies that all parameters work together
+         * correctly.
          */
         @Test
         @DisplayName("Simplified list - with all parameters")
@@ -840,8 +839,8 @@ class RepoControllerTest {
         }
 
         /**
-         * Tests get detail with various repository ID values.
-         * Verifies that different valid IDs are correctly processed.
+         * Tests get detail with various repository ID values. Verifies that different valid IDs are
+         * correctly processed.
          *
          * @param id the repository ID to test
          */
@@ -870,8 +869,8 @@ class RepoControllerTest {
     class HitTestTests {
 
         /**
-         * Tests hit test functionality with default topN value.
-         * Verifies that default parameters work correctly.
+         * Tests hit test functionality with default topN value. Verifies that default parameters work
+         * correctly.
          */
         @Test
         @DisplayName("Hit test - default topN")
@@ -890,8 +889,8 @@ class RepoControllerTest {
         }
 
         /**
-         * Tests hit test with different topN parameter values.
-         * Verifies that various topN values are correctly handled.
+         * Tests hit test with different topN parameter values. Verifies that various topN values are
+         * correctly handled.
          *
          * @param topN the number of top results to return
          */
@@ -997,8 +996,8 @@ class RepoControllerTest {
         }
 
         /**
-         * Tests listing hit test history with various pagination parameters.
-         * Verifies that different page numbers and sizes work correctly.
+         * Tests listing hit test history with various pagination parameters. Verifies that different page
+         * numbers and sizes work correctly.
          *
          * @param pageNo the page number
          * @param pageSize the page size
@@ -1029,8 +1028,8 @@ class RepoControllerTest {
         }
 
         /**
-         * Tests listing hit test history with empty results.
-         * Verifies that empty history lists are properly handled.
+         * Tests listing hit test history with empty results. Verifies that empty history lists are properly
+         * handled.
          */
         @Test
         @DisplayName("History list - empty result")
@@ -1076,8 +1075,7 @@ class RepoControllerTest {
     class EnableRepoTests {
 
         /**
-         * Tests enabling a repository.
-         * Verifies that repositories can be successfully enabled.
+         * Tests enabling a repository. Verifies that repositories can be successfully enabled.
          */
         @Test
         @DisplayName("Enable repository")
@@ -1095,8 +1093,7 @@ class RepoControllerTest {
         }
 
         /**
-         * Tests disabling a repository.
-         * Verifies that repositories can be successfully disabled.
+         * Tests disabling a repository. Verifies that repositories can be successfully disabled.
          */
         @Test
         @DisplayName("Disable repository")
@@ -1117,8 +1114,8 @@ class RepoControllerTest {
         }
 
         /**
-         * Tests enable/disable with different state values.
-         * Verifies that both enabled and disabled states work correctly.
+         * Tests enable/disable with different state values. Verifies that both enabled and disabled states
+         * work correctly.
          *
          * @param enabled the enabled state (0 for disabled, 1 for enabled)
          */
@@ -1138,15 +1135,16 @@ class RepoControllerTest {
         }
 
         /**
-         * Tests enabling repository with invalid ID.
-         * Verifies that appropriate exception is thrown for invalid IDs.
+         * Tests enabling repository with invalid ID. Verifies that appropriate exception is thrown for
+         * invalid IDs.
          */
         @Test
         @DisplayName("Enable repository - invalid ID")
         void enableRepo_InvalidId() {
             // Given
             doThrow(new IllegalArgumentException("Repository not found"))
-                    .when(repoService).enableRepo(eq(INVALID_REPO_ID), anyInt());
+                    .when(repoService)
+                    .enableRepo(eq(INVALID_REPO_ID), anyInt());
 
             // When & Then
             assertThatThrownBy(() -> controller.enableRepo(INVALID_REPO_ID, ENABLED))
@@ -1155,15 +1153,16 @@ class RepoControllerTest {
         }
 
         /**
-         * Tests enable repository when service throws RuntimeException.
-         * Verifies that system errors are properly propagated.
+         * Tests enable repository when service throws RuntimeException. Verifies that system errors are
+         * properly propagated.
          */
         @Test
         @DisplayName("Enable repository - service throws RuntimeException")
         void enableRepo_ServiceThrowsRuntimeException() {
             // Given
             doThrow(new RuntimeException("System error"))
-                    .when(repoService).enableRepo(anyLong(), anyInt());
+                    .when(repoService)
+                    .enableRepo(anyLong(), anyInt());
 
             // When & Then
             assertThatThrownBy(() -> controller.enableRepo(VALID_REPO_ID, ENABLED))
@@ -1179,8 +1178,8 @@ class RepoControllerTest {
     class DeleteRepoTests {
 
         /**
-         * Tests deleting repository without tag parameter.
-         * Verifies that deletion works with minimal parameters.
+         * Tests deleting repository without tag parameter. Verifies that deletion works with minimal
+         * parameters.
          */
         @Test
         @DisplayName("Delete repository - without tag")
@@ -1199,8 +1198,8 @@ class RepoControllerTest {
         }
 
         /**
-         * Tests deleting repository with tag parameter.
-         * Verifies that tag-filtered deletion works correctly.
+         * Tests deleting repository with tag parameter. Verifies that tag-filtered deletion works
+         * correctly.
          */
         @Test
         @DisplayName("Delete repository - with tag")
@@ -1257,8 +1256,8 @@ class RepoControllerTest {
         }
 
         /**
-         * Tests deleting repository with different tag values.
-         * Verifies that various tag values including null and empty are handled correctly.
+         * Tests deleting repository with different tag values. Verifies that various tag values including
+         * null and empty are handled correctly.
          *
          * @param tag the tag parameter value
          */
@@ -1288,8 +1287,8 @@ class RepoControllerTest {
     class SetTopTests {
 
         /**
-         * Tests successfully setting a repository as top/pinned.
-         * Verifies that repositories can be pinned to the top of lists.
+         * Tests successfully setting a repository as top/pinned. Verifies that repositories can be pinned
+         * to the top of lists.
          */
         @Test
         @DisplayName("Set top - success")
@@ -1306,8 +1305,7 @@ class RepoControllerTest {
         }
 
         /**
-         * Tests that setTop returns proper ApiResult.
-         * Verifies the response structure and success code.
+         * Tests that setTop returns proper ApiResult. Verifies the response structure and success code.
          */
         @Test
         @DisplayName("Set top - verify ApiResult")
@@ -1325,8 +1323,8 @@ class RepoControllerTest {
         }
 
         /**
-         * Tests setTop with different repository IDs.
-         * Verifies that various valid IDs are correctly processed.
+         * Tests setTop with different repository IDs. Verifies that various valid IDs are correctly
+         * processed.
          *
          * @param id the repository ID to pin
          */
@@ -1346,15 +1344,16 @@ class RepoControllerTest {
         }
 
         /**
-         * Tests setTop with invalid repository ID.
-         * Verifies that appropriate exception is thrown for non-existent repositories.
+         * Tests setTop with invalid repository ID. Verifies that appropriate exception is thrown for
+         * non-existent repositories.
          */
         @Test
         @DisplayName("Set top - invalid ID")
         void setTop_InvalidId() {
             // Given
             doThrow(new IllegalArgumentException("Repository not found"))
-                    .when(repoService).setTop(eq(INVALID_REPO_ID));
+                    .when(repoService)
+                    .setTop(eq(INVALID_REPO_ID));
 
             // When & Then
             assertThatThrownBy(() -> controller.setTop(INVALID_REPO_ID))
@@ -1362,15 +1361,16 @@ class RepoControllerTest {
         }
 
         /**
-         * Tests setTop when service throws exception.
-         * Verifies that errors during pinning are properly propagated.
+         * Tests setTop when service throws exception. Verifies that errors during pinning are properly
+         * propagated.
          */
         @Test
         @DisplayName("Set top - service throws exception")
         void setTop_ServiceThrowsException() {
             // Given
             doThrow(new RuntimeException("Set top failed"))
-                    .when(repoService).setTop(anyLong());
+                    .when(repoService)
+                    .setTop(anyLong());
 
             // When & Then
             assertThatThrownBy(() -> controller.setTop(VALID_REPO_ID))
@@ -1386,8 +1386,8 @@ class RepoControllerTest {
     class ListFilesTests {
 
         /**
-         * Tests successful file listing for a repository.
-         * Verifies that repository files are correctly retrieved.
+         * Tests successful file listing for a repository. Verifies that repository files are correctly
+         * retrieved.
          */
         @Test
         @DisplayName("List files - success")
@@ -1502,8 +1502,8 @@ class RepoControllerTest {
     class GetRepoUseStatusTests {
 
         /**
-         * Tests successful retrieval of repository usage status.
-         * Verifies that usage statistics are correctly returned.
+         * Tests successful retrieval of repository usage status. Verifies that usage statistics are
+         * correctly returned.
          */
         @Test
         @DisplayName("Get use status - success")
@@ -1643,8 +1643,7 @@ class RepoControllerTest {
     class EdgeCasesAndExceptionsTests {
 
         /**
-         * Tests handling of large ID values.
-         * Verifies that maximum long values are correctly processed.
+         * Tests handling of large ID values. Verifies that maximum long values are correctly processed.
          */
         @Test
         @DisplayName("Large ID values test")
@@ -1679,7 +1678,7 @@ class RepoControllerTest {
             int threadCount = 10;
             List<Thread> threads = new ArrayList<>();
             for (int i = 0; i < threadCount; i++) {
-                Thread thread = new Thread(() -> 
+                Thread thread = new Thread(() ->
                     controller.getDetail(VALID_REPO_ID, "", request));
                 threads.add(thread);
                 thread.start();
@@ -1695,8 +1694,8 @@ class RepoControllerTest {
         }
 
         /**
-         * Tests handling of special characters in input.
-         * Verifies that special characters are properly escaped and processed.
+         * Tests handling of special characters in input. Verifies that special characters are properly
+         * escaped and processed.
          */
         @Test
         @DisplayName("Special characters handling test")
@@ -1716,8 +1715,8 @@ class RepoControllerTest {
         }
 
         /**
-         * Tests handling of very long strings.
-         * Verifies that extremely long input strings are properly processed.
+         * Tests handling of very long strings. Verifies that extremely long input strings are properly
+         * processed.
          */
         @Test
         @DisplayName("Very long string test")
@@ -1776,8 +1775,8 @@ class RepoControllerTest {
         }
 
         /**
-         * Tests handling of Unicode characters including emojis.
-         * Verifies that Unicode strings are properly processed.
+         * Tests handling of Unicode characters including emojis. Verifies that Unicode strings are properly
+         * processed.
          */
         @Test
         @DisplayName("Unicode characters test")
@@ -1861,8 +1860,8 @@ class RepoControllerTest {
         }
 
         /**
-         * Tests hit test and history query scenario.
-         * Verifies that hit testing and history retrieval work together correctly.
+         * Tests hit test and history query scenario. Verifies that hit testing and history retrieval work
+         * together correctly.
          */
         @Test
         @DisplayName("Hit test and history query scenario")
@@ -1876,7 +1875,7 @@ class RepoControllerTest {
 
             // When
             Object testResult = controller.hitTest(VALID_REPO_ID, "test query", 5);
-            ApiResult<PageData<HitTestHistory>> historyResult = 
+            ApiResult<PageData<HitTestHistory>> historyResult =
                     controller.listHitTestHistoryByPage(VALID_REPO_ID, 1, 10);
 
             // Then
@@ -1959,17 +1958,16 @@ class RepoControllerTest {
         }
 
         /**
-         * Tests verification that no interactions occurred.
-         * Verifies that service methods were not called when controller methods are not invoked.
+         * Tests verification that no interactions occurred. Verifies that service methods were not called
+         * when controller methods are not invoked.
          */
         @Test
         @DisplayName("Verify no interactions")
         void verifyNoInteractionsTest() {
             // When - no methods called
-            
+
             // Then
             verifyNoMoreInteractions(repoService);
         }
     }
 }
-

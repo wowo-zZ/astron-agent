@@ -118,7 +118,7 @@ def req_ase_ability_ocr(
         log.info("req_ase_ability_ocr request: %s", ase_ocr_llm_vo.json())
         try:
             image_byte_arrays.append(
-                requests.get(ase_ocr_llm_vo.file_url, timeout=30).content
+                requests.get(url=ase_ocr_llm_vo.file_url, timeout=30).content
             )
             client = OcrLLMClientMultithreading(url=os.getenv("OCR_LLM_WS_URL"))
             asyncio.run(

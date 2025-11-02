@@ -41,13 +41,10 @@ import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for FileController
- * 
- * Technology Stack: JUnit5 + Mockito + AssertJ
- * Coverage Requirements:
- * - JaCoCo Statement Coverage >= 80%
- * - JaCoCo Branch Coverage >= 90%
- * - High PIT Mutation Test Score
- * - Covers normal flows, edge cases, and exceptions
+ *
+ * Technology Stack: JUnit5 + Mockito + AssertJ Coverage Requirements: - JaCoCo Statement Coverage
+ * >= 80% - JaCoCo Branch Coverage >= 90% - High PIT Mutation Test Score - Covers normal flows, edge
+ * cases, and exceptions
  *
  * @author AI Assistant
  */
@@ -77,8 +74,8 @@ class FileControllerTest {
     private KnowledgeQueryVO knowledgeQueryVO;
 
     /**
-     * Set up test fixtures before each test
-     * Initializes common test data including mock file info, VO objects, and query parameters
+     * Set up test fixtures before each test Initializes common test data including mock file info, VO
+     * objects, and query parameters
      */
     @BeforeEach
     void setUp() {
@@ -120,8 +117,8 @@ class FileControllerTest {
     class FileUploadTests {
 
         /**
-         * Test successful file upload
-         * Verifies that a file can be uploaded successfully and returns correct result
+         * Test successful file upload Verifies that a file can be uploaded successfully and returns correct
+         * result
          */
         @Test
         @DisplayName("Upload file successfully")
@@ -144,8 +141,8 @@ class FileControllerTest {
         }
 
         /**
-         * Test file upload with empty file name
-         * Verifies that uploading a file with empty name throws BusinessException
+         * Test file upload with empty file name Verifies that uploading a file with empty name throws
+         * BusinessException
          */
         @Test
         @DisplayName("Upload file - Empty file name")
@@ -164,8 +161,7 @@ class FileControllerTest {
         }
 
         /**
-         * Test successful HTML file creation
-         * Verifies that HTML files can be created from URL addresses
+         * Test successful HTML file creation Verifies that HTML files can be created from URL addresses
          */
         @Test
         @DisplayName("Create HTML file successfully")
@@ -186,8 +182,8 @@ class FileControllerTest {
         }
 
         /**
-         * Test HTML file creation with empty address list
-         * Verifies that creating HTML files with empty address list returns empty result
+         * Test HTML file creation with empty address list Verifies that creating HTML files with empty
+         * address list returns empty result
          */
         @Test
         @DisplayName("Create HTML file - Empty address list")
@@ -215,9 +211,9 @@ class FileControllerTest {
     class FileSliceTests {
 
         /**
-         * Test successful file slicing with normal separator
-         * Verifies that files can be sliced successfully with provided separator
-         * 
+         * Test successful file slicing with normal separator Verifies that files can be sliced successfully
+         * with provided separator
+         *
          * @throws InterruptedException if the operation is interrupted
          * @throws ExecutionException if the operation fails during execution
          */
@@ -242,9 +238,9 @@ class FileControllerTest {
         }
 
         /**
-         * Test successful file slicing with empty separator defaults to newline
-         * Verifies that empty separator is automatically replaced with default newline separator
-         * 
+         * Test successful file slicing with empty separator defaults to newline Verifies that empty
+         * separator is automatically replaced with default newline separator
+         *
          * @throws InterruptedException if the operation is interrupted
          * @throws ExecutionException if the operation fails during execution
          */
@@ -271,9 +267,9 @@ class FileControllerTest {
         }
 
         /**
-         * Test successful file slicing with null separator defaults to newline
-         * Verifies that null separator is automatically replaced with default newline separator
-         * 
+         * Test successful file slicing with null separator defaults to newline Verifies that null separator
+         * is automatically replaced with default newline separator
+         *
          * @throws InterruptedException if the operation is interrupted
          * @throws ExecutionException if the operation fails during execution
          */
@@ -299,9 +295,9 @@ class FileControllerTest {
         }
 
         /**
-         * Test file slicing failure with error message returned
-         * Verifies that slicing failure returns appropriate error code and message
-         * 
+         * Test file slicing failure with error message returned Verifies that slicing failure returns
+         * appropriate error code and message
+         *
          * @throws InterruptedException if the operation is interrupted
          * @throws ExecutionException if the operation fails during execution
          */
@@ -329,7 +325,7 @@ class FileControllerTest {
         /**
          * Test file slicing throws InterruptedException
          * Verifies that InterruptedException is properly propagated when thread is interrupted
-         * 
+         *
          * @throws InterruptedException if the operation is interrupted
          * @throws ExecutionException if the operation fails during execution
          */
@@ -355,9 +351,8 @@ class FileControllerTest {
     class FileEmbeddingTests {
 
         /**
-         * Test successful file embedding
-         * Verifies that files can be embedded successfully without errors
-         * 
+         * Test successful file embedding Verifies that files can be embedded successfully without errors
+         *
          * @throws ExecutionException if the operation fails during execution
          * @throws InterruptedException if the operation is interrupted
          */
@@ -377,9 +372,9 @@ class FileControllerTest {
         }
 
         /**
-         * Test file embedding throws RuntimeException
-         * Verifies that RuntimeException is properly thrown when embedding fails
-         * 
+         * Test file embedding throws RuntimeException Verifies that RuntimeException is properly thrown
+         * when embedding fails
+         *
          * @throws ExecutionException if the operation fails during execution
          * @throws InterruptedException if the operation is interrupted
          */
@@ -388,7 +383,8 @@ class FileControllerTest {
         void embeddingFiles_ThrowsRuntimeException() throws ExecutionException, InterruptedException {
             // Given
             doThrow(new RuntimeException("Embedding failed"))
-                    .when(fileInfoV2Service).embeddingFiles(dealFileVO, request);
+                    .when(fileInfoV2Service)
+                    .embeddingFiles(dealFileVO, request);
 
             // When & Then
             assertThatThrownBy(() -> fileController.embeddingFiles(dealFileVO, request))
@@ -398,9 +394,9 @@ class FileControllerTest {
         }
 
         /**
-         * Test successful background file embedding
-         * Verifies that files can be embedded in background successfully
-         * 
+         * Test successful background file embedding Verifies that files can be embedded in background
+         * successfully
+         *
          * @throws ExecutionException if the operation fails during execution
          * @throws InterruptedException if the operation is interrupted
          */
@@ -420,9 +416,8 @@ class FileControllerTest {
         }
 
         /**
-         * Test retry failed files
-         * Verifies that failed files can be retried successfully
-         * 
+         * Test retry failed files Verifies that failed files can be retried successfully
+         *
          * @throws ExecutionException if the operation fails during execution
          * @throws InterruptedException if the operation is interrupted
          */
@@ -450,8 +445,7 @@ class FileControllerTest {
     class FileStatusTests {
 
         /**
-         * Test get file indexing status
-         * Verifies that file indexing status can be retrieved successfully
+         * Test get file indexing status Verifies that file indexing status can be retrieved successfully
          */
         @Test
         @DisplayName("Get file indexing status")
@@ -471,8 +465,8 @@ class FileControllerTest {
         }
 
         /**
-         * Test get file summary information
-         * Verifies that file summary information can be retrieved successfully
+         * Test get file summary information Verifies that file summary information can be retrieved
+         * successfully
          */
         @Test
         @DisplayName("Get file summary information")
@@ -492,8 +486,8 @@ class FileControllerTest {
         }
 
         /**
-         * Test get file info by sourceId
-         * Verifies that file information can be retrieved by sourceId successfully
+         * Test get file info by sourceId Verifies that file information can be retrieved by sourceId
+         * successfully
          */
         @Test
         @DisplayName("Get file info by sourceId")
@@ -521,8 +515,8 @@ class FileControllerTest {
     class KnowledgeTests {
 
         /**
-         * Test list preview knowledge by page
-         * Verifies that preview knowledge can be queried with pagination successfully
+         * Test list preview knowledge by page Verifies that preview knowledge can be queried with
+         * pagination successfully
          */
         @Test
         @DisplayName("List preview knowledge by page")
@@ -541,8 +535,7 @@ class FileControllerTest {
         }
 
         /**
-         * Test list knowledge by page
-         * Verifies that knowledge can be queried with pagination successfully
+         * Test list knowledge by page Verifies that knowledge can be queried with pagination successfully
          */
         @Test
         @DisplayName("List knowledge by page")
@@ -563,8 +556,8 @@ class FileControllerTest {
         }
 
         /**
-         * Test download knowledge by violation
-         * Verifies that knowledge marked as violation can be downloaded successfully
+         * Test download knowledge by violation Verifies that knowledge marked as violation can be
+         * downloaded successfully
          */
         @Test
         @DisplayName("Download knowledge by violation")
@@ -588,8 +581,8 @@ class FileControllerTest {
     class FileQueryTests {
 
         /**
-         * Test query file list with default parameters
-         * Verifies that file list can be queried with default pagination parameters
+         * Test query file list with default parameters Verifies that file list can be queried with default
+         * pagination parameters
          */
         @Test
         @DisplayName("Query file list - With defaults")
@@ -610,8 +603,8 @@ class FileControllerTest {
         }
 
         /**
-         * Test query file list with custom parameters
-         * Verifies that file list can be queried with custom pagination and filter parameters
+         * Test query file list with custom parameters Verifies that file list can be queried with custom
+         * pagination and filter parameters
          */
         @Test
         @DisplayName("Query file list - With custom params")
@@ -636,8 +629,8 @@ class FileControllerTest {
         }
 
         /**
-         * Test search file
-         * Verifies that files can be searched with specified criteria and returns SSE emitter
+         * Test search file Verifies that files can be searched with specified criteria and returns SSE
+         * emitter
          */
         @Test
         @DisplayName("Search file")
@@ -664,8 +657,8 @@ class FileControllerTest {
         }
 
         /**
-         * Test search file with null parameters
-         * Verifies that file search can handle null parameters gracefully
+         * Test search file with null parameters Verifies that file search can handle null parameters
+         * gracefully
          */
         @Test
         @DisplayName("Search file - With null params")
@@ -694,8 +687,8 @@ class FileControllerTest {
     class FolderOperationsTests {
 
         /**
-         * Test create folder successfully without tags
-         * Verifies that a folder can be created without any tags
+         * Test create folder successfully without tags Verifies that a folder can be created without any
+         * tags
          */
         @Test
         @DisplayName("Create folder successfully - No tags")
@@ -714,8 +707,8 @@ class FileControllerTest {
         }
 
         /**
-         * Test create folder successfully with valid tags
-         * Verifies that a folder can be created with tags of normal length
+         * Test create folder successfully with valid tags Verifies that a folder can be created with tags
+         * of normal length
          */
         @Test
         @DisplayName("Create folder successfully - With valid tags")
@@ -734,8 +727,8 @@ class FileControllerTest {
         }
 
         /**
-         * Test create folder successfully with max length tag
-         * Verifies that a folder can be created with tag exactly 30 characters long
+         * Test create folder successfully with max length tag Verifies that a folder can be created with
+         * tag exactly 30 characters long
          */
         @Test
         @DisplayName("Create folder successfully - With max length tag")
@@ -755,8 +748,8 @@ class FileControllerTest {
         }
 
         /**
-         * Test create folder failure when tag is too long
-         * Verifies that folder creation fails when tag exceeds 30 characters
+         * Test create folder failure when tag is too long Verifies that folder creation fails when tag
+         * exceeds 30 characters
          */
         @Test
         @DisplayName("Create folder failure - Tag too long")
@@ -773,8 +766,8 @@ class FileControllerTest {
         }
 
         /**
-         * Test create folder failure when one of many tags is too long
-         * Verifies that folder creation fails when at least one tag exceeds length limit
+         * Test create folder failure when one of many tags is too long Verifies that folder creation fails
+         * when at least one tag exceeds length limit
          */
         @Test
         @DisplayName("Create folder failure - One of many tags too long")
@@ -789,8 +782,8 @@ class FileControllerTest {
         }
 
         /**
-         * Test create folder successfully with empty tag list
-         * Verifies that a folder can be created with an empty tag list
+         * Test create folder successfully with empty tag list Verifies that a folder can be created with an
+         * empty tag list
          */
         @Test
         @DisplayName("Create folder successfully - Empty tag list")
@@ -809,8 +802,7 @@ class FileControllerTest {
         }
 
         /**
-         * Test update folder successfully
-         * Verifies that a folder can be updated successfully
+         * Test update folder successfully Verifies that a folder can be updated successfully
          */
         @Test
         @DisplayName("Update folder successfully")
@@ -828,8 +820,7 @@ class FileControllerTest {
         }
 
         /**
-         * Test delete folder successfully
-         * Verifies that a folder can be deleted successfully
+         * Test delete folder successfully Verifies that a folder can be deleted successfully
          */
         @Test
         @DisplayName("Delete folder successfully")
@@ -856,8 +847,7 @@ class FileControllerTest {
     class FileOperationsTests {
 
         /**
-         * Test update file successfully
-         * Verifies that a file can be updated successfully
+         * Test update file successfully Verifies that a file can be updated successfully
          */
         @Test
         @DisplayName("Update file successfully")
@@ -875,8 +865,7 @@ class FileControllerTest {
         }
 
         /**
-         * Test delete file successfully
-         * Verifies that a file can be deleted successfully
+         * Test delete file successfully Verifies that a file can be deleted successfully
          */
         @Test
         @DisplayName("Delete file successfully")
@@ -897,8 +886,7 @@ class FileControllerTest {
         }
 
         /**
-         * Test enable file
-         * Verifies that a file can be enabled successfully
+         * Test enable file Verifies that a file can be enabled successfully
          */
         @Test
         @DisplayName("Enable file")
@@ -918,8 +906,7 @@ class FileControllerTest {
         }
 
         /**
-         * Test disable file
-         * Verifies that a file can be disabled successfully
+         * Test disable file Verifies that a file can be disabled successfully
          */
         @Test
         @DisplayName("Disable file")
@@ -939,8 +926,7 @@ class FileControllerTest {
         }
 
         /**
-         * Test get file directory tree
-         * Verifies that file directory tree can be retrieved successfully
+         * Test get file directory tree Verifies that file directory tree can be retrieved successfully
          */
         @Test
         @DisplayName("Get file directory tree")
@@ -949,8 +935,7 @@ class FileControllerTest {
             Long fileId = 123L;
             List<FileDirectoryTree> expectedTree = Arrays.asList(
                     new FileDirectoryTree(),
-                    new FileDirectoryTree()
-            );
+                    new FileDirectoryTree());
             when(fileInfoV2Service.listFileDirectoryTree(fileId)).thenReturn(expectedTree);
 
             // When
@@ -964,8 +949,8 @@ class FileControllerTest {
         }
 
         /**
-         * Test get file directory tree with empty result
-         * Verifies that empty result is handled correctly when file has no directory tree
+         * Test get file directory tree with empty result Verifies that empty result is handled correctly
+         * when file has no directory tree
          */
         @Test
         @DisplayName("Get file directory tree - Empty result")
@@ -993,9 +978,9 @@ class FileControllerTest {
     class EdgeCaseTests {
 
         /**
-         * Test sliceFiles with empty separator list
-         * Verifies that empty separator list causes IndexOutOfBoundsException
-         * 
+         * Test sliceFiles with empty separator list Verifies that empty separator list causes
+         * IndexOutOfBoundsException
+         *
          * @throws InterruptedException if the operation is interrupted
          * @throws ExecutionException if the operation fails during execution
          */
@@ -1011,8 +996,8 @@ class FileControllerTest {
         }
 
         /**
-         * Test queryFileList with large page number
-         * Verifies that query works correctly with maximum integer page number
+         * Test queryFileList with large page number Verifies that query works correctly with maximum
+         * integer page number
          */
         @Test
         @DisplayName("queryFileList - Large page number")
@@ -1033,8 +1018,8 @@ class FileControllerTest {
         }
 
         /**
-         * Test queryFileList with large page size
-         * Verifies that query works correctly with large page size value
+         * Test queryFileList with large page size Verifies that query works correctly with large page size
+         * value
          */
         @Test
         @DisplayName("queryFileList - Large page size")
@@ -1055,8 +1040,7 @@ class FileControllerTest {
         }
 
         /**
-         * Test deleteFile with empty string ID
-         * Verifies that file deletion works with empty string ID
+         * Test deleteFile with empty string ID Verifies that file deletion works with empty string ID
          */
         @Test
         @DisplayName("deleteFile - Empty string ID")
@@ -1077,8 +1061,8 @@ class FileControllerTest {
         }
 
         /**
-         * Test createFolder with tag at boundary value
-         * Verifies that folder creation works correctly with tags at length boundary (29, 30 characters)
+         * Test createFolder with tag at boundary value Verifies that folder creation works correctly with
+         * tags at length boundary (29, 30 characters)
          */
         @Test
         @DisplayName("createFolder - Tag at boundary")
@@ -1086,19 +1070,19 @@ class FileControllerTest {
             // Given - Test with 29, 30, 31 characters
             String tag29 = "a".repeat(29);
             String tag30 = "a".repeat(30);
-            
+
             // 29 characters should succeed
             createFolderVO.setTags(Collections.singletonList(tag29));
             doNothing().when(fileInfoV2Service).createFolder(createFolderVO);
-            
+
             ApiResult<Void> result1 = fileController.createFolder(createFolderVO);
             assertThat(result1.code()).isEqualTo(0);
-            
+
             // 30 characters should succeed
             createFolderVO.setTags(Collections.singletonList(tag30));
             ApiResult<Void> result2 = fileController.createFolder(createFolderVO);
             assertThat(result2.code()).isEqualTo(0);
-            
+
             verify(fileInfoV2Service, times(2)).createFolder(createFolderVO);
         }
     }
@@ -1127,9 +1111,9 @@ class FileControllerTest {
         }
 
         /**
-         * Test embeddingFiles throws BusinessException
-         * Verifies that BusinessException is properly thrown when embedding fails
-         * 
+         * Test embeddingFiles throws BusinessException Verifies that BusinessException is properly thrown
+         * when embedding fails
+         *
          * @throws ExecutionException if the operation fails during execution
          * @throws InterruptedException if the operation is interrupted
          */
@@ -1138,7 +1122,8 @@ class FileControllerTest {
         void embeddingFiles_BusinessException() throws ExecutionException, InterruptedException {
             // Given
             doThrow(new BusinessException(ResponseEnum.REPO_FILE_EMBEDDING_FAILED))
-                    .when(fileInfoV2Service).embeddingFiles(dealFileVO, request);
+                    .when(fileInfoV2Service)
+                    .embeddingFiles(dealFileVO, request);
 
             // When & Then
             assertThatThrownBy(() -> fileController.embeddingFiles(dealFileVO, request))
@@ -1146,8 +1131,8 @@ class FileControllerTest {
         }
 
         /**
-         * Test deleteFolder when service throws exception
-         * Verifies that BusinessException is properly thrown when folder doesn't exist
+         * Test deleteFolder when service throws exception Verifies that BusinessException is properly
+         * thrown when folder doesn't exist
          */
         @Test
         @DisplayName("deleteFolder - Service throws exception")
@@ -1155,7 +1140,8 @@ class FileControllerTest {
             // Given
             Long folderId = 123L;
             doThrow(new BusinessException(ResponseEnum.REPO_FOLDER_NOT_EXIST))
-                    .when(fileInfoV2Service).deleteFolder(folderId);
+                    .when(fileInfoV2Service)
+                    .deleteFolder(folderId);
 
             // When & Then
             assertThatThrownBy(() -> fileController.deleteFolder(folderId))
@@ -1163,8 +1149,8 @@ class FileControllerTest {
         }
 
         /**
-         * Test getFileInfoV2BySourceId when file doesn't exist
-         * Verifies that BusinessException is properly thrown when file is not found
+         * Test getFileInfoV2BySourceId when file doesn't exist Verifies that BusinessException is properly
+         * thrown when file is not found
          */
         @Test
         @DisplayName("getFileInfoV2BySourceId - File not found")
@@ -1182,7 +1168,7 @@ class FileControllerTest {
         /**
          * Test sliceFiles throws RuntimeException
          * Verifies that RuntimeException is properly thrown when slice processing fails
-         * 
+         *
          * @throws InterruptedException if the operation is interrupted
          * @throws ExecutionException if the operation fails during execution
          */
@@ -1226,7 +1212,7 @@ class FileControllerTest {
         /**
          * Test complete file processing flow including upload, slice, and embedding
          * Verifies that the entire file processing workflow works correctly from start to finish
-         * 
+         *
          * @throws ExecutionException if the operation fails during execution
          * @throws InterruptedException if the operation is interrupted
          */
@@ -1252,15 +1238,15 @@ class FileControllerTest {
             assertThat(uploadResult.code()).isEqualTo(0);
             assertThat(sliceResultApi.code()).isEqualTo(0);
             assertThat(embeddingResult.code()).isEqualTo(0);
-            
+
             verify(fileInfoV2Service, times(1)).uploadFile(multipartFile, 0L, 100L, "tag", request);
             verify(fileInfoV2Service, times(1)).sliceFiles(dealFileVO);
             verify(fileInfoV2Service, times(1)).embeddingFiles(dealFileVO, request);
         }
 
         /**
-         * Test folder operations flow including create, update, and delete
-         * Verifies that folder operations can be performed sequentially without errors
+         * Test folder operations flow including create, update, and delete Verifies that folder operations
+         * can be performed sequentially without errors
          */
         @Test
         @DisplayName("Folder operations flow - Create, update, delete")
@@ -1279,11 +1265,10 @@ class FileControllerTest {
             assertThat(createResult.code()).isEqualTo(0);
             assertThat(updateResult.code()).isEqualTo(0);
             assertThat(deleteResult.code()).isEqualTo(0);
-            
+
             verify(fileInfoV2Service, times(1)).createFolder(createFolderVO);
             verify(fileInfoV2Service, times(1)).updateFolder(createFolderVO);
             verify(fileInfoV2Service, times(1)).deleteFolder(1L);
         }
     }
 }
-

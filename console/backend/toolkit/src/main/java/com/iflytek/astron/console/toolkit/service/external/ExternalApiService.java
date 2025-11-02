@@ -39,7 +39,7 @@ public class ExternalApiService {
 
             // Check for common error responses
             if (response.contains("404") || response.contains("not found") ||
-                response.contains("error") || !response.trim().startsWith("{")) {
+                    response.contains("error") || !response.trim().startsWith("{")) {
                 log.warn("External API not available (response: {}), using mock data for apiKey: {}",
                         response.trim(), apiKey);
                 return createMockResponse(apiKey);
@@ -54,8 +54,8 @@ public class ExternalApiService {
     }
 
     /**
-     * Create mock response when external API is not available
-     * TODO: Remove this when external API is fixed
+     * Create mock response when external API is not available TODO: Remove this when external API is
+     * fixed
      */
     private AppInfoResponse createMockResponse(String apiKey) {
         AppInfoResponse response = new AppInfoResponse();

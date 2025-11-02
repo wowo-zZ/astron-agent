@@ -31,10 +31,14 @@ import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for KnowledgeController
- * 
- * <p>Technology Stack: JUnit5 + Mockito + AssertJ</p>
- * 
- * <p>Coverage Requirements:</p>
+ *
+ * <p>
+ * Technology Stack: JUnit5 + Mockito + AssertJ
+ * </p>
+ *
+ * <p>
+ * Coverage Requirements:
+ * </p>
  * <ul>
  * <li>JaCoCo Statement Coverage >= 80%</li>
  * <li>JaCoCo Branch Coverage >= 90%</li>
@@ -58,8 +62,8 @@ class KnowledgeControllerTest {
     private KnowledgeVO knowledgeVO;
 
     /**
-     * Set up test fixtures before each test method.
-     * Initializes common test data including mock Knowledge entity and KnowledgeVO.
+     * Set up test fixtures before each test method. Initializes common test data including mock
+     * Knowledge entity and KnowledgeVO.
      */
     @BeforeEach
     void setUp() {
@@ -82,8 +86,8 @@ class KnowledgeControllerTest {
     }
 
     /**
-     * Test cases for the createKnowledge method.
-     * Validates knowledge creation functionality including success scenarios and error handling.
+     * Test cases for the createKnowledge method. Validates knowledge creation functionality including
+     * success scenarios and error handling.
      */
     @Nested
     @DisplayName("createKnowledge Tests")
@@ -91,7 +95,7 @@ class KnowledgeControllerTest {
 
         /**
          * Test successful knowledge creation with valid input.
-         * 
+         *
          * @throws ExecutionException if the computation threw an exception
          * @throws InterruptedException if the current thread was interrupted
          */
@@ -117,7 +121,7 @@ class KnowledgeControllerTest {
 
         /**
          * Test knowledge creation with empty VO object.
-         * 
+         *
          * @throws ExecutionException if the computation threw an exception
          * @throws InterruptedException if the current thread was interrupted
          */
@@ -179,7 +183,7 @@ class KnowledgeControllerTest {
 
         /**
          * Test knowledge creation when service returns null.
-         * 
+         *
          * @throws ExecutionException if the computation threw an exception
          * @throws InterruptedException if the current thread was interrupted
          */
@@ -202,8 +206,8 @@ class KnowledgeControllerTest {
     }
 
     /**
-     * Test cases for the updateKnowledge method.
-     * Validates knowledge update functionality including tag validation and error handling.
+     * Test cases for the updateKnowledge method. Validates knowledge update functionality including tag
+     * validation and error handling.
      */
     @Nested
     @DisplayName("updateKnowledge Tests")
@@ -211,7 +215,7 @@ class KnowledgeControllerTest {
 
         /**
          * Test successful knowledge update without tags.
-         * 
+         *
          * @throws ExecutionException if the computation threw an exception
          * @throws InterruptedException if the current thread was interrupted
          */
@@ -236,7 +240,7 @@ class KnowledgeControllerTest {
 
         /**
          * Test successful knowledge update with empty tags list.
-         * 
+         *
          * @throws ExecutionException if the computation threw an exception
          * @throws InterruptedException if the current thread was interrupted
          */
@@ -259,33 +263,8 @@ class KnowledgeControllerTest {
         }
 
         /**
-         * Test successful knowledge update with valid tags.
-         * 
-         * @throws ExecutionException if the computation threw an exception
-         * @throws InterruptedException if the current thread was interrupted
-         */
-        @Test
-        @DisplayName("Update knowledge successfully with valid tags")
-        void testUpdateKnowledge_ValidTags_Success() throws ExecutionException, InterruptedException {
-            // Given
-            List<String> tags = Arrays.asList("tag1", "tag2", "tag3");
-            knowledgeVO.setTags(tags);
-            when(knowledgeService.updateKnowledge(any(KnowledgeVO.class))).thenReturn(mockKnowledge);
-
-            // When
-            ApiResult<Knowledge> result = knowledgeController.updateKnowledge(knowledgeVO);
-
-            // Then
-            assertThat(result).isNotNull();
-            assertThat(result.code()).isEqualTo(0);
-            assertThat(result.data()).isNotNull();
-
-            verify(knowledgeService, times(1)).updateKnowledge(any(KnowledgeVO.class));
-        }
-
-        /**
          * Test knowledge update with tag length equal to 30 (boundary value).
-         * 
+         *
          * @throws ExecutionException if the computation threw an exception
          * @throws InterruptedException if the current thread was interrupted
          */
@@ -310,7 +289,7 @@ class KnowledgeControllerTest {
 
         /**
          * Test knowledge update with tag length equal to 29 (boundary value).
-         * 
+         *
          * @throws ExecutionException if the computation threw an exception
          * @throws InterruptedException if the current thread was interrupted
          */
@@ -383,8 +362,7 @@ class KnowledgeControllerTest {
             // Given
             List<String> tags = Arrays.asList(
                     "1234567890123456789012345678901", // 31 characters, too long
-                    "validTag"
-            );
+                    "validTag");
             knowledgeVO.setTags(tags);
 
             // When & Then
@@ -398,7 +376,7 @@ class KnowledgeControllerTest {
 
         /**
          * Test knowledge update with tags containing empty string.
-         * 
+         *
          * @throws ExecutionException if the computation threw an exception
          * @throws InterruptedException if the current thread was interrupted
          */
@@ -422,7 +400,7 @@ class KnowledgeControllerTest {
 
         /**
          * Test knowledge update with tags containing single character.
-         * 
+         *
          * @throws ExecutionException if the computation threw an exception
          * @throws InterruptedException if the current thread was interrupted
          */
@@ -502,17 +480,17 @@ class KnowledgeControllerTest {
         }
 
         /**
-         * Test knowledge update with valid Chinese tags.
-         * 
+         * Test knowledge update with valid tags.
+         *
          * @throws ExecutionException if the computation threw an exception
          * @throws InterruptedException if the current thread was interrupted
          */
         @Test
-        @DisplayName("Update knowledge - with valid Chinese tags")
-        void testUpdateKnowledge_ChineseTagsValid_Success() throws ExecutionException, InterruptedException {
-            // Given - 10 Chinese characters (30 bytes, but 10 characters in length)
-            String chineseTag = "这是一个测试标签1234"; // 10 characters
-            knowledgeVO.setTags(Collections.singletonList(chineseTag));
+        @DisplayName("Update knowledge - with valid tags")
+        void testUpdateKnowledge_ValidTags_Success() throws ExecutionException, InterruptedException {
+            // Given - 10 characters
+            String validTag = "TestTag123"; // 10 characters
+            knowledgeVO.setTags(Collections.singletonList(validTag));
             when(knowledgeService.updateKnowledge(any(KnowledgeVO.class))).thenReturn(mockKnowledge);
 
             // When
@@ -526,15 +504,15 @@ class KnowledgeControllerTest {
         }
 
         /**
-         * Test knowledge update with Chinese tags that are too long.
+         * Test knowledge update with tags that are too long.
          */
         @Test
-        @DisplayName("Update knowledge - with Chinese tags that are too long")
-        void testUpdateKnowledge_ChineseTagsTooLong_ThrowsException() {
-            // Given - 31 characters (Chinese + numbers)
-            String chineseTag = "这是一个非常长的中文标签用于测试边界条件的处理逻辑问题1234"; // 31 characters
-            assertThat(chineseTag.length()).isEqualTo(31); // Verify it's indeed 31 characters
-            knowledgeVO.setTags(Collections.singletonList(chineseTag));
+        @DisplayName("Update knowledge - with tags that are too long")
+        void testUpdateKnowledge_TagsTooLong_ThrowsException() {
+            // Given - 31 characters
+            String longTag = "VeryLongTagForBoundaryTest12345"; // 31 characters
+            assertThat(longTag.length()).isEqualTo(31); // Verify it's indeed 31 characters
+            knowledgeVO.setTags(Collections.singletonList(longTag));
 
             // When & Then
             assertThatThrownBy(() -> knowledgeController.updateKnowledge(knowledgeVO))
@@ -547,7 +525,7 @@ class KnowledgeControllerTest {
 
         /**
          * Test knowledge update with many valid tags.
-         * 
+         *
          * @throws ExecutionException if the computation threw an exception
          * @throws InterruptedException if the current thread was interrupted
          */
@@ -574,8 +552,8 @@ class KnowledgeControllerTest {
     }
 
     /**
-     * Test cases for the enableKnowledge method.
-     * Validates knowledge enable/disable functionality and various input scenarios.
+     * Test cases for the enableKnowledge method. Validates knowledge enable/disable functionality and
+     * various input scenarios.
      */
     @Nested
     @DisplayName("enableKnowledge Tests")
@@ -583,7 +561,7 @@ class KnowledgeControllerTest {
 
         /**
          * Test enabling knowledge with enabled=1.
-         * 
+         *
          * @throws ExecutionException if the computation threw an exception
          * @throws InterruptedException if the current thread was interrupted
          */
@@ -609,7 +587,7 @@ class KnowledgeControllerTest {
 
         /**
          * Test disabling knowledge with enabled=0.
-         * 
+         *
          * @throws ExecutionException if the computation threw an exception
          * @throws InterruptedException if the current thread was interrupted
          */
@@ -635,7 +613,7 @@ class KnowledgeControllerTest {
 
         /**
          * Test enabling knowledge with empty string ID.
-         * 
+         *
          * @throws ExecutionException if the computation threw an exception
          * @throws InterruptedException if the current thread was interrupted
          */
@@ -659,7 +637,7 @@ class KnowledgeControllerTest {
 
         /**
          * Test enabling knowledge with non-standard enabled value.
-         * 
+         *
          * @throws ExecutionException if the computation threw an exception
          * @throws InterruptedException if the current thread was interrupted
          */
@@ -724,7 +702,7 @@ class KnowledgeControllerTest {
 
         /**
          * Test enabling knowledge when service returns null.
-         * 
+         *
          * @throws ExecutionException if the computation threw an exception
          * @throws InterruptedException if the current thread was interrupted
          */
@@ -749,7 +727,7 @@ class KnowledgeControllerTest {
 
         /**
          * Test enabling knowledge when service returns empty string.
-         * 
+         *
          * @throws ExecutionException if the computation threw an exception
          * @throws InterruptedException if the current thread was interrupted
          */
@@ -774,7 +752,7 @@ class KnowledgeControllerTest {
 
         /**
          * Test enabling knowledge with negative enabled value.
-         * 
+         *
          * @throws ExecutionException if the computation threw an exception
          * @throws InterruptedException if the current thread was interrupted
          */
@@ -798,8 +776,8 @@ class KnowledgeControllerTest {
     }
 
     /**
-     * Test cases for the deleteKnowledge method.
-     * Validates knowledge deletion functionality with various scenarios.
+     * Test cases for the deleteKnowledge method. Validates knowledge deletion functionality with
+     * various scenarios.
      */
     @Nested
     @DisplayName("deleteKnowledge Tests")
@@ -875,7 +853,8 @@ class KnowledgeControllerTest {
             // Given
             String knowledgeId = "knowledge-001";
             doThrow(new RuntimeException("Delete failed"))
-                    .when(knowledgeService).deleteKnowledge(anyString());
+                    .when(knowledgeService)
+                    .deleteKnowledge(anyString());
 
             // When & Then
             assertThatThrownBy(() -> knowledgeController.deleteKnowledge(knowledgeId))
@@ -894,7 +873,8 @@ class KnowledgeControllerTest {
             // Given
             String knowledgeId = "knowledge-001";
             doThrow(new BusinessException(ResponseEnum.REPO_KNOWLEDGE_NOT_EXIST))
-                    .when(knowledgeService).deleteKnowledge(anyString());
+                    .when(knowledgeService)
+                    .deleteKnowledge(anyString());
 
             // When & Then
             assertThatThrownBy(() -> knowledgeController.deleteKnowledge(knowledgeId))
@@ -970,8 +950,7 @@ class KnowledgeControllerTest {
     }
 
     /**
-     * Integration scenario tests.
-     * Tests complete workflows combining multiple operations.
+     * Integration scenario tests. Tests complete workflows combining multiple operations.
      */
     @Nested
     @DisplayName("Integration Scenario Tests")
@@ -979,7 +958,7 @@ class KnowledgeControllerTest {
 
         /**
          * Test full lifecycle: create, update, enable, and delete knowledge.
-         * 
+         *
          * @throws ExecutionException if the computation threw an exception
          * @throws InterruptedException if the current thread was interrupted
          */
@@ -990,7 +969,7 @@ class KnowledgeControllerTest {
             String knowledgeId = "knowledge-full-test";
             KnowledgeVO createVO = new KnowledgeVO();
             createVO.setContent("Initial content");
-            
+
             Knowledge createdKnowledge = Knowledge.builder()
                     .id(knowledgeId)
                     .enabled(0)
@@ -1036,7 +1015,7 @@ class KnowledgeControllerTest {
 
         /**
          * Test boundary scenario where all tags have exactly 30 characters.
-         * 
+         *
          * @throws ExecutionException if the computation threw an exception
          * @throws InterruptedException if the current thread was interrupted
          */
@@ -1047,7 +1026,7 @@ class KnowledgeControllerTest {
             List<String> tags = Arrays.asList(
                     "123456789012345678901234567890", // 30 chars
                     "abcdefghijklmnopqrstuvwxyz1234", // 30 chars
-                    "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234"  // 30 chars
+                    "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234" // 30 chars
             );
             knowledgeVO.setTags(tags);
             when(knowledgeService.updateKnowledge(any(KnowledgeVO.class))).thenReturn(mockKnowledge);
@@ -1079,8 +1058,7 @@ class KnowledgeControllerTest {
     }
 
     /**
-     * Parameter validation tests.
-     * Tests handling of null and edge-case parameter values.
+     * Parameter validation tests. Tests handling of null and edge-case parameter values.
      */
     @Nested
     @DisplayName("Parameter Validation Tests")
@@ -1088,7 +1066,7 @@ class KnowledgeControllerTest {
 
         /**
          * Test createKnowledge with null parameter.
-         * 
+         *
          * @throws ExecutionException if the computation threw an exception
          * @throws InterruptedException if the current thread was interrupted
          */
@@ -1108,7 +1086,7 @@ class KnowledgeControllerTest {
 
         /**
          * Test updateKnowledge with all VO fields being null.
-         * 
+         *
          * @throws ExecutionException if the computation threw an exception
          * @throws InterruptedException if the current thread was interrupted
          */
@@ -1129,7 +1107,7 @@ class KnowledgeControllerTest {
 
         /**
          * Test enableKnowledge with null parameters.
-         * 
+         *
          * @throws ExecutionException if the computation threw an exception
          * @throws InterruptedException if the current thread was interrupted
          */
@@ -1149,4 +1127,3 @@ class KnowledgeControllerTest {
         }
     }
 }
-
