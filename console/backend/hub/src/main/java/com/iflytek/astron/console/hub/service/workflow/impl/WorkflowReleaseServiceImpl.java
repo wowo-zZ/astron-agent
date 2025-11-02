@@ -302,16 +302,15 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
             log.info("Generated timestamp version number: {} - timestampVersionNum={}", logCtx, timestampVersionNum);
 
             // Create a new request with timestamp version number
-            WorkflowReleaseRequestDto requestWithVersionNum = new WorkflowReleaseRequestDto();
-            requestWithVersionNum.setBotId(request.getBotId());
-            requestWithVersionNum.setFlowId(request.getFlowId());
-            requestWithVersionNum.setPublishChannel(request.getPublishChannel());
-            requestWithVersionNum.setPublishResult(request.getPublishResult());
-            requestWithVersionNum.setDescription(request.getDescription());
-            requestWithVersionNum.setName(request.getName());
-            requestWithVersionNum.setVersionNum(timestampVersionNum);
+            WorkflowReleaseRequestDto releaseRequestDto = new WorkflowReleaseRequestDto();
+            releaseRequestDto.setBotId(request.getBotId());
+            releaseRequestDto.setFlowId(request.getFlowId());
+            releaseRequestDto.setPublishChannel(request.getPublishChannel());
+            releaseRequestDto.setPublishResult(request.getPublishResult());
+            releaseRequestDto.setDescription(request.getDescription());
+            releaseRequestDto.setName(request.getName());
 
-            String jsonBody = JSON.toJSONString(requestWithVersionNum);
+            String jsonBody = JSON.toJSONString(releaseRequestDto);
             String authHeader = getAuthorizationHeader();
 
             if (!StringUtils.hasText(authHeader)) {
@@ -326,6 +325,7 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
                     .url(versionUrl)
                     .post(RequestBody.create(jsonBody, JSON_MEDIA_TYPE))
                     .addHeader("Content-Type", "application/json")
+                    .addHeader(MaasUtil.X_AUTH_SOURCE_HEADER, MaasUtil.X_AUTH_SOURCE_VALUE)
                     .addHeader("Authorization", authHeader);
 
             if (spaceId != null) {

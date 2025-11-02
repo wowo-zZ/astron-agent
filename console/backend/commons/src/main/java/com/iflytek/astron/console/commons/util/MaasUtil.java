@@ -95,9 +95,9 @@ public class MaasUtil {
 
     public static final String PREFIX_MAAS_COPY = "maas_copy_";
     private static final String BOT_TAG_LIST = "bot_tag_list";
-    private static final String AUTHORIZATION_HEADER = "Authorization";
-    private static final String X_AUTH_SOURCE_HEADER = "x-auth-source";
-    private static final String X_AUTH_SOURCE_VALUE = "xfyun";
+    public static final String AUTHORIZATION_HEADER = "Authorization";
+    public static final String X_AUTH_SOURCE_HEADER = "x-auth-source";
+    public static final String X_AUTH_SOURCE_VALUE = "xfyun";
 
     private final OkHttpClient client = new OkHttpClient();
 
