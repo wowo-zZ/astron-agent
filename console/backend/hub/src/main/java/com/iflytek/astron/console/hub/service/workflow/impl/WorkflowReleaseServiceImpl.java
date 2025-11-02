@@ -73,15 +73,30 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
     // private final ApiSyncService apiSyncService;
     // private final WorkflowReleaseCallbackMapper workflowReleaseCallbackMapper;
 
+    /**
+     * Generate consistent log context string for tracing
+     */
+    private String logCtx(Integer botId, String flowId, Long spaceId) {
+        return String.format("[botId=%s, flowId=%s, spaceId=%s]", botId, flowId, spaceId);
+    }
+
+    /**
+     * Generate consistent log context string for tracing (with versionId)
+     */
+    private String logCtx(Integer botId, String flowId, Long spaceId, Long versionId) {
+        return String.format("[botId=%s, flowId=%s, spaceId=%s, versionId=%s]", botId, flowId, spaceId, versionId);
+    }
+
     @Override
     public WorkflowReleaseResponseDto publishWorkflow(Integer botId, String uid, Long spaceId, String publishType) {
         log.info("🔵 Starting workflow bot publish: botId={}, uid={}, spaceId={}, publishType={}",
                 botId, uid, spaceId, publishType);
 
         Long versionId = null;
+        String flowId = null;
         try {
             // 1. Get flowId
-            String flowId = userLangChainDataService.findFlowIdByBotId(botId);
+            flowId = userLangChainDataService.findFlowIdByBotId(botId);
             if (!StringUtils.hasText(flowId)) {
                 log.error("❌ Failed to get flowId by botId: botId={}", botId);
                 return createErrorResponse("Unable to get workflow ID");
@@ -89,7 +104,7 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
             log.debug("✓ Got flowId: {}", flowId);
 
             // 2. Get version name for new release
-            String versionName = getNextVersionName(flowId, spaceId);
+            String versionName = getNextVersionName(flowId, spaceId, botId);
             if (!StringUtils.hasText(versionName)) {
                 log.error("❌ Failed to get version name by flowId: flowId={}", flowId);
                 return createErrorResponse("Unable to get version name");
@@ -124,7 +139,7 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
             String appId = getAppIdByBotId(botId);
             if (!StringUtils.hasText(appId)) {
                 log.error("❌ AppId is empty, cannot sync to API system");
-                updateAuditResult(versionId, "Failed");
+                updateAuditResult(versionId, "Failed", botId, flowId, spaceId);
                 return createErrorResponse("AppId not found for bot");
             }
 
@@ -134,12 +149,12 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
             } catch (Exception syncError) {
                 // Sync failed - mark version as failed
                 log.error("❌ API sync failed, marking version as failed: {}", syncError.getMessage());
-                updateAuditResult(versionId, "Failed");
+                updateAuditResult(versionId, "Failed", botId, flowId, spaceId);
                 return createErrorResponse("API sync failed: " + syncError.getMessage());
             }
 
             // 6. Update audit result to success
-            boolean updateSuccess = updateAuditResult(versionId, "Success");
+            boolean updateSuccess = updateAuditResult(versionId, "Success", botId, flowId, spaceId);
             if (!updateSuccess) {
                 log.error("❌ Failed to update audit result, but sync was successful");
                 // Don't fail the whole operation if audit update fails
@@ -156,7 +171,7 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
             // Try to mark version as failed if we have versionId
             if (versionId != null) {
                 try {
-                    updateAuditResult(versionId, "Failed");
+                    updateAuditResult(versionId, "Failed", botId, flowId, spaceId);
                 } catch (Exception updateError) {
                     log.error("   Additional error updating version status: {}", updateError.getMessage());
                 }
@@ -170,8 +185,9 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
      * Get next version name for workflow release Simplified to match old project logic exactly - no
      * fallback
      */
-    private String getNextVersionName(String flowId, Long spaceId) {
-        log.info("Getting next workflow version name: flowId={}, spaceId={}", flowId, spaceId);
+    private String getNextVersionName(String flowId, Long spaceId, Integer botId) {
+        String logCtx = logCtx(botId, flowId, spaceId);
+        log.info("Getting next workflow version name: {}", logCtx);
 
         JSONObject requestBody = new JSONObject();
         requestBody.put("flowId", flowId);
@@ -179,8 +195,12 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
         String jsonBody = requestBody.toJSONString();
         String authHeader = getAuthorizationHeader();
 
+        String requestUrl = baseUrl + GET_VERSION_NAME_URL;
+        log.info("📤 GET_VERSION_NAME API Request {} - URL: {}", logCtx, requestUrl);
+        log.debug("   Request Body: {}", jsonBody);
+
         Request.Builder requestBuilder = new Request.Builder()
-                .url(baseUrl + GET_VERSION_NAME_URL)
+                .url(requestUrl)
                 .post(RequestBody.create(jsonBody, JSON_MEDIA_TYPE))
                 .addHeader("Content-Type", "application/json")
                 .addHeader("Authorization", authHeader);
@@ -191,24 +211,32 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
 
         try (Response response = okHttpClient.newCall(requestBuilder.build()).execute()) {
             ResponseBody body = response.body();
+            String responseStr = body != null ? body.string() : null;
+            
+            // Log complete HTTP response details
+            log.info("📥 GET_VERSION_NAME API Response {} - StatusCode: {}, IsSuccessful: {}", logCtx, response.code(), response.isSuccessful());
+            log.debug("   Response Headers: {}", response.headers());
+            log.debug("   Response Body: {}", responseStr);
+            
             if (body != null && response.isSuccessful()) {
-                String responseStr = body.string();
-                log.debug("Version name API response: {}", responseStr);
-
                 JSONObject responseJson = JSON.parseObject(responseStr);
                 if (responseJson != null && responseJson.getInteger("code") == 0) {
                     JSONObject data = responseJson.getJSONObject("data");
                     if (data != null && data.containsKey("workflowVersionName")) {
                         String versionName = data.getString("workflowVersionName");
                         if (versionName != null && !versionName.trim().isEmpty()) {
-                            log.info("Got version name from API: {} for flowId: {}", versionName, flowId);
+                            log.info("✓ Got version name from API {} - versionName: {}", logCtx, versionName);
                             return versionName;
                         }
                     }
+                } else {
+                    log.warn("⚠️ GET_VERSION_NAME API returned non-zero code {} - code: {}, message: {}", logCtx, responseJson != null ? responseJson.get("code") : "null", responseJson != null ? responseJson.get("message") : "null");
                 }
+            } else {
+                log.warn("⚠️ GET_VERSION_NAME API call unsuccessful {} - StatusCode: {}, Response: {}", logCtx, response.code(), responseStr);
             }
         } catch (Exception e) {
-            log.error("Exception occurred while getting version name, flowId={}", flowId, e);
+            log.error("❌ Exception occurred while getting version name {}", logCtx, e);
             return null;
         }
 
@@ -263,12 +291,15 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
     }
 
     private WorkflowReleaseResponseDto createWorkflowVersion(WorkflowReleaseRequestDto request, Long spaceId) {
-        log.info("Creating workflow version: request={}", request);
+        Integer botId = Integer.parseInt(request.getBotId());
+        String flowId = request.getFlowId();
+        String logCtx = logCtx(botId, flowId, spaceId);
+        log.info("Creating workflow version: {} - versionName={}", logCtx, request.getName());
 
         try {
             // Generate timestamp-based version number like old project
             String timestampVersionNum = generateTimestampVersionNumber();
-            log.info("Generated timestamp version number: {}", timestampVersionNum);
+            log.info("Generated timestamp version number: {} - timestampVersionNum={}", logCtx, timestampVersionNum);
 
             // Create a new request with timestamp version number
             WorkflowReleaseRequestDto requestWithVersionNum = new WorkflowReleaseRequestDto();
@@ -289,7 +320,8 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
 
             // Send request using OkHttp
             String versionUrl = baseUrl + addVersionUrl;
-            log.debug("📤 Creating version at URL: {}", versionUrl);
+            log.info("📤 CREATE_WORKFLOW_VERSION API Request {} - URL: {}", logCtx, versionUrl);
+            log.debug("   Request Body: {}", jsonBody);
             Request.Builder builder = new Request.Builder()
                     .url(versionUrl)
                     .post(RequestBody.create(jsonBody, JSON_MEDIA_TYPE))
@@ -307,22 +339,25 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
                 ResponseBody body = response.body();
                 String responseBody = body != null ? body.string() : null;
 
+                // Log complete HTTP response details
+                log.info("📥 CREATE_WORKFLOW_VERSION API Response {} - StatusCode: {}, IsSuccessful: {}", logCtx, response.code(), response.isSuccessful());
+                log.debug("   Response Headers: {}", response.headers());
+                log.debug("   Response Body: {}", responseBody);
+
                 if (!response.isSuccessful()) {
-                    log.error("Failed to create workflow version: statusCode={}, response={}",
-                            response.code(), responseBody);
+                    log.error("❌ Failed to create workflow version {} - statusCode={}, response={}",
+                            logCtx, response.code(), responseBody);
                     return createErrorResponse("Failed to create version: HTTP " + response.code());
                 }
 
                 if (!StringUtils.hasText(responseBody)) {
-                    log.error("Empty response when creating workflow version");
+                    log.error("❌ Empty response when creating workflow version {}", logCtx);
                     return createErrorResponse("Invalid response data format");
                 }
 
-                log.debug("Create workflow version response: {}", responseBody);
-
                 JSONObject responseJson = JSON.parseObject(responseBody);
                 if (responseJson == null) {
-                    log.error("Failed to parse workflow version response: {}", responseBody);
+                    log.error("❌ Failed to parse workflow version response {} - response={}", logCtx, responseBody);
                     return createErrorResponse("Invalid response data format");
                 }
 
@@ -342,8 +377,8 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
                         result.setWorkflowVersionName(request.getName());
                     }
 
-                    log.info("Successfully created workflow version: versionId={}, versionName={}",
-                            result.getWorkflowVersionId(), result.getWorkflowVersionName());
+                    log.info("✓ Successfully created workflow version {} - versionId={}, versionName={}",
+                            logCtx, result.getWorkflowVersionId(), result.getWorkflowVersionName());
                     return result;
                 }
 
@@ -351,7 +386,7 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
             }
 
         } catch (Exception e) {
-            log.error("Exception occurred while creating workflow version: request={}", request, e);
+            log.error("❌ Exception occurred while creating workflow version {}", logCtx, e);
             return createErrorResponse("Exception occurred while creating version: " + e.getMessage());
         }
     }
@@ -455,14 +490,15 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
     /**
      * Update audit result
      */
-    private boolean updateAuditResult(Long versionId, String auditResult) {
+    private boolean updateAuditResult(Long versionId, String auditResult, Integer botId, String flowId, Long spaceId) {
+        String logCtx = logCtx(botId, flowId, spaceId, versionId);
         if (versionId == null) {
-            log.warn("Version ID is null, skipping audit result update");
+            log.warn("Version ID is null, skipping audit result update - {}", logCtx);
             return false;
         }
 
         try {
-            log.info("Updating audit result: versionId={}, auditResult={}", versionId, auditResult);
+            log.info("Updating audit result: {} - auditResult={}", logCtx, auditResult);
 
             // Build request parameters
             JSONObject requestBody = new JSONObject();
@@ -473,13 +509,18 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
             String authHeader = getAuthorizationHeader();
 
             if (!StringUtils.hasText(authHeader)) {
-                log.error("No authorization header available for audit result update");
+                log.error("❌ No authorization header available for audit result update - {}", logCtx);
                 return false;
             }
 
+            // Log HTTP request details
+            String updateUrl = baseUrl + UPDATE_RESULT_URL;
+            log.info("📤 UPDATE_AUDIT_RESULT API Request {} - URL: {}", logCtx, updateUrl);
+            log.debug("   Request Body: {}", jsonBody);
+
             // Send request using OkHttp
             Request httpRequest = new Request.Builder()
-                    .url(baseUrl + UPDATE_RESULT_URL)
+                    .url(updateUrl)
                     .post(RequestBody.create(jsonBody, JSON_MEDIA_TYPE))
                     .addHeader("Content-Type", "application/json")
                     .addHeader("Authorization", authHeader)
@@ -489,41 +530,44 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
                 ResponseBody body = response.body();
                 String responseBody = body != null ? body.string() : null;
 
+                // Log complete HTTP response details
+                log.info("📥 UPDATE_AUDIT_RESULT API Response {} - StatusCode: {}, IsSuccessful: {}", logCtx, response.code(), response.isSuccessful());
+                log.debug("   Response Headers: {}", response.headers());
+                log.debug("   Response Body: {}", responseBody);
+
                 if (!response.isSuccessful()) {
-                    log.error("Failed to update audit result: versionId={}, auditResult={}, responseCode={}, response={}",
-                            versionId, auditResult, response.code(), responseBody);
+                    log.error("❌ Failed to update audit result {} - statusCode={}, response={}",
+                            logCtx, response.code(), responseBody);
                     return false;
                 }
 
                 if (!StringUtils.hasText(responseBody)) {
-                    log.error("Empty response when updating audit result: versionId={}, auditResult={}",
-                            versionId, auditResult);
+                    log.error("❌ Empty response when updating audit result - {}",
+                            logCtx);
                     return false;
                 }
 
-                log.debug("Update audit result response: {}", responseBody);
-
                 JSONObject responseJson = JSON.parseObject(responseBody);
                 if (responseJson == null) {
-                    log.error("Failed to parse audit result response: versionId={}, response={}", versionId, responseBody);
+                    log.error("❌ Failed to parse audit result response - {}, response={}", logCtx, responseBody);
                     return false;
                 }
 
                 Integer code = responseJson.getInteger("code");
 
                 if (code != null && code.equals(0)) {
-                    log.info("Successfully updated audit result: versionId={}, auditResult={}", versionId, auditResult);
+                    log.info("✓ Successfully updated audit result - {} - auditResult={}", logCtx, auditResult);
                     return true;
                 } else {
-                    log.error("Failed to update audit result: versionId={}, auditResult={}, response={}",
-                            versionId, auditResult, responseBody);
+                    log.error("❌ Failed to update audit result (non-zero code) - {} - code={}, response={}",
+                            logCtx, code, responseBody);
                     return false;
                 }
             }
 
         } catch (Exception e) {
-            log.error("Exception occurred while updating audit result: versionId={}, auditResult={}",
-                    versionId, auditResult, e);
+            log.error("❌ Exception occurred while updating audit result - {} - auditResult={}",
+                    logCtx, auditResult, e);
             return false;
         }
     }
