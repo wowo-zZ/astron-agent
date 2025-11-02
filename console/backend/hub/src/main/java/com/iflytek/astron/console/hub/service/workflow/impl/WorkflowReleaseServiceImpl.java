@@ -49,9 +49,10 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
     private String maasAppId;
 
     // API endpoints for workflow version management
-    private static final String ADD_VERSION_URL = ""; // Create new version
-    private static final String UPDATE_RESULT_URL = "/update-channel-result"; // Update audit result
-    private static final String GET_VERSION_NAME_URL = "/get-version-name"; // Get next version name
+    @Value("${maas.addVersionUrl:}")
+    private String addVersionUrl;
+    private static final String UPDATE_RESULT_URL = "/update-channel-result";
+    private static final String GET_VERSION_NAME_URL = "/get-version-name";
 
     // Release status constants (reserved for future use)
     @SuppressWarnings("unused")
@@ -74,27 +75,30 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
 
     @Override
     public WorkflowReleaseResponseDto publishWorkflow(Integer botId, String uid, Long spaceId, String publishType) {
-        log.info("Starting workflow bot publish: botId={}, uid={}, spaceId={}, publishType={}",
+        log.info("🔵 Starting workflow bot publish: botId={}, uid={}, spaceId={}, publishType={}",
                 botId, uid, spaceId, publishType);
 
+        Long versionId = null;
         try {
             // 1. Get flowId
             String flowId = userLangChainDataService.findFlowIdByBotId(botId);
             if (!StringUtils.hasText(flowId)) {
-                log.error("Failed to get flowId by botId: botId={}", botId);
+                log.error("❌ Failed to get flowId by botId: botId={}", botId);
                 return createErrorResponse("Unable to get workflow ID");
             }
+            log.debug("✓ Got flowId: {}", flowId);
 
             // 2. Get version name for new release
             String versionName = getNextVersionName(flowId, spaceId);
             if (!StringUtils.hasText(versionName)) {
-                log.error("Failed to get version name by flowId: flowId={}", flowId);
+                log.error("❌ Failed to get version name by flowId: flowId={}", flowId);
                 return createErrorResponse("Unable to get version name");
             }
+            log.debug("✓ Got version name: {}", versionName);
 
             // 3. Check if version already exists
             if (isVersionExists(botId, versionName)) {
-                log.info("Version already exists, skipping publish: botId={}, versionName={}", botId, versionName);
+                log.info("⚠️ Version already exists, skipping publish: botId={}, versionName={}", botId, versionName);
                 return createSuccessResponse(null, versionName);
             }
 
@@ -103,29 +107,61 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
             request.setBotId(botId.toString());
             request.setFlowId(flowId);
             request.setPublishChannel(getPublishChannelCode(publishType));
-            request.setPublishResult("Success");
+            request.setPublishResult("Pending");  // Initially set to Pending
             request.setDescription("");
             request.setName(versionName);
 
-            WorkflowReleaseResponseDto response = createWorkflowVersion(request);
+            WorkflowReleaseResponseDto response = createWorkflowVersion(request, spaceId);
             if (!response.getSuccess()) {
+                log.error("❌ Failed to create workflow version: {}", response.getErrorMessage());
                 return response;
             }
 
+            versionId = response.getWorkflowVersionId();
+            log.info("✓ Created workflow version: versionId={}, versionName={}", versionId, response.getWorkflowVersionName());
+
             // 5. Sync to API system directly (no approval needed)
             String appId = getAppIdByBotId(botId);
-            syncToApiSystem(botId, flowId, versionName, appId);
+            if (!StringUtils.hasText(appId)) {
+                log.error("❌ AppId is empty, cannot sync to API system");
+                updateAuditResult(versionId, "Failed");
+                return createErrorResponse("AppId not found for bot");
+            }
+
+            try {
+                syncToApiSystem(botId, flowId, versionName, appId);
+                log.info("✓ Successfully synced to API system");
+            } catch (Exception syncError) {
+                // Sync failed - mark version as failed
+                log.error("❌ API sync failed, marking version as failed: {}", syncError.getMessage());
+                updateAuditResult(versionId, "Failed");
+                return createErrorResponse("API sync failed: " + syncError.getMessage());
+            }
 
             // 6. Update audit result to success
-            updateAuditResult(response.getWorkflowVersionId(), "Success");
+            boolean updateSuccess = updateAuditResult(versionId, "Success");
+            if (!updateSuccess) {
+                log.error("❌ Failed to update audit result, but sync was successful");
+                // Don't fail the whole operation if audit update fails
+            }
 
-            log.info("Workflow bot publish and sync successful: botId={}, versionId={}, versionName={}",
-                    botId, response.getWorkflowVersionId(), response.getWorkflowVersionName());
+            log.info("✓ Workflow bot publish and sync successful: botId={}, versionId={}, versionName={}",
+                    botId, versionId, response.getWorkflowVersionName());
 
             return response;
 
         } catch (Exception e) {
-            log.error("Workflow bot publish failed: botId={}, uid={}, spaceId={}", botId, uid, spaceId, e);
+            log.error("❌ Workflow bot publish failed: botId={}, uid={}, spaceId={}", botId, uid, spaceId, e);
+            
+            // Try to mark version as failed if we have versionId
+            if (versionId != null) {
+                try {
+                    updateAuditResult(versionId, "Failed");
+                } catch (Exception updateError) {
+                    log.error("   Additional error updating version status: {}", updateError.getMessage());
+                }
+            }
+            
             return createErrorResponse("Publish failed: " + e.getMessage());
         }
     }
@@ -226,7 +262,7 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
         }
     }
 
-    private WorkflowReleaseResponseDto createWorkflowVersion(WorkflowReleaseRequestDto request) {
+    private WorkflowReleaseResponseDto createWorkflowVersion(WorkflowReleaseRequestDto request, Long spaceId) {
         log.info("Creating workflow version: request={}", request);
 
         try {
@@ -247,16 +283,24 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
             String jsonBody = JSON.toJSONString(requestWithVersionNum);
             String authHeader = getAuthorizationHeader();
 
-            if (authHeader.isEmpty()) {
+            if (!StringUtils.hasText(authHeader)) {
                 return createErrorResponse("No authorization header available");
             }
 
             // Send request using OkHttp
-            Request httpRequest = new Request.Builder()
-                    .url(baseUrl + ADD_VERSION_URL)
+            String versionUrl = baseUrl + addVersionUrl;
+            log.debug("📤 Creating version at URL: {}", versionUrl);
+            Request.Builder builder = new Request.Builder()
+                    .url(versionUrl)
                     .post(RequestBody.create(jsonBody, JSON_MEDIA_TYPE))
                     .addHeader("Content-Type", "application/json")
-                    .addHeader("Authorization", authHeader)
+                    .addHeader("Authorization", authHeader);
+
+            if (spaceId != null) {
+                builder.addHeader("space-id", spaceId.toString());
+            }
+
+            Request httpRequest = builder
                     .build();
 
             try (Response response = okHttpClient.newCall(httpRequest).execute()) {
@@ -312,26 +356,58 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
         }
     }
 
+    /**
+     * Sync workflow to API system (publish and bind)
+     * Throws exception on failure to prevent silent failures
+     */
     private void syncToApiSystem(Integer botId, String flowId, String versionName, String appId) {
-        log.info("Syncing workflow to API system: botId={}, flowId={}, versionName={}, appId={}",
+        log.info("🔄 Starting API sync: botId={}, flowId={}, versionName={}, appId={}",
                 botId, flowId, versionName, appId);
 
         try {
+            // Validate inputs
+            if (!StringUtils.hasText(appId)) {
+                log.error("❌ Cannot sync to API system: appId is empty!");
+                throw new IllegalArgumentException("appId cannot be empty");
+            }
+
             // 1. Get version system data
             JSONObject versionData = getVersionSysData(botId, versionName);
             if (versionData == null) {
-                log.error("Failed to get version system data: botId={}, versionName={}", botId, versionName);
-                return;
+                log.warn("⚠️ Version system data is null, continuing with empty data");
+                versionData = new JSONObject();
+            } else if (versionData.isEmpty()) {
+                log.debug("   Version system data is empty");
             }
 
             // 2. Use MaasUtil's createApi method to publish and bind
-            maasUtil.createApi(flowId, appId, versionName, versionData);
+            try {
+                log.info("📤 Calling MaaS publish and bind APIs...");
+                maasUtil.createApi(flowId, appId, versionName, versionData);
+                log.info("✓ Successfully synced workflow to API system: botId={}, flowId={}, versionName={}",
+                        botId, flowId, versionName);
+            } catch (Exception maasException) {
+                log.error("❌ MaaS API call failed: {}", maasException.getMessage());
+                
+                // Analyze error cause
+                String errorMsg = maasException.getMessage();
+                if (errorMsg != null && (errorMsg.contains("binding failed") || errorMsg.contains("20007"))) {
+                    log.error("   → Application binding failed. Check:");
+                    log.error("     1. Does appId '{}' exist in MaaS platform?", appId);
+                    log.error("     2. Is appId active and has binding permission?");
+                    log.error("     3. Was workflow version successfully published?");
+                }
+                
+                throw maasException;  // Re-throw to be handled by caller
+            }
 
-            log.info("Successfully synced workflow to API system: botId={}, flowId={}, versionName={}", botId, flowId, versionName);
-
+        } catch (IllegalArgumentException e) {
+            log.error("❌ Invalid argument for API sync: {}", e.getMessage());
+            throw e;
         } catch (Exception e) {
-            log.error("Exception occurred while syncing workflow to API system: botId={}, flowId={}, versionName={}, appId={}",
+            log.error("❌ Exception occurred while syncing workflow to API system: botId={}, flowId={}, versionName={}, appId={}",
                     botId, flowId, versionName, appId, e);
+            throw new RuntimeException("API system sync failed: " + e.getMessage(), e);
         }
     }
 
@@ -396,7 +472,7 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
             String jsonBody = requestBody.toJSONString();
             String authHeader = getAuthorizationHeader();
 
-            if (authHeader.isEmpty()) {
+            if (!StringUtils.hasText(authHeader)) {
                 log.error("No authorization header available for audit result update");
                 return false;
             }
@@ -469,8 +545,10 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
 
     /**
      * Get appId by botId from chat_bot_api table, fallback to configured maas appId
+     * Validates that appId exists and is not empty
      */
     private String getAppIdByBotId(Integer botId) {
+        String appId = null;
         try {
             // Query chat_bot_api table to find appId for the given botId
             LambdaQueryWrapper<ChatBotApi> queryWrapper = new LambdaQueryWrapper<ChatBotApi>()
@@ -479,31 +557,44 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
 
             ChatBotApi chatBotApi = chatBotApiMapper.selectOne(queryWrapper);
 
-            if (chatBotApi != null && chatBotApi.getAppId() != null) {
-                log.debug("Found appId for botId {}: {}", botId, chatBotApi.getAppId());
-                return chatBotApi.getAppId();
+            if (chatBotApi != null && StringUtils.hasText(chatBotApi.getAppId())) {
+                appId = chatBotApi.getAppId();
+                log.info("✓ Found appId in database for botId {}: {}", botId, appId);
+                return appId;
             } else {
-                // Fallback to configured maas appId
-                log.debug("No appId found for botId: {}, using configured maas appId: {}", botId, maasAppId);
-                return maasAppId;
+                log.warn("⚠️ No appId found in chat_bot_api table for botId: {}", botId);
             }
         } catch (Exception e) {
-            // Fallback to configured maas appId on error
-            log.error("Failed to get appId for botId: {}, using configured maas appId: {}", botId, maasAppId, e);
+            log.error("❌ Exception querying chat_bot_api table for botId: {}", botId, e);
+        }
+
+        // Use fallback appId if database lookup failed or returned null
+        if (StringUtils.hasText(maasAppId)) {
+            log.warn("   Using fallback configured maasAppId: {}", maasAppId);
             return maasAppId;
+        } else {
+            log.error("❌ No appId found in database and no fallback configured!");
+            log.error("   Please configure maas.appId in application.yml or ensure chat_bot_api has botId mapping");
+            return null;
         }
     }
 
     /**
      * Get authorization header from current request context
+     * Throws exception if header is missing to prevent silent failures
      */
     private String getAuthorizationHeader() {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (attributes == null) {
-            log.warn("No request context available for Authorization header");
+            log.error("❌ RequestContextHolder is null - request context not available!");
+            log.error("   This usually means the method is being called outside an HTTP request context.");
             return "";
         }
-        return MaasUtil.getAuthorizationHeader(attributes.getRequest());
+        String authHeader = MaasUtil.getAuthorizationHeader(attributes.getRequest());
+        if (StringUtils.isEmpty(authHeader)) {
+            log.warn("⚠️ Authorization header is empty - API calls may fail if authentication is required");
+        }
+        return authHeader;
     }
 
     /**
