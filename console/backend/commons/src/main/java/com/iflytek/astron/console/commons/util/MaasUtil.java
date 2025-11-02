@@ -169,7 +169,7 @@ public class MaasUtil {
     }
 
     public JSONObject synchronizeWorkFlow(UserLangChainInfo userLangChainInfo, BotCreateForm botCreateForm,
-            HttpServletRequest request, Long spaceId) {
+                                          HttpServletRequest request, Long spaceId) {
         AdvancedConfig advancedConfig = new AdvancedConfig(botCreateForm.getPrologue(), botCreateForm.getInputExample(), botCreateForm.getAppBackground());
         JSONObject param = new JSONObject();
         param.put("avatarIcon", botCreateForm.getAvatar());
@@ -363,7 +363,7 @@ public class MaasUtil {
      * Create API (without version)
      *
      * @param flowId Workflow ID
-     * @param appid Application ID
+     * @param appid  Application ID
      * @return JSONObject response result
      */
     public JSONObject createApi(String flowId, String appid) {
@@ -377,10 +377,10 @@ public class MaasUtil {
     /**
      * Create API (with version) - data parameter is not sent to workflow/v1/publish
      *
-     * @param flowId Workflow ID
-     * @param appid Application ID
+     * @param flowId  Workflow ID
+     * @param appid   Application ID
      * @param version Version number
-     * @param data Version data (not used in publish request)
+     * @param data    Version data (not used in publish request)
      * @return JSONObject response result
      */
     public JSONObject createApi(String flowId, String appid, String version, JSONObject data) {
@@ -391,8 +391,8 @@ public class MaasUtil {
     /**
      * Internal generic method for creating API
      *
-     * @param flowId Workflow ID
-     * @param appid Application ID
+     * @param flowId  Workflow ID
+     * @param appid   Application ID
      * @param version Version number (can be null)
      * @return JSONObject response result
      */
@@ -414,7 +414,7 @@ public class MaasUtil {
     /**
      * Execute HTTP POST request and return response string
      *
-     * @param url Request URL
+     * @param url      Request URL
      * @param bodyData Request body data object
      * @return String representation of response content
      */
@@ -430,7 +430,7 @@ public class MaasUtil {
                 .addHeader("Authorization", "Bearer %s:%s".formatted(consumerKey, consumerSecret))
                 .addHeader(X_AUTH_SOURCE_HEADER, X_AUTH_SOURCE_VALUE)
                 .build();
-        log.info("MaasUtil executeRequest url: {} request: {}, header: {}", request.url(), request, request.headers());
+        log.info("MaasUtil executeRequest url: {} request: {}, header: {}, body: {}", request.url(), request, request.headers(), bodyData);
         try (Response httpResponse = HTTP_CLIENT.newCall(request).execute()) {
             ResponseBody responseBody = httpResponse.body();
             if (responseBody != null) {
@@ -448,9 +448,9 @@ public class MaasUtil {
      * Validate whether the response is successful
      *
      * @param responseStr Response content string representation
-     * @param action Description of current operation being performed (e.g., "publish", "bind")
-     * @param flowId Workflow ID
-     * @param appid Application ID
+     * @param action      Description of current operation being performed (e.g., "publish", "bind")
+     * @param flowId      Workflow ID
+     * @param appid       Application ID
      */
     private void validateResponse(String responseStr, String action, String flowId, String appid) {
         log.info("----- {} maas api response: {}", action, responseStr);
