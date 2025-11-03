@@ -377,6 +377,7 @@ export const en = {
       professional: 'Pro',
       team: 'Team',
       enterprise: 'Enterprise',
+      confirmUpgradeEnterprise: 'Confirm Upgrade Enterprise ?',
     },
 
     // Space role translations

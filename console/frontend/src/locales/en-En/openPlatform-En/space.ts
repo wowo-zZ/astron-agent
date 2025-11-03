@@ -227,6 +227,20 @@ const translation = {
   // UserItem
   invited: 'Invited',
   joined: 'Joined',
+
+  // TeamCreate
+  pleaseEnterName: 'Please enter {{enterpriseType}} name',
+  teamNameExists: '{{enterpriseType}} name already exists',
+  teamCreateSuccess: '{{enterpriseType}} created successfully',
+  teamCreateFailed: '{{enterpriseType}} created failed',
+  teamEditionAlreadyEffective: '{{enterpriseType}} edition already effective',
+  adminAvatar: 'Admin Avatar',
+  pleaseCompleteInfo: 'Please complete {{enterpriseType}} information setting',
+  upload: 'Upload',
+  avatar: 'Avatar',
+  name: '{{enterpriseType}} name',
+  create: 'Create {{enterpriseType}}',
+  avatarUploadSuccess: 'Avatar uploaded successfully!',
 };
 
 export default translation;

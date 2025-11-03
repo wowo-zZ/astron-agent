@@ -217,6 +217,20 @@ const translation = {
   // UserItem
   invited: '已邀请',
   joined: '已加入',
+
+  // TeamCreate
+  pleaseEnterName: '请输入{{enterpriseType}}名称',
+  teamNameExists: '{{enterpriseType}}名称已存在',
+  teamCreateSuccess: '{{enterpriseType}}创建成功',
+  teamCreateFailed: '{{enterpriseType}}创建失败',
+  teamEditionAlreadyEffective: '{{enterpriseType}}版已生效',
+  adminAvatar: '管理员头像',
+  pleaseCompleteInfo: '请完成{{enterpriseType}}信息设置',
+  upload: '上传',
+  avatar: '头像',
+  name: '{{enterpriseType}}名称',
+  create: '创建{{enterpriseType}}',
+  avatarUploadSuccess: '头像已上传!',
 };
 
 export default translation;

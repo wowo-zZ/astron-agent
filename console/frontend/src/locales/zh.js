@@ -361,6 +361,7 @@ export const zh = {
       team: '团队版',
       enterprise: '企业版',
       custom: '定制版',
+      confirmUpgradeEnterprise: '确定升级为企业版吗？',
     },
 
     // 空间角色翻译
