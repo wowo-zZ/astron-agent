@@ -210,6 +210,7 @@ public class VersionService {
                 }
 
             }
+            workflowVersionMapper.insert(workflowVersion);
 
             return ApiResult.success(new JSONObject()
                     .fluentPut("workflowVersionId", workflowVersion.getId())
