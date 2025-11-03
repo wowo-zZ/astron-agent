@@ -2129,7 +2129,6 @@ public class FileInfoV2Service extends ServiceImpl<FileInfoV2Mapper, FileInfoV2>
     @Transactional
     public void enableFile(Long id, Integer enabled) {
         FileDirectoryTree fileDirectoryTree = fileDirectoryTreeService.getById(id);
-        Long spaceId = SpaceInfoUtil.getSpaceId();
         if (fileDirectoryTree == null || fileDirectoryTree.getIsFile() != 1) {
             throw new BusinessException(ResponseEnum.REPO_FILE_NOT_EXIST);
         }
@@ -2137,8 +2136,23 @@ public class FileInfoV2Service extends ServiceImpl<FileInfoV2Mapper, FileInfoV2>
         if (fileInfoV2 == null) {
             throw new BusinessException(ResponseEnum.REPO_FILE_NOT_EXIST);
         }
-        if (null == spaceId) {
+
+        Repo repo = repoService.getById(fileInfoV2.getRepoId());
+        if (repo != null) {
+            try {
+                dataPermissionCheckTool.checkRepoBelong(repo);
+            } catch (Exception e) {
+                log.warn("Unauthorized operation detected, uid={}, fileDirectoryTreeId={}", UserInfoManagerHandler.getUserId(), id);
+                throw new BusinessException(ResponseEnum.REPO_FILE_NOT_EXIST);
+            }
+        }
+
+        try {
             dataPermissionCheckTool.checkFileBelong(fileInfoV2);
+        } catch (Exception e) {
+            log.warn("Unauthorized file access detected, uid={}, fileDirectoryTreeId={}, fileId={}",
+                    UserInfoManagerHandler.getUserId(), id, fileInfoV2.getId());
+            throw new BusinessException(ResponseEnum.REPO_FILE_NOT_EXIST);
         }
 
         fileInfoV2.setEnabled(enabled);
@@ -2146,6 +2160,11 @@ public class FileInfoV2Service extends ServiceImpl<FileInfoV2Mapper, FileInfoV2>
         this.updateById(fileInfoV2);
 
         knowledgeService.enableDoc(fileInfoV2.getId(), enabled);
+        log.info("File {} operation performed by user {}, fileId={}, enabled={}",
+                enabled == 1 ? "enable" : "disable",
+                UserInfoManagerHandler.getUserId(),
+                fileInfoV2.getId(),
+                enabled);
     }
 
 

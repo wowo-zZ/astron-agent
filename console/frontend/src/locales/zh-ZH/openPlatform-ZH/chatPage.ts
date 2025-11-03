@@ -32,6 +32,7 @@ const transition = {
     deepseekV3Model: 'DeepSeek V3模型',
     gemmaModel: 'Gemma大模型',
     qwenModel: 'Qwen大模型',
+    rolePlayModel: '角色扮演',
     toolCalling: '工具调用',
   },
   chatBottom: {
@@ -41,6 +42,7 @@ const transition = {
     read: '朗读',
     copy: '复制',
     reAnswer: '重新回答',
+    textTooLong: '文本过长，最大限制8000字符',
   },
   chatWindow: {
     clearChatHistoryFailed: '清空聊天记录失败',
@@ -56,6 +58,7 @@ const transition = {
     uploading: '上传中...',
     processing: '解析中...',
     newChat: '全新对话',
+    newChatSimple: '全新的开始',
     clearChatHistory: '清空聊天记录',
     confirmDeleteChat: '确认删除聊天记录？',
     stopOutput: '停止输出',
@@ -78,9 +81,13 @@ const transition = {
     deleteFile: '删除文件',
     cancelUpload: '取消上传',
     pleaseSelectOption: '请选择选项~',
-    virtualVoicePermission:'虚拟人播报需要浏览器权限',
-    virtualAuthorization:'授权',
-    virtualLoading:'虚拟人加载中'
+    virtualVoicePermission: '虚拟人播报需要浏览器权限',
+    virtualAuthorization: '授权',
+    virtualLoading: '虚拟人加载中',
+    freshStart: '全新的开始',
+    deleteErrorFilesBeforeSend: '请先删除上传失败的文件再发送消息',
+    vmsPermissionRequired: '虚拟人播报需要浏览器权限',
+    grantPermission: '授权',
   },
   feedbackPopover: {
     feedbackTitle: '你的反馈将帮助我们持续进步',

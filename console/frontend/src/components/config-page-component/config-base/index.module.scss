@@ -97,7 +97,8 @@
     gap: 8px;
     bottom: 13px;
     left: 20px;
-    width: 97px;
+    width: auto;
+    padding: 0 10px;
     height: 32px;
     line-height: 30px;
     // border: 1px solid #6356EA;
@@ -138,7 +139,8 @@
       display: flex;
       justify-content: center;
       gap: 8px;
-      width: 126px;
+      width: auto;
+      padding: 0 10px;
       height: 32px;
       line-height: 30px;
       border-radius: 8px;

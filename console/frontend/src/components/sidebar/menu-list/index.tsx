@@ -45,6 +45,7 @@ interface EnterpriseSpaceEmptyMenuProps {
 const EnterpriseSpaceEmptyMenu: FC<EnterpriseSpaceEmptyMenuProps> = ({
   isCollapsed = false,
 }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const { handleTeamSwitch } = useSpaceType(navigate);
@@ -78,29 +79,33 @@ const EnterpriseSpaceEmptyMenu: FC<EnterpriseSpaceEmptyMenuProps> = ({
         <div
           className={`${isCollapsed ? 'w-[25px] h-[25px]' : 'w-[94px] h-[94px]'} flex items-center justify-center`}
         >
-          <img src={createSpaceImg} alt="创建空间" className="w-full h-auto" />
+          <img
+            src={createSpaceImg}
+            alt={t('space.createSpace')}
+            className="w-full h-auto"
+          />
         </div>
         {!isCollapsed && (
           <div className="w-[162px] h-[43px] flex flex-col justify-center items-center py-2.5 px-5 rounded-[10px] bg-white font-medium text-sm leading-6 text-center text-[#1f1f1f] cursor-pointer hover:text-[#6356EA]">
-            创建空间
+            {t('space.createSpace')}
           </div>
         )}
         {isCollapsed && (
           <div className="w-auto rounded-lg bg-white shadow-[0px_0px_20px_0px_rgba(0,18,70,0.08)] text-[#333333] whitespace-nowrap py-3 px-5 absolute -top-1.5 left-[54px] z-[3] hidden group-hover:block">
-            创建空间
+            {t('space.createSpace')}
           </div>
         )}
       </div>
     );
-  }, [showCreateModal, setShowCreateModal, handleTeamSwitch, isCollapsed]);
+  }, [showCreateModal, setShowCreateModal, handleTeamSwitch, isCollapsed, t]);
 
   const otherMenuList = useMemo(
     () => [
       {
         key: 'create',
         icon: enterpriseShareCreate,
-        desc: '创建团队共享空间',
-        btnText: '创建新空间',
+        desc: t('space.createTeamSharedSpace'),
+        btnText: t('space.createNewSpace'),
         onClick: () => {
           setShowCreateModal(true);
         },
@@ -110,8 +115,8 @@ const EnterpriseSpaceEmptyMenu: FC<EnterpriseSpaceEmptyMenuProps> = ({
             {
               key: 'join',
               icon: enterpriseSpaceJoin,
-              desc: '加入团队下的空间',
-              btnText: '进入空间管理',
+              desc: t('space.joinTeamSpace'),
+              btnText: t('space.enterSpaceManagement'),
               onClick: () => {
                 navigate(`/enterprise/${enterpriseId}/space`);
               },
@@ -119,7 +124,7 @@ const EnterpriseSpaceEmptyMenu: FC<EnterpriseSpaceEmptyMenuProps> = ({
           ]
         : []),
     ],
-    [setShowCreateModal, navigate, enterpriseId, isShowJoinMenu]
+    [setShowCreateModal, navigate, enterpriseId, isShowJoinMenu, t]
   );
 
   const otherMenu = useMemo(() => {

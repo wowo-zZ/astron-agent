@@ -76,9 +76,9 @@ export const initialStatus = {
 };
 
 export const handleChatTypeChange = (type: string, set) => {
-      set({
-        chatType: type,
-      });
+  set({
+    chatType: type,
+  });
 };
 
 const getDialogues = (id: string, set, shouldAddDivider = false): void => {

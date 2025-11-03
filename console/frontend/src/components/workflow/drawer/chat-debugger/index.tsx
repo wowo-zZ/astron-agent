@@ -4,7 +4,12 @@ import { Drawer, Button, message, Spin } from 'antd';
 import { cloneDeep } from 'lodash';
 import useFlowsManager from '@/components/workflow/store/use-flows-manager';
 import useFlowStore from '@/components/workflow/store/use-flow-store';
-import { getProcessedStr, isJSON, isPureText, splitSentencesBasic } from '@/utils';
+import {
+  getProcessedStr,
+  isJSON,
+  isPureText,
+  splitSentencesBasic,
+} from '@/utils';
 import {
   validateInputJSON,
   generateDefaultInput,
@@ -28,21 +33,21 @@ import {
 // 从统一的图标管理中导入
 import { Icons } from '@/components/workflow/icons';
 import VmsInteractionCmp from '@/components/vms-interaction-cmp';
-import './index.scss'
+import './index.scss';
 // 获取 Chat Debugger 模块的图标
 const icons = Icons.chatDebugger;
 
 export let chatAnswer = '';
 //虚拟人形象参数
-export let sdkAvatarInfo = {
+export const sdkAvatarInfo = {
   avatar_id: '',
 };
 //虚拟人发言人参数
-export let sdkTTSInfo = {
+export const sdkTTSInfo = {
   vcn: '',
 };
 
-export let vmsInteractionCmpRefDome = (null);
+export const vmsInteractionCmpRefDome = null;
 const initInterruptChat: InterruptChatType = {
   eventId: '',
   interrupt: false,
@@ -64,7 +69,7 @@ const ChatFooter = ({
   startNodeParams,
   interruptChat,
   userInput,
-  vmsInteractionCmpRef
+  vmsInteractionCmpRef,
 }: {
   trialRun: boolean;
 }): React.ReactElement | null => {
@@ -292,9 +297,9 @@ const useChatDebuggerEffect = (
             }
             return [...chatList];
           });
-            if (chatAnswer && vmsInteractiveRefStatus === 'init') {
+          if (chatAnswer && vmsInteractiveRefStatus === 'init') {
             if (chatAnswer.length >= 2000) {
-              let str = chatAnswer.slice(0, 2000);
+              const str = chatAnswer.slice(0, 2000);
               isPureText(str) &&
                 vmsInteractionCmpRef?.current?.instance?.writeText(str, {
                   tts: sdkTTSInfo,
@@ -410,17 +415,17 @@ export function ChatDebuggerContent({
     useChatDebuggerContent({
       currentFlow,
     });
-    const [callStatus, setCallStatus] = useState('hangup');
-    const [loadingVms, setLoadingVms] = useState<boolean>(false);
-    const vmsInteractionCmpRef = useRef<any>(null);
-    const vmsInteractiveRefStatus = useChatStores(
-      (state: any) => state.vmsInteractiveRefStatus
-    );
-    const setVmsInteractiveRefStatus = useChatStores(
-      (state: any) => state.setVmsInteractiveRefStatus
-    );
-  
-    useEffect(() => {
+  const [callStatus, setCallStatus] = useState('hangup');
+  const [loadingVms, setLoadingVms] = useState<boolean>(false);
+  const vmsInteractionCmpRef = useRef<any>(null);
+  const vmsInteractiveRefStatus = useChatStores(
+    (state: any) => state.vmsInteractiveRefStatus
+  );
+  const setVmsInteractiveRefStatus = useChatStores(
+    (state: any) => state.setVmsInteractiveRefStatus
+  );
+
+  useEffect(() => {
     if (talkAgentConfig?.interactType === 0) {
       handleChatTypeChange('phone');
       setCallStatus('ringing');
@@ -432,61 +437,60 @@ export function ChatDebuggerContent({
     sdkTTSInfo.vcn = talkAgentConfig?.vcn;
     //如果开启了虚拟人，可能是语音通话虚拟人，也可能是语音通话，但是都需要初始化虚拟人必要的参数
     if (talkAgentConfig?.sceneEnable === 1 && open) {
-     
-    setTimeout(()=>{
+      setTimeout(() => {
         if (
-        sdkAvatarInfo.avatar_id !== talkAgentConfig?.sceneId &&
-        talkAgentConfig?.sceneId
-      ) {
-        sdkAvatarInfo.avatar_id = talkAgentConfig?.sceneId;        
-        // getSceneList().then(data => {
-        //   const list: SceneItem[] = Array.isArray(data)
-        //     ? (data as SceneItem[])
-        //     : [];
-        //   list.find(
-        //     (item: SceneItem) => item.sceneId === talkAgentConfig?.sceneId
-        //   )?.defaultVCN &&
-        //     (sdkTTSInfo.vcn =
-        //       list.find(
-        //         (item: SceneItem) => item.sceneId === talkAgentConfig?.sceneId
-        //       )?.defaultVCN || '');
-        if (talkAgentConfig?.sceneId) {
-          vmsInteractionCmpRef?.current?.instance &&
-            vmsInteractionCmpRef?.current?.dispose();
-          chatAnswer = '';
+          sdkAvatarInfo.avatar_id !== talkAgentConfig?.sceneId &&
+          talkAgentConfig?.sceneId
+        ) {
+          sdkAvatarInfo.avatar_id = talkAgentConfig?.sceneId;
+          // getSceneList().then(data => {
+          //   const list: SceneItem[] = Array.isArray(data)
+          //     ? (data as SceneItem[])
+          //     : [];
+          //   list.find(
+          //     (item: SceneItem) => item.sceneId === talkAgentConfig?.sceneId
+          //   )?.defaultVCN &&
+          //     (sdkTTSInfo.vcn =
+          //       list.find(
+          //         (item: SceneItem) => item.sceneId === talkAgentConfig?.sceneId
+          //       )?.defaultVCN || '');
+          if (talkAgentConfig?.sceneId) {
+            vmsInteractionCmpRef?.current?.instance &&
+              vmsInteractionCmpRef?.current?.dispose();
+            chatAnswer = '';
+            setVmsInteractiveRefStatus('init');
+          }
+          talkAgentConfig?.interactType === 2 &&
+            vmsInteractionCmpRef?.current?.initAvatar({
+              sdkAvatarInfo,
+              sdkTTSInfo,
+            });
           setVmsInteractiveRefStatus('init');
-        }
-        talkAgentConfig?.interactType === 2 &&
-          vmsInteractionCmpRef?.current?.initAvatar({
-            sdkAvatarInfo,
-            sdkTTSInfo,
-          })
-        setVmsInteractiveRefStatus('init')
-        //播放开场白
-        if (currentFlow?.advancedConfig) {
-          const advancedConfig = JSON.parse(currentFlow?.advancedConfig);
-          if (
-            advancedConfig?.prologue?.enabled &&
-            advancedConfig?.prologue?.prologueText
-          ) {
-            typeof advancedConfig?.prologue?.prologueText === 'string' &&
-              vmsInteractionCmpRef?.current?.instance?.writeText(
-                advancedConfig?.prologue?.prologueText,
-                {
-                  tts: sdkTTSInfo,
-                }
-              );
+          //播放开场白
+          if (currentFlow?.advancedConfig) {
+            const advancedConfig = JSON.parse(currentFlow?.advancedConfig);
+            if (
+              advancedConfig?.prologue?.enabled &&
+              advancedConfig?.prologue?.prologueText
+            ) {
+              typeof advancedConfig?.prologue?.prologueText === 'string' &&
+                vmsInteractionCmpRef?.current?.instance?.writeText(
+                  advancedConfig?.prologue?.prologueText,
+                  {
+                    tts: sdkTTSInfo,
+                  }
+                );
+            }
+          }
+          // });
+        } else {
+          if (talkAgentConfig?.interactType !== 2) {
+            vmsInteractionCmpRef?.current?.instance &&
+              vmsInteractionCmpRef?.current?.dispose();
+            chatAnswer = '';
           }
         }
-        // });
-      } else {
-        if (talkAgentConfig?.interactType !== 2) {
-          vmsInteractionCmpRef?.current?.instance &&
-            vmsInteractionCmpRef?.current?.dispose();
-          chatAnswer = '';
-        }
-      }
-})
+      });
     }
   }, [talkAgentConfig, open]);
   useChatDebuggerEffect(
@@ -500,66 +504,69 @@ export function ChatDebuggerContent({
   );
 
   const closeFunction = () => {
-    clearData(setOpen)
+    clearData(setOpen);
     vmsInteractionCmpRef?.current?.instance &&
-    vmsInteractionCmpRef?.current?.dispose();
+      vmsInteractionCmpRef?.current?.dispose();
     sdkAvatarInfo.avatar_id = '';
     setVmsInteractiveRefStatus('init');
     chatAnswer = '';
-  }
-  useEffect(()=>{
-    if(!open) closeFunction()
-  },[open])
+  };
+  useEffect(() => {
+    if (!open) closeFunction();
+  }, [open]);
 
-  useEffect(()=>{
-    if(chatList.length>0 && chatList[chatList.length-1].type==='answer'){
-      let responseResult = chatList[chatList.length-1];
-      if(responseResult?.showResponse) return;
-        if (vmsInteractiveRefStatus === 'init') {
-          //送文本到虚拟人，不一定是纯文本
-          if (
-            responseResult?.content &&
-            typeof responseResult?.content === 'string'
-          ) {
-            chatAnswer += responseResult?.content;
-            let splitSentencesArr = splitSentencesBasic(chatAnswer);
-            //判断是否可以按照句子来分割
-            if (splitSentencesArr?.length) {
-              const str = getProcessedStr(splitSentencesArr);
-              
-              str &&
-                vmsInteractionCmpRef?.current?.instance
-                  ?.writeText(str, {
-                    tts: sdkTTSInfo,
-                    avatar_dispatch: {
-                      interactive_mode: 0,
-                    },
-                  })
-                  .then(() => {})
-                  .catch((err: any) => {
-                    console.error(err);
-                    message.error('发送失败，可以打开控制台查看信息');
-                  });
+  useEffect(() => {
+    if (
+      chatList.length > 0 &&
+      chatList[chatList.length - 1].type === 'answer'
+    ) {
+      const responseResult = chatList[chatList.length - 1];
+      if (responseResult?.showResponse) return;
+      if (vmsInteractiveRefStatus === 'init') {
+        //送文本到虚拟人，不一定是纯文本
+        if (
+          responseResult?.content &&
+          typeof responseResult?.content === 'string'
+        ) {
+          chatAnswer += responseResult?.content;
+          const splitSentencesArr = splitSentencesBasic(chatAnswer);
+          //判断是否可以按照句子来分割
+          if (splitSentencesArr?.length) {
+            const str = getProcessedStr(splitSentencesArr);
+
+            str &&
+              vmsInteractionCmpRef?.current?.instance
+                ?.writeText(str, {
+                  tts: sdkTTSInfo,
+                  avatar_dispatch: {
+                    interactive_mode: 0,
+                  },
+                })
+                .then(() => {})
+                .catch((err: any) => {
+                  console.error(err);
+                  message.error('发送失败，可以打开控制台查看信息');
+                });
+            chatAnswer = chatAnswer.slice(str.length, chatAnswer.length);
+          } else {
+            if (chatAnswer.length >= 2000) {
+              const str = chatAnswer.slice(0, 2000);
+              isPureText(str) &&
+                vmsInteractionCmpRef?.current?.instance?.writeText(str, {
+                  tts: sdkTTSInfo,
+                  avatar_dispatch: {
+                    interactive_mode: 0,
+                  },
+                });
               chatAnswer = chatAnswer.slice(str.length, chatAnswer.length);
             } else {
-              if (chatAnswer.length >= 2000) {
-                let str = chatAnswer.slice(0, 2000);
-                isPureText(str) &&
-                  vmsInteractionCmpRef?.current?.instance?.writeText(str, {
-                    tts: sdkTTSInfo,
-                    avatar_dispatch: {
-                      interactive_mode: 0,
-                    },
-                  });
-                chatAnswer = chatAnswer.slice(str.length, chatAnswer.length);
-              }else {
-                vmsInteractionCmpRef?.current?.instance?.writeText(chatAnswer)
-              }
+              vmsInteractionCmpRef?.current?.instance?.writeText(chatAnswer);
             }
+          }
         }
       }
-  }
-  },[chatList])
+    }
+  }, [chatList]);
   return (
     <div
       className="w-full h-full py-4 flex flex-col overflow-hidden"
@@ -670,7 +677,7 @@ export function ChatDebuggerContent({
         >
           <Spin
             spinning={loadingVms}
-            tip={t('workflow.nodes.chatDebugger.virtualLoading')+'...'}
+            tip={t('workflow.nodes.chatDebugger.virtualLoading') + '...'}
             className="mt-[100px] color-[#6356ea]"
           >
             <div></div>
@@ -690,26 +697,26 @@ export function ChatDebuggerContent({
             loadingStatusChange={setLoadingVms}
           />
         </div>
-       {(chatType === 'text' || chatType === 'vms') && (
-        <div className="w-full flex-1 relative debugger-chat-content">
-        <ChatContent
-          open={open}
-          userWheel={userWheel}
-          setUserWheel={setUserWheel}
-          chatList={chatList}
-          setChatList={setChatList}
-          startNodeParams={startNodeParams}
-          resetNodesAndEdges={resetNodesAndEdges}
-          handleRunDebugger={handleRunDebugger}
-          debuggering={debuggering}
-          suggestProblem={suggestProblem}
-          suggestLoading={suggestLoading}
-          needReply={interruptChat?.needReply}
-          handleResumeChat={handleResumeChat}
-          handleStopConversation={handleStopConversation}
-          chatType={chatType}
-        />
-        </div>
+        {(chatType === 'text' || chatType === 'vms') && (
+          <div className="w-full flex-1 relative debugger-chat-content">
+            <ChatContent
+              open={open}
+              userWheel={userWheel}
+              setUserWheel={setUserWheel}
+              chatList={chatList}
+              setChatList={setChatList}
+              startNodeParams={startNodeParams}
+              resetNodesAndEdges={resetNodesAndEdges}
+              handleRunDebugger={handleRunDebugger}
+              debuggering={debuggering}
+              suggestProblem={suggestProblem}
+              suggestLoading={suggestLoading}
+              needReply={interruptChat?.needReply}
+              handleResumeChat={handleResumeChat}
+              handleStopConversation={handleStopConversation}
+              chatType={chatType}
+            />
+          </div>
         )}
         <ChatInput
           interruptChat={interruptChat}

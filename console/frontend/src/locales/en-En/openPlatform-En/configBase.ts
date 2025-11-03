@@ -33,6 +33,12 @@ Based on the given note topic, write a creative Xiaohongshu-style product recomm
   publishSuccess: 'Publish success',
   updatePublish: 'Update publish',
   publish: 'Publish',
+  confirmLeavePrompt:
+    'Are you sure you want to leave?\\nThe system may not save your changes.',
+  settingCannotBeEmpty: 'Setting cannot be empty!',
+  createAgentBeforePublish: 'Create agent first',
+  inputHere: 'Input here',
+
   agentCategory: 'Agent Category',
   agentIntroduction: 'Agent Introduction',
   restoreDefaultDisplay: 'Restore Default Display',
@@ -45,6 +51,7 @@ Based on the given note topic, write a creative Xiaohongshu-style product recomm
   modelComparison: 'Model Comparison',
   sparkModel: 'Spark V4.0 Ultra',
   sparkX1Model: 'Spark X1',
+  rolePlayModel: 'Role Play',
   pleaseSelectModel: 'Please select model',
   highOrderConfig: 'High Order Config',
 
@@ -74,6 +81,12 @@ Based on the given note topic, write a creative Xiaohongshu-style product recomm
 
   //能力开发
   CapabilityDevelopment: {
+    backgroundImage: 'Background Image',
+    horizontalScreenDisplay: 'Horizontal Screen Display',
+    verticalScreenDisplay: 'Vertical Screen Display',
+    viewActualVerticalScreenEffect: 'View actual vertical screen effect',
+    modify: 'Modify',
+    upload: 'Upload',
     requireCreativeNovelty: 'Require creative novelty',
     pleaseWriteACreativeCommercialCopywriting:
       'Please write a creative commercial copywriting',

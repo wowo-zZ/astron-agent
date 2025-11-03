@@ -97,8 +97,8 @@ const HeaderFeedbackModal: React.FC<HeaderFeedbackModalProps> = ({
             <div
               className={classNames(styles.cueWord_img, styles.virtual_img)}
             ></div>
-            <p>语音/虚拟人创建</p>
-            <span>面向实时语音交互&虚拟人驱动的多模态场景</span>
+            <p>{t('createAgent1.virtualCreation')}</p>
+            <span>{t('createAgent1.virtualCreationDesc')}</span>
           </div>
         </div>
       </div>

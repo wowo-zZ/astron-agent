@@ -1,6 +1,4 @@
 name: rpa-opensource-studio
-x-env-file: &env_file
-  - .env
 
 services:
   rpa-mysql:
@@ -8,9 +6,13 @@ services:
     container_name: rpa-opensource-mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD}
-      MYSQL_DATABASE: ${DATABASE_NAME}
-    env_file: *env_file
+      MYSQL_ROOT_PASSWORD: ${RPASERVER_DATABASE_PASSWORD}
+      MYSQL_DATABASE: ${RPASERVER_DATABASE_NAME}
+      DATABASE_USERNAME: ${RPASERVER_DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${RPASERVER_DATABASE_PASSWORD}
+      DATABASE_HOST: ${RPASERVER_DATABASE_HOST}
+      DATABASE_PORT: ${RPASERVER_DATABASE_PORT}
+      DATABASE_NAME: ${RPASERVER_DATABASE_NAME}
     # ports:
     #   - "${DATABASE_PORT}:3306"
     volumes:
@@ -20,6 +22,7 @@ services:
       - ./volumes/mysql/init_app_market_dict_data.sql:/docker-entrypoint-initdb.d/02-init_data.sql
       - ./volumes/mysql/init_c_atom_meta_data.sql:/docker-entrypoint-initdb.d/03-init_data.sql
       - ./volumes/mysql/init_his_data_enum_data.sql:/docker-entrypoint-initdb.d/04-init_data.sql
+      - ./volumes/mysql/init_sample_template_data.sql:/docker-entrypoint-initdb.d/05-init_data.sql
     healthcheck:
       test:
         [
@@ -44,12 +47,15 @@ services:
     restart: always
     user: root
     privileged: true
-    env_file: *env_file
     environment:
       - REDIS_AOF_ENABLED=no
-      - REDIS_PORT_NUMBER=${REDIS_PORT}
+      - REDIS_PORT_NUMBER=${RPASERVER_REDIS_PORT}
       - REDIS_IO_THREADS=4
       - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_HOST=${RPASERVER_REDIS_HOST}
+      - REDIS_PORT=${RPASERVER_REDIS_PORT}
+      - REDIS_DB=${RPASERVER_REDIS_DB}
+      - REDIS_PASSWORD=${RPASERVER_REDIS_PASSWORD}
     # ports:
     #   - "${REDIS_PORT}:6379"
     volumes:
@@ -78,16 +84,19 @@ services:
     user: root
     privileged: true
     restart: always
-    env_file: *env_file
     # ports:
     #   - "9000:9000"
     #   - "9001:9001"
     volumes:
       - ./data/minio:/data
     environment:
-      MINIO_ROOT_USER: ${MINIO_AK}
-      MINIO_ROOT_PASSWORD: ${MINIO_SK}
-      MINIO_DEFAULT_BUCKETS: ${MINIO_BUCKET}
+      MINIO_ROOT_USER: ${RPASERVER_MINIO_AK}
+      MINIO_ROOT_PASSWORD: ${RPASERVER_MINIO_SK}
+      MINIO_DEFAULT_BUCKETS: ${RPASERVER_MINIO_BUCKET}
+      MINIO_URL: ${RPASERVER_MINIO_URL}
+      MINIO_BUCKET: ${RPASERVER_MINIO_BUCKET}
+      MINIO_AK: ${RPASERVER_MINIO_AK}
+      MINIO_SK: ${RPASERVER_MINIO_SK}
     entrypoint:
       - /bin/sh
       - -c
@@ -95,13 +104,13 @@ services:
         # Run initialization in background
         (
           # Wait for MinIO to be ready
-          until (/usr/bin/mc alias set localminio http://localhost:9000 ${MINIO_AK} ${MINIO_SK}) do
+          until (/usr/bin/mc alias set localminio http://localhost:9000 ${RPASERVER_MINIO_AK} ${RPASERVER_MINIO_SK}) do
             echo "Waiting for MinIO to be ready..."
             sleep 1
           done
 
           # Create bucket
-          /usr/bin/mc mb --ignore-existing localminio/${MINIO_BUCKET}
+          /usr/bin/mc mb --ignore-existing localminio/${RPASERVER_MINIO_BUCKET}
 
           echo "MinIO initialization complete."
         ) &
@@ -112,7 +121,7 @@ services:
       test:
         [
           'CMD-SHELL',
-          '/usr/bin/mc alias set health_check http://localhost:9000 ${MINIO_AK} ${MINIO_SK} && /usr/bin/mc ready health_check',
+          '/usr/bin/mc alias set health_check http://localhost:9000 ${RPASERVER_MINIO_AK} ${RPASERVER_MINIO_SK} && /usr/bin/mc ready health_check',
         ]
       interval: 30s
       timeout: 10s
@@ -145,67 +154,49 @@ services:
     networks:
       - astron-agent-network
 
-  # casdoor service is disabled in integrated mode
-  # Use astronAgent's shared casdoor instead
-  # casdoor:
-  #   image: casbin/casdoor:v2.67.0
-  #   container_name: rpa-opensource-casdoor
-  #   restart: always
-  #   env_file: *env_file
-  #   environment:
-  #     - driverName=mysql
-  #     - dataSourceName=${DATABASE_USERNAME}:${DATABASE_PASSWORD}@tcp(${DATABASE_HOST}:${DATABASE_PORT})/
-  #   ports:
-  #     - "8000:8000"
-  #   volumes:
-  #     - ./volumes/casdoor/init_data_dump.json:/init_data.json
-  #   depends_on:
-  #     mysql:
-  #       condition: service_healthy
-  #   networks:
-  #     - astron-agent-network
-
-  mysql-init:
-    image: mysql:8.4.6
-    container_name: rpa-opensource-mysql-init
-    depends_on:
-      rpa-mysql:
-        condition: service_healthy
-      resource-service:
-        condition: service_started
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD}
-      MYSQL_DATABASE: ${DATABASE_NAME}
-    env_file: *env_file
-    volumes:
-      - ./volumes/mysql/init_robot_example_data.sql:/init_robot_example_data.sql
-    command: >
-      sh -c "
-        echo 'Waiting for robot-service to be ready...'
-        sleep 10
-        echo 'Executing robot example data initialization...'
-        mysql -h rpa-mysql -u root -p$$MYSQL_ROOT_PASSWORD --default-character-set=utf8mb4 --init-command='SET NAMES utf8mb4;' $$MYSQL_DATABASE < /init_robot_example_data.sql
-        echo 'Robot example data initialization completed!'
-      "
-    networks:
-      - astron-agent-network
-
   ai-service:
-    build:
-      context: ..
-      dockerfile: backend/ai-service/Dockerfile
+    image: ghcr.io/iflytek/astron-rpa/ai-service:latest
     container_name: rpa-opensource-ai-service
     restart: always
-    env_file: *env_file
     environment:
-      - DATABASE_URL=mysql+aiomysql://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@rpa-mysql:3306/${DATABASE_NAME}
-      - REDIS_URL=redis://rpa-redis:6379/${REDIS_DB}
-      - AICHAT_BASE_URL=${AICHAT_BASE_URL}
-      - AICHAT_API_KEY=${AICHAT_API_KEY}
+      - DATABASE_URL=mysql+aiomysql://${RPASERVER_DATABASE_USERNAME}:${RPASERVER_DATABASE_PASSWORD}@rpa-mysql:3306/${RPASERVER_DATABASE_NAME}
+      - REDIS_URL=redis://rpa-redis:6379/${RPASERVER_REDIS_DB}
+      - AICHAT_BASE_URL=${RPASERVER_AICHAT_BASE_URL}
+      - AICHAT_API_KEY=${RPASERVER_AICHAT_API_KEY}
+      - LOG_LEVEL=${RPASERVER_LOG_LEVEL}
+      - LOG_DIR=${RPASERVER_LOG_DIR}
+      - MONTHLY_GRANT_AMOUNT=${RPASERVER_MONTHLY_GRANT_AMOUNT}
+      - AICHAT_POINTS_COST=${RPASERVER_AICHAT_POINTS_COST}
+      - OCR_GENERAL_POINTS_COST=${RPASERVER_OCR_GENERAL_POINTS_COST}
+      - JFBYM_POINTS_COST=${RPASERVER_JFBYM_POINTS_COST}
+      - XFYUN_APP_ID=${RPASERVER_XFYUN_APP_ID}
+      - XFYUN_API_SECRET=${RPASERVER_XFYUN_API_SECRET}
+      - XFYUN_API_KEY=${RPASERVER_XFYUN_API_KEY}
+      - JFBYM_ENDPOINT=${RPASERVER_JFBYM_ENDPOINT}
+      - JFBYM_API_TOKEN=${RPASERVER_JFBYM_API_TOKEN}
+      - DATABASE_USERNAME=${RPASERVER_DATABASE_USERNAME}
+      - DATABASE_PASSWORD=${RPASERVER_DATABASE_PASSWORD}
+      - DATABASE_HOST=${RPASERVER_DATABASE_HOST}
+      - DATABASE_PORT=${RPASERVER_DATABASE_PORT}
+      - DATABASE_NAME=${RPASERVER_DATABASE_NAME}
+      - ATLAS_URL=${RPASERVER_ATLAS_URL}
+      - REDIS_HOST=${RPASERVER_REDIS_HOST}
+      - REDIS_PORT=${RPASERVER_REDIS_PORT}
+      - REDIS_DB=${RPASERVER_REDIS_DB}
+      - REDIS_PASSWORD=${RPASERVER_REDIS_PASSWORD}
+      - MINIO_URL=${RPASERVER_MINIO_URL}
+      - MINIO_BUCKET=${RPASERVER_MINIO_BUCKET}
+      - MINIO_AK=${RPASERVER_MINIO_AK}
+      - MINIO_SK=${RPASERVER_MINIO_SK}
+      - CASDOOR_ENDPOINT=${RPASERVER_CASDOOR_ENDPOINT}
+      - CASDOOR_CLIENT_ID=${RPASERVER_CASDOOR_CLIENT_ID}
+      - CASDOOR_CLIENT_SECRET=${RPASERVER_CASDOOR_CLIENT_SECRET}
+      - CASDOOR_ORGANIZATION_NAME=${RPASERVER_CASDOOR_ORGANIZATION_NAME}
+      - CASDOOR_APPLICATION_NAME=${RPASERVER_CASDOOR_APPLICATION_NAME}
+      - CASDOOR_REDIRECT_URL=${RPASERVER_CASDOOR_REDIRECT_URL}
+      - CASDOOR_EXTERNAL_ENDPOINT=${CONSOLE_CASDOOR_URL}
     # ports:
     #   - "8010:8010"
-    volumes:
-      - ../backend/ai-service/app:/app/app
     depends_on:
       rpa-mysql:
         condition: service_healthy
@@ -217,21 +208,48 @@ services:
       - astron-agent-network
 
   openapi-service:
-    build:
-      context: ..
-      dockerfile: backend/openapi-service/Dockerfile
+    image: ghcr.io/iflytek/astron-rpa/openapi-service:latest
     container_name: rpa-opensource-openapi-service
     restart: always
-    env_file: *env_file
     environment:
-      - DATABASE_URL=mysql+aiomysql://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@rpa-mysql:3306/${DATABASE_NAME}
-      - REDIS_URL=redis://rpa-redis:6379/${REDIS_DB}
-      - AICHAT_BASE_URL=${AICHAT_BASE_URL}
-      - AICHAT_API_KEY=${AICHAT_API_KEY}
+      - DATABASE_URL=mysql+aiomysql://${RPASERVER_DATABASE_USERNAME}:${RPASERVER_DATABASE_PASSWORD}@rpa-mysql:3306/${RPASERVER_DATABASE_NAME}
+      - REDIS_URL=redis://rpa-redis:6379/${RPASERVER_REDIS_DB}
+      - AICHAT_BASE_URL=${RPASERVER_AICHAT_BASE_URL}
+      - AICHAT_API_KEY=${RPASERVER_AICHAT_API_KEY}
+      - LOG_LEVEL=${RPASERVER_LOG_LEVEL}
+      - LOG_DIR=${RPASERVER_LOG_DIR}
+      - MONTHLY_GRANT_AMOUNT=${RPASERVER_MONTHLY_GRANT_AMOUNT}
+      - AICHAT_POINTS_COST=${RPASERVER_AICHAT_POINTS_COST}
+      - OCR_GENERAL_POINTS_COST=${RPASERVER_OCR_GENERAL_POINTS_COST}
+      - JFBYM_POINTS_COST=${RPASERVER_JFBYM_POINTS_COST}
+      - XFYUN_APP_ID=${RPASERVER_XFYUN_APP_ID}
+      - XFYUN_API_SECRET=${RPASERVER_XFYUN_API_SECRET}
+      - XFYUN_API_KEY=${RPASERVER_XFYUN_API_KEY}
+      - JFBYM_ENDPOINT=${RPASERVER_JFBYM_ENDPOINT}
+      - JFBYM_API_TOKEN=${RPASERVER_JFBYM_API_TOKEN}
+      - DATABASE_USERNAME=${RPASERVER_DATABASE_USERNAME}
+      - DATABASE_PASSWORD=${RPASERVER_DATABASE_PASSWORD}
+      - DATABASE_HOST=${RPASERVER_DATABASE_HOST}
+      - DATABASE_PORT=${RPASERVER_DATABASE_PORT}
+      - DATABASE_NAME=${RPASERVER_DATABASE_NAME}
+      - ATLAS_URL=${RPASERVER_ATLAS_URL}
+      - REDIS_HOST=${RPASERVER_REDIS_HOST}
+      - REDIS_PORT=${RPASERVER_REDIS_PORT}
+      - REDIS_DB=${RPASERVER_REDIS_DB}
+      - REDIS_PASSWORD=${RPASERVER_REDIS_PASSWORD}
+      - MINIO_URL=${RPASERVER_MINIO_URL}
+      - MINIO_BUCKET=${RPASERVER_MINIO_BUCKET}
+      - MINIO_AK=${RPASERVER_MINIO_AK}
+      - MINIO_SK=${RPASERVER_MINIO_SK}
+      - CASDOOR_ENDPOINT=${RPASERVER_CASDOOR_ENDPOINT}
+      - CASDOOR_CLIENT_ID=${RPASERVER_CASDOOR_CLIENT_ID}
+      - CASDOOR_CLIENT_SECRET=${RPASERVER_CASDOOR_CLIENT_SECRET}
+      - CASDOOR_ORGANIZATION_NAME=${RPASERVER_CASDOOR_ORGANIZATION_NAME}
+      - CASDOOR_APPLICATION_NAME=${RPASERVER_CASDOOR_APPLICATION_NAME}
+      - CASDOOR_REDIRECT_URL=${RPASERVER_CASDOOR_REDIRECT_URL}
+      - CASDOOR_EXTERNAL_ENDPOINT=${CONSOLE_CASDOOR_URL}
     # ports:
     #   - "8020:8020"
-    volumes:
-      - ../backend/openapi-service/app:/app/app
     depends_on:
       rpa-mysql:
         condition: service_healthy
@@ -243,12 +261,44 @@ services:
       - astron-agent-network
 
   resource-service:
-    build:
-      context: ..
-      dockerfile: backend/resource-service/Dockerfile
+    image: ghcr.io/iflytek/astron-rpa/resource-service:latest
     container_name: rpa-opensource-resource-service
     restart: always
-    env_file: *env_file
+    environment:
+      - LOG_LEVEL=${RPASERVER_LOG_LEVEL}
+      - LOG_DIR=${RPASERVER_LOG_DIR}
+      - MONTHLY_GRANT_AMOUNT=${RPASERVER_MONTHLY_GRANT_AMOUNT}
+      - AICHAT_POINTS_COST=${RPASERVER_AICHAT_POINTS_COST}
+      - OCR_GENERAL_POINTS_COST=${RPASERVER_OCR_GENERAL_POINTS_COST}
+      - JFBYM_POINTS_COST=${RPASERVER_JFBYM_POINTS_COST}
+      - AICHAT_BASE_URL=${RPASERVER_AICHAT_BASE_URL}
+      - AICHAT_API_KEY=${RPASERVER_AICHAT_API_KEY}
+      - XFYUN_APP_ID=${RPASERVER_XFYUN_APP_ID}
+      - XFYUN_API_SECRET=${RPASERVER_XFYUN_API_SECRET}
+      - XFYUN_API_KEY=${RPASERVER_XFYUN_API_KEY}
+      - JFBYM_ENDPOINT=${RPASERVER_JFBYM_ENDPOINT}
+      - JFBYM_API_TOKEN=${RPASERVER_JFBYM_API_TOKEN}
+      - DATABASE_USERNAME=${RPASERVER_DATABASE_USERNAME}
+      - DATABASE_PASSWORD=${RPASERVER_DATABASE_PASSWORD}
+      - DATABASE_HOST=${RPASERVER_DATABASE_HOST}
+      - DATABASE_PORT=${RPASERVER_DATABASE_PORT}
+      - DATABASE_NAME=${RPASERVER_DATABASE_NAME}
+      - ATLAS_URL=${RPASERVER_ATLAS_URL}
+      - REDIS_HOST=${RPASERVER_REDIS_HOST}
+      - REDIS_PORT=${RPASERVER_REDIS_PORT}
+      - REDIS_DB=${RPASERVER_REDIS_DB}
+      - REDIS_PASSWORD=${RPASERVER_REDIS_PASSWORD}
+      - MINIO_URL=${RPASERVER_MINIO_URL}
+      - MINIO_BUCKET=${RPASERVER_MINIO_BUCKET}
+      - MINIO_AK=${RPASERVER_MINIO_AK}
+      - MINIO_SK=${RPASERVER_MINIO_SK}
+      - CASDOOR_ENDPOINT=${RPASERVER_CASDOOR_ENDPOINT}
+      - CASDOOR_CLIENT_ID=${RPASERVER_CASDOOR_CLIENT_ID}
+      - CASDOOR_CLIENT_SECRET=${RPASERVER_CASDOOR_CLIENT_SECRET}
+      - CASDOOR_ORGANIZATION_NAME=${RPASERVER_CASDOOR_ORGANIZATION_NAME}
+      - CASDOOR_APPLICATION_NAME=${RPASERVER_CASDOOR_APPLICATION_NAME}
+      - CASDOOR_REDIRECT_URL=${RPASERVER_CASDOOR_REDIRECT_URL}
+      - CASDOOR_EXTERNAL_ENDPOINT=${CONSOLE_CASDOOR_URL}
     # ports:
     #   - "8030:8030"
     volumes:
@@ -266,12 +316,44 @@ services:
       - astron-agent-network
 
   robot-service:
-    build:
-      context: ..
-      dockerfile: backend/robot-service/Dockerfile
+    image: ghcr.io/iflytek/astron-rpa/robot-service:latest
     container_name: rpa-opensource-robot-service
     restart: always
-    env_file: *env_file
+    environment:
+      - LOG_LEVEL=${RPASERVER_LOG_LEVEL}
+      - LOG_DIR=${RPASERVER_LOG_DIR}
+      - MONTHLY_GRANT_AMOUNT=${RPASERVER_MONTHLY_GRANT_AMOUNT}
+      - AICHAT_POINTS_COST=${RPASERVER_AICHAT_POINTS_COST}
+      - OCR_GENERAL_POINTS_COST=${RPASERVER_OCR_GENERAL_POINTS_COST}
+      - JFBYM_POINTS_COST=${RPASERVER_JFBYM_POINTS_COST}
+      - AICHAT_BASE_URL=${RPASERVER_AICHAT_BASE_URL}
+      - AICHAT_API_KEY=${RPASERVER_AICHAT_API_KEY}
+      - XFYUN_APP_ID=${RPASERVER_XFYUN_APP_ID}
+      - XFYUN_API_SECRET=${RPASERVER_XFYUN_API_SECRET}
+      - XFYUN_API_KEY=${RPASERVER_XFYUN_API_KEY}
+      - JFBYM_ENDPOINT=${RPASERVER_JFBYM_ENDPOINT}
+      - JFBYM_API_TOKEN=${RPASERVER_JFBYM_API_TOKEN}
+      - DATABASE_USERNAME=${RPASERVER_DATABASE_USERNAME}
+      - DATABASE_PASSWORD=${RPASERVER_DATABASE_PASSWORD}
+      - DATABASE_HOST=${RPASERVER_DATABASE_HOST}
+      - DATABASE_PORT=${RPASERVER_DATABASE_PORT}
+      - DATABASE_NAME=${RPASERVER_DATABASE_NAME}
+      - ATLAS_URL=${RPASERVER_ATLAS_URL}
+      - REDIS_HOST=${RPASERVER_REDIS_HOST}
+      - REDIS_PORT=${RPASERVER_REDIS_PORT}
+      - REDIS_DB=${RPASERVER_REDIS_DB}
+      - REDIS_PASSWORD=${RPASERVER_REDIS_PASSWORD}
+      - MINIO_URL=${RPASERVER_MINIO_URL}
+      - MINIO_BUCKET=${RPASERVER_MINIO_BUCKET}
+      - MINIO_AK=${RPASERVER_MINIO_AK}
+      - MINIO_SK=${RPASERVER_MINIO_SK}
+      - CASDOOR_ENDPOINT=${RPASERVER_CASDOOR_ENDPOINT}
+      - CASDOOR_CLIENT_ID=${RPASERVER_CASDOOR_CLIENT_ID}
+      - CASDOOR_CLIENT_SECRET=${RPASERVER_CASDOOR_CLIENT_SECRET}
+      - CASDOOR_ORGANIZATION_NAME=${RPASERVER_CASDOOR_ORGANIZATION_NAME}
+      - CASDOOR_APPLICATION_NAME=${RPASERVER_CASDOOR_APPLICATION_NAME}
+      - CASDOOR_REDIRECT_URL=${RPASERVER_CASDOOR_REDIRECT_URL}
+      - CASDOOR_EXTERNAL_ENDPOINT=${CONSOLE_CASDOOR_URL}
     # ports:
     #   - "8040:8040"
     volumes:
