@@ -606,7 +606,7 @@ function index() {
                             />
                             {operationId === k.botId && (
                               <div
-                                className={`absolute top-[28px] right-0 bg-white rounded p-1 shadow-md flex flex-col gap-1  ${k.version === 3 ? 'w-[155px]' : 'w-[48px]'}`}
+                                className={`absolute top-[28px] right-0 bg-white rounded p-1 shadow-md flex flex-col gap-1  ${k.version === 3 ? styles.propBox1 : styles.propBox2}`}
                                 style={{
                                   zIndex: 1,
                                 }}
@@ -724,7 +724,7 @@ function index() {
           onSubmit={values => {
             upgradeWorkflow({ sourceId: copyParams?.botId, ...values })
               .then((res: any) => {
-                message.success('复制成功');
+                message.success(t('agentPage.agentPage.copyToVirtualSuccess'));
                 navigate(
                   `/work_flow/${res?.maasId}/arrange?botId=${res?.botId}`
                 );

@@ -19,6 +19,8 @@ import configBase from './openPlatform-ZH/configBase';
 import loginModal from './openPlatform-ZH/loginModal';
 import appManage from './openPlatform-ZH/appManage';
 
+import virtualConfig from './openPlatform-ZH/virtualConfig';
+
 /** ## 开放平台的翻译配置 -- zh
  * @description 注意模块名称不要跟星辰的重复
  */
@@ -43,4 +45,5 @@ export default {
   loginModal,
   space,
   appManage,
+  virtualConfig,
 };

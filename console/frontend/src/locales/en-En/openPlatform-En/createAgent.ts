@@ -47,6 +47,7 @@ const translation = {
   customCreation: 'Custom Creation',
   buildSame: 'Build Same',
   allTemplates: 'All Templates',
+  createSuccess: 'Create success',
 };
 
 export default translation;

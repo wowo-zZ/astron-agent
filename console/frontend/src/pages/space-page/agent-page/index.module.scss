@@ -67,3 +67,17 @@
   height: 64px;
   border-radius: 12px;
 }
+  .propBox1{
+    width: 155px;
+  }
+  .propBox2{
+    width: 45px;
+  }
+:global(.lang-en) {
+  .propBox1{
+    width: 180px;
+  }
+  .propBox2{
+    width: 55px;
+  }
+}
