@@ -671,6 +671,8 @@ const translation = {
       regenerate: '重新生成',
       tryFlow: '试试Flow',
       confirmDeleteAllDialogue: '确认删除清空所有对话？',
+      versionNotPublished: '当前版本未发布成功，无用户对话页',
+      virtualLoading: '虚拟人加载中',
     },
     flowModal: {
       createWorkflow: '创建工作流',

@@ -44,6 +44,7 @@ const translation = {
   customCreation: '自定义创建',
   buildSame: '建同款',
   allTemplates: '所有模板',
+  createSuccess: '创建成功',
 };
 
 export default translation;

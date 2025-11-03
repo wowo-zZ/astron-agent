@@ -927,3 +927,15 @@
     }
   }
 }
+
+:global(.lang-en) {
+  .open_source_modal {
+    .modal_content {
+      .inputBottom {
+        .aiBottom {
+          width: 120px;
+        }
+      }
+    }
+  }
+}

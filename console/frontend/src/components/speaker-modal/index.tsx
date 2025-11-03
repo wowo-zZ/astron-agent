@@ -249,8 +249,8 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
         />
         <div className="w-full flex flex-wrap justify-start h-auto gap-4 mb-3">
           {activeTab === 'official' && (
-            <div className="w-full mt-3.5">
-              <div className="w-full flex flex-wrap justify-start h-auto gap-4">
+            <div className="w-full">
+              <div className="w-full flex flex-wrap justify-start h-auto gap-4 pt-[12px]">
                 {officialVoiceList.map((item: VcnItem) => (
                   <div
                     className={`w-[230px] h-[50px] rounded-[10px] bg-white flex items-center justify-between px-3 border cursor-pointer ${
@@ -511,6 +511,8 @@ const SpeakerModal: React.FC<SpeakerModalProps> = ({
                   )}
                 </div>
               </div>
+
+              {/* 普通音色 */}
               {basicVoiceList.length > 0 && (
                 <div className="mt-4">
                   <div className="text-base font-bold text-[#222529] mb-3.5">

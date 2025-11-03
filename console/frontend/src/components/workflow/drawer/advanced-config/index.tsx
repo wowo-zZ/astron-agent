@@ -256,7 +256,7 @@ const CharacterVoice: React.FC<CommonComponentProps> = ({
 
   // 渲染发音人显示
   const renderBotVcn = () => {
-    let vcnObj =
+    const vcnObj =
       vcnList.find((item: VcnItem) => item.voiceType === botCreateActiveV.cn) ||
       mySpeaker.find((item: MyVCNItem) => item.assetId === botCreateActiveV.cn);
     return (
@@ -685,9 +685,11 @@ function AdvancedConfiguration(): React.ReactElement {
       window.removeEventListener('resize', handleAdjustmentDrawerStyle);
   }, [drawerStyle]);
   useEffect(() => {
-    getVcnList().then((res: VcnItem[]) => {
-      setVcnList(res);
-    });
+    if (open) {
+      getVcnList().then((res: VcnItem[]) => {
+        setVcnList(res);
+      });
+    }
   }, [open]);
   return (
     <Drawer

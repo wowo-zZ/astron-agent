@@ -18,7 +18,7 @@ import {
 import ChatInput from './components/chat-input';
 import ChatSide from './components/chat-side';
 import useChat from '@/hooks/use-chat';
-import { formatHistoryToMessages } from '@/utils';
+import { formatHistoryToMessages, isPureText } from '@/utils';
 import { useTranslation } from 'react-i18next';
 import styles from './index.module.scss';
 import vmsIcon from '@/assets/svgs/icon-user-filled.svg';
@@ -80,6 +80,14 @@ const ChatPage = (): ReactElement => {
   const [talkAgentConfig, setTalkAgentConfig] = useState<any>({});
   const chatType = useChatStore(state => state.chatType); //  聊天类型
   const setChatType = useChatStore((state: any) => state.setChatType);
+
+  const vmsInteractiveRefStatus = useChatStore(
+    (state: any) => state.vmsInteractiveRefStatus
+  );
+  const [loadingVms, setLoadingVms] = useState<boolean>(false);
+  const setVmsInteractiveRefStatus = useChatStore(
+    (state: any) => state.setVmsInteractiveRefStatus
+  );
   useEffect(() => {
     initializeChatPage();
     return () => {
@@ -91,9 +99,11 @@ const ChatPage = (): ReactElement => {
   const handleChatTypeChange = (type: string) => {
     setChatType(type);
     if (type === 'vms') {
-      vmsInteractionCmpRef?.current?.initAvatar({
-        sdkAvatarInfo,
-        sdkTTSInfo,
+      setTimeout(() => {
+        vmsInteractionCmpRef?.current?.initAvatar({
+          sdkAvatarInfo,
+          sdkTTSInfo,
+        });
       });
     } else {
       vmsInteractionCmpRef?.current?.instance &&
@@ -154,30 +164,26 @@ const ChatPage = (): ReactElement => {
         //如果是虚拟人播报或者语音通话虚拟人，初始化虚拟人sdk信息，并写入开场白
         if (talkAgentConfigRes?.sceneEnable === 1) {
           sdkAvatarInfo.avatar_id = talkAgentConfigRes?.sceneId;
-          //根据id获取vcn
-          const res = await getSceneList();
-          const list: SceneItem[] = Array.isArray(res)
-            ? (res as SceneItem[])
-            : [];
-          list.find(
-            (item: SceneItem) => item.sceneId === talkAgentConfigRes?.sceneId
-          )?.defaultVCN &&
-            (sdkTTSInfo.vcn =
-              list.find(
-                (item: SceneItem) =>
-                  item.sceneId === talkAgentConfigRes?.sceneId
-              )?.defaultVCN || '');
-
-          talkAgentConfigRes?.interactType === 2 &&
-            vmsInteractionCmpRef?.current?.initAvatar({
-              sdkAvatarInfo,
-              sdkTTSInfo,
-            });
-          botInfo?.prologue &&
-            !showVmsPermissionTip &&
-            vmsInteractionCmpRef?.current?.instance?.writeText(
-              botInfo?.prologue
-            );
+          sdkTTSInfo.vcn = talkAgentConfigRes?.vcn;
+          if (talkAgentConfigRes?.interactType === 2) {
+            setTimeout(() => {
+              vmsInteractionCmpRef?.current?.initAvatar({
+                sdkAvatarInfo,
+                sdkTTSInfo,
+              });
+            }, 1000);
+            botInfo?.prologue &&
+              !showVmsPermissionTip &&
+              vmsInteractionCmpRef?.current?.instance?.writeText(
+                botInfo?.prologue,
+                {
+                  tts: sdkTTSInfo,
+                  avatar_dispatch: {
+                    interactive_mode: 0,
+                  },
+                }
+              );
+          }
         }
       }
       const workflowBotInfo = await getWorkflowBotInfoApi(botId);
@@ -268,6 +274,96 @@ const ChatPage = (): ReactElement => {
     };
   };
 
+  useEffect(() => {
+    console.log('vmsInteractiveRefStatus@@--------', vmsInteractiveRefStatus);
+    if (vmsInteractiveRefStatus !== 'init') {
+      vmsInter && clearInterval(vmsInter);
+      vmsInter = null;
+      tempAnsBak = '';
+      prevTempAns = '';
+    } else {
+      const updatedMessageList = [...messageList];
+      const lastMessage = updatedMessageList[updatedMessageList.length - 1];
+      console.log('lastMessage@@--------', lastMessage);
+      //如果正在回答中，或者回答内容已经结束，但是虚拟人还未播完的状态
+      if ((lastMessage && !lastMessage.sid) || tempAnsBak) {
+        vmsInter && clearInterval(vmsInter);
+        vmsInter = null;
+        //如果虚拟人实例初始化成功，则开始播报，若是打断或者断开状态，则不进行播报
+        if (vmsInteractiveRefStatus === 'init') {
+          vmsInter = setInterval(() => {
+            //表示正在回答中
+            if (lastMessage && !lastMessage.sid) {
+              const arr = lastMessage.message.split('');
+              let str = '';
+              arr.splice(0, prevTempAns.length); //去除之前播报过的内容
+              //如果剩下的要播的内容超过2000，必须截断处理，否则播报报错
+              if (arr.length > 2000) {
+                const newArr = arr.splice(0, 2000);
+                str = newArr.join('').trim();
+                prevTempAns += newArr.join('')?.toString();
+              } else {
+                str = arr.join('').trim();
+                prevTempAns = lastMessage.message?.toString() + '';
+              }
+              tempAnsBak = lastMessage.message;
+              //如果非纯文本，直接提示不支持播报
+              isPureText(str) &&
+                vmsInteractionCmpRef?.current?.instance
+                  ?.writeText(str, {
+                    tts: sdkTTSInfo,
+                    avatar_dispatch: {
+                      interactive_mode: 0,
+                    },
+                  })
+                  .then(() => {
+                    console.log('文本驱动发送成功');
+                  })
+                  .catch((err: any) => {
+                    console.error(err);
+                  });
+            } else {
+              //表示回答结束
+              if (messageList?.[messageList?.length - 1]?.sid && tempAnsBak) {
+                const fullMessage =
+                  messageList?.[messageList?.length - 1]?.message || '';
+                const arr = fullMessage.split('');
+                let str = '';
+                arr.splice(0, prevTempAns.length); //去除之前播报过的内容
+                //如果剩下的要播的内容超过2000，必须截断处理，否则播报报错
+                if (arr.length > 2000) {
+                  const newArr = arr.splice(0, 2000);
+                  str = newArr.join('').trim();
+                  prevTempAns += newArr.join('')?.toString();
+                } else {
+                  str = arr.join('').trim();
+                  tempAnsBak = '';
+                  prevTempAns = '';
+                }
+                isPureText(str) &&
+                  vmsInteractionCmpRef?.current?.instance
+                    ?.writeText(str, {
+                      tts: sdkTTSInfo,
+                      avatar_dispatch: {
+                        interactive_mode: 0,
+                      },
+                    })
+                    .then(() => {
+                      console.log('发送成功');
+                    })
+                    .catch((err: any) => {
+                      console.error(err);
+                    });
+
+                vmsInter && clearInterval(vmsInter);
+              }
+            }
+          }, 200);
+        }
+      }
+    }
+  }, [messageList, vmsInteractiveRefStatus]);
+
   return (
     <div
       className="w-full h-screen bg-no-repeat bg-center bg-cover flex flex-col overflow-auto scrollbar-none"
@@ -281,7 +377,7 @@ const ChatPage = (): ReactElement => {
         setBotInfo={setBotInfo}
         isDataLoading={isDataLoading}
       />
-      <div className="overflow-scroll flex flex-1 flex-col pt-20">
+      <div className="overflow-scroll flex flex-1 flex-col pt-[100px] pr-[388px] pl-[24px]">
         <div className="flex items-center justify-end gap-4">
           {talkAgentConfig?.sceneEnable === 1 && (
             <>
@@ -304,26 +400,8 @@ const ChatPage = (): ReactElement => {
             </>
           )}
         </div>
-        {chatType === 'vms' && showVmsPermissionTip && (
-          <div className={styles.avatar_permission_tip_wrapper}>
-            <div className={styles.avatar_permission_tip}>
-              <span>{t('chatPage.chatWindow.vmsPermissionRequired')}</span>
-              <a
-                href="javascript:void(0)"
-                onClick={() => {
-                  vmsInteractionCmpRef?.current?.player?.resume();
-                  setShowVmsPermissionTip(false);
-                }}
-              >
-                {t('chatPage.chatWindow.grantPermission')}
-              </a>
-            </div>
-          </div>
-        )}
         <div
-          className={`w-full mx-auto flex flex-col flex-1 min-h-0 overflow-hidden ${
-            chatType === 'text' ? 'pr-0' : 'pr-52'
-          }`}
+          className={`w-full mx-auto flex flex-col flex-1 min-h-0 overflow-hidden z-[1]`}
         >
           <MessageList
             messageList={messageList}
@@ -331,6 +409,8 @@ const ChatPage = (): ReactElement => {
             isDataLoading={isDataLoading}
             botNameColor={botNameColor}
             handleSendMessage={handleRecomendClick}
+            chatType={chatType}
+            vmsInteractionCmpRef={vmsInteractionCmpRef}
           />
         </div>
       </div>
@@ -342,7 +422,40 @@ const ChatPage = (): ReactElement => {
       />
       {chatType === 'vms' && (
         <div className={styles.vms_container}>
+          {showVmsPermissionTip && (
+            <div className={styles.avatar_permission_tip_wrapper}>
+              <div className={styles.avatar_permission_tip}>
+                <span>{t('chatPage.chatWindow.virtualVoicePermission')}</span>
+                <a
+                  href="javascript:void(0)"
+                  onClick={() => {
+                    vmsInteractionCmpRef?.current?.player?.resume();
+                    setShowVmsPermissionTip(false);
+                  }}
+                >
+                  {t('chatPage.chatWindow.virtualAuthorization')}
+                </a>
+              </div>
+            </div>
+          )}
           <div className={styles.vms_container_inner}>
+            <div
+              style={{
+                width: '380px',
+                height: '100%',
+                zIndex: 10,
+                position: 'absolute',
+                right: '-150px',
+              }}
+            >
+              <Spin
+                spinning={loadingVms}
+                tip={t('chatPage.chatWindow.virtualLoading') + '...'}
+                className="mt-[100px] color-[#275EFF]"
+              >
+                <div></div>
+              </Spin>
+            </div>
             {/* {showResetOperation && <div>虚拟人已离开，是否恢复</div>} */}
             <VmsInteractionCmp
               ref={vmsInteractionCmpRef}
@@ -360,6 +473,7 @@ const ChatPage = (): ReactElement => {
                 position: 'absolute',
                 right: '-150px',
               }}
+              loadingStatusChange={setLoadingVms}
             />
           </div>
         </div>

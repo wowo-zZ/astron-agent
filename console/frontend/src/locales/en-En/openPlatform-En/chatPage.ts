@@ -82,6 +82,10 @@ const transition = {
     deleteFile: 'Delete File',
     cancelUpload: 'Cancel Upload',
     pleaseSelectOption: 'Please select an option~',
+    virtualVoicePermission:
+      'Virtual voice broadcast requires browser permissions',
+    virtualAuthorization: 'Authorization',
+    virtualLoading: 'Loading',
     freshStart: 'A Fresh Start',
     deleteErrorFilesBeforeSend: 'Please delete failed files before sending',
     vmsPermissionRequired: 'VMS requires browser permission',

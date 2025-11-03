@@ -696,6 +696,8 @@ const translation = {
       regenerate: 'Regenerate',
       tryFlow: 'Try Flow',
       confirmDeleteAllDialogue: 'Confirm to delete and clear all dialogue?',
+      versionNotPublished: 'Version not published',
+      virtualLoading: 'Loading',
     },
     flowModal: {
       createWorkflow: 'Create Workflow',

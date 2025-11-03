@@ -123,7 +123,7 @@ const HeaderFeedbackModal: React.FC<HeaderFeedbackModalProps> = ({
           onSubmit={values => {
             createTalkAgent(values)
               .then((res: any) => {
-                message.success('创建成功');
+                message.success(t('createAgent1.createSuccess'));
                 navigate(
                   `/work_flow/${res?.maasId}/arrange?botId=${res?.botId}`
                 );
