@@ -10,7 +10,6 @@ from typing import Optional
 from urllib.parse import urlencode
 
 import boto3  # type: ignore
-import requests  # type: ignore
 from botocore.exceptions import ClientError
 from common.utils.hmac_auth import HMACAuth
 from loguru import logger
@@ -187,6 +186,9 @@ class IFlyGatewayStorageClient(BaseOSSService, Service):
         headers["X-TTL"] = str(self.ttl)
         headers["Content-Length"] = str(len(file_bytes))
         try:
+
+            import requests  # type: ignore
+
             resp = requests.post(url, headers=headers, data=file_bytes)
         except Exception as e:
             logger.error(e)

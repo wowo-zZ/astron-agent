@@ -6,7 +6,6 @@ from abc import abstractmethod
 from asyncio import Event
 from typing import Any, AsyncIterator, Dict, List, Literal, Optional, Tuple
 
-import requests  # type: ignore
 from pydantic import BaseModel, Field, PrivateAttr
 
 from workflow.consts.engine.chat_status import ChatStatus, SparkLLMStatus
@@ -1188,6 +1187,8 @@ class BaseLLMNode(BaseNode):
                         payload_comp_history.pop(0)
         # If it's an image understanding model, reserve the first position in array for image
         if image_url:
+            import requests  # type: ignore
+
             image_response = requests.get(image_url)
             if image_response.status_code != 200:
                 raise Exception(f"Failed to download image from {image_url}")

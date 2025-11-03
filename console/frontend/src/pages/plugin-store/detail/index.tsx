@@ -278,7 +278,7 @@ const PluginStoreDetail: React.FC = (): ReactElement => {
                       alt=""
                     />
                     <div className="text-sm text-[#757575]">
-                      <span className="text-[#275EFF]">
+                      <span className="text-[#6356EA]">
                         {toolInfo?.botUsedCount}
                       </span>{' '}
                       {t('common.storePlugin.references')}
@@ -293,7 +293,7 @@ const PluginStoreDetail: React.FC = (): ReactElement => {
                       alt=""
                     />
                     <div className="text-sm text-[#757575]">
-                      <span className="text-[#275EFF]">
+                      <span className="text-[#6356EA]">
                         {toolInfo?.favoriteCount}
                       </span>{' '}
                       {t('common.storePlugin.favorites')}
@@ -313,7 +313,7 @@ const PluginStoreDetail: React.FC = (): ReactElement => {
               </span>
               <div className="flex items-center gap-2">
                 <span
-                  className="text-sm text-[#275EFF] cursor-pointer"
+                  className="text-sm text-[#6356EA] cursor-pointer"
                   onClick={() =>
                     setCurrentTab(currentTab === 'debug' ? 'details' : 'debug')
                   }
@@ -323,7 +323,7 @@ const PluginStoreDetail: React.FC = (): ReactElement => {
                     : t('plugin.debug')}
                 </span>
                 <span
-                  className="text-sm text-[#275EFF] cursor-pointer"
+                  className="text-sm text-[#6356EA] cursor-pointer"
                   onClick={() => setModal(true)}
                 >
                   {t('common.storePlugin.privacyStatement')}
@@ -358,7 +358,7 @@ const PluginStoreDetail: React.FC = (): ReactElement => {
                   <Button
                     loading={debugLoading}
                     type="primary"
-                    className="flex items-center w-[80px] gap-1.5 text-[#275eff] cursor-pointer"
+                    className="flex items-center w-[80px] gap-1.5 text-[#6356EA] cursor-pointer"
                     onClick={handleDebuggerTool}
                     style={{
                       height: '36px',

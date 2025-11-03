@@ -31,7 +31,6 @@ class FlowUpdate(BaseModel):
     :param description: Workflow description
     :param data: Workflow data dictionary
     :param app_id: Application ID
-    :param status: Workflow status
     """
 
     id: Optional[str] = None
@@ -39,7 +38,6 @@ class FlowUpdate(BaseModel):
     description: Optional[str] = None
     data: Optional[Dict] = None
     app_id: Optional[str] = None
-    status: Optional[int] = None
 
 
 class Edge(BaseModel):

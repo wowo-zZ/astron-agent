@@ -269,6 +269,8 @@ public class BotAIServiceImpl implements BotAIService {
             log.info("User [{}] avatar generated and uploaded successfully: {}", uid, avatarUrl);
             return avatarUrl;
 
+        } catch (BusinessException e) {
+            throw e;
         } catch (Exception e) {
             log.error("Exception occurred during AI avatar generation for user [{}]", uid, e);
             return "Should return fallback content";
