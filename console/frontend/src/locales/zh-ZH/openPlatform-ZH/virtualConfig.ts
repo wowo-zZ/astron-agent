@@ -61,14 +61,14 @@ const translation = {
     cancel: '取消',
     confirm: '使用',
   },
-  defVcnList:{
-    name1:'林思语',
-    name2:'林晨星',
-    gender1:'女',
-    gender2:'男',
-    posture:'大半身',
-    scene:'教育学习',
-  }
+  defVcnList: {
+    name1: '林思语',
+    name2: '林晨星',
+    gender1: '女',
+    gender2: '男',
+    posture: '大半身',
+    scene: '教育学习',
+  },
 };
 
 export default translation;

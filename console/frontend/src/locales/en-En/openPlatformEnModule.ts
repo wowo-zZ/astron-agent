@@ -21,8 +21,6 @@ import appManage from './openPlatform-En/appManage';
 import virtualConfig from './openPlatform-En/virtualConfig';
 import vmsInteractionCmp from './openPlatform-En/vmsInteractionCmp';
 
-
-
 /** ## 开放平台的翻译配置 -- en
  * @description 注意模块名称不要跟星辰的重复
  */

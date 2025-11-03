@@ -26,10 +26,7 @@ import voiceIcon from '@/assets/imgs/virtual-config-modal/voice-icon.svg';
 import voiceActionIcon from '@/assets/imgs/workflow/edit-voice.svg';
 import defaultModalAvatar from '@/assets/imgs/virtual-config-modal/default-modal-avatar.png';
 import defaultModalAvatarPreview from '@/assets/imgs/virtual-config-modal/default-modal-avatar-preview.png';
-import {
-  getBotType,
-  getSceneList,
-} from '@/services/spark-common';
+import { getBotType, getSceneList } from '@/services/spark-common';
 import { getVcnList } from '@/services/chat';
 import styles from './index.module.scss';
 import { aiGenPrologue } from '@/services/spark-common';
@@ -380,8 +377,8 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
     } catch (err) {
       const msg =
         typeof err === 'object' &&
-          err &&
-          'message' in (err as Record<string, unknown>)
+        err &&
+        'message' in (err as Record<string, unknown>)
           ? String((err as Record<string, unknown>).message)
           : t('virtualConfig.submitFailed');
       message.error(msg);
@@ -451,11 +448,7 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
       sit: '坐姿',
     };
     const typeMap: Record<
-      | 'ai_host'
-      | 'education'
-      | 'digital_staff'
-      | 'cartoon'
-      | 'historical',
+      'ai_host' | 'education' | 'digital_staff' | 'cartoon' | 'historical',
       string
     > = {
       ai_host: 'AI主播',
@@ -476,49 +469,48 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
         typeFilter === 'all'
           ? true
           : (() => {
-            const expected =
-              typeMap[typeFilter as keyof typeof typeMap];
-            const raw = a.type as unknown;
-            if (Array.isArray(raw)) {
-              return (raw as unknown[]).some(
-                x => typeof x === 'string' && x === expected
-              );
-            }
-            if (typeof raw === 'string') {
-              const s = raw.trim();
-              if (s.startsWith('[') && s.endsWith(']')) {
-                try {
-                  const arr = JSON.parse(s);
-                  return (
-                    Array.isArray(arr) &&
-                    arr.some(
-                      (x: unknown) => typeof x === 'string' && x === expected
-                    )
-                  );
-                } catch {
-                  return s === expected;
-                }
+              const expected = typeMap[typeFilter as keyof typeof typeMap];
+              const raw = a.type as unknown;
+              if (Array.isArray(raw)) {
+                return (raw as unknown[]).some(
+                  x => typeof x === 'string' && x === expected
+                );
               }
-              return s === expected;
-            }
-            return false;
-          })();
+              if (typeof raw === 'string') {
+                const s = raw.trim();
+                if (s.startsWith('[') && s.endsWith(']')) {
+                  try {
+                    const arr = JSON.parse(s);
+                    return (
+                      Array.isArray(arr) &&
+                      arr.some(
+                        (x: unknown) => typeof x === 'string' && x === expected
+                      )
+                    );
+                  } catch {
+                    return s === expected;
+                  }
+                }
+                return s === expected;
+              }
+              return false;
+            })();
       return genderOk && postureOk && typeOk;
     });
   }, [avatarList, genderFilter, postureFilter, typeFilter, sceneMode]);
 
   useEffect(() => {
-      getVcnList()
-        .then((res: VcnItem[]) => {
-          setOfficialVcnList(res);
-          setSelectedVoice(res[0]?.voiceType || '');
-        })
-        .catch(err => { });
-      getAvatarList();
-      getBotTypeList();
-      if (!avatarIcon?.length) {
-        getAvatarConfig(); // 获取图标库
-      }
+    getVcnList()
+      .then((res: VcnItem[]) => {
+        setOfficialVcnList(res);
+        setSelectedVoice(res[0]?.voiceType || '');
+      })
+      .catch(err => {});
+    getAvatarList();
+    getBotTypeList();
+    if (!avatarIcon?.length) {
+      getAvatarConfig(); // 获取图标库
+    }
   }, []);
 
   const setBotCreateVcn = (vcn: any) => {
@@ -725,7 +717,7 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
                     onClick={() => {
                       setSceneMode(0);
                       setSelectedAvatar(
-                        selectedAvatar || avatarList[0]!.sceneId 
+                        selectedAvatar || avatarList[0]!.sceneId
                       );
                       setSceneVcn(avatarList[0]!.defaultVCN || '');
                     }}
@@ -1041,13 +1033,13 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
                                 onChange={v =>
                                   setTypeFilter(
                                     v as
-                                    | 'ai_host'
-                                    | 'education'
-                                    | 'digital_staff'
-                                    | 'conference_host'
-                                    | 'cartoon'
-                                    | 'historical'
-                                    | 'all'
+                                      | 'ai_host'
+                                      | 'education'
+                                      | 'digital_staff'
+                                      | 'conference_host'
+                                      | 'cartoon'
+                                      | 'historical'
+                                      | 'all'
                                   )
                                 }
                               />

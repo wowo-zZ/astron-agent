@@ -230,9 +230,9 @@ const MessageActions = ({
   setVisible,
   copyData,
   advancedConfig,
-  chatType
+  chatType,
 }): React.ReactElement => {
-    const { t } = useTranslation();
+  const { t } = useTranslation();
   // 为每个消息创建播放状态映射
   const [playingStates, setPlayingStates] = useState<Record<string, boolean>>(
     {}
@@ -242,14 +242,14 @@ const MessageActions = ({
   const setCurrentPlayingId = useVoicePlayStore(
     state => state.setCurrentPlayingId
   );
-    const vmsInteractiveRef = useChatStore(state => state.vmsInteractiveRef);
+  const vmsInteractiveRef = useChatStore(state => state.vmsInteractiveRef);
   const vmsInteractiveRefStatus = useChatStore(
     state => state.vmsInteractiveRefStatus
   );
   const setVmsInteractiveRefStatus = useChatStore(
     (state: any) => state.setVmsInteractiveRefStatus
   );
-    function processStringByChunk(str, chunkSize = 200, handleChunk) {
+  function processStringByChunk(str, chunkSize = 200, handleChunk) {
     // 1. 边界判断：若字符串为空或未传入处理函数，直接返回
     if (!str || typeof handleChunk !== 'function') return;
 
@@ -279,8 +279,8 @@ const MessageActions = ({
   // 播放语音
   const playAudio = useCallback(
     async (item: any) => {
-     if (chatType === 'vms') {
-      console.log('vmsInteractiveRef',vmsInteractiveRef)
+      if (chatType === 'vms') {
+        console.log('vmsInteractiveRef', vmsInteractiveRef);
         vmsInteractiveRef?.on(SDKEvents.frame_stop, () => {
           setCurrentPlayingId(null);
         });
@@ -288,7 +288,7 @@ const MessageActions = ({
         if (playingStates[item.id]) {
           setCurrentPlayingId(null);
         } else {
-          console.log('advancedConfig',advancedConfig,item)
+          console.log('advancedConfig', advancedConfig, item);
           if (!isPureText(item.content)) {
             message.error(t('chatPage.chatBottom.unSupportRead'));
             return;
@@ -328,27 +328,30 @@ const MessageActions = ({
           setVmsInteractiveRefStatus('init');
         }
       } else {
-         if (playingStates[item.id]) {
-        // 如果当前正在播放，则停止
-        setCurrentPlayingId(null);
-      } else {
-        // 切换播放：先停止当前播放
-        if (currentPlayingId) {
+        if (playingStates[item.id]) {
+          // 如果当前正在播放，则停止
           setCurrentPlayingId(null);
+        } else {
+          // 切换播放：先停止当前播放
+          if (currentPlayingId) {
+            setCurrentPlayingId(null);
+          }
+          // 使用 setTimeout 确保状态更新完成后再开始新的播放
+          setTimeout(() => {
+            setCurrentPlayingId(item.id);
+          }, 50);
         }
-        // 使用 setTimeout 确保状态更新完成后再开始新的播放
-        setTimeout(() => {
-          setCurrentPlayingId(item.id);
-        }, 50);
       }
-      }
-
     },
-    [playingStates, setCurrentPlayingId, currentPlayingId,      
+    [
+      playingStates,
+      setCurrentPlayingId,
+      currentPlayingId,
       chatType,
       vmsInteractiveRefStatus,
       vmsInteractiveRef,
-      advancedConfig,]
+      advancedConfig,
+    ]
   );
   useEffect(() => {
     const newPlayingStates: Record<string, boolean> = {};
@@ -358,7 +361,7 @@ const MessageActions = ({
     setPlayingStates(newPlayingStates);
   }, [currentPlayingId, chatList]);
 
-      const handleWindowTabChange = () => {
+  const handleWindowTabChange = () => {
     // 判断页面是否从“可见”变为“不可见”（即切换到其他标签页）
     if (document.visibilityState === 'hidden') {
       setCurrentPlayingId(null);
@@ -392,19 +395,19 @@ const MessageActions = ({
                     playingStates[chat.id] ? 'play-active' : 'play-normal'
                   }`}
                 ></span>
-                  {chatType === 'text' && (
-                <TtsModule
-                  text={chat.content}
-                  language={useLanguage.current}
-                  voiceName={advancedConfig?.textToSpeech?.vcn_cn}
-                  isPlaying={playingStates[chat.id] || false}
-                  setIsPlaying={playing => {
-                    if (!playing) {
-                      setCurrentPlayingId(null);
-                    }
-                  }}
-                />
-                 )}
+                {chatType === 'text' && (
+                  <TtsModule
+                    text={chat.content}
+                    language={useLanguage.current}
+                    voiceName={advancedConfig?.textToSpeech?.vcn_cn}
+                    isPlaying={playingStates[chat.id] || false}
+                    setIsPlaying={playing => {
+                      if (!playing) {
+                        setCurrentPlayingId(null);
+                      }
+                    }}
+                  />
+                )}
               </>
             )}
             <img
@@ -585,7 +588,7 @@ const MessageReply = ({
   needReply,
   handleStopConversation,
   setChatList,
-  chatType
+  chatType,
 }): React.ReactElement => {
   return (
     <div className="flex flex-col gap-4 group" key={chat?.id}>

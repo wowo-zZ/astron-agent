@@ -65,14 +65,14 @@ const translation = {
     cancel: 'Cancel', //'取消',
     confirm: 'Use', //'使用',
   },
-    defVcnList:{
-     name1: 'Lin Si Yu', //'林思语',
-     name2:'Lin Ming Xiong', //'林晨星',
-     gender1:'Female', //'女',
-     gender2:'Male', //'男',
-     posture:'Half Body', //'大半身',
-     scene:'Education and Learning', //'教育学习',
-  }
+  defVcnList: {
+    name1: 'Lin Si Yu', //'林思语',
+    name2: 'Lin Ming Xiong', //'林晨星',
+    gender1: 'Female', //'女',
+    gender2: 'Male', //'男',
+    posture: 'Half Body', //'大半身',
+    scene: 'Education and Learning', //'教育学习',
+  },
 };
 
 export default translation;
