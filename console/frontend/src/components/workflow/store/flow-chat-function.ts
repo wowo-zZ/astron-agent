@@ -63,6 +63,7 @@ export const initialStatus = {
   preRunningNodeIds: [],
   currentFollowNodeId: '',
   versionId: '',
+  chatType: 'text',
   startNodeParams: [],
   buildPassRef: false,
   debuggering: false,
@@ -72,6 +73,12 @@ export const initialStatus = {
   userWheel: false,
   deleteAllModal: false,
   chatIdRef: uuid().replace(/-/g, ''),
+};
+
+export const handleChatTypeChange = (type: string, set) => {
+  set({
+    chatType: type,
+  });
 };
 
 const getDialogues = (id: string, set, shouldAddDivider = false): void => {

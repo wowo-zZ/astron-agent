@@ -132,7 +132,7 @@ const AgentList: React.FC<AgentListProps> = ({ AgentType }) => {
             <ExclamationCircleOutlined
               style={{ marginRight: '5px', color: '#f2aa58' }}
             />
-            下架申请提交后无法撤回，请谨慎提交！
+            {t('releaseManagement.takeDownWarning')}
           </div>
         </div>
       ),
@@ -146,12 +146,12 @@ const AgentList: React.FC<AgentListProps> = ({ AgentType }) => {
           handleAgentStatus(botId, {
             action: 'OFFLINE',
             publishType: 'MARKET',
-            publishData: { reason: '维护更新' },
+            publishData: { reason: t('releaseManagement.maintenanceUpdate') },
           })
             .then(() => {
               reasonRef.current = undefined;
               close && close();
-              message.success('提交申请成功！');
+              message.success(t('releaseManagement.submitApplicationSuccess'));
               setPageInfo(pre => ({ ...pre, pageIndex: 1 }));
             })
             .catch(err => {
@@ -163,7 +163,7 @@ const AgentList: React.FC<AgentListProps> = ({ AgentType }) => {
               .then(res => {
                 getBotInfo({ botId: botInfo.botId }).then(res => {
                   setBotDetailInfo(res.data);
-                  message.success('解绑成功');
+                  message.success(t('releaseManagement.unbindSuccess'));
                 });
               })
               .catch(error => {

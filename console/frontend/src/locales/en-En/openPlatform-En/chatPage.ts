@@ -32,6 +32,7 @@ const transition = {
     deepseekV3Model: 'DeepSeek V3 Model',
     gemmaModel: 'Gemma Model',
     qwenModel: 'Qwen Model',
+    rolePlayModel: 'Role Play',
     toolCalling: 'Tool Calling',
   },
   chatBottom: {
@@ -41,6 +42,7 @@ const transition = {
     read: 'Read',
     copy: 'Copy',
     reAnswer: 'Re-answer',
+    textTooLong: 'Text too long, maximum limit 8000 characters',
   },
   chatWindow: {
     clearChatHistoryFailed: 'Failed to clear chat history',
@@ -56,6 +58,7 @@ const transition = {
     uploading: 'Uploading...',
     processing: 'Processing...',
     newChat: 'New Chat',
+    newChatSimple: 'New Conversation',
     clearChatHistory: 'Clear Chat History',
     confirmDeleteChat: 'Confirm delete chat history?',
     stopOutput: 'Stop',
@@ -79,6 +82,14 @@ const transition = {
     deleteFile: 'Delete File',
     cancelUpload: 'Cancel Upload',
     pleaseSelectOption: 'Please select an option~',
+    virtualVoicePermission:
+      'Virtual voice broadcast requires browser permissions',
+    virtualAuthorization: 'Authorization',
+    virtualLoading: 'Loading',
+    freshStart: 'A Fresh Start',
+    deleteErrorFilesBeforeSend: 'Please delete failed files before sending',
+    vmsPermissionRequired: 'VMS requires browser permission',
+    grantPermission: 'Grant Permission',
   },
   feedbackPopover: {
     feedbackTitle: 'Your feedback helps us improve',

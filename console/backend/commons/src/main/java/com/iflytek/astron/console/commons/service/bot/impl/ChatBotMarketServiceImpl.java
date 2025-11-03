@@ -31,6 +31,7 @@ public class ChatBotMarketServiceImpl implements ChatBotMarketService {
         Page<ChatBotMarket> marketPage = new Page<>(page, pageSize);
         LambdaQueryWrapper<ChatBotMarket> queryWrapper = Wrappers.lambdaQuery(ChatBotMarket.class)
                 .eq(ChatBotMarket::getIsDelete, NOT_DELETED)
+                .eq(ChatBotMarket::getBotStatus, BotStatusEnum.PUBLISHED.getCode())
                 .orderByDesc(ChatBotMarket::getCreateTime);
         if (type != null) {
             queryWrapper.eq(ChatBotMarket::getBotType, type);

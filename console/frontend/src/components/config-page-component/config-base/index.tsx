@@ -22,9 +22,6 @@ import {
 import ConfigHeader from '@/components/config-page-component/config-header/ConfigHeader';
 import CapabilityDevelopment from '@/components/config-page-component/config-base/components/CapabilityDevelopment';
 import UploadCover from '@/components/upload-avatar/index';
-// import { DeleteIcon } from '@/components/svg-icons';
-// import PromptModel from '@/components/prompt-model';
-// import PromptTip from '@/components/prompt-tip';
 import PromptTry, { PromptTryRef } from '@/components/prompt-try';
 import InputBox from '@/components/prompt-try/input-box';
 import WxModal from '@/components/wx-modal';
@@ -853,7 +850,7 @@ const BaseConfig: React.FC<ChatProps> = ({
     });
   }, []);
 
-  usePrompt(isChanged, `确定离开吗？\n系统可能不会保存您做的更改。`);
+  usePrompt(isChanged, t('configBase.confirmLeavePrompt'));
 
   useEffect(() => {
     setCurrentTab('base');
@@ -861,7 +858,7 @@ const BaseConfig: React.FC<ChatProps> = ({
 
   const aiGen = () => {
     if (!prompt) {
-      return message.warning('设定不能为空！');
+      return message.warning(t('configBase.settingCannotBeEmpty'));
     }
     setLoadingPrompt(true);
     quickCreateBot(prompt).then((res: any) => {

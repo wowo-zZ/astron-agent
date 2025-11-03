@@ -25,6 +25,10 @@ const translation = {
   publishSuccess: '发布成功',
   updatePublish: '更新发布',
   publish: '发布',
+  confirmLeavePrompt: '确定离开吗？\\n系统可能不会保存您做的更改。',
+  settingCannotBeEmpty: '设定不能为空！',
+  createAgentBeforePublish: '先创建助手',
+  inputHere: '在此输入内容',
 
   agentCategory: '智能体分类',
   agentIntroduction: '智能体简介',
@@ -38,6 +42,7 @@ const translation = {
   modelComparison: '模型对比',
   sparkModel: '星火大模型 Spark V4.0 Ultra',
   sparkX1Model: '星火大模型 Spark X1',
+  rolePlayModel: '角色扮演',
   pleaseSelectModel: '请选择模型',
   highOrderConfig: '高阶配置',
   defaultPrompt: '默认提示词',
@@ -66,6 +71,12 @@ const translation = {
   select: '选这个',
 
   CapabilityDevelopment: {
+    backgroundImage: '背景图',
+    horizontalScreenDisplay: '横屏展示',
+    verticalScreenDisplay: '竖屏展示',
+    viewActualVerticalScreenEffect: '可以在对话后前往app查看实际竖屏效果',
+    modify: '修改',
+    upload: '上传',
     requireCreativeNovelty:
       '要求创意新颖，文案表达符合目标客群的喜好，避免口语化',
     pleaseWriteACreativeCommercialCopywriting:
@@ -150,46 +161,6 @@ const translation = {
     pleaseUploadDescriptionFileAndInterfaceDocumentAndVerify:
       '请先左侧上传描述文件、接口文档并验证后可进行调试预览',
     pleaseUploadInterfaceDocumentAndVerify:
-      '请在左侧重新上传接口文档并验证后可进行调试预览',
-    stopOutput: '停止输出',
-    answerInProgress: '回答中...',
-    hereIsTheAgentName: '这里是智能体名称',
-    hereIsTheAgentIntroduction: '这里是智能体简介',
-    clearHistory: '清除历史记录',
-    send: '发送',
-  },
-  promptTip: {
-    pleaseCompleteVerification: '请完成验证',
-    pluginNeedsUserAuthorization: '插件需要用户授权信息',
-    answerPleaseTryAgainLater: '回答中，请稍后再试',
-    pleaseEnterQuestion: '请输入询问内容',
-    end: '结束',
-    networkError: '网络好像出了个小差，可以刷新页面试一下。',
-    uploadDescriptionAndApiDocument: '您还未上传描述文件、接口文档',
-    uploadApiDocumentAndVerify: '您上传的接口文档未验证通过',
-    uploadDescriptionAndApiDocumentAndVerify:
-      '请先左侧上传描述文件、接口文档并验证后可进行调试预览',
-    uploadApiDocumentAndVerifyAndDebugPreview:
-      '请在左侧重新上传接口文档并验证后可进行调试预览',
-    stopOutput: '停止输出',
-    answerInProgress: '回答中...',
-    hereIsTheAgentName: '这里是智能体名称',
-    hereIsTheAgentIntroduction: '这里是智能体简介',
-    clearHistory: '清除历史记录',
-    send: '发送',
-  },
-  promptModel: {
-    pleaseCompleteVerification: '请完成验证',
-    pluginNeedsUserAuthorization: '插件需要用户授权信息',
-    answerPleaseTryAgainLater: '回答中，请稍后再试',
-    pleaseEnterQuestion: '请输入询问内容',
-    end: '结束',
-    networkError: '网络好像出了个小差，可以刷新页面试一下。',
-    uploadDescriptionAndApiDocument: '您还未上传描述文件、接口文档',
-    uploadApiDocumentAndVerify: '您上传的接口文档未验证通过',
-    uploadDescriptionAndApiDocumentAndVerify:
-      '请先左侧上传描述文件、接口文档并验证后可进行调试预览',
-    uploadApiDocumentAndVerifyAndDebugPreview:
       '请在左侧重新上传接口文档并验证后可进行调试预览',
     stopOutput: '停止输出',
     answerInProgress: '回答中...',
