@@ -549,7 +549,7 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
     >
       <Spin spinning={loading} tip={t('virtualConfig.generate') + '...'}>
         <div className={styles.modal_content}>
-          <div className={styles.title}></div>
+          <div className={styles.title}>{t('virtualConfig.baseConfig')}</div>
           <div className={styles.scrollable_content}>
             <Form
               form={form}
@@ -559,7 +559,7 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
             >
               <div className={styles.sectionHeader}>
                 <div className={styles.sectionTitle}>
-                  {t('virtualConfig.baseConfig')}
+                  {t('virtualConfig.baseInfo')}
                 </div>
                 {/* <Tooltip title="基本信息">
                 <img className={styles.sectionHelp} src={helpIcon} />

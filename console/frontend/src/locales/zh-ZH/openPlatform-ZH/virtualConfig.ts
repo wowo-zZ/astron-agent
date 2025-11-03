@@ -8,6 +8,7 @@ const translation = {
   defaultVoice: '未选择',
   generate: '生成中',
   baseConfig: '基础配置',
+  baseInfo: '基础信息',
   name: '名称：',
   avatar: '头像',
   customName: '自定义',
