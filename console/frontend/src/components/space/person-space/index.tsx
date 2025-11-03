@@ -79,7 +79,7 @@ export const PersonSpace = ({
         navigate('/space/agent');
       }
     } catch (err: any) {
-      message.error(err.msg || '空间访问失败');
+      message.error(err.msg || t('space.accessSpaceFailed'));
     }
   };
 
@@ -94,7 +94,7 @@ export const PersonSpace = ({
           setAllList(res);
         })
         .catch((err: any) => {
-          message.error(err.msg || '获取空间列表失败');
+          message.error(err.msg || t('space.getSpaceListFailed'));
         });
     } else {
       getAllSpace(params)
@@ -111,7 +111,7 @@ export const PersonSpace = ({
           }
         })
         .catch((err: any) => {
-          message.error(err.msg || '获取空间列表失败');
+          message.error(err.msg || t('space.getSpaceListFailed'));
         });
     }
   };
@@ -143,7 +143,7 @@ export const PersonSpace = ({
         setRecentList(res?.slice(0, 5));
       })
       .catch((err: any) => {
-        message.error(err.msg || '获取最近访问列表失败');
+        message.error(err.msg || t('space.getRecentVisitFailed'));
       });
   };
 

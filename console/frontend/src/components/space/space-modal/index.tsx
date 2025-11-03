@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Form, Input, Button, message } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import createSpaceBg from '@/assets/imgs/space/createSpaceBg.png';
 import styles from './index.module.scss';
 import UploadAvatar from './upload-avatar';
@@ -45,6 +46,7 @@ const SpaceModal: React.FC<SpaceModalProps> = ({
   mode = 'create',
   initialData,
 }) => {
+  const { t } = useTranslation();
   const { checkName, createSpace, editSpace } = useSpaceType();
   const [form] = Form.useForm();
   const [avatarUrl, setAvatarUrl] = useState<string>(
@@ -95,8 +97,8 @@ const SpaceModal: React.FC<SpaceModalProps> = ({
     const checkRes = await checkName(checkParams);
 
     if (checkRes) {
-      console.log('空间名已存在');
-      throw new Error('空间名已存在');
+      console.log(t('space.spaceNameExists'));
+      throw new Error(t('space.spaceNameExists'));
     }
 
     // 🎯 使用策略模式统一处理
@@ -122,7 +124,9 @@ const SpaceModal: React.FC<SpaceModalProps> = ({
       } else {
         await defaultSubmitHandle(submitData);
         message.success(
-          mode === 'create' ? '空间创建成功！' : '空间更新成功！'
+          mode === 'create'
+            ? t('space.createSuccess')
+            : t('space.updateSuccess')
         );
         handleCancel();
         onSuccess?.();
@@ -130,7 +134,7 @@ const SpaceModal: React.FC<SpaceModalProps> = ({
         setSpaceName(name);
       }
     } catch (error: any) {
-      message.error(error?.msg || error?.message || '创建空间失败');
+      message.error(error?.msg || error?.message || t('space.createFailed'));
       console.error('表单验证失败:', error);
     }
   };
@@ -187,7 +191,7 @@ const SpaceModal: React.FC<SpaceModalProps> = ({
   const buttons: ButtonConfig[] = [
     {
       key: 'cancel',
-      text: '取消',
+      text: t('space.cancel'),
       type: 'default',
       onClick: () => handleCancel(),
     },
@@ -195,10 +199,10 @@ const SpaceModal: React.FC<SpaceModalProps> = ({
       key: 'submit',
       text:
         isNeedUpgrade && mode === 'create'
-          ? '创建次数已达上限'
+          ? t('space.createLimitReached')
           : mode === 'create'
-            ? '确定'
-            : '保存',
+            ? t('space.confirm')
+            : t('space.save'),
       type: isNeedUpgrade && mode === 'create' ? 'default' : 'primary',
       disabled: isNeedUpgrade && mode === 'create',
       onClick: () => {
@@ -213,7 +217,9 @@ const SpaceModal: React.FC<SpaceModalProps> = ({
   return (
     <>
       <Modal
-        title={mode === 'create' ? '创建新空间' : '编辑空间'}
+        title={
+          mode === 'create' ? t('space.createSpace') : t('space.editSpace')
+        }
         open={open}
         onCancel={handleCancel}
         footer={null}
@@ -223,7 +229,6 @@ const SpaceModal: React.FC<SpaceModalProps> = ({
         maskClosable={false}
         keyboard={false}
       >
-        {/* 信息横幅 */}
         <div
           className={styles.infoBanner}
           style={{ backgroundImage: `url(${createSpaceBg})` }}
@@ -236,9 +241,7 @@ const SpaceModal: React.FC<SpaceModalProps> = ({
               setCoverUrl={setAvatarUrl}
             />
           </div>
-          <div className={styles.bannerText}>
-            通过创建空间,将支持项目、智能体、插件、工作流和知识库在空间内进行协作和共享
-          </div>
+          <div className={styles.bannerText}>{t('space.bannerText')}</div>
         </div>
 
         <Form
@@ -256,29 +259,33 @@ const SpaceModal: React.FC<SpaceModalProps> = ({
           }}
         >
           <Form.Item
-            label="空间名称"
+            label={t('space.spaceName')}
             name="name"
             rules={[
-              { required: true, message: '请输入空间名称' },
-              { max: 50, message: '空间名称不能超过50个字符' },
+              { required: true, message: t('space.pleaseEnterSpaceName') },
+              { max: 50, message: t('space.spaceNameMaxLength') },
               {
                 pattern: patterns.spaceName?.pattern,
                 message: patterns.spaceName?.message,
               },
             ]}
           >
-            <Input placeholder="请输入空间名称" maxLength={50} showCount />
+            <Input
+              placeholder={t('space.pleaseEnterSpaceName')}
+              maxLength={50}
+              showCount
+            />
           </Form.Item>
 
           <Form.Item
-            label="描述"
+            label={t('space.description')}
             name="description"
-            rules={[{ max: 2000, message: '描述不能超过2000个字符' }]}
+            rules={[{ max: 2000, message: t('space.descriptionMaxLength') }]}
           >
             <TextArea
               className="xingchen-textarea xingchen-space-textarea"
               autoSize={{ minRows: 3, maxRows: 3 }}
-              placeholder="描述空间"
+              placeholder={t('space.describeSpace')}
               maxLength={2000}
               showCount
             />
@@ -294,7 +301,7 @@ const SpaceModal: React.FC<SpaceModalProps> = ({
                     onClose();
                   }}
                 >
-                  去升级
+                  {t('space.goUpgrade')}
                 </div>
               )}
               <ButtonGroup buttons={buttons} size="large" />

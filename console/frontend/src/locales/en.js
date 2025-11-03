@@ -220,10 +220,23 @@ export const en = {
   searchPersonality: 'Search for a friend',
   viewTutorial: 'View Tutorial',
   initialName: 'My speaker',
-  createVoice: 'Create Speaker',
+  createVoice: 'Create with one sentence',
+  selectGender: 'Select Gender',
+  male: 'Male',
+  female: 'Female',
+  startRecord: 'Start Record',
+  pleaseRead: 'Please Read',
+  recordingPleaseRead: 'Recording, please read',
+  recordingQualityDetection: 'Recording quality detection...',
+  pleaseReadInQuietEnvironment:
+    'Please read this text naturally and fluently in a quiet environment',
+  recordingProcessing: 'Recording processing...',
+  clickStartRecord: 'Click start recording, read the text',
+  clickStopRecord: 'Click stop recording',
+  complete: 'You have completed the voice collection',
   open: 'Enter',
-  complete:
-    'Image generation completed, welcome your valuable opinions and suggestions to help me improve rapidly',
+  audioUploading: 'Audio is uploading, please wait',
+  complete: 'Recording completed',
   oc: 'Optimize Command',
   oci: 'Question optimization in progress',
   oct: 'Command Content Optimization',
@@ -321,7 +334,14 @@ export const en = {
   thinkingProblem: 'Thinking the Problem',
   solvingProblem: 'Solving the Problem',
   checkAll: 'Check All...',
-
+  networkError:
+    'The web seems to go wrong, so please refresh the page for a try.',
+  edit: 'Edit',
+  deleteSpeaker: 'Delete Speaker',
+  deleteSpeakerTip: 'Are you sure you want to delete this speaker?',
+  speakerNameOnlySupport:
+    'Speaker name only supports English, numbers, spaces and underscore',
+  updateSuccess: 'Update Success',
   // Sidebar translations
   sidebar: {
     create: 'Create',
@@ -358,6 +378,23 @@ export const en = {
       team: 'Team',
       enterprise: 'Enterprise',
     },
+
+    // Space role translations
+    spaceRoles: {
+      superAdmin: 'Super Admin',
+      admin: 'Admin',
+      member: 'Member',
+    },
+
+    // Space edition type translations
+    personalEdition: 'Personal',
+    customEdition: 'Custom',
+    teamEdition: 'Team',
+    enterpriseEdition: 'Enterprise',
+    teamEnterpriseEdition: 'Team/Enterprise',
+
+    // Brand name
+    xingchen: 'Stellar',
   },
 
   // Space management related
@@ -396,7 +433,38 @@ export const en = {
     noData: 'No data',
     addSpace: 'Add Space',
     spaceManage: 'Space Management',
-
+    space: 'Space',
+    team: 'Team',
+    youAreNotInTheSpaceOrTeam: 'You are not in the {{spaceOrTeam}}',
+    inviteYouToJoin: 'Invite you to join ',
+    owner: 'Owner',
+    inviteWillExpireAt: 'Invite will expire at {{expireTime}}',
+    refuseSuccess: 'Refuse success',
+    refuse: 'Refuse',
+    joinSuccess: 'Join success',
+    join: 'Join',
+    rejected: 'Rejected',
+    enter: 'Enter {{spaceOrTeam}}',
+    withdrawn: 'Withdrawn',
+    expired: 'Expired',
+    batchImport: 'Batch Import',
+    confirmImport: 'Confirm Import',
+    cancelUpload: 'Cancel Upload',
+    templateFormatNotMatch: 'Template Format Not Match',
+    pleaseSelectFile: 'Please Select File',
+    uploadFail: 'Upload Fail',
+    importFail: 'Import Fail',
+    supportUploadExcel: 'Support Upload Excel',
+    supportDragOrClickUpload: 'Support Drag or Click Upload',
+    parsingInProgress: 'Parsing In Progress',
+    fileParsedSuccessfully: 'File Parsed Successfully',
+    successfullyParsed: 'Successfully Parsed',
+    members: 'members',
+    noParsingResult: 'No Parsing Result',
+    addNewMember: 'Add New Member',
+    cancel: 'Cancel',
+    importTemplate: 'Import Template',
+    exportResult: 'Export Result',
     // tsx
   },
 };

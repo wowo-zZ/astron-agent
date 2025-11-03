@@ -192,7 +192,7 @@ const ChatPage = (): ReactElement => {
       await getChatHistoryData(botInfo.chatId);
       setIsDataLoading(false);
     } catch (error) {
-      console.error('初始化聊天页面失败:', error);
+      console.error(error);
     } finally {
       setIsDataLoading(false);
     }
@@ -205,7 +205,7 @@ const ChatPage = (): ReactElement => {
     setMessageList(formattedMessages);
   };
 
-  //发送消息
+  //send message
   const handleRecomendClick = (params: {
     item: string;
     callback?: () => void;
@@ -220,17 +220,17 @@ const ChatPage = (): ReactElement => {
     });
   };
 
-  //停止生成
+  //stop answer
   const stopAnswer = () => {
     postStopChat(streamId).catch(err => {
       console.error(err);
     });
   };
 
-  //设置颜色
+  //set color
   const getBotNameColor = (imgUrl: string) => {
     const img = new window.Image();
-    img.crossOrigin = 'Anonymous'; // 处理跨域问题
+    img.crossOrigin = 'Anonymous'; // handle cross-origin problem
     img.src = imgUrl;
     img.onload = () => {
       const canvas = document.createElement('canvas');
@@ -261,9 +261,9 @@ const ChatPage = (): ReactElement => {
       g = Math.floor(g / length);
       b = Math.floor(b / length);
 
-      // 计算亮度（YIQ公式）
+      // calculate brightness
       const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-      const fontColor = brightness > 144 ? '#000000' : '#FFFFFF'; // 根据亮度设置字体颜色
+      const fontColor = brightness > 144 ? '#000000' : '#FFFFFF'; // set font color based on brightness
       setBotNameColor(fontColor);
     };
   };
@@ -307,7 +307,7 @@ const ChatPage = (): ReactElement => {
         {chatType === 'vms' && showVmsPermissionTip && (
           <div className={styles.avatar_permission_tip_wrapper}>
             <div className={styles.avatar_permission_tip}>
-              <span>虚拟人播报需要浏览器权限</span>
+              <span>{t('chatPage.chatWindow.vmsPermissionRequired')}</span>
               <a
                 href="javascript:void(0)"
                 onClick={() => {
@@ -315,7 +315,7 @@ const ChatPage = (): ReactElement => {
                   setShowVmsPermissionTip(false);
                 }}
               >
-                授权
+                {t('chatPage.chatWindow.grantPermission')}
               </a>
             </div>
           </div>

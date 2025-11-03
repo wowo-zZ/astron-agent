@@ -3,9 +3,6 @@
 <div align="center">
 
 [![License](https://img.shields.io/badge/license-apache2.0-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/github/v/release/iflytek/astron-agent)](https://github.com/iflytek/astron-agent/releases)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/iflytek/astron-agent/ci.yml)](https://github.com/iflytek/astron-agent/actions)
-[![Coverage](https://img.shields.io/codecov/c/github/iflytek/astron-agent)](https://codecov.io/gh/iflytek/astron-agent)
 [![GitHub Stars](https://img.shields.io/github/stars/iflytek/astron-agent?style=social)](https://github.com/iflytek/astron-agent/stargazers)
 
 English | [简体中文](README-zh.md)
@@ -48,9 +45,13 @@ cd docker/astronAgent
 # Copy environment configuration
 cp .env.example .env
 
-# Edit environment configuration (refer to docs/DEPLOYMENT_GUIDE_WITH_AUTH.md for details)
+# Configure environment variables
 vim .env
+```
 
+For environment variable configuration, please refer to the documentation:[DEPLOYMENT_GUIDE_WITH_AUTH.md](https://github.com/iflytek/astron-agent/blob/main/docs/DEPLOYMENT_GUIDE_WITH_AUTH.md#step-2-configure-astronagent-environment-variables)
+
+```bash
 # Start all services (including Casdoor)
 docker compose -f docker-compose-with-auth.yaml up -d
 ```

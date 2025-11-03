@@ -853,7 +853,7 @@ const BaseConfig: React.FC<ChatProps> = ({
     });
   }, []);
 
-  usePrompt(isChanged, `确定离开吗？\n系统可能不会保存您做的更改。`);
+  usePrompt(isChanged, t('configBase.confirmLeavePrompt'));
 
   useEffect(() => {
     setCurrentTab('base');
@@ -861,7 +861,7 @@ const BaseConfig: React.FC<ChatProps> = ({
 
   const aiGen = () => {
     if (!prompt) {
-      return message.warning('设定不能为空！');
+      return message.warning(t('configBase.settingCannotBeEmpty'));
     }
     setLoadingPrompt(true);
     quickCreateBot(prompt).then((res: any) => {

@@ -8,6 +8,7 @@ import {
 } from 'react-router-dom';
 import { Spin, message } from 'antd';
 import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
 import styles from './index.module.scss';
 
 import EnterpriseSpaceLayout from './base-layout';
@@ -27,6 +28,7 @@ import { useSpaceI18n } from '@/pages/space/hooks/use-space-i18n';
 import { RoleType, SpaceType, EnterpriseServiceType } from '@/types/permission';
 
 export default function Index() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { enterpriseId } = useParams();
   const { setUserRole, user } = useUserStore();
@@ -65,10 +67,10 @@ export default function Index() {
       // 切换到个人空间并重定向
       switchToPersonal({ isJump: true });
 
-      message.warning('您当前为个人版，无权访问企业空间');
+      message.warning(t('space.personalVersionNoAccess'));
       return;
     }
-  }, [user?.enterpriseServiceType, clearEnterpriseData, switchToPersonal]);
+  }, [user?.enterpriseServiceType, clearEnterpriseData, switchToPersonal, t]);
   // 初始化获取团队信息
   const getEnterpriseDetailFn = useCallback(async () => {
     // 个人版用户不执行企业信息获取

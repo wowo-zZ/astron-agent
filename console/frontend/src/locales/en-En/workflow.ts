@@ -780,7 +780,7 @@ const translation = {
     debugNode: 'Debug Node',
     debugPreview: 'Debug Preview',
     nodeInfoChanged:
-      'Due to changes in {nodeNames} node information, all control groups need to reset this node information',
+      'Due to changes in {{nodeNames}} node information, all control groups need to reset this node information',
     addControlGroup: 'Add Control Group ({{count}}/4)',
     clearHistoryRecords: 'Clear History Records',
     benchmarkGroup: 'Benchmark Group',
