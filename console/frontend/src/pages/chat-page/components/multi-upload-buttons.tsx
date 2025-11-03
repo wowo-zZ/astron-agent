@@ -2,17 +2,16 @@ import React, { useState, useEffect, JSX } from 'react';
 import { Tooltip, Popover } from 'antd';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
-import { SupportUploadConfig } from '@/types/chat';
+import { BotInfoType, SupportUploadConfig, UploadFileInfo } from '@/types/chat';
 
 interface MultiUploadButtonsProps {
-  botInfo: any;
-  /** 文件选择处理函数（来自 useChatFileUpload hook） */
+  botInfo: BotInfoType;
   handleFileSelect: (
     event: React.ChangeEvent<HTMLInputElement>,
     config?: SupportUploadConfig,
     uploadMaxMB?: number
   ) => void;
-  fileList: any[];
+  fileList: UploadFileInfo[];
 }
 
 const MultiUploadButtons: React.FC<MultiUploadButtonsProps> = ({
@@ -39,17 +38,20 @@ const MultiUploadButtons: React.FC<MultiUploadButtonsProps> = ({
 
     // 统计 fileList 中的有效文件
     if (fileList && Array.isArray(fileList) && fileList.length > 0) {
-      fileList.forEach((file: any) => {
+      fileList.forEach((file: UploadFileInfo) => {
         // 排除失败状态的文件
         const status = file.status || 'success';
-        if (status === 'failed' || status === 'error' || file.hasError) {
+        if (status === 'error') {
           return; // 跳过失败的文件
         }
 
         // 根据 inputName (config.name) 进行计数
         // 只计算有效文件：uploading、processing、success、pending、completed
-        const inputName = file.inputName || file.fileType || 'unknown';
-        if (inputName && counts.hasOwnProperty(inputName)) {
+        const inputName = file.inputName || file.type || 'unknown';
+        if (
+          inputName &&
+          Object.prototype.hasOwnProperty.call(counts, inputName)
+        ) {
           counts[inputName] = (counts[inputName] || 0) + 1;
         }
       });
@@ -76,7 +78,7 @@ const MultiUploadButtons: React.FC<MultiUploadButtonsProps> = ({
     index: number,
     isPopover?: boolean
   ): JSX.Element => {
-    const { accept, limit, type, tip, icon, name } = config;
+    const { accept, limit, type, icon, name } = config;
     const currentCount = fileTypeCounts[name || type] || 0;
     const uploadMaxMB = icon === 'image' ? 20 : icon === 'video' ? 500 : 50;
     const isDisabled = currentCount >= (limit || 1);

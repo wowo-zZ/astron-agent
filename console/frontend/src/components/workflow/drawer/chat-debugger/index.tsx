@@ -414,7 +414,7 @@ export function ChatDebuggerContent({
               )}
               {chatType !== 'text' && (
                 <img
-                  src={icon?.message}
+                  src={icons?.message}
                   alt=""
                   className="cursor-pointer"
                   onClick={() => handleChatTypeChange('text')}

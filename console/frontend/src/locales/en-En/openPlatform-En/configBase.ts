@@ -184,52 +184,6 @@ Based on the given note topic, write a creative Xiaohongshu-style product recomm
     clearHistory: 'Clear History',
     send: 'Send',
   },
-  promptTip: {
-    pleaseCompleteVerification: 'Please complete the verification',
-    pluginNeedsUserAuthorization: 'Plugin needs user authorization information',
-    answerPleaseTryAgainLater: 'Answer in progress, please try again later',
-    pleaseEnterQuestion: 'Please enter the question',
-    end: 'End',
-    networkError:
-      'Network seems to have a problem, you can refresh the page to try again.',
-    uploadDescriptionAndApiDocument:
-      'You have not uploaded the description file and interface document',
-    uploadApiDocumentAndVerify:
-      'You uploaded the interface document but it has not been verified',
-    uploadDescriptionAndApiDocumentAndVerify:
-      'Please upload the description file and interface document and verify',
-    uploadApiDocumentAndVerifyAndDebugPreview:
-      'Please upload the interface document and verify',
-    stopOutput: 'Stop',
-    answerInProgress: 'Answer in progress...',
-    hereIsTheAgentName: 'Here is the agent name',
-    hereIsTheAgentIntroduction: 'Here is the agent introduction',
-    clearHistory: 'Clear History',
-    send: 'Send',
-  },
-  promptModel: {
-    pleaseCompleteVerification: 'Please complete the verification',
-    pluginNeedsUserAuthorization: 'Plugin needs user authorization information',
-    answerPleaseTryAgainLater: 'Answer in progress, please try again later',
-    pleaseEnterQuestion: 'Please enter the question',
-    end: 'End',
-    networkError:
-      'Network seems to have a problem, you can refresh the page to try again.',
-    uploadDescriptionAndApiDocument:
-      'You have not uploaded the description file and interface document',
-    uploadApiDocumentAndVerify:
-      'You uploaded the interface document but it has not been verified',
-    uploadDescriptionAndApiDocumentAndVerify:
-      'Please upload the description file and interface document and verify',
-    uploadApiDocumentAndVerifyAndDebugPreview:
-      'Please upload the interface document and verify',
-    stopOutput: 'Stop',
-    answerInProgress: 'Answer in progress...',
-    hereIsTheAgentName: 'Here is the agent name',
-    hereIsTheAgentIntroduction: 'Here is the agent introduction',
-    clearHistory: 'Clear History',
-    send: 'Send',
-  },
 };
 
 export default translation;

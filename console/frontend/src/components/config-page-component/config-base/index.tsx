@@ -22,9 +22,6 @@ import {
 import ConfigHeader from '@/components/config-page-component/config-header/ConfigHeader';
 import CapabilityDevelopment from '@/components/config-page-component/config-base/components/CapabilityDevelopment';
 import UploadCover from '@/components/upload-avatar/index';
-// import { DeleteIcon } from '@/components/svg-icons';
-// import PromptModel from '@/components/prompt-model';
-// import PromptTip from '@/components/prompt-tip';
 import PromptTry, { PromptTryRef } from '@/components/prompt-try';
 import InputBox from '@/components/prompt-try/input-box';
 import WxModal from '@/components/wx-modal';
