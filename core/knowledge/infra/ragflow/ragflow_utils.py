@@ -276,13 +276,17 @@ class RagflowUtils:
             return file_content, filename
 
     @staticmethod
-    async def get_document_chunks(dataset_id: str, doc_id: str) -> List[Dict[str, Any]]:
+    async def get_document_chunks(
+        dataset_id: str, doc_id: str, max_retries: int = 15, retry_delay: float = 3.0
+    ) -> List[Dict[str, Any]]:
         """
         Get all chunk content of a document
 
         Args:
             dataset_id: Dataset ID
             doc_id: Document ID
+            max_retries: Maximum number of retry attempts to get chunks (default: 15)
+            retry_delay: Delay between retries in seconds (default: 3.0)
 
         Returns:
             List of chunk data, returns empty list if retrieval fails
@@ -291,6 +295,7 @@ class RagflowUtils:
             all_chunks = []
             page = 1
             page_size = 100  # Get 100 chunks per page
+            retry_count = 0
 
             while True:
                 # Use functional API to get chunks, supports pagination
@@ -314,9 +319,19 @@ class RagflowUtils:
                             break
 
                         page += 1
+                        retry_count = 0
                     else:
-                        # No more chunks
-                        break
+                        # No chunks found - might be because RAGFlow is still indexing
+                        if retry_count < max_retries and page == 1:
+                            retry_count += 1
+                            logger.info(
+                                f"No chunks found yet for document {doc_id}, retrying... (attempt {retry_count}/{max_retries})"
+                            )
+                            await asyncio.sleep(retry_delay)
+                            continue
+                        else:
+                            # No more chunks or max retries reached
+                            break
                 else:
                     logger.warning(f"Failed to get chunks: {chunks_response}")
                     break
@@ -326,7 +341,8 @@ class RagflowUtils:
             )
             return all_chunks
 
-        except Exception:
+        except Exception as e:
+            logger.error(f"Exception while getting document chunks: {e}")
             return []
 
     @staticmethod
@@ -404,10 +420,16 @@ class RagflowUtils:
             Processed status, returns None if need to continue waiting
         """
         if run_status == "DONE":
-            logger.info(
-                f"Document {doc_id} parsing completed with {token_count} tokens"
-            )
-            return run_status
+            if token_count > 0:
+                logger.info(
+                    f"Document {doc_id} parsing completed with {token_count} tokens"
+                )
+                return run_status
+            else:
+                logger.warning(
+                    f"Document {doc_id} status is DONE but token_count is 0, will continue waiting..."
+                )
+                return None
         elif run_status == "FAIL":
             raise Exception(f"Document {doc_id} parsing failed")
         elif run_status == "RUNNING":
