@@ -88,6 +88,7 @@ const transition = {
     deleteErrorFilesBeforeSend: '请先删除上传失败的文件再发送消息',
     vmsPermissionRequired: '虚拟人播报需要浏览器权限',
     grantPermission: '授权',
+    previewNotSupported: '不支持预览该文件类型',
   },
   feedbackPopover: {
     feedbackTitle: '你的反馈将帮助我们持续进步',

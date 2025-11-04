@@ -136,8 +136,8 @@ const ChatPage = (): ReactElement => {
         botId,
         version !== 'debugger' ? version || '' : ''
       );
-      if (botInfo?.pc_background) {
-        getBotNameColor(botInfo?.pc_background);
+      if (botInfo?.pcBackground) {
+        getBotNameColor(botInfo?.pcBackground);
       }
       //如果是语音智能体工作流，加载配置信息
       if (botInfo?.version === 4) {
@@ -367,7 +367,7 @@ const ChatPage = (): ReactElement => {
   return (
     <div
       className="w-full h-screen bg-no-repeat bg-center bg-cover flex flex-col overflow-auto scrollbar-none"
-      style={{ backgroundImage: `url(${botInfo.pc_background || chatBg})` }}
+      style={{ backgroundImage: `url(${botInfo.pcBackground || chatBg})` }}
     >
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
         <Spin spinning={isDataLoading} />
