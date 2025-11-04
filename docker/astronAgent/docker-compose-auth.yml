@@ -1,6 +1,6 @@
 services:
   casdoor:
-    image: casbin/casdoor:latest
+    image: casbin/casdoor:v2.67.0
     container_name: astron-agent-casdoor
     restart: always
     user: root
