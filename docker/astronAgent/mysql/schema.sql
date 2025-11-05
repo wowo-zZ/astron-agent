@@ -16536,3 +16536,23 @@ CREATE TABLE `workflow_config` (
                                    `deleted` tinyint(1) DEFAULT '0' COMMENT '是否删除：1-删除，0-未删除',
                                    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5805 DEFAULT CHARSET=utf8mb4;
+
+
+DROP TABLE IF EXISTS `custom_speaker`;
+create table custom_speaker
+(
+    id          bigint auto_increment
+        primary key,
+    create_uid  varchar(64)                        not null,
+    space_id    bigint                             null,
+    name        varchar(64)                        not null,
+    task_id     varchar(64)                        not null,
+    asset_id    varchar(64)                        null,
+    deleted     tinyint  default 0                 not null,
+    create_time datetime default CURRENT_TIMESTAMP null comment 'create time',
+    update_time datetime default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP comment 'update time',
+    constraint uni_task_id
+        unique (task_id),
+    KEY `idx_asset_id` (`asset_id`),
+    KEY `idx_bot_id` (`space_id`)
+);
