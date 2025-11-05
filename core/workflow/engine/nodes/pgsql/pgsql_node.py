@@ -1,8 +1,8 @@
 import json
 import re
-from typing import Any, List, Literal, Optional, Union
+from typing import Annotated, Any, List, Literal, Optional, Union
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, StringConstraints, field_validator
 from pydantic_core.core_schema import ValidationInfo
 from sqlalchemy import text
 
@@ -29,10 +29,12 @@ ZERO = {
     "object": {},
 }
 
+AssignmentType = Annotated[str, StringConstraints(pattern=r"^[\w]+$")]
+
 
 class Condition(BaseModel):
     # Column/field name used in WHERE clause
-    fieldName: str = Field(min_length=1)
+    fieldName: str = Field(min_length=1, pattern=r"^[\w]+$")
     # Variable index placeholder, e.g. ${varIndex}
     varIndex: str = Field(min_length=1)
     # SQL comparison operator
@@ -63,7 +65,7 @@ class Case(BaseModel):
 
 class OrderItem(BaseModel):
     # Column name used in ORDER BY clause
-    fieldName: str = Field(min_length=1)
+    fieldName: str = Field(min_length=1, pattern=r"^[\w]+$")
     # Sort direction: ascending or descending
     order: Literal["asc", "desc"]
 
@@ -83,11 +85,13 @@ class PGSqlNode(BaseNode):
     mode: Literal[0, 1, 2, 3, 4]  # 0=CUSTOM,1=ADD,2=UPDATE,3=SEARCH,4=DELETE
 
     # --- optional SQL building blocks ---
-    tableName: str | None = None  # Table name (required except for CUSTOM)
+    tableName: Annotated[str | None, StringConstraints(pattern=r"^[\w]+$")] = (
+        None  # Table name (required except for CUSTOM)
+    )
     spaceId: int | str | None = None  # Workspace/space identifier
     sql: str | None = Field(default=None, min_length=1)  # Raw SQL for CUSTOM mode
     cases: List[Case] = Field(default_factory=list)  # WHERE conditions
-    assignmentList: List[str] = Field(default_factory=list)  # Columns for SELECT/UPDATE
+    assignmentList: List[AssignmentType] = Field(default_factory=list)  # type: ignore # Columns for SELECT/UPDATE
     orderData: List[OrderItem] = Field(default_factory=list)  # ORDER BY configuration
     limit: int = Field(default=0, ge=0)  # LIMIT clause for SELECT
 

@@ -788,8 +788,12 @@ def _filter_response_frame(
     is_stop = choice.finish_reason == ChatStatus.FINISH_REASON.value
     is_content_empty = not delta.content and not delta.reasoning_content
     is_interrupted = choice.finish_reason == ChatStatus.INTERRUPT.value
+    is_ping = choice.finish_reason == ChatStatus.PING.value
 
     response_frame.workflow_step.node = None
+
+    if is_ping:
+        return response_frame
 
     if is_stop:
         response_frame.workflow_step.seq = last_workflow_step.seq + 1
