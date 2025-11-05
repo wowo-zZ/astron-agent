@@ -68,8 +68,9 @@ spec:
           mountPath: /docker-entrypoint-initdb.d
       volumes:
       - name: init-scripts
-        configMap:
-          name: {{ include "astron-agent.fullname" . }}-mysql-init
+        hostPath:
+          path: {{ .Values.mysql.initScriptsPath }}
+          type: DirectoryOrCreate
   {{- if .Values.mysql.persistence.enabled }}
   volumeClaimTemplates:
   - metadata:
