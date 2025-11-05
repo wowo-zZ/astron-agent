@@ -854,6 +854,13 @@ INSERT INTO `agent_space_permission` (`id`, `module`, `point`, `description`, `p
                                       `member`, `available_expired`, `create_time`, `update_time`)
 VALUES (283, 'Update Bot', '', '', 'BotCreateController_updateBot_POST', 1, 1, 1, 0, '2025-08-11 09:19:40',
         '2025-08-11 09:19:40');
+
+INSERT INTO astron_console.agent_space_permission (module, point, description, permission_key, owner, admin, member, available_expired, create_time, update_time) VALUES ('one-sentence', 'one-sentence', 'one-sentence', 'SpeakerTrainController_create_POST', 1, 1, 1, 0, NOW(), NOW());
+INSERT INTO astron_console.agent_space_permission (module, point, description, permission_key, owner, admin, member, available_expired, create_time, update_time) VALUES ('one-sentence', 'one-sentence', 'one-sentence', 'SpeakerTrainController_trainStatus_GET', 1, 1, 1, 0, NOW(), NOW());
+INSERT INTO astron_console.agent_space_permission (module, point, description, permission_key, owner, admin, member, available_expired, create_time, update_time) VALUES ('one-sentence', 'one-sentence', 'one-sentence', 'SpeakerTrainController_trainSpeaker_GET', 1, 1, 1, 0, NOW(), NOW());
+INSERT INTO astron_console.agent_space_permission (module, point, description, permission_key, owner, admin, member, available_expired, create_time, update_time) VALUES ('one-sentence', 'one-sentence', 'one-sentence', 'SpeakerTrainController_updateTrainSpeaker_POST', 1, 1, 1, 0, NOW(), NOW());
+INSERT INTO astron_console.agent_space_permission (module, point, description, permission_key, owner, admin, member, available_expired, create_time, update_time) VALUES ('one-sentence', 'one-sentence', 'one-sentence', 'SpeakerTrainController_deleteTrainSpeaker_POST', 1, 1, 1, 0, NOW(), NOW());
+
 COMMIT;
 
 -- ----------------------------
@@ -16498,7 +16505,7 @@ create table pronunciation_person_config
     cover_url          varchar(2048)                      null comment 'Pronunciation person cover image URL',
     voice_type         varchar(64)                        null comment 'Pronunciation person parameters',
     sort               int      default 0                 null comment 'Pronunciation person sort',
-    model_manufacturer varchar(64)                        null comment 'Pronunciation person model manufacturer',
+    speaker_type varchar(64)                        null comment 'Pronunciation person type',
     exquisite          tinyint  default 0                 null comment 'Exquisite pronunciation person (0 = not exquisite, 1 = exquisite)',
     deleted            tinyint  default 0                 null comment 'Deleted status (0 = not deleted, 1 = deleted)',
     create_time        datetime default CURRENT_TIMESTAMP null comment 'Creation time',
@@ -16506,13 +16513,11 @@ create table pronunciation_person_config
 )
     comment 'Pronunciation person configuration' charset = utf8mb4;
 
-INSERT INTO astron_console.pronunciation_person_config (name, cover_url, voice_type, sort, model_manufacturer, exquisite, deleted, create_time, update_time) VALUES ( '许久', 'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16824985943686779%2Flfc.png', 'aisjiuxu', 0, 'XFYUN', 0, 0, NOW(), NOW());
-INSERT INTO astron_console.pronunciation_person_config (name, cover_url, voice_type, sort, model_manufacturer, exquisite, deleted, create_time, update_time) VALUES ('小婧', 'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16824985943709826%2Flxq.png', 'aisjinger', 0, 'XFYUN', 0, 0, NOW(), NOW());
-INSERT INTO astron_console.pronunciation_person_config (name, cover_url, voice_type, sort, model_manufacturer, exquisite, deleted, create_time, update_time) VALUES ('小燕', 'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16824985943686779%2Flfc.png', 'x4_xiaoyan', 0, 'XFYUN', 0, 0, NOW(), NOW());
-INSERT INTO astron_console.pronunciation_person_config (name, cover_url, voice_type, sort, model_manufacturer, exquisite, deleted, create_time, update_time) VALUES ( '小露', 'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16824985943686779%2Flfc.png', 'x4_yezi', 0, 'XFYUN', 0, 0, NOW(), NOW());
-INSERT INTO astron_console.pronunciation_person_config (name, cover_url, voice_type, sort, model_manufacturer, exquisite, deleted, create_time, update_time) VALUES ('许小宝', 'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16824985943709826%2Flxq.png', 'aisbabyxu', 0, 'XFYUN', 0, 0, NOW(), NOW());
-INSERT INTO astron_console.pronunciation_person_config (name, cover_url, voice_type, sort, model_manufacturer, exquisite, deleted, create_time, update_time) VALUES ('聆伯松', 'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16824985943686779%2Flfc.png', 'x4_lingbosong', 0, 'XFYUN', 1, 0, NOW(), NOW());
-INSERT INTO astron_console.pronunciation_person_config (name, cover_url, voice_type, sort, model_manufacturer, exquisite, deleted, create_time, update_time) VALUES ('聆飞哲', 'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16824985943686779%2Flfc.png', 'x4_lingfeizhe_zl', 0, 'XFYUN', 1, 0, NOW(), NOW());
+INSERT INTO astron_console.pronunciation_person_config (name, cover_url, voice_type, sort, speaker_type, exquisite, deleted, create_time, update_time) VALUES ('speaker.lingFeiZhe', 'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16824985943686779%2Flfc.png', 'x4_lingfeizhe_oral', 0, 'NORMAL', 0, 0, NOW(), NOW());
+INSERT INTO astron_console.pronunciation_person_config (name, cover_url, voice_type, sort, speaker_type, exquisite, deleted, create_time, update_time) VALUES ('speaker.lingXiaoQi', 'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16824985943709826%2Flxq.png', 'x4_lingxiaoqi_oral', 0, 'NORMAL', 0, 0, NOW(), NOW());
+INSERT INTO astron_console.pronunciation_person_config (name, cover_url, voice_type, sort, speaker_type, exquisite, deleted, create_time, update_time) VALUES ('speaker.lingXiaoTang', 'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16824985943709826%2Flxq.png', 'x5_lingxiaotang_flow', 0, 'NORMAL', 1, 0, NOW(), NOW());
+INSERT INTO astron_console.pronunciation_person_config (name, cover_url, voice_type, sort, speaker_type, exquisite, deleted, create_time, update_time) VALUES ('speaker.lingXiaoYue', 'https://1024-cdn.xfyun.cn/2022_1024%2Fcms%2F16824985943709826%2Flxq.png', 'x5_lingxiaoyue_flow', 0, 'NORMAL', 1, 0, NOW(), NOW());
+
 
 ALTER TABLE astron_console.workflow ADD `type` INT NULL COMMENT '工作流类型';
 

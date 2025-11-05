@@ -42,16 +42,16 @@ public class PronunciationPersonConfig {
 
 
     /**
-     * Pronunciation person model manufacturer
+     * Pronunciation person type
      */
-    private ModelManufacturerEnum modelManufacturer;
+    private SpeakerTypeEnum speakerType;
 
 
-    public enum ModelManufacturerEnum {
+    public enum SpeakerTypeEnum {
         /**
-         * Xfyun
+         * Normal speaker
          */
-        XFYUN
+        NORMAL
     }
 
     /**
