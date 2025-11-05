@@ -144,7 +144,7 @@ const OrderTypeDisplay: React.FC<OrderTypeDisplayProps> = ({ onClose }) => {
       <Modal
         width={400}
         open={upgradeComboModalVisible}
-        title="确定升级为企业版吗？"
+        title={t('sidebar.orderTypes.confirmUpgradeEnterprise')}
         footer={null}
         centered
         onCancel={handleUpgradeComboModalCancel}
@@ -159,13 +159,13 @@ const OrderTypeDisplay: React.FC<OrderTypeDisplayProps> = ({ onClose }) => {
               onClick={debouncedUpgradeOk}
               loading={upgradeLoading}
             >
-              确定
+              {t('btnOk')}
             </Button>
             <Button
               onClick={handleUpgradeComboModalCancel}
               disabled={upgradeLoading}
             >
-              取消
+              {t('btnCancel')}
             </Button>
           </div>
         </div>

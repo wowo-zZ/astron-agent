@@ -172,7 +172,7 @@ const PublishHeader: React.FC<PublishHeaderProps> = ({
   const isLoading: boolean = useFlowsManager(
     (state: unknown) => state.isLoading
   );
-  const [botMultiFileParam, setBotMultiFileParam] = useState<any>(false);
+  const [botMultiFileParam, setBotMultiFileParam] = useState<boolean>(false);
   const [editV2Visible, { setLeft: hide, setRight: show }] = useToggle();
   const [fabuFlag, setFabuFlag]: any = useState(false);
   const [openWxmol, setOpenWxmol] = useState(false);
@@ -192,7 +192,6 @@ const PublishHeader: React.FC<PublishHeaderProps> = ({
   });
 
   useEffect(() => {
-    console.log('newBotId@@', newBotId);
     newBotId && getBotBaseInfo(newBotId);
   }, [newBotId]);
 

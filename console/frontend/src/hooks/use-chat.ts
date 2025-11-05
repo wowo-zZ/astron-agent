@@ -48,7 +48,6 @@ const useChat = () => {
   const messageList = useChatStore(state => state.messageList); //消息列表
   const currentChatId = useChatStore(state => state.currentChatId); //当前聊天id
   const chatFileListNoReq = useChatStore(state => state.chatFileListNoReq); //文件列表
-  const deepThinkText = useChatStore(state => state.deepThinkText); //深度思考文本
   const setStreamId = useChatStore(state => state.setStreamId); //对话流id
   const setAnswerPercent = useChatStore(state => state.setAnswerPercent); //进度条
   const setControllerRef = useChatStore(state => state.setControllerRef); //sse请求控制器
@@ -283,7 +282,7 @@ const useChat = () => {
   };
 
   const handleFlowToChat = (item: any) => {
-    let url = `${location.origin}/chat/${item?.botId}`;
+    let url = `${window.location.origin}/chat/${item?.botId}`;
     if (item?.version) {
       url += `?version=${item?.version}`;
     }

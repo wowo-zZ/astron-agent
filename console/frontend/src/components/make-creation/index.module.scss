@@ -11,9 +11,6 @@
   }
 
   .create_modal_wrap {
-    // width: fit-content;
-    //width: 972px;
-    width: 880px;
     height: 714px;
     background: #ffffff;
     border-radius: 16px;
@@ -605,6 +602,7 @@
 
 :global(.lang-en) {
   .agent_Template_Tab_item {
+    line-height: 34px !important;
     width: auto !important;
     min-width: 88px !important;
     max-width: 130px !important;

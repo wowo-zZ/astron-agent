@@ -71,7 +71,7 @@
       display: grid;
       margin-top: 20px;
       gap: 20px;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       grid-template-rows: 1fr;
 
       .cueWord {
@@ -314,5 +314,12 @@
 
   .Workflow_img {
     background-image: url('@/assets/imgs/create-application-modal/WorkflowPre-en.png') !important;
+  }
+
+  .cueWord span,
+  .Workflow span,
+  .virtual span {
+    text-align: center !important;
+    justify-content: center !important;
   }
 }

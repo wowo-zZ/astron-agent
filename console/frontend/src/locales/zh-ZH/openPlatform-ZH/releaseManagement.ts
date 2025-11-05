@@ -23,6 +23,10 @@ const translation = {
     confirmApplyRelease: '确认申请上架？',
     pleaseEnterReason: '请先填写原因！',
     submitApplication: '提交申请',
+    takeDownWarning: '下架申请提交后无法撤回，请谨慎提交！',
+    submitApplicationSuccess: '提交申请成功！',
+    unbindSuccess: '解绑成功',
+    maintenanceUpdate: '维护更新',
     total: '共有',
     totalData: '条数据',
     all: '全部',
@@ -130,7 +134,7 @@ const translation = {
     mcpServerParamsDesc: '描述',
     mcpReleaseSuccess: 'mcp发布成功',
     mcpReleaseFail: 'mcp发布失败',
-    AppIDEmpty: 'AppID不能为空',
+    appidEmpty: 'AppID不能为空',
     mcpServerParamsDescEmpty: '存在输入项未填写！',
     unBindSuccess: '解绑成功',
     submitAuditSuccess: '提交成功！',
@@ -141,6 +145,29 @@ const translation = {
     unBindTipDesc4: '平台进行取消授权操作',
     virtualPlatformPublishTitle: '发布到虚拟人交互平台',
     virtualPlatformPublishTip: '发布成功',
+    virtualPlatformPublishDesc:
+      '发布并审核通过后，可在<a href="https://virtual-man.xfyun.cn/console/projects" target="_blank">讯飞AI虚拟人交互平台</a>平台使用该智能体',
+    virtualPlatformPublishWarning:
+      '<span style="color: red;">*</span>需要先发布为API，且绑定后暂不支持更新，请谨慎发布',
+    virtualPlatformPublishButton: '发布',
+    virtualPlatformPublishSuccess: '发布成功',
+    // 飞书相关
+    feishuPleaseInputIdAndSecret: '请填写App ID和App Secret',
+    feishuConfigSuccess: '飞书应用配置成功',
+    releaseToFeishu: '发布为飞书机器人',
+    feishuReleaseDesc:
+      '通过发布为API接入飞书机器人，根据文档配置后，可在飞书上使用智能体',
+    feishuBindWarning:
+      '需要先发布为API，且绑定后飞书应用后不支持更新，请谨慎绑定',
+    pleaseReleaseApiFirst: '请先发布为api',
+    publishToFeishu: '发布到飞书',
+    viewGuideDoc: '查看引导文档',
+    confirm: '确认',
+    close: '关闭',
+    interfaceInfo: '接口信息',
+    pleaseInputAppId: '请输入App ID',
+    pleaseInputAppSecret: '请输入App Secret',
+    createSuccess: '创建成功',
   },
 };
 

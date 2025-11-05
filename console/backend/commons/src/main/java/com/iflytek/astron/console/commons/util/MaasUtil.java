@@ -438,7 +438,7 @@ public class MaasUtil {
                 .addHeader("Authorization", "Bearer %s:%s".formatted(consumerKey, consumerSecret))
                 .addHeader(X_AUTH_SOURCE_HEADER, X_AUTH_SOURCE_VALUE)
                 .build();
-        log.info("MaasUtil executeRequest url: {} request: {}, header: {}", request.url(), request, request.headers());
+        log.info("MaasUtil executeRequest url: {} request: {}, header: {}, body: {}", request.url(), request, request.headers(), bodyData);
         try (Response httpResponse = HTTP_CLIENT.newCall(request).execute()) {
             ResponseBody responseBody = httpResponse.body();
             if (responseBody != null) {

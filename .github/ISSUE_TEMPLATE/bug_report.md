@@ -45,6 +45,13 @@ assignees: ''
 - **Deployment:** [e.g., Docker Compose, Source Code]
 - **Browser:** [if applicable]
 
+**Docker Image Info:**
+<!-- Please run the following command and paste the output below -->
+<!-- Command: docker images --digests | grep astron-agent -->
+```
+Paste docker image info here
+```
+
 ## Impact
 <!-- Who/what is affected by this bug? -->
 

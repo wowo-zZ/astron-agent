@@ -24,22 +24,10 @@ import useBindEvents from '@/hooks/search-event-bind';
 import SourceInfoBox from './source-info-box';
 import UseToolsInfo from './use-tools-info';
 import WorkflowNodeOptions from './workflow-node-options';
-import { formatFileSize, getFileIcon } from '@/utils';
 import FilePreview from './file-preview';
 import ResqBottomButtons from './resq-bottom-buttons';
 import { useTranslation } from 'react-i18next';
 import FileGridDisplay from './file-grid-display';
-//渲染全新开始
-const renderRestart = (): ReactElement => {
-  return (
-    <div className="flex items-center w-full mx-5 text-[#c4c4c8]">
-      <div className="flex-1 h-[1px] bg-[#e3e4e9]" />
-      <div className="px-4 py-1.5">全新的开始</div>
-      <div className="flex-1 h-[1px] bg-[#e3e4e9]" />
-    </div>
-  );
-};
-
 const MessageList = (props: {
   messageList: MessageListType[];
   botInfo: BotInfoType;
@@ -57,6 +45,8 @@ const MessageList = (props: {
     isDataLoading,
     botNameColor,
     handleSendMessage,
+    chatType,
+    vmsInteractionCmpRef,
   } = props;
   const { t } = useTranslation();
   const scrollAnchorRef = useRef<HTMLDivElement>(null);
@@ -88,6 +78,17 @@ const MessageList = (props: {
     bindTagClickEvent();
     scrollAnchorRef.current?.scrollIntoView();
   }, [messageList.length, streamId]);
+
+  //渲染全新开始
+  const renderRestart = (): ReactElement => {
+    return (
+      <div className="flex items-center w-full mx-5 text-[#c4c4c8]">
+        <div className="flex-1 h-[1px] bg-[#e3e4e9]" />
+        <div className="px-4 py-1.5">{t('chatPage.chatWindow.freshStart')}</div>
+        <div className="flex-1 h-[1px] bg-[#e3e4e9]" />
+      </div>
+    );
+  };
 
   // 渲染Header和推荐内容的函数 - 在column-reverse中需要反序渲染
   const renderHeaderAndRecommend = (): ReactElement => (
@@ -127,31 +128,33 @@ const MessageList = (props: {
         </div>
       )}
 
-      <div className="flex flex-col items-center justify-center mt-10 min-h-[116px]">
-        {isDataLoading ? (
-          <>
-            <Skeleton.Avatar active size={88} style={{ borderRadius: 12 }} />
-            <Skeleton.Input
-              active
-              size="small"
-              style={{ width: 120, marginTop: 8 }}
-            />
-          </>
-        ) : (
-          <>
-            <img
-              src={botInfo.avatar}
-              alt="avatar"
-              className="w-[88px] h-[88px] rounded-xl"
-            />
-            <span
-              className={`text-2xl font-[PingFang SC] font-medium mt-2 text-[${botNameColor}] leading-9`}
-            >
-              {botInfo.botName}
-            </span>
-          </>
-        )}
-      </div>
+      {chatType === 'text' && (
+        <div className="flex flex-col items-center justify-center mt-10 min-h-[116px]">
+          {isDataLoading ? (
+            <>
+              <Skeleton.Avatar active size={88} style={{ borderRadius: 12 }} />
+              <Skeleton.Input
+                active
+                size="small"
+                style={{ width: 120, marginTop: 8 }}
+              />
+            </>
+          ) : (
+            <>
+              <img
+                src={botInfo.avatar}
+                alt="avatar"
+                className="w-[88px] h-[88px] rounded-xl"
+              />
+              <span
+                className={`text-2xl font-[PingFang SC] font-medium mt-2 text-[${botNameColor}] leading-9`}
+              >
+                {botInfo.botName}
+              </span>
+            </>
+          )}
+        </div>
+      )}
     </>
   );
 
@@ -244,16 +247,32 @@ const MessageList = (props: {
         </div>
         {item?.sid && <SourceInfoBox traceSource={item?.traceSource} />}
         {item?.sid && (
-          <ResqBottomButtons message={item} isLastMessage={isLastMessage} />
+          <ResqBottomButtons
+            message={item}
+            isLastMessage={isLastMessage}
+            chatType={chatType}
+            vmsInteractiveRef={vmsInteractionCmpRef}
+          />
         )}
       </div>
     );
   };
 
   return (
-    <div className="relative w-full flex flex-col flex-1 overflow-hidden scrollbar-hide">
-      <div className="w-full flex flex-col-reverse items-center overflow-y-auto min-h-0 pr-[388px] pl-6">
-        <div className="w-full flex flex-col-reverse items-center max-w-[960px] min-h-min scrollbar-hide">
+    <div
+      className={`relative w-full flex flex-col flex-1 overflow-hidden scrollbar-hide  `}
+    >
+      <div
+        className="w-full flex flex-col-reverse items-center overflow-y-auto min-h-0  pl-6"
+        style={{
+          scrollbarWidth: 'none',
+        }}
+      >
+        <div
+          className={`w-full flex flex-col-reverse items-center max-w-[960px] min-h-min scrollbar-hide m-[0_auto] ${
+            chatType === 'text' ? 'pr-0' : 'pr-52'
+          }`}
+        >
           <div ref={scrollAnchorRef} />
 
           {/* 直接渲染消息列表 */}

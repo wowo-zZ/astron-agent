@@ -109,7 +109,7 @@ export interface PostChatItem {
 }
 
 export interface BotInfoType {
-  pc_background: string;
+  pcBackground: string;
   botStatus: number;
   chatId: number;
   supportUploadConfig: SupportUploadConfig[];

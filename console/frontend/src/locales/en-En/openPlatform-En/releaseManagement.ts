@@ -23,6 +23,11 @@ const translation = {
     confirmApplyRelease: 'Confirm Application for Release?',
     pleaseEnterReason: 'Please enter the reason first!',
     submitApplication: 'Submit Application',
+    takeDownWarning:
+      'The takedown request cannot be withdrawn after submission, please submit carefully!',
+    submitApplicationSuccess: 'Application submitted successfully!',
+    unbindSuccess: 'Unbind successfully',
+    maintenanceUpdate: 'Maintenance Update',
     total: 'Total',
     totalData: 'Data',
     all: 'All',
@@ -34,6 +39,7 @@ const translation = {
     input: 'Input',
     release: 'Release',
     detail: 'Detail',
+    analyze: 'Analyze',
     edit: 'Edit',
     view: 'View',
     reapply: 'Reapply',
@@ -129,7 +135,7 @@ const translation = {
     mcpServerParamsDesc: 'Description',
     mcpReleaseSuccess: 'MCP Server Release Success',
     mcpReleaseFail: 'MCP Server Release Fail',
-    AppIDEmpty: 'AppID is Empty',
+    appidEmpty: 'AppID is Empty',
     mcpServerParamsDescEmpty: 'Description is Empty',
     unBindSuccess: 'Unbind Success',
     submitAuditSuccess: 'Submit Success',
@@ -142,6 +148,29 @@ const translation = {
     virtualPlatformPublishTitle:
       'Publish to Virtual Person Interaction Platform',
     virtualPlatformPublishTip: 'Publish Success',
+    virtualPlatformPublishDesc:
+      'After release and audit pass, you can use this agent on <a href="https://virtual-man.xfyun.cn/console/projects" target="_blank">iFlytek AI Virtual Person Interaction Platform</a>',
+    virtualPlatformPublishWarning:
+      '<span style="color: red;">*</span>Please release as API first, updates are not supported after binding, please publish carefully',
+    virtualPlatformPublishButton: 'Publish',
+    virtualPlatformPublishSuccess: 'Publish Success',
+    // Feishu related
+    feishuPleaseInputIdAndSecret: 'Please enter App ID and App Secret',
+    feishuConfigSuccess: 'Feishu app configured successfully',
+    releaseToFeishu: 'Release as Feishu Bot',
+    feishuReleaseDesc:
+      'Integrate Feishu bot via API release. After configuration, the agent can be used in Feishu',
+    feishuBindWarning:
+      'API release is required first. After binding, Feishu app updates are not supported. Please bind carefully',
+    pleaseReleaseApiFirst: 'Please release as API first',
+    publishToFeishu: 'Publish to Feishu',
+    viewGuideDoc: 'View Guide Document',
+    confirm: 'Confirm',
+    close: 'Close',
+    interfaceInfo: 'Interface Info',
+    pleaseInputAppId: 'Please enter App ID',
+    pleaseInputAppSecret: 'Please enter App Secret',
+    createSuccess: 'Created successfully',
   },
 };
 

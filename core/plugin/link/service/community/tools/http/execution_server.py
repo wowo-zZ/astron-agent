@@ -220,7 +220,7 @@ def process_authentication(
 
     api_key_info = operation_id_schema["security"].get(security_type)
     auth_name = api_key_info.get("name", None)
-    auth_value = api_key_info.get("value", None)
+    auth_value = api_key_info.get("x-value", None)
     if not auth_name or not auth_value:
         raise Exception(f"auth name:{auth_name}, auth value:{auth_value}")
 

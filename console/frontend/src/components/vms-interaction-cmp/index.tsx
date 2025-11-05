@@ -10,8 +10,9 @@ import React, {
   useRef,
   useEffect,
 } from 'react';
+import { useTranslation } from 'react-i18next';
 
-const appId = '0e6a2c87';
+const appId = window?.__APP_CONFIG__?.SPARK_APP_ID;
 
 // 虚拟人初始化鉴权参数
 const sdkInitAppInfoDefault: any = {
@@ -82,6 +83,7 @@ interface VmsInteractiveRefProps {
 
 // 虚拟人交互组件
 const VmsInteractionCmp = forwardRef((props: VmsInteractiveRefProps, ref) => {
+  const { t } = useTranslation();
   const {
     notAllowedPlayCallback,
     avatarDom,
@@ -103,8 +105,16 @@ const VmsInteractionCmp = forwardRef((props: VmsInteractiveRefProps, ref) => {
    * 加载虚拟人签名url信息，初始化虚拟人sdk实例
    */
   const loadSignedUrlInfo = async () => {
-    const res: any = await getSignedUrl();
-    sdkInitAppInfoDefault.signedUrl = res;
+    try {
+      const res: any = await getSignedUrl();
+      sdkInitAppInfoDefault.signedUrl = res;
+    } catch (error) {
+      console.error(
+        t('vmsInteractionCmp.loadVirtualHumanAvatarSignUrlFailed'),
+        error
+      );
+      message.error(t('vmsInteractionCmp.loadVirtualHumanAvatarSignUrlFailed'));
+    }
   };
 
   /**
@@ -169,23 +179,27 @@ const VmsInteractionCmp = forwardRef((props: VmsInteractiveRefProps, ref) => {
       setVmsInteractiveRefPlayer(vmsInteractiveRefPlayer);
       setVmsInteractiveRefStatus('init');
     } else {
-      //   message.warning('请勿多次初始化 或先销毁当前实例');
+      // message.warning('请勿多次初始化 或先销毁当前实例');
     }
     if (!vmsInteractiveRef.current) {
-      return message.warning('虚拟人初始化异常');
+      return message.warning(
+        t('vmsInteractionCmp.virtualHumanAvatarInitException')
+      );
     }
     await vmsInteractiveRef.current
       ?.start({
-        wrapper: avatarDom as HTMLDivElement,
+        wrapper:
+          (avatarDom as HTMLDivElement) ||
+          (document.getElementById('avatarDom') as HTMLDivElement),
       })
       .then(() => {
-        console.info('虚拟人连接成功 & 拉流订阅成功 & 流播放成功');
+        console.info(t('vmsInteractionCmp.virtualHumanAvatarConnectSuccess'));
         // loadingStatusChange?.(false);
       })
       .catch((e: any) => {
         // message.error('连接失败，可以打开控制台查看信息');
         console.error(
-          '连接失败，可以打开控制台查看信息:',
+          t('vmsInteractionCmp.virtualHumanAvatarConnectFailed'),
           e.code,
           e.message,
           e.name,
@@ -235,12 +249,15 @@ const VmsInteractionCmp = forwardRef((props: VmsInteractiveRefProps, ref) => {
   useEffect(() => {
     document.body.addEventListener('click', () => {
       vmsInteractiveRefPlayer?.resume();
+      playerResumeCallback?.();
     });
     document.body.addEventListener('focus', () => {
       vmsInteractiveRefPlayer?.resume();
+      playerResumeCallback?.();
     });
     document.body.addEventListener('keydown', () => {
       vmsInteractiveRefPlayer?.resume();
+      playerResumeCallback?.();
     });
     // 绑定 visibilitychange 事件
     document.addEventListener('visibilitychange', handleWindowTabChange);

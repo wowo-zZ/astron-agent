@@ -1,6 +1,6 @@
 import { MessageListType } from '@/types/chat';
 import { ReactElement, useEffect, useState } from 'react';
-import { copyText } from '@/utils';
+import { copyText, processStringByChunk } from '@/utils';
 import copyIcon from '@/assets/imgs/chat/copy.svg';
 import { ReactSVG } from 'react-svg';
 import { Tooltip } from 'antd';
@@ -10,6 +10,10 @@ import TtsModule from '@/components/tts-module';
 import useChat from '@/hooks/use-chat';
 import useVoicePlayStore from '@/store/voice-play-store';
 import useBotInfoStore from '@/store/bot-info-store';
+import useChatStore from '@/store/chat-store';
+import { isPureText } from '@/utils';
+import { SDKEvents } from '@/utils/avatar-sdk-web_3.1.2.1002/index.js';
+import { message as AntdMessage } from 'antd';
 
 /**
  * 每个回复内容下面的按钮
@@ -17,6 +21,7 @@ import useBotInfoStore from '@/store/bot-info-store';
 const ResqBottomButtons = ({
   message,
   isLastMessage,
+  chatType,
 }: {
   message: MessageListType;
   isLastMessage: boolean;
@@ -29,7 +34,14 @@ const ResqBottomButtons = ({
     state => state.setCurrentPlayingId
   );
   const botInfo = useBotInfoStore(state => state.botInfo); //  智能体信息
+  const vmsInteractiveRef = useChatStore(state => state.vmsInteractiveRef);
+  const vmsInteractiveRefStatus = useChatStore(
+    (state: any) => state.vmsInteractiveRefStatus
+  );
 
+  const setVmsInteractiveRefStatus = useChatStore(
+    (state: any) => state.setVmsInteractiveRefStatus
+  );
   const getVoiceName = () => {
     if (botInfo?.vcnCn) {
       return botInfo?.vcnCn;
@@ -43,16 +55,60 @@ const ResqBottomButtons = ({
         }
       }
     }
-    return '';
+    return 'x4_lingbosong';
   };
   // 播放按钮点击
   const handlePlayAudio = () => {
-    if (isPlaying) {
-      setIsPlaying(false);
-      setCurrentPlayingId(null);
+    const answerInfo = message;
+    if (chatType === 'vms') {
+      vmsInteractiveRef?.on(SDKEvents.frame_stop, () => {
+        setCurrentPlayingId(null);
+      });
+      if (isPlaying) {
+        vmsInteractiveRef?.interrupt();
+        setVmsInteractiveRefStatus('init');
+        setCurrentPlayingId(null);
+      } else {
+        if (!isPureText(answerInfo?.message)) {
+          return;
+        }
+        if (vmsInteractiveRefStatus === 'init') {
+          setCurrentPlayingId(answerInfo?.id);
+          if (answerInfo?.message.length >= 2000) {
+            processStringByChunk(answerInfo?.message, 2000, chunk => {
+              isPureText(chunk) &&
+                vmsInteractiveRef
+                  ?.writeText(chunk, {
+                    avatar_dispatch: {
+                      interactive_mode: 0, //此处默认追加模式
+                    },
+                  })
+                  .then(() => {})
+                  .catch((err: any) => {});
+            });
+          } else {
+            vmsInteractiveRef
+              ?.writeText(answerInfo?.message)
+              .then(() => {})
+              .catch((err: any) => {
+                // console.error(err);
+                // message.error(err?.msg || t('chatPage.chatBottom.feedbackFailed'));
+              });
+          }
+        }
+      }
     } else {
-      setIsPlaying(true);
-      setCurrentPlayingId(message.id || 0);
+      if (message?.message?.length > 8000) {
+        AntdMessage.error(t('chatPage.chatBottom.textTooLong'));
+        return;
+      }
+      if (isPlaying) {
+        setIsPlaying(false);
+        setCurrentPlayingId(null);
+      } else {
+        setIsPlaying(true);
+        setCurrentPlayingId(message.id || 0);
+      }
     }
   };
 
@@ -61,10 +117,14 @@ const ResqBottomButtons = ({
     setIsPlaying(currentPlayingId === message?.id);
   }, [currentPlayingId, message?.id]);
 
+  const playText = message?.reasoning
+    ? message?.reasoning + message?.message
+    : message?.message;
+
   return (
     <div className="flex items-center ml-14 w-fit px-2 py-1 h-7">
       <TtsModule
-        text={message?.reasoning + message?.message}
+        text={playText}
         language="cn"
         voiceName={getVoiceName()}
         isPlaying={isPlaying}

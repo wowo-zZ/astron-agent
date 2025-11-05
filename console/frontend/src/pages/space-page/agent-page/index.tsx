@@ -378,7 +378,9 @@ function index() {
               }}
             >
               <PlusOutlined />
-              <span className={styles.addText}>新建智能体</span>
+              <span className={styles.addText}>
+                {t('agentPage.agentPage.createAgent')}
+              </span>
             </div>
           </div>
         </div>
@@ -487,8 +489,10 @@ function index() {
                           <div className={styles.angentType}>
                             {k.version === 1 &&
                               t('agentPage.agentPage.instructionType')}
-                            {k.version === 3 && '工作流'}
-                            {k.version === 4 && '语音*虚拟人'}
+                            {k.version === 3 &&
+                              t('agentPage.agentPage.workflowType')}
+                            {k.version === 4 &&
+                              t('agentPage.agentPage.voiceVirtualType')}
                           </div>
                         </div>
                       </span>
@@ -602,7 +606,7 @@ function index() {
                             />
                             {operationId === k.botId && (
                               <div
-                                className={`absolute top-[28px] right-0 bg-white rounded p-1 shadow-md flex flex-col gap-1  ${k.version === 3 ? 'w-[155px]' : 'w-[48px]'}`}
+                                className={`absolute top-[28px] right-0 bg-white rounded p-1 shadow-md flex flex-col gap-1  ${k.version === 3 ? styles.propBox1 : styles.propBox2}`}
                                 style={{
                                   zIndex: 1,
                                 }}
@@ -644,7 +648,9 @@ function index() {
                                       setVirtualModal(true);
                                     }}
                                   >
-                                    复制为语音·虚拟人智能体
+                                    {t(
+                                      'agentPage.agentPage.copyToVirtualAgent'
+                                    )}
                                   </div>
                                 )}
                                 {![1, 4].includes(k?.botStatus) && (
@@ -691,7 +697,7 @@ function index() {
                   color: '#666',
                 }}
               >
-                暂无智能体，快去创建吧~
+                {t('agentPage.agentPage.noAgentsYet')}
               </div>
               <div
                 className={styles.addBot}
@@ -704,7 +710,9 @@ function index() {
                 style={{ margin: '0 auto' }}
               >
                 <PlusOutlined />
-                <span className={styles.addText}>新建智能体</span>
+                <span className={styles.addText}>
+                  {t('agentPage.agentPage.createAgent')}
+                </span>
               </div>
             </div>
           </>
@@ -716,7 +724,7 @@ function index() {
           onSubmit={values => {
             upgradeWorkflow({ sourceId: copyParams?.botId, ...values })
               .then((res: any) => {
-                message.success('复制成功');
+                message.success(t('agentPage.agentPage.copyToVirtualSuccess'));
                 navigate(
                   `/work_flow/${res?.maasId}/arrange?botId=${res?.botId}`
                 );

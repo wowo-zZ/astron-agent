@@ -33,7 +33,6 @@ const MakeCreateModal: React.FC<MakeCreateModalProps> = ({
     pageSize: number;
   }>({ pageIndex: 1, pageSize: 20000 });
   const [addAgentTemplateLoading, setAddAgentTemplateLoading] = useState(false);
-  const [form] = Form.useForm();
   const [createButton, setCreateButton] = useState(-1);
   const mouseNowPageRef = useRef<Array<HTMLDivElement | null>>([]);
   const { isDefaultPersonalSpace } = useSpaceType(navigate);
@@ -101,7 +100,11 @@ const MakeCreateModal: React.FC<MakeCreateModalProps> = ({
   //获取模板分类列表
   const getTemplateTypeList = async () => {
     const res = await getStarTemplateGroup();
-    res.unshift({ id: null, groupName: t('createAgent1.allTemplates') }); // 添加“所有模板”选项
+    res.unshift({
+      id: null,
+      groupName: t('createAgent1.allTemplates'),
+      groupNameEn: t('createAgent1.allTemplates'),
+    }); // 添加“所有模板”选项
     setModalList(res);
   };
   // 根据分类进行查询
@@ -158,11 +161,14 @@ const MakeCreateModal: React.FC<MakeCreateModalProps> = ({
                     transition duration-75`}
                     onClick={() => handleTabChange(item.id)}
                   >
-                    <Tooltip title={item.groupName} placement="top">
+                    <Tooltip
+                      title={isEnglish ? item.groupNameEn : item.groupName}
+                      placement="top"
+                    >
                       <div
                         className={`${styles.agent_Template_Tab_item_content}`}
                       >
-                        {item.groupName}
+                        {isEnglish ? item.groupNameEn : item.groupName}
                       </div>
                     </Tooltip>
                   </div>
@@ -322,7 +328,6 @@ const MakeCreateModal: React.FC<MakeCreateModalProps> = ({
                                     color: '#7f7f7f',
                                     lineHeight: '18px',
                                     paddingTop: '2px',
-                                    // height: '60px',
                                     width: '100%',
                                   }}
                                 >
