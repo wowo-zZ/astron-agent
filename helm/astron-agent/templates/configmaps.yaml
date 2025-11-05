@@ -19,9 +19,14 @@ metadata:
   labels:
     {{- include "astron-agent.labels" . | nindent 4 }}
 data:
-  {{- range $path, $_ := .Files.Glob "files/mysql/*.sql" }}
-  {{ base $path }}: {{ $.Files.Get $path | quote }}
-  {{- end }}
+  01-schema-part1.sql: {{ .Files.Get "files/mysql/schema_part1.sql" | quote }}
+  02-schema-part2.sql: {{ .Files.Get "files/mysql/schema_part2.sql" | quote }}
+  03-schema-part3.sql: {{ .Files.Get "files/mysql/schema_part3.sql" | quote }}
+  04-schema-part4.sql: {{ .Files.Get "files/mysql/schema_part4.sql" | quote }}
+  05-agent.sql: {{ .Files.Get "files/mysql/agent.sql" | quote }}
+  06-link.sql: {{ .Files.Get "files/mysql/link.sql" | quote }}
+  07-tenant.sql: {{ .Files.Get "files/mysql/tenant.sql" | quote }}
+  08-workflow.sql: {{ .Files.Get "files/mysql/workflow.sql" | quote }}
 ---
 {{- end }}
 {{- if .Values.postgresql.enabled }}
