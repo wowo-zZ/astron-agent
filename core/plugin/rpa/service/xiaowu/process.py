@@ -131,14 +131,14 @@ async def task_monitoring(
                 AttributeError,
             ) as e:
                 logger.error(f"error: {e}")
-                code = ErrorCode.CREATE_TASK_ERROR.code
-                msg = f"{ErrorCode.CREATE_TASK_ERROR.message}, detail: {e}"
+                code = ErrorCode.QUERY_TASK_ERROR.code
+                msg = f"{ErrorCode.QUERY_TASK_ERROR.message}, detail: {e}"
                 error = RPAExecutionResponse(code=code, message=msg, sid=sid)
                 yield error.model_dump_json()
                 otlp_handle(
                     meter=meter,
                     node_trace=node_trace,
-                    code=ErrorCode.CREATE_TASK_ERROR.code,
+                    code=ErrorCode.QUERY_TASK_ERROR.code,
                     message=msg,
                 )
                 return
