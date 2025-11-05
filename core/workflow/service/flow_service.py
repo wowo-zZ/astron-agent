@@ -52,8 +52,10 @@ def save(flow: Flow, app_info: App, session: Session, span: Span) -> Flow:
     :return: The saved flow object with generated ID
     """
     # Create new flow instance with generated IDs and app source
+    flow_id = get_id()
     db_flow = Flow(
-        group_id=get_id(),
+        id=flow_id,
+        group_id=flow_id,
         name=flow.name,
         data=flow.data,
         description=flow.description,
@@ -61,7 +63,6 @@ def save(flow: Flow, app_info: App, session: Session, span: Span) -> Flow:
         source=app_info.actual_source,
         version="-1",  # Initial version for new flows
     )
-    db_flow.id = get_id()
 
     # Persist to database
     session.add(db_flow)
