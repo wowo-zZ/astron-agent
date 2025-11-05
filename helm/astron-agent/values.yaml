@@ -73,6 +73,10 @@ mysql:
     size: 10Gi
   auth:
     rootPassword: root123
+  # SQL initialization - hybrid approach
+  # Large schema files from host path (bypasses Helm 1MB limit)
+  # Small utility files from ConfigMap (no manual setup required)
+  initScriptsPath: /data/mysql-init
   healthCheck:
     interval: 30
     timeout: 10

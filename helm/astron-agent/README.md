@@ -41,6 +41,38 @@ Astron Agent 是一个功能强大的 AI Agent 构建平台，包含以下组件
 
 ## 安装
 
+### 重要：安装前准备 MySQL 初始化脚本
+
+在安装 Chart 之前，需要在 **Kubernetes 节点**上准备 MySQL 初始化脚本。
+
+在 MySQL Pod 可能被调度到的每个节点上执行以下操作：
+
+```bash
+# 创建目录
+sudo mkdir -p /data/mysql-init
+
+# 复制 SQL 文件（按字母顺序执行）
+sudo cp helm/astron-agent/files/mysql/schema.sql /data/mysql-init/01-schema.sql
+sudo cp helm/astron-agent/files/mysql/agent.sql /data/mysql-init/02-agent.sql
+sudo cp helm/astron-agent/files/mysql/link.sql /data/mysql-init/03-link.sql
+sudo cp helm/astron-agent/files/mysql/tenant.sql /data/mysql-init/04-tenant.sql
+sudo cp helm/astron-agent/files/mysql/workflow.sql /data/mysql-init/05-workflow.sql
+
+# 设置权限
+sudo chmod 644 /data/mysql-init/*.sql
+```
+
+**多节点集群说明**：
+- 方式 1：在所有节点上准备文件
+- 方式 2：使用 `nodeSelector` 将 MySQL 固定到特定节点（推荐）
+
+如果使用方式 2，在 `values.yaml` 中配置：
+```yaml
+mysql:
+  nodeSelector:
+    kubernetes.io/hostname: your-node-name
+```
+
 ### 1. 添加 Helm 仓库（如果可用）
 
 ```bash
