@@ -19,38 +19,39 @@ Namespace: {{ .Release.Namespace }}
 📋 Service Information
 ============================================================
 
-{{- if .Values.nginx.enabled }}
-1. Nginx (Frontend Gateway):
-   {{- if eq .Values.nginx.service.type "LoadBalancer" }}
-
-   Get the application URL by running:
-
-   export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "astron-agent.fullname" . }}-nginx --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
-   echo "Astron Agent URL: http://$SERVICE_IP"
-   {{- else if eq .Values.nginx.service.type "ClusterIP" }}
-
-   Access the application using port-forward:
-
-   kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ include "astron-agent.fullname" . }}-nginx {{ .Values.nginx.service.port }}:80
-   echo "Astron Agent URL: http://localhost:{{ .Values.nginx.service.port }}"
-   {{- end }}
-{{- end }}
-
 {{- if .Values.ingress.enabled }}
 
-2. Ingress (External Access):
+1. Ingress (External Access):
    {{- range .Values.ingress.hosts }}
    https://{{ .host }}
    {{- end }}
 {{- end }}
 
+{{- if .Values.consoleFrontend.enabled }}
+
+2. Console Frontend:
+   Access Console Frontend using port-forward:
+
+   kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ include "astron-agent.fullname" . }}-console-frontend {{ .Values.consoleFrontend.service.port }}:{{ .Values.consoleFrontend.service.port }}
+   echo "Console Frontend: http://localhost:{{ .Values.consoleFrontend.service.port }}"
+{{- end }}
+
 {{- if .Values.minio.enabled }}
 
 3. MinIO Console:
+   {{- if eq .Values.minio.service.type "NodePort" }}
+   MinIO is exposed via NodePort:
+   - API Port: {{ .Values.minio.service.nodePort }}
+   - Console Port: {{ .Values.minio.service.consoleNodePort }}
+   {{- if .Values.global.hostBaseAddress }}
+   - MinIO Console: {{ .Values.global.hostBaseAddress }}:{{ .Values.minio.service.consoleNodePort }}
+   {{- end }}
+   {{- else }}
    Access MinIO console using port-forward:
 
    kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ include "astron-agent.fullname" . }}-minio {{ .Values.minio.service.consolePort }}:9001
    echo "MinIO Console: http://localhost:{{ .Values.minio.service.consolePort }}"
+   {{- end }}
 
    Credentials:
    - Username: {{ .Values.minio.auth.rootUser }}
@@ -60,10 +61,18 @@ Namespace: {{ .Release.Namespace }}
 {{- if .Values.casdoor.enabled }}
 
 4. Casdoor (Authentication):
+   {{- if eq .Values.casdoor.service.type "NodePort" }}
+   Casdoor is exposed via NodePort:
+   - Port: {{ .Values.casdoor.service.nodePort }}
+   {{- if .Values.global.hostBaseAddress }}
+   - Casdoor URL: {{ .Values.global.hostBaseAddress }}:{{ .Values.casdoor.service.nodePort }}
+   {{- end }}
+   {{- else }}
    Access Casdoor using port-forward:
 
    kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ include "astron-agent.fullname" . }}-casdoor {{ .Values.casdoor.service.port }}:8000
    echo "Casdoor URL: http://localhost:{{ .Values.casdoor.service.port }}"
+   {{- end }}
 {{- end }}
 
 ============================================================

@@ -116,10 +116,6 @@ minio:
   auth:
     rootUser: minioadmin
     rootPassword: minioadmin123
-  # MinIO Server URL - 用于生成预签名 URL
-  # 如果 global.hostBaseAddress 设置了，会自动使用 ${HOST_BASE_ADDRESS}:${nodePort}
-  # 否则使用内部 Service 地址
-  serverUrl: ""  # 可手动指定完整 URL，会覆盖自动生成
   service:
     type: NodePort  # 可选: ClusterIP, NodePort, LoadBalancer
     apiPort: 9000
