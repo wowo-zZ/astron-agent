@@ -178,6 +178,7 @@ coreTenant:
     port: 5052
   env:
     serviceLocation: hf
+    servicePort: 5052
     databaseType: mysql
     databaseUsername: root
     databasePassword: root123
@@ -201,6 +202,7 @@ coreDatabase:
     type: ClusterIP
     port: 7990
   env:
+    servicePort: 7990
     pgsqlHost: astron-agent-postgres
     pgsqlPort: 5432
     pgsqlUser: spark
@@ -224,6 +226,7 @@ coreRpa:
     type: ClusterIP
     port: 17198
   env:
+    servicePort: 17198
     otlpEndpoint: "127.0.0.1:4317"
     otlpEnable: "0"
     kafkaEnable: "0"
@@ -246,6 +249,7 @@ coreLink:
     type: ClusterIP
     port: 18888
   env:
+    servicePort: 18888
     mysqlHost: astron-agent-mysql
     mysqlPort: 3306
     mysqlUser: root
@@ -275,6 +279,7 @@ coreAitools:
     type: ClusterIP
     port: 18668
   env:
+    servicePort: 18668
     ossType: s3
     ossEndpoint: "http://astron-agent-minio:9000"
     ossAccessKeyId: minioadmin
@@ -299,6 +304,7 @@ coreAgent:
     type: ClusterIP
     port: 17870
   env:
+    servicePort: 17870
     serviceLocation: hf
     serviceHost: "0.0.0.0"
     serviceWorkers: "1"
@@ -357,6 +363,7 @@ coreKnowledge:
     type: ClusterIP
     port: 20010
   env:
+    servicePort: 20010
     otlpEnable: "0"
     ragflowBaseUrl: ""
     ragflowApiToken: ""
@@ -379,6 +386,7 @@ coreWorkflow:
     type: ClusterIP
     port: 7880
   env:
+    servicePort: 7880
     runtimeEnv: dev
     mysqlHost: astron-agent-mysql
     mysqlPort: 3306
