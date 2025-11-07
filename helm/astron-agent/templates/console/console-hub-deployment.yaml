@@ -43,7 +43,7 @@ spec:
         imagePullPolicy: {{ .Values.global.imagePullPolicy }}
         env:
         {{- range $key, $value := .Values.consoleHub.env }}
-        {{- if or (eq $key "casdoorUrl") (eq $key "oauth2IssuerUri") }}
+        {{- if or (eq $key "consoleCasdoorUrl") (eq $key "oauth2IssuerUri") }}
         - name: {{ upper (snakecase $key) }}
           value: {{ printf "%s:%d" $.Values.global.hostBaseAddress ($.Values.casdoor.service.nodePort | int) | quote }}
         {{- else if eq $key "consoleDomain" }}
