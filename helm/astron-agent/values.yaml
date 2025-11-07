@@ -280,6 +280,10 @@ coreAitools:
     port: 18668
   env:
     servicePort: 18668
+    ossDownloadHost: ""
+    aiAppId: ""
+    aiApiKey: ""
+    aiApiSecret: ""
     ossType: s3
     ossEndpoint: "http://astron-agent-minio:9000"
     ossAccessKeyId: minioadmin
@@ -364,6 +368,8 @@ coreKnowledge:
     port: 20010
   env:
     servicePort: 20010
+    xinghuoAppId: ""
+    xinghuoAppSecret: ""
     otlpEnable: "0"
     ragflowBaseUrl: ""
     ragflowApiToken: ""
@@ -387,6 +393,7 @@ coreWorkflow:
     port: 7880
   env:
     servicePort: 7880
+    ossDownloadHost: ""
     runtimeEnv: dev
     mysqlHost: astron-agent-mysql
     mysqlPort: 3306
@@ -463,9 +470,11 @@ consoleHub:
     port: 8080
   env:
     # Casdoor Configuration
-    casdoorId: "astron-agent-client"
-    casdoorApp: "astron-agent-app"
-    casdoorOrg: "built-in"
+    consoleCasdoorUrl: ""
+    consoleCasdoorId: "astron-agent-client"
+    consoleCasdoorApp: "astron-agent-app"
+    consoleCasdoorOrg: "built-in"
+    consoleDomain: ""
     # MySQL Configuration
     mysqlUrl: "jdbc:mysql://astron-agent-mysql:3306/astron_console"
     mysqlUser: root
@@ -475,11 +484,13 @@ consoleHub:
     redisPort: 6379
     redisDatabaseConsole: 0
     # OSS/MinIO Configuration
+    ossRemoteEndpoint: ""
     ossEndpoint: "http://astron-agent-minio:9000"
     ossAccessKeyId: minioadmin
     ossAccessKeySecret: minioadmin123
     ossBucketConsole: console-oss
     ossPresignExpirySecondsConsole: 600
+    oauth2IssuerUri: ""
     oauth2JwkSetUri: "http://astron-agent-casdoor:8000/.well-known/jwks"
     oauth2Audience: astron-agent-client
     # Tenant Configuration (Important!)
@@ -531,6 +542,20 @@ consoleHub:
     wechatEncodingAesKey: your-wechat-encoding-aes-key
     # Admin Configuration
     adminUid: "9999"
+    # platform Configuration
+    platformAppId: ""
+    sparkAppId: ""
+    sparkRtasrAppid: ""
+    sparkImageAppId: ""
+    platformApiKey: ""
+    sparkApiKey: ""
+    sparkImageApiKey: ""
+    platformApiSecret: ""
+    sparkApiSecret: ""
+    sparkImageApiSecret: ""
+    sparkApiPassword: ""
+    sparkRtasrKey: ""
+    botApiMaasBaseUrl: ""
 
 # Ingress configuration
 ingress:
