@@ -165,7 +165,8 @@ vim .env
 创建应用完成后可能需要购买或领取相应能力的API授权服务量
 - 星火大模型API: https://xinghuo.xfyun.cn/sparkapi
   (对于大模型API会有额外的SPARK_API_PASSWORD需要在页面上获取)
-  (指令型助手对应的文本AI生成/优化功能需要开通Spark Ultra能力，页面地址为https://console.xfyun.cn/services/bm4)
+  (1、指令型助手对应的文本AI生成/优化功能需要开通Spark Ultra能力，页面地址为https://console.xfyun.cn/services/bm4
+   2、工作流智能体对应的AI生成和AI代码生成需要开通Spark3.5 Max和DeepSeekV3能力，Spark3.5 Max地址为：https://console.xfyun.cn/services/bm35,DeepSeekV3能力地址为：https://maas.xfyun.cn/modelSquare)
 - 实时语音转写API: https://console.xfyun.cn/services/rta
 - 图片生成API: https://www.xfyun.cn/services/wtop
 
