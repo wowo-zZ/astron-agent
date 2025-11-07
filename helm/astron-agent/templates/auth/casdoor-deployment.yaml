@@ -69,6 +69,8 @@ spec:
         resources:
           {{- toYaml .Values.casdoor.resources | nindent 10 }}
         volumeMounts:
+        - name: conf-ro
+          mountPath: /conf-ro
         - name: conf
           mountPath: /conf
         - name: entrypoint
@@ -78,9 +80,11 @@ spec:
           mountPath: /logs
         command: ["/bin/sh", "/entrypoint.sh"]
       volumes:
-      - name: conf
+      - name: conf-ro
         configMap:
           name: {{ include "astron-agent.fullname" . }}-casdoor-conf
+      - name: conf
+        emptyDir: {}
       - name: entrypoint
         configMap:
           name: {{ include "astron-agent.fullname" . }}-casdoor-conf

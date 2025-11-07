@@ -8,6 +8,7 @@ metadata:
 data:
   app.conf: {{ .Files.Get "files/casdoor/conf/app.conf" | quote }}
   init_data.json: {{ .Files.Get "files/casdoor/conf/init_data.json" | quote }}
+  init_data.json.template: {{ .Files.Get "files/casdoor/conf/init_data.json.template" | quote }}
   entrypoint.sh: {{ .Files.Get "files/casdoor/entrypoint.sh" | quote }}
 ---
 {{- end }}
