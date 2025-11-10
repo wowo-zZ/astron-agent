@@ -1,7 +1,7 @@
 ---
 name: General Issue
 description: Questions, documentation gaps, performance topics, or other general discussions
-title: ""
+title: "[GENERAL] "
 labels:
   - question
 body:
