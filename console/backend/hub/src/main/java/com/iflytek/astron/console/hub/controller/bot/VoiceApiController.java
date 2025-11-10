@@ -3,6 +3,7 @@ package com.iflytek.astron.console.hub.controller.bot;
 import com.iflytek.astron.console.commons.annotation.RateLimit;
 import com.iflytek.astron.console.commons.response.ApiResult;
 import com.iflytek.astron.console.hub.entity.PronunciationPersonConfig;
+import com.iflytek.astron.console.hub.service.bot.CustomSpeakerService;
 import com.iflytek.astron.console.hub.service.bot.VoiceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,9 +25,14 @@ public class VoiceApiController {
 
     private final VoiceService voiceService;
 
+    private final CustomSpeakerService customSpeakerService;
+
     @GetMapping(value = "/tts-sign")
     @RateLimit()
-    public ApiResult<Map<String, String>> ttsSign() {
+    public ApiResult<Map<String, String>> ttsSign(String code) {
+        if (customSpeakerService.existsByAssetId(code)) {
+            return ApiResult.success(customSpeakerService.getCloneSign());
+        }
         return ApiResult.success(voiceService.getTtsSign());
     }
 

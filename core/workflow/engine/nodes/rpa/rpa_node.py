@@ -35,6 +35,7 @@ class RPANode(BaseNode):
     projectId: str
     header: Dict[str, Any]
     source: str = ""
+    version: int | None = None
     rpaParams: Dict[str, Any] = Field(default_factory=dict)
 
     async def execute(
@@ -58,6 +59,8 @@ class RPANode(BaseNode):
                 "exec_position": self.rpaParams.get("execPosition", "EXECUTOR"),
                 "params": inputs,
             }
+            if self.version:
+                req_body.update({"version": self.version})
 
             headers = {
                 "Content-Type": "application/json",
