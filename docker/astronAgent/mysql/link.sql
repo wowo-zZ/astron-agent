@@ -22,7 +22,7 @@ CREATE TABLE tools_schema (
     `update_at` DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
     `mcp_server_url` VARCHAR(255) COMMENT 'mcp_server_url',
     `schema` TEXT COMMENT 'schema,json格式',
-    `version` VARCHAR(32) NOT NULL DEFAULT 'DEF_VER' COMMENT '版本号',
+    `version` VARCHAR(32) NOT NULL DEFAULT 'V1.0' COMMENT '版本号',
     `is_deleted` BIGINT NOT NULL DEFAULT 0 COMMENT '是否已删除',
     UNIQUE KEY unique_tool_version (tool_id, version, is_deleted)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='工具数据库表';
