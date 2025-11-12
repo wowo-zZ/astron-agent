@@ -564,14 +564,14 @@ ingress:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
   hosts:
-    - host: astron-agent.example.com
+    - host: astron.xfyun.cn
       paths:
         - path: /
           pathType: Prefix
   tls:
     - secretName: astron-agent-tls
       hosts:
-        - astron-agent.example.com
+        - astron.xfyun.cn
 
 # Service Account
 serviceAccount:
