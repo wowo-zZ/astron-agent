@@ -926,6 +926,8 @@ export function isBaseType(type: string): boolean {
     'array-integer',
     'array-boolean',
     'array-number',
+    'array-object',
+    'array-array',
     'image',
     'pdf',
   ];

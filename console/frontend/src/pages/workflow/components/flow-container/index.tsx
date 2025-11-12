@@ -51,7 +51,7 @@ const useFlowContainerEffect = ({
   const handleDelete = useCallback(() => {
     takeSnapshot();
     lastSelection.nodes = lastSelection?.nodes?.filter(
-      node => node.type !== '开始节点' && node.type !== '结束节点'
+      node => node.nodeType !== 'node-start' && node.nodeType !== 'node-end'
     );
     const edgeIds = lastSelection?.edges?.map(edge => edge?.id);
     const leftEdges = edges.filter(edge => !edgeIds?.includes(edge?.id));
@@ -91,7 +91,7 @@ const useFlowContainerEffect = ({
           );
           message.success('复制成功');
         } catch {
-          message.error('[Clipboard] 复制失败');
+          message.error('复制失败');
         }
       } else if ((event.ctrlKey || event.metaKey) && event.key === 'v') {
         event.preventDefault();
