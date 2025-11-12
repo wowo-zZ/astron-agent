@@ -32,7 +32,7 @@ def test_rewrite_dml_with_uid_and_limit() -> None:
     limit_num = 100
     env = "prod"
 
-    rewritten_sql, insert_ids = rewrite_dml_with_uid_and_limit(
+    rewritten_sql, insert_ids, params_dict = rewrite_dml_with_uid_and_limit(
         dml=test_dml,
         app_id=app_id,
         uid=uid,
@@ -41,12 +41,12 @@ def test_rewrite_dml_with_uid_and_limit() -> None:
         span_context=span_context,
     )
 
-    assert (
-        "WHERE (age > 18) AND users.uid IN ('user456', 'app123:user456')"
-        in rewritten_sql
-    )
+    assert "WHERE (age > 18) AND users.uid IN (:param_0, :param_1)" in rewritten_sql
     assert "LIMIT 100" in rewritten_sql
     assert insert_ids == []
+    assert isinstance(params_dict, dict)
+    assert params_dict["param_0"] == "user456"
+    assert params_dict["param_1"] == "app123:user456"
 
 
 def test_to_jsonable() -> None:
@@ -255,63 +255,74 @@ async def test_exec_dml_success() -> None:
                         mock_set_search.return_value = ("prod_u1_1001", None)
 
                         with patch(
-                            "memory.database.api.v1.exec_dml.rewrite_dml_with_uid_and_limit"
-                        ) as mock_rewrite:
-                            mock_rewrite.return_value = (
-                                "SELECT name FROM users WHERE age > 18 "
-                                "AND users.uid IN ('u1', 'app789:u1') LIMIT 100",
-                                [],
-                            )
+                            "memory.database.api.v1.exec_dml._validate_dml_legality",
+                            new_callable=AsyncMock,
+                        ) as mock_validate:
+                            mock_validate.return_value = None
 
                             with patch(
-                                "memory.database.api.v1.exec_dml.exec_sql_statement",
-                                new_callable=AsyncMock,
-                            ) as mock_exec_sql:
-                                select_result = MagicMock()
-                                select_result.mappings.return_value.all.return_value = [
-                                    {"name": "test_user"}
-                                ]
-                                mock_exec_sql.return_value = select_result
+                                "memory.database.api.v1.exec_dml.rewrite_dml_with_uid_and_limit"
+                            ) as mock_rewrite:
+                                mock_rewrite.return_value = (
+                                    "SELECT name FROM users WHERE age > 18 "
+                                    "AND users.uid IN ('u1', 'app789:u1') LIMIT 100",
+                                    [],
+                                    {},
+                                )
 
                                 with patch(
-                                    "memory.database.api.v1.exec_dml.get_otlp_metric_service"
-                                ) as mock_metric_service_func:
+                                    "memory.database.api.v1.exec_dml.exec_sql_statement",
+                                    new_callable=AsyncMock,
+                                ) as mock_exec_sql:
+                                    select_result = MagicMock()
+                                    select_result.mappings.return_value.all.return_value = [
+                                        {"name": "test_user"}
+                                    ]
+                                    mock_exec_sql.return_value = select_result
+
                                     with patch(
-                                        "memory.database.api.v1.exec_dml.get_otlp_span_service"
-                                    ) as mock_span_service_func:
-                                        # Mock meter instance
-                                        mock_meter_instance = MagicMock()
-                                        mock_meter_instance.in_success_count = (
-                                            MagicMock()
-                                        )
-                                        mock_meter_instance.in_error_count = MagicMock()
+                                        "memory.database.api.v1.exec_dml.get_otlp_metric_service"
+                                    ) as mock_metric_service_func:
+                                        with patch(
+                                            "memory.database.api.v1.exec_dml.get_otlp_span_service"
+                                        ) as mock_span_service_func:
+                                            # Mock meter instance
+                                            mock_meter_instance = MagicMock()
+                                            mock_meter_instance.in_success_count = (
+                                                MagicMock()
+                                            )
+                                            mock_meter_instance.in_error_count = (
+                                                MagicMock()
+                                            )
 
-                                        # Mock metric service
-                                        mock_metric_service = MagicMock()
-                                        mock_metric_service.get_meter.return_value = (
-                                            lambda func: mock_meter_instance
-                                        )
-                                        mock_metric_service_func.return_value = (
-                                            mock_metric_service
-                                        )
+                                            # Mock metric service
+                                            mock_metric_service = MagicMock()
+                                            mock_metric_service.get_meter.return_value = (
+                                                lambda func: mock_meter_instance
+                                            )
+                                            mock_metric_service_func.return_value = (
+                                                mock_metric_service
+                                            )
 
-                                        # Mock span service and instance
-                                        mock_span_instance = MagicMock()
-                                        mock_span_instance.start.return_value.__enter__.return_value = (
-                                            fake_span_context
-                                        )
-                                        mock_span_service = MagicMock()
-                                        mock_span_service.get_span.return_value = (
-                                            lambda uid: mock_span_instance
-                                        )
-                                        mock_span_service_func.return_value = (
-                                            mock_span_service
-                                        )
+                                            # Mock span service and instance
+                                            mock_span_instance = MagicMock()
+                                            mock_span_instance.start.return_value.__enter__.return_value = (
+                                                fake_span_context
+                                            )
+                                            mock_span_service = MagicMock()
+                                            mock_span_service.get_span.return_value = (
+                                                lambda uid: mock_span_instance
+                                            )
+                                            mock_span_service_func.return_value = (
+                                                mock_span_service
+                                            )
 
-                                        response = await exec_dml(test_input, mock_db)
+                                            response = await exec_dml(
+                                                test_input, mock_db
+                                            )
 
-                                        resp_body = json.loads(response.body)
-                                        assert "code" in resp_body
-                                        assert "message" in resp_body
-                                        assert "sid" in resp_body
-                                        assert "data" in resp_body
+                                            resp_body = json.loads(response.body)
+                                            assert "code" in resp_body
+                                            assert "message" in resp_body
+                                            assert "sid" in resp_body
+                                            assert "data" in resp_body
