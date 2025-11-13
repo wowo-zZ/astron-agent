@@ -288,10 +288,14 @@ def _collect_column_names(parsed: Any) -> list:
     """Collect column names."""
     columns_to_validate = []
     for node in parsed.walk():
-        if isinstance(node, Column):
-            column_name = node.name
-            if column_name:
-                columns_to_validate.append(column_name)
+        if not isinstance(node, Column):
+            continue
+
+        column_name = node.name
+        if not column_name:
+            continue
+
+        columns_to_validate.append(column_name)
     return columns_to_validate
 
 
@@ -299,11 +303,15 @@ def _collect_insert_keys(parsed: Any) -> list:
     """Collect key names from INSERT statements."""
     keys_to_validate = []
     for node in parsed.walk():
-        if isinstance(node, exp.Insert):
-            if node.this and hasattr(node.this, "expressions"):
-                for col in node.this.expressions:
-                    if isinstance(col, Column):
-                        keys_to_validate.append(col.name)
+        if not isinstance(node, exp.Insert):
+            continue
+
+        if not (node.this and hasattr(node.this, "expressions")):
+            continue
+
+        for col in node.this.expressions:
+            if isinstance(col, Column):
+                keys_to_validate.append(col.name)
     return keys_to_validate
 
 
@@ -311,16 +319,20 @@ def _collect_update_keys(parsed: Any) -> list:
     """Collect key names from UPDATE statements."""
     keys_to_validate = []
     for node in parsed.walk():
-        if isinstance(node, exp.Update):
-            for set_expr in node.expressions:
-                if isinstance(set_expr, exp.EQ):
-                    left = set_expr.left
-                    if isinstance(left, Column):
-                        keys_to_validate.append(left.name)
-                    elif not isinstance(left, Column):
-                        raise ValueError(
-                            f"Column names must be used in UPDATE SET clause: {set_expr}"
-                        )
+        if not isinstance(node, exp.Update):
+            continue
+
+        for set_expr in node.expressions:
+            if not isinstance(set_expr, exp.EQ):
+                continue
+
+            left = set_expr.left
+            if isinstance(left, Column):
+                keys_to_validate.append(left.name)
+            elif not isinstance(left, Column):
+                raise ValueError(
+                    f"Column names must be used in UPDATE SET clause: {set_expr}"
+                )
     return keys_to_validate
 
 
@@ -451,7 +463,7 @@ async def _validate_dml_legality(dml: str, uid: str, span_context: Any, m: Any) 
             lables={"uid": uid},
             span=span_context,
         )
-        return None, format_response(
+        return format_response(
             code=CodeEnum.SQLParseError.code,
             message="SQL parsing failed",
             sid=span_context.sid,
