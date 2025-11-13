@@ -211,7 +211,7 @@ def setup_logging_and_metrics(span_context: Span, req: str, product_id: str) -> 
 def otlp_handle(
     meter: Meter, node_trace: NodeTraceLog, code: int, message: str
 ) -> None:
-    if os.getenv(const.OTLP_ENABLE_KEY, "false").lower() == "false":
+    if os.getenv(const.OTLP_ENABLE_KEY, "0").lower() == "0":
         return
 
     if code != 0:

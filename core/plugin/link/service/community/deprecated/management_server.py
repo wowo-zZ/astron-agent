@@ -74,7 +74,7 @@ def _send_error_telemetry(
     meter: Any, node_trace: Any, error_code: Any, error_msg: Any
 ) -> None:
     """Send error telemetry data."""
-    if os.getenv(const.OTLP_ENABLE_KEY, "false").lower() == "true":
+    if os.getenv(const.OTLP_ENABLE_KEY, "0").lower() == "1":
         meter.in_error_count(error_code)
         node_trace.answer = error_msg
         node_trace.status = Status(code=error_code, message=error_msg)
@@ -87,7 +87,7 @@ def _send_success_telemetry(
     meter: Any, node_trace: Any, response_data: Any, service_id: Any = None
 ) -> None:
     """Send success telemetry data."""
-    if os.getenv(const.OTLP_ENABLE_KEY, "false").lower() == "true":
+    if os.getenv(const.OTLP_ENABLE_KEY, "0").lower() == "1":
         meter.in_success_count()
         node_trace.answer = json.dumps(response_data, ensure_ascii=False)
         if service_id:

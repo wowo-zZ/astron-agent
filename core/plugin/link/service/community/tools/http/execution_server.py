@@ -74,7 +74,7 @@ def extract_request_params(
 
 def send_telemetry(node_trace: NodeTraceLog) -> None:
     """Send telemetry data to Kafka."""
-    if os.getenv(const.OTLP_ENABLE_KEY, "false").lower() == "true":
+    if os.getenv(const.OTLP_ENABLE_KEY, "0").lower() == "1":
         kafka_service = get_kafka_producer_service()
         node_trace.start_time = int(round(time.time() * 1000))
         kafka_service.send(os.getenv(const.KAFKA_TOPIC_KEY), node_trace.to_json())
@@ -84,7 +84,7 @@ def handle_validation_error(
     validate_err: str, span_context: Span, node_trace: NodeTraceLog, m: Meter
 ) -> HttpRunResponse:
     """Handle validation errors with telemetry."""
-    if os.getenv(const.OTLP_ENABLE_KEY, "false").lower() == "true":
+    if os.getenv(const.OTLP_ENABLE_KEY, "0").lower() == "1":
         m.in_error_count(ErrCode.JSON_PROTOCOL_PARSER_ERR.code)
         node_trace.answer = validate_err
         node_trace.status = Status(
@@ -115,7 +115,7 @@ def handle_sparklink_error(
     span_context.add_error_event(err.message)
     span_context.set_status(OTelStatus(StatusCode.ERROR))
 
-    if os.getenv(const.OTLP_ENABLE_KEY, "false").lower() == "true":
+    if os.getenv(const.OTLP_ENABLE_KEY, "0").lower() == "1":
         m.in_error_count(err.code)
         node_trace.answer = err.message
         node_trace.service_id = tool_id
@@ -148,7 +148,7 @@ def handle_custom_error(
     span_context.add_error_event(message)
     span_context.set_status(OTelStatus(StatusCode.ERROR))
 
-    if os.getenv(const.OTLP_ENABLE_KEY, "false").lower() == "true":
+    if os.getenv(const.OTLP_ENABLE_KEY, "0").lower() == "1":
         m.in_error_count(error_code.code)
         node_trace.answer = message
         node_trace.service_id = tool_id
@@ -182,7 +182,7 @@ def handle_general_exception(
     span_context.add_error_event(f"{ErrCode.COMMON_ERR.msg}: {err}")
     span_context.set_status(OTelStatus(StatusCode.ERROR))
 
-    if os.getenv(const.OTLP_ENABLE_KEY, "false").lower() == "true":
+    if os.getenv(const.OTLP_ENABLE_KEY, "0").lower() == "1":
         m.in_error_count(ErrCode.COMMON_ERR.code)
         node_trace.answer = f"{ErrCode.COMMON_ERR.msg}: {err}"
         node_trace.service_id = tool_id
@@ -292,7 +292,7 @@ def handle_success_response(
     tool_type: str,
 ) -> HttpRunResponse:
     """Handle successful response with telemetry."""
-    if os.getenv(const.OTLP_ENABLE_KEY, "false").lower() == "true":
+    if os.getenv(const.OTLP_ENABLE_KEY, "0").lower() == "1":
         m.in_success_count()
         node_trace.answer = result
         node_trace.service_id = tool_id
@@ -331,7 +331,7 @@ def handle_debug_validation_error(
         f"error message: {validate_err}"
     )
 
-    if os.getenv(const.OTLP_ENABLE_KEY, "false").lower() == "true":
+    if os.getenv(const.OTLP_ENABLE_KEY, "0").lower() == "1":
         m.in_error_count(ErrCode.JSON_PROTOCOL_PARSER_ERR.code)
         node_trace.answer = validate_err
         node_trace.service_id = tool_id
@@ -361,7 +361,7 @@ def handle_debug_success_response(
     tool_type: str,
 ) -> ToolDebugResponse:
     """Handle successful debug response with telemetry."""
-    if os.getenv(const.OTLP_ENABLE_KEY, "false").lower() == "true":
+    if os.getenv(const.OTLP_ENABLE_KEY, "0").lower() == "1":
         m.in_success_count()
         node_trace.answer = result
         node_trace.service_id = tool_id
