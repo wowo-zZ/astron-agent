@@ -4,14 +4,14 @@ global:
   imagePullPolicy: IfNotPresent
   storageClass: ""
   astronAgentVersion: latest
-  # Host base address for external access (e.g., http://192.168.1.100 or http://your-domain.com)
+  # Host base address for external access (e.g., http://your-domain.com)
   # Used for MinIO server URL and other external endpoints
-  hostBaseAddress: ""  # 留空则使用 ClusterIP 内部地址
-
+  hostBaseAddress: ""
+  # mysql initScript
+  initScriptsPath: /data/astron-agent/helm/astron-agent/files/mysql
   # iFLYTEK Platform API Configuration
   # You can get your own API key and secret on the iFLYTEK Open Platform official website
   # SPARK LLM API: https://xinghuo.xfyun.cn/sparkapi
-  # RTASR API: https://www.xfyun.cn/services/rtasr
   # IMAGE-GEN API: https://www.xfyun.cn/services/wtop
   platformAppId: "your-app-id"
   platformApiKey: "your-api-key"
@@ -73,10 +73,6 @@ mysql:
     size: 10Gi
   auth:
     rootPassword: root123
-  # SQL initialization - hybrid approach
-  # Large schema files from host path (bypasses Helm 1MB limit)
-  # Small utility files from ConfigMap (no manual setup required)
-  initScriptsPath: /data/mysql-init
   healthCheck:
     interval: 30
     timeout: 10
@@ -121,12 +117,11 @@ minio:
     rootUser: minioadmin
     rootPassword: minioadmin123
   service:
-    type: NodePort  # 可选: ClusterIP, NodePort, LoadBalancer
+    type: NodePort
     apiPort: 9000
     consolePort: 9001
-    # NodePort 配置 (当 type 为 NodePort 时生效)
-    nodePort: 30900  # API 端口的 NodePort，范围 30000-32767
-    consoleNodePort: 30901  # Console 端口的 NodePort
+    nodePort: 30900
+    consoleNodePort: 30901
   healthCheck:
     interval: 30
     timeout: 10
@@ -145,10 +140,9 @@ casdoor:
       memory: "1Gi"
       cpu: "1000m"
   service:
-    type: NodePort  # 可选: ClusterIP, NodePort, LoadBalancer
+    type: NodePort
     port: 8000
-    # NodePort 配置 (当 type 为 NodePort 时生效)
-    nodePort: 30800  # Casdoor 端口的 NodePort，范围 30000-32767
+    nodePort: 30800
   env:
     ginMode: release
   mysql:
@@ -540,9 +534,7 @@ consoleHub:
     wechatComponentSecret: your-wechat-secret
     wechatToken: your-wechat-token
     wechatEncodingAesKey: your-wechat-encoding-aes-key
-    # Admin Configuration
     adminUid: "9999"
-    # platform Configuration
     platformAppId: ""
     sparkAppId: ""
     sparkRtasrAppid: ""
