@@ -217,10 +217,10 @@ coreRpa:
   replicaCount: 1
   resources:
     requests:
-      memory: "256Mi"
+      memory: "512Mi"
       cpu: "250m"
     limits:
-      memory: "1Gi"
+      memory: "2Gi"
       cpu: "1000m"
   service:
     type: ClusterIP
@@ -358,10 +358,10 @@ coreKnowledge:
   replicaCount: 1
   resources:
     requests:
-      memory: "256Mi"
+      memory: "512Mi"
       cpu: "250m"
     limits:
-      memory: "1Gi"
+      memory: "2Gi"
       cpu: "1000m"
   service:
     type: ClusterIP
@@ -383,10 +383,10 @@ coreWorkflow:
   replicaCount: 1
   resources:
     requests:
-      memory: "512Mi"
+      memory: "2Gi"
       cpu: "500m"
     limits:
-      memory: "2Gi"
+      memory: "6Gi"
       cpu: "2000m"
   service:
     type: ClusterIP
@@ -460,10 +460,10 @@ consoleHub:
   replicaCount: 1
   resources:
     requests:
-      memory: "512Mi"
+      memory: "2Gi"
       cpu: "500m"
     limits:
-      memory: "2Gi"
+      memory: "6Gi"
       cpu: "2000m"
   service:
     type: ClusterIP
