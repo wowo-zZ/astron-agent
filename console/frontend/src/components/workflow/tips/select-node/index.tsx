@@ -6,7 +6,7 @@ export default function Select({ lastSelection }): React.ReactElement {
   const copyNodes = async (): Promise<void> => {
     const cloneLastSelection = cloneDeep(lastSelection);
     cloneLastSelection.nodes = cloneLastSelection.nodes?.filter(
-      node => node.type !== '开始节点' && node.type !== '结束节点'
+      node => node.type !== 'node-start' && node.type !== 'node-end'
     );
     try {
       await navigator.clipboard.writeText(JSON.stringify(cloneLastSelection));

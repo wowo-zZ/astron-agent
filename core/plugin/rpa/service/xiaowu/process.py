@@ -131,14 +131,14 @@ async def task_monitoring(
                 AttributeError,
             ) as e:
                 logger.error(f"error: {e}")
-                code = ErrorCode.CREATE_TASK_ERROR.code
-                msg = f"{ErrorCode.CREATE_TASK_ERROR.message}, detail: {e}"
+                code = ErrorCode.QUERY_TASK_ERROR.code
+                msg = f"{ErrorCode.QUERY_TASK_ERROR.message}, detail: {e}"
                 error = RPAExecutionResponse(code=code, message=msg, sid=sid)
                 yield error.model_dump_json()
                 otlp_handle(
                     meter=meter,
                     node_trace=node_trace,
-                    code=ErrorCode.CREATE_TASK_ERROR.code,
+                    code=ErrorCode.QUERY_TASK_ERROR.code,
                     message=msg,
                 )
                 return
@@ -211,7 +211,7 @@ def setup_logging_and_metrics(span_context: Span, req: str, product_id: str) -> 
 def otlp_handle(
     meter: Meter, node_trace: NodeTraceLog, code: int, message: str
 ) -> None:
-    if os.getenv(const.OTLP_ENABLE_KEY, "false").lower() == "false":
+    if os.getenv(const.OTLP_ENABLE_KEY, "0").lower() == "0":
         return
 
     if code != 0:

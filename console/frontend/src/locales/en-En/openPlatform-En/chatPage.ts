@@ -90,6 +90,7 @@ const transition = {
     deleteErrorFilesBeforeSend: 'Please delete failed files before sending',
     vmsPermissionRequired: 'VMS requires browser permission',
     grantPermission: 'Grant Permission',
+    previewNotSupported: 'Preview not available for this file type.',
   },
   feedbackPopover: {
     feedbackTitle: 'Your feedback helps us improve',

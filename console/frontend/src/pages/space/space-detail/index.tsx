@@ -586,7 +586,7 @@ const useTabActions = (params: TabActionsParams): React.ReactNode => {
     searchHandlers,
   } = params;
 
-  const { t } = useSpaceI18n();
+  const { t } = useTranslation();
 
   return useMemo(() => {
     switch (activeTab) {

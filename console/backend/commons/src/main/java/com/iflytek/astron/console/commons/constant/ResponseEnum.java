@@ -88,6 +88,13 @@ public enum ResponseEnum {
     USER_APP_ID_NOT_EXISTE(60039, "error.app.not.exists"),
     PERSONALITY_AI_GENERATE_PARAM_EMPTY(60040, "error.personality.ai.generate.param.empty"),
     PERSONALITY_AI_GENERATE_ERROR(60041, "error.personality.ai.generate.failed"),
+    AUDIO_FILE_FORMAT_UNSUPPORTED(60042, "error.audio.file.format.unsupported"),
+    AUDIO_FILE_SIZE_EXCEEDED(60043, "error.audio.file.size.exceeded"),
+    AUDIO_CHANNELS_INVALID(60044, "error.audio.channels.invalid"),
+    AUDIO_SAMPLE_RATE_TOO_LOW(60045, "error.audio.sample.rate.too.low"),
+    AUDIO_BIT_DEPTH_INVALID(60046, "error.audio.bit.depth.invalid"),
+    AUDIO_DURATION_TOO_LONG(60047, "error.audio.duration.too.long"),
+    SPEAKER_TRAIN_FAILED(60048, "error.speaker.train.failed"),
 
     // Spark API errors 60040-60080
     SPARK_API_PARAM_ERROR(60040, "error.spark.api.param.error"),

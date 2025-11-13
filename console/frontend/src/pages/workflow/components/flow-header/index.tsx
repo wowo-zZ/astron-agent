@@ -14,6 +14,7 @@ import flowSuccessIcon from '@/assets/imgs/workflow/flow-success-icon.png';
 import flowRunningIcon from '@/assets/imgs/workflow/flow-running-icon.png';
 import flowFailedIcon from '@/assets/imgs/workflow/flow-failed-icon.png';
 import flowEditNormal from '@/assets/imgs/workflow/flow-edit-normal.svg';
+import { TFunction } from 'i18next';
 interface FlowHeaderProps {
   currentTab?: 'arrange' | 'overview';
   children?: ReactNode;
@@ -21,7 +22,7 @@ interface FlowHeaderProps {
 
 interface FlowStatusProps {
   flowResult: unknown;
-  t: unknown;
+  t: TFunction;
 }
 
 const FlowStatus: React.FC<FlowStatusProps> = ({ flowResult, t }) => {
@@ -85,7 +86,7 @@ const FlowStatus: React.FC<FlowStatusProps> = ({ flowResult, t }) => {
 interface FlowTabsProps {
   currentTab: 'arrange' | 'overview';
   id: string;
-  t: unknown;
+  t: TFunction;
   navigate: ReturnType<typeof useNavigate>;
 }
 
@@ -120,7 +121,7 @@ const FlowHeader: React.FC<FlowHeaderProps> = ({ children, currentFlow }) => {
   const historyVersionData = useFlowsManager(state => state.historyVersionData);
   const setCurrentFlow = useFlowsManager(state => state.setCurrentFlow);
   const [currentTab, setCurrentTab] = useState('arrange');
-  const [modalType, setModalType] = useState(false);
+  const [modalType, setModalType] = useState<string>('');
 
   const isVirtualFlow = useMemo(() => {
     return currentFlow?.type === 4;
@@ -165,7 +166,6 @@ const FlowHeader: React.FC<FlowHeaderProps> = ({ children, currentFlow }) => {
   };
 
   useEffect(() => {
-    console.log('location@@', location);
     setCurrentTab(location?.pathname?.split('/')?.pop());
   }, [location]);
 
@@ -238,7 +238,7 @@ const FlowHeader: React.FC<FlowHeaderProps> = ({ children, currentFlow }) => {
                   </>
                 )}
                 {historyVersion && (
-                  <span className="bg-[#E9EEFF] w-[30px] h-[18px] text-[#6356EA] text-[10px] rounded-[4px] flex items-center justify-center rounded-[7px]">
+                  <span className="bg-[#E9EEFF] w-[30px] h-[18px] text-[#6356EA] text-[10px] flex items-center justify-center rounded-[7px]">
                     {historyVersionData?.name}
                   </span>
                 )}

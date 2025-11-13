@@ -415,9 +415,7 @@ export const useFlowCommon = (): UseFlowCommonReturn => {
     state => state.setVersionManagement
   );
   const showToolModal = useFlowsManager(state => state.toolModalInfo.open);
-  const showIterativeModal = useFlowsManager(
-    state => state.knowledgeModalInfo.open
-  );
+  const showIterativeModal = useFlowsManager(state => state.showIterativeModal);
   const knowledgeModalInfoOpen = useFlowsManager(
     state => state.knowledgeModalInfo.open
   );
@@ -504,8 +502,23 @@ export const useFlowCommon = (): UseFlowCommonReturn => {
     showKnowledgeDetailModal,
   ]);
 
+  const startIterativeWorkflowKeydownEvent = useMemo(() => {
+    return (
+      !showToolModal &&
+      showIterativeModal &&
+      !knowledgeModalInfoOpen &&
+      !showKnowledgeDetailModal
+    );
+  }, [
+    showToolModal,
+    showIterativeModal,
+    knowledgeModalInfoOpen,
+    showKnowledgeDetailModal,
+  ]);
+
   return {
     startWorkflowKeydownEvent,
+    startIterativeWorkflowKeydownEvent,
     handleAddNode,
     handleAddToolNode,
     handleAddFlowNode,

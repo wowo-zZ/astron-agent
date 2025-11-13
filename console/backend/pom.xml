@@ -49,7 +49,8 @@
         <logback.version>1.5.18</logback.version>
         <spring-aspects.version>6.2.10</spring-aspects.version>
         <guava.version>33.4.8-jre</guava.version>
-        <xfyun-websdk.version>2.1.5</xfyun-websdk.version>
+        <websdk-java-spark.version>2.1.5</websdk-java-spark.version>
+        <websdk-java-speech.version>3.0.6</websdk-java-speech.version>
         <easy-excel.version>4.0.3</easy-excel.version>
         <minio.version>8.5.10</minio.version>
         <retrofit>2.5.0</retrofit>
@@ -179,7 +180,13 @@
             <dependency>
                 <groupId>cn.xfyun</groupId>
                 <artifactId>websdk-java-spark</artifactId>
-                <version>${xfyun-websdk.version}</version>
+                <version>${websdk-java-spark.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.xfyun</groupId>
+                <artifactId>websdk-java-speech</artifactId>
+                <version>${websdk-java-speech.version}</version>
             </dependency>
 
             <dependency>

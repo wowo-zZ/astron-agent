@@ -24,13 +24,10 @@ import useBindEvents from '@/hooks/search-event-bind';
 import SourceInfoBox from './source-info-box';
 import UseToolsInfo from './use-tools-info';
 import WorkflowNodeOptions from './workflow-node-options';
-import { formatFileSize, getFileIcon } from '@/utils';
 import FilePreview from './file-preview';
 import ResqBottomButtons from './resq-bottom-buttons';
 import { useTranslation } from 'react-i18next';
 import FileGridDisplay from './file-grid-display';
-import { TFunction } from 'i18next';
-
 const MessageList = (props: {
   messageList: MessageListType[];
   botInfo: BotInfoType;

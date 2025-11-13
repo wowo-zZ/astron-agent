@@ -165,7 +165,10 @@ For documentation, see: https://www.xfyun.cn/doc/platform/quickguide.html
 After creating your application, you may need to purchase or claim API authorization service quotas for the corresponding capabilities:
 - Spark LLM API: https://xinghuo.xfyun.cn/sparkapi
   (For the LLM API, you'll need an additional SPARK_API_PASSWORD available on the page)
-  (The text AI generation/optimization feature for instructional assistants requires enabling Spark Ultra capability at https://console.xfyun.cn/services/bm4)
+  (1、The text generation/optimization feature for instruction-based assistants requires Spark Ultra. It can be enabled at: https://console.xfyun.cn/services/bm4
+2、The AI generation and AI code generation capabilities for workflow agents require Spark 3.5 Max and DeepSeek V3.
+Spark 3.5 Max: https://console.xfyun.cn/services/bm35
+DeepSeek V3: https://maas.xfyun.cn/modelSquare)
 - Real-time Speech Recognition API: https://console.xfyun.cn/services/rta
 - Image Generation API: https://www.xfyun.cn/services/wtop
 
