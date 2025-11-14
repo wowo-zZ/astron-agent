@@ -6,9 +6,9 @@ global:
   astronAgentVersion: latest
   # Host base address for external access (e.g., http://your-domain.com)
   # Used for MinIO server URL and other external endpoints
-  hostBaseAddress: ""
+  hostBaseAddress: "http://astron-agent.example.com"
   # mysql initScript
-  initScriptsPath: /data/astron-agent/helm/astron-agent/files/mysql
+  initScriptsPath: /data/astron-agent/helm/astron-agent/files/mysql/
   # iFLYTEK Platform API Configuration
   # You can get your own API key and secret on the iFLYTEK Open Platform official website
   # SPARK LLM API: https://xinghuo.xfyun.cn/sparkapi
@@ -556,14 +556,14 @@ ingress:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
   hosts:
-    - host: astron.xfyun.cn
+    - host: astron-agent.example.com
       paths:
         - path: /
           pathType: Prefix
   tls:
     - secretName: astron-agent-tls
       hosts:
-        - astron.xfyun.cn
+        - astron-agent.example.com
 
 # Service Account
 serviceAccount:
