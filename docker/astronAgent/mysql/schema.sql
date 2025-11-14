@@ -13704,6 +13704,7 @@ $coreText',1,'新决策节点的prompt','2000-01-01 00:00:00','2025-07-23 15:22:
       {
         "schema": {
           "type": "string",
+          "properties": [],
           "value": {
             "type": "ref",
             "content": {}
@@ -13765,6 +13766,7 @@ $coreText',1,'新决策节点的prompt','2000-01-01 00:00:00','2025-07-23 15:22:
       {
         "schema": {
           "type": "string",
+          "properties": [],
           "value": {
             "type": "ref",
             "content": {}
