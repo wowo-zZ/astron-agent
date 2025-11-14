@@ -44,6 +44,10 @@ spec:
         env:
         - name: GIN_MODE
           value: {{ .Values.casdoor.env.ginMode | quote }}
+        - name: origin
+          value: {{ printf "%s:%d" .Values.global.hostBaseAddress (int .Values.casdoor.service.nodePort) | quote }}
+        - name: originFrontend
+          value: {{ printf "%s:%d" .Values.global.hostBaseAddress (int .Values.casdoor.service.nodePort) | quote }}
         - name: HOST_BASE_ADDRESS
           value: {{ .Values.global.hostBaseAddress | default "http://localhost" | quote }}
         ports:
