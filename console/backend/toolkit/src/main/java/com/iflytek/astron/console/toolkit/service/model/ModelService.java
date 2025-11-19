@@ -221,26 +221,9 @@ public class ModelService extends ServiceImpl<ModelMapper, Model> {
                             : Arrays.stream(rawBlacklist.split(","))
                                     .map(String::trim)
                                     .filter(StrUtil::isNotBlank)
-                                    .collect(toList());
-
-            // SECURITY FIX: Add hardcoded default blacklist to prevent SSRF even if database is empty
-            List<String> defaultBlacklist = Arrays.asList(
-                    // Private IP ranges (RFC 1918)
-                    "10.0.0.0/8",
-                    "172.16.0.0/12",
-                    "192.168.0.0/16",
-                    // Loopback
-                    "127.0.0.0/8",
-                    // Link-local
-                    "169.254.0.0/16",
-                    // IPv6 loopback and link-local
-                    "::1/128",
-                    "fe80::/10");
-
+                                    .toList();
             // Merge database blacklist with default blacklist
-            List<String> mergedBlacklist = new ArrayList<>(defaultBlacklist);
-            mergedBlacklist.addAll(databaseBlacklist);
-
+            List<String> mergedBlacklist = new ArrayList<>(databaseBlacklist);
             SsrfProperties ssrfProperties = new SsrfProperties();
             // Note: The underlying object field name is ipBlaklist (third-party spelling), maintain
             // compatibility

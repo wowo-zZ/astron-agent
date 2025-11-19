@@ -503,7 +503,7 @@ class TestOtlpHandle:
     def test_otlp_handle_disabled(self, mock_getenv: MagicMock) -> None:
         """Test otlp_handle when OTLP is disabled."""
         # Arrange
-        mock_getenv.return_value = "false"
+        mock_getenv.return_value = "0"
         mock_meter = MagicMock()
         mock_node_trace = MagicMock()
 

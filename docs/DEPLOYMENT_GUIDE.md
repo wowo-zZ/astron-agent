@@ -171,6 +171,7 @@ Spark 3.5 Max: https://console.xfyun.cn/services/bm35
 DeepSeek V3: https://maas.xfyun.cn/modelSquare)
 - Real-time Speech Recognition API: https://console.xfyun.cn/services/rta
 - Image Generation API: https://www.xfyun.cn/services/wtop
+- Talk Agent: https://www.xfyun.cn/services/VirtualHumans
 
 Edit the docker/astronAgent/.env file and update the relevant environment variables:
 ```env

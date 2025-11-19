@@ -69,7 +69,7 @@ spec:
       volumes:
       - name: init-scripts
         hostPath:
-          path: {{ .Values.mysql.initScriptsPath }}
+          path: {{ .Values.global.initScriptsPath }}
           type: DirectoryOrCreate
   {{- if .Values.mysql.persistence.enabled }}
   volumeClaimTemplates:

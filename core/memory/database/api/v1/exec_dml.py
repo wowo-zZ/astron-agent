@@ -5,8 +5,9 @@ import decimal
 import re
 import time
 import uuid
-from typing import Any, List, Optional
+from typing import Any, List
 
+import sqlglot
 import sqlparse
 from common.otlp.trace.span import Span
 from common.service import get_otlp_metric_service, get_otlp_span_service
@@ -24,22 +25,116 @@ from memory.database.exceptions.e import CustomException
 from memory.database.exceptions.error_code import CodeEnum
 from memory.database.repository.middleware.getters import get_session
 from sqlglot import exp, parse_one
-from sqlglot.expressions import (
-    Delete,
-    Func,
-    Identifier,
-    Insert,
-    Select,
-    Subquery,
-    Table,
-    Update,
-)
+from sqlglot.expressions import Column, Literal
 from sqlmodel.ext.asyncio.session import AsyncSession
 from starlette.responses import JSONResponse
 
 exec_dml_router = APIRouter(tags=["EXEC_DML"])
 
 INSERT_EXTRA_COLUMNS = ["id", "uid", "create_time", "update_time"]
+
+PGSQL_INVALID_KEY = [
+    "all",
+    "analyse",
+    "analyze",
+    "and",
+    "any",
+    "array",
+    "as",
+    "asc",
+    "asymmetric",
+    "authorization",
+    "binary",
+    "both",
+    "case",
+    "cast",
+    "check",
+    "collate",
+    "collation",
+    "column",
+    "concurrently",
+    "constraint",
+    "create",
+    "cross",
+    "current_catalog",
+    "current_date",
+    "current_role",
+    "current_schema",
+    "current_time",
+    "current_timestamp",
+    "current_user",
+    "default",
+    "deferrable",
+    "desc",
+    "distinct",
+    "do",
+    "else",
+    "end",
+    "except",
+    "false",
+    "fetch",
+    "for",
+    "foreign",
+    "freeze",
+    "from",
+    "full",
+    "grant",
+    "group",
+    "having",
+    "ilike",
+    "in",
+    "initially",
+    "inner",
+    "intersect",
+    "into",
+    "is",
+    "isnull",
+    "join",
+    "lateral",
+    "leading",
+    "left",
+    "like",
+    "limit",
+    "localtime",
+    "localtimestamp",
+    "natural",
+    "not",
+    "notnull",
+    "null",
+    "offset",
+    "on",
+    "only",
+    "or",
+    "order",
+    "outer",
+    "overlaps",
+    "placing",
+    "primary",
+    "references",
+    "returning",
+    "right",
+    "select",
+    "session_user",
+    "similar",
+    "some",
+    "symmetric",
+    "table",
+    "tablesample",
+    "then",
+    "to",
+    "trailing",
+    "true",
+    "union",
+    "unique",
+    "user",
+    "using",
+    "variadic",
+    "verbose",
+    "when",
+    "where",
+    "window",
+    "with",
+]
 
 
 def rewrite_dml_with_uid_and_limit(
@@ -49,7 +144,7 @@ def rewrite_dml_with_uid_and_limit(
     limit_num: int,
     env: str,  # pylint: disable=unused-argument
     span_context: Span,  # pylint: disable=unused-argument
-) -> tuple[str, list]:
+) -> tuple[str, list, dict]:
     """
     Rewrite DML with UID and limit expressions.
 
@@ -62,7 +157,7 @@ def rewrite_dml_with_uid_and_limit(
         span_context: Span context for tracing
 
     Returns:
-        tuple: (rewritten_sql, insert_ids)
+        tuple: (rewritten_sql, insert_ids, params_dict)
     """
     parsed = parse_one(dml)
     insert_ids: List[int] = []
@@ -80,7 +175,29 @@ def rewrite_dml_with_uid_and_limit(
     if isinstance(parsed, exp.Insert):
         _dml_insert_add_params(parsed, insert_ids, app_id, uid)
 
-    return parsed.sql(dialect="postgres"), insert_ids
+    # Parameterization: parameterize values in SQL statements
+    sql_str = parsed.sql(dialect="postgres")
+    params_dict: dict[str, str] = {}
+
+    # Traverse AST nodes to find all literal values
+    for node in parsed.walk():
+        if isinstance(node, exp.Literal):
+            value = node.this
+            # If it's an integer, use the original value directly
+            if isinstance(value, (int, float)) or (
+                isinstance(value, str) and value.isdigit()
+            ):
+                continue
+            # If it's not an integer, use parameterization
+            elif isinstance(value, str):
+                # Generate unique parameter name
+                param_name = f"param_{len(params_dict)}"
+                params_dict[param_name] = value
+                # Replace original value with parameter placeholder
+                sql_str = sql_str.replace(f"'{value}'", f":{param_name}")
+                sql_str = sql_str.replace(f'"{value}"', f":{param_name}")
+
+    return sql_str, insert_ids, params_dict
 
 
 def _dml_add_where(parsed: Any, tables: List[str], app_id: str, uid: str) -> None:
@@ -167,825 +284,190 @@ def to_jsonable(obj: Any) -> Any:
     return obj
 
 
-def _validate_sql_injection(dml: str, span_context: Any) -> Any:
-    """
-    Validate DML statement for SQL injection risks using PostgreSQL official AST parsing.
+def _collect_column_names(parsed: Any) -> list:
+    """Collect column names."""
+    columns_to_validate = []
+    for node in parsed.walk():
+        if not isinstance(node, Column):
+            continue
 
-    This function follows the same approach as DDL validation, using sqlglot's
-    PostgreSQL parser to construct and validate the AST, then reconstruct
-    a safe version of the statement.
+        column_name = node.name
+        if not column_name:
+            continue
 
-    Args:
-        dml: The DML statement to validate
-        span_context: Span context for logging
-
-    Returns:
-        JSONResponse with error if injection detected, None if safe
-    """
-    try:
-        span_context.add_info_event(f"validating_dml_sql: {dml}")
-
-        # Parse using PostgreSQL dialect for accurate parsing
-        parsed = parse_one(dml.strip(), dialect="postgres", error_level="raise")
-
-        if not parsed:
-            span_context.add_error_event("Failed to parse DML statement")
-            return format_response(
-                code=CodeEnum.SQLParseError.code,
-                message="Invalid DML statement structure",
-                sid=span_context.sid,
-            )
-
-        # Extract and validate DML statement information using AST
-        statement_info = _extract_dml_statement_info(parsed)
-        if not statement_info:
-            span_context.add_error_event("Unknown or invalid DML statement type")
-            return format_response(
-                code=CodeEnum.DMLNotAllowed.code,
-                message="Only SELECT, INSERT, UPDATE, DELETE statements are allowed",
-                sid=span_context.sid,
-            )
-
-        statement_type = statement_info
-
-        # Validate AST structure for security
-        if not _validate_dml_ast_security(parsed, span_context):
-            return format_response(
-                code=CodeEnum.DMLNotAllowed.code,
-                message="DML statement contains unsafe elements",
-                sid=span_context.sid,
-            )
-
-        # Reconstruct safe SQL using AST components
-        safe_sql = _reconstruct_safe_dml_statement(parsed, statement_type, span_context)
-        if not safe_sql:
-            span_context.add_error_event("Failed to reconstruct safe DML statement")
-            return format_response(
-                code=CodeEnum.DMLNotAllowed.code,
-                message="DML statement failed security reconstruction",
-                sid=span_context.sid,
-            )
-
-        # Validate the reconstructed SQL structure
-        if not _validate_reconstructed_dml(safe_sql, statement_type, span_context):
-            span_context.add_error_event("Reconstructed DML failed validation")
-            return format_response(
-                code=CodeEnum.DMLNotAllowed.code,
-                message="DML statement security validation failed",
-                sid=span_context.sid,
-            )
-
-        span_context.add_info_event(f"safe_reconstructed_dml: {safe_sql}")
-        span_context.add_info_event("DML SQL injection validation passed")
-        return None
-
-    except Exception as validation_error:
-        span_context.add_error_event(f"DML validation error: {str(validation_error)}")
-        return format_response(
-            code=CodeEnum.SQLParseError.code,
-            message="DML statement parsing failed",
-            sid=span_context.sid,
-        )
+        columns_to_validate.append(column_name)
+    return columns_to_validate
 
 
-def _extract_dml_statement_info(parsed_ast: Any) -> Optional[str]:
-    """
-    Extract DML statement type from parsed AST using official SQLGlot methods.
+def _collect_insert_keys(parsed: Any) -> list:
+    """Collect key names from INSERT statements."""
+    keys_to_validate = []
+    for node in parsed.walk():
+        if not isinstance(node, exp.Insert):
+            continue
 
-    Args:
-        parsed_ast: Parsed SQLGlot AST
+        if not (node.this and hasattr(node.this, "expressions")):
+            continue
 
-    Returns:
-        str: Statement type (SELECT, INSERT, UPDATE, DELETE) or None if not DML
-    """
-    if isinstance(parsed_ast, Select):
-        return "SELECT"
-    elif isinstance(parsed_ast, Insert):
-        return "INSERT"
-    elif isinstance(parsed_ast, Update):
-        return "UPDATE"
-    elif isinstance(parsed_ast, Delete):
-        return "DELETE"
+        for col in node.this.expressions:
+            if isinstance(col, Column):
+                keys_to_validate.append(col.name)
+    return keys_to_validate
+
+
+def _collect_update_keys(parsed: Any) -> list:
+    """Collect key names from UPDATE statements."""
+    keys_to_validate = []
+    for node in parsed.walk():
+        if not isinstance(node, exp.Update):
+            continue
+
+        for set_expr in node.expressions:
+            if not isinstance(set_expr, exp.EQ):
+                continue
+
+            left = set_expr.left
+            if isinstance(left, Column):
+                keys_to_validate.append(left.name)
+            elif not isinstance(left, Column):
+                raise ValueError(
+                    f"Column names must be used in UPDATE SET clause: {set_expr}"
+                )
+    return keys_to_validate
+
+
+def _collect_columns_and_keys(parsed: Any) -> tuple[list, list]:
+    """Collect column names and key names that need validation."""
+    columns_to_validate = _collect_column_names(parsed)
+    insert_keys = _collect_insert_keys(parsed)
+    update_keys = _collect_update_keys(parsed)
+    keys_to_validate = insert_keys + update_keys
+    return columns_to_validate, keys_to_validate
+
+
+def _validate_comparison_nodes(parsed: Any, uid: str, span_context: Any, m: Any) -> Any:
+    """Validate comparison operation nodes."""
+    for node in parsed.walk():
+        # Check keys in WHERE conditions
+        if (
+            isinstance(node, exp.EQ)
+            or isinstance(node, exp.NEQ)
+            or isinstance(node, exp.GT)
+            or isinstance(node, exp.LT)
+            or isinstance(node, exp.GTE)
+            or isinstance(node, exp.LTE)
+        ):
+            # Get left side (usually column name)
+            left = node.left
+            if isinstance(left, Column):
+                # These column names will be collected in _collect_columns_and_keys
+                continue
+            elif not isinstance(left, (Column, Literal)):
+                m.in_error_count(
+                    CodeEnum.DMLNotAllowed.code,
+                    lables={"uid": uid},
+                    span=span_context,
+                )
+                span_context.add_error_event(
+                    f"DML statement contains illegal expression: {node}"
+                )
+                return format_response(
+                    code=CodeEnum.DMLNotAllowed.code,
+                    message=f"DML statement contains illegal expression: {node}",
+                    sid=span_context.sid,
+                )
     return None
 
 
-def _validate_dml_ast_security(parsed_ast: Any, span_context: Any) -> bool:
-    """
-    Validate DML AST structure for security using PostgreSQL official parsing.
-
-    Args:
-        parsed_ast: Parsed SQLGlot AST
-        span_context: Span context for logging
-
-    Returns:
-        bool: True if AST is secure, False otherwise
-    """
-    try:
-        span_context.add_info_event("Starting DML AST security validation")
-
-        # Check for multiple statement injection
-        if _contains_multiple_dml_statements(parsed_ast):
-            span_context.add_error_event(
-                "Multiple statements detected (potential injection)"
+def _validate_name_pattern(
+    names: list, name_type: str, uid: str, span_context: Any, m: Any
+) -> Any:
+    """Validate name pattern."""
+    pattern = r"^[a-zA-Z_]+$"
+    for name in names:
+        if not bool(re.match(pattern, name)):
+            m.in_error_count(
+                CodeEnum.DMLNotAllowed.code,
+                lables={"uid": uid},
+                span=span_context,
             )
-            return False
-        span_context.add_info_event("✓ Multiple statement check passed")
-
-        # Validate all identifiers in the AST
-        if not _validate_dml_identifiers(parsed_ast):
-            span_context.add_error_event("Invalid identifiers detected")
-            return False
-        span_context.add_info_event("✓ Identifier validation passed")
-
-        # Check for dangerous functions or expressions
-        if _contains_dangerous_expressions(parsed_ast, span_context):
-            span_context.add_error_event("Dangerous expressions detected")
-            return False
-        span_context.add_info_event("✓ Dangerous expression check passed")
-
-        # Validate table references
-        if not _validate_table_references(parsed_ast):
-            span_context.add_error_event("Invalid table references")
-            return False
-        span_context.add_info_event("✓ Table reference validation passed")
-
-        span_context.add_info_event("All DML AST security checks passed")
-        return True
-
-    except Exception as e:
-        span_context.add_error_event(
-            f"Exception in DML AST security validation: {str(e)}"
-        )
-        return False
-
-
-def _contains_multiple_dml_statements(parsed_ast: Any) -> bool:
-    """
-    Check if AST contains multiple DML statements using SQLGlot's official traversal.
-
-    This function uses SQLGlot's find_all method to accurately count top-level
-    DML statements, which is more reliable than regex-based approaches.
-    """
-    # Count top-level DML statement nodes using SQLGlot's AST traversal
-    dml_types = (Select, Insert, Update, Delete)
-
-    # Count all DML statements in the entire AST
-    all_statements = list(parsed_ast.find_all(*dml_types))
-
-    # For security, we need to ensure there's only one top-level statement
-    # Subqueries are allowed (they're part of the single statement)
-    # But multiple independent statements indicate potential injection
-
-    # The root node should be one of our DML types
-    if not isinstance(parsed_ast, dml_types):
-        return True  # Root is not a DML statement
-
-    # Count statements at the same level as the root
-    # This is more complex but necessary for accurate detection
-    return len(all_statements) > _count_expected_statements(parsed_ast)
-
-
-def _count_expected_statements(parsed_ast: Any) -> int:
-    """
-    Count the expected number of statements for a given AST structure.
-
-    This helps distinguish between legitimate subqueries and injection attacks.
-    """
-    expected_count = 1  # The main statement
-
-    # Add expected counts for legitimate subqueries
-    if isinstance(parsed_ast, Select):
-        # SELECT statements can have subqueries in various places
-        subqueries = list(parsed_ast.find_all(Subquery))
-        expected_count += len(subqueries)
-
-    elif isinstance(parsed_ast, Insert):
-        # INSERT can have SELECT subqueries
-        subqueries = list(parsed_ast.find_all(Subquery))
-        expected_count += len(subqueries)
-
-    elif isinstance(parsed_ast, (Update, Delete)):
-        # UPDATE/DELETE can have subqueries in WHERE clauses
-        subqueries = list(parsed_ast.find_all(Subquery))
-        expected_count += len(subqueries)
-
-    return expected_count
-
-
-def _validate_dml_identifiers(parsed_ast: Any) -> bool:
-    """
-    Validate all identifiers in the DML AST using PostgreSQL standards.
-
-    This function checks identifiers using SQLGlot's AST structure and PostgreSQL's
-    official identifier rules, while properly handling special SQL elements.
-    """
-    # Use SQLGlot's find_all method to get all identifier nodes
-    identifiers = list(parsed_ast.find_all(Identifier))
-
-    for identifier in identifiers:
-        if not identifier.this:
-            continue
-
-        identifier_str = str(identifier.this)
-
-        # Skip validation for SQL keywords and special tokens that SQLGlot
-        # might parse as identifiers in certain contexts
-        sql_keywords_and_specials = {
-            "*",
-            "null",
-            "true",
-            "false",
-            "default",
-            "current_timestamp",
-            "current_date",
-            "current_time",
-            "current_user",
-            "session_user",
-            "user",
-            "now",
-            "today",
-            "yesterday",
-            "tomorrow",
-        }
-
-        if identifier_str.lower() in sql_keywords_and_specials:
-            continue
-
-        # Additional security check: detect suspicious identifier patterns
-        # that are commonly used in SQL injection attacks
-        if _is_suspicious_identifier_pattern(identifier_str):
-            return False
-
-        # Validate the identifier according to PostgreSQL rules
-        if not _is_valid_postgresql_identifier(identifier_str):
-            return False
-
-    return True
-
-
-def _is_suspicious_identifier_pattern(identifier: str) -> bool:
-    """
-    Detect suspicious identifier patterns commonly used in SQL injection.
-
-    This function uses string analysis based on PostgreSQL security best practices
-    to identify patterns often used in injection attacks but rarely in legitimate queries.
-    Uses direct string matching rather than regex for better performance and clarity.
-    """
-    # Convert to lowercase for pattern matching
-    lower_id = identifier.lower()
-
-    # Suspicious patterns commonly used in SQL injection (using direct string matching)
-    suspicious_keywords = [
-        # Information schema access patterns
-        "information_schema",
-        "pg_catalog",
-        "pg_class",
-        "pg_tables",
-        "pg_database",
-        # System function patterns
-        "@@version",
-        "@@servername",
-        # SQL injection payloads
-        "union_select",
-        "union select",
-    ]
-
-    # Check against suspicious keywords using direct string matching
-    for keyword in suspicious_keywords:
-        if keyword in lower_id:
-            return True
-
-    # Check for hexadecimal patterns (0x followed by hex digits)
-    if lower_id.startswith("0x") and len(lower_id) > 2:
-        hex_part = lower_id[2:]
-        # Check if all characters after 0x are valid hex digits
-        if all(c in "0123456789abcdef" for c in hex_part):
-            return True
-
-    # Check for function call patterns in identifiers (suspicious)
-    function_patterns = [
-        "char(",
-        "concat(",
-        "unhex(",
-        "convert(",
-        "user()",
-        "database()",
-    ]
-
-    for pattern in function_patterns:
-        if pattern in lower_id:
-            return True
-
-    # Check for boolean injection patterns
-    boolean_patterns = [
-        "1=1",
-        "0=0",
-        "true=true",
-        "'1'='1'",
-        '"1"="1"',
-    ]
-
-    for pattern in boolean_patterns:
-        if pattern in lower_id:
-            return True
-
-    return False
-
-
-def _contains_dangerous_expressions(parsed_ast: Any, span_context: Any) -> bool:
-    """
-    Check for dangerous expressions based on PostgreSQL official documentation.
-
-    This function follows PostgreSQL security best practices by implementing
-    context-aware detection rather than blanket function blocking. Based on:
-    - https://www.postgresql.org/docs/current/functions-info.html
-    - https://www.postgresql.org/docs/current/functions-string.html
-    - https://www.postgresql.org/docs/current/sql-expressions.html
-
-    The approach focuses on detecting injection patterns rather than blocking
-    legitimate PostgreSQL functionality.
-    """
-
-    # Truly dangerous functions that should NEVER be allowed in user queries
-    # These pose direct security risks regardless of context
-    absolutely_dangerous_functions = {
-        # File system access functions
-        "pg_read_file",
-        "pg_read_binary_file",
-        "pg_write_file",
-        "pg_ls_dir",
-        "pg_stat_file",
-        # Process control functions
-        "pg_sleep",
-        "pg_cancel_backend",
-        "pg_terminate_backend",
-        # System administration functions
-        "pg_reload_conf",
-        "pg_rotate_logfile",
-        # System commands
-        "copy_from_program",
-        "copy_to_program",
-        # Configuration modification functions
-        "set_config",
-    }
-
-    # Information disclosure functions - dangerous in WHERE clauses but may be OK in SELECT
-    # These are commonly used in SQL injection for information gathering
-    info_disclosure_functions = {
-        "current_catalog",
-        "current_database",
-        "current_role",
-        "current_schema",
-        "current_schemas",
-        "current_user",
-        "session_user",
-        "user",
-        "version",
-        "pg_backend_pid",
-        "pg_postmaster_start_time",
-        "pg_conf_load_time",
-        "current_setting",  # Read-only current_setting may be OK in some contexts
-    }
-
-    # String functions commonly used in blind SQL injection attacks
-    # These are dangerous when used with information disclosure functions
-    blind_injection_functions = {
-        "length",
-        "char_length",
-        "character_length",
-        "octet_length",
-        "bit_length",
-        "ascii",
-        "chr",
-        "substring",
-        "substr",
-        "left",
-        "right",
-        "position",
-        "strpos",
-    }
-
-    # Check for absolutely dangerous functions (always block)
-    for func in parsed_ast.find_all(Func):
-        if hasattr(func, "this") and func.this:
-            func_name = str(func.this).lower()
-            if func_name in absolutely_dangerous_functions:
-                span_context.add_error_event(
-                    f"Absolutely dangerous function detected: {func_name}"
-                )
-                return True
-
-    # Context-aware detection for information disclosure and blind injection patterns
-    return _detect_injection_patterns(
-        parsed_ast, info_disclosure_functions, blind_injection_functions, span_context
-    )
-
-
-def _extract_all_functions(parsed_ast: Any) -> list:
-    """Extract all functions from the parsed AST."""
-    all_functions = []
-    for func in parsed_ast.find_all(Func):
-        if hasattr(func, "this") and func.this:
-            func_name = str(func.this).lower()
-            all_functions.append((func_name, func))
-    return all_functions
-
-
-def _check_info_disclosure_in_where(
-    parsed_ast: Any, info_functions: set, span_context: Any
-) -> bool:
-    """Check for information disclosure functions in WHERE clauses."""
-    if not isinstance(parsed_ast, Select) or not parsed_ast.args.get("where"):
-        return False
-
-    where_functions = []
-    for func in parsed_ast.args["where"].find_all(Func):
-        if hasattr(func, "this") and func.this:
-            where_functions.append(str(func.this).lower())
-
-    info_in_where = [f for f in where_functions if f in info_functions]
-    if info_in_where:
-        span_context.add_error_event(
-            f"Information disclosure in WHERE clause: {info_in_where}"
-        )
-        return True
-    return False
-
-
-def _check_blind_injection_pattern(
-    info_funcs_present: list, blind_funcs_present: list, span_context: Any
-) -> bool:
-    """Check for blind injection patterns."""
-    if info_funcs_present and blind_funcs_present:
-        span_context.add_error_event(
-            f"Blind injection pattern detected: {info_funcs_present} + {blind_funcs_present}"
-        )
-        return True
-    return False
-
-
-def _check_multiple_info_disclosure(
-    info_funcs_present: list, span_context: Any
-) -> bool:
-    """Check for multiple information disclosure functions."""
-    if len(info_funcs_present) > 1:
-        span_context.add_error_event(
-            f"Multiple info disclosure functions: {info_funcs_present}"
-        )
-        return True
-    return False
-
-
-def _detect_injection_patterns(
-    parsed_ast: Any, info_functions: set, blind_functions: set, span_context: Any
-) -> bool:
-    """
-    Detect SQL injection patterns using context-aware analysis.
-
-    This function looks for suspicious combinations and contexts rather than
-    blocking individual functions, following PostgreSQL best practices.
-    """
-    # Get all functions in the query
-    all_functions = _extract_all_functions(parsed_ast)
-
-    # Pattern 1: Information disclosure functions in WHERE clauses (high risk)
-    if _check_info_disclosure_in_where(parsed_ast, info_functions, span_context):
-        return True
-
-    # Extract function lists for subsequent checks
-    info_funcs_present = [f for f, _ in all_functions if f in info_functions]
-    blind_funcs_present = [f for f, _ in all_functions if f in blind_functions]
-
-    # Pattern 2: Blind injection patterns (info + string functions together)
-    if _check_blind_injection_pattern(
-        info_funcs_present, blind_funcs_present, span_context
-    ):
-        return True
-
-    # Pattern 3: Multiple information disclosure functions (enumeration attack)
-    if _check_multiple_info_disclosure(info_funcs_present, span_context):
-        return True
-
-    # Pattern 4: Suspicious equality comparisons with blind functions using AST analysis
-    if blind_funcs_present:
-        if _detect_suspicious_function_comparisons(
-            parsed_ast, blind_functions, span_context
-        ):
-            return True
-
-    return False
-
-
-def _detect_suspicious_function_comparisons(
-    parsed_ast: Any, blind_functions: set, span_context: Any
-) -> bool:
-    """
-    Detect suspicious function comparisons using SQLGlot's AST analysis.
-
-    This function uses PostgreSQL's official AST parsing approach to identify
-    patterns commonly used in SQL injection attacks, such as:
-    - length(function()) = numeric_literal
-    - ascii(function()) = numeric_literal
-    - function() = literal AND '1' = '1'
-    """
-    from sqlglot.expressions import EQ, And, Literal
-
-    # Find all equality expressions in the AST
-    for eq_expr in parsed_ast.find_all(EQ):
-        left_side = eq_expr.this
-        right_side = eq_expr.expression
-
-        # Check if left side contains blind injection functions
-        left_functions = []
-        for func in left_side.find_all(Func):
-            if hasattr(func, "this") and func.this:
-                func_name = str(func.this).lower()
-                if func_name in blind_functions:
-                    left_functions.append(func_name)
-
-        # Pattern: blind_function() = numeric_literal
-        if left_functions and isinstance(right_side, Literal):
-            if right_side.is_number:
-                span_context.add_error_event(
-                    f"Suspicious function-to-number comparison: {left_functions} = {right_side}"
-                )
-                return True
-
-    # Check for AND chains with suspicious patterns
-    for and_expr in parsed_ast.find_all(And):
-        # Look for patterns like: condition AND '1' = '1'
-        if _is_suspicious_and_chain(and_expr, blind_functions):
             span_context.add_error_event(
-                "Suspicious AND chain with blind function and tautology"
+                f"{name_type}: '{name}' does not conform to rules, only letters and underscores are supported"
             )
-            return True
-
-    return False
-
-
-def _collect_and_expression_parts(and_expr: Any) -> list:
-    """Collect all parts of an AND expression chain recursively."""
-    and_parts = []
-
-    def collect_parts(expr: Any) -> None:
-        if hasattr(expr, "this") and hasattr(expr, "expression"):
-            left = expr.this
-            right = expr.expression
-
-            # If left is another AND, recursively collect its parts
-            if str(type(left).__name__) == "And":
-                collect_parts(left)
-            else:
-                and_parts.append(left)
-
-            # If right is another AND, recursively collect its parts
-            if str(type(right).__name__) == "And":
-                collect_parts(right)
-            else:
-                and_parts.append(right)
-
-    collect_parts(and_expr)
-    return and_parts
+            return format_response(
+                code=CodeEnum.DMLNotAllowed.code,
+                message=f"{name_type}: '{name}' does not conform to rules, only letters and underscores are supported",
+                sid=span_context.sid,
+            )
+    return None
 
 
-def _has_blind_function_in_equality(part: Any, blind_functions: set) -> bool:
-    """Check if an equality expression contains blind functions."""
-    if str(type(part).__name__) != "EQ":
-        return False
-
-    left = part.this
-    for func in left.find_all(Func):
-        if hasattr(func, "this") and func.this:
-            func_name = str(func.this).lower()
-            if func_name in blind_functions:
-                return True
-    return False
-
-
-def _is_tautology_equality(part: Any) -> bool:
-    """Check if an expression is a tautology like '1' = '1'."""
-    from sqlglot.expressions import Literal
-
-    if str(type(part).__name__) != "EQ":
-        return False
-
-    left = part.this
-    right = part.expression
-
-    return (
-        isinstance(left, Literal)
-        and isinstance(right, Literal)
-        and str(left) == str(right)
-    )
+def _validate_reserved_keywords(keys: list, uid: str, span_context: Any, m: Any) -> Any:
+    """Validate reserved keywords."""
+    for key_name in keys:
+        if key_name.lower() in PGSQL_INVALID_KEY:
+            m.in_error_count(
+                CodeEnum.DMLNotAllowed.code,
+                lables={"uid": uid},
+                span=span_context,
+            )
+            span_context.add_error_event(
+                f"Key name '{key_name}' is a reserved keyword and is not allowed"
+            )
+            return format_response(
+                code=CodeEnum.DMLNotAllowed.code,
+                message=f"Key name '{key_name}' is a reserved keyword and is not allowed",
+                sid=span_context.sid,
+            )
+    return None
 
 
-def _is_suspicious_and_chain(and_expr: Any, blind_functions: set) -> bool:
-    """
-    Check if an AND expression contains suspicious patterns using AST analysis.
-
-    Detects patterns like: blind_function() = value AND '1' = '1'
-    """
-    # Get all parts of the AND chain
-    and_parts = _collect_and_expression_parts(and_expr)
-
-    has_blind_function_comparison = False
-    has_tautology = False
-
-    for part in and_parts:
-        if _has_blind_function_in_equality(part, blind_functions):
-            has_blind_function_comparison = True
-
-        if _is_tautology_equality(part):
-            has_tautology = True
-
-    return has_blind_function_comparison and has_tautology
-
-
-def _validate_table_references(parsed_ast: Any) -> bool:
-    """Validate table references in the DML AST."""
-    tables = list(parsed_ast.find_all(Table))
-
-    # For SELECT statements, tables are optional (e.g., SELECT 1, SELECT NOW())
-    # For INSERT, UPDATE, DELETE statements, at least one table is required
-    if isinstance(parsed_ast, Select):
-        # SELECT can work without tables
-        pass
-    elif isinstance(parsed_ast, (Insert, Update, Delete)):
-        # These statements require at least one table
-        if not tables:
-            return False
-
-    # Validate all table names that are present
-    for table in tables:
-        if not _is_valid_postgresql_table_name(table):
-            return False
-
-    return True
-
-
-def _is_valid_postgresql_identifier(identifier: str) -> bool:
-    """
-    Check if identifier is valid for PostgreSQL based on official documentation.
-
-    PostgreSQL identifiers:
-    - Must begin with a letter (a-z, A-Z), underscore (_), or non-ASCII letter
-    - Subsequent characters can be letters, underscores, digits (0-9), or dollar signs ($)
-    - Maximum length is 63 bytes (NAMEDATALEN-1)
-    - Case-insensitive unless quoted
-    - Quoted identifiers can contain any character except null byte
-    """
-    if not identifier:
-        return False
-
-    import string
-
-    # Allow quoted identifiers (they can contain almost any character)
-    if identifier.startswith('"') and identifier.endswith('"'):
-        # Must have content between quotes and not exceed PostgreSQL limits
-        content = identifier[1:-1]
-        if not content or len(identifier) > 65:  # 63 + 2 quotes
-            return False
-        # Quoted identifiers cannot contain null bytes but allow everything else
-        return "\x00" not in content
-
-    # For unquoted identifiers, follow PostgreSQL standard
-    if len(identifier) > 63:
-        return False
-
-    # Must start with letter or underscore (PostgreSQL standard)
-    valid_start_chars = string.ascii_letters + "_"
-    if identifier[0] not in valid_start_chars:
-        return False
-
-    # Subsequent characters can be letters, digits, underscores, or dollar signs
-    valid_chars = string.ascii_letters + string.digits + "_$"
-    return all(c in valid_chars for c in identifier)
-
-
-def _is_valid_postgresql_table_name(table: Any) -> bool:
-    """
-    Check if table name is valid for PostgreSQL with practical considerations.
-
-    While PostgreSQL standard requires identifiers to start with letters,
-    many systems use numeric prefixes in table names. This function provides
-    a balanced approach between security and practicality.
-    """
-    if not hasattr(table, "name") or not table.name:
-        return False
-
-    table_name = str(table.name)
-
-    # For quoted table names, use strict PostgreSQL rules
-    if table_name.startswith('"') and table_name.endswith('"'):
-        return _is_valid_postgresql_identifier(table_name)
-
-    # For unquoted table names, be more permissive to support existing systems
-    # that may use table names like 'table001', 'user_2024', etc.
-    return _is_valid_practical_table_identifier(table_name)
-
-
-def _is_valid_practical_table_identifier(identifier: str) -> bool:
-    """
-    Validate table identifiers with practical considerations for existing systems.
-
-    This allows table names that start with numbers (common in many systems)
-    while maintaining security by validating character composition.
-    """
-    if not identifier or len(identifier) > 63:
-        return False
-
-    import string
-
-    # Allow letters, digits, underscores for practical table naming
-    valid_chars = string.ascii_letters + string.digits + "_"
-
-    # First character can be letter, digit, or underscore (more permissive)
-    # This allows common patterns like: table001, user_data, 2024_logs
-    if identifier[0] not in valid_chars:
-        return False
-
-    # All characters must be valid
-    if not all(c in valid_chars for c in identifier):
-        return False
-
-    # Reject identifiers that are only numbers (potential security risk)
-    if identifier.isdigit():
-        return False
-
-    # Reject identifiers that start and end with underscores (suspicious pattern)
-    if identifier.startswith("_") and identifier.endswith("_"):
-        return False
-
-    return True
-
-
-def _reconstruct_safe_dml_statement(
-    parsed_ast: Any, statement_type: str, span_context: Any
-) -> str:
-    """
-    Reconstruct safe DML statement from AST using PostgreSQL dialect.
-
-    Args:
-        parsed_ast: Parsed SQLGlot AST
-        statement_type: Type of DML statement
-        span_context: Span context for logging
-
-    Returns:
-        str: Safe reconstructed SQL or empty string if reconstruction fails
-    """
+async def _validate_dml_legality(dml: str, uid: str, span_context: Any, m: Any) -> Any:
     try:
-        # Use PostgreSQL dialect for reconstruction
-        safe_sql = parsed_ast.sql(dialect="postgres", pretty=True)
+        parsed = sqlglot.parse_one(dml, dialect="postgres")
 
-        if not safe_sql or not safe_sql.strip():
-            return ""
+        # Validate comparison operation nodes
+        error_result = _validate_comparison_nodes(parsed, uid, span_context, m)
+        if error_result:
+            return error_result
 
-        # Ensure the SQL starts with expected statement type
-        sql_upper = safe_sql.strip().upper()
-        if not sql_upper.startswith(statement_type):
-            return ""
+        # Collect column names and keys that need validation
+        columns_to_validate, keys_to_validate = _collect_columns_and_keys(parsed)
 
-        span_context.add_info_event(f"original_dml: {statement_type}")
-        return safe_sql.strip()
+        # Validate column names
+        error_result = _validate_name_pattern(
+            columns_to_validate, "Column name", uid, span_context, m
+        )
+        if error_result:
+            return error_result
 
-    except Exception:
-        return ""
+        # Validate key names
+        error_result = _validate_name_pattern(
+            keys_to_validate, "Key name", uid, span_context, m
+        )
+        if error_result:
+            return error_result
 
+        # Validate reserved keywords
+        error_result = _validate_reserved_keywords(
+            keys_to_validate, uid, span_context, m
+        )
+        if error_result:
+            return error_result
 
-def _validate_reconstructed_dml(
-    safe_sql: str, statement_type: str, span_context: Any
-) -> bool:
-    """
-    Validate that the reconstructed DML is safe and contains expected structure.
-
-    Args:
-        safe_sql: Reconstructed SQL string
-        statement_type: Expected statement type
-        span_context: Span context for logging
-
-    Returns:
-        bool: True if SQL is valid and safe, False otherwise
-    """
-    try:
-        # Re-parse the reconstructed SQL to ensure it's valid
-        reparsed = parse_one(safe_sql, dialect="postgres", error_level="raise")
-
-        if not reparsed:
-            return False
-
-        # Verify the statement type matches
-        restatement_type = _extract_dml_statement_info(reparsed)
-        if restatement_type != statement_type:
-            return False
-
-        # Ensure no additional security issues were introduced
-        if not _validate_dml_ast_security(reparsed, span_context):
-            return False
-
-        return True
-
-    except Exception:
-        return False
+        return None
+    except Exception as parse_error:  # pylint: disable=broad-except
+        span_context.record_exception(parse_error)
+        m.in_error_count(
+            CodeEnum.SQLParseError.code,
+            lables={"uid": uid},
+            span=span_context,
+        )
+        return format_response(
+            code=CodeEnum.SQLParseError.code,
+            message="SQL parsing failed",
+            sid=span_context.sid,
+        )
 
 
 async def _validate_and_prepare_dml(
@@ -998,11 +480,6 @@ async def _validate_and_prepare_dml(
     dml = dml_input.dml
     env = dml_input.env
     space_id = dml_input.space_id
-
-    # Validate SQL injection risks
-    injection_error = _validate_sql_injection(dml, span_context)
-    if injection_error:
-        return None, injection_error
 
     need_check = {
         "app_id": app_id,
@@ -1034,12 +511,16 @@ async def _validate_and_prepare_dml(
 
 
 async def _process_dml_statements(
-    dmls: List[str], app_id: str, uid: str, env: str, span_context: Any
+    dmls: List[str], app_id: str, uid: str, env: str, span_context: Any, m: Any
 ) -> Any:
     """Process and rewrite DML statements."""
     rewrite_dmls = []
     for statement in dmls:
-        rewrite_dml, insert_ids = rewrite_dml_with_uid_and_limit(
+        error_legality = await _validate_dml_legality(statement, uid, span_context, m)
+        if error_legality:
+            return None, error_legality
+
+        rewrite_dml, insert_ids, params = rewrite_dml_with_uid_and_limit(
             dml=statement,
             app_id=app_id,
             uid=uid,
@@ -1047,14 +528,17 @@ async def _process_dml_statements(
             env=env,
             span_context=span_context,
         )
-        span_context.add_info_event(f"rewrite dml: {rewrite_dml}")
+        span_context.add_info_event(f"rewrite dml sql: {rewrite_dml}")
+        span_context.add_info_event(f"rewrite dml params: {params}")
+        span_context.add_info_event(f"rewrite dml insert_ids: {insert_ids}")
         rewrite_dmls.append(
             {
                 "rewrite_dml": rewrite_dml,
                 "insert_ids": insert_ids,
+                "params": params,
             }
         )
-    return rewrite_dmls
+    return rewrite_dmls, None
 
 
 @exec_dml_router.post("/exec_dml", response_class=JSONResponse)
@@ -1102,9 +586,11 @@ async def exec_dml(
             if error_split:
                 return error_split  # type: ignore[no-any-return]
 
-            rewrite_dmls = await _process_dml_statements(
-                dmls, app_id, uid, env, span_context
+            rewrite_dmls, error_legality = await _process_dml_statements(
+                dmls, app_id, uid, env, span_context, m
             )
+            if error_legality:
+                return error_legality  # type: ignore[no-any-return]
 
             final_exec_success_res, exec_time, error_exec = await _exec_dml_sql(
                 db, rewrite_dmls, uid, span_context, m
@@ -1153,8 +639,13 @@ async def _exec_dml_sql(
         for dml_info in rewrite_dmls:
             rewrite_dml = dml_info["rewrite_dml"]
             insert_ids = dml_info["insert_ids"]
+            params = dml_info.get("params", {})
 
-            result = await exec_sql_statement(db, rewrite_dml)
+            # If there are parameters, use parameterized query, otherwise execute directly
+            if params:
+                result = await parse_and_exec_sql(db, rewrite_dml, params)
+            else:
+                result = await exec_sql_statement(db, rewrite_dml)
             try:
                 exec_result = result.mappings().all()
                 exec_result_dicts = [dict(row) for row in exec_result]

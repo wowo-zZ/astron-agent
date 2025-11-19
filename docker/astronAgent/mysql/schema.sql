@@ -13692,6 +13692,7 @@ $coreText',1,'新决策节点的prompt','2000-01-01 00:00:00','2025-07-23 15:22:
         "id": "",
         "name": "outputList",
         "nameErrMsg": "",
+        "properties": [],
         "schema": {
           "default": "Execution result",
           "type": "array-object"
@@ -13752,6 +13753,7 @@ $coreText',1,'新决策节点的prompt','2000-01-01 00:00:00','2025-07-23 15:22:
       {
         "id": "",
         "name": "outputList",
+        "properties": [],
         "nameErrMsg": "",
         "schema": {
           "default": "Execution result",
