@@ -25,7 +25,7 @@ http {
 
         location = /runtime-config.js {
             expires -1;
-            add_header Cache-Control "no-cache, no-store, must-revalidate";
+            add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0";
             add_header Pragma "no-cache";
         }
 

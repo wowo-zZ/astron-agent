@@ -1,6 +1,6 @@
 const translation = {
   rulesName: 'Please enter a name', //'请输入名称',
-  rulesDosc: 'Please enter a description', //'请输入描述',
+  rulesDesc: 'Please enter a description', //'请输入描述',
   submitFailed: 'Submit failed', //'提交失败',
   rulesContent: 'Please enter content', //'请输入内容',
   aiGenFailed: 'Generation failed', //'生成失败',
@@ -64,6 +64,7 @@ const translation = {
     avatarPreview: 'Avatar Preview', //'形象展示',
     cancel: 'Cancel', //'取消',
     confirm: 'Use', //'使用',
+    chooseAvatar: 'Choose Avatar', //'选择头像',
   },
   defVcnList: {
     name1: 'Lin Si Yu', //'林思语',

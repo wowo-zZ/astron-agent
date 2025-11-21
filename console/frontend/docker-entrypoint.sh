@@ -29,6 +29,8 @@ window.__APP_CONFIG__.CASDOOR_ID = "$CASDOOR_ID_ESCAPED";
 window.__APP_CONFIG__.CASDOOR_APP = "$CASDOOR_APP_ESCAPED";
 window.__APP_CONFIG__.CASDOOR_ORG = "$CASDOOR_ORG_ESCAPED";
 window.__APP_CONFIG__.SPARK_APP_ID = "$SPARK_APP_ID_ESCAPED";
+
+console.log('[runtime-config] executed, window.__APP_CONFIG__ = ', window.__APP_CONFIG__);
 EOF
 
 exec nginx -g "daemon off;"

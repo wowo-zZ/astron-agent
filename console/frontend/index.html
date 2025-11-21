@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
@@ -12,16 +12,9 @@
   <body>
     <div id="root"></div>
     <script>
-      // Dynamic loading with cache busting for runtime-config.js
-      (function () {
-        const script = document.createElement('script');
-        script.src = '/runtime-config.js?t=' + Date.now();
-        script.onerror = function () {
-          console.error('Failed to load runtime-config.js');
-        };
-        document.head.appendChild(script);
-      })();
+      window.__APP_CONFIG__ = window.__APP_CONFIG__ || {};
     </script>
+    <script src="/runtime-config.js"></script>
     <script>
       const RELOAD_FLAG = '__VITE_PRELOAD_FIXED_AT__';
       let reloading = false;

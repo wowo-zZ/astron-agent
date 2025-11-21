@@ -284,7 +284,7 @@ const ControlModal = ({
         </div> */}
 
         <div className={styles.content_item}>
-          <LanguageSwitcher />
+          <LanguageSwitcher className={styles.content_item} />
         </div>
 
         <div

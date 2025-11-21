@@ -650,7 +650,7 @@ const VirtualConfig: React.FC<HeaderFeedbackModalProps> = ({
                   maxLength={200}
                   className={styles.input_area}
                   autoSize={{ minRows: 7, maxRows: 7 }}
-                  placeholder={t('virtualConfig.placeholderDesc')}
+                  placeholder={t('virtualConfig.placeholderDescription')}
                 />
               </Form.Item>
               <div className={styles.inputBottom}>

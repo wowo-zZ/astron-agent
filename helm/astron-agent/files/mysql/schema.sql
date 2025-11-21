@@ -14505,25 +14505,27 @@ CREATE TABLE `hit_test_history`
 -- Table structure for knowledge
 -- ----------------------------
 DROP TABLE IF EXISTS `knowledge`;
-CREATE TABLE `knowledge`
-(
-    `id`               varchar(64) NOT NULL COMMENT 'Primary key ID',
-    `file_id`          varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci  DEFAULT NULL COMMENT 'User ID',
-    `content`          text,
-    `char_count`       varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
-    `name`             varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
-    `description`      varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
-    `enabled`          bit(1)                                                        DEFAULT b'0',
-    `source`           bit(1)                                                        DEFAULT b'1',
-    `test_hit_count`   bigint                                                        DEFAULT NULL,
-    `dialog_hit_count` bigint                                                        DEFAULT NULL,
-    `core_repo_name`   text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
-    `deleted`          bit(1)      NOT NULL                                          DEFAULT b'0',
-    `created_at`       datetime    NOT NULL,
-    `updated_at`       datetime                                                      DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`),
-    KEY                `flow_id` (`char_count`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+CREATE TABLE `knowledge` (
+                             `id` varchar(64) NOT NULL COMMENT 'Primary key ID',
+                             `file_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT 'User ID',
+                             `content` text,
+                             `char_count` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+                             `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+                             `description` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+                             `enabled` bit(1) DEFAULT b'0',
+                             `source` bit(1) DEFAULT b'1',
+                             `test_hit_count` bigint DEFAULT NULL,
+                             `dialog_hit_count` bigint DEFAULT NULL,
+                             `core_repo_name` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+                             `deleted` bit(1) NOT NULL DEFAULT b'0',
+                             `created_at` datetime NOT NULL,
+                             `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+                             `seq_id` bigint NOT NULL AUTO_INCREMENT COMMENT 'Auto-increment sequence ID to preserve insertion order',
+                             PRIMARY KEY (`id`),
+                             UNIQUE KEY `uk_seq_id` (`seq_id`),
+                             KEY `flow_id` (`char_count`) USING BTREE,
+                             KEY `idx_file_seq` (`file_id`,`seq_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=9660 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Table structure for maas_template
@@ -14829,18 +14831,20 @@ CREATE TABLE `notifications`
 -- Table structure for preview_knowledge
 -- ----------------------------
 DROP TABLE IF EXISTS `preview_knowledge`;
-CREATE TABLE `preview_knowledge`
-(
-    `id`         varchar(64) NOT NULL COMMENT 'Primary key ID',
-    `file_id`    varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci  DEFAULT NULL COMMENT 'User ID',
-    `content`    text,
-    `char_count` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
-    `deleted`    bit(1)      NOT NULL                                          DEFAULT b'0',
-    `created_at` datetime    NOT NULL,
-    `updated_at` datetime                                                      DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`),
-    KEY          `flow_id` (`char_count`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+CREATE TABLE `preview_knowledge` (
+                                     `id` varchar(64) NOT NULL COMMENT 'Primary key ID',
+                                     `file_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT 'User ID',
+                                     `content` text,
+                                     `char_count` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+                                     `deleted` bit(1) NOT NULL DEFAULT b'0',
+                                     `created_at` datetime NOT NULL,
+                                     `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+                                     `seq_id` bigint NOT NULL AUTO_INCREMENT COMMENT 'Auto-increment sequence ID to preserve insertion order',
+                                     PRIMARY KEY (`id`),
+                                     UNIQUE KEY `uk_seq_id` (`seq_id`),
+                                     KEY `flow_id` (`char_count`) USING BTREE,
+                                     KEY `idx_file_seq` (`file_id`,`seq_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=14591 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Table structure for prompt_template
