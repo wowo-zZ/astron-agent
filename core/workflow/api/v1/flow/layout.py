@@ -300,7 +300,7 @@ def get_flow_info(
         return Resp.success(mcp_input_schema, current_span.sid)
 
 
-@router.post("/protocolcompare/save")
+@router.post("/protocol/compare/save")
 def save_comparisons(
     chat_input: SaveComparisonVo,
     session: Session = Depends(get_session),

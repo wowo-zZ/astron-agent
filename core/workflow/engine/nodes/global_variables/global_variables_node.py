@@ -6,6 +6,7 @@ It includes a VariablesManage class for cache operations and a GlobalVariablesNo
 that extends BaseNode to handle global variable operations (set/get) in workflow nodes.
 """
 
+import asyncio
 import json
 from typing import Any, Literal
 
@@ -175,12 +176,12 @@ class GlobalVariablesNode(BaseNode):
                     inputs[key] = variable_pool.get_variable(
                         node_id=self.node_id, key_name=key, span=span
                     )
-                    var_manager.add_variable(key, inputs[key])
+                    await asyncio.to_thread(var_manager.add_variable, key, inputs[key])
                 span.add_info_events({"set": json.dumps(inputs, ensure_ascii=False)})
 
             # Handle 'get' operation: retrieve global variables
             elif self.method == "get":
-                global_vars = var_manager.get_all_variables()
+                global_vars = await asyncio.to_thread(var_manager.get_all_variables)
                 for key in self.output_identifier:
                     if key in global_vars:
                         # Use global variable if available

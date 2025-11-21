@@ -4,6 +4,7 @@ from typing import Any, List, Optional
 from pydantic import BaseModel, Field, field_validator
 from pydantic_settings import BaseSettings
 
+from workflow.consts.database import PGSQL_INVALID_KEY
 from workflow.exception.e import CustomException
 from workflow.exception.errors.err_code import CodeEnum
 
@@ -140,9 +141,37 @@ class FileConfig(BaseSettings):
         return pattern
 
 
+class PgsqlConfig(BaseSettings):
+    """
+    PostgreSQL configuration model.
+
+    This model represents the PostgreSQL configuration with its keyword list.
+    """
+
+    model_config = {"env_prefix": "", "case_sensitive": False}
+    keyword_list: List[str] = Field(default=PGSQL_INVALID_KEY, alias="KEYWORD_LIST")
+
+    def is_valid(self, key: str, field_type: str) -> None:
+        """
+        Validate if the key is valid.
+
+        :param key: The key to validate
+        :param field_type: The type of the field
+        :raises CustomException: If the key is not valid
+        """
+        key_lower = key.lower()
+        if key_lower in PGSQL_INVALID_KEY:
+            raise CustomException(
+                err_code=CodeEnum.PG_SQL_PARAM_ERROR,
+                err_msg=f"Invalid {field_type}: {key} is a reserved keyword in PostgreSQL",
+                cause_error=f"Invalid {field_type}: {key} is a reserved keyword in PostgreSQL",
+            )
+
+
 class WorkflowConfig(BaseModel):
     """
     Workflow configuration model.
     """
 
     file_config: FileConfig = Field(default_factory=FileConfig)
+    pgsql_config: PgsqlConfig = Field(default_factory=PgsqlConfig)

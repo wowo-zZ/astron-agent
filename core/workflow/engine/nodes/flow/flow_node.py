@@ -10,6 +10,7 @@ from aiohttp import ClientTimeout
 from pydantic import Field
 
 from workflow.consts.engine.chat_status import ChatStatus
+from workflow.consts.runtime_env import RuntimeEnv
 from workflow.domain.models.ai_app import App
 from workflow.engine.callbacks.openai_types_sse import GenerateUsage
 from workflow.engine.entities.history import EnableChatHistoryV2, History
@@ -406,13 +407,16 @@ class FlowNode(BaseNode):
             # Construct authorization header
             authorization = f"Bearer {app.api_key}:{app.api_secret}"
 
-        # Set appropriate authentication header based on environment
-        if "127.0.0.1" in url or "dev" in url or "pre" in url or "10.1.87.65" in url:
-            # Use consumer username for local/development environments
-            headers["X-Consumer-Username"] = self.appId
-        else:
+        # Set authentication headers based on runtime environment
+        if not os.getenv("RUNTIME_ENV", RuntimeEnv.Local.value) in [
+            RuntimeEnv.Dev.value,
+            RuntimeEnv.Test.value,
+        ]:
             # Use bearer token for production environments
             headers["Authorization"] = authorization
+        else:
+            # Use consumer username for local environments
+            headers["X-Consumer-Username"] = self.appId
 
         return headers, req_body
 

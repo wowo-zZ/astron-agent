@@ -14,6 +14,7 @@ from starlette.responses import JSONResponse
 from workflow.domain.entities.node_debug_vo import CodeRunVo, NodeDebugVo
 from workflow.domain.entities.response import Resp
 from workflow.engine.entities.node_entities import NodeType
+from workflow.engine.entities.workflow_dsl import WorkflowDSL
 from workflow.engine.nodes.code.code_node import CodeNode
 from workflow.exception.e import CustomException
 from workflow.exception.errors.err_code import CodeEnum
@@ -125,13 +126,10 @@ async def node_debug_old(node_id: str, data: Dict[str, Any]) -> JSONResponse:
     for node in nodes:
         if node.get("id", "") == node_id:
             node_debug_vo = NodeDebugVo(
-                id=data.get("id"),
-                name=data.get("name"),
-                description=data.get("description"),
-                data={
-                    "nodes": [node],
-                    "edges": [],
-                },
+                id=data.get("id", ""),
+                name=data.get("name", ""),
+                description=data.get("description", ""),
+                data=WorkflowDSL(nodes=[node], edges=[]),
             )
             resp = await node_debug(node_debug_vo)
             content = json.loads(resp.body)

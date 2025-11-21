@@ -61,7 +61,15 @@ class PolarisLoader(EnvLoader):
         self.cluster_group = os.getenv("POLARIS_CLUSTER", "")
         self.service_name = os.getenv("POLARIS_SERVICE_NAME", "spark-flow")
         self.version = os.getenv("POLARIS_VERSION", "1.0.0")
-        self.config_file = os.getenv("POLARIS_CONFIG_FILE", "workflow.env")
+        self.config_file = os.getenv("POLARIS_CONFIG_FILE", "config.env")
+        logger.info(
+            f"🔍 Polaris config info: "
+            f"project name = {self.project_name}, "
+            f"cluster group = {self.cluster_group}, "
+            f"service name = {self.service_name}, "
+            f"version = {self.version}, "
+            f"config file = {self.config_file}"
+        )
 
     def load(self) -> None:
         """
@@ -110,10 +118,10 @@ class EnvLoaderFactory:
         :return: An instance of EnvLoader
         """
         if strategy == EnvStrategy.Local.value:
-            logger.info("Using Local file for configuration management.")
+            logger.info("🔍 Using Local file for configuration management.")
             return LocalLoader()
         if strategy == EnvStrategy.Polaris.value:
-            logger.info("Using Polaris for configuration management.")
+            logger.info("🔍 Using Polaris for configuration management.")
             return PolarisLoader()
         raise ValueError(f"Unknown strategy: {strategy}")
 

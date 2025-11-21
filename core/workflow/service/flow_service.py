@@ -10,10 +10,9 @@ import time
 from typing import Any, cast
 
 from common.utils.snowfake import get_id
-from sqlmodel import Session
+from sqlmodel import Session  # type: ignore
 
 from workflow.cache import flow as flow_cache
-from workflow.cache.engine import ENGINE_CACHE_PREFIX
 from workflow.domain.entities.flow import FlowUpdate
 from workflow.domain.entities.node_debug_vo import NodeDebugRespVo
 from workflow.domain.models.ai_app import App
@@ -34,7 +33,7 @@ from workflow.exception.e import CustomException
 from workflow.exception.errors.err_code import CodeEnum
 from workflow.extensions.middleware.cache.base import BaseCacheService
 from workflow.extensions.middleware.database.utils import session_getter
-from workflow.extensions.middleware.getters import get_cache_service, get_db_service
+from workflow.extensions.middleware.getters import get_db_service
 from workflow.extensions.otlp.log_trace.workflow_log import WorkflowLog
 from workflow.extensions.otlp.trace.span import Span
 from workflow.repository import flow_dao, license_dao
@@ -99,13 +98,6 @@ def update(
         session.add(db_flow)
         session.commit()
 
-        # Clear engine cache for the updated flow
-        cache_service = get_cache_service()
-        cache_service.delete(key=f"{ENGINE_CACHE_PREFIX}:{flow_id}:{flow.app_id}")
-        current_span.add_info_event(
-            f"Cleared engine instance from redis: "
-            f"{ENGINE_CACHE_PREFIX}:{flow_id}:{flow.app_id}"
-        )
     except Exception as e:
         current_span.record_exception(e)
         session.rollback()
