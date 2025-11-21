@@ -10,7 +10,7 @@ from typing import Optional
 from urllib.parse import urlencode
 
 import boto3  # type: ignore
-from botocore.exceptions import ClientError
+from botocore.exceptions import ClientError  # type: ignore
 from common.utils.hmac_auth import HMACAuth
 from loguru import logger
 

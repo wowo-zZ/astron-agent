@@ -380,6 +380,8 @@ class RetryableErrorHandler(ExceptionHandlerBase):
             )
             input_dict.update({input_key: input_value})
 
+        if not node.node_instance.stream_node_first_token.is_set():
+            node.node_instance.stream_node_first_token.set()
         # Create result
         run_result = NodeRunResult(
             status=WorkflowNodeExecutionStatus.SUCCEEDED,
@@ -1064,8 +1066,8 @@ class WorkflowEngine(BaseModel):
         :param node_type: The type of the node
         :return: List of next nodes to execute based on branch logic
         """
-        edge_source_handle = run_result.dict().get(
-            "edge_source_handle", "default_chain"
+        edge_source_handle = (
+            run_result.dict().get("edge_source_handle") or "default_chain"
         )
         intents = node.get_classify_class().get(edge_source_handle)
 
@@ -1098,8 +1100,8 @@ class WorkflowEngine(BaseModel):
         )
 
         for intent in intent_chains:
-            if intent.get("name", "") == "default":
-                default_id = intent.get("id", "")
+            if intent.name == "default":
+                default_id = intent.id
                 return node.get_classify_class().get(default_id)
 
         return None
@@ -1691,7 +1693,6 @@ class WorkflowEngine(BaseModel):
             return
 
         node_chains = self.engine_ctx.chains.get_node_chains(node.node_id)
-        tasks = []
 
         for simple_path in node_chains:
             if simple_path.inactive.is_set():
@@ -1705,14 +1706,9 @@ class WorkflowEngine(BaseModel):
                 )
 
                 if current_node_id == node.node_id:
-                    tasks.extend(
-                        self._create_predecessor_wait_tasks(
-                            node, pre_node_id, simple_path
-                        )
+                    await self._create_predecessor_wait_tasks(
+                        node, pre_node_id, simple_path
                     )
-
-        if tasks:
-            await asyncio.wait(tasks)
 
     async def _wait_at_least_one_task_completed(self, tasks: list[Task]) -> None:
         """
@@ -1725,12 +1721,12 @@ class WorkflowEngine(BaseModel):
         _, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
         await self._cancel_pending_task(pending)
 
-    def _create_predecessor_wait_tasks(
+    async def _create_predecessor_wait_tasks(
         self,
         node: SparkFlowEngineNode,
         pre_node_id: str,
         simple_path: SimplePath,
-    ) -> List[Task]:
+    ) -> None:
         """
         Create waiting tasks for predecessor nodes.
 
@@ -1739,26 +1735,13 @@ class WorkflowEngine(BaseModel):
         :param simple_path: The simple path containing the nodes
         :return: List of asyncio tasks for waiting
         """
-        tasks = []
         pre_nodes = node.get_pre_nodes()
 
         for pre_node in pre_nodes:
             if pre_node.node_id == pre_node_id:
-                wait_task = asyncio.create_task(
-                    self._wait_at_least_one_task_completed(
-                        [
-                            asyncio.create_task(
-                                self.engine_ctx.node_run_status[
-                                    pre_node.node_id
-                                ].complete.wait()
-                            ),
-                            asyncio.create_task(simple_path.inactive.wait()),
-                        ]
-                    )
-                )
-                tasks.append(wait_task)
-        self.engine_ctx.dfs_tasks.extend(tasks)
-        return tasks
+                await self.engine_ctx.node_run_status[pre_node.node_id].complete.wait()
+
+        return None
 
     def dumps(self, span: Span) -> bytes:
         """

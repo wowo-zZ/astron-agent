@@ -136,12 +136,9 @@ def _init_workflow_trace(
     return wl
 
 
-async def _get_or_build_workflow_engine(
+def _get_or_build_workflow_engine(
     is_release: bool,
-    chat_vo: ChatVo,
-    app_alias_id: str,
     workflow_dsl: Dict,
-    workflow_dsl_update_time: datetime,
     span_context: Span,
 ) -> WorkflowEngine:
     """
@@ -158,65 +155,29 @@ async def _get_or_build_workflow_engine(
     :param span_context: Distributed tracing span context
     :return: WorkflowEngine instance ready for execution
     """
-
     sparkflow_engine: WorkflowEngine
-    need_rebuild = True
+    start_time = time.time() * 1000
+    sparkflow_engine = WorkflowEngineFactory.create_engine(
+        WorkflowDSL.model_validate(workflow_dsl.get("data", {})), span_context
+    )
+    span_context.add_info_event("Engine not found in cache, rebuilding from DSL")
 
-    # Attempt to retrieve engine from cache
-    from workflow.cache.engine import get_engine, set_engine
-
-    sparkflow_engine_cache_obj = get_engine(
-        is_release, chat_vo.flow_id, chat_vo.version, app_alias_id
+    for key in sparkflow_engine.engine_ctx.built_nodes:
+        if key.startswith(NodeType.FLOW.value):
+            set_flow_node_output_mode(
+                variable_pool=sparkflow_engine.engine_ctx.variable_pool,
+                node_instance=sparkflow_engine.engine_ctx.built_nodes[
+                    key
+                ].node_instance,
+                span=span_context,
+            )
+    sparkflow_engine.engine_ctx.variable_pool.system_params.set(
+        ParamKey.IsRelease, is_release
     )
 
-    if sparkflow_engine_cache_obj:
-        engine_cache_entity, build_timestamp = WorkflowEngine.loads(
-            sparkflow_engine_cache_obj, span_context
-        )
-        if (
-            engine_cache_entity
-            and int(workflow_dsl_update_time.timestamp() * 1000) < build_timestamp
-        ):
-            sparkflow_engine = engine_cache_entity
-            need_rebuild = False
-            span_context.add_info_event(
-                f"Retrieved Workflow engine from cache, "
-                f"DSL update time: {workflow_dsl_update_time}, "
-                f"engine build time: {build_timestamp}"
-            )
-
-    # Rebuild engine if cache miss or outdated
-    if need_rebuild:
-        start_time = time.time() * 1000
-        sparkflow_engine = WorkflowEngineFactory.create_engine(
-            WorkflowDSL.model_validate(workflow_dsl.get("data", {})), span_context
-        )
-        span_context.add_info_event("Engine not found in cache, rebuilding from DSL")
-
-        for key in sparkflow_engine.engine_ctx.built_nodes:
-            if key.startswith(NodeType.FLOW.value):
-                set_flow_node_output_mode(
-                    variable_pool=sparkflow_engine.engine_ctx.variable_pool,
-                    node_instance=sparkflow_engine.engine_ctx.built_nodes[
-                        key
-                    ].node_instance,
-                    span=span_context,
-                )
-        sparkflow_engine.engine_ctx.variable_pool.system_params.set(
-            ParamKey.IsRelease, is_release
-        )
-        set_engine(
-            is_release,
-            chat_vo.flow_id,
-            chat_vo.version,
-            app_alias_id,
-            sparkflow_engine,
-            span_context,
-        )
-
-        span_context.add_info_events(
-            {"rebuild_sparkflow_engine_cache_obj": f"{time.time() * 1000 - start_time}"}
-        )
+    span_context.add_info_events(
+        {"rebuild_sparkflow_engine_cache_obj": f"{time.time() * 1000 - start_time}"}
+    )
 
     return sparkflow_engine
 
@@ -509,16 +470,12 @@ async def _run(
         try:
 
             # Get or build workflow engine
-            src_sparkflow_engine = await _get_or_build_workflow_engine(
+            sparkflow_engine = await asyncio.to_thread(
+                _get_or_build_workflow_engine,
                 is_release,
-                chat_vo,
-                app_alias_id,
                 workflow_dsl,
-                workflow_dsl_update_time,
                 span_context,
             )
-            sparkflow_engine = copy.deepcopy(src_sparkflow_engine)
-
             # Initialize streaming processing components
             need_order_stream_result_q: asyncio.Queue[Any] = asyncio.Queue()
             structured_data: dict[Any, Any] = {}
@@ -981,7 +938,9 @@ async def _chat_response_stream(
 
                 if response.choices[0].finish_reason == ChatStatus.FINISH_REASON.value:
                     # Exit condition met
-                    EventRegistry().on_finished(event_id=event_id)
+                    await asyncio.to_thread(
+                        EventRegistry().on_finished, event_id=event_id
+                    )
                     return
 
         except asyncio.TimeoutError:
@@ -1014,7 +973,8 @@ async def _chat_response_stream(
             )
             yield Streaming.generate_data(llm_resp.model_dump(exclude_none=True))
             return
-        except Exception:
+        except Exception as err:
+            span_context.record_exception(err)
             llm_resp = LLMGenerate.workflow_end_open_error(
                 code=CodeEnum.OPEN_API_ERROR.code,
                 message=CodeEnum.OPEN_API_ERROR.msg,

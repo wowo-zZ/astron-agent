@@ -20,7 +20,7 @@ from workflow.extensions.middleware.getters import get_cache_service
 from workflow.infra.audit_system.strategy.base_strategy import AuditStrategy
 
 # Redis key prefix for event-related data
-_EVENT_PREFIX = "sparkflowV2:event"
+_EVENT_PREFIX = "workflow:event"
 
 # Global audit strategy registry for events
 EVENT_AUDIT_STRATEGY: Dict[str, AuditStrategy] = {}

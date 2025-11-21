@@ -1,3 +1,4 @@
+import asyncio
 import copy
 import json
 from abc import ABC, abstractmethod
@@ -266,7 +267,7 @@ class NodeExecutionTemplate:
 
         self._add_chat_history_if_needed(result, event_log_trace, variable_pool)
         self._add_variable_to_pool(result, variable_pool, span_context)
-        self._log_success_result(result, span_context)
+        await asyncio.to_thread(self._log_success_result, result, span_context)
         await self._handle_node_end_callback(result, callbacks)
 
         if event_log_trace:

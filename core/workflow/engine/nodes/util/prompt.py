@@ -38,11 +38,16 @@ def parse_nested_array(arr: list, index_str: str) -> Union[Any, None]:
 
     # Extract indices from array expression, e.g., 'arr_arr_input[0][0]' -> ['0', '0']
     index_list = re.findall(r"\[(\d+)\]", index_str)
+    if not index_list:
+        return arr
+
     # Convert indices to integer list
     indices = [int(i) for i in index_list]
     # Iteratively parse array values using extracted indices
     result = arr
     for idx in indices:
+        if not isinstance(result, (list, tuple)) or idx < 0 or idx >= len(result):
+            return None
         result = result[idx]
     return result
 

@@ -770,12 +770,7 @@ class VariablePool:
         if node_id.split(":")[0] == "node-end":
             self.add_end_node_variable(node_id, key_name_list, value)
             return
-        self.do_validate(
-            node_id=node_id,
-            key_name_list=key_name_list,
-            outputs=output_value,
-            span=span,
-        )
+
         for key in key_name_list:
             mapping_key = assemble_mapping_key(node_id, key)
             if mapping_key not in self.output_variable_mapping:

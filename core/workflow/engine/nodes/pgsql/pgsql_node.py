@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field, StringConstraints, field_validator
 from pydantic_core.core_schema import ValidationInfo
 from sqlalchemy import text
 
+from workflow.configs import workflow_config
 from workflow.consts.database import DBMode, ExecuteEnv
 from workflow.engine.entities.variable_pool import ParamKey, VariablePool
 from workflow.engine.nodes.base_node import BaseNode
@@ -521,6 +522,36 @@ class PGSqlNode(BaseNode):
             pgsql_config.dml = await self.generate_dml(inputs, span)
         return pgsql_config
 
+    def check_table_key_valid(
+        self,
+        inputs: dict,
+    ) -> None:
+        """Check if table and field names contain invalid PostgreSQL keywords.
+        :param inputs: Input data dictionary containing variable values
+        """
+
+        # Validate table name
+        workflow_config.pgsql_config.is_valid(
+            self.tableName if self.tableName else "", "tableName"
+        )
+
+        # Validate input field names
+        for key in inputs.keys():
+            workflow_config.pgsql_config.is_valid(key, "inputs")
+
+        # Validate condition field names
+        for case in self.cases:
+            for condition in case.conditions:
+                workflow_config.pgsql_config.is_valid(condition.fieldName, "condition")
+
+        # Validate assignment field names
+        for field in self.assignmentList:
+            workflow_config.pgsql_config.is_valid(field, "assignmentList")
+
+        # Validate order field names
+        for order in self.orderData:
+            workflow_config.pgsql_config.is_valid(order.fieldName, "orderData")
+
     async def async_execute(
         self,
         variable_pool: VariablePool,
@@ -566,6 +597,7 @@ class PGSqlNode(BaseNode):
         span.add_info_events({"inputs": json.dumps(inputs, ensure_ascii=False)})
         outputList = []
         try:
+            self.check_table_key_valid(inputs)
             # Get release status and generate PostgreSQL configuration
             is_release = variable_pool.system_params.get(ParamKey.IsRelease)
             pgsql_config = await self.generate_config(inputs, is_release, span)

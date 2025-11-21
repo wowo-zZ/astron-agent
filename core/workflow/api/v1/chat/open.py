@@ -5,6 +5,7 @@ This module provides open API endpoints for chat completions and resume function
 including platform-specific publishing validation and audit policies.
 """
 
+import asyncio
 import json
 import os
 from typing import Annotated, Optional, Union
@@ -59,11 +60,18 @@ async def chat_open(
         attributes={"flow_id": chat_vo.flow_id},
     ) as span_context:
         try:
-            db_flow = flow_service.get_latest_published_flow_by(
-                chat_vo.flow_id, app_id, db_session, span_context, chat_vo.version
+            db_flow = await asyncio.to_thread(
+                flow_service.get_latest_published_flow_by,
+                chat_vo.flow_id,
+                app_id,
+                db_session,
+                span_context,
+                chat_vo.version,
             )
             spark_dsl = db_flow.release_data
-            app_info = app_service.get_info(app_id, db_session, span)
+            app_info = await asyncio.to_thread(
+                app_service.get_info, app_id, db_session, span
+            )
 
             app_audit_policy = (
                 AppAuditPolicy.DEFAULT
@@ -116,8 +124,7 @@ async def chat_open(
                 chat_id=chat_vo.chat_id,
                 is_stream=chat_vo.stream,
             )
-            EventRegistry().init_event(event)
-
+            await asyncio.to_thread(EventRegistry().init_event, event)
             return await Streaming.send(
                 await chat_service.event_stream(
                     app_id,
