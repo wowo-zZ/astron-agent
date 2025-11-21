@@ -14529,9 +14529,6 @@ CREATE TABLE `knowledge` (
                              KEY `idx_file_seq` (`file_id`,`seq_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=9660 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-ALTER TABLE `knowledge`
-    ADD INDEX `idx_file_seq` (`file_id`, `seq_id`);
-
 -- ----------------------------
 -- Table structure for maas_template
 -- ----------------------------
@@ -14850,8 +14847,6 @@ CREATE TABLE `preview_knowledge` (
                                      KEY `flow_id` (`char_count`) USING BTREE,
                                      KEY `idx_file_seq` (`file_id`,`seq_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=14591 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-ALTER TABLE `preview_knowledge`
-    ADD INDEX `idx_file_seq` (`file_id`, `seq_id`);
 
 -- ----------------------------
 -- Table structure for prompt_template
