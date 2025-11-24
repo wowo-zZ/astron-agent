@@ -22,7 +22,7 @@ const translation = {
     applyTakeDownAgent: 'Apply to Take Down Agent',
     confirmApplyRelease: 'Confirm Application for Release?',
     pleaseEnterReason: 'Please enter the reason first!',
-    submitApplication: 'Submit Application',
+    submitApplication: 'Submit',
     takeDownWarning:
       'The takedown request cannot be withdrawn after submission, please submit carefully!',
     submitApplicationSuccess: 'Application submitted successfully!',
