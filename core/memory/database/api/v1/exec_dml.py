@@ -5,7 +5,7 @@ import decimal
 import re
 import time
 import uuid
-from typing import Any, List
+from typing import Any, List, Union
 
 import sqlglot
 import sqlparse
@@ -177,7 +177,7 @@ def rewrite_dml_with_uid_and_limit(
 
     # Parameterization: parameterize values in SQL statements
     sql_str = parsed.sql(dialect="postgres")
-    params_dict: dict[str, str] = {}
+    params_dict: dict[str, Any] = {}
 
     # Traverse AST nodes to find all literal values
     for node in parsed.walk():
@@ -190,9 +190,16 @@ def rewrite_dml_with_uid_and_limit(
                 continue
             # If it's not an integer, use parameterization
             elif isinstance(value, str):
+                # original string
+                converted_value: Union[str, datetime.datetime] = value
+                # Check if it's a datetime string in format "2025-11-14 14:56:36"
+                if re.match(r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$", value):
+                    converted_value = datetime.datetime.strptime(
+                        value, "%Y-%m-%d %H:%M:%S"
+                    )
                 # Generate unique parameter name
                 param_name = f"param_{len(params_dict)}"
-                params_dict[param_name] = value
+                params_dict[param_name] = converted_value
                 # Replace original value with parameter placeholder
                 sql_str = sql_str.replace(f"'{value}'", f":{param_name}")
                 sql_str = sql_str.replace(f'"{value}"', f":{param_name}")
