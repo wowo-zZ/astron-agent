@@ -133,7 +133,7 @@ public class PublishApiServiceImpl implements PublishApiService {
             throw new BusinessException(ResponseEnum.BOT_API_CREATE_LIMIT_ERROR);
         }
         try {
-            List<Integer> maasSupportedVersions = List.of(BotVersionEnum.WORKFLOW.getVersion(), BotVersionEnum.TALK.getVersion());
+            List<Integer> maasSupportedVersions = List.of(BotVersionEnum.WORKFLOW.getVersion());
             if (maasSupportedVersions.contains(botBase.getVersion())) {
                 return createMaasApi(uid, appMst, botBase, request);
             } else {

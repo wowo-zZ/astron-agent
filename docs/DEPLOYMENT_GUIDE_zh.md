@@ -171,7 +171,9 @@ vim .env
    DeepSeekV3能力地址为：https://maas.xfyun.cn/modelSquare)
 - 实时语音转写API: https://console.xfyun.cn/services/rta
 - 图片生成API: https://www.xfyun.cn/services/wtop
-- 虚拟人智能体：https://www.xfyun.cn/services/VirtualHumans 
+- 虚拟人智能体：https://www.xfyun.cn/services/VirtualHumans
+- 使用虚拟人智能体时，非localhost（本地主机名）或127.0.0.1，确保是https环境；若为http环境，需配置绕过检查，例如谷歌浏览器上开启下chrome://flags/#unsafely-treat-insecure-origin-as-secure
+
 
 编辑 docker/astronAgent/.env 文件，更新相关环境变量：
 ```env
