@@ -208,9 +208,7 @@ def req_ase_ability_image_generate(
 
         try:
             from plugin.aitools.service.ase_sdk.__base.entities.req_data import ReqData
-            from plugin.aitools.service.ase_sdk.common.client import (
-                CommonClient,
-            )
+            from plugin.aitools.service.ase_sdk.common.client import CommonClient
             from plugin.aitools.service.ase_sdk.common.entities.req_data import (
                 CommonReqSourceData,
             )
