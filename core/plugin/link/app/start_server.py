@@ -110,7 +110,7 @@ class SparkLinkServer:
             port=int(service_port),
             workers=20,
             reload=False,
-            # log_config=None
+            log_config=None,
         )
         uvicorn_server = uvicorn.Server(uvicorn_config)
         uvicorn_server.run()

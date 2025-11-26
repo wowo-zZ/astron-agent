@@ -6,10 +6,13 @@ It initializes the necessary environment variables
 and starts the SparkLinkServer instance.
 """
 
+import functools
 import os
 import subprocess
 import sys
 from pathlib import Path
+
+print = functools.partial(print, flush=True)
 
 
 def setup_python_path() -> None:
@@ -64,10 +67,7 @@ def load_env_file(env_file: str) -> None:
                 key, value = line.split("=", 1)
                 # Set CONFIG_ENV_PATH, common to load
                 if os.environ.get(key.strip()):
-                    print(
-                        f"ENV  ✅ {key.strip()}= \
-                          {os.environ.get(key.strip())}"
-                    )
+                    print(f"ENV  ✅ {key.strip()}={os.environ.get(key.strip())}")
                 else:
                     print(f"CFG  ✅ {key.strip()}={value.strip()}")
 
