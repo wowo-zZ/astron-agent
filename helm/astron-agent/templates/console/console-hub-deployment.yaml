@@ -67,6 +67,12 @@ spec:
         {{- else if eq $key "sparkRtasrKey" }}
         - name: {{ upper (snakecase $key) }}
           value: {{ $.Values.global.sparkRtasrApiKey | quote }}
+        - name: {{ upper (snakecase $key) }}
+          value: {{ $.Values.global.sparkVirtualManAppId | quote }}
+        - name: {{ upper (snakecase $key) }}
+          value: {{ $.Values.global.sparkVirtualManApiKey | quote }}
+        - name: {{ upper (snakecase $key) }}
+          value: {{ $.Values.global.sparkVirtualManApiSecret | quote }}
         {{- else if eq $key "botApiMaasBaseUrl" }}
         - name: {{ upper (snakecase $key) }}
           value: {{ printf "%s/workflow/v1/chat/completions" $.Values.global.hostBaseAddress | quote }}
