@@ -22,6 +22,10 @@ global:
   # For Spark LLM API, there will be an additional API password from the console website
   # https://console.xfyun.cn/services/bm4
   sparkApiPassword: "your-api-password"
+  # For virtual-man API, you need to apply for a separate API key from the console website (https://virtual-man.xfyun.cn/console/applications)
+  sparkVirtualManAppId: "your-virtual-man-app-id"
+  sparkVirtualManApiKey: "your-virtual-man-api-key"
+  sparkVirtualManApiSecret: "your-virtual-man-api-secret"
 
 # Override the full name for consistent resource naming
 fullnameOverride: "astron-agent"
@@ -547,6 +551,9 @@ consoleHub:
     sparkImageApiSecret: ""
     sparkApiPassword: ""
     sparkRtasrKey: ""
+    sparkVirtualManAppId: ""
+    sparkVirtualManApiKey: ""
+    sparkVirtualManApiSecret: ""
     botApiMaasBaseUrl: ""
 
 # Ingress configuration
