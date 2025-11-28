@@ -551,6 +551,9 @@ consoleHub:
     sparkImageApiSecret: ""
     sparkApiPassword: ""
     sparkRtasrKey: ""
+    sparkVirtualManAppId: ""
+    sparkVirtualManApiKey: ""
+    sparkVirtualManApiSecret: ""
     botApiMaasBaseUrl: ""
 
 # Ingress configuration
