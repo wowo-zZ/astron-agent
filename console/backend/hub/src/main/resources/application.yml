@@ -135,6 +135,8 @@ spark:
   image-appId: ${SPARK_IMAGE_APP_ID:xxx}
   image-apiKey: ${SPARK_IMAGE_API_KEY:xxx}
   image-apiSecret: ${SPARK_IMAGE_API_SECRET:xxx}
+  virtual-man-apiKey: ${SPARK_VIRTUAL_MAN_API_KEY:xxx}
+  virtual-man-apiSecret: ${SPARK_VIRTUAL_MAN_API_SECRET:xxx}
 
 # Workflow configuration
 workflow:
