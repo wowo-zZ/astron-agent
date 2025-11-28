@@ -22,8 +22,8 @@ public class MysqlPreviewKnowledge {
     private String fileId;
 
     /**
-     * Auto-increment sequence ID to preserve insertion order
-     * This field ensures that data order remains consistent during queries
+     * Auto-increment sequence ID to preserve insertion order This field ensures that data order remains
+     * consistent during queries
      */
     @TableField(value = "seq_id")
     private Long seqId;
