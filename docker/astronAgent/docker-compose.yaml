@@ -483,6 +483,7 @@ services:
       CONSOLE_CASDOOR_APP: "${CONSOLE_CASDOOR_APP:-}"
       CONSOLE_CASDOOR_ORG: "${CONSOLE_CASDOOR_ORG:-}"
       SPARK_APP_ID: "${SPARK_APP_ID:-}"
+      SPARK_VIRTUAL_MAN_APP_ID: "${SPARK_VIRTUAL_MAN_APP_ID:your-virtual-man-app-id}"
     expose:
       - "1881"
     networks:
