@@ -183,6 +183,7 @@ PLATFORM_API_SECRET=your-api-secret
 
 SPARK_API_PASSWORD=your-api-password
 SPARK_RTASR_API_KEY=your-rtasr-api-key
+SPARK_VIRTUAL_MAN_APP_ID=your-virtual-man-app-id
 SPARK_VIRTUAL_MAN_API_KEY=your-virtual-man-api-key
 SPARK_VIRTUAL_MAN_API_SECRET=your-virtual-man-api-secret
 ```
