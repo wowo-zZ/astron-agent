@@ -115,12 +115,10 @@ const useNodeInfo = ({ id, data }): UseNodeInfoReturn => {
   }, [nodeType]);
 
   const showInputs = useMemo(() => {
-    return (
-      data?.inputs?.length > 0 &&
-      !isIfElseNode &&
-      (data?.nodeParam?.mode === 0 || data?.nodeParam?.mode === undefined)
-    );
-  }, [data, isIfElseNode]);
+    const isDatabaseNodeFormMode =
+      isDataBaseNode && data?.nodeParam?.mode === 1;
+    return data?.inputs?.length > 0 && !isIfElseNode && !isDatabaseNodeFormMode;
+  }, [data, isIfElseNode, isDataBaseNode]);
 
   const showOutputs = useMemo(() => {
     return data?.outputs?.length > 0;
@@ -190,6 +188,18 @@ const useNodeInfo = ({ id, data }): UseNodeInfoReturn => {
   const isRpaNode = useMemo(() => {
     return nodeType === 'rpa' || nodeType === 'rpa';
   }, [nodeType]);
+  const inputLabel = useMemo(() => {
+    if (isEndNode || isIteratorEnd) {
+      return '输出';
+    }
+    return '输入';
+  }, [isEndNode, isIteratorEnd]);
+  const outputLabel = useMemo(() => {
+    if (isStartNode || isIteratorStart) {
+      return '输入';
+    }
+    return '输出';
+  }, [isStartNode, isIteratorStart]);
 
   return {
     nodeType,
@@ -220,6 +230,8 @@ const useNodeInfo = ({ id, data }): UseNodeInfoReturn => {
     nodeIcon,
     nodeDesciption,
     isRpaNode,
+    inputLabel,
+    outputLabel,
   };
 };
 
@@ -227,9 +239,6 @@ const useNodeFunc = ({ id, data }): UseNodeFuncReturn => {
   const { isIteratorNode, nodeType } = useNodeInfo({ id, data });
   const setNodeInfoEditDrawerlInfo = useFlowsManager(
     state => state.setNodeInfoEditDrawerlInfo
-  );
-  const setChatDebuggerResult = useFlowsManager(
-    state => state.setChatDebuggerResult
   );
   const setVersionManagement = useFlowsManager(
     state => state.setVersionManagement
@@ -256,7 +265,6 @@ const useNodeFunc = ({ id, data }): UseNodeFuncReturn => {
       open: true,
       nodeId: id,
     });
-    setChatDebuggerResult(false);
     setVersionManagement(false);
     setAdvancedConfiguration(false);
     setOpenOperationResult(false);
