@@ -176,7 +176,6 @@ def rewrite_dml_with_uid_and_limit(
         _dml_insert_add_params(parsed, insert_ids, app_id, uid)
 
     # Parameterization: parameterize values in SQL statements
-    sql_str = parsed.sql(dialect="postgres")
     params_dict: dict[str, Any] = {}
 
     # Traverse AST nodes to find all literal values
@@ -199,12 +198,11 @@ def rewrite_dml_with_uid_and_limit(
                     )
                 # Generate unique parameter name
                 param_name = f"param_{len(params_dict)}"
-                params_dict[param_name] = converted_value
                 # Replace original value with parameter placeholder
-                sql_str = sql_str.replace(f"'{value}'", f":{param_name}")
-                sql_str = sql_str.replace(f'"{value}"', f":{param_name}")
+                node.replace(exp.Placeholder(this=param_name))
+                params_dict[param_name] = converted_value
 
-    return sql_str, insert_ids, params_dict
+    return parsed.sql(dialect="postgres"), insert_ids, params_dict
 
 
 def _dml_add_where(parsed: Any, tables: List[str], app_id: str, uid: str) -> None:
