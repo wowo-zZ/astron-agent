@@ -29,6 +29,7 @@ The platform supports **high-availability** deployment, enabling organizations t
 ## 📰 News
 
 - **[Astron Hackathon @ 2025 iFLYTEK Global 1024 Developer Festival](https://luma.com/9zmbc6xb)**
+- **[Astron Agent Zhengzhou Meetup](https://github.com/iflytek/astron-agent/discussions/672)**
 
 ## 🚀 Quick Start
 

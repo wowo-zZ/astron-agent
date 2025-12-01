@@ -30,6 +30,7 @@
 ## 📰 新闻动态
 
 - **[Astron 黑客松@2025科大讯飞全球1024开发者节](https://luma.com/9zmbc6xb)**
+- **[Astron Agent 郑州见面会](https://github.com/iflytek/astron-agent/discussions/672)**
 
 ## 🚀 快速开始
 
