@@ -1,24 +1,27 @@
 import json
+import os
 import time
 import traceback
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, AsyncGenerator, List
 
+# Use unified common package import module
+from common.exceptions.base import BaseExc
+from common.otlp.log_trace.node_trace_log import NodeTraceLog as NodeTrace
+from common.otlp.log_trace.node_trace_log import Status as TraceStatus
+from common.otlp.metrics.meter import Meter
+from common.otlp.trace.span import Span
 from pydantic import BaseModel, ConfigDict
 
-from api.schemas.base_inputs import BaseInputs
-from api.schemas.completion_chunk import (
+from agent.api.schemas.base_inputs import BaseInputs
+from agent.api.schemas.completion_chunk import (
     ReasonChatCompletionChunk,
     ReasonChoice,
     ReasonChoiceDelta,
 )
-from api.schemas.node_trace_patch import NodeTracePatch
-
-# Use unified common package import module
-from common_imports import BaseExc, Meter, NodeTrace, Span, TraceStatus
-from exceptions.agent_exc import AgentInternalExc, AgentNormalExc
-from infra import agent_config
+from agent.api.schemas.node_trace_patch import NodeTracePatch
+from agent.exceptions.agent_exc import AgentInternalExc, AgentNormalExc
 
 
 def json_serializer(obj: Any) -> Any:
@@ -126,7 +129,11 @@ class CompletionBase(BaseModel, ABC):
                     total_usage["total_tokens"] += node.data.usage.total_tokens
 
             if total_usage["total_tokens"] > 0:
-                stop_chunk.usage = CompletionUsage(**total_usage)
+                stop_chunk.usage = CompletionUsage(
+                    completion_tokens=total_usage["completion_tokens"],
+                    prompt_tokens=total_usage["prompt_tokens"],
+                    total_tokens=total_usage["total_tokens"],
+                )
 
         context.chunk_logs.append(stop_chunk.model_dump_json())
 
@@ -136,7 +143,7 @@ class CompletionBase(BaseModel, ABC):
         yield await self.create_chunk(stop_chunk)
         yield await self.create_done()
 
-        if agent_config.UPLOAD_METRICS:
+        if os.getenv("UPLOAD_METRICS"):
             context.meter.in_error_count(context.error.c)
             # context.meter.in_error_count(
             #     context.error.c, lables={"msg": context.error.m}
@@ -146,7 +153,7 @@ class CompletionBase(BaseModel, ABC):
         context.span.add_info_events({"message": context.error.m})
 
         context.node_trace.record_end()
-        if agent_config.UPLOAD_NODE_TRACE:
+        if os.getenv("UPLOAD_NODE_TRACE"):
             node_trace_log = context.node_trace.upload(
                 status=TraceStatus(code=context.error.c, message=context.error.m),
                 log_caller=self.log_caller,

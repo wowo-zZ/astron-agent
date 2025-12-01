@@ -1,28 +1,32 @@
 import json
 import time
-from typing import Any, AsyncIterator, Union
+from typing import Any, AsyncIterator, Optional, Tuple, Union
 
-from pydantic import Field
-
-from api.schemas.agent_response import AgentResponse, CotStep
-from api.schemas.llm_message import LLMMessage, LLMMessages
+from common.otlp.log_trace.base import Usage as NodeDataUsage
 
 # Use unified common package import module
-from common_imports import Node, NodeData, NodeDataUsage, NodeTrace, Span
-from domain.models.base import BaseLLMModel
-from engine.nodes.base import RunnerBase, Scratchpad
-from engine.nodes.cot.cot_prompt import (
+from common.otlp.log_trace.node_log import Data as NodeData
+from common.otlp.log_trace.node_log import NodeLog as Node
+from common.otlp.log_trace.node_trace_log import NodeTraceLog as NodeTrace
+from common.otlp.trace.span import Span
+from pydantic import Field
+
+from agent.api.schemas.agent_response import AgentResponse, CotStep
+from agent.api.schemas.llm_message import LLMMessage, LLMMessages
+from agent.domain.models.base import BaseLLMModel
+from agent.engine.nodes.base import RunnerBase, Scratchpad
+from agent.engine.nodes.cot.cot_prompt import (
     COT_SYSTEM_NO_R1_MORE_TEMPLATE,
     COT_SYSTEM_R1_MORE_TEMPLATE,
     COT_SYSTEM_TEMPLATE,
     COT_USER_TEMPLATE,
 )
-from engine.nodes.cot_process.cot_process_runner import CotProcessRunner
-from exceptions import cot_exc
-from service.plugin.base import BasePlugin, PluginResponse
-from service.plugin.link import LinkPlugin
-from service.plugin.mcp import McpPlugin
-from service.plugin.workflow import WorkflowPlugin
+from agent.engine.nodes.cot_process.cot_process_runner import CotProcessRunner
+from agent.exceptions import cot_exc
+from agent.service.plugin.base import BasePlugin, PluginResponse
+from agent.service.plugin.link import LinkPlugin
+from agent.service.plugin.mcp import McpPlugin
+from agent.service.plugin.workflow import WorkflowPlugin
 
 default_cot_step = CotStep(empty=True)
 
@@ -195,11 +199,14 @@ class CotRunner(RunnerBase):
             # Usage will be attached to stop chunk in _finalize_run
             sp.add_info_events(
                 {
-                    "accumulated_usage": {
-                        "completion_tokens": node_data_usage.completion_tokens,
-                        "prompt_tokens": node_data_usage.prompt_tokens,
-                        "total_tokens": node_data_usage.total_tokens,
-                    }
+                    "accumulated_usage": json.dumps(
+                        {
+                            "completion_tokens": node_data_usage.completion_tokens,
+                            "prompt_tokens": node_data_usage.prompt_tokens,
+                            "total_tokens": node_data_usage.total_tokens,
+                        },
+                        ensure_ascii=False,
+                    )
                 }
             )
 
@@ -255,7 +262,7 @@ class CotRunner(RunnerBase):
 
     async def _process_agent_response(
         self, msgs: LLMMessages, is_first_loop: bool, sp: Span, node_trace: NodeTrace
-    ) -> AsyncIterator[tuple[bool, CotStep, AgentResponse | None]]:
+    ) -> AsyncIterator[Tuple[bool, CotStep, Optional[AgentResponse]]]:
         """Process agent response and yield responses with final result"""
         cot_step: CotStep = default_cot_step
         yield_answer = False
@@ -307,7 +314,7 @@ class CotRunner(RunnerBase):
         sp: Span,
         node_trace: NodeTrace,
         span: Span,
-    ) -> AsyncIterator[tuple[bool, bool, AgentResponse | None]]:
+    ) -> AsyncIterator[Tuple[bool, bool, Optional[AgentResponse]]]:
         """Run a single iteration of the CoT loop"""
         msgs = await self._create_messages(system_prompt, user_prompt_template)
 

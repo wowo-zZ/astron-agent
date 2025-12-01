@@ -1,13 +1,14 @@
 from typing import AsyncIterator
 
-from pydantic import Field
-
-from api.schemas.agent_response import AgentResponse
+from common.otlp.log_trace.node_trace_log import NodeTraceLog as NodeTrace
 
 # Use unified common package import module
-from common_imports import NodeTrace, Span
-from engine.nodes.base import RunnerBase
-from engine.nodes.chat.chat_prompt import CHAT_SYSTEM_TEMPLATE, CHAT_USER_TEMPLATE
+from common.otlp.trace.span import Span
+from pydantic import Field
+
+from agent.api.schemas.agent_response import AgentResponse
+from agent.engine.nodes.base import RunnerBase
+from agent.engine.nodes.chat.chat_prompt import CHAT_SYSTEM_TEMPLATE, CHAT_USER_TEMPLATE
 
 
 class ChatRunner(RunnerBase):

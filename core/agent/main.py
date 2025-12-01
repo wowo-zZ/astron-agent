@@ -4,106 +4,161 @@ Agent main entry point
 Load configuration files and start FastAPI service
 """
 
+import json
 import os
-import subprocess
 import sys
-from pathlib import Path
+import time
+
+import uvicorn
+from common.initialize.initialize import initialize_services
+from common.otlp.sid import sid_generator2
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from loguru import logger
+from starlette.middleware.cors import CORSMiddleware
+
+from agent.api import router
+from agent.api.schemas.completion_chunk import ReasonChatCompletionChunk
+from agent.exceptions.agent_exc import AgentExc
 
 
-def load_env_file(env_file: str) -> None:
-    """Load environment variables from .env file"""
-    if not os.path.exists(env_file):
-        print(f"❌ Configuration file {env_file} does not exist")
-        return
+def initialize_extensions() -> None:
+    """Initialize required extensions and services for the application."""
 
-    print(f"📋 Loading configuration file: {env_file}")
+    os.environ["CONFIG_ENV_PATH"] = "./agent/config.env"
 
-    with open(env_file, "r", encoding="utf-8") as f:
-        for line_num, line in enumerate(f, 1):
-            line = line.strip()
-
-            # Skip empty lines and comments
-            if not line or line.startswith("#"):
-                continue
-
-            # Parse environment variables
-            if "=" in line:
-                key, value = line.split("=", 1)
-                key = key.strip()
-                value = value.strip()
-
-                if key in os.environ:
-                    print(f"  🔄 {key}={os.environ[key]} (using existing env var)")
-                else:
-                    os.environ[key] = value
-                    print(f"  ✅ {key}={value} (loaded from config)")
-            else:
-                print(f"  ⚠️  Line {line_num} format error: {line}")
-
-
-def setup_python_path() -> None:
-    """Set up Python path"""
-    project_root = Path(__file__).parent
-    python_path = os.environ.get("PYTHONPATH", "")
-
-    if str(project_root) not in python_path:
-        if python_path:
-            os.environ["PYTHONPATH"] = f"{project_root}:{python_path}"
-        else:
-            os.environ["PYTHONPATH"] = str(project_root)
-        print(f"🔧 PYTHONPATH: {os.environ['PYTHONPATH']}")
-
-
-def start_service() -> None:
-    """Start FastAPI service"""
-    print("\n🚀 Starting Agent service...")
-
-    # Display key environment variables
-    env_vars = [
-        "PYTHONUNBUFFERED",
-        "polaris_cluster",
-        "polaris_url",
-        "polaris_username",
-        "RUN_ENVIRON",
-        "USE_POLARIS",
+    need_init_services = [
+        "settings_service",
+        "log_service",
+        "database_service",
+        # "cache_service",
+        "kafka_producer_service",
+        "otlp_sid_service",
+        "otlp_span_service",
+        "otlp_metric_service",
     ]
-
-    print("📋 Environment configuration:")
-    for var in env_vars:
-        value = os.environ.get(var, "None")
-        # Hide passwords
-        if "password" in var.lower():
-            value = "***"
-        print(f"  - {var}: {value}")
-
-    print("")
-
-    try:
-        # Start FastAPI application
-        subprocess.run([sys.executable, "api/app.py"], check=True)
-    except subprocess.CalledProcessError as e:
-        print(f"❌ Service startup failed: {e}")
-        sys.exit(1)
-    except KeyboardInterrupt:
-        print("\n🛑 Service stopped")
-        sys.exit(0)
+    initialize_services(services=need_init_services)
 
 
-def main() -> None:
-    """Main function"""
-    print("🌟 Agent Development Environment Launcher")
-    print("=" * 50)
+def create_app() -> FastAPI:
+    """Create and configure the FastAPI application instance.
 
-    # Set up Python path
-    setup_python_path()
+    This function initializes all required extensions, sets up CORS middleware,
+    includes API routers, and configures global exception handlers for the
+    authentication service.
 
-    # Load environment configuration
-    config_file = Path(__file__).parent / "config.env"
-    load_env_file(str(config_file))
+    Returns:
+        FastAPI: The configured FastAPI application instance.
+    """
+    initialize_extensions()
+    logger.info(""" AGENT SERVER START """)
 
-    # Start service
-    start_service()
+    app = FastAPI()
+    origins = ["*"]
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    app.include_router(router.router_v1)
+
+    @app.exception_handler(AgentExc)  # type: ignore[misc]
+    async def agent_exception_handler(_request: Request, exc: AgentExc) -> JSONResponse:
+        """Handle AgentExc business exceptions"""
+        request_id = (
+            sid_generator2.gen() if sid_generator2 is not None else "agent-error"
+        )
+
+        rs = JSONResponse(
+            status_code=200,  # Business errors return 200 with error code
+            content=ReasonChatCompletionChunk(
+                code=exc.c,
+                message=exc.m,
+                id=request_id,
+                choices=[],
+                created=int(time.time()),
+                model="",
+                object="chat.completion.chunk",
+            ).model_dump(),
+        )
+        return rs
+
+    @app.exception_handler(RequestValidationError)  # type: ignore[misc]
+    async def validation_exception_handler(
+        _request: Request, exc: RequestValidationError
+    ) -> JSONResponse:
+        """Handle request validation errors"""
+        try:
+            # Safely get the first error message
+            errors = exc.errors()
+            err = errors[0] if errors else {}
+        except (IndexError, AttributeError):
+            err = exc.body or {}
+        message = f"{err['type']}, {err['loc'][-1]}, {err['msg']}"
+
+        # Generate ID safely - fallback if sid_generator2 not initialized
+        request_id = (
+            sid_generator2.gen() if sid_generator2 is not None else "validation-error"
+        )
+
+        rs = JSONResponse(
+            content=ReasonChatCompletionChunk(
+                code=40002,
+                message=message,
+                id=request_id,
+                choices=[],
+                created=int(time.time()),
+                model="",
+                object="chat.completion.chunk",
+            ).model_dump()
+        )
+        return rs
+
+    @app.on_event("startup")
+    async def print_routes() -> None:
+        """Print all registered routes on application startup.
+
+        This startup event handler collects information about all registered
+        routes and logs them for debugging and monitoring purposes.
+        """
+        route_infos = []
+        for route in app.routes:
+            route_infos.append(
+                {
+                    "path": getattr(route, "path", str(route)),
+                    "name": getattr(route, "name", type(route).__name__),
+                    "methods": (
+                        list(route.methods) if hasattr(route, "methods") else "chat"
+                    ),
+                }
+            )
+        logger.info("Registered routes:")
+        print("Registered routes:")
+        for route_info in route_infos:
+            logger.info(json.dumps(route_info, ensure_ascii=False))
+            print(json.dumps(route_info, ensure_ascii=False))
+
+    return app
 
 
 if __name__ == "__main__":
-    main()
+    logger.debug(f"current platform {sys.platform}")
+    # app = asyncio.run(create_app())
+
+    uvicorn.run(
+        app="main:create_app",
+        host="0.0.0.0",
+        port=int(os.getenv("SERVICE_PORT", "17870")),
+        workers=(
+            None
+            if sys.platform in ["win", "win32", "darwin"]
+            else int(os.getenv("WORKERS", "1"))
+        ),
+        reload=False,
+        log_level="error",
+        ws_ping_interval=None,
+        ws_ping_timeout=None,
+    )

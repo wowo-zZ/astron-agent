@@ -3,14 +3,18 @@ import json
 import time
 from typing import Any, AsyncIterator, List
 
-from pydantic import BaseModel, Field
-
-from api.schemas.agent_response import AgentResponse, CotStep
-from api.schemas.llm_message import LLMMessage
+from common.otlp.log_trace.base import Usage as NodeDataUsage
 
 # Use unified common package import module
-from common_imports import Node, NodeData, NodeDataUsage, NodeTrace, Span
-from domain.models.base import BaseLLMModel
+from common.otlp.log_trace.node_log import Data as NodeData
+from common.otlp.log_trace.node_log import NodeLog as Node
+from common.otlp.log_trace.node_trace_log import NodeTraceLog as NodeTrace
+from common.otlp.trace.span import Span
+from pydantic import BaseModel, Field
+
+from agent.api.schemas.agent_response import AgentResponse, CotStep
+from agent.api.schemas.llm_message import LLMMessage
+from agent.domain.models.base import BaseLLMModel
 
 
 class UpdatedNode(Node):
@@ -56,7 +60,6 @@ class RunnerBase(BaseModel):
             node_data_output: dict[str, Any] = {}
             node_data_config: dict[str, Any] = {}
             node_data_usage = NodeDataUsage()
-            last_chunk_has_content = False
             async for chunk in self.model.stream(messages, True, sp):
                 if not chunk.choices:
                     continue
@@ -82,7 +85,6 @@ class RunnerBase(BaseModel):
                         usage=None,
                     )
                     thinks += reasoning_content
-                    last_chunk_has_content = True
                 if content:
                     yield AgentResponse(
                         typ="content",
@@ -91,16 +93,18 @@ class RunnerBase(BaseModel):
                         usage=None,
                     )
                     answers += content
-                    last_chunk_has_content = True
 
             # Usage will be attached to stop chunk in _finalize_run
             sp.add_info_events(
                 {
-                    "accumulated_usage": {
-                        "completion_tokens": node_data_usage.completion_tokens,
-                        "prompt_tokens": node_data_usage.prompt_tokens,
-                        "total_tokens": node_data_usage.total_tokens,
-                    }
+                    "accumulated_usage": json.dumps(
+                        {
+                            "completion_tokens": node_data_usage.completion_tokens,
+                            "prompt_tokens": node_data_usage.prompt_tokens,
+                            "total_tokens": node_data_usage.total_tokens,
+                        },
+                        ensure_ascii=False,
+                    )
                 }
             )
 

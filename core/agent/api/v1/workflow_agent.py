@@ -2,18 +2,17 @@
 
 from typing import Annotated, Any, AsyncGenerator, cast
 
+from common.otlp.trace.span import Span
 from fastapi import APIRouter, Header
 from pydantic import ConfigDict
 from starlette.responses import StreamingResponse
 
-from api.schemas.completion_chunk import ReasonChatCompletionChunk
-from api.schemas.workflow_agent_inputs import CustomCompletionInputs
-from api.v1.base_api import CompletionBase
-from common_imports import Span
-from engine.workflow_agent_runner import WorkflowAgentRunner
-from service.builder.workflow_agent_builder import WorkflowAgentRunnerBuilder
+from agent.api.schemas.workflow_agent_inputs import CustomCompletionInputs
+from agent.api.v1.base_api import CompletionBase
+from agent.service.builder.workflow_agent_builder import WorkflowAgentRunnerBuilder
+from agent.service.runner.workflow_agent_runner import WorkflowAgentRunner
 
-workflow_agent_router = APIRouter(prefix="/agent/v1")
+workflow_agent_router = APIRouter()
 
 headers = {"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}
 
@@ -100,6 +99,6 @@ async def custom_chat_completions(
 
     return StreamingResponse(
         generate(),
-        media_type="application/json",
+        media_type="text/event-stream",
         headers=headers,
     )

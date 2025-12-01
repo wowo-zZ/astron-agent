@@ -60,8 +60,6 @@ tmp/
 # Backup
 backup/
 
-# Configuration files with sensitive data
-config.env
 
 # Development scripts (excluded from version control)
 scripts/run_tests.sh
