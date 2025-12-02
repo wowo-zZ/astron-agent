@@ -120,6 +120,25 @@ build-java: ## 📦 Build Java projects
 		echo "$(BLUE)Skipping Java build (no Java projects configured)$(RESET)"; \
 	fi
 
+fmt-java: ## ✏️ Format Java code with Spotless
+	@if [ -n "$(JAVA_DIRS)" ]; then \
+		echo "$(YELLOW)Formatting Java projects in: $(JAVA_DIRS)$(RESET)"; \
+		for dir in $(JAVA_DIRS); do \
+			if [ -d "$$dir" ]; then \
+				echo "$(YELLOW)  Formatting $$dir...$(RESET)"; \
+				(cd $$dir && \
+				echo "$(YELLOW)    Running Spotless apply...$(RESET)" && \
+				$(MVN) spotless:apply $(MAVEN_DEFAULT_OPTS)) || exit 1; \
+			else \
+				echo "$(RED)    Directory $$dir does not exist$(RESET)"; \
+				exit 1; \
+			fi; \
+		done; \
+		echo "$(GREEN)Java formatting completed$(RESET)"; \
+	else \
+		echo "$(BLUE)Skipping Java formatting (no Java projects configured)$(RESET)"; \
+	fi
+
 clean-java: ## 🧹 Clean Java build artifacts
 	@if [ -n "$(JAVA_DIRS)" ]; then \
 		echo "$(YELLOW)Cleaning Java build artifacts in: $(JAVA_DIRS)$(RESET)"; \

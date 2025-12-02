@@ -20,9 +20,7 @@ from plugin.aitools.const.err_code.code import CodeEnum
 from plugin.aitools.service.image_understanding.image_understanding_client import (
     ImageUnderstandingClient,
 )
-from plugin.aitools.service.translation.translation_client import (
-    TranslationClient,
-)
+from plugin.aitools.service.translation.translation_client import TranslationClient
 
 from common.otlp.log_trace.node_trace_log import NodeTraceLog, Status
 from common.otlp.metrics.meter import Meter
