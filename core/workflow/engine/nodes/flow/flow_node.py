@@ -49,38 +49,8 @@ class FlowNode(BaseNode):
         default_factory=EnableChatHistoryV2
     )
 
-    # Default chat body template for API requests
-    chatBody: dict = {
-        "inputs": {},
-        "appId": "xxxx",
-        "uid": "xxxx",
-        "caller": "workflow",
-        "botId": "xxxxxxxx",
-    }
-
     # Optional version specification for the target flow
     version: Optional[str] = None
-
-    def assemble_chat_body(self, inputs: dict) -> dict:
-        """
-        Assemble the chat body for API requests.
-
-        Creates a deep copy of the default chat body template and updates it
-        with the current node configuration and input parameters.
-
-        :param inputs: Input parameters to include in the chat body
-        :return: Assembled chat body dictionary for API requests
-        """
-        chat_body: dict = copy.deepcopy(self.chatBody)
-        chat_body.update(
-            {
-                "appId": self.appId,
-                "uid": self.uid,
-                "botId": self.flowId,
-            }
-        )
-        chat_body["inputs"].update(inputs)
-        return chat_body
 
     async def async_execute(
         self,
@@ -245,7 +215,8 @@ class FlowNode(BaseNode):
             async with aiohttp.ClientSession(
                 timeout=ClientTimeout(
                     total=30 * 60, sock_connect=30, sock_read=interval_timeout
-                )
+                ),
+                read_bufsize=1024 * 1024,  # 1MB high_water
             ) as session:
                 async with session.post(
                     url=url, headers=headers, json=req_body

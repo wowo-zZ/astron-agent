@@ -654,6 +654,10 @@ class VariablePool:
             else:
                 # Error: protocol issue
                 raise CustomException(err_code=CodeEnum.VARIABLE_PARSE_ERROR)
+        else:
+            # Convert the dependent node to LITERAL when the keyname is not in the input.
+            ref_var_type = ValueType.LITERAL.value
+            literal_var_value = "{{" + key_name + "}}"
         return RefNodeInfo(
             ref_node_id=ref_node_id,
             ref_var_name=ref_var_name,
