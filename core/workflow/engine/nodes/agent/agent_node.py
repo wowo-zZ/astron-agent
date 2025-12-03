@@ -242,7 +242,9 @@ class AgentNode(BaseNode):
                 total=30 * 60, sock_connect=30, sock_read=interval_timeout
             )
 
-            async with aiohttp.ClientSession(timeout=timeout_config) as session:
+            async with aiohttp.ClientSession(
+                timeout=timeout_config, read_bufsize=1024 * 1024  # 1MB high_water
+            ) as session:
                 async with session.post(
                     url=f"{os.getenv('AGENT_BASE_URL')}/agent/v1/custom/chat/completions",
                     headers=headers,

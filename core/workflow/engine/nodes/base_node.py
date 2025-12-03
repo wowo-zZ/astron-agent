@@ -3,7 +3,7 @@ import base64
 import json
 import os
 from abc import abstractmethod
-from asyncio import Event
+from asyncio import Queue
 from typing import Any, AsyncIterator, Dict, List, Literal, Optional, Tuple
 
 from pydantic import BaseModel, Field, PrivateAttr
@@ -82,8 +82,8 @@ class BaseNode(BaseModel):
     node_id: str = ""
     _private_config: PrivateConfig = PrivateAttr(default_factory=PrivateConfig)
     retry_config: RetryConfig = Field(default_factory=RetryConfig)
-    stream_node_first_token: Event = Field(
-        default_factory=Event
+    stream_node_first_token: Queue = Field(
+        default_factory=lambda: Queue(maxsize=1)
     )  # Event to track if streaming node has sent first token
     remarkVisible: bool = False
     remark: str = ""
@@ -139,10 +139,10 @@ class BaseNode(BaseModel):
             if not variable_pool.get_stream_node_has_sent_first_token(node_id):
                 # Mark that streaming node has sent first token
                 variable_pool.set_stream_node_has_sent_first_token(node_id)
-            if not self.stream_node_first_token.is_set():
+            if self.stream_node_first_token.empty():
                 # Mark that streaming output first frame has been sent,
                 # triggering engine to set exception branches as inactive
-                self.stream_node_first_token.set()
+                self.stream_node_first_token.put_nowait(True)
             if not msg_or_end_node_deps:
                 # No node dependencies during single node debugging
                 return
@@ -1365,8 +1365,10 @@ class BaseLLMNode(BaseNode):
                 # As long as put_llm_content method is executed, it proves LLM has sent first frame,
                 # so set has_sent_first_token to True
                 variable_pool.set_stream_node_has_sent_first_token(node_id)
-            if not self.stream_node_first_token.is_set():
-                self.stream_node_first_token.set()  # Mark streaming output first frame has been sent, trigger engine to set exception branches as inactive
+            if self.stream_node_first_token.empty():
+                self.stream_node_first_token.put_nowait(
+                    True
+                )  # Mark streaming output first frame has been sent, trigger engine to set exception branches as inactive
             if not msg_or_end_node_deps:
                 # No node dependencies during single node debugging
                 return
