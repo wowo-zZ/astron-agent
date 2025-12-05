@@ -51,7 +51,6 @@ def create_app() -> FastAPI:
     Returns:
         FastAPI: The configured FastAPI application instance.
     """
-    initialize_extensions()
     logger.info(""" AGENT SERVER START """)
 
     app = FastAPI()
@@ -147,11 +146,12 @@ def create_app() -> FastAPI:
 if __name__ == "__main__":
     logger.debug(f"current platform {sys.platform}")
     # app = asyncio.run(create_app())
+    initialize_extensions()
 
     uvicorn.run(
         app="main:create_app",
         host="0.0.0.0",
-        port=int(os.getenv("SERVICE_PORT", "17870")),
+        port=int(os.getenv("SERVICE_PORT", "8700")),
         workers=(
             None
             if sys.platform in ["win", "win32", "darwin"]
