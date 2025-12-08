@@ -30,6 +30,7 @@
 ## 📰 新闻动态
 
 - **[Astron 黑客松@2025科大讯飞全球1024开发者节](https://luma.com/9zmbc6xb)**
+- **[Astron Agent 郑州见面会](https://github.com/iflytek/astron-agent/discussions/672)**
 
 ## 🚀 快速开始
 
@@ -42,7 +43,7 @@
 git clone https://github.com/iflytek/astron-agent.git
 
 # 进入 astronAgent 目录
-cd docker/astronAgent
+cd astron-agent/docker/astronAgent
 
 # 复制环境变量配置
 cp .env.example .env

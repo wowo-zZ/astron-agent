@@ -169,6 +169,8 @@ class NodeExecutionTemplate:
                 raise CustomException(
                     CodeEnum.NODE_RUN_ERROR, cause_error=f"{err}"
                 ) from err
+            finally:
+                self.node.node_log.set_end()
 
     def _build_execution_parameters(
         self, span_context: Span, **kwargs: Any
@@ -209,7 +211,9 @@ class NodeExecutionTemplate:
             return
 
         if result.status != WorkflowNodeExecutionStatus.SUCCEEDED:
-            self._handle_failed_result(result, span_context)
+            self._handle_failed_result(
+                result, span_context, cast(WorkflowLog, kwargs.get("event_log_trace"))
+            )
             return
 
         await self._handle_successful_result(result, span_context, **kwargs)
@@ -223,12 +227,13 @@ class NodeExecutionTemplate:
         :param span_context: Tracing span context
         :param event_log_trace: Workflow event log trace
         """
-        if event_log_trace:
-            event_log_trace.add_node_log([self.node.node_log])
+        event_log_trace.add_node_log([self.node.node_log])
         self.node.node_log.running_status = False
         span_context.add_info_event(f"node {result.node_id} run cancelled.")
 
-    def _handle_failed_result(self, result: NodeRunResult, span_context: Span) -> None:
+    def _handle_failed_result(
+        self, result: NodeRunResult, span_context: Span, event_log_trace: WorkflowLog
+    ) -> None:
         """Handle failed execution result.
 
         :param result: Failed node execution result
@@ -243,6 +248,7 @@ class NodeExecutionTemplate:
             )
 
         self.node.node_log.running_status = False
+        event_log_trace.add_node_log([self.node.node_log])
         span_context.add_error_event(
             f"node {result.node_id} run failed, "
             f"err code {result.error.code}, err reason: {result.error}"

@@ -51,12 +51,9 @@ async def chat_debug(
         try:
             session = next(get_session())
 
-            if chat_vo.version:
-                db_flow = flow_service.get_latest_published_flow_by(
-                    chat_vo.flow_id, app_id, session, span_context, chat_vo.version
-                )
-            else:
-                db_flow = flow_service.get(chat_vo.flow_id, session, span)
+            db_flow = flow_service.get_flow_by_version(
+                chat_vo.flow_id, session, span_context, chat_vo.version
+            )
 
             app_info = app_service.get_info(app_id, session, span)
 

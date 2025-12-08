@@ -7,7 +7,7 @@ creation, updates, retrieval, debugging, and execution of workflow instances.
 
 import json
 import time
-from typing import Any, cast
+from typing import Any, Optional, cast
 
 from common.utils.snowfake import get_id
 from sqlmodel import Session  # type: ignore
@@ -124,6 +124,33 @@ def get(flow_id: str, session: Session, span: Span) -> Flow:
     return db_flow
 
 
+def get_flow_by_version(
+    flow_id: str, session: Session, span: Span, version: str = ""
+) -> Flow:
+    """
+    Retrieve a workflow by its flow ID from the database.
+
+    :param flow_id: The unique identifier of the workflow
+    :param session: Database session for querying
+    :param span: Tracing span for logging operations
+    :param version: Optional version number of the workflow (empty string for latest)
+    :return: The flow object if found
+    :raises CustomException: If flow with the given ID is not found
+    """
+    # Query database if not found in cache
+    db_flow: Optional[Flow] = get(flow_id, session, span)
+    if version and db_flow:
+        db_flow = (
+            session.query(Flow)
+            .filter_by(group_id=db_flow.group_id, version=version)
+            .first()
+        )
+
+    if db_flow:
+        return db_flow
+    raise CustomException(CodeEnum.FLOW_NOT_FOUND_ERROR)
+
+
 def get_latest_published_flow_by(
     flow_id: str, app_alias_id: str, session: Session, span: Span, version: str = ""
 ) -> Flow:
@@ -150,9 +177,7 @@ def get_latest_published_flow_by(
         return flow
 
     # Query database if not found in cache
-    db_flow = session.query(Flow).filter_by(id=int(flow_id)).first()
-    if not db_flow:
-        raise CustomException(CodeEnum.FLOW_NOT_FOUND_ERROR)
+    db_flow = get(flow_id, session, span)
 
     # Validate license permissions
     lic = license_dao.get_by(db_flow.group_id, app_alias_id, session)
