@@ -31,6 +31,7 @@
 
 - **[Astron 黑客松@2025科大讯飞全球1024开发者节](https://luma.com/9zmbc6xb)**
 - **[Astron Agent 郑州见面会](https://github.com/iflytek/astron-agent/discussions/672)**
+- **[Astron on Campus @ 浙江财经大学](https://mp.weixin.qq.com/s/oim_Z0ckgpFwf5jOskoJuA)**
 
 ## 🚀 快速开始
 
