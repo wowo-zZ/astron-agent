@@ -97,7 +97,7 @@ redis:
     enabled: true
     size: 5Gi
   auth:
-    password: ""
+    password: 123
   healthCheck:
     interval: 30
     timeout: 10
@@ -179,7 +179,7 @@ coreTenant:
     servicePort: 5052
     databaseType: mysql
     databaseUsername: root
-    databasePassword: root123
+    databasePassword: ""
     databaseUrl: "(astron-agent-mysql:3306)/tenant"
     maxOpenConns: 5
     maxIdleConns: 5
@@ -204,7 +204,7 @@ coreDatabase:
     pgsqlHost: astron-agent-postgres
     pgsqlPort: 5432
     pgsqlUser: spark
-    pgsqlPassword: spark123
+    pgsqlPassword: ""
     pgsqlDatabase: sparkdb_manager
     otlpEndpoint: "127.0.0.1:4317"
     otlpEnable: "0"
@@ -251,7 +251,7 @@ coreLink:
     mysqlHost: astron-agent-mysql
     mysqlPort: 3306
     mysqlUser: root
-    mysqlPassword: root123
+    mysqlPassword: ""
     mysqlDb: spark-link
     redisIsCluster: "false"
     redisAddr: astron-agent-redis:6379
@@ -284,8 +284,8 @@ coreAitools:
     aiApiSecret: ""
     ossType: s3
     ossEndpoint: "http://astron-agent-minio:9000"
-    ossAccessKeyId: minioadmin
-    ossAccessKeySecret: minioadmin123
+    ossAccessKeyId: ""
+    ossAccessKeySecret: ""
     ossBucketName: "workflow"
     ossTtl: "157788000"
     kafkaEnable: "0"
@@ -320,7 +320,7 @@ coreAgent:
     mysqlHost: astron-agent-mysql
     mysqlPort: 3306
     mysqlUser: root
-    mysqlPassword: root123
+    mysqlPassword: ""
     mysqlDb: agent
     otlpEndpoint: "127.0.0.1:4317"
     otlpMetricTimeout: "3000"
@@ -396,7 +396,7 @@ coreWorkflow:
     mysqlHost: astron-agent-mysql
     mysqlPort: 3306
     mysqlUser: root
-    mysqlPassword: root123
+    mysqlPassword: ""
     mysqlDb: workflow
     redisClusterAddr: ""
     redisAddr: astron-agent-redis:6379
@@ -414,8 +414,8 @@ coreWorkflow:
     otlpTraceExportTimeoutMillis: "3000"
     ossType: s3
     ossEndpoint: "http://astron-agent-minio:9000"
-    ossAccessKeyId: minioadmin
-    ossAccessKeySecret: minioadmin123
+    ossAccessKeyId: ""
+    ossAccessKeySecret: ""
     ossBucketName: "workflow"
     ossTtl: "157788000"
     kafkaEnable: "0"
@@ -476,16 +476,17 @@ consoleHub:
     # MySQL Configuration
     mysqlUrl: "jdbc:mysql://astron-agent-mysql:3306/astron_console"
     mysqlUser: root
-    mysqlPassword: root123
+    mysqlPassword: ""
     # Redis Configuration
     redisHost: astron-agent-redis
     redisPort: 6379
+    redisPassword: ""
     redisDatabaseConsole: 0
     # OSS/MinIO Configuration
     ossRemoteEndpoint: ""
     ossEndpoint: "http://astron-agent-minio:9000"
-    ossAccessKeyId: minioadmin
-    ossAccessKeySecret: minioadmin123
+    ossAccessKeyId: ""
+    ossAccessKeySecret: ""
     ossBucketConsole: console-oss
     ossPresignExpirySecondsConsole: 600
     oauth2IssuerUri: ""
