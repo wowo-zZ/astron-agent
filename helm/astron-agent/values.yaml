@@ -7,8 +7,6 @@ global:
   # Host base address for external access (e.g., http://your-domain.com)
   # Used for MinIO server URL and other external endpoints
   hostBaseAddress: "http://astron-agent.example.com"
-  # mysql initScript
-  initScriptsPath: /data/astron-agent/helm/astron-agent/files/mysql/
   # iFLYTEK Platform API Configuration
   # You can get your own API key and secret on the iFLYTEK Open Platform official website
   # SPARK LLM API: https://xinghuo.xfyun.cn/sparkapi
