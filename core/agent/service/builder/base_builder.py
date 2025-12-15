@@ -224,30 +224,14 @@ class BaseApiBuilder(BaseModel):
             else:
                 sk = await self.query_maas_sk(app_id, model_name)
 
-            # Normalize base_url: remove /chat/completions if present
-            # OpenAI SDK automatically appends this path
-            normalized_base_url = base_url
-            if base_url.endswith("/chat/completions"):
-                normalized_base_url = base_url.rsplit("/chat/completions", 1)[0]
-                sp.add_info_event(
-                    f"Normalized base_url: {base_url} -> {normalized_base_url}"
-                )
-            elif base_url.endswith("/completions"):
-                normalized_base_url = base_url.rsplit("/completions", 1)[0]
-                sp.add_info_event(
-                    f"Normalized base_url: {base_url} -> {normalized_base_url}"
-                )
-
             sp.add_info_events(
                 {
                     "model": model_name,
                     "base_url": base_url,
-                    "normalized_base_url": normalized_base_url,
                     "api_key": sk,
                     "app_id": app_id,
                 }
             )
-
             # Configure HTTP client with SSL and timeout settings
             # Create SSL context
             ssl_context = ssl.create_default_context()
@@ -274,7 +258,7 @@ class BaseApiBuilder(BaseModel):
                 name=model_name,
                 llm=AsyncOpenAI(
                     api_key=sk,
-                    base_url=normalized_base_url,
+                    base_url=base_url,
                     http_client=http_client,
                     timeout=300.0,  # Overall timeout: 5 minutes
                     max_retries=2,  # Retry failed requests twice
