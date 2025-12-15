@@ -1,6 +1,8 @@
 package com.iflytek.astron.console.hub.controller;
 
+import cn.hutool.core.util.RandomUtil;
 import com.iflytek.astron.console.commons.response.ApiResult;
+import com.iflytek.astron.console.commons.util.RequestContextUtil;
 import com.iflytek.astron.console.commons.util.S3ClientUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,9 +24,11 @@ public class S3Controller {
     @GetMapping("/presign")
     public ApiResult<PresignResp> presignPut(@RequestParam("objectKey") String objectKey, @RequestParam(value = "contentType", required = false) String contentType) {
         // contentType is only used by frontend to set request headers, not involved in signature
+        String uid = RequestContextUtil.getUID();
         String bucket = s3ClientUtil.getDefaultBucket();
+        String fileName = uid + "_" + RandomUtil.randomString(6) + objectKey;
         int expiry = s3ClientUtil.getPresignExpirySeconds();
-        String url = s3ClientUtil.generatePresignedPutUrl(bucket, objectKey, expiry);
+        String url = s3ClientUtil.generatePresignedPutUrl(bucket, fileName, expiry);
         return ApiResult.success(new PresignResp(url, bucket, objectKey));
     }
 
