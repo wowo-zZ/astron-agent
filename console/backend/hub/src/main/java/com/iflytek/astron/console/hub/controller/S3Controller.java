@@ -29,7 +29,7 @@ public class S3Controller {
         String fileName = uid + "_" + RandomUtil.randomString(6) + objectKey;
         int expiry = s3ClientUtil.getPresignExpirySeconds();
         String url = s3ClientUtil.generatePresignedPutUrl(bucket, fileName, expiry);
-        return ApiResult.success(new PresignResp(url, bucket, objectKey));
+        return ApiResult.success(new PresignResp(url, bucket, fileName));
     }
 
     @Data
