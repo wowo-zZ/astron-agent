@@ -26,7 +26,7 @@ public class S3Controller {
         // contentType is only used by frontend to set request headers, not involved in signature
         String uid = RequestContextUtil.getUID();
         String bucket = s3ClientUtil.getDefaultBucket();
-        String fileName = uid + "_" + RandomUtil.randomString(6) + objectKey;
+        String fileName = uid + "_" + RandomUtil.randomString(6) + new java.io.File(objectKey).getName();
         int expiry = s3ClientUtil.getPresignExpirySeconds();
         String url = s3ClientUtil.generatePresignedPutUrl(bucket, fileName, expiry);
         return ApiResult.success(new PresignResp(url, bucket, fileName));
