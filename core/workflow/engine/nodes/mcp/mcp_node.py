@@ -7,6 +7,7 @@ import httpx
 from aiohttp import ClientTimeout
 from pydantic import Field, model_validator
 
+from workflow.engine.entities.private_config import PrivateConfig
 from workflow.engine.entities.variable_pool import VariablePool
 from workflow.engine.nodes.base_node import BaseNode
 from workflow.engine.nodes.entities.node_run_result import (
@@ -27,6 +28,7 @@ class MCPNode(BaseNode):
     supporting dynamic tool execution with configurable parameters and server endpoints.
     """
 
+    _private_config = PrivateConfig(timeout=5 * 60.0)
     mcpServerId: str = Field(default="", description="MCP server unique identifier")
     mcpServerUrl: str = Field(default="", description="MCP server endpoint URL")
     toolName: str = Field(..., description="Name of the MCP tool to execute")
@@ -81,7 +83,7 @@ class MCPNode(BaseNode):
             }
             # Execute MCP tool call
             async with aiohttp.ClientSession(
-                timeout=ClientTimeout(total=30 * 60, sock_connect=30)
+                timeout=ClientTimeout(total=5 * 60, sock_connect=30)
             ) as session:
                 async with session.post(url, json=req_body) as resp:
                     if resp.status != httpx.codes.OK:
@@ -108,7 +110,14 @@ class MCPNode(BaseNode):
                             err_msg=msg,
                             cause_error=msg,
                         )
-
+            if not self.output_identifier:
+                msg = "MCP node output identifier is empty"
+                span.add_error_event(msg)
+                raise CustomException(
+                    err_code=CodeEnum.MCP_ERROR,
+                    err_msg=msg,
+                    cause_error=msg,
+                )
             outputs = {self.output_identifier[0]: res_json.get("data", {})}
             return NodeRunResult(
                 status=status,
