@@ -12,6 +12,7 @@ from workflow.consts.engine.model_provider import ModelProviderEnum
 from workflow.engine.callbacks.openai_types_sse import GenerateUsage
 from workflow.engine.entities.history import EnableChatHistoryV2
 from workflow.engine.entities.msg_or_end_dep_info import MsgOrEndDepInfo
+from workflow.engine.entities.private_config import PrivateConfig
 from workflow.engine.entities.variable_pool import VariablePool
 from workflow.engine.nodes.base_node import BaseNode
 from workflow.engine.nodes.entities.node_run_result import (
@@ -167,6 +168,8 @@ class AgentNode(BaseNode):
     :param enableChatHistoryV2: Chat history configuration
     :param source: Model provider source (default: XINGHUO)
     """
+
+    _private_config = PrivateConfig(timeout=5 * 60.0)
 
     appId: str = Field(...)
     apiKey: str = Field(...)

@@ -165,6 +165,9 @@ class ParamKey(str, Enum):
     FlowId = "flow_id"
     FlowOutputMode = "flow_output_mode"
     IsRelease = "is_release"
+    ChatId = "chat_id"
+    Uid = "uid"
+    AppId = "app_id"
 
 
 class SystemParams:
@@ -179,13 +182,14 @@ class SystemParams:
         self, key: ParamKey, value: Any, *, node_id: Optional[str] = None
     ) -> "SystemParams":
         """
-        Set a system parameter value.
+        Set system parameter value(s).
 
         :param key: Parameter key
-        :param value: Parameter value
+        :param value: Parameter value (ignored if key is a dict)
         :param node_id: Optional node ID for node-specific parameters
         :return: Self for method chaining
         """
+
         if node_id is None:
             self._data[key] = value
         else:
@@ -481,8 +485,6 @@ class VariablePool:
         self.do_validate(
             node_id=node_id, key_name_list=key_name_list, outputs=value, span=span
         )
-        # Generate chat_id from span
-        self.chat_id = span.chat_id
         for key in key_name_list:
             mapping_key = assemble_mapping_key(node_id, key)
             if mapping_key not in self.output_variable_mapping:
