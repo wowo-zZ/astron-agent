@@ -1034,6 +1034,8 @@ class BaseLLMNode(BaseNode):
     :param chat_ai: Chat AI instance
     """
 
+    _private_config = PrivateConfig(timeout=5 * 60.0)
+
     domain: str = Field(...)
     appId: str = Field(...)
     apiKey: str = Field(default="")
@@ -1285,6 +1287,9 @@ class BaseLLMNode(BaseNode):
                 status, content, reasoning_content, token_usage = (
                     self._get_chat_ai().decode_message(msg)
                 )
+                # Mark streaming output first frame has been sent, trigger engine to set exception branches as inactive
+                if self.stream_node_first_token.empty():
+                    self.stream_node_first_token.put_nowait(True)
                 if reasoning_content:
                     reasoning_contents.append(reasoning_content)
                 if stream and self.respFormat != RespFormatEnum.JSON.value:
@@ -1359,10 +1364,6 @@ class BaseLLMNode(BaseNode):
                 # As long as put_llm_content method is executed, it proves LLM has sent first frame,
                 # so set has_sent_first_token to True
                 variable_pool.set_stream_node_has_sent_first_token(node_id)
-            if self.stream_node_first_token.empty():
-                self.stream_node_first_token.put_nowait(
-                    True
-                )  # Mark streaming output first frame has been sent, trigger engine to set exception branches as inactive
             if not msg_or_end_node_deps:
                 # No node dependencies during single node debugging
                 return
