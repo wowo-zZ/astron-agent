@@ -31,6 +31,8 @@ The platform supports **high-availability** deployment, enabling organizations t
 - **[Astron Hackathon @ 2025 iFLYTEK Global 1024 Developer Festival](https://luma.com/9zmbc6xb)**
 - **[Astron Agent Zhengzhou Meetup](https://github.com/iflytek/astron-agent/discussions/672)**
 - **[Astron on Campus @ Zhejiang University of Finance and Economics](https://mp.weixin.qq.com/s/oim_Z0ckgpFwf5jOskoJuA)**
+- **[Astron Agent & RPA · Qingdao Meetup Brings Agentic AI!](https://github.com/iflytek/astron-agent/discussions/740)**
+- **[Astron Training Camp · Cohort #1](https://www.aidaxue.com/astronCamp)**
 
 ## 🚀 Quick Start
 
