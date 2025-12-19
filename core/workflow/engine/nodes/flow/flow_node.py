@@ -315,8 +315,8 @@ class FlowNode(BaseNode):
         # Initialize request headers
         headers = {"Content-Type": "application/json"}
 
-        chat_id: str = variable_pool.system_params.get(ParamKey.ChatId)
-        uid: str = variable_pool.system_params.get(ParamKey.Uid)
+        chat_id: str = variable_pool.system_params.get(ParamKey.ChatId, default="")
+        uid: str = variable_pool.system_params.get(ParamKey.Uid, default="")
 
         # Process chat history if enabled
         history = []
