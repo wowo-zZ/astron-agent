@@ -725,6 +725,7 @@ async def http_run(run_params: HttpRunRequest) -> HttpRunResponse:
     with span.start(func_name="http_run") as span_context:
         node_trace.sid = span_context.sid
         node_trace.chat_id = span_context.sid
+        node_trace.caller = "http_run"
         m = setup_logging_and_metrics(span_context, run_params_list)
 
         params, error_response = await validate_and_get_params(
@@ -782,7 +783,7 @@ async def tool_debug(tool_debug_params: ToolDebugRequest) -> ToolDebugResponse:
                 uid=span_context.uid,
                 chat_id=span_context.sid,
                 sub="spark-link",
-                caller=caller,
+                caller="tool_debug",
                 log_caller="",
                 question=json.dumps(run_params_list, ensure_ascii=False),
             )

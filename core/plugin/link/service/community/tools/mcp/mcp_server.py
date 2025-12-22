@@ -187,7 +187,7 @@ async def tool_list(list_info: MCPToolListRequest = Body()) -> MCPToolListRespon
             uid=span_context.uid,
             chat_id=span_context.sid,
             sub="spark-link",
-            caller="mcp_caller",
+            caller="tool_list",
             log_caller="",
             question=list_info.model_dump_json(),
         )
@@ -438,7 +438,7 @@ async def call_tool(call_info: MCPCallToolRequest = Body()) -> MCPCallToolRespon
             uid=span_context.uid,
             chat_id=span_context.sid,
             sub="spark-link",
-            caller="mcp_caller",
+            caller="call_tool",
             log_caller="",
             question=call_info.model_dump_json(),
         )
