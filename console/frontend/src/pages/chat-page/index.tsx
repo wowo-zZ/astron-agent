@@ -185,6 +185,8 @@ const ChatPage = (): ReactElement => {
               );
           }
         }
+      } else {
+        setChatType('text');
       }
       const workflowBotInfo = await getWorkflowBotInfoApi(botId);
       setBotInfo({

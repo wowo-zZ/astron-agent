@@ -4,6 +4,7 @@ import json
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional, Union, cast
 
+from loguru import logger
 from pydantic import BaseModel
 
 from workflow.engine.callbacks.callback_handler import ChatCallBacks
@@ -169,6 +170,8 @@ class NodeExecutionTemplate:
                 raise CustomException(
                     CodeEnum.NODE_RUN_ERROR, cause_error=f"{err}"
                 ) from err
+            finally:
+                self.node.node_log.set_end()
 
     def _build_execution_parameters(
         self, span_context: Span, **kwargs: Any
@@ -209,7 +212,9 @@ class NodeExecutionTemplate:
             return
 
         if result.status != WorkflowNodeExecutionStatus.SUCCEEDED:
-            self._handle_failed_result(result, span_context)
+            self._handle_failed_result(
+                result, span_context, cast(WorkflowLog, kwargs.get("event_log_trace"))
+            )
             return
 
         await self._handle_successful_result(result, span_context, **kwargs)
@@ -223,12 +228,13 @@ class NodeExecutionTemplate:
         :param span_context: Tracing span context
         :param event_log_trace: Workflow event log trace
         """
-        if event_log_trace:
-            event_log_trace.add_node_log([self.node.node_log])
+        event_log_trace.add_node_log([self.node.node_log])
         self.node.node_log.running_status = False
         span_context.add_info_event(f"node {result.node_id} run cancelled.")
 
-    def _handle_failed_result(self, result: NodeRunResult, span_context: Span) -> None:
+    def _handle_failed_result(
+        self, result: NodeRunResult, span_context: Span, event_log_trace: WorkflowLog
+    ) -> None:
         """Handle failed execution result.
 
         :param result: Failed node execution result
@@ -243,6 +249,7 @@ class NodeExecutionTemplate:
             )
 
         self.node.node_log.running_status = False
+        event_log_trace.add_node_log([self.node.node_log])
         span_context.add_error_event(
             f"node {result.node_id} run failed, "
             f"err code {result.error.code}, err reason: {result.error}"
@@ -598,6 +605,12 @@ class SparkFlowEngineNode(BaseModel):
         # Record LLM output
         if self.node_id.split(":")[0] in self.llm_nodes:
             self.node_log.llm_output = result.raw_output
+
+        try:
+            self.node_log.append_config_data(self.node_instance.__dict__)
+        except Exception as err:
+            logger.error(f"Failed to append config data: {err}")
+
         self.node_log.set_end()
 
     async def async_call(
@@ -796,6 +809,17 @@ class NodeFactory:
                 if item_checker and not all(item_checker(item) for item in value):
                     return False
 
+        # Special handling for object type properties checking
+        if expected_type == "object" and "properties" in schema:
+            properties = schema["properties"]
+            for prop_name, prop_schema in properties.items():
+                if prop_name in value:
+                    prop_type = prop_schema.get("type")
+                    if prop_type and not NodeFactory._check_type_match(
+                        value[prop_name], prop_type, prop_schema
+                    ):
+                        return False
+
         return True
 
     @staticmethod
@@ -944,9 +968,6 @@ class NodeFactory:
             input_keys.append(id_name_dict)
         else:
             input_keys = [node_input.name for node_input in inputs]
-
-        for node_output in outputs:
-            output_keys.append(node_output.name)
 
         return node_class(
             node_id=node.id,

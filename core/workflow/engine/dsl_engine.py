@@ -380,8 +380,10 @@ class RetryableErrorHandler(ExceptionHandlerBase):
             )
             input_dict.update({input_key: input_value})
 
-        if not node.node_instance.stream_node_first_token.is_set():
-            node.node_instance.stream_node_first_token.set()
+        if node.node_instance.stream_node_first_token.empty():
+            node.node_instance.stream_node_first_token.put_nowait(
+                CustomException(CodeEnum.NODE_RUN_ERROR)
+            )
         # Create result
         run_result = NodeRunResult(
             status=WorkflowNodeExecutionStatus.SUCCEEDED,
@@ -1175,6 +1177,8 @@ class WorkflowEngine(BaseModel):
                 timeout=node.node_instance._private_config.timeout,
             )
             return run_result, False
+        except TimeoutError:
+            error = CustomException(CodeEnum.NODE_RUN_TIMEOUT_ERROR)
         except Exception as err:
             if isinstance(err, CustomException):
                 error = err
@@ -1295,7 +1299,9 @@ class WorkflowEngine(BaseModel):
 
         # Create waiting task to handle cancellation of failure nodes
         async def wait_and_deactivate() -> None:
-            await node.node_instance.stream_node_first_token.wait()
+            result = await node.node_instance.stream_node_first_token.get()
+            if isinstance(result, Exception):
+                return
             cancel_error_node_ids = [
                 n.id for n in node.fail_nodes if n not in node.next_nodes
             ]
