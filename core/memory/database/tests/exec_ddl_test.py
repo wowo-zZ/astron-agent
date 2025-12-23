@@ -13,6 +13,8 @@ from memory.database.api.v1.exec_ddl import (
     _extract_drop_info,
     _rebuild_ddl_from_ast,
     _reset_uid,
+    _validate_ddl_legality,
+    _validate_name_pattern_ddl,
     exec_ddl,
     is_ddl_allowed,
 )
@@ -327,3 +329,153 @@ def test_rebuild_ddl_from_ast() -> None:
     if rebuilt_drop.strip():
         assert "DROP" in rebuilt_drop.upper()
         assert "TABLE" in rebuilt_drop.upper()
+
+
+def test_validate_name_pattern_ddl_valid() -> None:
+    """Test name pattern validation with valid names (letters and underscores only)."""
+    names = ["user_name", "age", "email_address", "first_name", "last_name"]
+    span_context = MagicMock()
+    span_context.sid = "test-sid"
+    mock_meter = MagicMock()
+    uid = "u1"
+
+    result = _validate_name_pattern_ddl(
+        names, "Column name", uid, span_context, mock_meter
+    )
+    assert result is None
+    mock_meter.in_error_count.assert_not_called()
+
+
+def test_validate_name_pattern_ddl_invalid_with_digits() -> None:
+    """Test name pattern validation with invalid names containing digits."""
+    # This test case specifically addresses the code scanning issue:
+    # identifiers with digits (e.g., users_v2) should be rejected
+    names = ["users_v2", "table_2024", "column123"]
+    span_context = MagicMock()
+    span_context.sid = "test-sid"
+    span_context.add_error_event = MagicMock()
+    mock_meter = MagicMock()
+    mock_meter.in_error_count = MagicMock()
+    uid = "u1"
+
+    result = _validate_name_pattern_ddl(
+        names, "Column name", uid, span_context, mock_meter
+    )
+    assert result is not None
+    mock_meter.in_error_count.assert_called_once()
+    span_context.add_error_event.assert_called_once()
+    # Parse JSONResponse body to verify error code
+    body = json.loads(result.body)
+    assert body["code"] == CodeEnum.DDLNotAllowed.code
+    assert "only letters and underscores are supported" in body["message"]
+
+
+def test_validate_name_pattern_ddl_invalid_with_special_chars() -> None:
+    """Test name pattern validation with invalid names containing special characters."""
+    names = ["user-name", "email@address", "column.name"]
+    span_context = MagicMock()
+    span_context.sid = "test-sid"
+    span_context.add_error_event = MagicMock()
+    mock_meter = MagicMock()
+    mock_meter.in_error_count = MagicMock()
+    uid = "u1"
+
+    result = _validate_name_pattern_ddl(
+        names, "Column name", uid, span_context, mock_meter
+    )
+    assert result is not None
+    mock_meter.in_error_count.assert_called_once()
+    span_context.add_error_event.assert_called_once()
+    body = json.loads(result.body)
+    assert body["code"] == CodeEnum.DDLNotAllowed.code
+
+
+def test_validate_name_pattern_ddl_invalid_empty_name() -> None:
+    """Test name pattern validation with empty name."""
+    names = [""]
+    span_context = MagicMock()
+    span_context.sid = "test-sid"
+    span_context.add_error_event = MagicMock()
+    mock_meter = MagicMock()
+    mock_meter.in_error_count = MagicMock()
+    uid = "u1"
+
+    result = _validate_name_pattern_ddl(
+        names, "Column name", uid, span_context, mock_meter
+    )
+    assert result is not None
+    mock_meter.in_error_count.assert_called_once()
+    span_context.add_error_event.assert_called_once()
+    body = json.loads(result.body)
+    assert body["code"] == CodeEnum.DDLNotAllowed.code
+
+
+@pytest.mark.asyncio
+async def test_validate_ddl_legality_valid() -> None:
+    """Test DDL legality validation with valid DDL statements."""
+    ddl = "CREATE TABLE users (id INT, name TEXT)"
+    span_context = MagicMock()
+    span_context.sid = "test-sid"
+    mock_meter = MagicMock()
+    uid = "u1"
+
+    result = await _validate_ddl_legality(ddl, uid, span_context, mock_meter)
+    assert result is None
+    mock_meter.in_error_count.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_validate_ddl_legality_invalid_column_name_with_digits() -> None:
+    """Test DDL legality validation with invalid column name containing digits."""
+    # This test case specifically addresses the code scanning issue:
+    # CREATE TABLE users_v2 (id INT) would have caught the overly restrictive regex pattern
+    ddl = "CREATE TABLE users (id INT, users_v2 TEXT)"
+    span_context = MagicMock()
+    span_context.sid = "test-sid"
+    span_context.add_error_event = MagicMock()
+    mock_meter = MagicMock()
+    mock_meter.in_error_count = MagicMock()
+    uid = "u1"
+
+    result = await _validate_ddl_legality(ddl, uid, span_context, mock_meter)
+    assert result is not None
+    # Parse JSONResponse body to get code
+    body = json.loads(result.body)
+    assert body["code"] == CodeEnum.DDLNotAllowed.code
+    assert "only letters and underscores are supported" in body["message"]
+
+
+@pytest.mark.asyncio
+async def test_validate_ddl_legality_invalid_column_name_alter() -> None:
+    """Test DDL legality validation with invalid column name in ALTER statement."""
+    ddl = "ALTER TABLE users ADD COLUMN age123 INT"
+    span_context = MagicMock()
+    span_context.sid = "test-sid"
+    span_context.add_error_event = MagicMock()
+    mock_meter = MagicMock()
+    mock_meter.in_error_count = MagicMock()
+    uid = "u1"
+
+    result = await _validate_ddl_legality(ddl, uid, span_context, mock_meter)
+    assert result is not None
+    body = json.loads(result.body)
+    assert body["code"] == CodeEnum.DDLNotAllowed.code
+
+
+@pytest.mark.asyncio
+async def test_validate_ddl_legality_invalid_sql() -> None:
+    """Test DDL legality validation with invalid SQL syntax."""
+    ddl = "CREATE TABLE WHERE INVALID SQL"
+    span_context = MagicMock()
+    span_context.sid = "test-sid"
+    span_context.add_error_event = MagicMock()
+    mock_meter = MagicMock()
+    mock_meter.in_error_count = MagicMock()
+    uid = "u1"
+
+    result = await _validate_ddl_legality(ddl, uid, span_context, mock_meter)
+    assert result is not None
+    # Parse JSONResponse body to get code
+    body = json.loads(result.body)
+    assert body["code"] == CodeEnum.SQLParseError.code
+    span_context.add_error_event.assert_called_once()
