@@ -10,6 +10,7 @@ import atexit
 import base64
 import json
 import os
+import queue
 import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Dict, List, Optional, Tuple
@@ -43,13 +44,6 @@ from plugin.link.utils.json_schemas.schema_validate import api_validate
 from plugin.link.utils.open_api_schema.schema_parser import OpenapiSchemaParser
 from plugin.link.utils.uid.generate_uid import new_uid
 
-try:
-    max_workers = int(os.getenv(const.KAFKA_THREAD_NUM_KEY, "10"))
-except Exception:
-    max_workers = 10
-kafka_send_executor = ThreadPoolExecutor(max_workers=max_workers)
-atexit.register(kafka_send_executor.shutdown, wait=True)
-
 default_value = {
     " 'string'": "",
     " 'number'": 0,
@@ -58,6 +52,26 @@ default_value = {
     " 'boolean'": False,
     " 'integer'": 0,
 }
+
+global_kafka_queue: queue.Queue = queue.Queue(maxsize=10000)
+
+
+def init_kafka_send_worker() -> None:
+    max_workers = 10
+    kafka_send_executor = ThreadPoolExecutor(max_workers=max_workers)
+    atexit.register(kafka_send_executor.shutdown, wait=True)
+    loop = asyncio.get_event_loop()
+    loop.run_in_executor(kafka_send_executor, init_kafka_producer)
+
+
+def init_kafka_producer() -> None:
+    kafka_producer = get_kafka_producer_service()
+    while True:
+        if global_kafka_queue.empty():
+            time.sleep(1)
+            continue
+        data = global_kafka_queue.get()
+        kafka_producer.send(os.getenv(const.KAFKA_TOPIC_KEY), data)
 
 
 def extract_request_params(
@@ -84,16 +98,10 @@ def extract_request_params(
 
 async def send_telemetry(node_trace: NodeTraceLog) -> None:
     """Send telemetry data to Kafka."""
+    global global_kafka_queue
     if os.getenv(const.OTLP_ENABLE_KEY, "0").lower() == "1":
-        kafka_service = get_kafka_producer_service()
         node_trace.start_time = int(round(time.time() * 1000))
-        loop = asyncio.get_running_loop()
-        await loop.run_in_executor(
-            kafka_send_executor,
-            kafka_service.send,
-            os.getenv(const.KAFKA_TOPIC_KEY),
-            node_trace.to_json(),
-        )
+        global_kafka_queue.put(node_trace.to_json())
 
 
 async def handle_validation_error(
