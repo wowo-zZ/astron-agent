@@ -4,8 +4,6 @@ import re
 import string
 from typing import Any, List, Union
 
-import asyncpg
-import asyncpg.exceptions
 import sqlglot
 from common.otlp.trace.span import Span
 from common.service import get_otlp_metric_service, get_otlp_span_service
@@ -18,9 +16,9 @@ from memory.database.api.v1.common import (
 from memory.database.domain.entity.general import exec_sql_statement
 from memory.database.domain.entity.schema import set_search_path_by_schema
 from memory.database.domain.entity.views.http_resp import format_response
+from memory.database.exceptions.e import CustomException
 from memory.database.exceptions.error_code import CodeEnum
 from memory.database.repository.middleware.getters import get_session
-from memory.database.utils.exception_util import unwrap_cause
 from sqlglot.errors import ParseError
 from sqlglot.expressions import Alter, ColumnDef, Command, Create, Drop
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -176,7 +174,7 @@ def _collect_ddl_identifiers(parsed: Any) -> list:
 
 
 def _validate_name_pattern_ddl(
-    names: list, name_type: str, uid: str, span_context: Any, m: Any
+    names: list, name_type: str, uid: str, span_context: Any
 ) -> Any:
     """
     Validate name pattern for DDL identifiers.
@@ -207,11 +205,6 @@ def _validate_name_pattern_ddl(
     for name in names:
         # Check if name is empty
         if not name:
-            m.in_error_count(
-                CodeEnum.DDLNotAllowed.code,
-                lables={"uid": uid},
-                span=span_context,
-            )
             span_context.add_error_event(
                 f"{name_type}: '{name}' does not conform to rules, only letters and underscores are supported"
             )
@@ -223,11 +216,6 @@ def _validate_name_pattern_ddl(
 
         # Validate using column name
         if not all(c in allow_chars for c in name):
-            m.in_error_count(
-                CodeEnum.DDLNotAllowed.code,
-                lables={"uid": uid},
-                span=span_context,
-            )
             span_context.add_error_event(
                 f"{name_type}: '{name}' does not conform to rules, only letters and underscores are supported"
             )
@@ -239,7 +227,7 @@ def _validate_name_pattern_ddl(
     return None
 
 
-async def _validate_ddl_legality(ddl: str, uid: str, span_context: Any, m: Any) -> Any:
+async def _validate_ddl_legality(ddl: str, uid: str, span_context: Any) -> Any:
     """
     Validate DDL statement legality similar to DML validation logic.
 
@@ -267,7 +255,7 @@ async def _validate_ddl_legality(ddl: str, uid: str, span_context: Any, m: Any) 
         # Validate column names
         if column_names:
             error_result = _validate_name_pattern_ddl(
-                column_names, "Column name", uid, span_context, m
+                column_names, "Column name", uid, span_context
             )
             if error_result:
                 return error_result
@@ -275,12 +263,6 @@ async def _validate_ddl_legality(ddl: str, uid: str, span_context: Any, m: Any) 
         return None
     except Exception as parse_error:  # pylint: disable=broad-except
         span_context.add_error_event(f"DDL validate legality error: {parse_error}")
-        m.in_error_count(
-            CodeEnum.SQLParseError.code,
-            lables={"uid": uid},
-            span=span_context,
-        )
-
         return format_response(
             code=CodeEnum.SQLParseError.code,
             message=f"DDL validate legality error: {parse_error}",
@@ -349,29 +331,6 @@ async def _execute_ddl_statements(
                 raise exec_error
 
 
-async def _handle_ddl_error(
-    ddl_error: Exception, db: Any, m: Any, uid: str, span_context: Any
-) -> Any:
-    """Handle DDL execution errors."""
-    span_context.record_exception(ddl_error)
-    await db.rollback()
-    m.in_error_count(
-        CodeEnum.DDLExecutionError.code, lables={"uid": uid}, span=span_context
-    )
-    root_exc = unwrap_cause(ddl_error)
-    if isinstance(root_exc, asyncpg.exceptions.DatatypeMismatchError):
-        return format_response(  # type: ignore[no-any-return]
-            code=CodeEnum.DDLExecutionError.code,
-            message=f"Data type mismatch error, reason: {str(root_exc)}",
-            sid=span_context.sid,
-        )
-    return format_response(
-        code=CodeEnum.DDLExecutionError.code,
-        message=f"DDL statement execution failed, reason: {str(root_exc)}",
-        sid=span_context.sid,
-    )
-
-
 @exec_ddl_router.post("/exec_ddl", response_class=JSONResponse)
 async def exec_ddl(
     ddl_input: ExecDDLInput, db: AsyncSession = Depends(get_session)
@@ -411,18 +370,18 @@ async def exec_ddl(
         span_context.add_info_event(f"uid: {uid}")
 
         uid, error_reset = await _reset_uid(
-            db, database_id, space_id, uid, span_context, m
+            db, database_id, space_id, uid, span_context
         )
         if error_reset:
             return error_reset  # type: ignore[no-any-return]
 
         schema_list, error_resp = await check_database_exists_by_did_uid(
-            db, database_id, uid, span_context, m
+            db, database_id, uid, span_context
         )
         if error_resp:
             return error_resp  # type: ignore[no-any-return]
 
-        ddls, error_split = await _ddl_split(ddl, uid, span_context, m)
+        ddls, error_split = await _ddl_split(ddl, uid, span_context)
         if error_split:
             return error_split  # type: ignore[no-any-return]
 
@@ -435,19 +394,37 @@ async def exec_ddl(
                 message=CodeEnum.Successes.msg,
                 sid=span_context.sid,
             )
-        except Exception as ddl_error:  # pylint: disable=broad-except
-            return await _handle_ddl_error(ddl_error, db, m, uid, span_context)  # type: ignore[no-any-return]
+        except CustomException as custom_error:
+            span_context.record_exception(custom_error)
+            await db.rollback()
+            m.in_error_count(custom_error.code, lables={"uid": uid}, span=span_context)
+            return format_response(  # type: ignore[no-any-return]
+                code=custom_error.code,
+                message="Database execution failed",
+                sid=span_context.sid,
+            )
+        except Exception as unexpected_error:  # pylint: disable=broad-except
+            m.in_error_count(
+                CodeEnum.DDLExecutionError.code, lables={"uid": uid}, span=span_context
+            )
+            span_context.record_exception(unexpected_error)
+            await db.rollback()
+            return format_response(  # type: ignore[no-any-return]
+                code=CodeEnum.DDLExecutionError.code,
+                message="Database execution failed",
+                sid=span_context.sid,
+            )
 
 
 async def _reset_uid(
-    db: Any, database_id: int, space_id: str, uid: str, span_context: Any, m: Any
+    db: Any, database_id: int, space_id: str, uid: str, span_context: Any
 ) -> Any:
     """Reset UID based on space ID if provided."""
     new_uid = uid
 
     if space_id:
         create_uid_res, error = await check_space_id_and_get_uid(
-            db, database_id, space_id, span_context, m
+            db, database_id, space_id, span_context
         )
         if error:
             return None, error
@@ -460,7 +437,7 @@ async def _reset_uid(
     return new_uid, None
 
 
-async def _ddl_split(ddl: str, uid: str, span_context: Any, m: Any) -> Any:
+async def _ddl_split(ddl: str, uid: str, span_context: Any) -> Any:
     """Split DDL statements, validate them, and reconstruct safe versions."""
     ddl = ddl.strip()
     original_ddls = [
@@ -473,9 +450,6 @@ async def _ddl_split(ddl: str, uid: str, span_context: Any, m: Any) -> Any:
         # First, use the original validation logic
         if not is_ddl_allowed(statement, span_context):
             span_context.add_error_event(f"invalid ddl: {statement}")
-            m.in_error_count(
-                CodeEnum.DDLNotAllowed.code, lables={"uid": uid}, span=span_context
-            )
             return None, format_response(
                 CodeEnum.DDLNotAllowed.code,
                 message=f"DDL statement is invalid, illegal statement: {statement}",
@@ -483,7 +457,7 @@ async def _ddl_split(ddl: str, uid: str, span_context: Any, m: Any) -> Any:
             )
 
         # After validation passes, validate DDL legality (identifier validation)
-        error_legality = await _validate_ddl_legality(statement, uid, span_context, m)
+        error_legality = await _validate_ddl_legality(statement, uid, span_context)
         if error_legality:
             return None, error_legality
 
@@ -492,9 +466,6 @@ async def _ddl_split(ddl: str, uid: str, span_context: Any, m: Any) -> Any:
         if not safe_statement:
             span_context.add_error_event(
                 f"DDL reconstruction failed for security: {statement}"
-            )
-            m.in_error_count(
-                CodeEnum.DDLNotAllowed.code, lables={"uid": uid}, span=span_context
             )
             return None, format_response(
                 CodeEnum.DDLNotAllowed.code,

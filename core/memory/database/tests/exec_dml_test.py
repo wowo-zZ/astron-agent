@@ -119,7 +119,6 @@ async def test_set_search_path_success() -> None:
     """Test search path setting (success scenario)."""
     mock_db = AsyncMock(spec=AsyncSession)
     mock_span_context = MagicMock()
-    mock_meter = MagicMock()
 
     with patch(
         "memory.database.api.v1.exec_dml.set_search_path_by_schema",
@@ -133,7 +132,6 @@ async def test_set_search_path_success() -> None:
             env="prod",
             uid="u1",
             span_context=mock_span_context,
-            m=mock_meter,
         )
 
         assert error is None
@@ -147,7 +145,6 @@ async def test_dml_split_success() -> None:
     """Test SQL splitting and validation (success scenario)."""
     mock_db = AsyncMock(spec=AsyncSession)
     mock_span_context = MagicMock()
-    mock_meter = MagicMock()
 
     mock_result = MagicMock()
     mock_result.fetchall.return_value = [("users",)]
@@ -162,7 +159,6 @@ async def test_dml_split_success() -> None:
             schema="prod_u1_1001",
             uid="u1",
             span_context=mock_span_context,
-            m=mock_meter,
         )
 
         assert error is None
@@ -178,7 +174,6 @@ async def test_exec_dml_sql_success() -> None:
     """Test SQL execution (success scenario)."""
     mock_db = AsyncMock(spec=AsyncSession)
     mock_span_context = MagicMock()
-    mock_meter = MagicMock()
 
     mock_result = MagicMock()
     mock_result.mappings.return_value.all.return_value = []
@@ -199,7 +194,6 @@ async def test_exec_dml_sql_success() -> None:
             rewrite_dmls=rewrite_dmls,
             uid="u1",
             span_context=mock_span_context,
-            m=mock_meter,
         )
 
         assert error is None
@@ -433,12 +427,10 @@ def test_validate_comparison_nodes_valid() -> None:
     parsed = parse_one(dml)
     span_context = MagicMock()
     span_context.sid = "test-sid"
-    mock_meter = MagicMock()
     uid = "u1"
 
-    result = _validate_comparison_nodes(parsed, uid, span_context, mock_meter)
+    result = _validate_comparison_nodes(parsed, uid, span_context)
     assert result is None
-    mock_meter.in_error_count.assert_not_called()
 
 
 def test_validate_comparison_nodes_invalid() -> None:
@@ -450,11 +442,9 @@ def test_validate_comparison_nodes_invalid() -> None:
     span_context = MagicMock()
     span_context.sid = "test-sid"
     span_context.add_error_event = MagicMock()
-    mock_meter = MagicMock()
-    mock_meter.in_error_count = MagicMock()
     uid = "u1"
 
-    result = _validate_comparison_nodes(parsed, uid, span_context, mock_meter)
+    result = _validate_comparison_nodes(parsed, uid, span_context)
     # Should return None for valid comparison nodes
     assert result is None
 
@@ -464,12 +454,9 @@ def test_validate_name_pattern_valid() -> None:
     names = ["user_name", "age", "email_address"]
     span_context = MagicMock()
     span_context.sid = "test-sid"
-    mock_meter = MagicMock()
-    uid = "u1"
 
-    result = _validate_name_pattern(names, "Column name", uid, span_context, mock_meter)
+    result = _validate_name_pattern(names, "Column name", span_context)
     assert result is None
-    mock_meter.in_error_count.assert_not_called()
 
 
 def test_validate_name_pattern_invalid() -> None:
@@ -478,13 +465,9 @@ def test_validate_name_pattern_invalid() -> None:
     span_context = MagicMock()
     span_context.sid = "test-sid"
     span_context.add_error_event = MagicMock()
-    mock_meter = MagicMock()
-    mock_meter.in_error_count = MagicMock()
-    uid = "u1"
 
-    result = _validate_name_pattern(names, "Column name", uid, span_context, mock_meter)
+    result = _validate_name_pattern(names, "Column name", span_context)
     assert result is not None
-    mock_meter.in_error_count.assert_called_once()
     span_context.add_error_event.assert_called_once()
 
 
@@ -493,12 +476,9 @@ def test_validate_reserved_keywords_valid() -> None:
     keys = ["user_name", "age", "email"]
     span_context = MagicMock()
     span_context.sid = "test-sid"
-    mock_meter = MagicMock()
-    uid = "u1"
 
-    result = _validate_reserved_keywords(keys, uid, span_context, mock_meter)
+    result = _validate_reserved_keywords(keys, span_context)
     assert result is None
-    mock_meter.in_error_count.assert_not_called()
 
 
 def test_validate_reserved_keywords_invalid() -> None:
@@ -507,13 +487,9 @@ def test_validate_reserved_keywords_invalid() -> None:
     span_context = MagicMock()
     span_context.sid = "test-sid"
     span_context.add_error_event = MagicMock()
-    mock_meter = MagicMock()
-    mock_meter.in_error_count = MagicMock()
-    uid = "u1"
 
-    result = _validate_reserved_keywords(keys, uid, span_context, mock_meter)
+    result = _validate_reserved_keywords(keys, span_context)
     assert result is not None
-    mock_meter.in_error_count.assert_called_once()
     span_context.add_error_event.assert_called_once()
 
 
@@ -523,10 +499,9 @@ async def test_validate_dml_legality_valid() -> None:
     dml = "SELECT name, age FROM users WHERE id = 1"
     span_context = MagicMock()
     span_context.sid = "test-sid"
-    mock_meter = MagicMock()
     uid = "u1"
 
-    result = await _validate_dml_legality(dml, uid, span_context, mock_meter)
+    result = await _validate_dml_legality(dml, uid, span_context)
     assert result is None
 
 
@@ -539,11 +514,9 @@ async def test_validate_dml_legality_invalid_name() -> None:
     span_context = MagicMock()
     span_context.sid = "test-sid"
     span_context.add_error_event = MagicMock()
-    mock_meter = MagicMock()
-    mock_meter.in_error_count = MagicMock()
     uid = "u1"
 
-    result = await _validate_dml_legality(dml, uid, span_context, mock_meter)
+    result = await _validate_dml_legality(dml, uid, span_context)
     assert result is not None
     # Parse JSONResponse body to get code
     body = json.loads(result.body)
@@ -557,11 +530,9 @@ async def test_validate_dml_legality_invalid_sql() -> None:
     span_context = MagicMock()
     span_context.sid = "test-sid"
     span_context.record_exception = MagicMock()
-    mock_meter = MagicMock()
-    mock_meter.in_error_count = MagicMock()
     uid = "u1"
 
-    result = await _validate_dml_legality(dml, uid, span_context, mock_meter)
+    result = await _validate_dml_legality(dml, uid, span_context)
     assert result is not None
     # Parse JSONResponse body to get code
     body = json.loads(result.body)
@@ -576,7 +547,6 @@ async def test_validate_and_prepare_dml_success() -> None:
     mock_span_context = MagicMock()
     mock_span_context.add_info_events = MagicMock()
     mock_span_context.add_info_event = MagicMock()
-    mock_meter = MagicMock()
 
     test_input = ExecDMLInput(
         app_id="app123",
@@ -597,7 +567,7 @@ async def test_validate_and_prepare_dml_success() -> None:
         )
 
         result, error = await _validate_and_prepare_dml(
-            mock_db, test_input, mock_span_context, mock_meter
+            mock_db, test_input, mock_span_context
         )
 
         assert error is None
@@ -618,7 +588,6 @@ async def test_validate_and_prepare_dml_with_space_id() -> None:
     mock_span_context = MagicMock()
     mock_span_context.add_info_events = MagicMock()
     mock_span_context.add_info_event = MagicMock()
-    mock_meter = MagicMock()
 
     test_input = ExecDMLInput(
         app_id="app123",
@@ -645,7 +614,7 @@ async def test_validate_and_prepare_dml_with_space_id() -> None:
             )
 
             result, error = await _validate_and_prepare_dml(
-                mock_db, test_input, mock_span_context, mock_meter
+                mock_db, test_input, mock_span_context
             )
 
             assert error is None
@@ -662,7 +631,6 @@ async def test_process_dml_statements_success() -> None:
     env = "prod"
     span_context = MagicMock()
     span_context.add_info_event = MagicMock()
-    mock_meter = MagicMock()
 
     with patch(
         "memory.database.api.v1.exec_dml._validate_dml_legality",
@@ -680,7 +648,7 @@ async def test_process_dml_statements_success() -> None:
             )
 
             result, error = await _process_dml_statements(
-                dmls, app_id, uid, env, span_context, mock_meter
+                dmls, app_id, uid, env, span_context
             )
 
             assert error is None
@@ -700,7 +668,6 @@ async def test_process_dml_statements_validation_error() -> None:
     env = "prod"
     span_context = MagicMock()
     span_context.sid = "test-sid"
-    mock_meter = MagicMock()
 
     error_response = MagicMock()
     error_response.code = CodeEnum.DMLNotAllowed.code
@@ -712,7 +679,7 @@ async def test_process_dml_statements_validation_error() -> None:
         mock_validate.return_value = error_response
 
         result, error = await _process_dml_statements(
-            dmls, app_id, uid, env, span_context, mock_meter
+            dmls, app_id, uid, env, span_context
         )
 
         assert result is None

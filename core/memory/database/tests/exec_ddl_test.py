@@ -67,7 +67,6 @@ async def test_reset_uid_with_valid_space_id_reset_success() -> None:
             space_id=space_id,
             uid=original_uid,
             span_context=mock_span_context,
-            m=mock_meter,
         )
 
         # Verify return value
@@ -76,7 +75,7 @@ async def test_reset_uid_with_valid_space_id_reset_success() -> None:
 
         # Verify check_space_id_and_get_uid call parameters
         mock_check_space.assert_called_once_with(
-            mock_db, database_id, space_id, mock_span_context, mock_meter
+            mock_db, database_id, space_id, mock_span_context
         )
 
         # Verify meter was not called incorrectly
@@ -97,7 +96,7 @@ async def test_ddl_split_success() -> None:
         """
         uid = "u1"
 
-        ddls, error_resp = await _ddl_split(raw_ddl, uid, mock_span_context, mock_meter)
+        ddls, error_resp = await _ddl_split(raw_ddl, uid, mock_span_context)
 
         assert error_resp is None
         assert len(ddls) == 3
@@ -339,9 +338,7 @@ def test_validate_name_pattern_ddl_valid() -> None:
     mock_meter = MagicMock()
     uid = "u1"
 
-    result = _validate_name_pattern_ddl(
-        names, "Column name", uid, span_context, mock_meter
-    )
+    result = _validate_name_pattern_ddl(names, "Column name", uid, span_context)
     assert result is None
     mock_meter.in_error_count.assert_not_called()
 
@@ -358,11 +355,8 @@ def test_validate_name_pattern_ddl_invalid_with_digits() -> None:
     mock_meter.in_error_count = MagicMock()
     uid = "u1"
 
-    result = _validate_name_pattern_ddl(
-        names, "Column name", uid, span_context, mock_meter
-    )
+    result = _validate_name_pattern_ddl(names, "Column name", uid, span_context)
     assert result is not None
-    mock_meter.in_error_count.assert_called_once()
     span_context.add_error_event.assert_called_once()
     # Parse JSONResponse body to verify error code
     body = json.loads(result.body)
@@ -380,11 +374,8 @@ def test_validate_name_pattern_ddl_invalid_with_special_chars() -> None:
     mock_meter.in_error_count = MagicMock()
     uid = "u1"
 
-    result = _validate_name_pattern_ddl(
-        names, "Column name", uid, span_context, mock_meter
-    )
+    result = _validate_name_pattern_ddl(names, "Column name", uid, span_context)
     assert result is not None
-    mock_meter.in_error_count.assert_called_once()
     span_context.add_error_event.assert_called_once()
     body = json.loads(result.body)
     assert body["code"] == CodeEnum.DDLNotAllowed.code
@@ -400,11 +391,8 @@ def test_validate_name_pattern_ddl_invalid_empty_name() -> None:
     mock_meter.in_error_count = MagicMock()
     uid = "u1"
 
-    result = _validate_name_pattern_ddl(
-        names, "Column name", uid, span_context, mock_meter
-    )
+    result = _validate_name_pattern_ddl(names, "Column name", uid, span_context)
     assert result is not None
-    mock_meter.in_error_count.assert_called_once()
     span_context.add_error_event.assert_called_once()
     body = json.loads(result.body)
     assert body["code"] == CodeEnum.DDLNotAllowed.code
@@ -419,7 +407,7 @@ async def test_validate_ddl_legality_valid() -> None:
     mock_meter = MagicMock()
     uid = "u1"
 
-    result = await _validate_ddl_legality(ddl, uid, span_context, mock_meter)
+    result = await _validate_ddl_legality(ddl, uid, span_context)
     assert result is None
     mock_meter.in_error_count.assert_not_called()
 
@@ -437,7 +425,7 @@ async def test_validate_ddl_legality_invalid_column_name_with_digits() -> None:
     mock_meter.in_error_count = MagicMock()
     uid = "u1"
 
-    result = await _validate_ddl_legality(ddl, uid, span_context, mock_meter)
+    result = await _validate_ddl_legality(ddl, uid, span_context)
     assert result is not None
     # Parse JSONResponse body to get code
     body = json.loads(result.body)
@@ -456,7 +444,7 @@ async def test_validate_ddl_legality_invalid_column_name_alter() -> None:
     mock_meter.in_error_count = MagicMock()
     uid = "u1"
 
-    result = await _validate_ddl_legality(ddl, uid, span_context, mock_meter)
+    result = await _validate_ddl_legality(ddl, uid, span_context)
     assert result is not None
     body = json.loads(result.body)
     assert body["code"] == CodeEnum.DDLNotAllowed.code
@@ -473,7 +461,7 @@ async def test_validate_ddl_legality_invalid_sql() -> None:
     mock_meter.in_error_count = MagicMock()
     uid = "u1"
 
-    result = await _validate_ddl_legality(ddl, uid, span_context, mock_meter)
+    result = await _validate_ddl_legality(ddl, uid, span_context)
     assert result is not None
     # Parse JSONResponse body to get code
     body = json.loads(result.body)
