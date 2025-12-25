@@ -51,7 +51,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class S3Util {
-    @Value("${s3.remoteEndpoint}")
+    @Value("${s3.endpoint}")
     private String endpoint;
 
     @Value("${s3.accessKey}")
