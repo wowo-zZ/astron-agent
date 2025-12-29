@@ -113,7 +113,8 @@ public class WorkflowReleaseServiceImpl implements WorkflowReleaseService {
             }
 
             // 5. Sync to API system directly (no approval needed)
-            String appId = getAppIdByBotId(botId);
+            // String appId = getAppIdByBotId(botId);
+            String appId = maasAppId;
             syncToApiSystem(botId, flowId, versionName, appId);
 
             // 6. Update audit result to success
