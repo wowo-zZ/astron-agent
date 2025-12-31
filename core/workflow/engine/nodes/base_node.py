@@ -967,7 +967,7 @@ class BaseOutputNode(BaseNode):
         dep_var_name = variable_pool.get_variable_ref_node_id(
             self.node_id, template_unit.key, span=span
         ).ref_var_name
-        is_reasoning = dep_var_name == "REASONING_CONTENT"
+        is_reasoning = dep_var_name.upper() == "REASONING_CONTENT"
 
         if not is_reasoning:
             # If it's an LLM node, get values from message queue or from llm_output_cache
