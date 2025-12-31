@@ -1,11 +1,11 @@
 import asyncio
 import json
-import os
 from typing import Any
 
 import httpx
 from aiohttp import ClientSession
 
+from workflow.configs import workflow_config
 from workflow.engine.nodes.code.executor.base_executor import BaseExecutor
 from workflow.exception.e import CustomException, CustomExceptionCD
 from workflow.exception.errors.err_code import CodeEnum
@@ -38,11 +38,6 @@ class IFlyExecutor(BaseExecutor):
         :return: Execution result as string
         :raises CustomException: If execution fails or service is unavailable
         """
-        url: str = os.getenv("CODE_EXEC_URL", "")
-        assert url, "CODE_EXEC_URL is not set"
-
-        code_exec_api_key: str = os.getenv("CODE_EXEC_API_KEY", "")
-        code_exec_api_secret: str = os.getenv("CODE_EXEC_API_SECRET", "")
 
         # Prepare request parameters
         params: dict[str, Any] = {
@@ -54,15 +49,21 @@ class IFlyExecutor(BaseExecutor):
             "timeout_sec": timeout,
         }
         headers: dict[str, str] = {}
-        if code_exec_api_key and code_exec_api_secret:
+        if (
+            workflow_config.code_executor_config.api_key
+            and workflow_config.code_executor_config.api_secret
+        ):
             headers["Authorization"] = (
-                f"Bearer {code_exec_api_key}:{code_exec_api_secret}"
+                f"Bearer {workflow_config.code_executor_config.api_key}:"
+                f"{workflow_config.code_executor_config.api_secret}"
             )
 
         span.add_info_events({"request_body": json.dumps(body, ensure_ascii=False)})
 
         try:
-            return await self._execute_with_retry(url, body, params, headers, span)
+            return await self._execute_with_retry(
+                workflow_config.code_executor_config.url, body, params, headers, span
+            )
         except Exception as err:
             if isinstance(err, (CustomExceptionCD, CustomException)):
                 raise err

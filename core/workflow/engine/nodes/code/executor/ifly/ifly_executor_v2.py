@@ -1,10 +1,10 @@
 import asyncio
 import json
-import os
 from typing import Any
 
 import httpx
 
+from workflow.configs import workflow_config
 from workflow.engine.nodes.code.executor.ifly.ifly_executor import IFlyExecutor
 from workflow.exception.e import CustomException, CustomExceptionCD
 from workflow.exception.errors.err_code import CodeEnum
@@ -42,9 +42,6 @@ class IFlyExecutorV2(IFlyExecutor):
         :raises CustomException: If execution fails or service is unavailable
         """
 
-        url: str = os.getenv("CODE_EXEC_URL", "")
-        assert url, "CODE_EXEC_URL is not set"
-
         # Prepare request parameters
         params = {
             "appid": kwargs.get("app_id", ""),
@@ -55,10 +52,20 @@ class IFlyExecutorV2(IFlyExecutor):
             "timeout": timeout * 1000,
         }
         headers: dict[str, str] = {}
+        if (
+            workflow_config.code_executor_config.api_key
+            and workflow_config.code_executor_config.api_secret
+        ):
+            headers["Authorization"] = (
+                f"Bearer {workflow_config.code_executor_config.api_key}:"
+                f"{workflow_config.code_executor_config.api_secret}"
+            )
         span.add_info_events({"request_body": json.dumps(body, ensure_ascii=False)})
 
         try:
-            return await self._execute_with_retry(url, body, params, headers, span)
+            return await self._execute_with_retry(
+                workflow_config.code_executor_config.url, body, params, headers, span
+            )
         except Exception as err:
             if isinstance(err, (CustomExceptionCD, CustomException)):
                 raise err
