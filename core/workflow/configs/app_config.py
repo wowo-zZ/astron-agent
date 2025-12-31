@@ -188,8 +188,13 @@ class CodeExecutorConfig(BaseSettings):
 
         :return: The validated URL
         """
-        if self.exec_type in ["ifly", "ifly-v2"] and self.url == "":
-            raise ValueError("URL is required for ifly or ifly-v2")
+        if self.exec_type in ["ifly", "ifly-v2"]:
+            if not self.url:
+                raise ValueError("URL is required for ifly or ifly-v2")
+            if bool(self.api_key) != bool(self.api_secret):
+                raise ValueError(
+                    "Both API key and secret must be provided for ifly authentication, or neither."
+                )
         return self
 
 
