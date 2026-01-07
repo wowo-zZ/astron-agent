@@ -1,11 +1,12 @@
-from typing import Any, AsyncIterator
+import os
+from typing import Any, AsyncIterator, Optional
 
+from common.otlp.trace.span import Span
 from openai import APIError, APITimeoutError, AsyncOpenAI
 from openai.types.chat.chat_completion_chunk import ChatCompletionChunk
 from pydantic import BaseModel, ConfigDict
 
-from common_imports import Span
-from exceptions.plugin_exc import PluginExc, llm_plugin_error
+from agent.exceptions.plugin_exc import PluginExc, llm_plugin_error
 
 
 class BaseLLMModel(BaseModel):
@@ -19,6 +20,8 @@ class BaseLLMModel(BaseModel):
             messages=messages,
             stream=stream,
             model=self.name,
+            timeout=int(os.getenv("DEFAULT_LLM_TIMEOUT", "90")),
+            max_tokens=int(os.getenv("DEFAULT_LLM_MAX_TOKEN", "10000")),
         )
 
     def _log_messages_to_span(self, sp: Span, messages: list) -> None:
@@ -35,7 +38,7 @@ class BaseLLMModel(BaseModel):
         """Handle API timeout error"""
         raise PluginExc(-1, "请求服务超时", om=str(error)) from error
 
-    def _handle_api_error(self, error: APIError, sp: Span | None) -> None:
+    def _handle_api_error(self, error: APIError, sp: Optional[Span]) -> None:
         """Handle API error"""
         if sp is not None:
             sp.add_info_events({"code": error.code or "null"})
@@ -46,7 +49,7 @@ class BaseLLMModel(BaseModel):
             sp.add_info_events({"converted-message": error.message})
         llm_plugin_error(error.code, error.message)
 
-    def _handle_general_error(self, error: Exception, sp: Span | None) -> None:
+    def _handle_general_error(self, error: Exception, sp: Optional[Span]) -> None:
         """Handle general error (ValueError, TypeError, KeyError)"""
         if sp is not None:
             sp.add_info_events({"code": ""})
@@ -78,7 +81,7 @@ class BaseLLMModel(BaseModel):
         else:
             return f"{error_type}: {error_msg}"
 
-    def _handle_exception(self, error: Exception, sp: Span | None) -> None:
+    def _handle_exception(self, error: Exception, sp: Optional[Span]) -> None:
         """Handle general exceptions including SSL and connection errors"""
         error_type = type(error).__name__
         error_msg = str(error)
@@ -90,7 +93,7 @@ class BaseLLMModel(BaseModel):
         llm_plugin_error("-1", error_message)
 
     async def stream(
-        self, messages: list, stream: bool, span: Span | None = None
+        self, messages: list, stream: bool, span: Optional[Span] = None
     ) -> AsyncIterator[ChatCompletionChunk]:
 
         sp = span
