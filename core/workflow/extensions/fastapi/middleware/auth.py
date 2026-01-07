@@ -4,7 +4,6 @@ import os
 from typing import Any
 
 import httpx
-
 from common.utils.hmac_auth import HMACAuth
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -135,10 +134,8 @@ class AuthMiddleware(BaseHTTPMiddleware):
         app_id = await asyncio.to_thread(self._get_app_id_with_cache, api_key)
         if app_id:
             return app_id
+
         url = f"{url}/{api_key}"
-
-        import requests  # type: ignore
-
         async with httpx.AsyncClient() as client:
             resp = await client.get(url, headers=self._gen_app_auth_header(url))
         span.add_info_event(f"Application management platform response: {resp.text}")
