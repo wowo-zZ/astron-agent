@@ -3,6 +3,8 @@ import json
 import os
 from typing import Any
 
+import httpx
+
 from common.utils.hmac_auth import HMACAuth
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -137,9 +139,8 @@ class AuthMiddleware(BaseHTTPMiddleware):
 
         import requests  # type: ignore
 
-        resp = await asyncio.to_thread(
-            requests.get, url, params=None, headers=self._gen_app_auth_header(url)
-        )
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(url, headers=self._gen_app_auth_header(url))
         span.add_info_event(f"Application management platform response: {resp.text}")
         if resp.status_code != 200:
             raise CustomException(
