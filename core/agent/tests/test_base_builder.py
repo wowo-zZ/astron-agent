@@ -252,7 +252,7 @@ class TestBaseApiBuilder:
     async def test_create_model_normalize_base_url_chat_completions(
         self, builder: BaseApiBuilder
     ) -> None:
-        """Test base_url (contains /chat/completions) is preserved"""
+        """Test normalizing base_url (contains /chat/completions)"""
         model = await builder.create_model(
             app_id="test_app",
             model_name="test_model",
@@ -260,14 +260,15 @@ class TestBaseApiBuilder:
             api_key="test_key",
         )
 
-        # Verify base_url is preserved as-is
-        assert "https://api.test.com/chat/completions" in str(model.llm.base_url)
+        # Verify base_url is normalized by AsyncOpenAI (removes /chat/completions)
+        assert "/chat/completions" not in str(model.llm.base_url)
+        assert "https://api.test.com" in str(model.llm.base_url)
 
     @pytest.mark.asyncio
     async def test_create_model_normalize_base_url_completions(
         self, builder: BaseApiBuilder
     ) -> None:
-        """Test base_url (contains /completions) is preserved"""
+        """Test normalizing base_url (contains /completions)"""
         model = await builder.create_model(
             app_id="test_app",
             model_name="test_model",
@@ -275,8 +276,9 @@ class TestBaseApiBuilder:
             api_key="test_key",
         )
 
-        # Verify base_url is preserved as-is
-        assert "https://api.test.com/completions" in str(model.llm.base_url)
+        # Verify base_url is normalized by AsyncOpenAI (removes /completions)
+        assert "/completions" not in str(model.llm.base_url)
+        assert "https://api.test.com" in str(model.llm.base_url)
 
     @pytest.mark.asyncio
     async def test_create_model_ssl_verify_enabled(
