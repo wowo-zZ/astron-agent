@@ -262,7 +262,7 @@ class TestBaseApiBuilder:
 
         # Verify base_url is normalized by AsyncOpenAI (removes /chat/completions)
         assert "/chat/completions" not in str(model.llm.base_url)
-        assert "https://api.test.com" in str(model.llm.base_url)
+        assert str(model.llm.base_url).startswith("https://api.test.com")
 
     @pytest.mark.asyncio
     async def test_create_model_normalize_base_url_completions(
@@ -278,7 +278,7 @@ class TestBaseApiBuilder:
 
         # Verify base_url is normalized by AsyncOpenAI (removes /completions)
         assert "/completions" not in str(model.llm.base_url)
-        assert "https://api.test.com" in str(model.llm.base_url)
+        assert str(model.llm.base_url).startswith("https://api.test.com")
 
     @pytest.mark.asyncio
     async def test_create_model_ssl_verify_enabled(

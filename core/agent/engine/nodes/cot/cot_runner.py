@@ -184,19 +184,13 @@ class CotRunner(RunnerBase):
                 thinks += reasoning_content
                 answers += content
 
-                node_data_usage.completion_tokens = 0
-                node_data_usage.prompt_tokens = 0
-                node_data_usage.total_tokens = 0
-                if chunk.usage and chunk.usage.model_dump().get("total_tokens") != 0:
-                    node_data_usage.completion_tokens = chunk.usage.model_dump().get(
-                        "completion_tokens"
+                if chunk.usage:
+                    usage_data = chunk.usage.model_dump()
+                    node_data_usage.completion_tokens += usage_data.get(
+                        "completion_tokens", 0
                     )
-                    node_data_usage.prompt_tokens = chunk.usage.model_dump().get(
-                        "prompt_tokens"
-                    )
-                    node_data_usage.total_tokens = chunk.usage.model_dump().get(
-                        "total_tokens"
-                    )
+                    node_data_usage.prompt_tokens += usage_data.get("prompt_tokens", 0)
+                    node_data_usage.total_tokens += usage_data.get("total_tokens", 0)
 
                 if final_answer and content:
                     yield AgentResponse(
@@ -296,12 +290,12 @@ class CotRunner(RunnerBase):
         plugin = await self.get_plugin(cot_step)
         cot_step.plugin = plugin
 
-        if plugin.typ == "workflow":  # type: ignore[union-attr]
+        if plugin and plugin.typ == "workflow":  # type: ignore[union-attr]
             async for agent_response in self.run_workflow_plugin(
                 plugin, cot_step, span
             ):
                 yield agent_response
-        else:
+        elif plugin:
             cot_step.tool_type = "tool"
             plugin_response = await self.run_plugin(cot_step, span)
             cot_step.plugin.run_result = plugin_response  # type: ignore[union-attr]
