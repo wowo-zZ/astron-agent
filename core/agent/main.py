@@ -181,7 +181,7 @@ def _get_host_ip_from_getaddrinfo() -> str | None:
         for fam, _, _, _, sockaddr in socket.getaddrinfo(hostname, None):
             if fam == socket.AF_INET:
                 candidate = sockaddr[0]
-                if not candidate.startswith("127."):
+                if isinstance(candidate, str) and not candidate.startswith("127."):
                     return candidate
     except (OSError, socket.gaierror):
         pass
