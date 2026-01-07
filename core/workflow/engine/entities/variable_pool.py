@@ -95,14 +95,13 @@ def iteration_array(content: Any, schemas: dict, key_list: list) -> Any:
 
                 # Ensure mapping_value is iterable list
                 mapping_value = cast(list, mapping_value)
-                return [
-                    iteration_array(
-                        value.get(key, schema_type_default_value.get(key_type)),
-                        mapping_schema,
-                        key_list[key_i:],
+                # Only take first element and continue processing
+                if len(mapping_value) > 0:
+                    mapping_value = mapping_value[0].get(
+                        key, schema_type_default_value.get(key_type)
                     )
-                    for value in mapping_value
-                ]
+                else:
+                    mapping_value = schema_type_default_value.get(key_type)
             else:
                 return mapping_value
         elif key_type == "object":
@@ -576,17 +575,17 @@ class VariablePool:
                     key_type = cast(str, mapping_schema.get("type", ""))
 
                     mapping_value = cast(list, mapping_value)
-                    mapping_value = [
-                        iteration_array(
-                            cast(dict, value).get(
-                                key, schema_type_default_value.get(key_type)
-                            ),
-                            mapping_schema,
-                            key_name_list[key_i:],
-                        )
-                        for value in mapping_value
-                    ]
-                    return mapping_value
+                    if not mapping_value:
+                        return schema_type_default_value.get(key_type)
+
+                    first_value = mapping_value[0]
+                    return iteration_array(
+                        cast(dict, first_value).get(
+                            key, schema_type_default_value.get(key_type)
+                        ),
+                        mapping_schema,
+                        key_name_list[key_i:],
+                    )
                 else:
                     return mapping_value
             elif key_type == "object":
