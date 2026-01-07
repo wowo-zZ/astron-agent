@@ -483,6 +483,8 @@ async def _run(
 
             sparkflow_engine.engine_ctx.variable_pool.system_params.set(
                 ParamKey.FlowId, chat_vo.flow_id
+            ).set(ParamKey.ChatId, chat_vo.chat_id).set(ParamKey.Uid, chat_vo.uid).set(
+                ParamKey.AppId, app_alias_id
             )
             # Initialize model content output queues
             await _init_stream_q(
@@ -542,7 +544,7 @@ async def _run(
         except Exception as err:
             llm_resp = LLMGenerate.workflow_end_error(
                 sid=span.sid,
-                code=CodeEnum.PROTOCOL_VALIDATION_ERROR.code,
+                code=CodeEnum.OPEN_API_ERROR.code,
                 message=str(err),
             )
             await response_queue.put(llm_resp)
@@ -749,7 +751,7 @@ def _filter_response_frame(
 
     response_frame.workflow_step.node = None
 
-    if is_ping:
+    if is_ping and is_stream:
         return response_frame
 
     if is_stop:

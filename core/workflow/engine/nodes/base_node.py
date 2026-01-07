@@ -43,7 +43,6 @@ from workflow.engine.nodes.util.prompt import (
     process_prompt,
 )
 from workflow.exception.e import CustomException
-from workflow.exception.errors.code_convert import CodeConvert
 from workflow.exception.errors.err_code import CodeEnum
 from workflow.extensions.otlp.log_trace.node_log import NodeLog
 from workflow.extensions.otlp.trace.span import Span
@@ -968,7 +967,7 @@ class BaseOutputNode(BaseNode):
         dep_var_name = variable_pool.get_variable_ref_node_id(
             self.node_id, template_unit.key, span=span
         ).ref_var_name
-        is_reasoning = dep_var_name == "REASONING_CONTENT"
+        is_reasoning = dep_var_name.upper() == "REASONING_CONTENT"
 
         if not is_reasoning:
             # If it's an LLM node, get values from message queue or from llm_output_cache
@@ -1034,6 +1033,8 @@ class BaseLLMNode(BaseNode):
     :param extraParams: Additional parameters
     :param chat_ai: Chat AI instance
     """
+
+    _private_config = PrivateConfig(timeout=5 * 60.0)
 
     domain: str = Field(...)
     appId: str = Field(...)
@@ -1283,44 +1284,42 @@ class BaseLLMNode(BaseNode):
                 search_disable=self.searchDisable,
             ):
                 msg = llm_response.msg
-                code, status, content, reasoning_content, token_usage = (
+                status, content, reasoning_content, token_usage = (
                     self._get_chat_ai().decode_message(msg)
                 )
-                if code == 0:
-                    if reasoning_content:
-                        reasoning_contents.append(reasoning_content)
-                    if stream and self.respFormat != RespFormatEnum.JSON.value:
-                        await self.put_llm_content(
-                            node_id=self.node_id,
-                            model_name=self.domain,
-                            variable_pool=variable_pool,
-                            msg_or_end_node_deps=msg_or_end_node_deps or {},
-                            llm_content=msg,
-                        )
-                    texts.append(content if content else "")
-                    if status in [
+                # Mark streaming output first frame has been sent, trigger engine to set exception branches as inactive
+                if self.stream_node_first_token.empty():
+                    self.stream_node_first_token.put_nowait(True)
+                if reasoning_content:
+                    reasoning_contents.append(reasoning_content)
+                if stream and self.respFormat != RespFormatEnum.JSON.value:
+                    await self.put_llm_content(
+                        node_id=self.node_id,
+                        model_name=self.domain,
+                        variable_pool=variable_pool,
+                        msg_or_end_node_deps=msg_or_end_node_deps or {},
+                        llm_content=msg,
+                    )
+                texts.append(content if content else "")
+                if status in [
+                    SparkLLMStatus.END.value,
+                    ChatStatus.FINISH_REASON.value,
+                ]:
+                    token_usage = token_usage
+                    break
+                if (
+                    self.source == ModelProviderEnum.OPENAI.value
+                    and status
+                    and status
+                    not in [
                         SparkLLMStatus.END.value,
                         ChatStatus.FINISH_REASON.value,
-                    ]:
-                        token_usage = token_usage
-                        break
-                    if (
-                        self.source == ModelProviderEnum.OPENAI.value
-                        and status
-                        and status
-                        not in [
-                            SparkLLMStatus.END.value,
-                            ChatStatus.FINISH_REASON.value,
-                        ]
-                    ):
-                        # Exception case: finish_reason has value but not "stop", report the issue
-                        # For example, openai-gpt-4o gives "length" when max_token is very small
-                        raise CustomException(err_code=CodeEnum.OPEN_AI_REQUEST_ERROR)
-                else:
-                    raise CustomException(
-                        err_code=CodeConvert.sparkCode(code),
-                        cause_error=json.dumps(msg, ensure_ascii=False),
-                    )
+                    ]
+                ):
+                    # Exception case: finish_reason has value but not "stop", report the issue
+                    # For example, openai-gpt-4o gives "length" when max_token is very small
+                    raise CustomException(err_code=CodeEnum.OPEN_AI_REQUEST_ERROR)
+
             if texts:
                 res = "".join(texts)
                 span.add_info_events({"spark_llm_chat_result": "".join(texts)})
@@ -1365,10 +1364,6 @@ class BaseLLMNode(BaseNode):
                 # As long as put_llm_content method is executed, it proves LLM has sent first frame,
                 # so set has_sent_first_token to True
                 variable_pool.set_stream_node_has_sent_first_token(node_id)
-            if self.stream_node_first_token.empty():
-                self.stream_node_first_token.put_nowait(
-                    True
-                )  # Mark streaming output first frame has been sent, trigger engine to set exception branches as inactive
             if not msg_or_end_node_deps:
                 # No node dependencies during single node debugging
                 return

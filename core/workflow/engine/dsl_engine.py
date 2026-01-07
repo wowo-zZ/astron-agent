@@ -1177,6 +1177,8 @@ class WorkflowEngine(BaseModel):
                 timeout=node.node_instance._private_config.timeout,
             )
             return run_result, False
+        except TimeoutError:
+            error = CustomException(CodeEnum.NODE_RUN_TIMEOUT_ERROR)
         except Exception as err:
             if isinstance(err, CustomException):
                 error = err
