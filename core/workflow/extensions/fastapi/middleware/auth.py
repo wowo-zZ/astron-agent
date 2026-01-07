@@ -1,6 +1,9 @@
+import asyncio
 import json
 import os
 from typing import Any
+
+import httpx
 
 from common.utils.hmac_auth import HMACAuth
 from fastapi import Request
@@ -129,14 +132,15 @@ class AuthMiddleware(BaseHTTPMiddleware):
                 err_msg="authorization header is invalid",
             )
 
-        app_id = await self._get_app_id_with_cache(api_key)
+        app_id = await asyncio.to_thread(self._get_app_id_with_cache, api_key)
         if app_id:
             return app_id
         url = f"{url}/{api_key}"
 
         import requests  # type: ignore
 
-        resp = requests.get(url, headers=self._gen_app_auth_header(url))
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(url, headers=self._gen_app_auth_header(url))
         span.add_info_event(f"Application management platform response: {resp.text}")
         if resp.status_code != 200:
             raise CustomException(
@@ -170,10 +174,10 @@ class AuthMiddleware(BaseHTTPMiddleware):
                 err_msg="appid is null",
                 cause_error=json.dumps(resp.json(), ensure_ascii=False),
             )
-        await self._set_app_id_with_cache(api_key, app_id)
+        await asyncio.to_thread(self._set_app_id_with_cache, api_key, app_id)
         return app_id
 
-    async def _get_app_id_with_cache(self, api_key: str) -> str:
+    def _get_app_id_with_cache(self, api_key: str) -> str:
         """
         Get the app id with cache
 
@@ -184,7 +188,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
         app_id: str = cache_service[f"workflow:app:api_key:{api_key}"]
         return app_id
 
-    async def _set_app_id_with_cache(self, api_key: str, app_id: str) -> None:
+    def _set_app_id_with_cache(self, api_key: str, app_id: str) -> None:
         """
         Set the app id with cache
 
