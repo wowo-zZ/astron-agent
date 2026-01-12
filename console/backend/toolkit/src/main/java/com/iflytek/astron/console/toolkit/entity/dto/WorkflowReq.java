@@ -38,4 +38,9 @@ public class WorkflowReq {
      * Voice intelligent agent configuration
      */
     TalkAgentConfigDto flowConfig;
+
+    /**
+     * SpecialSign
+     */
+    Boolean specialSign = false;
 }

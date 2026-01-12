@@ -1,4 +1,4 @@
-package com.iflytek.astron.console.commons.service.workflow.impl;
+package com.iflytek.astron.console.hub.service.workflow.impl;
 
 import com.alibaba.fastjson2.JSON;
 import com.iflytek.astron.console.commons.constant.ResponseEnum;
@@ -20,6 +20,10 @@ import com.iflytek.astron.console.commons.service.data.ChatHistoryService;
 import com.iflytek.astron.console.commons.service.data.UserLangChainDataService;
 import com.iflytek.astron.console.commons.service.workflow.WorkflowBotParamService;
 import com.iflytek.astron.console.commons.workflow.WorkflowClient;
+import com.iflytek.astron.console.commons.entity.workflow.Workflow;
+import com.iflytek.astron.console.commons.response.ApiResult;
+import com.iflytek.astron.console.toolkit.mapper.workflow.WorkflowMapper;
+import com.iflytek.astron.console.toolkit.service.workflow.WorkflowService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -69,6 +73,12 @@ class WorkflowBotChatServiceImplTest {
     @Mock
     private RBucket<String> rBucket;
 
+    @Mock
+    private WorkflowMapper workflowMapper;
+
+    @Mock
+    private WorkflowService workflowService;
+
     @InjectMocks
     private WorkflowBotChatServiceImpl workflowBotChatService;
 
@@ -105,6 +115,7 @@ class WorkflowBotChatServiceImplTest {
         userLangChainInfo.setFlowId("test-flow-id");
         userLangChainInfo.setExtraInputs("{}");
         userLangChainInfo.setExtraInputsConfig("[]");
+        userLangChainInfo.setMaasId(100L);
 
         chatReqRecords = new ChatReqRecords();
         chatReqRecords.setId(789L);
@@ -115,7 +126,7 @@ class WorkflowBotChatServiceImplTest {
     }
 
     @Test
-    void testChatWorkflowBot_Success_WithDebugUrl() {
+    void testChatWorkflowBot_Success_WithDebugUrl() throws InterruptedException {
         // Given
         when(userLangChainDataService.findOneByBotId(456)).thenReturn(userLangChainInfo);
         when(chatDataService.createRequest(any(ChatReqRecords.class))).thenReturn(chatReqRecords);
@@ -129,6 +140,16 @@ class WorkflowBotChatServiceImplTest {
         when(chatHistoryService.getHistory("testUser", 123L, reqList)).thenReturn(requestDtoList);
 
         when(chatBotDataService.findMarketBotByBotId(456)).thenReturn(null); // No market bot, use debug
+
+        // Mock workflowMapper for buildWorkflowReq
+        Workflow workflow = new Workflow();
+        workflow.setId(100L);
+        workflow.setName("Test Workflow");
+        workflow.setDescription("Test Description");
+        workflow.setFlowId("test-flow-id");
+        workflow.setData("{}");
+        when(workflowMapper.selectById(100L)).thenReturn(workflow);
+        doAnswer(invocation -> ApiResult.success()).when(workflowService).build(any());
 
         try (MockedConstruction<WorkflowClient> mockWorkflowClient = mockConstruction(WorkflowClient.class)) {
             // When
@@ -181,7 +202,7 @@ class WorkflowBotChatServiceImplTest {
     }
 
     @Test
-    void testChatWorkflowBot_WithResumeWorkflow() {
+    void testChatWorkflowBot_WithResumeWorkflow() throws InterruptedException {
         // Given
         String resumeOperation = "resumeDial";
         when(userLangChainDataService.findOneByBotId(456)).thenReturn(userLangChainInfo);
@@ -196,6 +217,16 @@ class WorkflowBotChatServiceImplTest {
         when(chatHistoryService.getHistory("testUser", 123L, reqList)).thenReturn(requestDtoList);
 
         when(chatBotDataService.findMarketBotByBotId(456)).thenReturn(null);
+
+        // Mock workflowMapper for buildWorkflowReq
+        Workflow workflow = new Workflow();
+        workflow.setId(100L);
+        workflow.setName("Test Workflow");
+        workflow.setDescription("Test Description");
+        workflow.setFlowId("test-flow-id");
+        workflow.setData("{}");
+        when(workflowMapper.selectById(100L)).thenReturn(workflow);
+        doAnswer(invocation -> ApiResult.success()).when(workflowService).build(any());
 
         // Mock Redis operations for resume workflow
         when(redissonClient.<String>getBucket(anyString())).thenReturn(rBucket);
@@ -236,7 +267,7 @@ class WorkflowBotChatServiceImplTest {
     }
 
     @Test
-    void testChatWorkflowBot_WithMultiFileParam() {
+    void testChatWorkflowBot_WithMultiFileParam() throws InterruptedException {
         // Given
         when(userLangChainDataService.findOneByBotId(456)).thenReturn(userLangChainInfo);
         when(chatDataService.createRequest(any(ChatReqRecords.class))).thenReturn(chatReqRecords);
@@ -250,6 +281,16 @@ class WorkflowBotChatServiceImplTest {
         when(chatHistoryService.getHistory("testUser", 123L, reqList)).thenReturn(requestDtoList);
 
         when(chatBotDataService.findMarketBotByBotId(456)).thenReturn(null);
+
+        // Mock workflowMapper for buildWorkflowReq
+        Workflow workflow = new Workflow();
+        workflow.setId(100L);
+        workflow.setName("Test Workflow");
+        workflow.setDescription("Test Description");
+        workflow.setFlowId("test-flow-id");
+        workflow.setData("{}");
+        when(workflowMapper.selectById(100L)).thenReturn(workflow);
+        doAnswer(invocation -> ApiResult.success()).when(workflowService).build(any());
 
         try (MockedConstruction<WorkflowClient> mockWorkflowClient = mockConstruction(WorkflowClient.class)) {
             // When
@@ -377,7 +418,7 @@ class WorkflowBotChatServiceImplTest {
     }
 
     @Test
-    void testChatWorkflowBot_VerifyChatReqRecordsCreation() {
+    void testChatWorkflowBot_VerifyChatReqRecordsCreation() throws InterruptedException {
         // Given
         when(userLangChainDataService.findOneByBotId(456)).thenReturn(userLangChainInfo);
         when(chatDataService.createRequest(any(ChatReqRecords.class))).thenReturn(chatReqRecords);
@@ -391,6 +432,16 @@ class WorkflowBotChatServiceImplTest {
         when(chatHistoryService.getHistory("testUser", 123L, reqList)).thenReturn(requestDtoList);
 
         when(chatBotDataService.findMarketBotByBotId(456)).thenReturn(null);
+
+        // Mock workflowMapper for buildWorkflowReq
+        Workflow workflow = new Workflow();
+        workflow.setId(100L);
+        workflow.setName("Test Workflow");
+        workflow.setDescription("Test Description");
+        workflow.setFlowId("test-flow-id");
+        workflow.setData("{}");
+        when(workflowMapper.selectById(100L)).thenReturn(workflow);
+        doAnswer(invocation -> ApiResult.success()).when(workflowService).build(any());
 
         try (MockedConstruction<WorkflowClient> mockWorkflowClient = mockConstruction(WorkflowClient.class)) {
             // When

@@ -1,32 +1,37 @@
-package com.iflytek.astron.console.commons.service.workflow.impl;
+package com.iflytek.astron.console.hub.service.workflow.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.iflytek.astron.console.commons.constant.RedisKeyConstant;
 import com.iflytek.astron.console.commons.constant.ResponseEnum;
+import com.iflytek.astron.console.commons.dto.bot.ChatBotReqDto;
 import com.iflytek.astron.console.commons.dto.chat.ChatModelMeta;
 import com.iflytek.astron.console.commons.dto.chat.ChatReqModelDto;
 import com.iflytek.astron.console.commons.dto.chat.ChatRequestDto;
 import com.iflytek.astron.console.commons.dto.chat.ChatRequestDtoList;
-import com.iflytek.astron.console.commons.entity.bot.ChatBotMarket;
-import com.iflytek.astron.console.commons.dto.bot.ChatBotReqDto;
-import com.iflytek.astron.console.commons.entity.chat.*;
 import com.iflytek.astron.console.commons.dto.workflow.WorkflowApiRequest;
 import com.iflytek.astron.console.commons.dto.workflow.WorkflowEventData;
 import com.iflytek.astron.console.commons.dto.workflow.WorkflowResumeRequest;
+import com.iflytek.astron.console.commons.entity.bot.ChatBotMarket;
+import com.iflytek.astron.console.commons.entity.bot.UserLangChainInfo;
+import com.iflytek.astron.console.commons.entity.chat.ChatReqRecords;
+import com.iflytek.astron.console.commons.entity.workflow.Workflow;
+import com.iflytek.astron.console.commons.enums.ShelfStatusEnum;
 import com.iflytek.astron.console.commons.exception.BusinessException;
 import com.iflytek.astron.console.commons.service.WssListenerService;
 import com.iflytek.astron.console.commons.service.bot.ChatBotDataService;
 import com.iflytek.astron.console.commons.service.data.ChatDataService;
 import com.iflytek.astron.console.commons.service.data.ChatHistoryService;
 import com.iflytek.astron.console.commons.service.data.UserLangChainDataService;
-import com.iflytek.astron.console.commons.entity.bot.UserLangChainInfo;
-import com.iflytek.astron.console.commons.enums.ShelfStatusEnum;
-import com.iflytek.astron.console.commons.service.workflow.WorkflowBotChatService;
 import com.iflytek.astron.console.commons.service.workflow.WorkflowBotParamService;
 import com.iflytek.astron.console.commons.workflow.WorkflowClient;
 import com.iflytek.astron.console.commons.workflow.WorkflowListener;
+import com.iflytek.astron.console.hub.service.workflow.WorkflowBotChatService;
+import com.iflytek.astron.console.toolkit.entity.biz.workflow.BizWorkflowData;
+import com.iflytek.astron.console.toolkit.entity.dto.WorkflowReq;
+import com.iflytek.astron.console.toolkit.mapper.workflow.WorkflowMapper;
+import com.iflytek.astron.console.toolkit.service.workflow.WorkflowService;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -67,6 +72,12 @@ public class WorkflowBotChatServiceImpl implements WorkflowBotChatService {
 
     @Autowired
     private WssListenerService wssListenerService;
+
+    @Autowired
+    private WorkflowMapper workflowMapper;
+
+    @Autowired
+    private WorkflowService workflowService;
 
     @Value("${workflow.chatUrl}")
     private String chatUrl;
@@ -149,6 +160,19 @@ public class WorkflowBotChatServiceImpl implements WorkflowBotChatService {
         if (market == null || ShelfStatusEnum.isOffShelf(market.getBotStatus())) {
             apiUsedUrl = debugUrl;
             isDebug = true;
+            // Before using the debug interface, synchronize the latest workflow protocol
+            JSONObject userLangChainInfoJson = (JSONObject) JSON.toJSON(userLangChainInfo);
+            WorkflowReq workflowReq = buildWorkflowReq(userLangChainInfoJson);
+            if (workflowReq != null) {
+                try {
+                    // Set special flag to skip validation
+                    workflowReq.setSpecialSign(true);
+                    workflowService.build(workflowReq);
+                } catch (InterruptedException e) {
+                    log.error("Exception occurred while synchronizing workflow protocol for debug, flowId:{}", flowId, e);
+                    throw new BusinessException(ResponseEnum.SYSTEM_ERROR);
+                }
+            }
         } else {
             apiUsedUrl = chatUrl;
         }
@@ -237,5 +261,35 @@ public class WorkflowBotChatServiceImpl implements WorkflowBotChatService {
             // Ignore JSON parsing exceptions, content is not workflow event data
         }
         return false;
+    }
+
+    /**
+     * Before release, build and synchronize the sync parameters and workflow parameters to ensure that
+     * calling the debug API works successfully.
+     *
+     * @param userLangChainInfoJson
+     * @return
+     */
+    private WorkflowReq buildWorkflowReq(JSONObject userLangChainInfoJson) {
+        if (userLangChainInfoJson == null) {
+            return null;
+        }
+        // Get workflow information.
+        Workflow workflow = workflowMapper.selectById(userLangChainInfoJson.getLong("maasId"));
+        if (workflow == null) {
+            return null;
+        }
+        // Construct the request parameters.
+        WorkflowReq workflowReq = new WorkflowReq();
+        workflowReq.setId(workflow.getId());
+        workflowReq.setName(workflow.getName());
+        workflowReq.setDescription(workflow.getDescription());
+        workflowReq.setFlowId(workflow.getFlowId());
+        // Convert the data field in the workflow to the data field in WorkflowReq.
+        if (StrUtil.isNotBlank(workflow.getData())) {
+            BizWorkflowData bizWorkflowData = JSON.parseObject(workflow.getData(), BizWorkflowData.class);
+            workflowReq.setData(bizWorkflowData);
+        }
+        return workflowReq;
     }
 }

@@ -1773,7 +1773,9 @@ public class WorkflowService extends ServiceImpl<WorkflowMapper, Workflow> {
         if (workflow == null) {
             throw new BusinessException(ResponseEnum.WORKFLOW_NOT_EXIST);
         }
-        dataPermissionCheckTool.checkWorkflowVisible(workflow, saveReq.getSpaceId());
+        if (!saveReq.getSpecialSign()) {
+            dataPermissionCheckTool.checkWorkflowVisible(workflow, saveReq.getSpaceId());
+        }
         return workflow;
     }
 
