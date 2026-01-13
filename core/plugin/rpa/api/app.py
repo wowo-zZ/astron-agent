@@ -46,6 +46,17 @@ class RPAServer:
         ]
         initialize_services(services=need_init_services)
 
+        try:
+            import asyncio
+
+            from extension.gateway.watchdog import log_ready_after_delay
+
+            asyncio.run(log_ready_after_delay())
+        except (ModuleNotFoundError, ImportError):
+            pass
+        except Exception as e:
+            print(f"[Service] ⚠️  gateway watchdog setup exception:{str(e)}")
+
     @staticmethod
     def load_polaris() -> None:
         """

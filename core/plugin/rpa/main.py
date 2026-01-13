@@ -18,14 +18,15 @@ def setup_python_path() -> None:
     project_root = current_file_path.parent
     parent_dir = project_root.parent
     grandparent_dir = parent_dir.parent
+    extension_dir = grandparent_dir.parent.parent
 
     # Retrieve the current PYTHONPATH.
     python_path = os.environ.get("PYTHONPATH", "")
 
     # Check and add necessary directories.
     new_paths = []
-    for directory in [project_root, parent_dir, grandparent_dir]:
-        if str(directory) not in python_path:
+    for directory in [project_root, parent_dir, grandparent_dir, extension_dir]:
+        if Path(directory).exists() and str(directory) not in python_path:
             new_paths.append(str(directory))
 
     # If there is a need to add a path, update the PYTHONPATH.
