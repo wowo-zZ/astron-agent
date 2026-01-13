@@ -83,9 +83,9 @@ class AIToolsServer:
         try:
             import asyncio
 
-            from extension.gateway.watchdog import log_ready_after_delay
+            from plugin.aitools.extension.gateway.watchdog import setup_watchdog
 
-            asyncio.run(log_ready_after_delay())
+            asyncio.run(setup_watchdog())
         except (ModuleNotFoundError, ImportError):
             pass
         except Exception as e:
