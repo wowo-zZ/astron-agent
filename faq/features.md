@@ -82,3 +82,233 @@ module_id varchar(50) DEFAULT NULL ）。
 - 如果找不到下架/删除入口，可能是当前版本的已知问题（Issue），建议关注 GitHub 仓库的修复
 进度。
 
+## 怎么使用https协议访问项目？
+
+1. 修改配置文件，如图所示，添加https暴露接口，并修改CONSOLE_DOMAIN环境变量。
+![](assets/img1.png)
+![](assets/img2.png)
+2. 修改docker-compose.yaml文件中nginx容器的配置，暴露出https和casdoor的端口号，并映射https证书文件。
+![](assets/img3.png)
+3. 修改docker/astronAgent/nginx/nginx.conf配置文件以适配https协议
+```
+worker_processes auto;
+worker_rlimit_nofile 65535;
+
+events {
+    worker_connections 65535;
+    multi_accept on;
+}
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    # Log format
+    log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+                    '$status $body_bytes_sent "$http_referer" '
+                    '"$http_user_agent" "$http_x_forwarded_for"';
+
+    # Access log
+    access_log /var/log/nginx/access.log main;
+    error_log /var/log/nginx/error.log warn;
+
+    # Basic configuration
+    sendfile on;
+    tcp_nopush on;
+    tcp_nodelay on;
+    keepalive_timeout 65;
+    types_hash_max_size 2048;
+
+    # Upload size limit
+    client_max_body_size 20m;
+
+    # Gzip compression
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1000;
+    gzip_types
+        text/plain
+        text/css
+        text/xml
+        text/javascript
+        application/xml+rss
+        application/javascript
+        application/json;
+
+    server {
+        listen 80;
+        server_name localhost;
+
+        # Security headers
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header X-XSS-Protection "1; mode=block" always;
+        add_header X-Content-Type-Options "nosniff" always;
+
+        # Health check
+        location /nginx-health {
+            access_log off;
+            return 200 "nginx is healthy\n";
+            add_header Content-Type text/plain;
+        }
+
+        # Redirect all other HTTP traffic to HTTPS
+        location / {
+            return 301 https://$host$request_uri;
+        }
+    }
+
+    server {
+        listen 443 ssl http2;
+        server_name localhost;
+
+        ssl_certificate     /etc/nginx/certs/localhost.pem;
+        ssl_certificate_key /etc/nginx/certs/localhost-key.pem;
+        ssl_protocols       TLSv1.2 TLSv1.3;
+
+        # Security headers
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header X-XSS-Protection "1; mode=block" always;
+        add_header X-Content-Type-Options "nosniff" always;
+
+        # Runtime config - no cache (dynamic config file)
+        location = /runtime-config.js {
+            proxy_pass http://console-frontend:1881;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto https;
+
+            # Disable caching for runtime config
+            expires -1;
+            add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0";
+            add_header Pragma "no-cache";
+        }
+
+        # Static resource caching
+        location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+            proxy_pass http://console-frontend:1881;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto https;
+
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+        }
+
+        # SSE (Server-Sent Events) API proxy for workflow chat completions
+        location /workflow/v1/chat/completions {
+            proxy_pass http://core-workflow:7880/workflow/v1/chat/completions;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto https;
+
+            # SSE specific settings
+            proxy_buffering off;                    # Disable buffering for real-time data transmission
+            proxy_cache off;                        # Disable caching
+            proxy_set_header Connection '';         # SSE uses persistent connections
+            proxy_http_version 1.1;                 # Use HTTP/1.1
+            chunked_transfer_encoding on;           # Enable chunked transfer encoding
+
+            # Prevent nginx from buffering responses
+            proxy_set_header X-Accel-Buffering no;
+
+            # Timeout settings - SSE requires long-lived connections
+            proxy_connect_timeout 60s;
+            proxy_send_timeout 1800s;                # 30 minutes send timeout
+            proxy_read_timeout 1800s;                # 30 minutes read timeout
+
+            # Set correct headers for SSE
+            add_header Cache-Control 'no-cache';
+            add_header X-Accel-Buffering 'no';
+        }
+
+        # SSE (Server-Sent Events) API proxy for chat messages
+        location /console-api/chat-message/ {
+            proxy_pass http://console-hub:8080/chat-message/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto https;
+
+            # SSE specific settings
+            proxy_buffering off;                    # Disable buffering for real-time data transmission
+            proxy_cache off;                        # Disable caching
+            proxy_set_header Connection '';         # SSE uses persistent connections
+            proxy_http_version 1.1;                 # Use HTTP/1.1
+            chunked_transfer_encoding on;           # Enable chunked transfer encoding
+
+            # Prevent nginx from buffering responses
+            proxy_set_header X-Accel-Buffering no;
+
+            # Timeout settings - SSE requires long-lived connections
+            proxy_connect_timeout 60s;
+            proxy_send_timeout 1800s;                # 30 minutes send timeout
+            proxy_read_timeout 1800s;                # 30 minutes read timeout
+
+            # Set correct headers for SSE
+            add_header Cache-Control 'no-cache';
+            add_header X-Accel-Buffering 'no';
+        }
+
+        # Backend API proxy - proxy /console-api path to console-hub
+        location /console-api/ {
+            proxy_pass http://console-hub:8080/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto https;
+
+            # Timeout settings
+            proxy_connect_timeout 30s;
+            proxy_send_timeout 30s;
+            proxy_read_timeout 30s;
+        }
+
+        # Frontend application proxy - default proxy to console-frontend
+        location / {
+            proxy_pass http://console-frontend:1881;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto https;
+
+            # Timeout settings
+            proxy_connect_timeout 30s;
+            proxy_send_timeout 30s;
+            proxy_read_timeout 30s;
+        }
+
+        # Health check
+        location /nginx-health {
+            access_log off;
+            return 200 "nginx is healthy\n";
+            add_header Content-Type text/plain;
+        }
+    }
+
+    # Casdoor HTTPS endpoint (same cert, different port)
+    server {
+        listen 8000 ssl http2;
+        server_name localhost;
+
+        ssl_certificate     /etc/nginx/certs/localhost.pem;
+        ssl_certificate_key /etc/nginx/certs/localhost-key.pem;
+        ssl_protocols       TLSv1.2 TLSv1.3;
+
+        # Security headers
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header X-XSS-Protection "1; mode=block" always;
+        add_header X-Content-Type-Options "nosniff" always;
+
+        location / {
+            proxy_pass http://casdoor:8000;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto https;
+        }
+    }
+}
+```
