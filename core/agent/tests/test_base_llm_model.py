@@ -68,7 +68,6 @@ class TestBaseLLMModel:
             stream=True,
             model="test_model",
             timeout=90,
-            max_tokens=10000,
         )
         assert result == mock_response
 
