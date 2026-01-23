@@ -7,12 +7,12 @@ from sqlmodel import SQLModel
 from alembic import context
 
 # Import all models for SQLModel metadata registration
-from workflow.configs import workflow_config
-from workflow.domain.models.ai_app import App
-from workflow.domain.models.app_source import AppSource
-from workflow.domain.models.flow import Flow
-from workflow.domain.models.history import History
-from workflow.domain.models.license import License
+from workflow.configs import workflow_config  # noqa: F401
+from workflow.domain.models.ai_app import App  # noqa: F401
+from workflow.domain.models.app_source import AppSource  # noqa: F401
+from workflow.domain.models.flow import Flow  # noqa: F401
+from workflow.domain.models.history import History  # noqa: F401
+from workflow.domain.models.license import License  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

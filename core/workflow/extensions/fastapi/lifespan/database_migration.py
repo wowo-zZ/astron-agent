@@ -16,6 +16,7 @@ from workflow.extensions.middleware.getters import get_cache_service
 
 INIT_VERSION = "b13356244aea"
 
+
 def run_database_migration() -> None:
     """
     Execute database migration (using Redis distributed lock).
@@ -48,7 +49,9 @@ def run_database_migration() -> None:
                     command.stamp(config, INIT_VERSION)
                     command.upgrade(config, "head")
                 except Exception as stamp_error:
-                    logger.error(f"Failed to stamp and upgrade legacy database: {stamp_error}")
+                    logger.error(
+                        f"Failed to stamp and upgrade legacy database: {stamp_error}"
+                    )
             else:
                 logger.error(f"Database migration failed: {e}")
         except Exception as e:
