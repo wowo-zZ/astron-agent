@@ -10,7 +10,7 @@ from pathlib import Path
 from loguru import logger
 from sqlalchemy.exc import OperationalError
 
-from alembic import command
+from alembic import command  # type: ignore[attr-defined]
 from alembic.config import Config
 from workflow.extensions.middleware.getters import get_cache_service
 

@@ -4,7 +4,7 @@ from loguru import logger
 from sqlalchemy import engine_from_config, pool
 from sqlmodel import SQLModel
 
-from alembic import context
+from alembic import context  # type: ignore[attr-defined]
 
 # Import all models for SQLModel metadata registration
 from workflow.configs import workflow_config  # noqa: F401
@@ -19,7 +19,7 @@ from workflow.domain.models.license import License  # noqa: F401
 config = context.config
 
 
-def get_database_url():
+def get_database_url() -> str:
     host = os.getenv("MYSQL_HOST")
     port = os.getenv("MYSQL_PORT")
     user = os.getenv("MYSQL_USER")
@@ -32,17 +32,17 @@ def get_database_url():
 config.set_main_option("sqlalchemy.url", get_database_url())
 
 
-def get_metadata():
+def get_metadata():  # type: ignore[no-untyped-def]
     return SQLModel.metadata
 
 
-def include_object(object, name, type_, reflected, compare_to):
+def include_object(object: object, name: str, type_: str, reflected: bool, compare_to: object) -> bool:  # type: ignore[no-untyped-def]
     if type_ == "foreign_key_constraint":
         return False
     return True
 
 
-def run_migrations_offline():
+def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
 
     This configures the context with just a URL
@@ -66,7 +66,7 @@ def run_migrations_offline():
         context.run_migrations()
 
 
-def run_migrations_online():
+def run_migrations_online() -> None:
     """Run migrations in 'online' mode.
 
     In this scenario we need to create an Engine
@@ -76,7 +76,7 @@ def run_migrations_online():
     # this callback is used to prevent an auto-migration from being generated
     # when there are no changes to the schema
     # reference: http://alembic.zzzcomputing.com/en/latest/cookbook.html
-    def process_revision_directives(context, revision, directives):
+    def process_revision_directives(context: object, revision: object, directives: list) -> None:  # type: ignore[no-untyped-def]
         if getattr(config.cmd_opts, "autogenerate", False):
             script = directives[0]
             if script.upgrade_ops.is_empty():
