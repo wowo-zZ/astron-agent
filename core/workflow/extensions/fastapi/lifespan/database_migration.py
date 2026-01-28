@@ -14,7 +14,15 @@ from alembic import command  # type: ignore[attr-defined]
 from alembic.config import Config
 from workflow.extensions.middleware.getters import get_cache_service
 
+# Migration constants
 INIT_VERSION = "b13356244aea"
+
+# MySQL error codes
+MYSQL_ERROR_SELECT_DENIED = 1142
+MYSQL_ERROR_ACCESS_DENIED = 1227
+MYSQL_ERROR_EXECUTE_DENIED = 1370
+MYSQL_ERROR_TABLE_EXISTS = 1050
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(name)s:%(funcName)s:%(lineno)d | %(message)s",
@@ -47,10 +55,17 @@ def run_database_migration() -> None:
         try:
             command.upgrade(config, "head")
         except OperationalError as e:
-            if "denied" in str(e):
-                logging.warning(f"Skip database migration due to don't have permission: {e}")
+            db_error_code = e.orig.args[0]
+            if db_error_code in (
+                MYSQL_ERROR_SELECT_DENIED,
+                MYSQL_ERROR_ACCESS_DENIED,
+                MYSQL_ERROR_EXECUTE_DENIED,
+            ):
+                logging.warning(
+                    f"Skip database migration due to insufficient permissions: {e}"
+                )
                 return
-            if "already exists" in str(e):
+            elif db_error_code == MYSQL_ERROR_TABLE_EXISTS:
                 logging.warning("Detected legacy database, stamping to init version...")
                 try:
                     command.stamp(config, INIT_VERSION)
