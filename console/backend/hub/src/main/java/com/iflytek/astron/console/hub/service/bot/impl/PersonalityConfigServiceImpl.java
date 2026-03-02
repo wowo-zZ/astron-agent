@@ -16,7 +16,7 @@ import com.iflytek.astron.console.hub.enums.PersonalitySceneTypeEnum;
 import com.iflytek.astron.console.hub.mapper.personality.PersonalityCategoryMapper;
 import com.iflytek.astron.console.hub.mapper.personality.PersonalityConfigMapper;
 import com.iflytek.astron.console.hub.mapper.personality.PersonalityRoleMapper;
-import com.iflytek.astron.console.hub.service.bot.OpenAiModelProcessService;
+import com.iflytek.astron.console.commons.service.bot.OpenAiModelProcessService;
 import com.iflytek.astron.console.hub.service.bot.PersonalityConfigService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

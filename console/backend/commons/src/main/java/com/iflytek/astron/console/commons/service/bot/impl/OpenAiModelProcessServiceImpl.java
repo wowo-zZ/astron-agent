@@ -1,9 +1,9 @@
-package com.iflytek.astron.console.hub.service.bot.impl;
+package com.iflytek.astron.console.commons.service.bot.impl;
 
 import com.iflytek.astron.console.commons.constant.ResponseEnum;
 import com.iflytek.astron.console.commons.exception.BusinessException;
 import com.iflytek.astron.console.commons.util.SseEmitterUtil;
-import com.iflytek.astron.console.hub.service.bot.OpenAiModelProcessService;
+import com.iflytek.astron.console.commons.service.bot.OpenAiModelProcessService;
 import com.openai.client.OpenAIClient;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
 import com.openai.core.http.StreamResponse;
