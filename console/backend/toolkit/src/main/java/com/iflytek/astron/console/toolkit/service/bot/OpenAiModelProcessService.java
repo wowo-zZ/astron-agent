@@ -104,8 +104,8 @@ public class OpenAiModelProcessService {
         Thread.startVirtualThread(() -> {
             // Track if this is the first frame
             AtomicBoolean isFirstFrame = new AtomicBoolean(true);
-            // Track sequence number starting from 1
-            AtomicInteger seqCounter = new AtomicInteger(1);
+            // Track sequence number starting from 0
+            AtomicInteger seqCounter = new AtomicInteger(0);
             // Store OpenAI response id as sid
             AtomicReference<String> sid = new AtomicReference<>();
 
@@ -142,7 +142,7 @@ public class OpenAiModelProcessService {
 
                                     // Remove code block markers
                                     String processedContent = content;
-                                    if (currentSeq == 1 || currentSeq == 2) {
+                                    if (currentSeq == 0 || currentSeq == 1) {
                                         processedContent = processedContent.replace("python", "");
                                     }
                                     processedContent = processedContent.replace("```", "");
