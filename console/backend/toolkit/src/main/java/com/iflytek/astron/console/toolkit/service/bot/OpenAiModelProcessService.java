@@ -140,18 +140,9 @@ public class OpenAiModelProcessService {
                                 .flatMap(choice -> choice.delta().content().stream())
                                 .filter(content -> !content.isEmpty())
                                 .forEach(content -> {
-                                    // Get current sequence number
-                                    int currentSeq = seqCounter.get();
-                                    // Remove code block markers
-                                    String processedContent = content;
-                                    if (currentSeq == 0 || currentSeq == 1) {
-                                        processedContent = processedContent.replace("python", "");
-                                    }
-                                    processedContent = processedContent.replace("```", "");
-
                                     // First frame: status=0, subsequent frames: status=1
                                     int status = isFirstFrame.getAndSet(false) ? 0 : 1;
-                                    ChatResponse response = new ChatResponse(chatId, false, status, processedContent);
+                                    ChatResponse response = new ChatResponse(chatId, false, status, content);
                                     response.getHeader().setSid(sid.get());
                                     response.getHeader().setSeq(seqCounter.getAndIncrement());
                                     SseEmitterUtil.sendData(emitter, response);
