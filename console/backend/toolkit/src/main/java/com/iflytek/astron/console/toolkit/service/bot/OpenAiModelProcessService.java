@@ -114,6 +114,8 @@ public class OpenAiModelProcessService {
                 ChatCompletionCreateParams params = ChatCompletionCreateParams.builder()
                         .model(model)
                         .addUserMessage(prompt)
+                        .temperature(0.2)
+                        .topP(0.85)
                         .build();
 
                 // Call streaming API and process response
@@ -139,7 +141,6 @@ public class OpenAiModelProcessService {
                                 .forEach(content -> {
                                     // Get current sequence number
                                     int currentSeq = seqCounter.get();
-
                                     // Remove code block markers
                                     String processedContent = content;
                                     if (currentSeq == 0 || currentSeq == 1) {
