@@ -135,7 +135,8 @@ public class OpenAiModelProcessService {
                         }
 
                         // Process each choice's content
-                        chunk.choices().stream()
+                        chunk.choices()
+                                .stream()
                                 .flatMap(choice -> choice.delta().content().stream())
                                 .filter(content -> !content.isEmpty())
                                 .forEach(content -> {
