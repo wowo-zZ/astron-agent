@@ -3,6 +3,7 @@ package com.iflytek.astron.console.toolkit.service.bot;
 import com.iflytek.astron.console.commons.constant.ResponseEnum;
 import com.iflytek.astron.console.commons.exception.BusinessException;
 import com.iflytek.astron.console.commons.util.SseEmitterUtil;
+import com.iflytek.astron.console.toolkit.entity.spark.chat.ChatResponse;
 import com.openai.client.OpenAIClient;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
 import com.openai.core.http.StreamResponse;
@@ -16,6 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * OpenAI model processing service implementation
@@ -94,9 +98,17 @@ public class OpenAiModelProcessService {
         // Create SseEmitter
         SseEmitter emitter = SseEmitterUtil.createSseEmitter();
         String streamId = UUID.randomUUID().toString();
+        String chatId = UUID.randomUUID().toString();
 
         // Process streaming response asynchronously
         Thread.startVirtualThread(() -> {
+            // Track if this is the first frame
+            AtomicBoolean isFirstFrame = new AtomicBoolean(true);
+            // Track sequence number starting from 1
+            AtomicInteger seqCounter = new AtomicInteger(1);
+            // Store OpenAI response id as sid
+            AtomicReference<String> sid = new AtomicReference<>();
+
             try {
                 // Build streaming request parameters
                 ChatCompletionCreateParams params = ChatCompletionCreateParams.builder()
@@ -108,27 +120,44 @@ public class OpenAiModelProcessService {
                 try (StreamResponse<ChatCompletionChunk> streamResponse =
                         client.chat().completions().createStreaming(params)) {
 
-                    streamResponse.stream()
-                            .flatMap(chunk -> chunk.choices().stream())
-                            .flatMap(choice -> choice.delta().content().stream())
-                            .forEach(content -> {
-                                // Check if stopped
-                                if (SseEmitterUtil.isStreamStopped(streamId)) {
-                                    log.info("Streaming call stopped");
-                                    return;
-                                }
+                    streamResponse.stream().forEach(chunk -> {
+                        // Get sid from first chunk
+                        if (sid.get() == null) {
+                            sid.set(chunk.id());
+                        }
 
-                                // Send content to frontend
-                                if (!content.isEmpty()) {
-                                    SseEmitterUtil.sendData(emitter, content);
-                                }
-                            });
+                        // Check if stopped
+                        if (SseEmitterUtil.isStreamStopped(streamId)) {
+                            log.info("Streaming call stopped");
+                            return;
+                        }
+
+                        // Process each choice's content
+                        chunk.choices().stream()
+                                .flatMap(choice -> choice.delta().content().stream())
+                                .filter(content -> !content.isEmpty())
+                                .forEach(content -> {
+                                    // First frame: status=0, subsequent frames: status=1
+                                    int status = isFirstFrame.getAndSet(false) ? 0 : 1;
+                                    ChatResponse response = new ChatResponse(chatId, false, status, content);
+                                    response.getHeader().setSid(sid.get());
+                                    response.getHeader().setSeq(seqCounter.getAndIncrement());
+                                    SseEmitterUtil.sendData(emitter, response);
+                                });
+                    });
                 }
 
-                // Send end signal and complete
-                SseEmitterUtil.sendEndAndComplete(emitter);
+                // Send final message with isFinish=true
+                ChatResponse finalResponse = new ChatResponse(chatId, true, 2, "");
+                finalResponse.getHeader().setSid(sid.get());
+                finalResponse.getHeader().setSeq(seqCounter.getAndIncrement());
+                SseEmitterUtil.sendData(emitter, finalResponse);
             } catch (Exception e) {
                 log.error("Streaming OpenAI API call failed", e);
+                ChatResponse errorResponse = new ChatResponse(chatId, true, 2, "OpenAI API call failed: " + e.getMessage());
+                errorResponse.getHeader().setSid(sid.get());
+                errorResponse.getHeader().setSeq(seqCounter.getAndIncrement());
+                SseEmitterUtil.sendData(emitter, errorResponse);
                 SseEmitterUtil.completeWithError(emitter, "OpenAI API call failed: " + e.getMessage());
             }
         });
