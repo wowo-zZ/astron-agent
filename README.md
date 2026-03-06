@@ -32,7 +32,8 @@ The platform supports **high-availability** deployment, enabling organizations t
 - **[Astron Agent Zhengzhou Meetup](https://github.com/iflytek/astron-agent/discussions/672)**  🎤 <a href="https://github.com/lyj715824"><img src="https://github.com/lyj715824.png" width="20" align="center" /> @lyj715824</a> <a href="https://github.com/wowo-zZ"><img src="https://github.com/wowo-zZ.png" width="20" align="center" /> @wowo-zZ</a>
 - **[Astron on Campus @ Zhejiang University of Finance and Economics](https://mp.weixin.qq.com/s/oim_Z0ckgpFwf5jOskoJuA)**  🎤 <a href="https://github.com/lyj715824"><img src="https://github.com/lyj715824.png" width="20" align="center" /> @lyj715824</a>
 - **[Astron Agent & RPA · Qingdao Meetup Brings Agentic AI!](https://github.com/iflytek/astron-agent/discussions/740)**  🎤 <a href="https://github.com/vsxd"><img src="https://github.com/vsxd.png" width="20" align="center" /> @vsxd</a> <a href="https://github.com/doctorbruce"><img src="https://github.com/doctorbruce.png" width="20" align="center" /> @doctorbruce</a> <a href="https://github.com/MaxwellJean"><img src="https://github.com/MaxwellJean.png" width="20" align="center" /> @MaxwellJean</a>
-- **[Astron Training Camp · Cohort #1](https://www.aidaxue.com/astronCamp)**  🎤 <a href="https://github.com/lyj715824"><img src="https://github.com/lyj715824.png" width="20" align="center" /> @lyj715824</a>
+- **[Astron Training Camp · Cohort #1](https://www.aidaxue.com/astronCamp)**  🎤 <a href="https://github.com/lyj715824"><img src="https://github.com/lyj715824.png" width="20" align="center" /> @lyj715824</a> <a href="https://github.com/Thomas1024-Astron"><img src="https://github.com/Thomas1024-Astron.png" width="20" align="center" /> @Thomas1024-Astron</a> <a href="https://github.com/abelzha"><img src="https://github.com/abelzha.png" width="20" align="center" /> @abelzha</a>
+- **[iFLYTEK @ MWC Barcelona 2026](https://www.iflytek.com/en/news-events/mwc2026.html)**
 - **[Astron Talk @ Chongqing Mini Tech Fest](https://mp.weixin.qq.com/s/HROf1zZpkPVDSsCQrv2jRg)**  🎤 <a href="https://github.com/lyj715824"><img src="https://github.com/lyj715824.png" width="20" align="center" /> @lyj715824</a>
 
 ## 🚀 Quick Start
@@ -128,4 +129,3 @@ We welcome contributions of all kinds! Please see our [Contributing Guide](CONTR
 ## 📄 Open Source License
 
 This project is licensed under the [Apache 2.0 License](LICENSE), allowing free use, modification, distribution, and commercial use without any restrictions.
-
