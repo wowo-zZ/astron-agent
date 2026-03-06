@@ -557,7 +557,7 @@ services:
       PLATFORM_APP_ID: "${PLATFORM_APP_ID:-your-app-id}"
       PLATFORM_API_KEY: "${PLATFORM_API_KEY:-your-api-key}"
       PLATFORM_API_SECRET: "${PLATFORM_API_SECRET:-your-api-secret}"
-      AI_ABILITY_CHAT_BASE_URL: "${AI_ABILITY_CHAT_BASE_URL:-url}"
+      AI_ABILITY_CHAT_BASE_URL: "${AI_ABILITY_CHAT_BASE_URL:-https://spark-api-open.xf-yun.com/v1}"
       AI_ABILITY_CHAT_MODEL: "${AI_ABILITY_CHAT_MODEL:- model-id}"
       AI_ABILITY_CHAT_API_KEY: "${AI_ABILITY_CHAT_API_KEY:-your-ai-ability-api-key}"
       SPARK_APP_ID: "${SPARK_APP_ID:-your-spark-app-id}"
