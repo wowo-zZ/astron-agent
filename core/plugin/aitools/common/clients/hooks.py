@@ -3,9 +3,9 @@ from typing import Any, Dict, List, Optional, Protocol
 
 from aiohttp import ClientResponse
 from common.otlp.trace.span import SPAN_SIZE_LIMIT
+from loguru import logger as log
 from plugin.aitools.api.schemas.types import BaseResponse, ErrorResponse
 from plugin.aitools.common.clients.adapters import SpanLike
-from plugin.aitools.common.log.logger import log
 
 
 class HttpLikeClient(Protocol):

@@ -21,12 +21,13 @@ from common.otlp.trace.span import SPAN_SIZE_LIMIT, Span
 from common.otlp.trace.span_instance import SpanInstance
 from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse
+from loguru import logger as log
 from plugin.aitools.api.schemas.types import ErrorResponse
 from plugin.aitools.common.clients.adapters import SpanLike, adapt_span
 from plugin.aitools.common.exceptions.error.code_enums import CodeEnums
 from plugin.aitools.common.exceptions.exceptions import ServiceException
-from plugin.aitools.common.log.logger import log
 from plugin.aitools.const.const import (
+    AI_APP_ID_KEY,
     SERVICE_LOCATION_KEY,
     SERVICE_PORT_KEY,
     SERVICE_SUB_KEY,
@@ -62,7 +63,7 @@ class OTLPMiddleware(BaseHTTPMiddleware):
     def __init__(
         self,
         app: ASGIApp,
-        enabled: str = "1",
+        enabled: bool = False,
         sample_rate: float = 1.0,
         include_paths: list | None = None,
     ):
@@ -71,14 +72,14 @@ class OTLPMiddleware(BaseHTTPMiddleware):
         self.sample_rate = sample_rate
         self.include_paths = include_paths or ["/aitools/v1"]
 
-        self.app_id = os.getenv("AI_APP_ID", "")
+        self.app_id = os.getenv(AI_APP_ID_KEY, "")
         self.uid = str(uuid.uuid1())
         self.sid_info = SidInfo(
             sub=os.getenv(SERVICE_SUB_KEY, "aitools"),
             location=os.getenv(SERVICE_LOCATION_KEY, "default"),
             index=0,
             local_ip=get_host_ip(),
-            local_port=os.getenv(SERVICE_PORT_KEY, "18668"),
+            local_port=os.getenv(SERVICE_PORT_KEY, "18667"),
         )
         self.sid = SidGenerator2(self.sid_info).gen()
 
@@ -90,18 +91,6 @@ class OTLPMiddleware(BaseHTTPMiddleware):
         try:
             if self._should_skip(request):
                 return await call_next(request)
-
-            # with self._init_span(request) as span:
-
-            #     usr_input_str = await self._capture_user_input(request, span)
-            #     node_trace, meter = self._init_node_trace(request, usr_input_str)
-
-            #     request.state.span = span
-            #     request.state.meter = meter
-            #     request.state.node_trace = node_trace
-            #     response = await call_next(request)
-
-            #     return response
 
             span = self._init_span_instance(request)
 
@@ -126,7 +115,7 @@ class OTLPMiddleware(BaseHTTPMiddleware):
 
     def _should_skip(self, request: Request) -> bool:
         """Should skip logging for this request?"""
-        if self.enabled.lower() == "0":
+        if not self.enabled:
             return True
 
         if random.random() > self.sample_rate:

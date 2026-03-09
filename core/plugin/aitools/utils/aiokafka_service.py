@@ -5,7 +5,7 @@ from typing import Optional, Tuple
 
 from aiokafka import AIOKafkaProducer
 from common.service.base import Service, ServiceType
-from plugin.aitools.common.log.logger import log
+from loguru import logger as log
 
 
 class AioKafkaProducerService(Service):

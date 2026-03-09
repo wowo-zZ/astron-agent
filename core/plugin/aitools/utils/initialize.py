@@ -6,7 +6,7 @@ from common.service.otlp.metric import factory as otlp_metric_factory
 from common.service.otlp.sid import factory as otlp_sid_factory
 from common.service.otlp.span import factory as otlp_span_factory
 from common.service.settings import factory as settings_factory
-from plugin.aitools.common.log.logger import log
+from loguru import logger as log
 from plugin.aitools.utils import aitools_service_manager
 from plugin.aitools.utils.aiokafka_factory import AioKafkaProducerServiceFactory
 
@@ -29,6 +29,3 @@ def initialize_services() -> None:
             aitools_service_manager.register_factory(factory, dependencies=dependencies)
         except Exception as exc:
             log.exception(exc)
-            raise RuntimeError(
-                "Could not initialize services. Please check your settings."
-            ) from exc

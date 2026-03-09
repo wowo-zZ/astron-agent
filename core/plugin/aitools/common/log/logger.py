@@ -10,20 +10,30 @@ from types import FrameType
 from typing import List, Optional, cast
 
 from loguru import logger
+from plugin.aitools.const.const import (
+    LOG_ENCODING_KEY,
+    LOG_FILE_KEY,
+    LOG_LEVEL_KEY,
+    LOG_RETENTION_KEY,
+    LOG_ROTATION_KEY,
+    LOG_STDOUT_ENABLE_KEY,
+)
+from plugin.aitools.utils.env_utils import safe_get_bool_env
 
-# def init_logger():
-LOG_FILE = "logs/aitools.log"
-ROTATION = "5 MB"
-RETENTION = "30 days"
-ENCODING = "UTF-8"
-LEVEL = "DEBUG"
+LOG_FILE = os.getenv(LOG_FILE_KEY, "logs/aitools.log")
+ROTATION = os.getenv(LOG_ROTATION_KEY, "5 MB")
+RETENTION = os.getenv(LOG_RETENTION_KEY, "30 days")
+ENCODING = os.getenv(LOG_ENCODING_KEY, "UTF-8")
+LEVEL = os.getenv(LOG_LEVEL_KEY, "DEBUG")
+LOG_STDOUT_ENABLE = safe_get_bool_env(LOG_STDOUT_ENABLE_KEY, False)
+
 logger.remove()  # Remove default logger
 logger.add(
     LOG_FILE, rotation=ROTATION, retention=RETENTION, encoding=ENCODING, level=LEVEL
 )
 
 # Add console handler for local environment
-if os.getenv("LOG_STDOUT_ENABLE", "0") == "1":
+if LOG_STDOUT_ENABLE:
     logger.add(
         sys.stdout,
         level=LEVEL,

@@ -2,7 +2,7 @@
 
 from common.service import ServiceManager, ServiceType
 from common.service.oss.base_oss import BaseOSSService
-from plugin.aitools.common.log.logger import log
+from loguru import logger as log
 from plugin.aitools.utils.aiokafka_factory import AioKafkaProducerServiceFactory
 from plugin.aitools.utils.aiokafka_service import AioKafkaProducerService
 
@@ -23,9 +23,10 @@ class AitoolsServiceManager(ServiceManager):
                 self.services[name] = kafka_factory.create()
                 log.info("Kafka producer service restarted successfully.")
                 continue
-            log.debug(f"Hot-reloaded {name} service...")
-            self._create_service(name)
-            log.debug(f"{name} service restarted successfully.")
+            if name == ServiceType.OSS_SERVICE:
+                log.debug(f"Hot-reloaded {name} service...")
+                self._create_service(name)
+                log.debug(f"{name} service restarted successfully.")
 
 
 aitools_service_manager = AitoolsServiceManager()
