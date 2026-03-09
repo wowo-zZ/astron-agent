@@ -35,10 +35,9 @@ async def test_hot_load_callback_restarts_kafka_and_other_services() -> None:
     kafka_factory.create.assert_called_once()
     assert manager.services[ServiceType.KAFKA_PRODUCER_SERVICE] is new_kafka_service
 
-    # Non-kafka services should use generic create path.
+    # Only OSS service should use generic create path.
     manager._create_service.assert_has_calls(
         [
-            call(ServiceType.SETTINGS_SERVICE),
             call(ServiceType.OSS_SERVICE),
         ],
         any_order=False,

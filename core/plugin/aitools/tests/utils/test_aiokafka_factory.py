@@ -9,9 +9,9 @@ from plugin.aitools.utils.aiokafka_factory import AioKafkaProducerServiceFactory
 class TestAioKafkaProducerServiceFactory:
     """Test cases for kafka factory."""
 
-    def test_parse_int_env_fallback(self) -> None:
+    def test_parse_acks_env_non_int_fallback(self) -> None:
         with patch("os.getenv", return_value="bad"):
-            assert AioKafkaProducerServiceFactory.parse_int_env("X", 5) == 5
+            assert AioKafkaProducerServiceFactory.parse_acks_env() == 1
 
     def test_parse_acks_env_all(self) -> None:
         with patch("os.getenv", return_value="all"):
@@ -39,6 +39,7 @@ class TestAioKafkaProducerServiceFactory:
         mock_service_cls.return_value = mock_service
 
         loop = MagicMock()
+        loop.create_task.side_effect = lambda coro: (coro.close(), MagicMock())[1]
         mock_get_event_loop.return_value = loop
 
         with patch.dict(
@@ -59,8 +60,7 @@ class TestAioKafkaProducerServiceFactory:
     @pytest.mark.asyncio
     async def test_shutdown_stops_cached_service(self) -> None:
         factory = AioKafkaProducerServiceFactory()
-        cached = MagicMock()
-        cached.stop = AsyncMock()
+        cached = AsyncMock()
         factory._cached_instance = cached
 
         await factory.shutdown()

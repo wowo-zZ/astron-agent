@@ -53,43 +53,24 @@ class TestSetupPythonPath:
             os.environ["PYTHONPATH"] = original_path
 
 
-class TestLoadEnvFile:
-    """Test cases for load_env_file function."""
+class TestMainConfig:
+    """Test config wiring in main()."""
 
-    def test_load_env_file_nonexistent_file(self, tmp_path: Path) -> None:
-        """Test load_env_file with nonexistent file."""
-        from main import load_env_file
+    @patch("main.start_service")
+    @patch("main.setup_python_path")
+    def test_main_sets_config_file_env(
+        self, mock_setup_python_path: MagicMock, mock_start_service: MagicMock
+    ) -> None:
+        """main should set CONFIG_FILE to plugin config.env path."""
+        from main import main
 
-        nonexistent = tmp_path / "nonexistent.env"
-        # Should not raise, just print warning
-        load_env_file(str(nonexistent))
+        with patch.dict(os.environ, {}, clear=True):
+            main()
+            expected = str(Path(__file__).resolve().parents[2] / "config.env")
+            assert os.environ["CONFIG_FILE"] == expected
 
-    def test_load_env_file_with_valid_file(self, tmp_path: Path) -> None:
-        """Test load_env_file with valid file."""
-        from main import load_env_file
-
-        env_file = tmp_path / "test.env"
-        env_file.write_text(
-            "TEST_KEY=test_value\n"
-            "# This is a comment\n"
-            "ANOTHER_KEY=another_value\n"
-        )
-
-        with patch.dict(os.environ, {}, clear=False):
-            load_env_file(str(env_file))
-
-            # Verify the file was read (function runs without error)
-            assert env_file.exists()
-
-    def test_load_env_file_with_invalid_format(self, tmp_path: Path) -> None:
-        """Test load_env_file with invalid line format."""
-        from main import load_env_file
-
-        env_file = tmp_path / "invalid.env"
-        env_file.write_text("INVALID_LINE_NO_EQUALS\n")
-
-        # Should not raise
-        load_env_file(str(env_file))
+        mock_setup_python_path.assert_called_once()
+        mock_start_service.assert_called_once()
 
 
 class TestStartService:

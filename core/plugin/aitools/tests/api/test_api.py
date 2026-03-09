@@ -84,7 +84,7 @@ class TestOTLPMiddleware:
         app = MagicMock()
         middleware = OTLPMiddleware(app)
 
-        assert middleware.enabled == "1"
+        assert middleware.enabled is False
         assert middleware.sample_rate == 1.0
         assert middleware.include_paths == ["/aitools/v1"]
 
@@ -93,19 +93,19 @@ class TestOTLPMiddleware:
         app = MagicMock()
         middleware = OTLPMiddleware(
             app,
-            enabled="0",
+            enabled=True,
             sample_rate=0.5,
             include_paths=["/custom"],
         )
 
-        assert middleware.enabled == "0"
+        assert middleware.enabled is True
         assert middleware.sample_rate == 0.5
         assert middleware.include_paths == ["/custom"]
 
     def test_should_skip_when_disabled(self) -> None:
         """Test should_skip returns True when disabled."""
         app = MagicMock()
-        middleware = OTLPMiddleware(app, enabled="0")
+        middleware = OTLPMiddleware(app, enabled=False)
 
         mock_request = MagicMock()
         mock_request.url.path = "/aitools/v1/test"
@@ -115,7 +115,7 @@ class TestOTLPMiddleware:
     def test_should_skip_with_sampling(self) -> None:
         """Test should_skip with sampling."""
         app = MagicMock()
-        middleware = OTLPMiddleware(app, sample_rate=0.0)
+        middleware = OTLPMiddleware(app, enabled=True, sample_rate=0.0)
 
         mock_request = MagicMock()
         mock_request.url.path = "/aitools/v1/test"
@@ -127,7 +127,7 @@ class TestOTLPMiddleware:
     def test_should_skip_path_not_matching(self) -> None:
         """Test should_skip when path doesn't match include_paths."""
         app = MagicMock()
-        middleware = OTLPMiddleware(app, include_paths=["/aitools/v1"])
+        middleware = OTLPMiddleware(app, enabled=True, include_paths=["/aitools/v1"])
 
         mock_request = MagicMock()
         mock_request.url.path = "/other/path"
@@ -137,7 +137,7 @@ class TestOTLPMiddleware:
     def test_should_skip_path_matching(self) -> None:
         """Test should_skip when path matches include_paths."""
         app = MagicMock()
-        middleware = OTLPMiddleware(app, include_paths=["/aitools/v1"])
+        middleware = OTLPMiddleware(app, enabled=True, include_paths=["/aitools/v1"])
 
         mock_request = MagicMock()
         mock_request.url.path = "/aitools/v1/test"
@@ -147,7 +147,7 @@ class TestOTLPMiddleware:
     def test_build_span_attributes(self) -> None:
         """Test _build_span_attributes builds correct attributes."""
         app = MagicMock()
-        middleware = OTLPMiddleware(app)
+        middleware = OTLPMiddleware(app, enabled=True)
 
         mock_request = MagicMock()
         mock_request.method = "POST"
@@ -187,7 +187,7 @@ class TestOTLPMiddlewareWithDynamicRoutes:
         app = FastAPI()
         app.add_middleware(
             OTLPMiddleware,
-            enabled="0",  # For Unit tests, we disable OTLP
+            enabled=False,  # For Unit tests, we disable OTLP
         )
 
         router = APIRouter(prefix="/aitools/v1")
