@@ -36,6 +36,11 @@ from plugin.link.utils.json_schemas.read_json_schemas import (
     get_tool_debug_schema,
 )
 from plugin.link.utils.json_schemas.schema_validate import api_validate
+from plugin.link.utils.open_api_schema.response_filter import (
+    filter_response_by_x_display,
+    get_missing_visible_declared_paths,
+    should_ignore_validation_error_by_x_display,
+)
 from plugin.link.utils.open_api_schema.schema_parser import OpenapiSchemaParser
 from plugin.link.utils.uid.generate_uid import new_uid
 
@@ -223,18 +228,52 @@ def process_authentication(
             message_query.update(api_key_dict)
 
 
-def validate_response_schema(
+def validate_response_schema(  # noqa: C901
     result_json: Any, open_api_schema: Dict[str, Any]
 ) -> List[str]:
     """Validate response against schema and return error messages."""
     response_schema = get_response_schema(open_api_schema)
+    er_msgs: List[str] = []
+
+    try:
+        missing_visible_paths = get_missing_visible_declared_paths(
+            result_json,
+            response_schema,
+            open_api_schema,
+        )
+    except Exception as missing_paths_err:
+        logger.exception(
+            "get_missing_visible_declared_paths failed, "
+            f"fallback to []: {missing_paths_err}"
+        )
+        missing_visible_paths = []
+    for missing_path in missing_visible_paths:
+        er_msgs.append(
+            f"参数路径: {missing_path}, 错误信息: 字段在schema中已声明且可见，但在response中缺失"
+        )
+
     import jsonschema
 
     errs = list(jsonschema.Draft7Validator(response_schema).iter_errors(result_json))
-    er_msgs = []
     for err in errs:
+        try:
+            if should_ignore_validation_error_by_x_display(
+                err,
+                response_schema,
+                open_api_schema,
+            ):
+                continue
+        except Exception as ex:
+            logger.exception(
+                "should_ignore_validation_error_by_x_display failed, "
+                f"fallback to not ignore: {ex}"
+            )
+
         err_msg = err.message
         if err_msg.startswith("None is not of type"):
+            # Legacy compatibility behavior:
+            # when a field is null but schema expects a concrete type,
+            # patch the response in-place with a default value if possible.
             key_type = err_msg.split("None is not of type")[1]
             key_type = key_type.strip("")
             path = err.json_path
@@ -247,6 +286,7 @@ def validate_response_schema(
                     break
                 path_ = path_list[i]
                 if "[" in path_ and "]" in path_:
+                    # Navigate array segment like users[0].
                     array_name, array_index = process_array(path_)
                     root = root.get(array_name)
                     root = root[array_index]
@@ -454,6 +494,13 @@ async def process_http_result(
             m,
             tool_id,
             tool_type,
+        )
+
+    try:
+        result_json = filter_response_by_x_display(result_json, open_api_schema)
+    except Exception as err:
+        logger.exception(
+            f"filter_response_by_x_display failed, fallback to original result: {err}"
         )
 
     span_context.add_info_events({"before result": result})
@@ -714,7 +761,9 @@ async def http_run(run_params: HttpRunRequest) -> HttpRunResponse:
         )
 
 
-async def tool_debug(tool_debug_params: ToolDebugRequest) -> ToolDebugResponse:
+async def tool_debug(  # noqa: C901
+    tool_debug_params: ToolDebugRequest,
+) -> ToolDebugResponse:
     """Tool debugging interface."""
     run_params_list = tool_debug_params.dict()
     app_id, uid, caller = extract_request_params(run_params_list)
@@ -800,6 +849,13 @@ async def tool_debug(tool_debug_params: ToolDebugRequest) -> ToolDebugResponse:
                     m,
                     tool_id,
                     tool_type or "",
+                )
+
+            try:
+                result_json = filter_response_by_x_display(result_json, openapi_schema)
+            except Exception as err:
+                logger.exception(
+                    f"filter_response_by_x_display failed, fallback to original result: {err}"
                 )
 
             span_context.add_info_events({"before result": result})

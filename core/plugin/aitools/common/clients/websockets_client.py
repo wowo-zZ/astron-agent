@@ -11,6 +11,7 @@ from typing import Any, AsyncIterator, Dict, List, Optional
 
 import websockets
 from common.utils.hmac_auth import HMACAuth
+from loguru import logger as log
 from plugin.aitools.common.clients.adapters import (
     InstrumentedClient,
     NoOpSpanAdapter,
@@ -20,7 +21,6 @@ from plugin.aitools.common.clients.hooks import WebSocketSpanHooks
 from plugin.aitools.common.clients.task_factory import AsyncIOTaskFactory, TaskFactory
 from plugin.aitools.common.exceptions.error.code_enums import CodeEnums
 from plugin.aitools.common.exceptions.exceptions import WebSocketClientException
-from plugin.aitools.common.log.logger import log
 
 
 class WebSocketClient(InstrumentedClient):
